@@ -1809,6 +1809,7 @@
   (let [runner (get @selected-mode :name)
         syntax (get @selected-mode :syntax)
         ttype  (get @selected-mode :type)
+        client-name @(ut/tracked-sub ::bricks/client-name {})
         ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
         ;; is-rf-event? (and (or (= runner :views) (= runner :clover))
         ;;                   (cstr/starts-with? (cstr/trim command) "[:dispatch"))
@@ -1825,6 +1826,7 @@
                   command ;; the "implied string"
                   (ensure-quoted-string (cstr/replace command "\"" "\\\"")))
         opts-map (if (= runner :fabric) {:model (get @fbc-selected-model runner) 
+                                         :client-name client-name
                                          :pattern (get @fbc-selected-pattern runner)} {})]
     (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
@@ -2751,22 +2753,43 @@
                                                                                              (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])
                                                                                                    react! [@db/data-browser-query @db/value-spy]
                                                                                                    spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
-                                                                                               ^{:key (str "cm-" selected-block s-kp spy-hash ;; important!
+                                                                                               ^{:key (str "cm-" selected-block s-kp spy-hash   ;; important!
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [re-com/h-box
-                                                                                                :children [[bricks/reecatch [flows/alert-box selected-block data-key]]
+                                                                                                :children [[bricks/reecatch
+                                                                                                            [flows/alert-box selected-block data-key]]
                                                                                                            [bricks/panel-code-box
-                                                                                                           (fn [] selected-block) ;; sneaky sneaky, react.... :/
-                                                                                                           (fn [] s-kp)
-                                                                                                           (+ 17 single-width) (- single-height 20)
-                                                                                                           (if (nil? selected-kp)
-                                                                                                             selected-panel-map
-                                                                                                             (get-in selected-panel-map selected-kp)) repl? true nil]]])
-                                                                                             [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
-                                                                                              (if (nil? selected-kp)
-                                                                                                selected-panel-map
-                                                                                                (get-in selected-panel-map selected-kp))
-                                                                                              syntax])))))]
+                                                                                                            (fn [] selected-block) ;; sneaky sneaky, react.... :/
+                                                                                                            (fn [] s-kp)
+                                                                                                            (+ 17 single-width) (- single-height 20)
+                                                                                                            (if (nil? selected-kp)
+                                                                                                              selected-panel-map
+                                                                                                              (get-in selected-panel-map selected-kp)) repl? true nil]]])
+                                                                                             
+                                                                                            ;;  [bricks/panel-string-box 
+                                                                                            ;;   selected-kp (+ 17 single-width) (- single-height 20)
+                                                                                            ;;   (if (nil? selected-kp)
+                                                                                            ;;     selected-panel-map
+                                                                                            ;;     (get-in selected-panel-map selected-kp))
+                                                                                            ;;   syntax]
+
+                                                                                             (let [react! [@db/data-browser-query @db/value-spy]
+                                                                                                   spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
+
+                                                                                               ^{:key (str "cm-string-" selected-block s-kp spy-hash   ;; important!
+                                                                                                           (get-in @db/value-spy [selected-block data-key]))}
+                                                                                               [re-com/h-box
+                                                                                                :children [[bricks/reecatch
+                                                                                                            [flows/alert-box selected-block data-key]]
+                                                                                                           [bricks/panel-string-box
+                                                                                                            (fn [] selected-block)
+                                                                                                            (fn [] s-kp)
+                                                                                                            (+ 17 single-width)  (- single-height 20)
+                                                                                                            (if (nil? selected-kp)
+                                                                                                              selected-panel-map
+                                                                                                              (get-in selected-panel-map selected-kp))
+                                                                                                            syntax
+                                                                                                            repl? true nil]]]))))))]
             (when (and system-panel? (= @db/editor-mode :status))
               [re-com/box :child (str websocket-status) :style
                {:color        (str (theme-pull :theme/editor-font-color nil) 77) ;; "#ffffff44"

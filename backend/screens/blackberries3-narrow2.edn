@@ -10,41 +10,62 @@
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 1,
+     :distinct 58,
      :group-by? true,
      :commons {},
-     :cardinality 100}},
-   :rowcount 1},
-  :fields-sys {:fields {}, :rowcount 0},
+     :cardinality 59}},
+   :rowcount 97},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons
+     {"last_seen_seconds" 1, "recent_messages_per_second" 1, "client_latency" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"INTEGER" 11, "TEXT" 5, "TIMESTAMP" 1},
+     :cardinality 17},
+    :data_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"integer" 11, "string" 5, "datetime" 1},
+     :cardinality 17}},
+   :rowcount 17},
   :tables-sys
   {:fields
    {:db_schema
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"none" 24},
-     :cardinality 4},
+     :commons {"none" 25},
+     :cardinality 3},
     :db_catalog
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 24},
-     :cardinality 4},
+     :commons {nil 25},
+     :cardinality 3},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"system-db" 24},
-     :cardinality 4},
+     :commons {"system-db" 25},
+     :cardinality 3},
     :schema_cat
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {nil 24},
-     :cardinality 4},
+     :commons {nil 25},
+     :cardinality 3},
     :table_name
     {:data-type "string",
-     :distinct 24,
+     :distinct 25,
      :group-by? true,
      :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
      :cardinality 100},
@@ -53,8 +74,8 @@
      :distinct 15,
      :group-by? false,
      :commons {6 4, 5 3, 15 3},
-     :cardinality 62}},
-   :rowcount 24},
+     :cardinality 60}},
+   :rowcount 25},
   :new-query
   {:fields
    {:diff
@@ -170,38 +191,47 @@
   {:fields
    {:client-name
     {:data-type "keyword",
-     :distinct 11,
+     :distinct 7,
      :group-by? true,
      :commons {},
      :cardinality 100},
     :ticks
     {:data-type "integer",
-     :distinct 10,
+     :distinct 7,
      :group-by? true,
      :commons {},
-     :cardinality 90}},
-   :rowcount 11},
+     :cardinality 100}},
+   :rowcount 7},
+  :hare-vw-7
+  {:fields
+   {:vec-val
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 9},
   :connections-sys
   {:fields
    {:database_name
     {:data-type "string",
      :distinct 3,
      :group-by? true,
-     :commons {"*cache-db*" 4, "SQLite" 3, "*csv-import-db*" 1},
-     :cardinality 37},
+     :commons {"*cache-db*" 5, "SQLite" 3, "*csv-import-db*" 1},
+     :cardinality 33},
     :connection_id
     {:data-type "string",
-     :distinct 8,
+     :distinct 9,
      :group-by? true,
-     :commons {"cache.db" 1, "flows-db" 1, "snifftmp2" 1},
+     :commons {"history-db" 1, "imported" 1, "bigfoot-ufos" 1},
      :cardinality 100},
     :styler_highlight_8717ss
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {1 8},
-     :cardinality 12}},
-   :rowcount 8},
+     :commons {1 9},
+     :cardinality 11}},
+   :rowcount 9},
   :reco-counts {:fields {}, :rowcount 0},
   :client-memory-drag-36
   {:fields
@@ -278,11 +308,12 @@
      :cardinality 100}},
    :rowcount 50}},
  :default-col-widths
- {:virtual-panel {:kick-812421489 511},
+ {:virtual-panel {:kick--1171317173 511, :kick-473473616 511, :kick-812421489 511},
   :block-11015 {:new-clojure-2 255},
   :system-connections-list* {:connections-sys 126},
   :system-tables-list* {:tables-sys 133},
-  :system-fields-list* {:fields-sys ##Inf}},
+  :system-fields-list* {:fields-sys 170},
+  :block-4481 {:hare-vw-7 111}},
  :runstream-drops nil,
  :tabs
  ["generated lass of the woodlands"
@@ -344,7 +375,10 @@
     "Neuromancer. The lane to the land of the dead."],
    :eleven-labs-api-key nil,
    :modes
-   {:pre
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
@@ -355,12 +389,10 @@
        :font-family :theme/monospaced-font}}
      [:string3 :*data]],
     :edn [:edn :*data],
-    :text [:console :*data],
-    :terminal [:terminal :*data],
-    :data [:data-viewer :*data],
+    :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
-    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
-    :clover [:box :child :*data]},
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
    :kits {},
    :clover-templates
    {:color-theft
@@ -527,6 +559,7 @@
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "repl-demo-july23"
     "repl-tests-3"
     "retro-machines"
     "riffle-test"
@@ -545,6 +578,7 @@
     "tallica-param-test2"
     "tangerine-dreams"
     "technicolor-shanny"
+    "test-blog-screen"
     "the-future-soon"
     "the-generated-lass"
     "the-generated-lass-glow"
@@ -575,30 +609,39 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [355804614 331365146 4294705152],
- :client-name :phenomenal-chocolate-hare-4,
- :alt-key-held? false,
+ :memory [245627178 166518618 4294705152],
+ :client-name :soulful-lavender-mole-25,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2660, :h 1678},
- :implicit-rowsets {:solver [:new-clojure-3 :new-clojure-2 nil]},
- :post-meta {:tables-sys {:* {:rowcount 24}}},
+ :window {:w 2696, :h 1630},
+ :quake-console? false,
+ :implicit-rowsets
+ {:solver [nil :new-clojure-2 :new-clojure-3], :clover [:hare-vw-7]},
+ :post-meta {:connections-sys {:* {:rowcount 9}}},
  :status
  {:alert1 {:alerts :alert2},
   :heartbeat
   {:kick
-   [:solver/raw-custom-override707250133
-    :solver-status/phenomenal-chocolate-hare-4>raw-custom-override707250133>running?
-    :flow-status/a-random-wow>*running?
+   [:time/second=30
+    :solver-status/soulful-lavender-mole-25>raw-custom-override-1395171372>running?
+    :solver-status/soulful-lavender-mole-25>raw-custom-override-1541577870>running?
+    :signal/every-30-seconds?
+    :solver-status/soulful-lavender-mole-25>raw-custom-override-1569630808>running?
+    :solver/raw-custom-override-1395171372
+    :solver-meta/raw-custom-override-1569630808>output>evald-result>out
+    :time/second=0
+    :solver/raw-custom-override-1569630808
+    :time/minute
+    :time/hour
+    :solver/raw-custom-override-1541577870
     :flow-status/live-scratch-flow>*running?
-    :solver-status/phenomenal-chocolate-hare-4>raw-custom-override707250133
-    :solver-meta/raw-custom-override707250133
-    :solver-meta/raw-custom-override707250133>output>evald-result>out]}},
+    :time/second
+    :flow-status/a-random-wow>*running?]}},
  :screen-name "blackberries3-narrow2",
  :recos-page2 0,
- :selected-tab "Persian blue cat",
+ :selected-tab "beige whale",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -610,14 +653,15 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   3396
+   1329
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"a-random-wow" nil},
+ :panels-hash -2012646990,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 256216451,
+ :user-params-hash 146915173,
  :grid-recos? true,
- :preview-keys2 [],
+ :session-hash -357309782,
  :resolved-queries
  {:client-memory-drag-36
   {:select
@@ -859,8 +903,8 @@
    :w 8,
    :selected-mode {:new-clojure-3 :data},
    :selected-view :hare-vw-10,
-   :root [44 21],
-   :h 7,
+   :root [44 20],
+   :h 8,
    :queries {},
    :tab "beige whale",
    :minimized? false,
@@ -1137,18 +1181,43 @@
    :name "editor-block-9713-hare-vw",
    :root [22 3],
    :tab "effective pheasant"},
+  :block-2236
+  {:h 3,
+   :w 11,
+   :root [41 9],
+   :tab "beige whale",
+   :selected-view :hare-vw-2,
+   :name "block-2236",
+   :views
+   {:hare-vw-2
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "90px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string3 :time/hour "." :time/minute "." :time/second]]},
+   :queries {}},
   :block-721
   {:clojure
    {:new-clojure
     (do
       (ns rvbbit-backend.websockets)
-      (let [timer :signal/every-30-seconds? cw :col-width]
+      (let [timer [:time/second=30 :time/second=0] cw :col-width]
         (println cw)
         (draw-client-stats
           :new-clojure-2.*/client-name
           (sort (or :hare-vw-7.*/vec-val []))
           (or :new-clojure-3.*/data-viewer [])
-          true
+          false
           cw)))},
    :name "block-721",
    :w 39,
@@ -1166,8 +1235,8 @@
    :w 3,
    :selected-mode {:hare-vw-7 :rowset},
    :selected-view :hare-vw-7,
-   :root [41 21],
-   :h 7,
+   :root [41 20],
+   :h 8,
    :queries {},
    :tab "beige whale",
    :views {:hare-vw-7 [1 15 30 45 60 90 120 200 600]}},
@@ -1229,7 +1298,7 @@
    :queries {}},
   :block-9432
   {:h 8,
-   :w 12,
+   :w 11,
    :views
    {:editor-block-721-new-clojure [:editor [:block-721 :clojure :new-clojure]]},
    :name "editor-block-721-new-clojure",
@@ -1644,7 +1713,7 @@
       :font-family :theme/base-font}
      :child
      "It's a perfect day for planting seeds and planning adventures!"]}}},
- :selected-block :block-179,
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#2A3959",
   "boolean" "#13283E",
@@ -1691,7 +1760,13 @@
    :blocks 3,
    :queries 0,
    :ts "2024-03-24 00:18:04"},
-  :time {:second 20, :now "Friday, July 19th 12:41PM", :minute 51},
+  :time
+  {:second 30,
+   :now "Friday, July 19th 12:41PM",
+   :minute 57,
+   :second=0 1722193020780,
+   :second=30 1722193050780,
+   :hour 14},
   :clover-hop {},
   :viz-tables-sys2 {:table_name :client-memory-drag-36},
   :client-stats-drag-36
@@ -1781,10 +1856,24 @@
    :wealthy-thin-lark-35>stats>recent-messages-per-second nil,
    :thrilling-icosahedral-raccoon-3>stats>client-name nil},
   :param
-  {:selected-view [:views :pulled-val],
+  {:selected-view [:views :hare-vw-2],
    :selected-view-data
-   [:data-viewer [:get-in [nil [:surprising-puce-squirrel-24]]]],
-   :selected-block :block-179,
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "90px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    [:string3 :time/second]],
+   :selected-block :block-2236,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
    :super-cobalt-mole ["1121pm - 229mb"]},
@@ -1894,11 +1983,12 @@
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
-  :new-clojure-2.* {},
+  :new-clojure-2.*
+  {:client-name [:soulful-lavender-mole-25 :thorough-globular-skunk-15]},
   :hare-v23232w {:vec-val :testa3},
   :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
   :hare-vw-7.* {:vec-val [200 90 45 15]},
-  :sys {:selected-tab "Persian blue cat", :selected-tab-idx 5},
+  :sys {:selected-tab "beige whale", :selected-tab-idx 2},
   :block-6551 {:clover-hop-1 nil},
   :client-memory-drag-36
   {:client_name ":friendly-wide-grasshopper-40",

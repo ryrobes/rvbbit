@@ -38,30 +38,34 @@
  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
    (get-in db [::sockets socket-id :subscriptions])))
 
+(defonce last-http-panel-push (atom nil))
 
 (re-frame/reg-event-db
  ::update-panels-hash
  (fn [db _]
-   (let [pp          (get db :panels)
+   (if  (or (nil? @last-http-panel-push) ;; debounce this expensive client call 
+            (> (- (get-in db [:re-pollsive.core/polling :counter]) @last-http-panel-push) 600))
+     (let [pp          (get db :panels)
+           _ (reset! last-http-panel-push (get-in db [:re-pollsive.core/polling :counter]))
               ;;ppr         {} ;;; TEMP!
               ;; ppr         (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
               ;;                        {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace vv)})))}))
               ;; ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
               ;;                         {k (materialize-values v)}))
-         new-h       (hash (ut/remove-underscored pp))
-         client-name (get db :client-name)]
-     (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
-     (ut/dispatch-delay 800 [::insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
+           new-h       (hash pp) ;; (hash (ut/remove-underscored pp))
+           client-name (get db :client-name)]
+       (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
+       (ut/dispatch-delay 800 [::insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
      ;;(conn/push-panels-to-server pp ppr client-name)
-     (ut/tracked-dispatch
-      [::wfx/push :default
-       {:kind :current-panels
-        :panels pp
-        :materialized-panels {} ;ppm
-        :resolved-panels {} ;ppr
-        :client-name client-name}])
+       (ut/tracked-dispatch
+        [::wfx/push :default
+         {:kind :current-panels
+          :panels pp
+          :materialized-panels {} ;ppm
+          :resolved-panels {} ;ppr
+          :client-name client-name}])
      ;;(when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
-     (assoc db :panels-hash new-h))))
+       (assoc db :panels-hash new-h)) db)))
 
 
 (defn options [x]
@@ -532,11 +536,11 @@
               kick?                       (= ui-keypath :kick)
               counts?                     (= task-id :cnts)
               heartbeat?                  (= task-id :heartbeat)
-              alert?                      (= task-id :alert1)
+              alert?                      (cstr/starts-with? (str task-id) ":alert")
               server-sub?                 (and kick?
                                                (contains? valid-task-ids (get-in result [:task-id 0]))
-                                               (not heartbeat?))                                                     
-              flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) 
+                                               (not heartbeat?))
+              flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?))
               settings-update?            (and kick? (= (get-in result [:task-id 0]) :settings) (not heartbeat?))
               flow-runner-tracker-blocks? (and kick? (= (get-in result [:task-id 0]) :tracker-blocks) (not heartbeat?))
               flow-runner-acc-tracker?    (and kick? (= (get-in result [:task-id 0]) :acc-tracker) (not heartbeat?))
@@ -545,7 +549,7 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
-          ;; (when (cstr/starts-with? (str client-name) ":reliable-" )  (ut/tapp>> [:task-id result]))
+          (when (cstr/starts-with? (str client-name) ":power" )  (ut/tapp>> [:msg-in (get result :task-id) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))

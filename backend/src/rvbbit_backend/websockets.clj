@@ -10,7 +10,7 @@
    [nextjournal.beholder      :as beholder]
    [io.pedestal.http          :as http]
    [rvbbit-backend.surveyor   :as surveyor]
-   [rvbbit-backend.fabric     :as fbc]
+   ;;[rvbbit-backend.fabric     :as fbc]
    [clojure.java.shell        :as shell]
    [rvbbit-backend.assistants :as assistants]
    [flowmaps.db               :as flow-db]
@@ -1908,10 +1908,10 @@
 
 (def client-batches (atom {}))
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :tracker :alert1}) ;; to not skip old dupes
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :tracker :alert :alert1 :alert2 :alert3}) ;; to not skip old dupes
 (def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
-(defn sub-push-loop
+(defn sub-push-loop ;; legacy, but flawed?
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
@@ -1937,6 +1937,75 @@
              (recur)))
          (catch Throwable e (ut/pp [:subscription-err!! sub-name (str e) data]) (async/go-loop [] (recur))))
     results))
+
+;; (defn sub-push-loop
+;;   [client-name data cq sub-name]
+;;   (when (not (get @cq client-name)) (new-client client-name))
+;;   (inc-score! client-name :booted true)
+;;   (let [results (async/chan (async/sliding-buffer 100))]
+;;     (try (async/go-loop []
+;;            (async/<! (async/timeout (safe-get-timeout client-name)))
+;;            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
+;;              (let [items            (loop [res []]
+;;                                       (if-let [item (ut/dequeue! queue-atom)]
+;;                                         (recur (conj res item))
+;;                                         res))
+;;                    ;;_ (ut/pp  [:sub-loop client-name items])
+;;                    items-by-task-id (group-by :task-id items)
+;;                    latest-items     (mapcat (fn [[task-id group]]
+;;                                               (if (contains? valid-groups task-id)
+;;                                                 group  ; Keep all items for valid groups
+;;                                                 [(last group)]))  ; Only keep the last item for other groups
+;;                                             items-by-task-id)]
+;;                (if (not-empty latest-items)
+;;                  (let [_ (swap! client-batches update client-name (fnil inc 0))
+;;                        message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
+;;                    (when (async/>! results message) (recur)))
+;;                  (recur)))
+;;              (recur)))
+;;          (catch Throwable e (ut/pp [:subscription-err!! sub-name (str e) data]) (async/go-loop [] (recur))))
+;;     results))
+
+;; (defn sub-push-loop
+;;   [client-name data cq sub-name]
+;;   (when (not (get @cq client-name)) (new-client client-name))
+;;   (inc-score! client-name :booted true)
+;;   (let [results (async/chan (async/sliding-buffer 100))]
+;;     (try
+;;       (async/go-loop []
+;;         (async/<! (async/timeout (safe-get-timeout client-name)))
+;;         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
+;;           (let [items (loop [res []]
+;;                         (if-let [item (ut/dequeue! queue-atom)]
+;;                           (recur (conj res item))
+;;                           res))
+;;                 items-by-task-id (group-by :task-id items)]
+
+;;             ;; Process valid-groups items first, sending each individually
+;;             (doseq [[task-id group] items-by-task-id
+;;                     :when (contains? valid-groups task-id)
+;;                     item group]
+;;               (swap! client-batches update client-name (fnil inc 0))
+;;               (async/>! results item))
+
+;;             ;; Process non-valid-groups items, sending only the latest
+;;             (let [latest-non-valid-items (keep (fn [[task-id group]]
+;;                                                  (when-not (contains? valid-groups task-id)
+;;                                                    (last group)))
+;;                                                items-by-task-id)]
+;;               (when (seq latest-non-valid-items)
+;;                 (swap! client-batches update client-name (fnil inc 0))
+;;                 (let [message (if (= 1 (count latest-non-valid-items))
+;;                                 (first latest-non-valid-items)
+;;                                 latest-non-valid-items)]
+;;                   (async/>! results message))))
+
+;;             (recur))
+;;           (recur)))
+;;       (catch Throwable e
+;;         (ut/pp [:subscription-err!! sub-name (str e) data])
+;;         (async/go-loop [] (recur))))
+;;     results))
 
 
 (defmethod wl/handle-subscription :server-push2
@@ -2243,24 +2312,24 @@
 
 
 (defn push-to-history-db [client-name panels comp-atom tname]
-  (let [runner-keys (vec (keys (get (config/settings) :runners)))
-        _ (ut/pp [:runner-keys runner-keys])
+  (let [;;runner-keys (vec (keys (get (config/settings) :runners)))
+        ;;_ (ut/pp [:runner-keys runner-keys])
         prev-data   (get @comp-atom client-name)
-        _           (ut/pp [:push-to-hist client-name tname (keys @comp-atom)])
+        ;;_           (ut/pp [:push-to-hist client-name tname (keys @comp-atom)])
         changed-paths (find-changed-paths prev-data panels)
         diffy-kps   (vec (filter #(and ;(not (= (count %) 1))
                                        (= (count %) 3)
                                        ;(not (some (fn [x] (= (last %) x)) runner-keys))
                                        )
                                  changed-paths))
-        _ (ut/pp [:diffy  diffy-kps tname])
-        _ (ut/pp [:diffy2 tname  ])
+        ;;_ (ut/pp [:diffy  diffy-kps tname])
+        ;;_ (ut/pp [:diffy2 tname  ])
         table-name  (keyword (str tname  "-history"))
         rows        (vec (for [kp diffy-kps
                                :let [data  (get-in panels kp)
                                      pdata (get-in prev-data kp)
                                      pdiff (deep-diff pdata data)
-                                     _ (ut/pp [:diff-in kp data pdata pdiff])
+                                     ;;_ (ut/pp [:diff-in kp data pdata pdiff])
                                      ]]
                            {:kp          (str kp)
                             :client_name (str client-name)
@@ -2271,7 +2340,7 @@
                             :panel_key   (str (first kp))
                             :key         (str (last kp))
                             :type        (str (second kp))}))
-        _ (ut/pp [:diffy3 (count rows) tname])
+        ;;_ (ut/pp [:diffy3 (count rows) tname])
         ins-sql     {:insert-into [table-name] :values rows}]
     (when (ut/ne? rows)
       (sql-exec history-db (to-sql ins-sql))))
@@ -2398,6 +2467,9 @@
         {:status :ok :file-path full-path})))
 
 
+(declare get-fabric-patterns)
+(declare get-fabric-models)
+
 (defn get-audio
   [request]
   (let [jss  (get request :json-params)
@@ -2426,8 +2498,8 @@
                                                                 :from     [[:screens :jj24a7a]]
                                                                 :group-by [:screen_name]
                                                                 :order-by [[1 :asc]]}))))})
-        fabric-patterns (fbc/get-fabric-patterns)
-        fabric-models   (fbc/get-fabric-models)
+        fabric-patterns (get-fabric-patterns)
+        fabric-models   (get-fabric-models)
         settings (-> settings
                      (assoc-in [:runners :fabric :patterns] fabric-patterns)
                      (assoc-in [:runners :fabric :models] fabric-models))]
@@ -3002,7 +3074,7 @@
 
 (defn alert!
   [client-name content w h duration & [type]]
-  (push-to-client [:alerts] [content w h duration] client-name -1 :alert1 :alert2)
+  (push-to-client [:alerts] [content w h duration] client-name -1 (rand-nth [:alert1 :alert2 :alert3]) (or type :alert2))
   :alerted!)
 
 (defn ttap> [client-name x & [w h d]] (alert! client-name (if (number? x) (str x) x) (or w 10) (or h 1.35) (or d 12)))
@@ -4266,9 +4338,103 @@
   (let [s (str s)]
     (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
 
-(defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? cache-key]
+(defn sample-alert-clover [sample-message-lines sample-error solver-name]
+  [:v-box
+   :gap "6px"
+   :children
+   [;[:box :style {:font-size "13px"} :child (str solver-name " - " (get-in output-full [:sampled :message]))]
+    [:box
+     :style {:font-size "16px"}
+     :child (str (first sample-message-lines) ".")]
+  
+    [:h-box
+     :style {:font-size "13px"}
+     :gap "12px"
+     :children (vec (for [x (rest sample-message-lines)]
+                      [:v-box
+                       :gap "6px"
+                       :children (let [ss (cstr/split x #"\: ")]
+                                   [[:box
+                                     :style {:font-size "15px"}
+                                     :child (str (first ss))]
+                                    [:v-box
+                                     :style {:opacity 0.9 :font-weight 700}
+                                     :children (vec (for [e (rest (cstr/split (str (last ss)) #"\, "))
+                                                          :let [e (cond
+                                                                    (cstr/ends-with? e "items")
+                                                                    [:h-box
+                                                                     :gap "8px"
+                                                                     :justify :between
+                                                                     :children
+                                                                     [[:box :child (ut/nf (edn/read-string (first (cstr/split e #" "))))]
+                                                                      [:box
+                                                                       :style {:opacity 0.5}
+                                                                       :child "values"]]]
+  
+                                                                    (cstr/includes? e "size")
+                                                                    [:h-box
+                                                                     :gap "8px"
+                                                                     :justify :between
+                                                                     :children
+                                                                     [[:box
+                                                                       :style {:opacity 0.5}
+                                                                       :child "est size"]
+                                                                      [:box :child (let [result (last (cstr/split e #"size "))
+                                                                                         truncated (if (.endsWith result ".")
+                                                                                                     (.substring result 0 (- (.length result) 1))
+                                                                                                     result)]
+                                                                                     truncated)]]]
+  
+                                                                    (cstr/starts-with? e "dimensions")
+                                                                    [:h-box
+                                                                     :gap "8px"
+                                                                     :justify :between
+                                                                     :children
+                                                                     [[:box
+                                                                       :style {:opacity 0.5}
+                                                                       :child "key depth"]
+                                                                      [:box :child (cstr/join " x " (map #(-> % edn/read-string ut/nf str)
+                                                                                                         (cstr/split (last (cstr/split e #" ")) #"x")))]]]
+                                                                    :else e)]]
+                                                      [:box
+                                                       :child e]))]])]))]
+  
+    [:box :style {:font-size "11px"} :child (str sample-error)]
+    [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]]])
+
+(defn fabric-post-process [client-name fabric-opts-map output elapsed-ms is-history?]
+  (let [{:keys [pattern id input]} fabric-opts-map]
+    (ut/pp  [:fabric-post-process client-name fabric-opts-map elapsed-ms is-history?])
+    ;;(Thread/sleep 1000) ;; testing alert collisions
+    (when (not is-history?)
+      (alert! client-name
+              [:v-box
+               :justify :center
+             ;:style {:opacity 0.7}
+               :children
+               [[:box
+                 :style {:color :theme/editor-outer-rim-color
+                         :font-weight 700}
+                 :child
+                 [:v-box
+                  :size "auto"
+                  :children [[:box
+                              :style {:font-size "14px"}
+                              :child (str "Fabric has completed it's " pattern " pattern.")]
+                             [:box
+                              :style {:font-size "12px"}
+                              :child [:speak (if (vector? output)
+                                               (cstr/join "\n" output)
+                                               output)]]]]]]]
+              16
+              nil
+              20 :fabric-response))))
+
+(defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key]
   (try (let [repl-host                   (get-in runner-map [:runner :host])
              repl-port                   (get-in runner-map [:runner :port])
+             is-fabric?                   (cstr/includes? (str vdata) "fabric-run")
+             _ (ut/pp [:nrepl-call runner-name is-fabric? solver-name client-name])
              {:keys [result elapsed-ms]} (ut/timed-exec
                                           (ppy/execute-in-thread-pools-but-deliver (keyword (str "serial-nrepl-instance/" (cstr/replace (str solver-name) ":" "")))
                                            ;;:nrepl-evals 
@@ -4276,11 +4442,14 @@
                                                                                    (fn []
                                                                                      (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
              output-full                 result
-             sampled?                    true ;(get-in output-full [:sampled :sampling-details])
+             sampled?                    (get-in output-full [:sampled :sampling-details])
              output                      (if sampled?
                                            (get-in output-full [:sampled :data])
                                            (last (get-in output-full [:evald-result :value])))
              output                      (if (nil? output) "(returns nil value)" output)
+             fabric-opts-map             (when is-fabric? (last output))
+             output                      (if is-fabric? (first output) output)
+             ;;_ (when is-fabric? (ut/pp [:fabric fabric-opts-map output]))
              output-full                 (-> output-full
                                              (assoc-in [:evald-result :output-lines]
                                                        (try (count (remove empty?
@@ -4301,6 +4470,7 @@
              output                      (if error?
                                            (select-keys (get output-full :evald-result) [:root-ex :ex :err])
                                            output)]
+         (when is-fabric? (fabric-post-process client-name fabric-opts-map output elapsed-ms is-history?))
          (when sampled?
            (try
              (let [sample-message (get-in output-full [:sampled :message] "")
@@ -4309,97 +4479,10 @@
                    sample-error   (get-in output-full [:sampled :error] "")
                    sample-details (get-in output-full [:sampled :sampling-details] {})]
                (alert! client-name
-                       [:v-box
-                        :gap "6px"
-                        :children
-                        [;[:box :style {:font-size "13px"} :child (str solver-name " - " (get-in output-full [:sampled :message]))]
-                         [:box
-                          :style {:font-size "16px"}
-                          :child (str (first sample-message-lines) ".")]
-                         
-                         [:h-box 
-                          :style {:font-size "13px"}
-                          :gap "12px"
-                          :children (vec (for [x (rest sample-message-lines)] 
-                                           [:v-box
-                                            :gap "6px"
-                                            :children (let [ss (cstr/split x #"\: ")]
-                                                        [[:box 
-                                                          :style {:font-size "15px"}
-                                                          :child (str (first ss))]
-                                                         [:v-box 
-                                                          :style {:opacity 0.9 :font-weight 700}
-                                                          :children (vec (for [e (rest (cstr/split (str (last ss)) #"\, "))
-                                                                               :let [e (cond
-                                                                                         (cstr/ends-with? e "items")
-                                                                                         [:h-box
-                                                                                          :gap "8px"
-                                                                                          :justify :between
-                                                                                          :children
-                                                                                          [[:box :child (ut/nf (edn/read-string (first (cstr/split e #" "))))]
-                                                                                           [:box
-                                                                                            :style {:opacity 0.5}
-                                                                                            :child "values"]]]
-                                                                                         
-                                                                                         (cstr/includes? e "size")
-                                                                                         [:h-box
-                                                                                          :gap "8px"
-                                                                                          :justify :between
-                                                                                          :children
-                                                                                          [[:box
-                                                                                            :style {:opacity 0.5}
-                                                                                            :child "est size"]
-                                                                                           [:box :child (let [result (last (cstr/split e #"size "))
-                                                                                                              truncated (if (.endsWith result ".")
-                                                                                                                          (.substring result 0 (- (.length result) 1))
-                                                                                                                          result)]
-                                                                                                          truncated)]
-                                                                                           ]]
-
-                                                                                         (cstr/starts-with? e "dimensions")
-                                                                                         [:h-box
-                                                                                          :gap "8px"
-                                                                                          :justify :between
-                                                                                          :children
-                                                                                          [[:box
-                                                                                            :style {:opacity 0.5}
-                                                                                            :child "key depth"]
-                                                                                           [:box :child (cstr/join " x " (map #(-> % edn/read-string ut/nf str)
-                                                                                                                              (cstr/split (last (cstr/split e #" ")) #"x")))]]]
-                                                                                         :else e)]]
-                                                                           [:box 
-                                                                            ;:min-width "130px"
-                                                                            :child e]))]]
-                                                        )]))]
-
-                        ;;  [:v-box
-                        ;;   :style {:font-size "12px"}
-                        ;;   :children [[:v-box
-                        ;;               :children [[:box :child "original"]
-                        ;;                          [:h-box :size "auto"
-                        ;;                           :children (vec (for [[k v] (get sample-details :original-structure)]
-                        ;;                                            [:v-box
-                        ;;                                             :size "auto"
-                        ;;                                             :children [[:box
-                        ;;                                                         :size "auto"
-                        ;;                                                         :child (str k)]
-                        ;;                                                        [:box
-                        ;;                                                         :size "auto"
-                        ;;                                                         :child (str v)]]]))]]]
-                        ;;              [:v-box
-                        ;;               :children [[:box :child "sampled"]
-                        ;;                          [:box :child "sampled data"]]]]]
-  
-                        ;;  [:box
-                        ;;   :size "auto"
-                        ;;   :style {:font-size "11px" :opacity 0.4}
-                        ;;   :child (str sample-details)]
-  
-                         [:box :style {:font-size "11px"} :child (str sample-error)]
-                         [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]]]
+                       (sample-alert-clover sample-message-lines sample-error solver-name)
                        13
                        nil ;2.1
-                       (if sample-details 8 20)))
+                       (if sample-details 8 20) :sample-detail))
              (catch Exception  e (ut/pp [:solver-repl-alert-error (str e) e]))))
          (swap! last-solvers-atom assoc solver-name output)
          (swap! last-solvers-atom-meta assoc
@@ -4411,7 +4494,7 @@
          (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
          (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
         ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
-         (when (and use-cache? (not error?))
+         (when (not error?) ;;(and use-cache? (not error?))
            (swap! solvers-cache-atom assoc cache-key [output output-full]))
          (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
          output)
@@ -4483,7 +4566,9 @@
           ;use-cache?            (true?
           ;                       (or (true? (not (nil? temp-solver-name))) ;; temp test
           ;                           (true? (get solver-map :cache? false))))
-          use-cache?            (true? (get solver-map :cache? false)) ;; false
+          
+          is-history?           (true? (get solver-map :history? false))
+          use-cache?            (or is-history? (true? (get solver-map :cache? false)))
           vdata                 (walk/postwalk-replace input-map (get solver-map :data))
           vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on
                                                               ;; it
@@ -4515,7 +4600,11 @@
           runner-map            (get-in (config/settings) [:runners runner-name] {})
           runner-type           (get runner-map :type runner-name)
           ;;cache-key             (pr-str [solver-name vdata runner-name])
-          cache-key             (hash [solver-map input-map])
+          sanitized-req         (ut/deep-remove-keys ;; only for cache uniqueness 
+                                 (ut/lists-to-vectors [solver-map input-map])
+                                 [:id :history? :cache?])
+          cache-key             (hash sanitized-req) ;; mostly for fabric and history cache forcing
+          _ (when (cstr/includes? (str client-name) "powerful") (ut/pp [solver-name client-name cache-key sanitized-req]))
           cache-val             (when use-cache? (get @solvers-cache-atom cache-key))
           cache-hit?            (true?  (and (and use-cache?
                                                   (ut/ne? cache-val)
@@ -4547,7 +4636,7 @@
                          meta-extra           {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms 0}}
                          timestamp-str        (str timestamp-str " (cache hit)")
                          new-history          (vec (conj (get @last-solvers-history-atom solver-name []) timestamp-str))] ;; regardless
-                   ;(ut/pp [:cached-solver-hit! solver-name])
+                     (ut/pp [:cached-solver-hit! solver-name])
                      (swap! last-solvers-atom assoc solver-name output)
                      (swap! last-solvers-atom-meta assoc
                             solver-name
@@ -4604,7 +4693,7 @@
                    (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
             (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
             (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
-            (when (and use-cache? (not error?))
+            (when (not error?) ;(and use-cache? (not error?))
               (swap! solvers-cache-atom assoc cache-key [output output-full]))
             ;;;(swap! solvers-cache-atom assoc cache-key [output output-full])
             ;(swap! solvers-running assoc-in [client-name solver-name] false)
@@ -4630,7 +4719,7 @@
 
 
         (= runner-type :nrepl)
-        (nrepl-solver-run vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? cache-key)
+        (nrepl-solver-run vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key)
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try
@@ -4677,7 +4766,7 @@
               (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
               (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
 
-              (when (and use-cache? (not error?))
+              (when (not error?) ;; (and use-cache? (not error?))
                 (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
 
               (swap! flow-db/results-atom dissoc flow-id)  ;; <-- clear out the flow atom
@@ -6768,44 +6857,216 @@
 (def booted (atom nil))
 (def clients-alive (atom nil))
 
-;; (defn average-in-chunks [data chunk-size]
-;;   (->> data
-;;        (partition-all chunk-size) ;; vector into chunks
-;;        (map (fn [chunk]
-;;               (let [sum (apply + chunk)
-;;                     count (count chunk)
-;;                     average (if (zero? sum)
-;;                               0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
-;;                               (/ sum count))] ;; Calculate average normally
-;;                 average)))))
-
-;; (defn sum-in-chunks [data chunk-size]
-;;   (->> data
-;;        (partition-all chunk-size) ;; vector into chunks
-;;        (map (fn [chunk]
-;;               (reduce + 0 chunk)))))
 
 
-(defn average-in-chunks
-  "Calculates the average of each chunk in a sequence of numbers.
-   Returns a lazy sequence of averages."
-  [data chunk-size]
+
+
+(def agg-cache (atom {}))
+
+;; (ut/pp [:math-cache (count (keys @agg-cache))])
+
+(defn avg-chunks [chunk]
+    (let [cache-key (pr-str chunk)
+          cache (get @agg-cache cache-key)]
+      (if cache
+        cache
+        (let [sum (apply + chunk)
+              count (count chunk)
+              average (if (zero? sum)
+                        0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
+                        (/ sum count))] ;; Calculate average normally
+          (swap! agg-cache assoc cache-key average)
+          average))))
+
+(defn average-in-chunks [data chunk-size n]
   (->> data
-       (partition-all chunk-size)
-       (map (fn [chunk]
-              (let [sum (reduce + 0.0 chunk)  ; Use 0.0 to ensure float division
-                    count (count chunk)]
-                (if (pos? count)
-                  (/ sum count)
-                  0.0))))))  ; Return 0.0 for empty chunks
+       (partition-all chunk-size) ;; vector into chunks
+      ;;  (pmap (fn [chunk]
+      ;;         (let [sum (apply + chunk)
+      ;;               count (count chunk)
+      ;;               average (if (zero? sum)
+      ;;                         0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
+      ;;                         (/ sum count))] ;; Calculate average normally
+      ;;           average)))
+       (map avg-chunks)))
 
-(defn sum-in-chunks
-  "Calculates the sum of each chunk in a sequence of numbers.
-   Returns a lazy sequence of sums."
-  [data chunk-size]
+(defn add-chunks [chunk]
+  (let [cache-key (pr-str chunk)
+        cache (get @agg-cache cache-key)]
+    (if cache
+      cache
+      (let [sum (reduce + 0 chunk)]
+        (swap! agg-cache assoc cache-key sum)
+        sum))))
+
+(defn sum-in-chunks [data chunk-size n]
   (->> data
-       (partition-all chunk-size)
-       (map #(reduce + 0 %))))
+       (partition-all chunk-size) ;; vector into chunks
+      ;;  (map (fn [chunk]
+      ;;         (reduce + 0 chunk)))
+       (map add-chunks)))
+
+
+
+
+;; (defn average-in-chunks
+;;   "Calculates the average of each chunk in a sequence of numbers.
+;;    Returns a lazy sequence of averages."
+;;   [data chunk-size & [n]]
+;;   (->> data
+;;        (partition-all chunk-size)
+;;        (map (fn [chunk]
+;;               (let [sum (reduce + 0.0 chunk)  ; Use 0.0 to ensure float division
+;;                     count (count chunk)]
+;;                 (if (pos? count)
+;;                   (/ sum count)
+;;                   0.0))))))  ; Return 0.0 for empty chunks
+
+;; (defn sum-in-chunks
+;;   "Calculates the sum of each chunk in a sequence of numbers.
+;;    Returns a lazy sequence of sums."
+;;   [data chunk-size & [n]]
+;;   (->> data
+;;        (partition-all chunk-size)
+;;        (map #(reduce + 0 %))))
+
+
+
+
+
+
+;; (def average-chunk
+;;   (memoize/lru
+;;    (fn [chunk]
+;;      (let [sum (reduce + 0.0 chunk)
+;;            count (count chunk)]
+;;        (if (pos? count)
+;;          (/ sum count)
+;;          0.0)))
+;;    :lru/threshold 20000))
+
+;; (def sum-chunk
+;;   (memoize/lru
+;;    (fn [chunk]
+;;      (reduce + 0 chunk))
+;;    :lru/threshold 20000))
+
+;; (defn process-in-chunks
+;;   "Processes data in chunks using the provided calculation function.
+;;    Returns a lazy sequence of results."
+;;   [calc-fn data chunk-size]
+;;   (lazy-seq
+;;    (when (seq data)
+;;      (let [chunk (vec (take chunk-size data))]
+;;        (cons (calc-fn chunk)
+;;              (process-in-chunks calc-fn (drop chunk-size data) chunk-size))))))
+
+;; (defn average-in-chunks
+;;   "Calculates the average of each chunk in a sequence of numbers.
+;;    Returns a lazy sequence of averages."
+;;   [data chunk-size & [n]]
+;;   (process-in-chunks average-chunk data chunk-size))
+
+;; (defn sum-in-chunks
+;;   "Calculates the sum of each chunk in a sequence of numbers.
+;;    Returns a lazy sequence of sums."
+;;   [data chunk-size & [n]]
+;;   (process-in-chunks sum-chunk data chunk-size))
+
+
+
+
+
+;; (defn calculate-in-chunks
+;;   "Generic function to calculate values for chunks.
+;;    calc-fn is the function to apply to each chunk (average or sum).
+;;    Returns a lazy sequence of results for all chunks, or only the last n if specified."
+;;   [data chunk-size calc-fn & [n]]
+;;   (let [chunks (partition-all chunk-size data)
+;;         result-seq (map calc-fn chunks)]
+;;     (if n
+;;       (vec (take-last n result-seq))
+;;       (lazy-seq result-seq))))
+
+;; (defn average-chunk [chunk]
+;;   (let [sum (reduce + 0.0 chunk)
+;;         count (count chunk)]
+;;     (if (pos? count)
+;;       (/ sum count)
+;;       0.0)))
+
+;; (defn sum-chunk [chunk]
+;;   (reduce + 0 chunk))
+
+;; (defn average-in-chunks
+;;   "Calculates the average of each chunk in a sequence of numbers.
+;;    Returns a lazy sequence of averages, or only the last n if specified."
+;;   [data chunk-size & [n]]
+;;   (calculate-in-chunks data chunk-size average-chunk n))
+
+;; (defn sum-in-chunks
+;;   "Calculates the sum of each chunk in a sequence of numbers.
+;;    Returns a lazy sequence of sums, or only the last n if specified."
+;;   [data chunk-size & [n]]
+;;   (calculate-in-chunks data chunk-size sum-chunk n))
+
+
+
+
+;; (def average-chunk
+;;   (memoize/lru
+;;    (fn [chunk]
+;;      (let [sum (reduce + 0.0 chunk)
+;;            count (count chunk)]
+;;        (if (pos? count)
+;;          (/ sum count)
+;;          0.0)))
+;;    :lru/threshold 20000))
+
+;; (def sum-chunk
+;;   (memoize/lru
+;;    (fn [chunk]
+;;      (reduce + 0 chunk))
+;;    :lru/threshold 20000))
+
+;; (defn process-in-chunks
+;;   "Processes data in chunks using the provided calculation function.
+;;    If n is provided, returns the last n results efficiently while maintaining correct chunk boundaries.
+;;    If n is not provided, processes and returns results for all chunks."
+;;   [calc-fn data chunk-size & [n]]
+;;   (let [chunk-count (Math/ceil (/ (count data) chunk-size))
+;;         chunks-to-process (if n (min chunk-count n) chunk-count)
+;;         start-chunk (max 0 (- chunk-count chunks-to-process))
+;;         padded-data (concat (repeat (* start-chunk chunk-size) nil) data)
+;;         relevant-chunks (partition chunk-size chunk-size nil padded-data)]
+;;     (if n
+;;       (->> relevant-chunks
+;;            (drop start-chunk)
+;;            (map calc-fn)
+;;            (take n)
+;;            vec)
+;;       (lazy-seq
+;;        (when (seq relevant-chunks)
+;;          (let [chunk (vec (remove nil? (first relevant-chunks)))]
+;;            (cons (calc-fn chunk)
+;;                  (process-in-chunks calc-fn (drop chunk-size padded-data) chunk-size))))))))
+
+;; (defn average-in-chunks
+;;   "Calculates the average of each chunk in a sequence of numbers.
+;;    If n is provided, returns the last n averages efficiently.
+;;    If n is not provided, calculates averages for all chunks."
+;;   [data chunk-size & [n]]
+;;   (process-in-chunks average-chunk data chunk-size n))
+
+;; (defn sum-in-chunks
+;;   "Calculates the sum of each chunk in a sequence of numbers.
+;;    If n is provided, returns the last n sums efficiently.
+;;    If n is not provided, calculates sums for all chunks."
+;;   [data chunk-size & [n]]
+;;   (process-in-chunks sum-chunk data chunk-size n))
+
+
+
 
 
 
@@ -6998,129 +7259,297 @@
 ;; (take-last 123 [34.5345345])
 ;; (apply min [34.5345345])
 
+;; (def draw-bar-graph
+;;   (memoize
+;;    (fn [usage-vals label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
+;;      (try
+;;        (let [console-width (if width width (- (ut/get-terminal-width) 10))
+;;              rows 5
+;;              border-width 2
+;;              label-padding 4
+;;              time-marker-interval 30
+;;              values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+;;              max-values (- console-width border-width label-padding)
+;;              num-markers (quot max-values values-per-marker)
+;;              actual-width (- max-values num-markers)
+;;              truncated (take-last actual-width usage-vals)
+;;              mmax (apply max truncated)
+;;              mmin (apply min truncated)
+;;              adjusted-min (* mmin 0.9) ; 90% to avoid zero bar 
+;;              value-range (- mmax adjusted-min)
+;;           ;; normalized (if (zero? mmax) ;; zero axis
+;;           ;;              (repeat (count truncated) 0)
+;;           ;;              (map #(int (/ (* % (* rows 8)) mmax)) truncated))
+;;              normalized (if (zero? value-range)
+;;                           (repeat (count truncated) 0)
+;;                           (map #(int (/ (* (- % adjusted-min) (* rows 8)) value-range)) truncated))
+;;              bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+;;              color-code (get ansi-colors color  "")
+;;              reset-code  "\u001B[0m"
+;;              colorize (fn [s] (str color-code s reset-code))
+;;              get-bar-char (fn [height row]
+;;                             (let [row-height (- height (* row 8))]
+;;                               (cond
+;;                                 (and (zero? height) (not= row 0)) " "
+;;                                 (and (zero? height) (zero? row)) "▁"
+;;                                 (<= height (* row 8)) " "
+;;                                 (> row-height 8) "█"
+;;                                 :else (nth bar-chars row-height))))
+;;              border-line (apply str (repeat (- console-width 2) "─"))
+;;              border-top (str "╭" border-line "╮")
+;;              border-bottom (str "╰" border-line "╯")
+;;              time-span (count truncated)
+;;              seconds (* time-span freq) ;(rem time-span 60)
+;;              trend (try
+;;                      (let [hchunk      (Math/floor (/ (count truncated) 2))
+;;                            first-half  (take hchunk truncated)
+;;                            second-half (drop hchunk truncated)
+;;                            avg-sec     (ut/avgf second-half)
+;;                            avg-first   (ut/avgf first-half)
+;;                            raw-pct     (* (/ (- avg-sec avg-first) avg-first) 100)
+;;                            pct-chg     (Math/abs (Math/ceil raw-pct))
+;;                            direction   (cond (> raw-pct 0) "up"
+;;                                              (< raw-pct 0) "down"
+;;                                              :else "stable")
+;;                            magnitude   (cond
+;;                                          (>= pct-chg 50) "dramatically"
+;;                                          (>= pct-chg 25) "significantly"
+;;                                          (>= pct-chg 10) "noticeably"
+;;                                          (>= pct-chg 5)  "moderately"
+;;                                          (>= pct-chg 1)  "slightly"
+;;                                          :else           "marginally")]
+;;                        (cond
+;;                          (and (= direction "stable")
+;;                               (= avg-first avg-sec))
+;;                          "flat"
+;;                          (and (= direction "stable")
+;;                               (= (Math/floor avg-sec) (Math/floor avg-first)))
+;;                          "mostly stable"
+;;                          :else (str magnitude " " direction)))
+;;                      (catch Throwable _ "not enough data"))
+;;              label (str label-str
+;;                         (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
+;;                         " | max "  (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+;;                         ", min "  (ut/nf (float (apply min truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+;;                         ", avg "  (ut/nf (float (ut/avgf truncated))) (when (not (= "%" symbol-str)) " ") symbol-str)
+;;              max-label-length (- console-width 6)
+;;              fitted-label (if (<= (count label) max-label-length)
+;;                             label
+;;                             (str (subs label 0 (- max-label-length 3)) "..."))
+;;              padding (str (apply str (repeat (- console-width (count fitted-label) 4) " ")) " ")
+;;              label-row (str "│ " (str "\u001B[1m" (colorize fitted-label) reset-code) padding "│")
+;;              draw-row (fn [row-data]
+;;                         (let [graph-data (apply str
+;;                                                 (map-indexed
+;;                                                  (fn [idx ch]
+;;                                                    (if (and (pos? idx)
+;;                                                             (zero? (rem idx (inc values-per-marker))))
+;;                                                      (str " " (colorize ch)) ; Space instead of vertical line
+;;                                                      (colorize ch)))
+;;                                                  row-data))
+;;                               padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+;;                           (str "│ " graph-data padding "│")))
+;;              agg-label (str ", " (if (= agg "avg") "averaged" "summed"))
+;;              legend (str (when (> freq 1)
+;;                            (str " freq: " freq))
+;;                          " (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " " agg-label)) ")")
+;;              legend (cstr/replace legend ", -" " -")
+;;              legend (str legend (apply str (repeat (- console-width (count legend) 9) " ")) (.format (java.text.SimpleDateFormat. "HH:mm:ss") (java.util.Date.)))]
+;;          (println border-top)
+;;          (println label-row)
+;;          (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+;;          (doseq [row (range (dec rows) -1 -1)]
+;;            (println (draw-row (map #(get-bar-char % row) normalized))))
+;;          (println (let [chunks (partition-all time-marker-interval truncated)
+;;                      ;last-chunk (count (last chunks))
+;;                         complete-chunks (vec (drop-last chunks))
+;;                         value-strings (apply str (for [chunk-idx (range (count complete-chunks))
+;;                                                        :let [chunk (vec (get complete-chunks chunk-idx))
+;;                                                              last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])]]
+;;                                                    (let [avg-last (ut/avgf last-chunk)
+;;                                                          avg-this (ut/avgf chunk)
+;;                                                          diff-last (-  avg-this avg-last)
+;;                                                          vv (* (/ diff-last avg-this) 100)
+;;                                                          lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%"))
+;;                                                          lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
+;;                                                          lbc (count (str lb))]
+;;                                                      (str (apply str (repeat (- 32 lbc) " ")) lb))))
+;;                         vals-line (str "│" "\u001B[1m"
+;;                                        (colorize value-strings)
+;;                                        reset-code)
+;;                         padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
+;;                     (str vals-line padding " │")))
+;;          (println border-bottom)
+;;          (println (str "\u001B[1m" (colorize legend) reset-code)))
+;;        (catch Throwable e
+;;          (ut/pp [:bar-graph-error! (str e)
+;;               ;;(stacktrace->map e)
+;;                  label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))))
+
+
+(defn split-vector-at-x [v]
+  (loop [input v
+         current-segment []
+         result []]
+    (if (empty? input)
+      (if (empty? current-segment)
+        result
+        (conj result current-segment))
+      (let [first-elem (first input)]
+        (if (= first-elem "X")
+          (recur (rest input)
+                 []
+                 (if (empty? current-segment)
+                   result
+                   (conj result current-segment)))
+          (recur (rest input)
+                 (conj current-segment first-elem)
+                 result))))))
+
 (defn draw-bar-graph [usage-vals label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
-  (try
-    (let [console-width (if width width (- (ut/get-terminal-width) 10))
-          rows 5
-          border-width 2
-          label-padding 4
-          time-marker-interval 30
-          values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
-          max-values (- console-width border-width label-padding)
-          num-markers (quot max-values values-per-marker)
-          actual-width (- max-values num-markers)
-          truncated (take-last actual-width usage-vals)
-          mmax (apply max truncated)
-          mmin (apply min truncated)
-          adjusted-min (* mmin 0.9) ; 90% to avoid zero bar 
-          value-range (- mmax adjusted-min)
-          ;; normalized (if (zero? mmax) ;; zero axis
-          ;;              (repeat (count truncated) 0)
-          ;;              (map #(int (/ (* % (* rows 8)) mmax)) truncated))
-          normalized (if (zero? value-range)
-                       (repeat (count truncated) 0)
-                       (map #(int (/ (* (- % adjusted-min) (* rows 8)) value-range)) truncated))
-          bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
-          color-code (get ansi-colors color  "")
-          reset-code  "\u001B[0m"
-          colorize (fn [s] (str color-code s reset-code))
-          get-bar-char (fn [height row]
-                         (let [row-height (- height (* row 8))]
-                           (cond
-                             (and (zero? height) (not= row 0)) " "
-                             (and (zero? height) (zero? row)) "▁"
-                             (<= height (* row 8)) " "
-                             (> row-height 8) "█"
-                             :else (nth bar-chars row-height))))
-          border-line (apply str (repeat (- console-width 2) "─"))
-          border-top (str "╭" border-line "╮")
-          border-bottom (str "╰" border-line "╯")
-          time-span (count truncated)
-          seconds (* time-span freq) ;(rem time-span 60)
-          trend (try
-                  (let [hchunk      (Math/floor (/ (count truncated) 2))
-                        first-half  (take hchunk truncated)
-                        second-half (drop hchunk truncated)
-                        avg-sec     (ut/avgf second-half)
-                        avg-first   (ut/avgf first-half)
-                        raw-pct     (* (/ (- avg-sec avg-first) avg-first) 100)
-                        pct-chg     (Math/abs (Math/ceil raw-pct))
-                        direction   (cond (> raw-pct 0) "up"
-                                          (< raw-pct 0) "down"
-                                          :else "stable")
-                        magnitude   (cond
-                                      (>= pct-chg 50) "dramatically"
-                                      (>= pct-chg 25) "significantly"
-                                      (>= pct-chg 10) "noticeably"
-                                      (>= pct-chg 5)  "moderately"
-                                      (>= pct-chg 1)  "slightly"
-                                      :else           "marginally")]
-                    (cond
-                      (and (= direction "stable")
-                           (= avg-first avg-sec))
-                      "flat"
-                      (and (= direction "stable")
-                           (= (Math/floor avg-sec) (Math/floor avg-first)))
-                      "mostly stable"
-                      :else (str magnitude " " direction)))
-                      (catch Throwable _ "not enough data"))
-          label (str label-str
-                     (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
-                     " | max "  (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
-                     ", min "  (ut/nf (float (apply min truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
-                     ", avg "  (ut/nf (float (ut/avgf truncated))) (when (not (= "%" symbol-str)) " ") symbol-str)
-          max-label-length (- console-width 6)
-          fitted-label (if (<= (count label) max-label-length)
-                         label
-                         (str (subs label 0 (- max-label-length 3)) "..."))
-          padding (str (apply str (repeat (- console-width (count fitted-label) 4) " ")) " ")
-          label-row (str "│ " (str "\u001B[1m" (colorize fitted-label) reset-code) padding "│")
-          draw-row (fn [row-data]
-                     (let [graph-data (apply str
-                                             (map-indexed
-                                              (fn [idx ch]
-                                                (if (and (pos? idx)
-                                                         (zero? (rem idx (inc values-per-marker))))
-                                                  (str " " (colorize ch)) ; Space instead of vertical line
-                                                  (colorize ch)))
-                                              row-data))
-                           padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
-                       (str "│ " graph-data padding "│")))
-          agg-label (str ", " (if (= agg "avg") "averaged" "summed"))
-          legend (str (when (> freq 1)
-                        (str " freq: " freq))
-                      " (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " " agg-label)) ")")
-          legend (cstr/replace legend ", -" " -")]
-      (println border-top)
-      (println label-row)
-      (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
-      (doseq [row (range (dec rows) -1 -1)]
-        (println (draw-row (map #(get-bar-char % row) normalized))))
-      (println (let [chunks (partition-all time-marker-interval truncated)
-                     ;last-chunk (count (last chunks))
-                     complete-chunks (vec (drop-last chunks))
-                     value-strings (apply str (for [chunk-idx (range (count complete-chunks))
-                                                    :let [chunk (vec (get complete-chunks chunk-idx))
-                                                          last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])]]
-                                                (let [avg-last (ut/avgf last-chunk)
-                                                      avg-this (ut/avgf chunk)
-                                                      diff-last (-  avg-this avg-last)
-                                                      vv (* (/ diff-last avg-this) 100)
-                                                      lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%" ))
-                                                      lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
-                                                      lbc (count (str lb))]
-                                                  (str (apply str (repeat (- 32 lbc) " ")) lb))))
-                     vals-line (str "│" "\u001B[1m"
-                                    (colorize value-strings)
-                                    reset-code)
-                     padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
-                 (str vals-line padding " │")))
-      (println border-bottom)
-      (println (str "\u001B[1m" (colorize legend) reset-code)))
-    (catch Throwable e
-      (ut/pp [:bar-graph-error! (str e) 
-              ;;(stacktrace->map e)
-              label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
+     (try
+       (let [console-width (if width width (- (ut/get-terminal-width) 10))
+             rows 5
+             border-width 2
+             label-padding 4
+             time-marker-interval 30
+             ;values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+             max-values (- console-width border-width label-padding 4)
+             truncated (take-last max-values usage-vals)
+             mmax (apply max truncated)
+             mmin (apply min truncated)
+             adjusted-min (* mmin 0.9) ; 90% to avoid zero bar 
+             value-range (- mmax adjusted-min)
+             normalized (if (zero? value-range)
+                          (repeat (count truncated) 0)
+                          (map #(int (/ (* (- % adjusted-min) (* rows 8)) value-range)) truncated))
+             bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+             color-code (get ansi-colors color "")
+             reset-code "\u001B[0m"
+             colorize (fn [s] (str color-code s reset-code))
+             get-bar-char (fn [height row]
+                            (let [row-height (- height (* row 8))]
+                              (cond
+                                (and (zero? height) (not= row 0)) " "
+                                (and (zero? height) (zero? row)) "▁"
+                                (<= height (* row 8)) " "
+                                (> row-height 8) "█"
+                                :else (nth bar-chars row-height))))
+             border-line (apply str (repeat (- console-width 2) "─"))
+             border-top (str "╭" border-line "╮")
+             border-bottom (str "╰" border-line "╯")
+             time-span (count truncated)
+             seconds (* time-span freq)
+             trend (try
+                     (let [hchunk (Math/floor (/ (count truncated) 2))
+                           first-half (take hchunk truncated)
+                           second-half (drop hchunk truncated)
+                           avg-sec (ut/avgf second-half)
+                           avg-first (ut/avgf first-half)
+                           raw-pct (* (/ (- avg-sec avg-first) avg-first) 100)
+                           pct-chg (Math/abs (Math/ceil raw-pct))
+                           direction (cond (> raw-pct 0) "up"
+                                           (< raw-pct 0) "down"
+                                           :else "stable")
+                           magnitude (cond
+                                       (>= pct-chg 50) "dramatically"
+                                       (>= pct-chg 25) "significantly"
+                                       (>= pct-chg 10) "noticeably"
+                                       (>= pct-chg 5) "moderately"
+                                       (>= pct-chg 1) "slightly"
+                                       :else "marginally")]
+                       (cond
+                         (and (= direction "stable")
+                              (= avg-first avg-sec))
+                         "flat"
+                         (and (= direction "stable")
+                              (= (Math/floor avg-sec) (Math/floor avg-first)))
+                         "mostly stable"
+                         :else (str magnitude " " direction)))
+                     (catch Throwable _ "not enough data"))
+             label (str label-str
+                        (let [pref (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
+                              suff (str " max " (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+                                        ", min " (ut/nf (float (apply min truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+                                        ", avg " (ut/nf (float (ut/avgf truncated))) (when (not (= "%" symbol-str)) " ") symbol-str)
+                              fwidth (count (str  label-str pref suff))
+                              room? (< fwidth (- console-width 6))]
+                          (str pref
+                               (if room? (apply str (repeat (- (- console-width 6) fwidth ) " ")) "")
+                               suff))
+                        )
+             max-label-length (- console-width 6)
+             fitted-label (if (<= (count label) max-label-length)
+                            label
+                            (str (subs label 0 (- max-label-length 3)) "..."))
+             padding (str (apply str (repeat (- console-width (count fitted-label) 4) " ")) " ")
+             label-row (str "│ " (str "\u001B[1m" (colorize fitted-label) reset-code) padding "│")
+             start-index (- (count usage-vals) (count truncated))
+
+             chunked-segments (atom [])
+             draw-row (fn [row-data row]
+                        (let [graph-data (apply str
+                                                (map-indexed
+                                                 (fn [idx ch]
+                                                   (if (zero? (rem (+ idx start-index) time-marker-interval))
+                                                     (do (when (= row 0) (swap! chunked-segments conj "X"))
+                                                         (str "." (colorize ch)))
+                                                     (do (when (= row 0) (swap! chunked-segments conj (nth truncated idx)))
+                                                         (colorize ch))))
+                                                 row-data))
+                              padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+                          (str "│ " graph-data padding "│")))
+             agg-label (str ", " (if (= agg "avg") "averaged" "summed"))
+             legend (str (when (> freq 1)
+                           (str " freq: " freq))
+                         " (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str agg-label)) ")")
+             legend (cstr/replace legend ", -" " -")
+             legend (str legend (apply str (repeat (- console-width (count legend) 9) " ")) (.format (java.text.SimpleDateFormat. "HH:mm:ss") (java.util.Date.)))]
+         (println border-top)
+         (println label-row)
+         (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+         (doseq [row (range (dec rows) -1 -1)]
+           (println (draw-row (map #(get-bar-char % row) normalized) row)))
+         ;;(ut/pp [:start-index start-index (count truncated) (for [e (split-vector-at-x @chunked-segments)] (count e))])
+         (println (let [;visible-chunks-cnt (int (Math/ceil (/ (count truncated) time-marker-interval)))
+                        chunks (vec (split-vector-at-x @chunked-segments)) ;; (partition-all time-marker-interval truncated)
+                        ;;complete-chunks chunks ;; (vec (drop-last chunks))
+                        fchunks (vec (take-last (count chunks) (partition-all time-marker-interval usage-vals)))
+                        ;;_ (ut/pp [:chunks-segs (count chunks) visible-chunks-cnt (count truncated)])
+                        value-strings (apply str (for [chunk-idx (range (count fchunks))
+                                                       :let [chunk (vec (get chunks chunk-idx))
+                                                             chunks-size (count chunk)
+                                                             ;last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])
+                                                             last-chunk-full (if (> chunk-idx 0) (vec (get fchunks (- chunk-idx 1))) [0])
+                                                             chunk-full (vec (get fchunks chunk-idx))]]
+                                                   (let [avg-last (ut/avgf last-chunk-full)
+                                                         avg-this (ut/avgf chunk-full)
+                                                         diff-last (-  avg-this avg-last)
+                                                         vv (* (/ diff-last avg-this) 100)
+                                                         lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%"))
+                                                         lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
+                                                         lbc (count (str lb))
+                                                         ;;_ (ut/pp [:ll chunk-idx lbc chunks-size (count chunks) (count fchunks) (count chunk-full)  (apply + chunk-full)])
+                                                         ]
+                                                     (if (< lbc chunks-size)
+                                                      ;;  (if (= chunk-idx 0)
+                                                      ;;    (str lb (apply str (repeat (- (+ 2 chunks-size) lbc) " ")))
+                                                      ;;    (str lb (apply str (repeat (- 34 lbc ) " "))))
+                                                       (str lb (apply str (repeat (- (+ 2 chunks-size) lbc) " ")))
+                                                       (apply str (repeat (+ 2 chunks-size) " "))))))
+                        vals-line (str "│" "\u001B[1m"
+                                       (colorize value-strings)
+                                       reset-code)
+                        padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
+                    (str vals-line padding " │")))
+         (println border-bottom)
+         (println (str "\u001B[1m" (colorize legend) reset-code)))
+       (catch Throwable e
+         (ut/pp [:bar-graph-error! (str e)
+                 label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
+
+
+
 
 
 ;; (draw-client-stats nil [30] nil true 300 {:metrics-atom sql-metrics})
@@ -7160,45 +7589,57 @@
   (into {} (for [[pool pname] (pools)]
              {pname (pool-monitor pool pname)})))
 
+;; (defn drop-last-from-chunks [chunks]
+;;   (if (empty? chunks)
+;;     chunks
+;;     (let [last-chunk (peek chunks)]
+;;       (if (= 1 (count last-chunk))
+;;         (pop chunks)
+;;         (assoc chunks (dec (count chunks)) (pop last-chunk))))))
+
+;; (def tt3 [[1 2 3] [1 2 3] [1 2 3] [1 2]])
+;; (ut/pp [:dl (drop-last-from-chunks tt3)])
 
 (defn draw-pool-stats [& [kks freqs label? width]]
-  (doseq [pp (cond (keyword? kks) [kks]
-                   (vector? kks)   kks ;;(sort-by str (keys @pool-stats-atom))
-                   (string? kks)  (vec (sort-by str (filter #(cstr/includes? (str " " (cstr/replace (str %) ":" "") " ") kks) (keys @pool-stats-atom))))
-                   :else (vec (sort-by str (keys @pool-stats-atom))))
-          :let [draw-it (fn [kkey sym ff color]
-                          (ut/pp (draw-bar-graph
-                                  (if (= ff 1)
-                                    (mapv kkey (get @pool-stats-atom pp))
-                                    (average-in-chunks
-                                     (mapv kkey (get @pool-stats-atom pp))  ff))
-                                  (str pp " - " kkey) sym :color color :freq ff :width width)))
-                freqs (if (nil? freqs)
+  (let [width (or width (ut/get-terminal-width))
+        sample-size (* width 1.5)]
+    (doseq [pp (cond (keyword? kks) [kks]
+                     (vector? kks)   kks ;;(sort-by str (keys @pool-stats-atom))
+                     (string? kks)  (vec (sort-by str (filter #(cstr/includes? (str " " (cstr/replace (str %) ":" "") " ") kks) (keys @pool-stats-atom))))
+                     :else (vec (sort-by str (keys @pool-stats-atom))))
+            :let [draw-it (fn [kkey sym ff color]
+                            (ut/pp (draw-bar-graph
+                                    (if (= ff 1)
+                                      (mapv kkey (get @pool-stats-atom pp))
+                                      (average-in-chunks (mapv kkey (get @pool-stats-atom pp)) ff sample-size))
+                                    (str pp " - " kkey) sym :color color :freq ff :width width)))
+                  freqs (if (nil? freqs)
                         ;[1 15]
-                        [15 90]
-                        freqs)
-                colors (vec (keys ansi-colors))
-                color-index (mod (hash pp) (count colors))
-                color (nth colors color-index)]]
+                          [15 90]
+                          freqs)
+                  colors (vec (keys ansi-colors))
+                  color-index (mod (hash pp) (count colors))
+                  color (nth colors color-index)]]
 
     ;(ut/pp [:pool pp])
 
     ;(ut/pp [:current-pool-size])
-    
-    (doseq [ff freqs] (draw-it :current-pool-size "threads" ff color))
+
+      (doseq [ff freqs] (draw-it :current-pool-size "threads" ff color))
     ;(ut/pp [:active-threads])
-    (doseq [ff freqs] (draw-it :active-threads "threads" ff color))
-    (when label? (fig-render (str pp) color))
+      (doseq [ff freqs] (draw-it :active-threads "threads" ff color))
+      (when label? (fig-render (str pp) color))
     ;(ut/pp [:percent-float])
     ;(doseq [ff freqs] (draw-it :percent-float "%" ff color))
-    )
+      ))
     ;;(ut/pp [:total-pools (try (count kks) (catch Exception _ -1))])
   )
 
 
 (defn draw-client-stats [& [kks freqs stats label? width {:keys [metrics-atom] :or {metrics-atom client-metrics}}]]
   (try
-    (let []
+    (let [width (or width (ut/get-terminal-width))
+          sample-size (* width 1.5)]
       (doseq [pp (cond (keyword? kks) [kks]
                        (vector? kks)   kks ;;(sort-by str (keys @metrics-atom))
                        (string? kks)  (vec (sort-by str (filter #(cstr/includes? (str " " (cstr/replace (str %) ":" "") " ") kks) (keys @metrics-atom))))
@@ -7208,7 +7649,7 @@
                                            data0 (mapv (fn [x] (if (nil? x) 0 x)) data0) ;; replace nil 
                                            data (vec (mapcat (fn [item] (repeat heartbeat-seconds item)) data0))]
                                        (draw-bar-graph
-                                        (if (= ff 1) data (average-in-chunks data ff))
+                                        (if (= ff 1) data (average-in-chunks data ff sample-size))
                                         (str pp " - " kkey) sym :color color :freq ff :width width))))
                     stats (cond (vector? stats) stats
                                 (keyword? stats) [stats]
@@ -7348,15 +7789,19 @@
   (let [stat (get (stats-keywords) kkey)]
     (let [[data-vec kkey sym] stat]
       (if agg
-        (last (sum-in-chunks data-vec num))
-        (last (average-in-chunks data-vec num))))))
+        (last (sum-in-chunks data-vec num nil))
+        (last (average-in-chunks data-vec num nil))))))
+
+(ut/pp (pop [ 1 2 3 4 5 ]))
 
 (defn draw-stats
   ([]
    (ut/pp [:draw-stats-needs-help
            (str "Hi. Draw what? " (clojure.string/join ", " (map str (keys (stats-keywords)))))]))
   ([kks & [freqs label? width]]
-   (let [kksv (cond (or (= kks :all) (= kks :*)) (vec (sort-by str (keys (stats-keywords))))
+   (let [width (or width (ut/get-terminal-width))
+         sample-size (* width 1.5)
+         kksv (cond (or (= kks :all) (= kks :*)) (vec (sort-by str (keys (stats-keywords))))
                     (keyword? kks) [kks]
                     (vector? kks)   kks ;;(sort-by str (keys @pool-stats-atom))
                     (string? kks)  (vec (sort-by str (filter #(cstr/includes? (str " " (cstr/replace (str %) ":" "") " ") kks) (keys (stats-keywords)))))
@@ -7365,16 +7810,33 @@
        (let [data-base (get (stats-keywords) kks)
          ;;_ (ut/pp data-base)
              draw-label (fn [data color]
-                          (let [[_ kkey _ _] data]
-                            (fig-render (str kkey) color)))
+                          (let [[dv kkey _ _] data]
+                            (fig-render (str kkey 
+                                             (let [vl (str (ut/rnd (ut/avg (take-last 10 dv)) 0) "%")
+                                                   vll (count vl)
+                                                   labl (count (str kkey))
+                                                   ;multi 6
+                                                   spc (* (+ vll labl) 9)
+                                                   ;_ (ut/pp [vl vll labl spc width])
+                                                   ]
+                                               (str (apply str (repeat (Math/ceil (/ (- width spc) 3)) " "))
+                                               vl))
+                                             
+                                             ) color)))
              draw-it (fn [ff color data]
                        (let [[data-vec kkey sym sum?] data]
                          (draw-bar-graph
                           (if (= ff 1)
                             data-vec
-                            (if (and (true? sum?) (not (nil? sum?)))
-                              (sum-in-chunks data-vec ff)
-                              (average-in-chunks data-vec ff)))
+                            (let [dd (if (and (true? sum?) (not (nil? sum?)))
+                                       (sum-in-chunks data-vec ff sample-size)
+                                       (average-in-chunks data-vec ff sample-size))
+                                 ;;; _ (ut/pp [:dd dd])
+                                  ;;dd (if (>= ff 15) (vec (drop-last dd)) dd)
+                                  ;;dd (pop dd)
+                                  ] dd)
+                            
+                            )
                           (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg") :width width)))
              freqs (cond (nil? freqs) [1 15 60]
                          (number? freqs) [freqs]
@@ -7395,8 +7857,7 @@
 ;;;(mapv (fn [x] (cstr/replace (str x) ":" "")) (keys (rvbbit-backend.websockets/stats-keywords)))
 ;;;(mapv #(cstr/replace (str %) ":" "") (keys (stats-keywords)))
 
-(defn jvm-stats
-  []
+(defn jvm-stats []
   (when (not @shutting-down?)
     (try
       (let [runtime (java.lang.Runtime/getRuntime)
@@ -7537,10 +7998,10 @@
         ;;(let [fss (flow-statuses) fssk (vec (keys fss))] (ut/pp [:flow-status (select-keys fss fssk)]))
 
         ;;(ut/pp [:date-map @time-atom])
-        (ut/pp [:sql-errors!
-                {:ttl     (count @sql/errors)
-                 :freq    (frequencies (mapv first @sql/errors))
-                 :freq-db (frequencies (mapv second @sql/errors))}])
+        ;; (ut/pp [:sql-errors!
+        ;;         {:ttl     (count @sql/errors)
+        ;;          :freq    (frequencies (mapv first @sql/errors))
+        ;;          :freq-db (frequencies (mapv second @sql/errors))}])
 
         ;;(ut/pp [:solvers-running? @solver-status])
 
@@ -7589,38 +8050,44 @@
 
         (ut/pp [:latency-adaptations @dynamic-timeouts])
 
+
+          (draw-stats [:cpu :mem :threads]
+                    [15]
+                    false
+                    )
+
         ;(ut/pp [:repl-introspections @evl/repl-introspection-atom])
 
         ;(ut/pp [:timekeeper-failovers? @timekeeper-failovers])
 
         ;;;(ut/pp [:pool-sizes pool-sizes])
 
-        (ut/pp [:pool-sizes
-                (let [pool-sizes (query-pool-sizes)
-                      pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
-                                                                 :let [runs (get-in v [1 :tasks-run] 0)
-                                                                       avgs (get-in v [1 :tasks-avg-ms] 0)]]
-                                                             [k (get-in v [1 :current-pool-size])
-                                                              {:runs runs
-                                                               :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
-                                                               :avg avgs}])))
-                      ttls {:pools (count pairs) :threads (apply + (map second pairs))}
-                      prev @pool-ttls-last]
-                  (reset! pool-ttls-last ttls)
-                  (into (sorted-map)
-                        {:pool-counts pairs
-                         :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
-                                                                    (let [group-key (first (clojure.string/split (str k) #"\."))]
-                                                                      (update acc group-key (fn [existing-runs]
-                                                                                              (if existing-runs
-                                                                                                (+ existing-runs runs)
-                                                                                                runs)))))
-                                                                  {}
-                                                                  pairs))
-                         :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
-                         :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
-                         :prev prev
-                         :now ttls}))])
+        ;; (ut/pp [:pool-sizes
+        ;;         (let [pool-sizes (query-pool-sizes)
+        ;;               pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
+        ;;                                                          :let [runs (get-in v [1 :tasks-run] 0)
+        ;;                                                                avgs (get-in v [1 :tasks-avg-ms] 0)]]
+        ;;                                                      [k (get-in v [1 :current-pool-size])
+        ;;                                                       {:runs runs
+        ;;                                                        :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
+        ;;                                                        :avg avgs}])))
+        ;;               ttls {:pools (count pairs) :threads (apply + (map second pairs))}
+        ;;               prev @pool-ttls-last]
+        ;;           (reset! pool-ttls-last ttls)
+        ;;           (into (sorted-map)
+        ;;                 {:pool-counts pairs
+        ;;                  :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
+        ;;                                                             (let [group-key (first (clojure.string/split (str k) #"\."))]
+        ;;                                                               (update acc group-key (fn [existing-runs]
+        ;;                                                                                       (if existing-runs
+        ;;                                                                                         (+ existing-runs runs)
+        ;;                                                                                         runs)))))
+        ;;                                                           {}
+        ;;                                                           pairs))
+        ;;                  :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
+        ;;                  :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
+        ;;                  :prev prev
+        ;;                  :now ttls}))])
 
         ;; (ut/pp [:client-cost (let [pool-sizes (query-pool-sizes)
         ;;                            clients (distinct 
@@ -7632,33 +8099,35 @@
 
         ;; (ut/pp @watcher-log)
 
-        (ut/pp [:reactor (into {} (for [[k v] @splitter-stats]
-                                    {k (into {} (for [[kk vv] v] {kk (get vv :cnt)}))}))])
-        (ut/pp [:reactor {:counts-by-type (into {}  (for [[k v] @splitter-stats] {k (count (keys v))}))}])
-        (ut/pp [:reactor (let [react-counts (apply concat (for [[_ v] @splitter-stats] (vals v)))
-                               updates (apply + (map :cnt react-counts))
-                               uptime  (reactor-uptime-seconds) ;; (ut/uptime-seconds)
-                               per-sec (ut/rnd (/ updates uptime) 2)]
-                           [:key-watchers-w-reactions (count react-counts)
-                            :watchers (last @watcher-usage)
-                            :updates updates
-                            :uptime-secs uptime
-                            :uptime (ut/format-duration-seconds  uptime)
-                            :per-sec per-sec
-                            :max-key-depth @key-depth-limit
-                            :clients (count @wl/sockets)
-                            :avg-cpu (ut/avgf @cpu-usage)])])
+        ;; (ut/pp (vec (filter #(cstr/starts-with? (str %) ":time/") (distinct (apply concat (for [[_ v] @splitter-stats] (keys v)))))))
+
+        ;; (ut/pp [:reactor (into {} (for [[k v] @splitter-stats]
+        ;;                             {k (into {} (for [[kk vv] v] {kk (get vv :cnt)}))}))])
+        ;; (ut/pp [:reactor {:counts-by-type (into {}  (for [[k v] @splitter-stats] {k (count (keys v))}))}])
+        ;; (ut/pp [:reactor (let [react-counts (apply concat (for [[_ v] @splitter-stats] (vals v)))
+        ;;                        updates (apply + (map :cnt react-counts))
+        ;;                        uptime  (reactor-uptime-seconds) ;; (ut/uptime-seconds)
+        ;;                        per-sec (ut/rnd (/ updates uptime) 2)]
+        ;;                    [:key-watchers-w-reactions (count react-counts)
+        ;;                     :watchers (last @watcher-usage)
+        ;;                     :updates updates
+        ;;                     :uptime-secs uptime
+        ;;                     :uptime (ut/format-duration-seconds  uptime)
+        ;;                     :per-sec per-sec
+        ;;                     :max-key-depth @key-depth-limit
+        ;;                     :clients (count @wl/sockets)
+        ;;                     :avg-cpu (ut/avgf @cpu-usage)])])
 
 
         ;;(get @atoms-and-watchers :okay-short-crow-1)
 
 
-        (let [ss (qp/get-queue-stats+)]
-          (ut/pp [:queue-party-stats+ ss]))
+        ;; (let [ss (qp/get-queue-stats+)]
+        ;;   (ut/pp [:queue-party-stats+ ss]))
 
-        (ut/pp [:freeze-pop? @(get-atom-splitter-deep :time/now father-time)
-                (get @father-time :now)
-                :rvbbit-sub-ms-diff (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))])
+        ;; (ut/pp [:freeze-pop? @(get-atom-splitter-deep :time/now father-time)
+        ;;         (get @father-time :now)
+        ;;         :rvbbit-sub-ms-diff (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))])
 
         (ut/pp [:clients-with-tardy-subs? (count (client-subs-late-delivery 30000))])
 
@@ -7813,16 +8282,16 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   ;:min-threads          300
-   ;:max-threads          1000 ;; Increased max threads
-   ;:idle-timeout         500000 ;; Reduced idle timeout
-   ;:max-idle-time        3000000 ;; Reduced max idle time
+   :min-threads          1
+   :max-threads          50 ;; Increased max threads
+   :idle-timeout         10000
+   :max-idle-time        15000
    ;:max-idle-time        15000
    ;:input-buffer-size    131072 ;; default is 8192
    ;:output-buffer-size   131072 ;; default is 32768
-   ;:input-buffer-size    32768
-   ;:output-buffer-size   131072
-   ;:max-message-size     6291456 ;; 6MB
+   :input-buffer-size    32768
+   :output-buffer-size   131072
+   :max-message-size     6291456 ;; 6MB
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
@@ -7895,3 +8364,223 @@
   []
   (ut/ppa [:shutting-down-web-server :port web-server-port])
   (when @web-server (server/stop @web-server) (reset! web-server nil)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(defn run-shell-command
+  "execute a generic shell command and return output as a map of timing and seq of str lines (forked fabric version)"
+  [command]
+  (let [;;shell                    (or (System/getenv "SHELL") "/bin/sh")
+        ;;output                   (shell/sh shell "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+        output                   (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+        split-lines              (vec (remove empty? (cstr/split-lines (get output :out))))
+        exit-code                (get output :exit)
+        error                    (vec (remove empty? (cstr/split-lines (get output :err))))
+        has-timing?              (if (ut/ne? error) (cstr/starts-with? (get error 0) "real") false)
+        error-data               (if has-timing? [] error)
+        timing-values-to-seconds #(let [split-timing (cstr/split (get (cstr/split % #"\t") 1) #"m")
+                                        minutes      (edn/read-string (get split-timing 0))
+                                        seconds      (edn/read-string (cstr/join "" (drop-last (get split-timing 1))))]
+                                    (+ (* 60 minutes) seconds))
+        timing-data              (if has-timing? (into [] (for [x error] (timing-values-to-seconds x))) [])]
+    {:output     split-lines
+     :exception  error-data
+     :seconds    timing-data
+     :exit-code  exit-code
+     :command    (str command)}))
+
+(defn read-local-file
+  "read local file and return its content as a string (forked fabric version)"
+  [full-path]
+  (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
+        output    (run-shell-command "pwd")
+        pwd       (first (get-in output [:output :output] []))
+        full-path (if fqd? full-path (str pwd "/" full-path))]
+    (ut/pp [:reading-file full-path])
+    (try {:file-data (str (slurp full-path)) :error nil}
+         (catch Exception e
+           {:file-data (str "\n" (str (.getMessage e)) "\n")
+            :error     nil ;(str "read-local-file, caught exception: " (.getMessage e))
+            }))))
+
+(defn write-local-file
+  "write local file with given data (forked fabric version)"
+  [full-path file-data]
+  (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
+        output    (run-shell-command "pwd")
+        pwd       (first (get-in output [:output] []))
+        full-path (if fqd? full-path (str pwd "/" full-path))]
+    (ut/pp [:writing-file full-path])
+    (do (try (spit full-path file-data)
+             (catch Exception e
+               (do (println "err")
+                   {;:file-data file-data
+                    :status    :error
+                    :file-path full-path
+                    :error     (str "caught exception: " (.getMessage e))})))
+        {:status :ok :file-path full-path})))
+
+(defn models-list-to-map [models-list]
+  (let [is-header? #(cstr/ends-with? % ":")]
+    (loop [remaining models-list
+           current-header nil
+           current-items []
+           result {}]
+      (if-let [item (first remaining)]
+        (if (is-header? item)
+          (recur (rest remaining)
+                 (cstr/replace item ":" "")
+                 []
+                 (cond-> result
+                   current-header (assoc current-header current-items)))
+          (recur (rest remaining)
+                 current-header
+                 (conj current-items item)
+                 result))
+        ;; last group and empty groups 
+        (cond-> result
+          current-header (assoc current-header current-items))))))
+
+(defn- kebab-case
+  "Convert a string to kebab-case"
+  [s]
+  (-> s
+      (cstr/replace #"([a-z0-9])([A-Z])" "$1-$2")
+      (cstr/replace #"([A-Z])([A-Z][a-z])" "$1-$2")
+      (cstr/replace #"_" "-")
+      (cstr/replace #":" "")
+      cstr/lower-case))
+
+(defn- shell-escape
+  "Escape a string for safe use in shell commands"
+  [s]
+  (-> s
+      (cstr/replace #"'" "'\\''")  ; Replace ' with '\''
+      (->> (format "'%s'"))))    ; Wrap the entire string in single quotes
+
+(defn get-fabric-models []
+  (let [output (run-shell-command "fabric --listmodels")]
+    (if (= (get output :error-code 0) 0)
+      (models-list-to-map (get output :output)) ;; check for malformed first?
+      (get output :exception))))
+
+(defn get-fabric-patterns []
+  (let [output (run-shell-command "fabric --list")]
+    (if (= (get output :error-code 0) 0)
+      (get output :output)
+      (get output :exception))))
+
+(defn fabric
+  "Wrapper for the fabric CLI application.
+   Required arguments:
+   :input   - The input text (will be passed as --text)
+   :pattern - The pattern to use
+   
+   Optional arguments (all others from the CLI help):
+   :copy, :agents, :output, :session, :clear-session, :session-log,
+   :list-sessions, :gui, :stream, :list, :temp, :top-p, :frequency-penalty,
+   :presence-penalty, :update, :setup, :change-default-model, :model,
+   :list-models, :remote-ollama-server, :context"
+  [& {:keys [input pattern] :as opts}]
+  (when (or (nil? input) (nil? pattern))
+    (throw (IllegalArgumentException. "Both :input and :pattern are required arguments.")))
+
+  (let [id (get opts :id)
+        client-name (get opts :client-name)
+        opts (dissoc opts :id :client-name)
+        opts (if id (-> opts
+                       ;; (assoc :session (str id))
+                        (assoc :output  (str "../fabric-outputs/" id))) opts)
+        cli-args (reduce-kv
+                  (fn [args k v]
+                    (case k
+                      :input (conj args "--text" (shell-escape v))
+                      (into args
+                            (if (boolean? v)
+                              [(str "--" (name (kebab-case k)))]
+                              [(str "--" (name (kebab-case k))) (str v)]))))
+                  ["fabric"]  ; Start with the command name
+                  opts)
+        command (cstr/join " " cli-args)]
+    (write-local-file (str "../fabric-inputs/" id) (str opts "\n \n \n" command))
+    (ut/pp [:fabric-cli command])
+
+    ;; Execute the command
+    ;(shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+    command))
+
+(ext/create-dirs "./fabric-sessions") ;; from base rvbbit folder
+(ext/create-dirs "./fabric-outputs")
+(ext/create-dirs "./fabric-inputs")
+
+;; (defn fabric-run [opts-map]
+;;   (let [command (fabric opts-map)
+;;         client-name (get opts-map :client-name)
+;;         id (get opts-map :id)
+;;         pattern (get opts-map :pattern)
+;;         process-builder (ProcessBuilder. (into-array ["sh" "-c" command]))
+;;         _ (.redirectErrorStream process-builder true)
+;;         process (.start process-builder)
+;;         reader (java.io.BufferedReader.
+;;                 (java.io.InputStreamReader.
+;;                  (.getInputStream process)))
+;;         output (StringBuilder.)]
+
+;;     (loop []
+;;       (when-let [line (.readLine reader)]
+;;         (.append output line)
+;;         (.append output "\n")
+;;         (recur)))
+
+;;     (.waitFor process)
+
+;;     (let [result (str output)]
+
+;;       (ut/pp [:sending-alert client-name])
+
+;;       (alert! client-name
+;;               [:v-box
+;;                :justify :center
+;;                :style {:opacity 0.7}
+;;                :children
+;;                [[:box
+;;                  :style {:color :theme/editor-outer-rim-color :font-weight 700}
+;;                  :child
+;;                  [:box :child [:speak (str "Fabric has completed it's " pattern " pattern: " result)]]]]]
+;;               12
+;;               2
+;;               10)
+
+;;       (if (empty? result)
+;;         "Command executed, but produced no output."
+;;         result))))
+
+
+(defn fabric-run [opts-map]
+   (let [_ (ut/pp [ :fabric-run opts-map])
+        command (fabric opts-map)
+        client-name (get opts-map :client-name)
+        id (get opts-map :id)
+        pattern (get opts-map :pattern)
+        result (run-shell-command command)
+        output (get result :output)]
+    [output opts-map]))
+
+
+;; (fabric-run {:model "claude-3-opus-20240229"
+;;              :input "tell a very short story about vampire rabbits ransacking a sleepy new england town"
+;;              :client-name :beneficial-fat-badger-0
+;;              :pattern "tweet"})

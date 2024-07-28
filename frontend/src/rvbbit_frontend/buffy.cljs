@@ -1824,6 +1824,7 @@
         sql-calls       {hist-key {:select   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated]
                                    :from     [:panel_history]
                                    :connection-id "history-db"
+                                   :group-by [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated] ;; distinct
                                    :limit    15
                                    :order-by [[:updated :desc]]
                                    :where    [:= :kp (str kp)]}}

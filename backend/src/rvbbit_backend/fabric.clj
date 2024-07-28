@@ -1,9 +1,10 @@
 (ns rvbbit-backend.fabric
-  (:require [clojure.string          :as cstr]
-            [clojure.edn             :as edn]
-            [rvbbit-backend.util     :as ut]
-            [rvbbit-backend.external :as ext]
-            [clojure.java.shell      :as shell]))
+  (:require [clojure.string            :as cstr]
+            [clojure.edn               :as edn]
+            [rvbbit-backend.util       :as ut]
+            [rvbbit-backend.external   :as ext]
+           ;; [rvbbit-backend.websockets :as wss]
+            [clojure.java.shell        :as shell]))
 
 
 (defn run-shell-command
@@ -125,7 +126,8 @@
     (throw (IllegalArgumentException. "Both :input and :pattern are required arguments.")))
 
   (let [id (get opts :id)
-        opts (dissoc opts :id)
+        client-name (get opts :client-name)
+        opts (dissoc opts :id :client-name)
         opts (if id (-> opts
                        ;; (assoc :session (str id))
                         (assoc :output  (str "./fabric-outputs/" id))) opts)
@@ -150,6 +152,45 @@
 (ext/create-dirs "./fabric-sessions") ;; from base rvbbit folder
 (ext/create-dirs "./fabric-outputs")
 (ext/create-dirs "./fabric-inputs")
+
+(defn fabric-run [opts-map]
+  (let [command (fabric opts-map)
+        client-name (get opts-map :client-name)
+        id (get opts-map :id)
+        process-builder (ProcessBuilder. (into-array ["sh" "-c" command]))
+        _ (.redirectErrorStream process-builder true)
+        process (.start process-builder)
+        reader (java.io.BufferedReader.
+                (java.io.InputStreamReader.
+                 (.getInputStream process)))
+        output (StringBuilder.)]
+  
+    (loop []
+      (when-let [line (.readLine reader)]
+        (.append output line)
+        (.append output "\n")
+        (recur)))
+  
+    (.waitFor process)
+  
+    (let [result (str output)]
+
+      ;; (alert! client-name
+      ;;             [:v-box
+      ;;              :justify :center
+      ;;              :style {:opacity 0.7}
+      ;;              :children
+      ;;              [[:box
+      ;;                :style {:color :theme/editor-outer-rim-color :font-weight 700}
+      ;;                :child
+      ;;                [:box :child [:speak result]]]]]
+      ;;             12
+      ;;             2
+      ;;             10)
+
+      (if (empty? result)
+        "Command executed, but produced no output."
+        result))))
 
 ;; (ut/pp [:fabric-models (get-fabric-models)])
 ;; (ut/pp [:fabric-patterns (get-fabric-patterns)])

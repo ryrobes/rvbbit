@@ -822,30 +822,30 @@
     (sql-exec system-db remove-old-rows)
     (sql-exec system-db rowset-insert)))
 
-(def target-db ;"jdbc:sqlite:./rabbit-sample-data.db")
-  {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "./data/rabbit-sample-data.db"})
+;; (def target-db ;"jdbc:sqlite:./rabbit-sample-data.db")
+;;   {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "./data/rabbit-sample-data.db"})
 
-(def target-db2 {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "./data/boston-crime-data.db"})
+;; (def target-db2 {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "./data/boston-crime-data.db"})
 
-(def target-db3 "jdbc:postgresql://postgres:postgrespw@localhost:49154/postgres")
+;; (def target-db3 "jdbc:postgresql://postgres:postgrespw@localhost:49154/postgres")
 
-(def target-db4 ;"jdbc:clickhouse://localhost:8123/test")
-  {:classname "ru.yandex.clickhouse.ClickHouseDriver" :subprotocol "clickhouse" :subname "//localhost:8123/default"})
+;; (def target-db4 ;"jdbc:clickhouse://localhost:8123/test")
+;;   {:classname "ru.yandex.clickhouse.ClickHouseDriver" :subprotocol "clickhouse" :subname "//localhost:8123/default"})
 
-(def target-db5 ;"jdbc:vertica://dbadmin@localhost:5433/VMart")
-  {:classname   "com.vertica.jdbc.Driver" ;; "org.clojars.prepor.Driver"
-   :subprotocol "vertica"
-   :subname     "_VMart" ; first char gets cut somehow?
-   :user        "dbadmin"
-   :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
-   :port        5433})
+;; (def target-db5 ;"jdbc:vertica://dbadmin@localhost:5433/VMart")
+;;   {:classname   "com.vertica.jdbc.Driver" ;; "org.clojars.prepor.Driver"
+;;    :subprotocol "vertica"
+;;    :subname     "_VMart" ; first char gets cut somehow?
+;;    :user        "dbadmin"
+;;    :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
+;;    :port        5433})
 
-(def target-db6 "jdbc:mysql://root@localhost:3306/imdb")
+;; (def target-db6 "jdbc:mysql://root@localhost:3306/imdb")
 
-(def target-db7 "jdbc:sqlserver://localhost:1433;databaseName=imdb;encrypt=false;username=sa;password=yourStrong(!)Password") ;"jdbc:sqlserver://sa:yourStrong(!)Password@localhost:1433;database=imdb")
+;; (def target-db7 "jdbc:sqlserver://localhost:1433;databaseName=imdb;encrypt=false;username=sa;password=yourStrong(!)Password") ;"jdbc:sqlserver://sa:yourStrong(!)Password@localhost:1433;database=imdb")
 
 
-(def target-db8 "jdbc:oracle:scott/tiger@localhost:1521:XE") ; "jdbc:oracle://system:tiger@localhost:1521:XE")
+;; (def target-db8 "jdbc:oracle:scott/tiger@localhost:1521:XE") ; "jdbc:oracle://system:tiger@localhost:1521:XE")
 
 (defn slread
   [file]
@@ -900,7 +900,7 @@
                                       (try (str (nth f 9)) (catch Exception _ nil)) (try (str (nth f 10)) (catch Exception _ nil))
                                       (keyhash-from-field-vector f) (contexthash-from-field-vector f) is-group-by?]]})))))
     (catch Exception e
-      (do (insert-error-row! target-db (str (str e)) {:sql-filter sql-filter :field-vectors field-vectors})
+      (do ;(insert-error-row! target-db (str (str e)) {:sql-filter sql-filter :field-vectors field-vectors})
           (ut/pp [:insert-field-vectors-ERROR! :f field-vectors :error e])))))
 
 (defn taste-test-derived-fields

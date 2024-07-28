@@ -989,7 +989,12 @@
 
   (start-scheduler 1
                    #(try
-                      (let [ddate (ut/current-datetime-parts)]
+                      (let [ddate (ut/current-datetime-parts)
+                            stamp (System/currentTimeMillis)
+                            ddate (-> ddate
+                                      (assoc (keyword (str "second=" (get ddate :second))) stamp)
+                                      (assoc (keyword (str "minute=" (get ddate :minute))) stamp)
+                                      (assoc (keyword (str "hour=" (get ddate :hour))) stamp))]
                         (reset! wss/father-time ddate))
                       (catch Exception e
                         (println "Error updating atom:" (.getMessage e))
@@ -1004,7 +1009,7 @@
                    #(wss/flow-statuses true)
                    "Flow Stats & Watchdog" 15)
 
-  (start-scheduler 45 ;; was 30
+  (start-scheduler 240 ;; was 30
                    #(ppy/execute-in-thread-pools
                      :param-sql-sync
                      (fn [] (wss/param-sql-sync)))
@@ -1081,12 +1086,15 @@
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper");;)
 
-  (start-scheduler (* 3600 3) ;; 3 hours
+  (start-scheduler (* 3600 4) ;; 4 hours
                    #(do
                       (ut/pp [:CLEARING-OUT-DEEP-FLATTEN-CACHE]) ;; (ut/pp (ut/calculate-atom-size :current-size wss/solvers-cache-atom)) ;; super expensive on big atoms 
+                      ;(ut/pp (sql-exec system-db "delete from client_memory where 1=1;"))
+                      ;(ut/pp (sql-exec system-db "delete from jvm_stats where 1=1;"))
                       ;(reset! wss/solvers-cache-hits-atom {})
                       ;(reset! wss/solvers-cache-atom {})
                       ;;(reset! sql/errors {}) ;; just for now
+                      (reset! wss/agg-cache {}) ;; <--- bigggger
                       (reset! ut/df-cache {})) ;; <--- big boy
                    "Purge Solver & Deep-Flatten Cache" (* 3600 2))
 
@@ -1185,15 +1193,15 @@
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
                            (wss/destroy-websocket-server!)
-                           (do (ut/pp [:saving-shutdown-metrics...])
-                               (ext/create-dirs "./shutdown-logs")
-                               (ut/println-to-file (str "./shutdown-logs/" (cstr/replace (ut/get-current-timestamp) " " "_") ".log")
-                                                   (fn [] (let [freqs [1 10 30 60 120 240 600]
-                                                                stats [:cpu :threads :mem :sql-queries+ :sql-exec+ :nrepl-calls+ :solvers+ :flows+ :pool-tasks-run+ :workers :msgs+]]
-                                                            (wss/draw-stats      nil freqs true) ;; all stats, with labels 
-                                                            (wss/draw-pool-stats nil freqs true)
-                                                            (wss/draw-client-stats nil freqs nil true {:metrics-atom wss/sql-metrics})
-                                                            (wss/draw-client-stats nil freqs nil true)))))
+                          ;;  (do (ut/pp [:saving-shutdown-metrics...])
+                          ;;      (ext/create-dirs "./shutdown-logs")
+                          ;;      (ut/println-to-file (str "./shutdown-logs/" (cstr/replace (ut/get-current-timestamp) " " "_") ".log")
+                          ;;                          (fn [] (let [freqs [1 10 30 60 120 240 600]
+                          ;;                                       stats [:cpu :threads :mem :sql-queries+ :sql-exec+ :nrepl-calls+ :solvers+ :flows+ :pool-tasks-run+ :workers :msgs+]]
+                          ;;                                   (wss/draw-stats      nil freqs true) ;; all stats, with labels 
+                          ;;                                   (wss/draw-pool-stats nil freqs true)
+                          ;;                                   (wss/draw-client-stats nil freqs nil true {:metrics-atom wss/sql-metrics})
+                          ;;                                   (wss/draw-client-stats nil freqs nil true)))))
                            (qp/stop-slot-queue-system)
                            (stop-all-schedulers)
                           ;;  (reset! flow-db/results-atom (select-keys @flow-db/results-atom 

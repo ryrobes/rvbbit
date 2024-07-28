@@ -2511,10 +2511,11 @@
                                ;[(str (char 34) (cstr/trim (str body)) (char 34))]
                              [(str body)])
           ;;valid-body         (if (or clover? clojure?) valid-body [body])
-        opts-map-star       (assoc 
+        opts-map-star       (merge 
                              (into {} (for [[k v] opts-map] 
                                        {(keyword (cstr/replace (str k) ":" "*")) v}))
-                             :*id (cstr/replace (str client-name "++" new-keyw "++" runner "++" view-name) ":" ""))
+                             {:*id (cstr/replace (str client-name "++" new-keyw "++" runner "++" view-name) ":" "")
+                              :*client-name client-name})
         valid-body          (if (and as-function? (or clover? clojure?))
                               (walk/postwalk-replace
                                (merge
@@ -3276,10 +3277,21 @@
 
 
 (defn panel-string-box
-  [_ width-int height-int value syntax]
+  ;;[_ width-int height-int value syntax]
+  [bid view-kp width-int height-int value syntax & [repl? editor? src-block-override vs?]]
   (let [syntax     (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")
         stringify? true ;;(not (= syntax "clojure"))
-        ]
+        bid (bid) ;; lord have mercy. thanks for being "optimized" here, react
+        view-kp (view-kp)
+        selected-block     @(ut/tracked-sub ::selected-block {})
+        on-focus-fn (fn [_]
+                      (reset! db/cm-focused? true)
+                      (reset! db/view-title-edit-idx nil)
+                      (reset! db/last-focused (if editor? ;; such a fucking dumb workaround for react being thrifty on some components... but hey. we roll.
+                                                [(or src-block-override selected-block) ;; src-block-override used only for :editor SELF IN-EDITOR.... 
+                                                        ;; ^^ (so we always target the *target* and not ourselves) meta within meta, my dude.
+                                                 [@(ut/tracked-sub ::view-type {:panel-key bid :view (get @db/data-browser-query bid)}) (get @db/data-browser-query bid)]]
+                                                [bid view-kp])))]
     [re-com/box
      :size "auto"
      :padding "8px"
@@ -3308,7 +3320,7 @@
                           (reset! db/cm-focused? false)
                           (when (not= value rr)
                             (ut/tracked-dispatch-sync [::update-selected-key-cons selected-kp rr])))
-              :onFocus        (fn [_] (reset! db/cm-focused? true))
+              :onFocus        on-focus-fn
               :options {:mode              syntax
                         :lineWrapping      true
                         :lineNumbers       false ;true
@@ -3586,7 +3598,9 @@
           ;;                         (ut/deep-flatten (get-in db [:panels selected-block selected-view-type data-key])))
           ;;  clover-kpw-set (set (map str clover-kpw))
              clover-kpw-set @(ut/tracked-sub ::clover-kpw-set {:selected-block selected-block :selected-view-type selected-view-type :data-key data-key})
-             interspace     (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
+             ;interspace     (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
+             interspace     (set (into (cset/intersection clover-kpw-set (set @db/autocomplete-keywords)) (filter #(cstr/starts-with? (str %) ":time/") clover-kpw-set)))
+             ;interspace     (set (into clover-kpw-set (set @db/autocomplete-keywords)))
         ;;  interspace     (set (into (vec
         ;;                         (apply concat
         ;;                                (for [[k v] (get db :click-param)
@@ -10289,7 +10303,7 @@
   (let [kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view])
         in-editor? (not (nil? override-view))
         cc (get @ut/clover-walk-singles-map kk)]
-    (if false ;cc ;(ut/ne? cc)
+    (if cc ;(ut/ne? cc)
       cc
       (let [in-editor? (not (nil? override-view))
             walk-map
@@ -10973,7 +10987,7 @@
 
         ;;orig-body body
 
-        _ (when (or (= panel-key :block-5662) (= panel-key :virtual-panel)) (tapp>> [:body panel-key body is-runner? curr-view-mode selected-view-type]))
+        ;; _ (when (or (= panel-key :block-5662) (= panel-key :virtual-panel)) (tapp>> [:body panel-key body is-runner? curr-view-mode selected-view-type]))
 
         body (if (or is-runner? (and (not clover?) (not query?)))
                ;;{(first body) [:box :child [:string3 (last body)]]}
@@ -10990,13 +11004,14 @@
                                                  :height :panel-height+50-px
                                                  :align :center :justify :center])
                      opts-map            (if opts-map opts-map @(ut/tracked-sub ::view-opts-map {:panel-key panel-key :data-key selected-view}))
-                     opts-map-star       (assoc
+                     opts-map-star       (merge
                                           (into {} (for [[k v] opts-map]
                                                      {(keyword (cstr/replace (str k) ":" "*")) v}))
-                                          :*id (cstr/replace (str client-name "++" panel-key "++" selected-view-type "++" selected-view) ":" ""))
+                                          {:*id (cstr/replace (str client-name "++" panel-key "++" selected-view-type "++" selected-view) ":" "")
+                                           :*client-name client-name})
+
                      ;;placeholder-clover (edn/read-string (cstr/replace (pr-str placeholder-clover) "*solver-name*" sub-param-root)) ;; ugly, but cheaper than parse and postwalk here
                      ;;_ (tapp>> [:ss sub-param sub-param-root  (str placeholder-clover)])
-
                      ;;wrapper (ut/postwalker {:clover-body body} wrapper) 
                      ;;_ (tapp>> [:body (str body)])
                      solver-body (into {} (for [[k v] body]
@@ -11012,17 +11027,22 @@
                                                                               {:clover-body v}
                                                                               opts-map-star) wrapper)
 
-                                                     v (ut/postwalk-replacer {:col-width (Math/floor (/ (* main-w db/brick-size) 9.5))} v)]
-                                                 
-                                                 (if (not (nil? v))
-                                                   (ut/postwalk-replacer {:*data v} clover-fn) v))}))
-                     _ (tapp>> [(str solver-body)])
-                     new-body (assoc solver-body :waiter placeholder-clover)
-                     ]
+                                                     v (ut/postwalk-replacer {:col-width (Math/floor (/ (* main-w db/brick-size) 9.5))} v)
+                                                     v (if (not (nil? v))
+                                                         (ut/postwalk-replacer {:*data v} clover-fn) v)]
+                                                 (if runner-type
+                                                   (try (-> v
+                                                            (assoc-in [1 1 :cache?] true) ;; tagged so we know its a honeycomb fragment or history replay
+                                                            (assoc-in [1 1 :history?] true))
+                                                        (catch :default _ v))
+                                                   v) ;; ^^ make sure history box is caching res
+                                                 )}))
+                    ;;; _ (tapp>> [(str solver-body)])
+                     new-body (assoc solver-body :waiter placeholder-clover)]
                  new-body)
                body)
         
-        _ (when (or (= panel-key :block-5662) (= panel-key :virtual-panel)) (tapp>> [:body2 panel-key body is-runner? curr-view-mode selected-view-type]))
+        ;; _ (when (or (= panel-key :block-5662) (= panel-key :virtual-panel)) (tapp>> [:body2 panel-key body is-runner? curr-view-mode selected-view-type]))
 
         runner-rowset? (true?
                         (when (or is-runner? view?)
@@ -11370,8 +11390,8 @@
                                    runners-map               @(ut/tracked-sub ::block-runners {})
                                    is-nrepl?                 (= :nrepl (get-in runners-map [rtype :type]))
                                    lets-go?                  (and online? (not run?))
-                                   ;_ (when lets-go?
-                                   ;    (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) @db/solver-fn-runs]))
+                                   _ (when lets-go?
+                                       (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) @db/solver-fn-runs]))
                                    _ (when lets-go?
                                        (ut/tracked-dispatch [::wfx/push :default req-map])
                                        ;;(ut/tracked-dispatch [::add-placeholder-value new-solver-name])
@@ -11384,6 +11404,7 @@
                                                 (not (some #(= % :time/now-seconds) clover-kps))
                                                 (not (some #(= % :time/second) clover-kps)))
                                        ;; when nrepl and first
+                                       (tapp>> [:nrelp-bricks-call fkp clover-kps :bricks rtype])
                                        (when (and is-nrepl? (nil? (get @ut/first-connect-nrepl rtype)))
                                          (ut/tracked-dispatch   [::http/insert-alert (ut/first-connect-clover fkp clover-kps :bricks rtype) 11 1.7 14])
                                          (swap! ut/first-connect-nrepl assoc rtype 1))
@@ -11858,9 +11879,13 @@
 (re-frame/reg-event-db
  ::refresh-history-log
  (fn [db _]
-   (if (not (nil? @db/active-tmp-history)) ;(get db :buffy?)
-     (ut/dissoc-in db [:data @db/active-tmp-history])
-     db)))
+  ;;  (if (not (nil? @db/active-tmp-history)) ;(get db :buffy?)
+  ;;    (ut/dissoc-in db [:data @db/active-tmp-history])
+  ;;    db)
+   (tapp>> [:db/active-tmp-history @db/active-tmp-history])
+   (ut/tracked-dispatch [::conn/clear-query-history @db/active-tmp-history])
+   db
+   ))
 
 
 (defn materialize-values [block-map]
@@ -11946,7 +11971,7 @@
            new-h       (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
        (tapp>> [:running :update-panels-hash :event :expensive! "full send of all panels to server"])
-       (ut/dispatch-delay 800 [::http/insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
+      ; (ut/dispatch-delay 800 [::http/insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
        ;;(conn/push-panels-to-server pp ppr client-name)
        (ut/tracked-dispatch
         [::wfx/push :default

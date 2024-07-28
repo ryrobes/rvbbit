@@ -78,10 +78,10 @@
   {:datasource
    @(pool-create
      {:jdbc-url
-      "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
+      ;;;"jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-           ;;;;;;;"jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
+       "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
       :idle-timeout      600000
       :maximum-pool-size 20
       :max-lifetime      1800000

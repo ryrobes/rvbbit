@@ -4650,13 +4650,15 @@
 
 (defn alert-box [& [panel-key data-key]]
   [bricks/reecatch
-   (let [rekt            [@db/kick-alert @db/pause-alerts]
+   (let [;;;_ (ut/tapp>> [:sel panel-key data-key (str @db/last-focused)])
+         rekt            [@db/kick-alert @db/pause-alerts]
          rs-running      @(ut/tracked-sub ::bricks/runstreams-running {})
          rs-running-list @(ut/tracked-sub ::bricks/runstreams-running-list {})
          selected-view   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
          selected-block  @(ut/tracked-sub ::bricks/selected-block {})
          editor?         @(ut/tracked-sub ::bricks/editor? {})
          in-panel?       (and (or panel-key data-key) editor?)
+         ;;;_ (ut/tapp>> [panel-key data-key @db/solver-fn-lookup])
          solver-assoc    (cond in-panel?
                                (cstr/replace (str (get @db/solver-fn-lookup [:panels panel-key data-key])) ":solver/" "")
 
