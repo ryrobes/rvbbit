@@ -2780,8 +2780,7 @@
   [sub-task subbed-subs]
   (let [replacements (into {} (map (fn [[k v]] [v k]) subbed-subs))] (map (fn [k] (get replacements k k)) sub-task)))
 
-(defn kick
-  [client-name task-id sub-task thread-id thread-desc message-name & args]
+(defn kick [client-name task-id sub-task thread-id thread-desc message-name & args]
   (let [ui-keypath   [:kick] ;;; ^ sub-task is the UI item-key in push ops
         payload      (vec args)
         payload?     (not (empty? payload))
@@ -3372,46 +3371,42 @@
 
 (declare run-solver)
 
-;; TODO, these 3 can all be combined into one "smarter" version base don args, but I'm still iterating, so it's fine
+;;; run-solver  [solver-name client-name & [override-map override-input temp-solver-name keypath]]
+
+;;; TODO, these 3 can all be combined into one "smarter" version base don args, but I'm still iterating, so it's fine
 (defmethod wl/handle-request :run-solver
-  [{:keys [solver-name client-name override-map]}]
+  [{:keys [solver-name client-name override-map ui-keypath]}]
   (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
   (swap! last-solvers-atom-meta assoc-in
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
-  ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
   (ppy/execute-in-thread-pools :client/run-solver ; (keyword (str "client/run-solver." (cstr/replace (str client-name) ":" "")))
   ;(qp/slot-queue :solvers client-name 
-                               (fn []
-                                 (run-solver solver-name client-name override-map))))
+                               (fn []  (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver
-  [{:keys [solver-name client-name override-map]}]
+  [{:keys [solver-name client-name override-map ui-keypath]}]
   (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
   (swap! last-solvers-atom-meta assoc-in
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
-  ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
   (ppy/execute-in-thread-pools :client/run-solver ; (keyword (str "client/run-solver." (cstr/replace (str client-name) ":" "")))
   ;(qp/slot-queue :solvers client-name 
-                               (fn []
-                                 (run-solver solver-name client-name override-map))))
+                               (fn []  (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver-custom
-  [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
+  [{:keys [solver-name temp-solver-name client-name override-map input-map ui-keypath]}]
   ;; (ut/pp [:custom-solver-run! temp-solver-name :from client-name :input-map input-map])
   (swap! last-solvers-atom-meta assoc-in
          [temp-solver-name :output]
          [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
-  ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
   ;(enqueue-task-slot-pool client-name (fn [] 
   (ppy/execute-in-thread-pools :client/run-solver ; (keyword (str "client/run-solver." (cstr/replace (str client-name) ":" "")))
   ;(qp/slot-queue :solvers client-name 
-                               (fn []
-                                 (run-solver solver-name client-name override-map input-map temp-solver-name)))
+                               (fn []  (run-solver solver-name client-name override-map input-map temp-solver-name ui-keypath)))
   temp-solver-name)
 
 (defn flow-kill!
@@ -4430,7 +4425,7 @@
               nil
               20 :fabric-response))))
 
-(defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key]
+(defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key ui-keypath]
   (try (let [repl-host                   (get-in runner-map [:runner :host])
              repl-port                   (get-in runner-map [:runner :port])
              is-fabric?                   (cstr/includes? (str vdata) "fabric-run")
@@ -4469,7 +4464,64 @@
              new-history                 (vec (conj runs timestamp-str))
              output                      (if error?
                                            (select-keys (get output-full :evald-result) [:root-ex :ex :err])
-                                           output)]
+                                           output)
+             kit-out {:tester {:data
+                               [{:ask-mutates {"Highlight these in your source query?"
+                                               {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]]
+                                                {:logic [:and [:= :DISTRICT "B2"]]
+                                                 :style {:background-color "#008b8b66" :border "1px solid #00000000"}}}}
+                                 :content [[:v-box :size "auto" :width "490px" :style {:font-size "13px" :opacity 0.33} :children
+                                            [[:h-box :size "auto" :justify :between :children
+                                              [[:box :child ":mean"] [:box :child "1185.7693" :style {:font-weight 400}]]]
+                                             [:h-box :size "auto" :justify :between :children
+                                              [[:box :child ":standard-deviation"] [:box :child "713.1985540610642" :style {:font-weight 400}]]]
+                                             [:h-box :size "auto" :justify :between :children
+                                              [[:box :child ":sample-size"] [:box :child "13" :style {:font-weight 400}]]]
+                                             [:h-box :size "auto" :justify :between :children
+                                              [[:box :child ":fields"] [:box :child "[:DISTRICT]" :style {:font-weight 400}]]]
+                                             [:h-box :size "auto" :justify :between :children
+                                              [[:box :child ":calc-used"] [:box :child "[:percentiles [0.01 0.99]]" :style {:font-weight 400}]]]]]
+                                           [:v-box :size "auto" :width "490px" :style {:font-size "16px"} :children
+                                            [[:h-box :size "auto" :justify :between :children
+                                              [[:box :child ":DISTRICT"] [:box :child "\"B2\"" :style {:font-weight 400}]]]]] "as a wider aggregate:"
+                                           {:_h            4
+                                            :_query-id     :kit-query--15841505520-agg
+                                            :connection-id "boston-crime"
+                                            :from          [:query/OFFENSE-CODE-GROUP-drag-40]
+                                            :group-by      [:DISTRICT]
+                                            :order-by      [[2 :desc]]
+                                            :select        [:DISTRICT [[:count 1] :rows]]
+                                            :style-rules   {[:* :highlight-group] {:logic [:and [:= :DISTRICT "B2"]]
+                                                                                   :style {:background-color "#008b8b66"
+                                                                                           :border           "1px solid #00000000"}}}}
+                                           "ALL rows in this group:"
+                                           {:_h            8
+                                            :_query-id     :kit-query--15841505520-detail
+                                            :connection-id "boston-crime"
+                                            :from          [:query/OFFENSE-CODE-GROUP-drag-40]
+                                            :select        [:*]
+                                            :where         [:*if :kit-query--15841505520-agg/*.clicked
+                                                            [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT "B2"]]]}]
+                                 :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}
+                                 :name "When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250."
+                                 :order 0
+                                 :parameters {:test-param123 ["fart fx service"]}
+                                 :step-mutates {[:panels :block-5394 :views :hare-vw-4]
+                                                [:box
+                                                 :align
+                                                 :center
+                                                 :justify
+                                                 :center
+                                                 :style
+                                                 {:font-size   (str (rand-int 123) "px")
+                                                  :font-weight  700
+                                                  :padding-top  "6px"
+                                                  :padding-left "14px"
+                                                  :margin-top   "-8px"
+                                                  :color        :theme/editor-outer-rim-color
+                                                  :font-family  :theme/base-font}
+                                                 :child
+                                                 "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]}}]}}]
          (when is-fabric? (fabric-post-process client-name fabric-opts-map output elapsed-ms is-history?))
          (when sampled?
            (try
@@ -4497,6 +4549,29 @@
          (when (not error?) ;;(and use-cache? (not error?))
            (swap! solvers-cache-atom assoc cache-key [output output-full]))
          (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
+
+        ;;  (kick  client-name "kick-solver!" (last ui-keypath) 
+        ;;         "solver-log"  ;; thread name
+        ;;         (str "solver-run" (cstr/join " " (rest ui-keypath))) ;; header title
+        ;;         (str "query-log-" (first ui-keypath))  
+        ;;         ;[(str (ut/get-current-timestamp) " - solver ran in " elapsed-ms " ms.")]
+
+                
+
+        ;;         )
+         
+         (insert-kit-data kit-out  
+                          (hash kit-out ) 
+                          (last ui-keypath)
+                          "solver-log"  ;; thread name
+                          ;;(str "solver-run" (cstr/join " " (rest ui-keypath))) ;; header title
+                          :kick ;;(last ui-keypath)
+                          elapsed-ms 
+                          client-name 
+                          )
+         ;;(insert-kit-data payload (hash payload) sub-task task-id ui-keypath 0 client-name "flow-id-here!"))
+
+
          output)
        (catch Throwable e
          (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
@@ -4513,8 +4588,13 @@
              (swap! last-solvers-atom-meta assoc solver-name {:error (str e)})
              (swap! last-solvers-atom assoc solver-name {:error (str e)})))))
 
+;;      ;;kick [client-name task-id       sub-task           thread-id     thread-desc                           message-name & args]                    payload-vec
+;;      (kick  client-name "kick-solver!" (last ui-keypath) "solver-log"  (str "query-log-" (first ui-keypath)) (str "query-log-" (first ui-keypath))  [(str (ut/get-current-timestamp) " - query ran in " -1 " ms.")])
+
+
+
 (defn run-solver
-  [solver-name client-name & [override-map override-input temp-solver-name keypath]]
+  [solver-name client-name & [override-map override-input temp-solver-name ui-keypath]]
   (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
         _                     (swap! solvers-run inc)
         timestamp             (System/currentTimeMillis)]
@@ -4719,7 +4799,7 @@
 
 
         (= runner-type :nrepl)
-        (nrepl-solver-run vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key)
+        (nrepl-solver-run vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key ui-keypath)
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try
@@ -4831,7 +4911,13 @@
       ;;              (assoc :time-running (ut/format-duration
       ;;                                    (:started solver)
       ;;                                    (System/currentTimeMillis))))))
-)));;)
+
+      
+
+
+
+
+)))
 
 (defonce last-signals-history-atom-temp (atom {}))
 

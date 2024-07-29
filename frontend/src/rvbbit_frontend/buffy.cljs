@@ -1457,7 +1457,10 @@
         kit-name         (if (= kit-name :ai/calliope) :kick kit-name) ;;; tempo demo
         iname            (str (last kp))
         iname            (if (empty? iname) ":base" iname)
-        where-filter     [:and (if (or (= kit-name :kick) (= kit-name :ai/calliope)) [:= :client_name (str client-name)] [:= 1 1])
+        where-filter     [:and (if 
+                                (or (= kit-name :kick) (= kit-name :ai/calliope)) 
+                                 [:= :client_name (str client-name)]
+                                 [:= 1 1])
                           [:= :item_name iname] [:= :kit_name (str kit-name)]]
         kit-results      @(re-frame.core/subscribe [::conn/sql-data [:kit-results-sys]])
         kits             (kit-rows-to-map kit-results)
@@ -1476,6 +1479,7 @@
         queued?          @(ut/tracked-subscribe [::bricks/reco-queued? kit-context-name kit-name])
         allow-mutate?    (get @kit-mutations kp false)
         sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}]
+    (ut/tapp>> [:kit-calls sql-calls])
     (doseq [[k query] sql-calls]
       (let [;query (ut/postwalk-replacer sql-params v)
             ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])

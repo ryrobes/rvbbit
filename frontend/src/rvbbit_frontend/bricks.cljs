@@ -4294,10 +4294,11 @@
                              @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                               {:keypath [(keyword (str (ut/replacer are-solver
                                                                                     ":solver/" "solver-meta/")))]}))
+        client-name       @(ut/tracked-sub ::client-name {})
         name-space        (get-in meta-data [:output :evald-result :ns])
         ;ns-clover         (keyword (str "repl-ns/" name-space))
         intro-map-all     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                           {:keypath [:repl-ns/*client-name*]})
+                                           {:keypath [(keyword (str "repl-ns/" (cstr/replace (str client-name) ":" "")))]})
         intro-map         (get intro-map-all name-space)
         ;intro-map         (when are-solver
         ;                    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
@@ -10731,12 +10732,13 @@
                                  [re-com/box :child ""]]]]]))
 
               :click-solver (fn [[solver-name tt & [input-map overrides]]]
-                              (let [client-name  @(ut/tracked-sub ::client-name {})
-                                    running-key  (keyword (str "solver-status/" (cstr/replace (str client-name) ":" "") ">" (cstr/replace (str solver-name) ":" "") ">running?"))
-                                    running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
-                                    overrides?   (ut/ne? overrides)
-                                    input-map?   (ut/ne? input-map)
-                                    trig!        [@waiting?]]
+                              (let [client-name         @(ut/tracked-sub ::client-name {})
+                                    running-key         (keyword (str "solver-status/" (cstr/replace (str client-name) ":" "") ">" (cstr/replace (str solver-name) ":" "") ">running?"))
+                                    running?            @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                                    overrides?          (ut/ne? overrides)
+                                    input-map?          (ut/ne? input-map)
+                                    selected-view-type  @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
+                                    trig!               [@waiting?]]
                                 [re-com/h-box :size "auto" :children
                                  [[re-com/box :child (if (not (vector? tt)) (str tt) tt)]
                                   [re-com/h-box :size "auto" :height "10px" :children
@@ -10760,6 +10762,7 @@
                                                       [::wfx/push     :default
                                                        {:kind         :run-solver-custom
                                                         :solver-name  solver-name
+                                                        :ui-keypath   [panel-key selected-view-type selected-view]
                                                         :override-map overrides
                                                         :input-map    input-map
                                                         :client-name  client-name}])
@@ -11377,6 +11380,7 @@
                                    req-map                   (merge
                                                               {:kind             :run-solver-custom
                                                                :solver-name      solver-name
+                                                               :ui-keypath       [panel-key selected-view-type selected-view]
                                                                :temp-solver-name (keyword new-solver-name)
                                                                :input-map        resolved-input-map
                                                                :client-name      client-name}
@@ -11404,7 +11408,6 @@
                                                 (not (some #(= % :time/now-seconds) clover-kps))
                                                 (not (some #(= % :time/second) clover-kps)))
                                        ;; when nrepl and first
-                                       (tapp>> [:nrelp-bricks-call fkp clover-kps :bricks rtype])
                                        (when (and is-nrepl? (nil? (get @ut/first-connect-nrepl rtype)))
                                          (ut/tracked-dispatch   [::http/insert-alert (ut/first-connect-clover fkp clover-kps :bricks rtype) 11 1.7 14])
                                          (swap! ut/first-connect-nrepl assoc rtype 1))
@@ -11538,14 +11541,12 @@
         body (if (ut/ne? sub-param)
                (let [curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
                      sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
-                     placeholder-on-running? (get-in br [selected-view-type :placeholder-on-running?])
+                     placeholder-on-running? (get-in br [selected-view-type :placeholder-on-running?] false)
+                     ;;;_ (tapp>> [:bodyend panel-key selected-view selected-view-type sub-param sub-param-root placeholder-on-running?])
                      running? (when placeholder-on-running?
-                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(str "solver-status/*client-name*>"
+                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(str "solver-status/" client-name ">"
                                                                                                     (cstr/replace (str sub-param-root) ":"  "") ">running?")]}))]
-                 (if (or (nil? curr-val) running?
-                         ;(and (keyword? curr-val) (cstr/starts-with?  (str curr-val) ":solver/"))
-                         ;(= curr-val sub-param)
-                         )
+                 (if (or (nil? curr-val) running?)
                    (assoc body selected-view
                           ;;[re-com/box :child "waiting..."]
                           (get body :waiter)) ;; use user-space clover placeholder?

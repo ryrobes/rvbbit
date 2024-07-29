@@ -2996,7 +2996,7 @@
                                                                meta-data            (when are-solver
                                                                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                                                        {:keypath [meta-data-ckp]}))
-                                                               running-status-ckp   (keyword (str (ut/replacer are-solver ":solver/" "solver-status/*client-name*>")))
+                                                               running-status-ckp   (keyword (str (ut/replacer are-solver ":solver/" (str "solver-status/" (cstr/replace (str client-name) ":" "") ">"))))
                                                                running-status       (when are-solver
                                                                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                                                        {:keypath [running-status-ckp]}))

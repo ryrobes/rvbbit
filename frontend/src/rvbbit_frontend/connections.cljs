@@ -363,6 +363,7 @@
                                      req-map                   (merge
                                                                 {:kind             :run-solver-custom
                                                                  :solver-name      solver-name
+                                                                 :ui-keypath       [panel-key]
                                                                  :temp-solver-name (keyword new-solver-name)
                                                                  :input-map        resolved-input-map
                                                                  :client-name      client-name}
