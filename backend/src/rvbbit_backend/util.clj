@@ -852,6 +852,26 @@
         (vector? data) (mapv dissoc-recursive data)
         :else          data))
 
+(defn capture-output [f & args]
+  (let [output (with-out-str (apply f args))]
+    output))
+
+(defn truncate-nested [data]
+  (letfn [(truncate-string [s]
+            (if (> (count s) 100)
+              (str (subs s 0 100) "...")
+              s))
+          (truncate [item]
+            (cond
+              (string? item) (truncate-string item)
+              (map? item) (into {} (map (fn [[k v]]
+                                          [(if (string? k) (truncate-string k) k)
+                                           (truncate v)])
+                                        item))
+              (vector? item) (mapv truncate item)
+              :else item))]
+    (truncate data)))
+
 (defn lists-to-vectors
   [x]
   (cond (list? x) (vec (map lists-to-vectors x))

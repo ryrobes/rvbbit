@@ -26,6 +26,8 @@
 (defonce unsafe-keys (atom #{}))
 
 (defonce view-title-edit-idx (reagent/atom nil))
+(defonce chunk-chart (reagent/atom :server/cpu-chart))
+(def chunk-charts [:server/cpu-chart :server/mem-chart :server/threads-chart :server/nrepl-chart :server/solvers-chart :server/flows-chart])
 
 ;;(defonce incidental-rowsets (atom []))
 

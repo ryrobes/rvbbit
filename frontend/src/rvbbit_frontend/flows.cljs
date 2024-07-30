@@ -3416,6 +3416,7 @@
                            {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         flow-id    @(ut/tracked-subscribe [::selected-flow])
         dyn-width  (last @db/flow-editor-system-mode)
+        ;;dyn-height ( @db/flow-editor-system-mode)
         o-modes    [["flows running" 800] ["flow browser" 600] ["flow parts" 600] ["metrics" 990] ["KPIs" 990] ["signals" 990]
                     ["rules" 990] ["flow history" 1200]]
         sql-calls  {:flow-fn-categories-sys {:select [:category] :from [:flow_functions] :group-by [1]}
@@ -3470,13 +3471,8 @@
             (str (first o))])] [re-com/gap :size "10px"]]] [re-com/gap :size "8px"]
       (cond (= (first @db/flow-editor-system-mode) "flows running") [flow-details-block-container "server flow statuses" :system
                                                                      :system
-                                                                     [re-com/box :height (px (* h 0.6)) :child
-                                                                      [server-flows (* h 0.6)]] ; flow-id
-                                                                                                ; orderb
-                                                                                                ; true
-                                                                                                ; 570
-                                                                                                ; nil
-                                                                                                ; ;366
+                                                                     [re-com/box :height (px (* h 0.5))
+                                                                      :child [server-flows (* h 0.5)]] ;
                                                                      "zmdi-dns"]
             (= (first @db/flow-editor-system-mode) "flow browser")  [flow-details-block-container
                                                                      (first @db/flow-editor-system-mode) :system :system
@@ -3485,12 +3481,7 @@
                                                                      (first @db/flow-editor-system-mode) :system :system
                                                                      [settings-block flow-id :part-browser] "zmdi-chart-donut"])
       (cond (some #(= (first @db/flow-editor-system-mode) %) ["flow browser" "flow parts"])
-              [flow-details-block-container "server flow statuses" :system :system [server-flows 240] ; flow-id
-                                                                                                      ; orderb
-                                                                                                      ; true
-                                                                                                      ; 570
-                                                                                                      ; nil
-                                                                                                      ; ;366
+              [flow-details-block-container "server flow statuses" :system :system [server-flows 240] 
                "zmdi-dns"]
             (= (first @db/flow-editor-system-mode) "scheduler") [flow-details-block-container (first @db/flow-editor-system-mode)
                                                                  :system :system [settings-block flow-id :scheduler]
@@ -3536,20 +3527,54 @@
                                         :stroke            (str (theme-pull :theme/editor-outer-rim-color nil)) ;;"#8884d8"
                                         :fill              (str (theme-pull :theme/editor-outer-rim-color nil) 55) ;;"#8884d8"
                                        }]]]}]
-                  [re-com/h-box :children
-                   [[re-com/v-box :width "50%" :children
-                     [[re-com/box :child "threads" :align :center :justify :center :size "auto" :style {:opacity 0.7}]
-                      [re-com/box :child [buffy/render-honey-comb-fragments qq1 (/ dyn-width 50) 2]]]]
-                    [re-com/v-box :width "50%" :children
-                     [[re-com/box :child "memory" :align :center :justify :center :size "auto" :style {:opacity 0.7}]
-                      [re-com/box :child [buffy/render-honey-comb-fragments qq2 (/ dyn-width 50) 2]]]]]])
-                [re-com/box :style {:padding-left "12px"} :child
-                 (let [qq {:select        [:ts [:thread_count :threads] [:used_memory_mb :used_mb] :sys_load [:ws_peers :clients]]
-                           :connection-id "system-db"
-                           :limit         1
-                           :order-by      [[:ts :desc]]
-                           :from          [[:jvm_stats :rr70]]}]
-                   [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]]]
+                  
+                  ;; [re-com/h-box :children
+                  ;;  [[re-com/v-box :width "50%" :children
+                  ;;    [[re-com/box :child "threads" :align :center :justify :center :size "auto" :style {:opacity 0.7}]
+                  ;;     [re-com/box :child [buffy/render-honey-comb-fragments qq1 (/ dyn-width 50) 2]]]]
+                  ;;   [re-com/v-box :width "50%" :children
+                  ;;    [[re-com/box :child "memory" :align :center :justify :center :size "auto" :style {:opacity 0.7}]
+                  ;;     [re-com/box :child [buffy/render-honey-comb-fragments qq2 (/ dyn-width 50) 2]]]]]]
+                  
+                  (let [rrt! [@db/chunk-chart]]
+                    [re-com/v-box
+                     :size "auto"
+                     :width (px (* dyn-width 1.25))
+                   ;:height "200px"
+                     :align :center :justify :center
+                     :style {;:border "1px solid pink"
+                             :margin-left "30px"
+                             :zoom 0.8}
+                     :children [[re-com/h-box 
+                                 :width (px dyn-width)
+                                 :size "auto" :justify :between 
+                                 :children (for [m db/chunk-charts ;;[:server/cpu-chart :server/mem-chart :server/thread-chart]
+                                                    :let [selected? (= m @db/chunk-chart)]] 
+                                             [re-com/box 
+                                              :padding "0px 10px 0px 10px"
+                                              :style (merge {:cursor "pointer"
+                                                             :font-family (theme-pull :theme/monospaced-font nil)
+                                                             :font-size "20px"}
+                                                            (when selected? {:border "1px solid #ffffff60"
+                                                                             :font-weight 700}))
+                                              :attr {:on-click #(reset! db/chunk-chart m)}
+                                              :child (str ":" (-> (str m) (cstr/replace ":server/" "") (cstr/replace "-chart" "")))])]
+                                [buffy/render-honey-comb-fragments [:terminal @db/chunk-chart] (/ (* dyn-width 1.25) 50) (/ (* h 0.5) 50)]]])
+                  
+                  ;;[:terminal :server/cpu-chart]
+                  ;; [buffy/render-honey-comb-fragments [:terminal :server/cpu-chart] (/ dyn-width 50) 2]
+                  
+                  
+                  )
+                ;; [re-com/box :style {:padding-left "12px"} :child
+                ;;  (let [qq {:select        [:ts [:thread_count :threads] [:used_memory_mb :used_mb] :sys_load [:ws_peers :clients]]
+                ;;            :connection-id "system-db"
+                ;;            :limit         1
+                ;;            :order-by      [[:ts :desc]]
+                ;;            :from          [[:jvm_stats :rr70]]}]
+                ;;    [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]
+                
+                ]]
             :else [re-com/box :child "oops"])]]))
 
 (defn waffles

@@ -972,7 +972,9 @@
 
   (defn reboot-reactor-and-resub []
     (evl/graceful-restart-nrepl-server!)
+    (Thread/sleep 10000)
     (wss/reboot-reactor!)
+    (Thread/sleep 10000)
     (wss/reload-signals-subs)
     (wss/reload-solver-subs))
 
@@ -1035,9 +1037,9 @@
   ;;                         cruiser/default-viz-shapes))))
   ;;                  "(Re)Sniff Client SQL DBs" 30)
 
-  ;; (start-scheduler 120
-  ;;                  wss/clean-up-reactor
-  ;;                  "Remove unneeded watchers from Reactor" 120)
+  (start-scheduler 600 ;; sketch for little gain?
+                   wss/clean-up-reactor
+                   "Remove unneeded watchers from Reactor" 120)
 
   (start-scheduler 300 ;; was 5
                    #(ppy/execute-in-thread-pools
@@ -1049,9 +1051,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  ;; (start-scheduler (* 3600 4) ;; 1 hour
-  ;;                  reboot-reactor-and-resub
-  ;;                  "Reboot Atom Reactor" (* 3600 4))
+  (start-scheduler (* 3600 8) ;; 8 hours
+                   reboot-reactor-and-resub
+                   "Reboot Atom Reactor & nREPL server" (* 3600 8))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
@@ -1081,7 +1083,7 @@
                         (swap! wss/sys-load conj (ut/get-system-load-average))
                         (swap! wss/non-heap-mem-usage conj (ut/get-non-heap-memory-usage))
                         (swap! wss/time-usage conj (System/currentTimeMillis)) ;; in case we want to easily ref w/o generating
-                        (qp/update-queue-stats-history) ;; has it's own timestamp key
+                        ;(qp/update-queue-stats-history) ;; moved to 15 second scheduler
                         ;(qp/update-specific-queue-stats-history [:watcher-to-client-serial :update-stat-atom-serial])
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper");;)
@@ -1095,7 +1097,7 @@
                       ;(reset! wss/solvers-cache-atom {})
                       ;;(reset! sql/errors {}) ;; just for now
                       (reset! wss/agg-cache {}) ;; <--- bigggger
-                      (reset! ut/df-cache {})) ;; <--- big boy
+                      (reset! ut/df-cache {}))  ;; <--- big boy
                    "Purge Solver & Deep-Flatten Cache" (* 3600 2))
 
   ;; (ut/calculate-atom-size :current-size ut/df-cache)
@@ -1120,7 +1122,7 @@
                                        :children [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
                                                    :child [:box :child (str "Restarting Websocket Server. See you in ~45 seconds...")]]]]
                                       10 1
-                                      5)))
+                                      45)))
                       (Thread/sleep 10000)
                       (wss/destroy-websocket-server!)
                       (Thread/sleep 30000)
@@ -1129,6 +1131,7 @@
 
   (start-scheduler 15
                    #(let [dbs (wss/database-sizes)]
+                      (qp/update-queue-stats-history) ;; has it's own timestamp key
                       (doseq [[db dbv] dbs]
                         (swap! wss/sql-metrics assoc db
                                (conj (get @wss/sql-metrics db [])
@@ -1136,7 +1139,7 @@
                    "Simple SQLite Db Stats" 60)
 
 
-  (start-scheduler 1
+  (start-scheduler 15
                    #(let [pst (wss/query-pool-sizes)]
                       (doseq [pp (keys pst)]
                         (swap! wss/pool-stats-atom assoc pp (conj (get @wss/pool-stats-atom pp []) (get-in pst [pp 1])))))

@@ -144,9 +144,10 @@
                                  :type :clojure
                                  :input-map {}
                                  :data (rvbbit-backend.websockets/fabric-run
-                                        {:input (str :clover-body " ")
+                                        {:input (str :clover-body "")
                                          :client-name :*client-name
                                          :id :*id
+                                         :context :*context
                                          :pattern (or :*pattern "tweet")
                                          :model (or :*model "gpt-3.5-turbo")})}]
                     :description "AI framework: Uses the Fabric command line tool to access various local and remote LLM models with pre-defined 'patterns', + special context-aware RVBBIT patterns."

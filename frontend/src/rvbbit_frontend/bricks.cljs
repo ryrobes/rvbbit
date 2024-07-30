@@ -1060,9 +1060,12 @@
         ;;                                 (keyword (str "repl-ns/" nms ">introspected"))))
          selected-block          (get db :selected-block)
          editor?                 (get db :editor?)
+         flow?                   (get db :flow?)
          selected-tab            (get db :selected-tab)
          panels-map              (get db :panels)
          ;;all? true 
+         chunk-charts            (if (and flow? (= (first @db/flow-editor-system-mode) "flows running"))
+                                   db/chunk-charts [])
          panels-map              (if all? panels-map
                                      (merge
                                       (only-relevant-tabs panels-map selected-tab)
@@ -1178,7 +1181,7 @@
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))
          subs-vec (vec (distinct
-                        (concat flow-runners clover-solver-outputs
+                        (concat flow-runners clover-solver-outputs chunk-charts  
                                      ;;client-namespaces-refs 
                                      ;;client-namespace-intros 
                                 client-ns-intro-map
@@ -1592,13 +1595,14 @@
          (ut/dissoc-in [:panels panel-key data-key-type block-layer])
          (ut/dissoc-in [:data block-layer])))))
 
-(re-frame/reg-event-db ::select-tab
-                       (fn [db [_ tab]]
-                         (-> db
-                             (assoc :selected-tab tab)
-                             (assoc-in [:click-param :sys :selected-tab] tab)
-                             (assoc-in [:click-param :sys :selected-tab-idx]
-                                       (try (.indexOf (get db :tabs) tab) (catch :default _ -1))))))
+(re-frame/reg-event-db
+ ::select-tab
+ (fn [db [_ tab]]
+   (-> db
+       (assoc :selected-tab tab)
+       (assoc-in [:click-param :sys :selected-tab] tab)
+       (assoc-in [:click-param :sys :selected-tab-idx]
+                 (try (.indexOf (get db :tabs) tab) (catch :default _ -1))))))
 
 (re-frame/reg-event-db ::add-tab (undoable) (fn [db [_ new-tab]] (assoc db :tabs (conj (vec (get db :tabs)) new-tab))))
 
@@ -1620,57 +1624,71 @@
 
 (re-frame/reg-sub ::auto-run? (fn [db] (get db :auto-run? false)))
 
-(re-frame/reg-sub ::auto-run-and-connected?
-                  (fn [db]
-                    (and (= (get-in db [:websocket-fx.core/sockets :default :status]) :connected) (get db :auto-run? false))))
+(re-frame/reg-sub
+ ::auto-run-and-connected?
+ (fn [db]
+   (and (= (get-in db [:websocket-fx.core/sockets :default :status]) :connected) (get db :auto-run? false))))
 
-(re-frame/reg-sub ::bg-status?
-                  (fn [_]
-                    (and @db/auto-refresh? ;; auto-refresh killswitch bool
-                         (or (= @db/editor-mode :status)
-                             (= @db/editor-mode :vvv)
-                             (= @db/editor-mode :meta)))))
+(re-frame/reg-sub
+ ::bg-status?
+ (fn [_]
+   (and @db/auto-refresh? ;; auto-refresh killswitch bool
+        (or (= @db/editor-mode :status)
+            (= @db/editor-mode :vvv)
+            (= @db/editor-mode :meta)))))
 
 (re-frame/reg-sub
  ::update-flow-statuses?
  (fn [db]
-  ;;  (and (get db :flow? false)
-  ;;       (= (get @db/flow-editor-system-mode 0) "flows running")
-  ;;       (get db :flow-editor? false))
-   false
+   (and (get db :flow? false)
+        (= (get @db/flow-editor-system-mode 0) "flows running")
+        (get db :flow-editor? false))
+  ;; false
    ))
 
-(re-frame/reg-event-db ::flow-statuses-response (fn [db [_ ss]] (assoc db :flow-statuses ss)))
+(re-frame/reg-event-db 
+ ::flow-statuses-response 
+ (fn [db [_ ss]] 
+   (assoc db :flow-statuses ss)))
 
-(re-frame/reg-sub ::flow-statuses (fn [db] (get db :flow-statuses {})))
+(re-frame/reg-sub 
+ ::flow-statuses 
+ (fn [db] 
+   (get db :flow-statuses {})))
 
-(re-frame/reg-sub ::condi-valves
-                  (fn [db [_ flow-id]] ;; just for reactionary purposes
-                    (get-in db [:flow-results :condis flow-id] {})))
+(re-frame/reg-sub
+ ::condi-valves
+ (fn [db [_ flow-id]] ;; just for reactionary purposes
+   (get-in db [:flow-results :condis flow-id] {})))
 
-(re-frame/reg-sub ::condi-valve-open? ;; TODO needs bid
-                  (fn [db [_ flow-id bid condi-key]]
-                    (let [fck   (ut/replacer (str condi-key) ":" "")
-                          bid   (ut/replacer (str bid) ":" "")
-                          conns (get-in db [:flows flow-id :connections])
-                          conn  (for [[c1 c2] conns
-                                      :when   (and ;(cstr/ends-with? (str c1) (str "/" fck))
-                                               (= c1 (keyword (str bid "/" fck))))]
-                                  (try (keyword (ut/replacer (str (first (ut/splitter (str c2) #"/"))) ":" ""))
-                                       (catch :default _ :error!)))
-                          kkey  (first conn)]
-                      (get-in db [:flow-results :condis flow-id kkey] false))))
+(re-frame/reg-sub
+ ::condi-valve-open? ;; TODO needs bid
+ (fn [db [_ flow-id bid condi-key]]
+   (let [fck   (ut/replacer (str condi-key) ":" "")
+         bid   (ut/replacer (str bid) ":" "")
+         conns (get-in db [:flows flow-id :connections])
+         conn  (for [[c1 c2] conns
+                     :when   (and ;(cstr/ends-with? (str c1) (str "/" fck))
+                              (= c1 (keyword (str bid "/" fck))))]
+                 (try (keyword (ut/replacer (str (first (ut/splitter (str c2) #"/"))) ":" ""))
+                      (catch :default _ :error!)))
+         kkey  (first conn)]
+     (get-in db [:flow-results :condis flow-id kkey] false))))
 
-(re-frame/reg-sub ::flow-channels-open? (fn [db [_ flow-id]] (get-in db [:flow-statuses flow-id :channels-open?] false)))
+(re-frame/reg-sub 
+ ::flow-channels-open? 
+ (fn [db [_ flow-id]] 
+   (get-in db [:flow-statuses flow-id :channels-open?] false)))
 
-(re-frame/reg-event-db ::update-flow-statuses
-                       (fn [db [_]]
-                           ;;(re-frame/dispatch [::http/insert-alert "update flow statues" 13 1 5 ])
-                         (ut/tracked-dispatch [::wfx/request :default
-                                               {:message     {:kind :get-flow-statuses :client-name (get db :client-name)}
-                                                :timeout     50000
-                                                :on-response [::flow-statuses-response]}])
-                         db))
+(re-frame/reg-event-db
+ ::update-flow-statuses
+ (fn [db [_]]
+   ;;(re-frame/dispatch [::http/insert-alert "update flow statues" 13 1 5 ])
+   (ut/tracked-dispatch [::wfx/request :default
+                         {:message     {:kind :get-flow-statuses :client-name (get db :client-name)}
+                          :timeout     50000
+                          :on-response [::flow-statuses-response]}])
+   db))
 
 ;; (re-frame/reg-sub ::has-query? (fn [db [_ panel-key query-key]] (not (nil? (get-in db [:panels panel-key :queries query-key])))))
 
@@ -2479,6 +2497,11 @@
 (def over-block (reagent/atom nil))
 (def over-flow? (reagent/atom false))
 
+(re-frame/reg-sub
+ ::get-view-data
+ (fn [db {:keys [panel-key runner data-key]}]
+   (get-in db [:panels panel-key runner data-key])))
+
 (defn is-float?
   [n] ;; cljs uses js "number" so core "float?" cant tell between int and float
   (and (number? n) (not= n (js/Math.floor n))))
@@ -2515,6 +2538,9 @@
                              (into {} (for [[k v] opts-map] 
                                        {(keyword (cstr/replace (str k) ":" "*")) v}))
                              {:*id (cstr/replace (str client-name "++" new-keyw "++" runner "++" view-name) ":" "")
+                              ;; :*context (let [[runner data-key]     @(ut/tracked-sub ::editor-panel-selected-view {})
+                              ;;                 selected-block  @(ut/tracked-sub ::selected-block {})]
+                              ;;             @(ut/tracked-sub ::get-view-data {:panel-key selected-block :runner runner :data-key data-key}))
                               :*client-name client-name})
         valid-body          (if (and as-function? (or clover? clojure?))
                               (walk/postwalk-replace
@@ -11011,6 +11037,9 @@
                                           (into {} (for [[k v] opts-map]
                                                      {(keyword (cstr/replace (str k) ":" "*")) v}))
                                           {:*id (cstr/replace (str client-name "++" panel-key "++" selected-view-type "++" selected-view) ":" "")
+                                          ;;  :*context (let [[runner data-key]     @(ut/tracked-sub ::editor-panel-selected-view {}) ;; temp. selected is its own thing
+                                          ;;                  selected-block  @(ut/tracked-sub ::selected-block {})]
+                                          ;;              @(ut/tracked-sub ::get-view-data {:panel-key selected-block :runner runner :data-key data-key})) 
                                            :*client-name client-name})
 
                      ;;placeholder-clover (edn/read-string (cstr/replace (pr-str placeholder-clover) "*solver-name*" sub-param-root)) ;; ugly, but cheaper than parse and postwalk here

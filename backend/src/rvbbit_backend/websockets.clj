@@ -1793,6 +1793,10 @@
          client-name
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
+  (ppy/execute-in-thread-pools :boomerang-heartbeat
+                               (fn []
+                                 (doseq [fk (vec (keys (get @atoms-and-watchers client-name {})))]
+                                   (sub-to-value client-name fk)))) ;; resub just in case?
   (let [cstats  (client-statuses)
         latency (get-in cstats [client-name :client-latency])
         server-subs (get-in cstats [client-name :server-subs])
@@ -1801,13 +1805,13 @@
         msgs (get-in @ack-scoreboard [client-name :messages-per-second])
         mem-mb (ut/bytes-to-mb (get memory :mem_used))
         _ (swap! client-metrics assoc client-name
-                  (conj (get @client-metrics client-name [])
-                        {:latency latency
-                         :server-subs server-subs
-                         :client-subs client-subs
-                         :recent-messages-per-second msgs-per-recent
-                         :messages-per-second msgs
-                         :mem-mb mem-mb}))
+                 (conj (get @client-metrics client-name [])
+                       {:latency latency
+                        :server-subs server-subs
+                        :client-subs client-subs
+                        :recent-messages-per-second msgs-per-recent
+                        :messages-per-second msgs
+                        :mem-mb mem-mb}))
         ins-sql {:insert-into [:client-memory]
                  :values      [(-> memory
                                    (assoc :latency latency)
@@ -3177,7 +3181,9 @@
                                                              :flow-id     flow-id}))
                                                      return-val       (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn
                                                      retry?           (get-in opts [:opts :retry-on-error?] false)
-                                                     restarts         (if retry? (- (get-in opts [:opts :retries] 0) (get @restart-map flow-id 0)) 0)
+                                                     rtty             (get-in opts [:opts :retries] 0)
+                                                     rtty             (if (> rtty 25) 25 rtty)
+                                                     restarts         (if retry? (- rtty (get @restart-map flow-id 0)) 0)
                                                      restarts-left?   (> restarts 0)
                                                      relevant-keys    (vec (filter #(cstr/starts-with? (str %) (str post-id)) (keys @flow-db/results-atom)))
                                                      working-data-ref (into {} (for [[k v] (select-keys @flow-db/working-data relevant-keys)] {k (get v :description)}))
@@ -3696,7 +3702,7 @@
 (defmethod wl/handle-request :get-flow-statuses
   [{:keys [client-name]}]
   (inc-score! client-name :push)
-  (ut/pp [:PUSH-get-flow-status! client-name])
+  ;; (ut/pp [:PUSH-get-flow-status! client-name])
   (let [fss     (flow-statuses)
         fssk    (vec (keys fss))
         payload (merge (select-keys fss fssk)
@@ -4397,8 +4403,71 @@
     [:box :style {:font-size "11px"} :child (str sample-error)]
     [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]]])
 
-(defn fabric-post-process [client-name fabric-opts-map output elapsed-ms is-history?]
-  (let [{:keys [pattern id input]} fabric-opts-map]
+;; (defn parse-text-and-code [input]
+;;   (let [input-str (if (vector? input) (cstr/join "\n" input) input)
+;;         parts (cstr/split input-str #"(?s)```")
+;;         process-part (fn [part]
+;;                        (let [trimmed (cstr/trim part)]
+;;                          (if (cstr/starts-with? trimmed "{")
+;;                            ; Code section
+;;                            (try
+;;                              (edn/read-string trimmed)
+;;                              (catch Exception e
+;;                                (println "Warning: Failed to parse code section:" (.getMessage e))
+;;                                trimmed))
+;;                            ; Text section
+;;                            trimmed)))]
+;;     (mapv process-part parts)))
+
+(defn parse-text-and-code [input]
+  (let [input-str (if (vector? input) (cstr/join "\n" input) input)
+        parts (cstr/split input-str #"(?s)```")
+        remove-comments (fn [code-str]
+                          (-> code-str
+                              ; Remove full-line comments
+                              (cstr/replace #"(?m)^\s*;.*$" "")
+                              ; Remove inline comments
+                              (cstr/replace #"(?m);.*$" "")
+                              ; Remove empty lines
+                              (cstr/replace #"(?m)^\s*$\n" "")
+                              cstr/trim))
+        process-part (fn [part]
+                       (let [trimmed (cstr/trim part)]
+                         (if (cstr/starts-with? trimmed "{")
+                           ; Code section
+                           (try
+                             (-> trimmed
+                                 remove-comments
+                                 edn/read-string)
+                             (catch Exception e
+                               (println "Warning: Failed to parse code section:" (.getMessage e))
+                               trimmed))
+                           ; Text section
+                           trimmed)))]
+    (mapv process-part parts)))
+
+;; (ut/pp (parse-text-and-code ["Sure, I will change the text color to a nice green and add a thick border."
+;;                       "``` " "{[:panels :block-5394 :views :hare-vw-4] " " [:box " "  :align :center " "  :justify :center " "  :style {:font-size \"56px\", " "          :font-weight 700, " "          :padding-top \"6px\", " "          :padding-left \"14px\", " "          :margin-top \"-8px\", "
+;;                       "          :color \"#00FF00\", " "          :font-family \"Oxygen Mono\"," "          :border \"5px solid #000000\"} " "  :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}"
+;;                       "```" "Changes made:" "1. Updated `:color` to `\"#00FF00\"` for a nice green text color." "2. Added `:border \"5px solid #000000\"` to the `:style` map for a thick border."]))
+
+(defn fabric-post-process [client-name fabric-opts-map output elapsed-ms ui-keypath is-history?]
+  (let [{:keys [pattern id input model context]} fabric-opts-map
+        code-proc? (and (=  pattern "clover")
+                        (cstr/includes? (str output) "```"))
+        kit-content (when code-proc? (parse-text-and-code output))
+        kit-out {(keyword model) {:data [{:name (str client-name " request")
+                                          :content [[:v-box :size "auto"
+                                                     :children [[:box :size "auto"
+                                                                 :child (str (ut/millis-to-date-string (- (System/currentTimeMillis) elapsed-ms)))]
+                                                                [:box :size "auto"
+                                                                 :child (str input)]]]]}
+                                         {:name (str model " reply")
+                                          :content [[:v-box :size "auto"
+                                                     :children [[:box :size "auto"
+                                                                 :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]
+                                                                [:box :size "auto"
+                                                                 :child (str output)]]]]}]}}]
     (ut/pp  [:fabric-post-process client-name fabric-opts-map elapsed-ms is-history?])
     ;;(Thread/sleep 1000) ;; testing alert collisions
     (when (not is-history?)
@@ -4414,22 +4483,49 @@
                  [:v-box
                   :size "auto"
                   :children [[:box
-                              :style {:font-size "14px"}
-                              :child (str "Fabric has completed it's " pattern " pattern.")]
+                              :style {:font-size "16px"}
+                              :child (str "Fabric has completed it's '" pattern "' pattern on " model ".")]
                              [:box
-                              :style {:font-size "12px"}
-                              :child [:speak (if (vector? output)
-                                               (cstr/join "\n" output)
-                                               output)]]]]]]]
+                              :style {:font-size "14px"}
+                              :width (str (* 16 50) "px") ;; alert size from other arg X "brick size" in UI
+                              :child (str (if (vector? output)
+                                            (cstr/join "\n" output)
+                                            output))]]]]]]
               16
               nil
-              20 :fabric-response))))
+              20 :fabric-response)
+
+      (insert-kit-data kit-out
+                       (hash kit-out)
+                       (last ui-keypath)
+                       "solver-log"  ;; thread name
+                          ;;(str "solver-run" (cstr/join " " (rest ui-keypath))) ;; header title
+                       :kick ;;(last ui-keypath)
+                       elapsed-ms
+                       client-name)
+      (when code-proc?
+        (let [step-maps (apply merge (filter map? kit-content))
+              target    (last (ffirst step-maps))
+              kit-out   {(keyword model) {:data  [{:name (cstr/join " " (filter string? (parse-text-and-code (str input))))
+                                                   :step-mutates context
+                                                   :content (into ["(context during req)"] (vec (vals context)))}
+                                                  {:name (cstr/join " " (filter string? (parse-text-and-code (str input))))
+                                                   :step-mutates step-maps
+                                                   :content (into (filterv string? kit-content) (vec (vals step-maps)))}]}}]
+          (ut/pp [:kit-response step-maps target context kit-out])
+          (insert-kit-data kit-out
+                           (hash kit-out)
+                           target
+                           "solver-log"  ;; thread name
+                           :kick ;;(last ui-keypath)
+                           elapsed-ms
+                           client-name))))))
 
 (defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key ui-keypath]
   (try (let [repl-host                   (get-in runner-map [:runner :host])
              repl-port                   (get-in runner-map [:runner :port])
              is-fabric?                   (cstr/includes? (str vdata) "fabric-run")
-             _ (ut/pp [:nrepl-call runner-name is-fabric? solver-name client-name])
+             ;;_ (ut/pp [:nrepl-call runner-name is-fabric? solver-name client-name])
              {:keys [result elapsed-ms]} (ut/timed-exec
                                           (ppy/execute-in-thread-pools-but-deliver (keyword (str "serial-nrepl-instance/" (cstr/replace (str solver-name) ":" "")))
                                            ;;:nrepl-evals 
@@ -4522,7 +4618,7 @@
                                                   :font-family  :theme/base-font}
                                                  :child
                                                  "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]}}]}}]
-         (when is-fabric? (fabric-post-process client-name fabric-opts-map output elapsed-ms is-history?))
+         (when is-fabric? (fabric-post-process client-name fabric-opts-map output elapsed-ms ui-keypath is-history?))
          (when sampled?
            (try
              (let [sample-message (get-in output-full [:sampled :message] "")
@@ -4560,15 +4656,15 @@
 
         ;;         )
          
-         (insert-kit-data kit-out  
-                          (hash kit-out ) 
-                          (last ui-keypath)
-                          "solver-log"  ;; thread name
-                          ;;(str "solver-run" (cstr/join " " (rest ui-keypath))) ;; header title
-                          :kick ;;(last ui-keypath)
-                          elapsed-ms 
-                          client-name 
-                          )
+        ;;  (insert-kit-data kit-out  
+        ;;                   (hash kit-out ) 
+        ;;                   (last ui-keypath)
+        ;;                   "solver-log"  ;; thread name
+        ;;                   ;;(str "solver-run" (cstr/join " " (rest ui-keypath))) ;; header title
+        ;;                   :kick ;;(last ui-keypath)
+        ;;                   elapsed-ms 
+        ;;                   client-name 
+        ;;                   )
          ;;(insert-kit-data payload (hash payload) sub-task task-id ui-keypath 0 client-name "flow-id-here!"))
 
 
@@ -5262,8 +5358,8 @@
     (when (not signal?)
       (kick client-name
             [base-type client-param-path]
-            (cond 
-              (cstr/includes? (str flow-key) "running?")  false
+            (cond
+              ;;(cstr/includes? (str flow-key) "running?")  false
               (= base-type :time)                         (get @father-time client-param-path)
                   ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
               (= base-type :signal)                       (get @last-signals-atom client-param-path)
@@ -5283,11 +5379,11 @@
                                                                   (vec (into [(keyword (second sub-path))]
                                                                              (vec (rest (rest sub-path)))))
                                                                   lv)
-                  ;; (= base-type :solver-status)                  (get-in @solver-status
-                  ;;                                                       (vec (into [(keyword (second sub-path))]
-                  ;;                                                                  (vec (rest (rest sub-path)))))
-                  ;;                                                       lv)
-              (= base-type :solver-status)                 {} ; nil ;; the old atom is gone anyways, lets clear the client for new values
+              (= base-type :solver-status)                  (get-in @solver-status
+                                                                    (vec (into [(keyword (second sub-path))]
+                                                                               (vec (rest (rest sub-path)))))
+                                                                    lv)
+              ;;(= base-type :solver-status)                 {} ; nil ;; the old atom is gone anyways, lets clear the client for new values
               (= base-type :signal-history)               (get-in @last-signals-history-atom
                                                                   (vec (into [(keyword (second sub-path))]
                                                                              (vec (rest (rest sub-path)))))
@@ -5960,7 +6056,7 @@
                                     (= connection-id "history-db")      history-db
                                     (= connection-id "system")          system-db
                                     (or (= connection-id :cache) 
-                                        (= connection-id "cache.db") 
+                                        (= connection-id "cache.db")  
                                         (nil? connection-id))           cache-db
                                     :else (get-connection-string connection-id))
                     has-pivot?
@@ -6325,6 +6421,14 @@
                                                      (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql))
                                                      )))
                     (do ;(swap! sql-cache assoc req-hash output)
+                      (kick client-name "kick-test!" (first ui-keypath)
+                            "query-log"
+                            (str "query-log " (first ui-keypath))
+                            (str "query-log " (first ui-keypath))
+                            [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms. ")
+                             [:text honey-sql-str2]
+                             [:edn (ut/truncate-nested (get honey-meta :fields))]
+                             ])
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
              (catch Exception e
@@ -6344,12 +6448,11 @@
               (doall (let [async-result-chan (go (let [result-chan (queue-runstream runstream)]
                                                    (println "Waiting for result...") ; Debugging
                                                    (<! result-chan)))] ; This returns a channel
-                       (do (println "Getting result from async operation...") (async/<!! async-result-chan)))) ; Blocking take
-                                                                                                                ; from the
-                                                                                                                ; channel
-              (runstream))))));)
+                       (do (println "Getting result from async operation...") 
+                           (async/<!! async-result-chan)))) ; Blocking take from the chan
+              (runstream))))))
 
-(defn kit-to-kit [payload])
+
 
 (defn insert-kit-data
   [output query-hash ui-keypath ttype kit-name elapsed-ms & [client-name flow-id]]
@@ -6964,7 +7067,7 @@
           (swap! agg-cache assoc cache-key average)
           average))))
 
-(defn average-in-chunks [data chunk-size n]
+(defn average-in-chunks [data chunk-size]
   (->> data
        (partition-all chunk-size) ;; vector into chunks
       ;;  (pmap (fn [chunk]
@@ -6985,7 +7088,7 @@
         (swap! agg-cache assoc cache-key sum)
         sum))))
 
-(defn sum-in-chunks [data chunk-size n]
+(defn sum-in-chunks [data chunk-size]
   (->> data
        (partition-all chunk-size) ;; vector into chunks
       ;;  (map (fn [chunk]
@@ -7605,6 +7708,7 @@
                         value-strings (apply str (for [chunk-idx (range (count fchunks))
                                                        :let [chunk (vec (get chunks chunk-idx))
                                                              chunks-size (count chunk)
+                                                             final-chunk? (= chunk-idx (dec (count chunks)))
                                                              ;last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])
                                                              last-chunk-full (if (> chunk-idx 0) (vec (get fchunks (- chunk-idx 1))) [0])
                                                              chunk-full (vec (get fchunks chunk-idx))]]
@@ -7621,8 +7725,8 @@
                                                       ;;  (if (= chunk-idx 0)
                                                       ;;    (str lb (apply str (repeat (- (+ 2 chunks-size) lbc) " ")))
                                                       ;;    (str lb (apply str (repeat (- 34 lbc ) " "))))
-                                                       (str lb (apply str (repeat (- (+ 2 chunks-size) lbc) " ")))
-                                                       (apply str (repeat (+ 2 chunks-size) " "))))))
+                                                       (str lb (apply str (repeat (- (+ 2 chunks-size) lbc (if final-chunk? 2 0)) " ")))
+                                                       (apply str (repeat (+ 2 chunks-size (if final-chunk? -2 0)) " "))))))
                         vals-line (str "│" "\u001B[1m"
                                        (colorize value-strings)
                                        reset-code)
@@ -7697,7 +7801,7 @@
                             (ut/pp (draw-bar-graph
                                     (if (= ff 1)
                                       (mapv kkey (get @pool-stats-atom pp))
-                                      (average-in-chunks (mapv kkey (get @pool-stats-atom pp)) ff sample-size))
+                                      (average-in-chunks (mapv kkey (get @pool-stats-atom pp)) ff))
                                     (str pp " - " kkey) sym :color color :freq ff :width width)))
                   freqs (if (nil? freqs)
                         ;[1 15]
@@ -7735,7 +7839,7 @@
                                            data0 (mapv (fn [x] (if (nil? x) 0 x)) data0) ;; replace nil 
                                            data (vec (mapcat (fn [item] (repeat heartbeat-seconds item)) data0))]
                                        (draw-bar-graph
-                                        (if (= ff 1) data (average-in-chunks data ff sample-size))
+                                        (if (= ff 1) data (average-in-chunks data ff))
                                         (str pp " - " kkey) sym :color color :freq ff :width width))))
                     stats (cond (vector? stats) stats
                                 (keyword? stats) [stats]
@@ -7871,22 +7975,21 @@
                           {k (conj v true)}))]
     (merge base-avg summed)))
 
-(defn get-stats [kkey agg num]
-  (let [stat (get (stats-keywords) kkey)]
-    (let [[data-vec kkey sym] stat]
-      (if agg
-        (last (sum-in-chunks data-vec num nil))
-        (last (average-in-chunks data-vec num nil))))))
+;; (defn get-stats [kkey agg num]
+;;   (let [stat (get (stats-keywords) kkey)]
+;;     (let [[data-vec kkey sym] stat]
+;;       (if agg
+;;         (last (sum-in-chunks data-vec num))
+;;         (last (average-in-chunks data-vec num))))))
 
-(ut/pp (pop [ 1 2 3 4 5 ]))
 
 (defn draw-stats
   ([]
    (ut/pp [:draw-stats-needs-help
            (str "Hi. Draw what? " (clojure.string/join ", " (map str (keys (stats-keywords)))))]))
-  ([kks & [freqs label? width]]
+  ([kks & [freqs label? width limit?]]
    (let [width (or width (ut/get-terminal-width))
-         sample-size (* width 1.5)
+         ;;sample-size (* width 1.5)
          kksv (cond (or (= kks :all) (= kks :*)) (vec (sort-by str (keys (stats-keywords))))
                     (keyword? kks) [kks]
                     (vector? kks)   kks ;;(sort-by str (keys @pool-stats-atom))
@@ -7898,32 +8001,39 @@
              draw-label (fn [data color]
                           (let [[dv kkey _ _] data]
                             (fig-render (str kkey 
-                                             (let [vl (str (ut/rnd (ut/avg (take-last 10 dv)) 0) "%")
+                                             (let [vl (str (ut/nf (ut/rnd (ut/avg (take-last 10 dv)) 0)))
                                                    vll (count vl)
                                                    labl (count (str kkey))
                                                    ;multi 6
                                                    spc (* (+ vll labl) 9)
                                                    ;_ (ut/pp [vl vll labl spc width])
                                                    ]
-                                               (str (apply str (repeat (Math/ceil (/ (- width spc) 3)) " "))
-                                               vl))
-                                             
-                                             ) color)))
+                                               ;(str (apply str (repeat (Math/ceil (/ (- width spc) 3)) " ")) vl)
+                                               (str " " vl))
+                                             ) color
+                                        ;;"data/Cybermedium.flf" ;;(figlet/load-flf "data/Cybermedium.flf")
+                                        )))
              draw-it (fn [ff color data]
-                       (let [[data-vec kkey sym sum?] data]
+                       (let [[data-vec kkey sym sum?] data
+                             data-vec (if limit? (take-last 
+                                                  ;(* (* ff width) 1.2)
+                                                  (* ff width)
+                                                  data-vec) data-vec)]
                          (draw-bar-graph
                           (if (= ff 1)
                             data-vec
                             (let [dd (if (and (true? sum?) (not (nil? sum?)))
-                                       (sum-in-chunks data-vec ff sample-size)
-                                       (average-in-chunks data-vec ff sample-size))
+                                       (sum-in-chunks data-vec ff)
+                                       (average-in-chunks data-vec ff))
                                  ;;; _ (ut/pp [:dd dd])
                                   ;;dd (if (>= ff 15) (vec (drop-last dd)) dd)
                                   ;;dd (pop dd)
                                   ] dd)
                             
                             )
-                          (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg") :width width)))
+                          ;(str kkey " : " kks) 
+                          (str kkey)
+                          sym :color color :freq ff :agg (if sum? "sum" "avg") :width width)))
              freqs (cond (nil? freqs) [1 15 60]
                          (number? freqs) [freqs]
                          :else freqs)
@@ -7935,7 +8045,14 @@
                (when label? (draw-label data-base color)))
            (ut/pp [:draw-stats-needs-help
                    (str kks "? Nope. Invalid data type, bro! Gimmie something: " (clojure.string/join ", " (map str (keys (stats-keywords)))))])))))))
+
 ;; (draw-stats :cpu)
+;; (draw-stats)
+
+;; (time (draw-stats [:cpu ] [15] false nil true))
+ ;;  (time (draw-stats [:cpu ] [15] false nil false))
+
+
 
 
 (defonce pool-ttls-last (atom {}))
@@ -8106,7 +8223,30 @@
                    sub-types (select-keys sub-types (filter #(not (cstr/includes? (str %) "||")) (keys sub-types)))
                    ;; ^^ flow tracker subs have messy keypath parents and are generally one-offs. noise.
                    server-subs ttl]
-               (swap! server-atom assoc :uptime uptime-str :clients peers :threads thread-count :memory mm :watchers watchers :subs ttl)
+               
+               (swap! server-atom merge
+                      {:cpu-chart      (ut/capture-output #(draw-stats [:cpu] [15 90 120 600 1800 3600] false 103 true))
+                       :mem-chart      (ut/capture-output #(draw-stats [:mem] [15 90 120 600 1800 3600] false 103 true))
+                       :threads-chart  (ut/capture-output #(draw-stats [:threads] [15 90 120 600 1800 3600] false 103 true))
+                       :nrepl-chart    (ut/capture-output #(draw-stats [:nrepl-calls] [15 90 120 600 1800 3600] false 103 true))
+                       :solvers-chart  (ut/capture-output #(draw-stats [:solvers] [15 90 120 600 1800 3600] false 103 true))
+                       :flows-chart    (ut/capture-output #(draw-stats [:flows] [15 90 120 600 1800 3600] false 103 true))
+                       :uptime         uptime-str
+                       :clients        peers
+                       :threads        thread-count
+                       :memory         mm
+                       :watchers       watchers
+                       :subs           ttl})
+               
+              ;;  (swap! server-atom assoc :cpu-chart (ut/capture-output #(draw-stats [:cpu] [15 90 120 600 1800 3600] false 103 true)))
+              ;;  (swap! server-atom assoc :mem-chart (ut/capture-output #(draw-stats [:mem] [15 90 120 600 1800 3600] false 103 true)))
+              ;;  (swap! server-atom assoc :threads-chart (ut/capture-output #(draw-stats [:threads] [15 90 120 600 1800 3600] false 103 true)))
+              ;;  (swap! server-atom assoc :nrepl-chart (ut/capture-output #(draw-stats [:nrepl-calls] [15 90 120 600 1800 3600] false 103 true)))
+              ;;  (swap! server-atom assoc :solvers-chart (ut/capture-output #(draw-stats [:solvers] [15 90 120 600 1800 3600] false 103 true)))
+              ;;  (swap! server-atom assoc :flows-chart (ut/capture-output #(draw-stats [:flows] [15 90 120 600 1800 3600] false 103 true)))
+
+               ;(swap! server-atom assoc :uptime uptime-str :clients peers :threads thread-count :memory mm :watchers watchers :subs ttl)
+
                (ut/pp [(get @father-time :now-seconds)
                        :jvm-stats
                        {;:*cached-queries              (count @sql-cache)
@@ -8134,13 +8274,11 @@
                         :*current-threads             thread-count}]))
              (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
 
-        (ut/pp [:latency-adaptations @dynamic-timeouts])
+        ;; (ut/pp [:latency-adaptations @dynamic-timeouts])
 
-
-          (draw-stats [:cpu :mem :threads]
-                    [15]
-                    false
-                    )
+                  ;; [kks & [freqs label? width limit?]]
+         (draw-stats [:cpu :mem :threads] [15] false nil true)
+        ;; (draw-stats [:cpu :mem :threads] [15] false nil false)
 
         ;(ut/pp [:repl-introspections @evl/repl-introspection-atom])
 
@@ -8504,13 +8642,13 @@
 
 (defn write-local-file
   "write local file with given data (forked fabric version)"
-  [full-path file-data]
+  [full-path file-data & [append?]]
   (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
         output    (run-shell-command "pwd")
         pwd       (first (get-in output [:output] []))
         full-path (if fqd? full-path (str pwd "/" full-path))]
     (ut/pp [:writing-file full-path])
-    (do (try (spit full-path file-data)
+    (do (try (spit full-path file-data :append (true? append?))
              (catch Exception e
                (do (println "err")
                    {;:file-data file-data
@@ -8518,6 +8656,8 @@
                     :file-path full-path
                     :error     (str "caught exception: " (.getMessage e))})))
         {:status :ok :file-path full-path})))
+
+;; (spit fp (str pretty-data "\n") :append true)
 
 (defn models-list-to-map [models-list]
   (let [is-header? #(cstr/ends-with? % ":")]
@@ -8550,12 +8690,22 @@
       (cstr/replace #":" "")
       cstr/lower-case))
 
-(defn- shell-escape
-  "Escape a string for safe use in shell commands"
-  [s]
+;; (defn- shell-escape
+;;   "Escape a string for safe use in shell commands"
+;;   [s]
+;;   (-> s
+;;       (cstr/replace #"'" "'\\''")  ; Replace ' with '\''
+;;       (->> (format "'%s'"))))    ; Wrap the entire string in single quotes
+
+(defn shell-escape [s]
   (-> s
-      (cstr/replace #"'" "'\\''")  ; Replace ' with '\''
-      (->> (format "'%s'"))))    ; Wrap the entire string in single quotes
+      (cstr/replace "\\" "\\\\")   ; Double up backslashes
+      (cstr/replace "'" "'\\''")   ; Escape single quotes
+      (cstr/replace "\"" "\\\"")   ; Escape double quotes
+      (cstr/replace "$" "\\$")     ; Escape dollar signs
+      (cstr/replace "`" "\\`")     ; Escape backticks
+      (cstr/replace "\n" "'\n'")   ; Handle newlines
+      (->> (format "'%s'"))))      ; Wrap in single quotes
 
 (defn get-fabric-models []
   (let [output (run-shell-command "fabric --listmodels")]
@@ -8568,6 +8718,47 @@
     (if (= (get output :error-code 0) 0)
       (get output :output)
       (get output :exception))))
+
+;; (defn fabric
+;;   "Wrapper for the fabric CLI application.
+;;    Required arguments:
+;;    :input   - The input text (will be passed as --text)
+;;    :pattern - The pattern to use
+   
+;;    Optional arguments (all others from the CLI help):
+;;    :copy, :agents, :output, :session, :clear-session, :session-log,
+;;    :list-sessions, :gui, :stream, :list, :temp, :top-p, :frequency-penalty,
+;;    :presence-penalty, :update, :setup, :change-default-model, :model,
+;;    :list-models, :remote-ollama-server, :context"
+;;   [& {:keys [input pattern] :as opts}]
+;;   (when (or (nil? input) (nil? pattern))
+;;     (throw (IllegalArgumentException. "Both :input and :pattern are required arguments.")))
+
+;;   (let [id (get opts :id)
+;;         client-name (get opts :client-name)
+;;         opts (dissoc opts :id :client-name)
+;;         opts (if id (-> opts
+;;                        ;; (assoc :session (str id)) ;; fabric session works kinda wacky. we are only doing one-shots now, so not needed ATM
+;;                         (assoc :output  (str "/tmp/" id))) opts)
+;;         cli-args (reduce-kv
+;;                   (fn [args k v]
+;;                     (case k
+;;                       :input (conj args "--text" (shell-escape v))
+;;                       (into args
+;;                             (if (boolean? v)
+;;                               [(str "--" (name (kebab-case k)))]
+;;                               [(str "--" (name (kebab-case k))) (str v)]))))
+;;                   ["fabric"]  ; Start with the command name
+;;                   opts)
+;;         command (cstr/join " " cli-args)]
+;;     (write-local-file (str "../fabric-sessions/" id) 
+;;                       (str "==============================================================================" "\n"
+;;                        (ut/millis-to-date-string (System/currentTimeMillis)) " " client-name "\n \n" opts "\n \n \n" command "\n \n \n" "==============================================================================" "\n") true)
+;;     (ut/pp [:fabric-cli command])
+
+;;     ;; Execute the command
+;;     ;(shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+;;     command))
 
 (defn fabric
   "Wrapper for the fabric CLI application.
@@ -8586,83 +8777,49 @@
 
   (let [id (get opts :id)
         client-name (get opts :client-name)
-        opts (dissoc opts :id :client-name)
-        opts (if id (-> opts
-                       ;; (assoc :session (str id))
-                        (assoc :output  (str "../fabric-outputs/" id))) opts)
+        opts (dissoc opts :id :client-name :input)  ; Remove :input from opts
+        opts (if id (assoc opts :output (str "/tmp/" id)) opts)
+        temp-file (str "/tmp/fabric-input-" (java.util.UUID/randomUUID) ".txt")
+        _ (spit temp-file input)  ; Write input to temp file
         cli-args (reduce-kv
                   (fn [args k v]
-                    (case k
-                      :input (conj args "--text" (shell-escape v))
-                      (into args
-                            (if (boolean? v)
-                              [(str "--" (name (kebab-case k)))]
-                              [(str "--" (name (kebab-case k))) (str v)]))))
+                    (into args
+                          (if (boolean? v)
+                            [(str "--" (name (kebab-case k)))]
+                            [(str "--" (name (kebab-case k))) (str v)])))
                   ["fabric"]  ; Start with the command name
                   opts)
-        command (cstr/join " " cli-args)]
-    (write-local-file (str "../fabric-inputs/" id) (str opts "\n \n \n" command))
+        command (str "cat " temp-file " | " (cstr/join " " cli-args))]
+    (write-local-file (str "../fabric-sessions/" id)
+                      (str "==============================================================================" "\n"
+                           (ut/millis-to-date-string (System/currentTimeMillis)) " " client-name "\n \n"
+                           input "\n"
+                           (assoc opts :input "...") "\n \n \n" command "\n \n \n"
+                           "==============================================================================" "\n")
+                      true)
     (ut/pp [:fabric-cli command])
 
-    ;; Execute the command
-    ;(shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+    ;; Return the command
     command))
 
 (ext/create-dirs "./fabric-sessions") ;; from base rvbbit folder
-(ext/create-dirs "./fabric-outputs")
-(ext/create-dirs "./fabric-inputs")
-
-;; (defn fabric-run [opts-map]
-;;   (let [command (fabric opts-map)
-;;         client-name (get opts-map :client-name)
-;;         id (get opts-map :id)
-;;         pattern (get opts-map :pattern)
-;;         process-builder (ProcessBuilder. (into-array ["sh" "-c" command]))
-;;         _ (.redirectErrorStream process-builder true)
-;;         process (.start process-builder)
-;;         reader (java.io.BufferedReader.
-;;                 (java.io.InputStreamReader.
-;;                  (.getInputStream process)))
-;;         output (StringBuilder.)]
-
-;;     (loop []
-;;       (when-let [line (.readLine reader)]
-;;         (.append output line)
-;;         (.append output "\n")
-;;         (recur)))
-
-;;     (.waitFor process)
-
-;;     (let [result (str output)]
-
-;;       (ut/pp [:sending-alert client-name])
-
-;;       (alert! client-name
-;;               [:v-box
-;;                :justify :center
-;;                :style {:opacity 0.7}
-;;                :children
-;;                [[:box
-;;                  :style {:color :theme/editor-outer-rim-color :font-weight 700}
-;;                  :child
-;;                  [:box :child [:speak (str "Fabric has completed it's " pattern " pattern: " result)]]]]]
-;;               12
-;;               2
-;;               10)
-
-;;       (if (empty? result)
-;;         "Command executed, but produced no output."
-;;         result))))
-
+;(ext/create-dirs "./fabric-outputs")
+;(ext/create-dirs "./fabric-inputs") 
 
 (defn fabric-run [opts-map]
-   (let [_ (ut/pp [ :fabric-run opts-map])
-        command (fabric opts-map)
-        client-name (get opts-map :client-name)
-        id (get opts-map :id)
-        pattern (get opts-map :pattern)
-        result (run-shell-command command)
-        output (get result :output)]
+   (let [_ (ut/pp [:fabric-run opts-map])
+         context (get opts-map :context)
+         pattern (get opts-map :pattern)
+         opts-map (if (and context (= pattern "clover"))
+                    (assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n ")) opts-map)
+         command (fabric (dissoc opts-map :context))
+         client-name (get opts-map :client-name)
+         id (get opts-map :id)
+         result (run-shell-command command)
+         output (get result :output)]
+     (write-local-file (str "../fabric-sessions/" id)
+                       (str (ut/millis-to-date-string (System/currentTimeMillis)) " :" (get opts-map :model) 
+                            "\n \n" output "\n \n \n" ) true)
     [output opts-map]))
 
 

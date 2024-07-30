@@ -1810,6 +1810,9 @@
         syntax (get @selected-mode :syntax)
         ttype  (get @selected-mode :type)
         client-name @(ut/tracked-sub ::bricks/client-name {})
+        [runner-src data-key] @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+        selected-block    @(ut/tracked-sub ::bricks/selected-block {})
+        context-body      @(ut/tracked-sub ::bricks/get-view-data {:panel-key selected-block :runner runner-src :data-key data-key})
         ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
         ;; is-rf-event? (and (or (= runner :views) (= runner :clover))
         ;;                   (cstr/starts-with? (cstr/trim command) "[:dispatch"))
@@ -1825,9 +1828,11 @@
         command (if (not= syntax "clojure")
                   command ;; the "implied string"
                   (ensure-quoted-string (cstr/replace command "\"" "\\\"")))
-        opts-map (if (= runner :fabric) {:model (get @fbc-selected-model runner) 
-                                         :client-name client-name
-                                         :pattern (get @fbc-selected-pattern runner)} {})]
+        opts-map (if (= runner :fabric)
+                   {:model (get @fbc-selected-model runner)
+                    :client-name client-name
+                    :context {[:panels selected-block runner-src data-key] context-body}
+                    :pattern (get @fbc-selected-pattern runner)} {})]
     (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
 
