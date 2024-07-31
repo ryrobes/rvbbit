@@ -183,24 +183,24 @@
 (defonce time-child-atoms (atom {}))
 (defonce solver-status-child-atoms (atom {}))
 
-(defn count-parent-keys []
-  (let [atoms {:screen-child-atoms screen-child-atoms
-               :param-child-atoms param-child-atoms
-               :panel-child-atoms panel-child-atoms
-               :flow-status-child-atoms flow-status-child-atoms
-               :flow-tracker-child-atoms flow-tracker-child-atoms
-               :signal-child-atoms signal-child-atoms
-               :last-signals-history-child-atoms last-signals-history-child-atoms
-               :flow-child-atoms flow-child-atoms
-               :evl/repl-introspection-child-atoms evl/repl-introspection-child-atoms
-               :solver-child-atoms solver-child-atoms
-               :solver-meta-child-atoms solver-meta-child-atoms
-               :time-child-atoms time-child-atoms
-               :solver-status-child-atoms solver-status-child-atoms}]
-    (reduce (fn [acc [atom-name atom-ref]]
-              (assoc acc atom-name (count (keys @atom-ref))))
-            {}
-            atoms)))
+;; (defn count-parent-keys []
+;;   (let [atoms {:screen-child-atoms screen-child-atoms
+;;                :param-child-atoms param-child-atoms
+;;                :panel-child-atoms panel-child-atoms
+;;                :flow-status-child-atoms flow-status-child-atoms
+;;                :flow-tracker-child-atoms flow-tracker-child-atoms
+;;                :signal-child-atoms signal-child-atoms
+;;                :last-signals-history-child-atoms last-signals-history-child-atoms
+;;                :flow-child-atoms flow-child-atoms
+;;                :evl/repl-introspection-child-atoms evl/repl-introspection-child-atoms
+;;                :solver-child-atoms solver-child-atoms
+;;                :solver-meta-child-atoms solver-meta-child-atoms
+;;                :time-child-atoms time-child-atoms
+;;                :solver-status-child-atoms solver-status-child-atoms}]
+;;     (reduce (fn [acc [atom-name atom-ref]]
+;;               (assoc acc atom-name (count (keys @atom-ref))))
+;;             {}
+;;             atoms)))
 
 (def reactor-boot-time (atom (System/currentTimeMillis)))
 ;;(reset! reactor-boot-time (System/currentTimeMillis))
@@ -4420,7 +4420,8 @@
 ;;     (mapv process-part parts)))
 
 (defn parse-text-and-code [input]
-  (let [input-str (if (vector? input) (cstr/join "\n" input) input)
+  (let [input (walk/postwalk-replace (into {} (for [f (filter #(cstr/starts-with? (str %) "```") input)] {f "```"})) input)
+        input-str (if (vector? input) (cstr/join "\n" input) input)
         parts (cstr/split input-str #"(?s)```")
         remove-comments (fn [code-str]
                           (-> code-str
@@ -4446,10 +4447,35 @@
                            trimmed)))]
     (mapv process-part parts)))
 
+;; (ut/pp (parse-text-and-code ["Certainly! I'll convert the Vega-Lite chart to a ReCharts equivalent. The conversion will use a BarChart component, which is suitable for the bar chart representation in the original Vega-Lite specification." 
+;;                              "Here's the converted ReCharts version:" "```clojure" "{[:panels :block-94 :views :oz]" " [:> :ResponsiveContainer" "  {:width \"100%\" :height :panel-height}" "  [:> :BarChart" "   {:data :gen-viz-84" "    :layout \"vertical\"" "    :margin {:top 5 :right 30 :left 20 :bottom 5}}" "   [:> :CartesianGrid {:strokeDasharray \"3 3\"}]" "   [:> :XAxis {:type \"number\"}]" "   [:> :YAxis {:type \"category\" :dataKey :country :width 150}]" "   [:> :Tooltip]" "   [:> :Legend]" "   [:> :Bar" "    {:dataKey :rows" "     :fill \"#8884d8\"}]]]}" "```" "Explanation of changes:" "1. Replaced Vega-Lite with ReCharts components." "2. Used a ResponsiveContainer for responsive sizing." "3. Set up a vertical BarChart to match the original layout." "4. Used XAxis for the quantitative axis (sum of rows) and YAxis for the categorical axis (countries)." "5. Added Tooltip and Legend components for interactivity." "6. Created a single Bar component to represent the data." "Note that this conversion maintains the basic structure and functionality of the original chart, but some advanced features and styling from the Vega-Lite version (like custom color schemes and detailed axis configurations) are not directly translated. You may need to adjust colors, fonts, and other styles to match your desired appearance."]
+;; ))
+
 ;; (ut/pp (parse-text-and-code ["Sure, I will change the text color to a nice green and add a thick border."
 ;;                       "``` " "{[:panels :block-5394 :views :hare-vw-4] " " [:box " "  :align :center " "  :justify :center " "  :style {:font-size \"56px\", " "          :font-weight 700, " "          :padding-top \"6px\", " "          :padding-left \"14px\", " "          :margin-top \"-8px\", "
 ;;                       "          :color \"#00FF00\", " "          :font-family \"Oxygen Mono\"," "          :border \"5px solid #000000\"} " "  :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}"
 ;;                       "```" "Changes made:" "1. Updated `:color` to `\"#00FF00\"` for a nice green text color." "2. Added `:border \"5px solid #000000\"` to the `:style` map for a thick border."]))
+
+;; (ut/pp (parse-text-and-code ["Certainly! I'll convert the Vega-Lite chart to a ReCharts equivalent. The main difference is that ReCharts doesn't have a built-in sorting mechanism, so we'll assume the data is pre-sorted. Here's the ReCharts version:"
+;;                              "The changes include:"
+;;                              "- Replaced Vega-Lite with ReCharts components"
+;;                              "- Used a BarChart instead of ComposedChart for simplicity" "- Implemented a vertical bar chart to match the original layout" "- Used similar styling and responsiveness"
+;;                              "```" "[:> :ResponsiveContainer" " {:width \"100%\" :height :panel-height}" " [:> :BarChart" "  {:data :gen-viz-84" "   :layout \"vertical\"" "   :margin {:top 20 :right 30 :left 100 :bottom 5}}" "  [:> :CartesianGrid {:strokeDasharray \"3 3\" :horizontal false}]" "  [:> :XAxis {:type \"number\" :axisLine false :tickLine false}]" "  [:> :YAxis {:type \"category\" :dataKey :country :axisLine false :tickLine false}]" "  [:> :Tooltip]" "  [:> :Legend]" "  [:> :Bar" "   {:dataKey :rows" "    :fill \"#8884d8\"" "    :label {:position \"right\" :fill \"#ffffff99\"}" "    :isAnimationActive false}]]]" "```" "This ReCharts version creates a vertical bar chart that should look similar to the Vega-Lite version. Note that you might need to adjust some styling to match your theme exactly."]
+;; ))
+
+
+(def garbage " lets change these results into a map with named keys please?
+
+ 
+ ##SPECIAL BLOCK TYPE INSTRUCTIONS:  
+This is a standard Clojure REPL block. It executes Clojure code and returns the result in an arbitrary nREPL server of the users choosing. 
+                                    Since this system is EDN based, all code has to be wrapped in a (do ..) form in order to be evaluated as a single expression. If a user-provided do block already exists, just use it, do not double wrap it - a single parent (do ...) form is all that is needed.
+                                    Being saved in EDN also means that it cannot use Clojure artifacts that are invalid EDN - so, do not use the shorthand for anon functions (#(this %)), or shorthand atom derefs (@atom), or shortcode sets (#{}) always use the full for version for these things - instead w/o the special characters (deref, set, (fn[x]...)).
+")
+
+(first (cstr/split garbage #" ##SPECIAL BLOCK TYPE INSTRUCTIONS:"))
+
+ 
 
 (defn fabric-post-process [client-name fabric-opts-map output elapsed-ms ui-keypath is-history?]
   (let [{:keys [pattern id input model context]} fabric-opts-map
@@ -4482,15 +4508,23 @@
                  :child
                  [:v-box
                   :size "auto"
+                  :gap "10px"
                   :children [[:box
                               :style {:font-size "16px"}
                               :child (str "Fabric has completed it's '" pattern "' pattern on " model ".")]
                              [:box
                               :style {:font-size "14px"}
                               :width (str (* 16 50) "px") ;; alert size from other arg X "brick size" in UI
-                              :child (str (if (vector? output)
-                                            (cstr/join "\n" output)
-                                            output))]]]]]]
+                              ;; :child (str (if (vector? output)
+                              ;;               (cstr/join "\n" output)
+                              ;;               output))
+                              ;;:child [:speak (cstr/join " " (filter string? (parse-text-and-code output)))]
+                              :child (cstr/join " " (filter string? (parse-text-and-code output)))
+                              ]
+                             (try 
+                               (when code-proc? [:execute (into {} (for [[k v] (apply merge (filter map? kit-content))] {k (edn/read-string v)}))])
+                               (catch Exception _ nil))
+                             ]]]]]
               16
               nil
               20 :fabric-response)
@@ -4506,10 +4540,10 @@
       (when code-proc?
         (let [step-maps (apply merge (filter map? kit-content))
               target    (last (ffirst step-maps))
-              kit-out   {(keyword model) {:data  [{:name (cstr/join " " (filter string? (parse-text-and-code (str input))))
-                                                   :step-mutates context
+              kit-out   {(keyword model) {:data  [{:name (first (cstr/split (cstr/join " " (filterv string? (parse-text-and-code (str input)))) #" ##SPECIAL BLOCK TYPE INSTRUCTIONS:")) ;; (filterv string (parse-text-and-code (str input)))
+                                                   :step-mutates (into {} (for [[kp v] context] {kp (edn/read-string v)})) ;; was stringified on the FE to protect from transfer issues, but now we need it back as a struct
                                                    :content (into ["(context during req)"] (vec (vals context)))}
-                                                  {:name (cstr/join " " (filter string? (parse-text-and-code (str input))))
+                                                  {:name (str model " response")
                                                    :step-mutates step-maps
                                                    :content (into (filterv string? kit-content) (vec (vals step-maps)))}]}}]
           (ut/pp [:kit-response step-maps target context kit-out])
@@ -4524,14 +4558,39 @@
 (defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key ui-keypath]
   (try (let [repl-host                   (get-in runner-map [:runner :host])
              repl-port                   (get-in runner-map [:runner :port])
-             is-fabric?                   (cstr/includes? (str vdata) "fabric-run")
+             is-fabric?                  (cstr/includes? (str vdata) "fabric-run")
              ;;_ (ut/pp [:nrepl-call runner-name is-fabric? solver-name client-name])
+             pre-opts-map                (when is-fabric? (ut/extract-map vdata #{:pattern :model}))
+             fabric-times-key            (when is-fabric? (vec (flatten (remove symbol? (select-keys pre-opts-map [:pattern :model])))))
+             ;;fabric-times-key            (when is-fabric? (select-keys pre-opts-map [:pattern :model]))
+             _ (when is-fabric?
+                 (let [;;pre-opts-map      (ut/extract-map vdata #{:pattern :model})
+                       {:keys [pattern model runner context]} pre-opts-map
+                       view-name        (or (last (ffirst context)) :*)
+                       prev-times       (get @times-atom fabric-times-key [-1])
+                       ship-est         (fn [client-name]
+                                          (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
+                                                            (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))
+                                                     _ (ut/pp [:pre-fabric-run! pre-opts-map times view-name])]
+                                                 (when (not (nil? times))
+                                                   (kick client-name [:estimate] {;;solver-name 
+                                                                                  ;;"*" ;; 
+                                                                                  solver-name ;;(cstr/replace (str solver-name) ":" "solver/")
+                                                                                  {:times (/ times 1000) ;; ms to secs
+                                                                                   ;;:run-id "*"
+                                                                                   :run-id solver-name ;;(cstr/replace (str solver-name) ":" "solver/")
+                                                                                   }} 
+                                                         nil nil nil)))
+                                               (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))]
+                   (ship-est client-name)))
              {:keys [result elapsed-ms]} (ut/timed-exec
                                           (ppy/execute-in-thread-pools-but-deliver (keyword (str "serial-nrepl-instance/" (cstr/replace (str solver-name) ":" "")))
                                            ;;:nrepl-evals 
                                           ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
                                                                                    (fn []
                                                                                      (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
+             _                          (when is-fabric? (swap! times-atom assoc fabric-times-key 
+                                                                (conj (get @times-atom fabric-times-key) elapsed-ms)))
              output-full                 result
              sampled?                    (get-in output-full [:sampled :sampling-details])
              output                      (if sampled?
@@ -5353,7 +5412,7 @@
     ;; (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath
     ;;         ;{:sub-path sub-path} 
     ;;         flow-key])
-    (when (get-in @flow-db/results-atom keypath) (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
+    ;; (when (get-in @flow-db/results-atom keypath) (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
     (add-watcher keypath client-name send-reaction flow-key :param-sub)
     (when (not signal?)
       (kick client-name
@@ -8807,21 +8866,42 @@
 ;(ext/create-dirs "./fabric-inputs") 
 
 (defn fabric-run [opts-map]
-   (let [_ (ut/pp [:fabric-run opts-map])
-         context (get opts-map :context)
-         pattern (get opts-map :pattern)
-         opts-map (if (and context (= pattern "clover"))
-                    (assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n ")) opts-map)
-         command (fabric (dissoc opts-map :context))
-         client-name (get opts-map :client-name)
-         id (get opts-map :id)
-         result (run-shell-command command)
-         output (get result :output)]
-     (write-local-file (str "../fabric-sessions/" id)
-                       (str (ut/millis-to-date-string (System/currentTimeMillis)) " :" (get opts-map :model) 
-                            "\n \n" output "\n \n \n" ) true)
-    [output opts-map]))
+   (doall
+    (let [_ (ut/pp [:fabric-run opts-map])
+         ;context (get opts-map :context)
+         ;pattern (get opts-map :pattern)
+          {:keys [context pattern model client-name runner id]} opts-map
+          ;view-name (when context (last (ffirst context)))
+          opts-map (cond ;(and context (= pattern "clover"))
+                         ;(assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n "))
 
+                         (and context (= pattern "clover"))
+                         (let [runner-hint (get-in (config/settings) [:runners runner :pattern-hint])]
+                           (assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n " 
+                                                       (when runner-hint 
+                                                         (str "##SPECIAL BLOCK TYPE INSTRUCTIONS:  \n" (str runner-hint) )))))
+
+                         :else opts-map)
+
+          ;; prev-times       (get @times-atom [pattern model] [-1])
+          ;; ship-est         (fn [client-name]
+          ;;                    (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
+          ;;                                      (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+          ;;                           (when (not (nil? times))
+          ;;                             (kick client-name [:estimate] {view-name {:times times :run-id (hash opts-map)}} nil nil nil)))
+          ;;                         (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
+          ;; _ (ship-est client-name)
+
+          command (fabric (dissoc opts-map :context :runner))
+          result (run-shell-command command)
+          output (get result :output)]
+      (write-local-file (str "../fabric-sessions/" id)
+                        (str (ut/millis-to-date-string (System/currentTimeMillis)) " :" (get opts-map :model)
+                             "\n \n" output "\n \n \n") true)
+      [output opts-map])))
+
+
+;; (kick :powerful-oval-gorilla-17 [:estimate] {:test {:times [2 3 2 33 22] :run-id "fsdfsdfsdff2f23f"}} nil nil nil)
 
 ;; (fabric-run {:model "claude-3-opus-20240229"
 ;;              :input "tell a very short story about vampire rabbits ransacking a sleepy new england town"

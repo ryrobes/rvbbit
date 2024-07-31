@@ -1,6 +1,200 @@
-{:orders {},
+{:orders
+ {:gen-viz-797 [:rows :date_posted],
+  :gen-viz-94 [:diff],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :gen-viz-84 [:rows :country],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :shape
+   :state],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt]},
  :reco-preview nil,
- :sql-source {},
+ :sql-source
+ {:gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
  :meta
  {nil
   {:fields
@@ -280,6 +474,18 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :gen-viz-84
   {:fields
    {:rows
@@ -315,12 +521,6 @@
      :group-by? true,
      :commons {"2001-08-05" 20, "2008-10-31" 12, "2009-12-12" 11},
      :cardinality 38},
-    :longitude
-    {:data-type "float",
-     :distinct 178,
-     :group-by? true,
-     :commons {-81.5191667 41, 138.598633 37, -99.7327778 30},
-     :cardinality 35},
     :state
     {:data-type "string",
      :distinct 45,
@@ -354,12 +554,6 @@
       "2010-05-29 21:50:00.000000" 2,
       "2006-11-30 12:17:00.000000" 2},
      :cardinality 98},
-    :latitude
-    {:data-type "string",
-     :distinct 178,
-     :group-by? true,
-     :commons {"41.0813889" 41, "-34.928661" 37, "32.4486111" 30},
-     :cardinality 35},
     :country
     {:data-type "string",
      :distinct 6,
@@ -442,6 +636,13 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
+ :default-col-widths
+ {:block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-8805 {:duration-hours-drag-43 180},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :block-1449 {:ufo-sightings-drag-9 173}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -508,7 +709,10 @@
     "Neuromancer. The lane to the land of the dead."],
    :eleven-labs-api-key nil,
    :modes
-   {:pre
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
@@ -519,12 +723,10 @@
        :font-family :theme/monospaced-font}}
      [:string3 :*data]],
     :edn [:edn :*data],
-    :text [:console :*data],
-    :terminal [:terminal :*data],
-    :data [:data-viewer :*data],
+    :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
-    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
-    :clover [:box :child :*data]},
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
    :kits {},
    :clover-templates
    {:color-theft
@@ -741,113 +943,55 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [250387265 230845489 4294705152],
- :client-name :vibrant-rhomboidal-dog-38,
+ :memory [224290423 205387647 4294705152],
+ :client-name :learned-gray-quail-14,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2108, :h 1442},
+ :window {:w 2062, :h 1463},
  :quake-console? false,
- :implicit-rowsets {:solver [nil :clojure-hop-9]},
- :post-meta {},
+ :post-meta
+ {:ufo-sightings-drag-9 {:* {:rowcount 80332}},
+  :gen-viz-84 {:* {:rowcount 6}},
+  :gen-viz-94 {:* {:rowcount 1}},
+  :shape-drag-7 {:* {:rowcount 30}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :gen-viz-797 {:* {:rowcount 317}}},
  :status
- {:alert1 {:alerts :alert2},
+ {"kick-test!" {:kick :gen-viz-797},
   :heartbeat
   {:kick
-   [:solver/get-my-colors391144716
-    :flow-status/flow-forever>*running?
-    :solver-status/vibrant-rhomboidal-dog-38>get-my-colors391144716>running?
-    :solver-meta/raw-custom-override109228912
-    :solver-status/vibrant-rhomboidal-dog-38>get-my-colors1713024795>running?
-    :solver-meta/raw-custom-override109228912>output>evald-result>out
-    :solver-status/vibrant-rhomboidal-dog-38>raw-custom-override109228912>running?
-    :solver-status/vibrant-rhomboidal-dog-38>raw-custom-override109228912
+   [:flow-status/flow-forever>*running?
     :flow-status/live-scratch-flow>*running?
-    :solver/get-my-colors1713024795
-    :solver/raw-custom-override109228912]}},
+    :solver-status/learned-gray-quail-14>get-my-colors66986740>running?
+    :solver/get-my-colors66986740]},
+  :alert1 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
- :selected-tab "refined dove",
+ :selected-tab "sapphire ape",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
- [[[:h-box
-    :children
-    [[:v-box
-      :gap
-      "6px"
-      :children
-      [[:box :style {:font-size "16px"} :child "Data was not sampled."]
-       [:h-box
-        :style
-        {:font-size "13px"}
-        :gap
-        "12px"
-        :children
-        [[:v-box
-          :gap
-          "6px"
-          :children
-          [[:box :style {:font-size "15px"} :child "Structure"]
-           [:v-box
-            :style
-            {:opacity 0.9, :font-weight 700}
-            :children
-            [[:box
-              :child
-              [:h-box
-               :gap
-               "8px"
-               :justify
-               :between
-               :children
-               [[:box :style {:opacity 0.5} :child "key depth"] [:box :child "4"]]]]
-             [:box
-              :child
-              [:h-box
-               :gap
-               "8px"
-               :justify
-               :between
-               :children
-               [[:box :child "4"] [:box :style {:opacity 0.5} :child "values"]]]]
-             [:box
-              :child
-              [:h-box
-               :gap
-               "8px"
-               :justify
-               :between
-               :children
-               [[:box :style {:opacity 0.5} :child "est size"]
-                [:box :child "1.20 KB"]]]]]]]]]]
-       [:box :style {:font-size "11px"} :child ""]
-       [:box
-        :style
-        {:font-size "11px", :opacity 0.4}
-        :child
-        ":raw-custom-override109228912"]]]]]
-   13
-   nil
-   868
-   148890768]
-  [[:box
+ [[[:box
     :child
     "sent screen save request to server... Please wait."
     :style
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   876
+   95
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash -384193310,
+ :base-sniff-queries {:ufo_sightings 484893751},
+ :panels-hash -92432517,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1667742878,
+ :user-params-hash 4597022,
  :grid-recos? true,
+ :session-hash 1758095231,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -860,8 +1004,6 @@
       :duration_hours
       :duration_seconds
       :duration_seconds_int
-      :latitude
-      :longitude
       :shape
       :state],
      :from [[:ufo_sightings :jj584]],
@@ -888,8 +1030,6 @@
       :duration_hours
       :duration_seconds
       :duration_seconds_int
-      :latitude
-      :longitude
       :shape
       :state],
      :from [[:ufo_sightings :jj584]],
@@ -944,8 +1084,6 @@
           :duration_hours
           :duration_seconds
           :duration_seconds_int
-          :latitude
-          :longitude
           :shape
           :state],
          :from [[:ufo_sightings :jj584]],
@@ -969,8 +1107,6 @@
       :duration_hours
       :duration_seconds
       :duration_seconds_int
-      :latitude
-      :longitude
       :shape
       :state],
      :from [[:ufo_sightings :jj584]],
@@ -988,8 +1124,6 @@
       :duration_hours
       :duration_seconds
       :duration_seconds_int
-      :latitude
-      :longitude
       :shape
       :state],
      :from [[:ufo_sightings :jj584]],
@@ -1004,8 +1138,6 @@
     :duration_hours
     :duration_seconds
     :duration_seconds_int
-    :latitude
-    :longitude
     :shape
     :state],
    :from [[:ufo_sightings :jj584]],
@@ -1021,8 +1153,6 @@
        :duration_hours
        :duration_seconds
        :duration_seconds_int
-       :latitude
-       :longitude
        :shape
        :state],
       :from [[:ufo_sightings :jj584]],
@@ -1041,8 +1171,6 @@
        :duration_hours
        :duration_seconds
        :duration_seconds_int
-       :latitude
-       :longitude
        :shape
        :state],
       :from [[:ufo_sightings :jj584]],
@@ -1061,8 +1189,6 @@
        :duration_hours
        :duration_seconds
        :duration_seconds_int
-       :latitude
-       :longitude
        :shape
        :state],
       :from [[:ufo_sightings :jj584]],
@@ -1081,8 +1207,6 @@
        :duration_hours
        :duration_seconds
        :duration_seconds_int
-       :latitude
-       :longitude
        :shape
        :state],
       :from [[:ufo_sightings :jj584]],
@@ -1095,7 +1219,7 @@
   {:mad-libs-combo-hash ["572062609" "ufo_sightings_drag_9"],
    :name "basic_timeseries - \"date_posted, rows\" - 769",
    :w 9,
-   :root [5 13],
+   :root [8 13],
    :h 5,
    :connection-id "bigfoot-ufos",
    :queries
@@ -1256,7 +1380,7 @@
      :from [[:query/ufo-sightings-drag-9 :ff571]],
      :group-by [:city],
      :order-by [[:rowcnt :desc]]}},
-   :root [1 8],
+   :root [4 8],
    :tab "sapphire ape"},
   :block-7416
   {:h 5,
@@ -1266,7 +1390,7 @@
    :queries
    {:rowcnt-drag-2
     {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/city-drag-26 :yy403]]}},
-   :root [1 13],
+   :root [4 13],
    :tab "sapphire ape"},
   :block-11530
   {:h 2,
@@ -1462,7 +1586,7 @@
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
    :w 10,
-   :root [23 13],
+   :root [26 13],
    :h 5,
    :connection-id "bigfoot-ufos",
    :queries
@@ -1636,7 +1760,7 @@
      :from [[:query/ufo-sightings-drag-9 :cc350]],
      :group-by [:duration_hours],
      :order-by [[:rowcnt :desc]]}},
-   :root [25 8],
+   :root [28 8],
    :tab "sapphire ape"},
   :block-8502
   {:h 2,
@@ -1719,7 +1843,7 @@
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
    :w 9,
-   :root [14 13],
+   :root [17 13],
    :h 5,
    :connection-id "bigfoot-ufos",
    :queries
@@ -1930,7 +2054,7 @@
      :from [[:query/ufo-sightings-drag-9 :hh354]],
      :group-by [:shape],
      :order-by [[:rowcnt :desc]]}},
-   :root [9 8],
+   :root [12 8],
    :tab "sapphire ape"},
   :block-4121
   {:h 3,
@@ -2061,7 +2185,7 @@
      :from [[:query/ufo-sightings-drag-9 :uu58]],
      :group-by [:state],
      :order-by [[:rowcnt :desc]]}},
-   :root [17 8],
+   :root [20 8],
    :tab "sapphire ape"},
   :block-10902
   {:h 8,
@@ -2222,13 +2346,11 @@
       :duration_hours
       :duration_seconds
       :duration_seconds_int
-      :latitude
-      :longitude
       :shape
       :state],
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}},
-   :root [1 1],
+   :root [4 18],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9},
   :block-6552
@@ -2376,7 +2498,7 @@
    :name "block-11887",
    :shell {:shell-hop [" whoami ; ls  -l --color"]},
    :selected-mode {:shell-hop :terminal}}},
- :selected-block :block-10729,
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -2421,7 +2543,7 @@
    :well-cerise-kangaroo
    "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently.   The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity. ",
    :rel-image-path "images/large/b64-image3-48163-50841-4k.webp",
-   :selected-block :block-10729,
+   :selected-block :block-11609,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -2551,5 +2673,9 @@
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
    :country "us"},
-  :sys {:selected-tab "refined dove", :selected-tab-idx 10}},
+  :sys {:selected-tab "sapphire ape", :selected-tab-idx 1},
+  :duration-hours-drag-43 nil,
+  :city-drag-26 nil,
+  :state-drag-3 nil,
+  :shape-drag-7 nil},
  :selected-flow "live-scratch-flow"}

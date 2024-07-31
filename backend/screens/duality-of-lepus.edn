@@ -1,53 +1,147 @@
 {:orders
- {:panel-history-drag-31
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :panel-history-drag-31 (:query_error),
   :fields-sys [:field_name :field_type :data_type],
-  :tmp--679760891-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :panel-history-drag-client-name-40
   [:kp :client_name :data :pre_data :diff :diff_kp :panel_key :key :type :updated],
-  :tmp-404636901-hist-sys
+  :tmp-265471656-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp-1525288419-hist-sys
+  :tmp-1702993825-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :setlists-drag-2 [:show_id :song_name :song_order :ts],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :panel_history
-  [:kp :client_name :data :pre_data :diff :diff_kp :panel_key :key :type :updated],
-  :panel_materialized_history (:query_error),
+  :gen-viz-797 [:rows :date_posted],
+  :panel_history (:query_error),
+  :chat-drag-22
+  [:client_name
+   :flow_id
+   :id
+   :item_data
+   :item_hash
+   :item_idx
+   :item_key
+   :item_name
+   :item_options
+   :item_type
+   :kit_name
+   :updated],
   :panel-history-drag-client-name-43 [:client_name :rowcnt],
+  :tmp--1399192217-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :flows-sys [:flow_id :file_path :last_modified],
-  :tmp--1473185323-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp-1215231624-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :gen-viz-94 [:diff],
+  :DISTRICT-drag-37 [:DISTRICT :rowcnt],
   :large-bgss (:query_error),
-  :tmp-453648805-hist-sys
+  :tmp-1954942012-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp--1284598422-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp--1760665799-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :kits
+  [:id
+   :item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :client_name
+   :flow_id
+   :updated],
+  :kits-drag-36
+  [:client_name
+   :flow_id
+   :id
+   :item_data
+   :item_hash
+   :item_idx
+   :item_key
+   :item_name
+   :item_options
+   :item_type
+   :kit_name
+   :updated],
   :shows (:query_error),
-  :tmp-2109860946-hist-sys
+  :offenses-drag-24
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :tmp--1041439146-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :panel_resolved_history (:query_error),
+  :rowcnt-drag-2 [:rowcnt_sum],
   :tour-name-drag-11 [:tour_name :rowcnt],
+  :offenses-drag-26
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :offenses (:query_error),
+  :flow-fn-categories-sys [:category],
+  :tmp--818218896-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
+  :gen-viz-84 [:rows :country],
   :gen-viz-342 [:rows :song_order],
   :connections-sys [:database_name :connection_id :styler_highlight_8717ss],
-  :tmp--943541296-hist-sys
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :tmp-952860608-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp-338024901-hist-sys
+  :tmp-1034462477-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp--1637744073-hist-sys
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :tmp-1626017590-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp--1489849301-hist-sys
+  :tmp-578267773-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp-446910141-hist-sys
+  :state-drag-3 [:state :rowcnt],
+  :tmp--1873620494-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :shape-drag-7 [:shape :rowcnt],
   :setlists (:query_error),
+  :tmp-1712068299-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :kit-results-sys
   [:id
    :item_hash
@@ -60,8 +154,10 @@
    :item_data
    :client_name
    :flow_id
-   :updated]},
+   :updated],
+  :flow-fn-all-sys [:name]},
  :reco-preview "-1489866873",
+ :flow? false,
  :sql-source
  {:panel-history-drag-31
   {:select
@@ -78,19 +174,94 @@
   {:select [:show_id :song_name :song_order :ts],
    :from [[:setlists :hh333]],
    :_last-run "05:53:09"},
+  :gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
   :panel_history
   {:select [:*], :connection-id "system-db", :from [:panel_history], :limit 111},
-  :panel_materialized_history
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:panel_materialized_history],
-   :limit 111},
+  :chat-drag-22
+  {:select
+   [:client_name
+    :flow_id
+    :id
+    :item_data
+    :item_hash
+    :item_idx
+    :item_key
+    :item_name
+    :item_options
+    :item_type
+    :kit_name
+    :updated],
+   :from [[:kits :bb43s8]],
+   :where [:< :updated [:raw "datetime('now', '-2 hours')"]],
+   :_db-type "SQLITE",
+   :_last-run "04:02:07"},
   :panel-history-drag-client-name-43
   {:select [:client_name [[:count 1] :rowcnt]],
    :from [[:panel_history :oo960]],
    :group-by [:client_name],
    :order-by [[:rowcnt :desc]],
    :_last-run "04:03:09d"},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :DISTRICT-drag-37
+  {:select [:DISTRICT [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Location
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :ff277]]}
+     :cc125]],
+   :group-by [:DISTRICT],
+   :order-by [[:rowcnt :desc]]},
   :large-bgss
   {:select [:*],
    :connection-id :*client-name*,
@@ -108,13 +279,68 @@
        (println (count files))
        (vec (for [f files] {:ffilename (str f)})))}],
    :page 3,
-   :_last-run "21:01:32"},
+   :_last-run "ds:32"},
+  :kits {:select [:*], :connection-id "system-db", :from [:kits], :limit 111},
+  :kits-drag-36
+  {:select
+   [:client_name
+    :flow_id
+    :id
+    :item_data
+    :item_hash
+    :item_idx
+    :item_key
+    :item_name
+    :item_options
+    :item_type
+    :kit_name
+    :updated],
+   :from [[:kits :bb438]],
+   :_last-run "04:02:07"},
   :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
-  :panel_resolved_history
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:panel_resolved_history],
-   :limit 111},
+  :offenses-drag-24
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :dd484]]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
   :tour-name-drag-11
   {:select [:tour_name [[:count 1] :rowcnt]],
    :from
@@ -123,15 +349,171 @@
      :kk455]],
    :group-by [:tour_name],
    :order-by [[:rowcnt :desc]]},
+  :offenses-drag-26
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :ff277]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :offenses
+  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
   :shows-drag-22
   {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
    :from [[:shows :pp193]],
    :_last-run "05:52:51"},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
   :gen-viz-342
   {:select [[[[:count 1]] :rows] :song_order],
    :from
    [{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}],
    :group-by [:song_order]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]},
   :setlists
   {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111}},
  :audio-playing? false,
@@ -140,221 +522,142 @@
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 11,
+     :distinct 52,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 11},
+   :rowcount 52},
+  :flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 97, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 25},
+    :full_map
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
+    :inputs
+    {:data-type "string",
+     :distinct 70,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 53},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 97, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 16},
+    :input_types
+    {:data-type "string",
+     :distinct 59,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 45},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 67, "" 16, ":string" 15},
+     :cardinality 10},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 97, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 2}},
+   :rowcount 131},
   :panel-history-drag-31
   {:fields
-   {:kp
+   {:query_error
     {:data-type "string",
-     :distinct 121,
+     :distinct 4,
      :group-by? true,
      :commons
-     {"[:block-3848 :queries :panel-history-drag-31]" 2,
-      "[:block-5318 :base]" 2,
-      "[:block-12330 :base]" 2},
-     :cardinality 95},
-    :key
-    {:data-type "string",
-     :distinct 34,
-     :group-by? true,
-     :commons {"" 64, ":hi" 9, ":stack" 6},
-     :cardinality 26},
-    :updated
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"2024-07-26 03:44:33" 121, "2024-07-26 03:46:27" 5, "2024-07-26 03:46:58" 1},
-     :cardinality 2},
-    :type
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":base" 64, ":views" 41, ":queries" 22},
-     :cardinality 2},
-    :panel_key
-    {:data-type "string",
-     :distinct 60,
-     :group-by? true,
-     :commons {":block-204" 4, ":block-3848" 4, ":block-12330" 4},
-     :cardinality 47},
-    :diff_kp
-    {:data-type "string",
-     :distinct 85,
-     :group-by? true,
-     :commons
-     {"([1] [0])" 13,
-      "([:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:group-by 0] [:group-by] [:from 0 1] [:from 0 0] [:from 0] [:from] [:select 1 1] [:select 1 0 1] [:select 1 0 0] [:select 1 0] [:select 1] [:select 0] [:select])"
-      6,
-      "([1 :panels :hello-there :root 1] [1 :panels :hello-there :root 0] [1 :panels :hello-there :root] [1 :panels :hello-there :w] [1 :panels :hello-there :h] [1 :panels :hello-there] [1 :panels] [1] [0])"
-      6},
-     :cardinality 66},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":beneficial-fat-badger-0" 127},
-     :cardinality 0},
-    :pre_data
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons
-     {"nil" 121,
-      "{:h 3, :w 6, :root [15 17], :tab \"azure oyster\", :selected-view :fabric-hop-5, :opts {:fabric-hop-5 {:model \"gpt-3.5-turbo\", :pattern \"tweet\"}}, :name \"block-5318\", :fabric {:fabric-hop-5 [\" adventures in moscow!\"]}}"
-      1,
-      "[:markdown \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!! \\n #test \\n ###TEST\"]"
-      1},
-     :cardinality 5},
-    :diff
-    {:data-type "string",
-     :distinct 119,
-     :group-by? true,
-     :commons
-     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 6,
-      "[:data-viewer :param/image-data]" 2,
-      "[:data-viewer :param/generated-colors]" 2},
-     :cardinality 93},
-    :data
-    {:data-type "string",
-     :distinct 119,
-     :group-by? true,
-     :commons
-     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 6,
-      "[:data-viewer :param/image-data]" 2,
-      "[:data-viewer :param/generated-colors]" 2},
-     :cardinality 93}},
-   :rowcount 127},
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :fields-sys
   {:fields
    {:field_name
     {:data-type "string",
-     :distinct 10,
+     :distinct 12,
      :group-by? true,
-     :commons {"data" 1, "updated" 1, "kp" 1},
+     :commons {"item_options" 1, "item_name" 1, "flow_id" 1},
      :cardinality 100},
     :field_type
     {:data-type "string",
-     :distinct 2,
+     :distinct 3,
      :group-by? true,
-     :commons {"TEXT" 9, "TIMESTAMP" 1},
-     :cardinality 20},
+     :commons {"TEXT" 9, "INTEGER" 2, "TIMESTAMP" 1},
+     :cardinality 25},
     :data_type
     {:data-type "string",
-     :distinct 2,
+     :distinct 3,
      :group-by? true,
-     :commons {"string" 9, "datetime" 1},
-     :cardinality 20}},
-   :rowcount 10},
-  :tmp--679760891-hist-sys
+     :commons {"string" 9, "integer" 2, "datetime" 1},
+     :cardinality 25}},
+   :rowcount 12},
+  :fabric-hop-26
   {:fields
-   {:kp
+   {:vec-val
     {:data-type "string",
-     :distinct 1,
+     :distinct 19,
      :group-by? true,
-     :commons {"[:block-6161 :fabric :fabric-hop-10]" 5},
-     :cardinality 20},
-    :key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":fabric-hop-10" 5},
-     :cardinality 20},
-    :updated
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"2024-07-28 00:50:05" 1, "2024-07-28 01:06:08" 1, "2024-07-28 01:10:00" 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":fabric" 5},
-     :cardinality 20},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-6161" 5},
-     :cardinality 20},
-    :diff_kp
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons
-     {"([0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])" 5},
-     :cardinality 20},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":beneficial-fat-badger-0" 5},
-     :cardinality 20},
-    :pre_data
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[\" tell a quick story about vampire rabbits\"]" 1,
-      "[\" tell a quick story about vampire rabbits in a sleepy town\"]" 1,
-      "[\" tell a quick story about vampire rabbits in a sleepy town..\"]" 1},
-     :cardinality 100},
-    :diff
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[[0 {:old \" tell a quick story about vampire rabbits\", :new \" tell a quick story about vampire rabbits in a sleepy town\"}]]"
-      1,
-      "[[0 {:old \" tell a quick story about vampire rabbits in a sleepy town\", :new \" tell a quick story about vampire rabbits in a sleepy town..\"}]]"
-      1,
-      "[[0 {:old \" tell a quick story about vampire rabbits in a sleepy town..\", :new \" tell a quick story about vampire rabbits in a sleepy town.. (with no emojis and use markdown)\"}]]"
-      1},
-     :cardinality 100},
-    :data
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[\" tell a quick story about vampire rabbits in a sleepy town\"]" 1,
-      "[\" tell a quick story about vampire rabbits in a sleepy town..\"]" 1,
-      "[\" tell a quick story about vampire rabbits in a sleepy town.. (with no emojis and use markdown)\"]"
-      1},
+     :commons {},
      :cardinality 100}},
-   :rowcount 5},
+   :rowcount 19},
   :panel-history-drag-client-name-40
   {:fields
    {:kp
     {:data-type "string",
-     :distinct 307,
+     :distinct 309,
      :group-by? true,
      :commons
-     {"[:new :block-11395 :w]" 2,
-      "[:new :block-1219 :tab]" 2,
-      "[:new :block-4654 :selected-view]" 2},
+     {"[:new :block-94 :h]" 2,
+      "[:new :block-11395 :w]" 2,
+      "[:new :block-1219 :tab]" 2},
      :cardinality 61},
     :key
     {:data-type "string",
-     :distinct 19,
+     :distinct 17,
      :group-by? true,
-     :commons {":tab" 78, ":h" 77, ":name" 76},
+     :commons {":name" 78, ":tab" 78, ":h" 76},
      :cardinality 3},
     :updated
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-07-26 21:43:40" 500},
+     :commons {"2024-07-28 00:23:42" 500},
      :cardinality 0},
     :type
     {:data-type "string",
      :distinct 39,
      :group-by? true,
-     :commons {":block-4654" 18, ":block-1071" 16, ":block-3887" 15},
+     :commons {":block-4654" 18, ":block-3477" 16, ":block-1071" 16},
      :cardinality 7},
     :panel_key
     {:data-type "string",
@@ -366,13 +669,13 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"([:new] [:new] [:old] [:old])" 500},
+     :commons {"()" 500},
      :cardinality 0},
     :client_name
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":sparkling-gold-butterfly-26" 500},
+     :commons {":vibrant-rhomboidal-dog-38" 500},
      :cardinality 0},
     :pre_data
     {:data-type "string",
@@ -384,7 +687,7 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"{:old nil, :new nil}" 500},
+     :commons {"{}" 500},
      :cardinality 0},
     :data
     {:data-type "string",
@@ -393,172 +696,106 @@
      :commons {"nil" 500},
      :cardinality 0}},
    :rowcount 500},
-  :tmp-404636901-hist-sys
+  :tmp-265471656-hist-sys
   {:fields
    {:kp
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"[:block-7535 :views :hare-vw-3]" 1},
-     :cardinality 100},
+     :commons {"[:block-3950 :fabric :fabric-hop-13]" 15},
+     :cardinality 6},
     :key
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":hare-vw-3" 1},
-     :cardinality 100},
+     :commons {":fabric-hop-13" 15},
+     :cardinality 6},
     :updated
     {:data-type "string",
-     :distinct 1,
+     :distinct 15,
      :group-by? true,
-     :commons {"2024-07-28 01:05:21" 1},
+     :commons
+     {"2024-07-28 21:38:14" 1, "2024-07-30 03:29:59" 1, "2024-07-30 03:18:50" 1},
      :cardinality 100},
     :type
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":views" 1},
-     :cardinality 100},
+     :commons {":fabric" 15},
+     :cardinality 6},
     :panel_key
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":block-7535" 1},
-     :cardinality 100},
+     :commons {":block-3950" 15},
+     :cardinality 6},
     :diff_kp
     {:data-type "string",
      :distinct 1,
      :group-by? true,
      :commons
-     {"([0 1 :font-size :new] [0 1 :font-size :new] [0 1 :font-size :old] [0 1 :font-size :old] [0 1 :font-size] [0 1] [0 0] [0 0] [0])"
-      1},
-     :cardinality 100},
+     {"([0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])" 15},
+     :cardinality 6},
     :client_name
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":beneficial-fat-badger-0" 1},
-     :cardinality 100},
+     :commons {":powerful-oval-gorilla-17" 15},
+     :cardinality 6},
     :pre_data
     {:data-type "string",
-     :distinct 1,
+     :distinct 15,
      :group-by? true,
      :commons
-     {"[:box :align :center :justify :center :style {:font-size \"33px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"I don't think... then you shouldn't talk, said the Hatter.\"]"
+     {"[\"abnraham lincoln yo, what is good\"]" 1,
+      "[\"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? PEPPERONI!\"]"
+      1,
+      "[\"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? salami!\"]"
       1},
      :cardinality 100},
     :diff
     {:data-type "string",
-     :distinct 1,
+     :distinct 15,
      :group-by? true,
-     :commons {"[[6 {:font-size {:old \"33px\", :new \"44px\"}}]]" 1},
+     :commons
+     {"[[0 {:old \"abnraham lincoln yo, what is good my peeps, im back from teh dead!\", :new \"abnraham lincoln yo, what is good my peeps, im back from the dead son!\"}]]"
+      1,
+      "[[0 {:old \"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza?\", :new \"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? PEPPERONI!\"}]]"
+      1,
+      "[[0 {:old \"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? PEPPERONI! bacon! pineapple?\", :new \"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? PEPPERONI! bacon! pineapple? yes\"}]]"
+      1},
      :cardinality 100},
     :data
     {:data-type "string",
-     :distinct 1,
+     :distinct 15,
      :group-by? true,
      :commons
-     {"[:box :align :center :justify :center :style {:font-size \"44px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"I don't think... then you shouldn't talk, said the Hatter.\"]"
-      1},
+     {"[\"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? PEPPERONI!\"]"
+      1,
+      "[\"abnraham lincoln yo, what is good my peeps, im back from the dead son!  whos ordering the pizza? salami!\"]"
+      1,
+      "[\"abnraham lincoln yo, what is good my peeps\"]" 1},
      :cardinality 100}},
-   :rowcount 1},
-  :new-clojure-10
+   :rowcount 15},
+  :tmp-1702993825-hist-sys {:fields {}, :rowcount 0},
+  :fabric-hop
   {:fields
    {:vec-val
-    {:data-type "keyword",
-     :distinct 3,
+    {:data-type "string",
+     :distinct 1,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 3},
-  :tmp-1525288419-hist-sys
+   :rowcount 1},
+  :fabric-hop-13
   {:fields
-   {:kp
+   {:vec-val
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"[:block-5662 :clojure :new-clojure-10]" 6},
-     :cardinality 16},
-    :key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":new-clojure-10" 6},
-     :cardinality 16},
-    :updated
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"2024-07-27 23:29:29" 1, "2024-07-27 23:39:06" 1, "2024-07-27 23:40:45" 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":clojure" 6},
-     :cardinality 16},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-5662" 6},
-     :cardinality 16},
-    :diff_kp
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"([:list-diff 1 :list-diff 2 :list-diff 3 :new] [:list-diff 1 :list-diff 2 :list-diff 3 :new] [:list-diff 1 :list-diff 2 :list-diff 3 :old] [:list-diff 1 :list-diff 2 :list-diff 3 :old] [:list-diff 1 :list-diff 2 :list-diff 3] [:list-diff 1 :list-diff 2 :list-diff 1 :new] [:list-diff 1 :list-diff 2 :list-diff 1 :new] [:list-diff 1 :list-diff 2 :list-diff 1 :old] [:list-diff 1 :list-diff 2 :list-diff 1 :old] [:list-diff 1 :list-diff 2 :list-diff 1] [:list-diff 1 :list-diff 2 :list-diff] [:list-diff 1 :list-diff 2] [:list-diff 1 :list-diff] [:list-diff 1] [:list-diff])"
-      1,
-      "([:list-diff 1 :list-diff 2 :list-diff 1 :new] [:list-diff 1 :list-diff 2 :list-diff 1 :new] [:list-diff 1 :list-diff 2 :list-diff 1 :old] [:list-diff 1 :list-diff 2 :list-diff 1 :old] [:list-diff 1 :list-diff 2 :list-diff 1] [:list-diff 1 :list-diff 2 :list-diff] [:list-diff 1 :list-diff 2] [:list-diff 1 :list-diff] [:list-diff 1] [:list-diff])"
-      1,
-      "([:list-diff 1 :list-diff 2 :list-diff 7 :new] [:list-diff 1 :list-diff 2 :list-diff 7 :new] [:list-diff 1 :list-diff 2 :list-diff 7 :old] [:list-diff 1 :list-diff 2 :list-diff 7 :old] [:list-diff 1 :list-diff 2 :list-diff 7] [:list-diff 1 :list-diff 2 :list-diff 6 :new] [:list-diff 1 :list-diff 2 :list-diff 6 :new] [:list-diff 1 :list-diff 2 :list-diff 6 :old] [:list-diff 1 :list-diff 2 :list-diff 6 :old] [:list-diff 1 :list-diff 2 :list-diff 6] [:list-diff 1 :list-diff 2 :list-diff 5 :new 3] [:list-diff 1 :list-diff 2 :list-diff 5 :new 3] [:list-diff 1 :list-diff 2 :list-diff 5 :new 2] [:list-diff 1 :list-diff 2 :list-diff 5 :new 2] [:list-diff 1 :list-diff 2 :list-diff 5 :new 1] [:list-diff 1 :list-diff 2 :list-diff 5 :new 1] [:list-diff 1 :list-diff 2 :list-diff 5 :new 0] [:list-diff 1 :list-diff 2 :list-diff 5 :new 0] [:list-diff 1 :list-diff 2 :list-diff 5 :new] [:list-diff 1 :list-diff 2 :list-diff 5 :old] [:list-diff 1 :list-diff 2 :list-diff 5 :old] [:list-diff 1 :list-diff 2 :list-diff 5] [:list-diff 1 :list-diff 2 :list-diff] [:list-diff 1 :list-diff 2] [:list-diff 1 :list-diff] [:list-diff 1] [:list-diff])"
-      1},
-     :cardinality 100},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":beneficial-fat-badger-0" 6},
-     :cardinality 16},
-    :pre_data
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"(do (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Sup!fff! Internaddldd6666d RVBBIT nREPL. Clojure \" clojure-version \" ondd \" jvm-version \" JVM techDfsfsdfDDfa\" \" 🥕🐇\")))"
-      1,
-      "(do (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Sup!fff! Internad  RVBBIT nREPL. Clojure \" clojure-version \" on  \" jvm-version \" JVM techDfsfsdfDDfa\" \" 🥕🐇\")))"
-      1,
-      "(do (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Sup!fff! Internad  RVBBIT!! nREPL. Clojure \" clojure-version \" on  \" jvm-version \" JVM techDfsfsdfDDfa\" \" 🥕🐇\")))"
-      1},
-     :cardinality 100},
-    :diff
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"{:list-diff {1 {:list-diff {2 {:list-diff {1 {:old \"🐇🥕 Sup!fff! Internaddldd6666d RVBBIT nREPL. Clojure \", :new \"🐇🥕 Sup!fff! Internad  RVBBIT nREPL. Clojure \"}, 3 {:old \" ondd \", :new \" on  \"}}}}}}}"
-      1,
-      "{:list-diff {1 {:list-diff {2 {:list-diff {1 {:old \"🐇🥕 Sup!fff! Internad  RVBBIT nREPL. Clojure \", :new \"🐇🥕 Sup!fff! Internad  RVBBIT!! nREPL. Clojure \"}}}}}}}"
-      1,
-      "{:list-diff {1 {:list-diff {2 {:list-diff {5 {:old \" JVM techDfsfsdfDDfa\", :new (+ 9 8 7)}, 6 {:old \" 🥕🐇\", :new \" JVM techDfsfsdfDDfa\"}, 7 {:old nil, :new \" 🥕🐇\"}}}}}}}"
-      1},
-     :cardinality 100},
-    :data
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"(do (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Sup!fff! Internad  RVBBIT nREPL. Clojure \" clojure-version \" on  \" jvm-version \" JVM techDfsfsdfDDfa\" \" 🥕🐇\")))"
-      1,
-      "(do (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Sup!fff! Internad  RVBBIT!! nREPL. Clojure \" clojure-version \" on  \" jvm-version \" JVM techDfsfsdfDDfa\" \" 🥕🐇\")))"
-      1,
-      "(do (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Sup!fff! Internad  RVBBIT!! nREPL. Clojure \" clojure-version \" on  \" jvm-version (+ 9 8 7) \" JVM techDfsfsdfDDfa\" \" 🥕🐇\")))"
-      1},
+     :commons {},
      :cardinality 100}},
-   :rowcount 6},
+   :rowcount 1},
   :setlists-drag-2
   {:fields
    {:show_id
@@ -589,48 +826,72 @@
      :commons {"2023-09-24 19:19:12" 500},
      :cardinality 0}},
    :rowcount 500},
+  :fabric-hop-36
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 57,
+     :group-by? true,
+     :commons {},
+     :cardinality 98}},
+   :rowcount 58},
   :tables-sys
   {:fields
    {:db_schema
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"none" 3},
-     :cardinality 33},
+     :commons {"none" 25},
+     :cardinality 3},
     :db_catalog
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 3},
-     :cardinality 33},
+     :commons {nil 25},
+     :cardinality 3},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"history-db" 3},
-     :cardinality 33},
+     :commons {"system-db" 25},
+     :cardinality 3},
     :schema_cat
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {nil 3},
-     :cardinality 33},
+     :commons {nil 25},
+     :cardinality 3},
     :table_name
     {:data-type "string",
-     :distinct 3,
+     :distinct 25,
      :group-by? true,
-     :commons
-     {"panel_resolved_history" 1,
-      "panel_materialized_history" 1,
-      "panel_history" 1},
+     :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
      :cardinality 100},
     :fields
     {:data-type "integer",
-     :distinct 1,
+     :distinct 15,
      :group-by? false,
-     :commons {11 3},
-     :cardinality 33}},
-   :rowcount 3},
+     :commons {6 4, 5 3, 15 3},
+     :cardinality 60}},
+   :rowcount 25},
+  :fabric-hop-7
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :fabric-hop-18
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons {},
+     :cardinality 94}},
+   :rowcount 36},
   :gen-viz-797
   {:fields
    {:rows
@@ -646,8 +907,7 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :panel_history {:fields {}, :rowcount 0},
-  :panel_materialized_history
+  :panel_history
   {:fields
    {:query_error
     {:data-type "string",
@@ -659,24 +919,146 @@
       "(from database connection)" 1},
      :cardinality 100}},
    :rowcount 4},
+  :chat-drag-22
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 500},
+     :cardinality 0},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"{}" 500},
+     :cardinality 0},
+    :updated
+    {:data-type "string",
+     :distinct 130,
+     :group-by? true,
+     :commons
+     {"2024-07-30 03:06:10" 7, "2024-07-30 03:06:25" 7, "2024-07-30 03:06:48" 7},
+     :cardinality 25},
+    :item_hash
+    {:data-type "string",
+     :distinct 120,
+     :group-by? true,
+     :commons {"1344774787" 11, "1671969318" 10, "1239414405" 10},
+     :cardinality 23},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"solver-log" 500},
+     :cardinality 0},
+    :item_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"" 251, ":new-clojure-1" 243, ":new-clojure-2" 6},
+     :cardinality 0},
+    :flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 500},
+     :cardinality 0},
+    :id
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {84 1, 390 1, 49 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {":harmonious-pear-hippopotamus-34" 132,
+      ":easy-indigo-prairie-dog-8" 128,
+      ":miraculous-amethyst-hippopotamus-6" 117},
+     :cardinality 0},
+    :item_data
+    {:data-type "string",
+     :distinct 120,
+     :group-by? true,
+     :commons
+     {"{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1185.7693\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"713.1985540610642\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"13\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DISTRICT]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DISTRICT\"] [:box :child \"\\\"B2\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query--15841505520-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:DISTRICT], :order-by [[2 :desc]], :select [:DISTRICT [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"ALL rows in this group:\" {:_h 8, :_query-id :kit-query--15841505520-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query--15841505520-agg/*.clicked [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT \"B2\"]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}, :name \"When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250.\", :order 0, :parameters {:test-param123 [\"fart fx service\"]}, :step-mutates {[:panels :block-5394 :views :hare-vw-4] [:box :align :center :justify :center :style {:font-size \"95px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}}"
+      11,
+      "{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1185.7693\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"713.1985540610642\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"13\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DISTRICT]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DISTRICT\"] [:box :child \"\\\"B2\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query--15841505520-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:DISTRICT], :order-by [[2 :desc]], :select [:DISTRICT [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"ALL rows in this group:\" {:_h 8, :_query-id :kit-query--15841505520-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query--15841505520-agg/*.clicked [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT \"B2\"]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}, :name \"When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250.\", :order 0, :parameters {:test-param123 [\"fart fx service\"]}, :step-mutates {[:panels :block-5394 :views :hare-vw-4] [:box :align :center :justify :center :style {:font-size \"17px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}}"
+      10,
+      "{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1185.7693\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"713.1985540610642\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"13\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DISTRICT]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DISTRICT\"] [:box :child \"\\\"B2\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query--15841505520-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:DISTRICT], :order-by [[2 :desc]], :select [:DISTRICT [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"ALL rows in this group:\" {:_h 8, :_query-id :kit-query--15841505520-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query--15841505520-agg/*.clicked [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT \"B2\"]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}, :name \"When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250.\", :order 0, :parameters {:test-param123 [\"fart fx service\"]}, :step-mutates {[:panels :block-5394 :views :hare-vw-4] [:box :align :center :justify :center :style {:font-size \"100px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}}"
+      10},
+     :cardinality 23},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":tester" 500},
+     :cardinality 0},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":kick" 500},
+     :cardinality 0}},
+   :rowcount 500},
   :panel-history-drag-client-name-43
   {:fields
    {:client_name
     {:data-type "string",
-     :distinct 4,
+     :distinct 9,
      :group-by? true,
      :commons
-     {":sparkling-gold-butterfly-26" 1,
-      ":stellar-ivory-toad-28" 1,
-      ":vibrant-rhomboidal-dog-38" 1},
+     {":thorough-globular-skunk-15" 1,
+      ":honest-icosahedral-lion-35" 1,
+      ":soulful-lavender-mole-25" 1},
      :cardinality 100},
     :rowcnt
     {:data-type "integer",
-     :distinct 4,
+     :distinct 8,
      :group-by? false,
-     :commons {870 1, 955 1, 1498 1},
+     :commons {1266 2, 950 1, 1022 1},
+     :cardinality 88}},
+   :rowcount 9},
+  :fabric-hop-33
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {},
+     :cardinality 96}},
+   :rowcount 26},
+  :fabric-hop-32
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {},
+     :cardinality 95}},
+   :rowcount 24},
+  :fabric-hop-29
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {},
      :cardinality 100}},
-   :rowcount 4},
+   :rowcount 25},
+  :tmp--1399192217-hist-sys {:fields {}, :rowcount 0},
+  :fabric-hop-4
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 3},
   :flows-sys
   {:fields
    {:flow_id
@@ -712,6 +1094,7 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
+  :fabric-hop-15 {:fields {}, :rowcount 0},
   :DISTRICT-drag-37
   {:fields
    {:DISTRICT
@@ -727,8 +1110,24 @@
      :commons {35717 1, 1765 1, 23460 1},
      :cardinality 100}},
    :rowcount 13},
-  :tmp--1473185323-hist-sys {:fields {}, :rowcount 0},
-  :tmp-1215231624-hist-sys {:fields {}, :rowcount 0},
+  :fabric-hop-39
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :fabric-hop-25
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 19,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 19},
   :large-bgss
   {:fields
    {:query_error
@@ -741,8 +1140,25 @@
       "(from database connection)" 1},
      :cardinality 100}},
    :rowcount 4},
-  :tmp-453648805-hist-sys {:fields {}, :rowcount 0},
-  :tmp--1284598422-hist-sys {:fields {}, :rowcount 0},
+  :fabric-hop-41
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :fabric-hop-2
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 7},
+  :tmp-1954942012-hist-sys {:fields {}, :rowcount 0},
   :new-clojure-9
   {:fields
    {:vec-val
@@ -752,79 +1168,191 @@
      :commons {},
      :cardinality 100}},
    :rowcount 1041},
-  :tmp--1760665799-hist-sys
+  :kits
   {:fields
-   {:kp
-    {:data-type "string",
+   {:item_idx
+    {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {"[:block-12330 :views :hare-vw]" 2},
-     :cardinality 50},
-    :key
+     :commons {0 111},
+     :cardinality 0},
+    :item_options
     {:data-type "string",
-     :distinct 1,
+     :distinct 4,
      :group-by? true,
-     :commons {":hare-vw" 2},
-     :cardinality 50},
+     :commons
+     {"{:options {:actions? false, :pages? false, :search? false}, :parameters {}, :mutates {}, :description \"query-log-\"}"
+      57,
+      "{:options {:actions? false, :pages? false, :search? false}, :parameters {}, :mutates {}, :description \"query-log-:block-1430\"}"
+      51,
+      "{:options {:actions? false, :pages? false, :search? false}, :parameters {}, :mutates {}, :description \"query-log-:block-8083\"}"
+      2},
+     :cardinality 3},
     :updated
     {:data-type "string",
-     :distinct 2,
+     :distinct 26,
      :group-by? true,
-     :commons {"2024-07-26 03:44:33" 1, "2024-07-26 03:46:27" 1},
+     :commons
+     {"2024-07-28 20:42:01" 11, "2024-07-28 20:42:03" 7, "2024-07-28 20:42:19" 6},
+     :cardinality 23},
+    :item_hash
+    {:data-type "string",
+     :distinct 54,
+     :group-by? true,
+     :commons {"470939750" 6, "-1722972897" 3, "2004179163" 3},
+     :cardinality 48},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"kick-solver!" 111},
+     :cardinality 0},
+    :item_name
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"" 57, ":block-1430" 51, ":block-8083" 2},
+     :cardinality 3},
+    :flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"flow-id-here!" 111},
+     :cardinality 0},
+    :id
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {84 1, 49 1, 8 1},
      :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":views" 2},
-     :cardinality 50},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-12330" 2},
-     :cardinality 50},
-    :diff_kp
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"([1] [0])" 2},
-     :cardinality 50},
     :client_name
     {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons
+     {":miraculous-amethyst-hippopotamus-6" 27,
+      ":harmonious-pear-hippopotamus-34" 26,
+      ":courageous-long-turkey-28" 25},
+     :cardinality 6},
+    :item_data
+    {:data-type "string",
+     :distinct 54,
+     :group-by? true,
+     :commons
+     {"{:content [\"2024-07-28 20:42:01 - query ran in -1 ms.\"], :name \"query-log-\", :order 1722213721, :parameters {}, :forced-mutates {}, :step-mutates {}}"
+      6,
+      "{:content [\"2024-07-28 20:42:03 - query ran in -1 ms.\"], :name \"query-log-\", :order 1722213723, :parameters {}, :forced-mutates {}, :step-mutates {}}"
+      3,
+      "{:content [\"2024-07-28 20:42:19 - query ran in -1 ms.\"], :name \"query-log-\", :order 1722213739, :parameters {}, :forced-mutates {}, :step-mutates {}}"
+      3},
+     :cardinality 48},
+    :item_key
+    {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":beneficial-fat-badger-0" 2},
-     :cardinality 50},
-    :pre_data
+     :commons {":solver-log" 111},
+     :cardinality 0},
+    :kit_name
     {:data-type "string",
-     :distinct 2,
+     :distinct 1,
+     :group-by? true,
+     :commons {":kick" 111},
+     :cardinality 0}},
+   :rowcount 111},
+  :kits-drag-36
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 500},
+     :cardinality 0},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"{}" 500},
+     :cardinality 0},
+    :updated
+    {:data-type "string",
+     :distinct 130,
      :group-by? true,
      :commons
-     {"nil" 1,
-      "[:markdown \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!! \\n #test \\n ###TEST\"]"
-      1},
+     {"2024-07-30 03:06:10" 7, "2024-07-30 03:06:25" 7, "2024-07-30 03:06:48" 7},
+     :cardinality 25},
+    :item_hash
+    {:data-type "string",
+     :distinct 120,
+     :group-by? true,
+     :commons {"1344774787" 11, "1671969318" 10, "1239414405" 10},
+     :cardinality 23},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"solver-log" 500},
+     :cardinality 0},
+    :item_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"" 251, ":new-clojure-1" 243, ":new-clojure-2" 6},
+     :cardinality 0},
+    :flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 500},
+     :cardinality 0},
+    :id
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {84 1, 390 1, 49 1},
      :cardinality 100},
-    :diff
+    :client_name
     {:data-type "string",
-     :distinct 2,
+     :distinct 5,
      :group-by? true,
      :commons
-     {"[:markdown \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!! \\n #test \\n ###TEST\"]"
-      1,
-      "[nil \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!! \\n #test \\n ###TEdddST\"]" 1},
-     :cardinality 100},
-    :data
+     {":harmonious-pear-hippopotamus-34" 132,
+      ":easy-indigo-prairie-dog-8" 128,
+      ":miraculous-amethyst-hippopotamus-6" 117},
+     :cardinality 0},
+    :item_data
     {:data-type "string",
-     :distinct 2,
+     :distinct 120,
      :group-by? true,
      :commons
-     {"[:markdown \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!! \\n #test \\n ###TEST\"]"
-      1,
-      "[:markdown \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!! \\n #test \\n ###TEdddST\"]"
-      1},
+     {"{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1185.7693\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"713.1985540610642\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"13\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DISTRICT]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DISTRICT\"] [:box :child \"\\\"B2\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query--15841505520-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:DISTRICT], :order-by [[2 :desc]], :select [:DISTRICT [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"ALL rows in this group:\" {:_h 8, :_query-id :kit-query--15841505520-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query--15841505520-agg/*.clicked [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT \"B2\"]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}, :name \"When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250.\", :order 0, :parameters {:test-param123 [\"fart fx service\"]}, :step-mutates {[:panels :block-5394 :views :hare-vw-4] [:box :align :center :justify :center :style {:font-size \"95px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}}"
+      11,
+      "{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1185.7693\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"713.1985540610642\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"13\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DISTRICT]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DISTRICT\"] [:box :child \"\\\"B2\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query--15841505520-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:DISTRICT], :order-by [[2 :desc]], :select [:DISTRICT [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"ALL rows in this group:\" {:_h 8, :_query-id :kit-query--15841505520-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query--15841505520-agg/*.clicked [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT \"B2\"]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}, :name \"When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250.\", :order 0, :parameters {:test-param123 [\"fart fx service\"]}, :step-mutates {[:panels :block-5394 :views :hare-vw-4] [:box :align :center :justify :center :style {:font-size \"17px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}}"
+      10,
+      "{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1185.7693\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"713.1985540610642\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"13\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DISTRICT]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DISTRICT\"] [:box :child \"\\\"B2\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query--15841505520-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:DISTRICT], :order-by [[2 :desc]], :select [:DISTRICT [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :DISTRICT \"B2\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"ALL rows in this group:\" {:_h 8, :_query-id :kit-query--15841505520-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query--15841505520-agg/*.clicked [:*all= :kit-query--15841505520-agg/*.clicked [:DISTRICT]] [:and [:= :DISTRICT \"B2\"]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DISTRICT]}, :name \"When grouping by district and aggregating by :rows there are values that are higher than the mean (1185 for this particular aggregation) by 1250.\", :order 0, :parameters {:test-param123 [\"fart fx service\"]}, :step-mutates {[:panels :block-5394 :views :hare-vw-4] [:box :align :center :justify :center :style {:font-size \"100px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]}}"
+      10},
+     :cardinality 23},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":tester" 500},
+     :cardinality 0},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":kick" 500},
+     :cardinality 0}},
+   :rowcount 500},
+  :fabric-hop-19
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {},
      :cardinality 100}},
-   :rowcount 2},
+   :rowcount 25},
   :shows
   {:fields
    {:query_error
@@ -837,6 +1365,15 @@
       "(from database connection)" 1},
      :cardinality 100}},
    :rowcount 4},
+  :fabric-hop-14
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 9},
   :offenses-drag-24
   {:fields
    {:SHOOTING
@@ -952,6 +1489,24 @@
       "2018-09-01 17:03:00.000000" 5},
      :cardinality 80}},
    :rowcount 500},
+  :fabric-hop-35
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {},
+     :cardinality 90}},
+   :rowcount 10},
+  :fabric-hop-28
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 16,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 16},
   :fabric-hop-10
   {:fields
    {:vec-val
@@ -961,6 +1516,15 @@
      :commons {},
      :cardinality 100}},
    :rowcount 7},
+  :fabric-hop-5
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
   :fabric-hop-11
   {:fields
    {:vec-val
@@ -970,6 +1534,83 @@
      :commons {},
      :cardinality 100}},
    :rowcount 3},
+  :tmp--1041439146-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-6837 :queries :kits-drag-36]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":kits-drag-36" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-07-30 04:19:24" 1, "2024-07-30 07:32:21" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-6837" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"([:_last-run :new] [:_last-run :new] [:_last-run :old] [:_last-run :old] [:_last-run])"
+      1,
+      "([:_db-type :new] [:_db-type :new] [:_db-type :old] [:_db-type :old] [:_db-type])"
+      1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":powerful-oval-gorilla-17" 2},
+     :cardinality 50},
+    :pre_data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"{:select [:client_name :flow_id :id :item_data :item_hash :item_idx :item_key :item_name :item_options :item_type :kit_name :updated], :from [[:kits :bb438]]}"
+      1,
+      "{:select [:client_name :flow_id :id :item_data :item_hash :item_idx :item_key :item_name :item_options :item_type :kit_name :updated], :from [[:kits :bb438]], :_last-run \"04:02:07\"}"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"{:_last-run {:old nil, :new \"04:02:07\"}}" 1,
+      "{:_db-type {:old nil, :new \"SQLITE\"}}" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"{:select [:client_name :flow_id :id :item_data :item_hash :item_idx :item_key :item_name :item_options :item_type :kit_name :updated], :from [[:kits :bb438]], :_last-run \"04:02:07\"}"
+      1,
+      "{:select [:client_name :flow_id :id :item_data :item_hash :item_idx :item_key :item_name :item_options :item_type :kit_name :updated], :from [[:kits :bb438]], :_db-type \"SQLITE\", :_last-run \"04:02:07\"}"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
   :virtual-view
   {:fields
    {:vec-val
@@ -979,88 +1620,15 @@
      :commons {},
      :cardinality 100}},
    :rowcount 1},
-  :tmp-2109860946-hist-sys
+  :fabric-hop-30
   {:fields
-   {:kp
+   {:vec-val
     {:data-type "string",
-     :distinct 1,
+     :distinct 22,
      :group-by? true,
-     :commons {"[:block-2524 :fabric :fabric-hop-8]" 5},
-     :cardinality 20},
-    :key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":fabric-hop-8" 5},
-     :cardinality 20},
-    :updated
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"2024-07-28 00:26:59" 1, "2024-07-28 00:28:42" 1, "2024-07-28 00:32:26" 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":fabric" 5},
-     :cardinality 20},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-2524" 5},
-     :cardinality 20},
-    :diff_kp
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons
-     {"([0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])" 5},
-     :cardinality 20},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":beneficial-fat-badger-0" 5},
-     :cardinality 20},
-    :pre_data
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[\"tell another edgy cyberpunk joke without emojis please...\"]" 1,
-      "[\"tell another edgy cyberpunk joke without emojis please and make it spicy!\"]"
-      1,
-      "[\"tell another edgy cyberpunk joke without emojis please and make it spicy!!\"]"
-      1},
-     :cardinality 100},
-    :diff
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[[0 {:old \"tell another edgy cyberpunk joke without emojis please...\", :new \"tell another edgy cyberpunk joke without emojis please and make it spicy!\"}]]"
-      1,
-      "[[0 {:old \"tell another edgy cyberpunk joke without emojis please and make it spicy!\", :new \"tell another edgy cyberpunk joke without emojis please and make it spicy!!\"}]]"
-      1,
-      "[[0 {:old \"tell another edgy cyberpunk joke without emojis please and make it spicy!!\", :new \"tell another edgy cyberpunk joke without emojis please and make it spicy plaese!!\"}]]"
-      1},
-     :cardinality 100},
-    :data
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[\"tell another edgy cyberpunk joke without emojis please and make it spicy!\"]"
-      1,
-      "[\"tell another edgy cyberpunk joke without emojis please and make it spicy!!\"]"
-      1,
-      "[\"tell another edgy cyberpunk joke without emojis please and make it spicy plaese!!\"]"
-      1},
-     :cardinality 100}},
-   :rowcount 5},
+     :commons {},
+     :cardinality 95}},
+   :rowcount 23},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -1070,18 +1638,6 @@
      :commons {80332 1},
      :cardinality 100}},
    :rowcount 1},
-  :panel_resolved_history
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {nil 1,
-      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
-      "(from database connection)" 1},
-     :cardinality 100}},
-   :rowcount 4},
   :tour-name-drag-11
   {:fields
    {:tour_name
@@ -1215,6 +1771,33 @@
       "2018-09-01 17:03:00.000000" 5},
      :cardinality 80}},
    :rowcount 500},
+  :fabric-hop-34
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {},
+     :cardinality 93}},
+   :rowcount 15},
+  :fabric-hop-21
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {},
+     :cardinality 95}},
+   :rowcount 24},
+  :fabric-hop-6
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
   :gen-viz-828
   {:fields
    {:agg
@@ -1230,6 +1813,58 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :fabric-hop-38
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 4},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :fabric-hop-40
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :offenses
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
+  :tmp--818218896-hist-sys {:fields {}, :rowcount 0},
   :shows-drag-22
   {:fields
    {:location
@@ -1285,11 +1920,11 @@
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 9,
+     :distinct 5,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 9},
+   :rowcount 5},
   :gen-viz-84
   {:fields
    {:rows
@@ -1413,90 +2048,26 @@
      :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
-  :tmp--943541296-hist-sys {:fields {}, :rowcount 0},
-  :tmp-338024901-hist-sys
+  :fabric-hop-42
   {:fields
-   {:kp
+   {:vec-val
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"[:block-3848 :queries :panel-history-drag-31]" 3},
-     :cardinality 33},
-    :key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":panel-history-drag-31" 3},
-     :cardinality 33},
-    :updated
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"2024-07-26 03:44:33" 1, "2024-07-26 03:46:27" 1, "2024-07-26 03:49:42" 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":queries" 3},
-     :cardinality 33},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-3848" 3},
-     :cardinality 33},
-    :diff_kp
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"([:_last-run] [:from 0 1] [:from 0 0] [:from 0] [:from] [:select 9] [:select 8] [:select 7] [:select 6] [:select 5] [:select 4] [:select 3] [:select 2] [:select 1] [:select 0] [:select])"
-      1,
-      "([:_last-run])" 1,
-      "([:order-by 0] [:order-by])" 1},
-     :cardinality 100},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":beneficial-fat-badger-0" 3},
-     :cardinality 33},
-    :pre_data
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"nil" 1,
-      "{:select [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated], :from [[:panel_history :yy623]], :_last-run \"03:dd:27\"}"
-      1,
-      "{:select [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated], :from [[:panel_history :yy623]], :_last-run \"03:45:49\"}"
-      1},
-     :cardinality 100},
-    :diff
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"{:select [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated], :from [[:panel_history :yy623]], :_last-run \"03:dd:27\"}"
-      1,
-      "{:_last-run \"03:45:49\"}" 1,
-      "{:order-by [1]}" 1},
-     :cardinality 100},
-    :data
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"{:select [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated], :from [[:panel_history :yy623]], :_last-run \"03:dd:27\"}"
-      1,
-      "{:select [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated], :from [[:panel_history :yy623]], :_last-run \"03:45:49\"}"
-      1,
-      "{:select [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated], :order-by [1], :from [[:panel_history :yy623]], :_last-run \"03:45:49\"}"
-      1},
+     :commons {},
      :cardinality 100}},
-   :rowcount 3},
+   :rowcount 1},
+  :tmp-952860608-hist-sys {:fields {}, :rowcount 0},
+  :fabric-hop-1
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :tmp-1034462477-hist-sys {:fields {}, :rowcount 0},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -1512,6 +2083,15 @@
      :commons {12 29, 13 23, 14 22},
      :cardinality 32}},
    :rowcount 500},
+  :fabric-hop-22
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons {},
+     :cardinality 94}},
+   :rowcount 18},
   :city-drag-26
   {:fields
    {:city
@@ -1527,176 +2107,123 @@
      :commons {27 35, 26 24, 29 23},
      :cardinality 23}},
    :rowcount 500},
-  :tmp--1637744073-hist-sys {:fields {}, :rowcount 0},
   :reco-counts {:fields {}, :rowcount 0},
-  :tmp--1489849301-hist-sys
+  :fabric-hop-27
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 19,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 19},
+  :fabric-hop-20
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 23},
+  :tmp-1626017590-hist-sys
   {:fields
    {:kp
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"[:block-10011 :fabric :fabric-hop-12]" 6},
-     :cardinality 16},
+     :commons {"[:block-5394 :views :hare-vw-4]" 15},
+     :cardinality 6},
     :key
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":fabric-hop-12" 6},
-     :cardinality 16},
+     :commons {":hare-vw-4" 15},
+     :cardinality 6},
     :updated
     {:data-type "string",
-     :distinct 6,
+     :distinct 15,
      :group-by? true,
      :commons
-     {"2024-07-28 01:26:22" 1, "2024-07-28 01:27:04" 1, "2024-07-28 01:29:21" 1},
+     {"2024-07-30 06:53:20" 1, "2024-07-30 06:54:03" 1, "2024-07-30 06:54:23" 1},
      :cardinality 100},
     :type
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":fabric" 6},
-     :cardinality 16},
+     :commons {":views" 15},
+     :cardinality 6},
     :panel_key
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":block-10011" 6},
-     :cardinality 16},
+     :commons {":block-5394" 15},
+     :cardinality 6},
     :diff_kp
     {:data-type "string",
-     :distinct 1,
+     :distinct 9,
      :group-by? true,
      :commons
-     {"([0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])" 6},
-     :cardinality 16},
+     {"([1 1 :new] [1 1 :new] [1 1 :old] [1 1 :old] [1 1] [1 0] [1 0] [1] [0 1 :margin :new] [0 1 :margin :new] [0 1 :margin :old] [0 1 :margin :old] [0 1 :margin] [0 1 :font-family :new] [0 1 :font-family :new] [0 1 :font-family :old] [0 1 :font-family :old] [0 1 :font-family] [0 1 :border-radius :new] [0 1 :border-radius :new] [0 1 :border-radius :old] [0 1 :border-radius :old] [0 1 :border-radius] [0 1 :border :new] [0 1 :border :new] [0 1 :border :old] [0 1 :border :old] [0 1 :border] [0 1 :text-shadow :new] [0 1 :text-shadow :new] [0 1 :text-shadow :old] [0 1 :text-shadow :old] [0 1 :text-shadow] [0 1 :padding :new] [0 1 :padding :new] [0 1 :padding :old] [0 1 :padding :old] [0 1 :padding] [0 1 :padding-left :new] [0 1 :padding-left :new] [0 1 :padding-left :old] [0 1 :padding-left :old] [0 1 :padding-left] [0 1 :padding-top :new] [0 1 :padding-top :new] [0 1 :padding-top :old] [0 1 :padding-top :old] [0 1 :padding-top] [0 1 :margin-top :new] [0 1 :margin-top :new] [0 1 :margin-top :old] [0 1 :margin-top :old] [0 1 :margin-top] [0 1 :background-color :new] [0 1 :background-color :new] [0 1 :background-color :old] [0 1 :background-color :old] [0 1 :background-color] [0 1 :font-size :new] [0 1 :font-size :new] [0 1 :font-size :old] [0 1 :font-size :old] [0 1 :font-size] [0 1 :color :new] [0 1 :color :new] [0 1 :color :old] [0 1 :color :old] [0 1 :color] [0 1 :box-shadow :new] [0 1 :box-shadow :new] [0 1 :box-shadow :old] [0 1 :box-shadow :old] [0 1 :box-shadow] [0 1] [0 0] [0 0] [0])"
+      5,
+      "([0 1 :margin :new] [0 1 :margin :new] [0 1 :margin :old] [0 1 :margin :old] [0 1 :margin] [0 1 :background-size :new] [0 1 :background-size :new] [0 1 :background-size :old] [0 1 :background-size :old] [0 1 :background-size] [0 1 :border-radius :new] [0 1 :border-radius :new] [0 1 :border-radius :old] [0 1 :border-radius :old] [0 1 :border-radius] [0 1 :border :new] [0 1 :border :new] [0 1 :border :old] [0 1 :border :old] [0 1 :border] [0 1 :padding :new] [0 1 :padding :new] [0 1 :padding :old] [0 1 :padding :old] [0 1 :padding] [0 1 :padding-left :new] [0 1 :padding-left :new] [0 1 :padding-left :old] [0 1 :padding-left :old] [0 1 :padding-left] [0 1 :padding-top :new] [0 1 :padding-top :new] [0 1 :padding-top :old] [0 1 :padding-top :old] [0 1 :padding-top] [0 1 :filter :new] [0 1 :filter :new] [0 1 :filter :old] [0 1 :filter :old] [0 1 :filter] [0 1 :background-image :new] [0 1 :background-image :new] [0 1 :background-image :old] [0 1 :background-image :old] [0 1 :background-image] [0 1 :background-blend-mode :new] [0 1 :background-blend-mode :new] [0 1 :background-blend-mode :old] [0 1 :background-blend-mode :old] [0 1 :background-blend-mode] [0 1 :margin-top :new] [0 1 :margin-top :new] [0 1 :margin-top :old] [0 1 :margin-top :old] [0 1 :margin-top] [0 1 :background-color :new] [0 1 :background-color :new] [0 1 :background-color :old] [0 1 :background-color :old] [0 1 :background-color] [0 1] [0 0] [0 0] [0])"
+      3,
+      "([0 1 :background-color :new] [0 1 :background-color :new] [0 1 :background-color :old] [0 1 :background-color :old] [0 1 :background-color] [0 1] [0 0] [0 0] [0])"
+      1},
+     :cardinality 60},
     :client_name
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":beneficial-fat-badger-0" 6},
-     :cardinality 16},
+     :commons {":powerful-oval-gorilla-17" 15},
+     :cardinality 6},
     :pre_data
     {:data-type "string",
-     :distinct 6,
+     :distinct 8,
      :group-by? true,
      :commons
-     {"[\" tell a horror story about a dishwasher (no emojits)...\"]" 1,
-      "[\" tell a horror story about a dishwasher (no emojits).....\"]" 1,
-      "[\" tell a horror story about a dishwasher (no emojits)!.\"]" 1},
-     :cardinality 100},
+     {"[:box :align :center :justify :center :style {:color \"#D2691E\", :font-size \"56px\", :font-weight 700, :background-color \"#FFFAF0\", :margin-top \"-8px\", :padding-top \"6px\", :padding-left \"14px\", :border \"2px solid #8B4513\", :border-radius \"10px\", :font-family \"Oxygen Mono\"} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]"
+      5,
+      "[:box :align :center :justify :center :style {:box-shadow \"0 4px 8px rgba(0, 0, 0, 0.1)\", :color \"#8B4513\", :font-size \"48px\", :font-weight 700, :background-color \"#FFF5E6\", :padding \"20px\", :text-shadow \"1px 1px 2px #FFD700\", :border \"3px solid #D2691E\", :border-radius \"15px\", :font-family \"Courier New, monospace\", :margin \"10px\"} :child \"YO. Have I gone mad?\\nI'm afraid so, but let me tell you something,\\nthe best people usually are.\"]"
+      3,
+      "[:box :align :center :justify :center :style {:color \"#D2691E\", :font-size \"56px\", :font-weight 700, :background-color \"rgba(255, 250, 240, 0.8)\", :background-blend-mode \"overlay\", :background-image \"url('https://placekitten.com/800/600')\", :filter \"drop-shadow(0 0 10px rgba(0,0,0,0.3)) sepia(20%)\", :padding \"30px\", :border \"4px solid #8B4513\", :border-radius \"15px\", :background-size \"cover\", :font-family \"Oxygen Mono\", :margin \"20px\"} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]"
+      2},
+     :cardinality 53},
     :diff
     {:data-type "string",
-     :distinct 6,
+     :distinct 11,
      :group-by? true,
      :commons
-     {"[[0 {:old \" tell a horror story about a dishwasher (no emojits)...\", :new \" tell a horror story about a dishwasher (no emojits).....\"}]]"
-      1,
-      "[[0 {:old \" tell a horror story about a dishwasher (no emojits).....\", :new \" tell a horror story about a dishwasher (no emojits)!.\"}]]"
-      1,
-      "[[0 {:old \" tell a horror story about a dishwasher (no emojits)!.\", :new \" tell a short horror story about a dishwasher (no emojits)!.\"}]]"
-      1},
-     :cardinality 100},
+     {"[[6 {:box-shadow {:old \"0 4px 8px rgba(0, 0, 0, 0.1)\", :new nil}, :color {:old \"#8B4513\", :new \"#D2691E\"}, :font-size {:old \"48px\", :new \"56px\"}, :background-color {:old \"#FFF5E6\", :new \"#FFFAF0\"}, :margin-top {:old nil, :new \"-8px\"}, :padding-top {:old nil, :new \"6px\"}, :padding-left {:old nil, :new \"14px\"}, :padding {:old \"20px\", :new nil}, :text-shadow {:old \"1px 1px 2px #FFD700\", :new nil}, :border {:old \"3px solid #D2691E\", :new \"2px solid #8B4513\"}, :border-radius {:old \"15px\", :new \"10px\"}, :font-family {:old \"Courier New, monospace\", :new \"Oxygen Mono\"}, :margin {:old \"10px\", :new nil}}] [8 {:old \"YO. Have I gone mad?\\nI'm afraid so, but let me tell you something,\\nthe best people usually are.\", :new \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"}]]"
+      3,
+      "[[6 {:box-shadow {:old nil, :new \"0 4px 8px rgba(0, 0, 0, 0.1)\"}, :color {:old \"#D2691E\", :new \"#8B4513\"}, :font-size {:old \"56px\", :new \"48px\"}, :background-color {:old \"#FFFAF0\", :new \"#FFF5E6\"}, :margin-top {:old \"-8px\", :new nil}, :padding-top {:old \"6px\", :new nil}, :padding-left {:old \"14px\", :new nil}, :padding {:old nil, :new \"20px\"}, :text-shadow {:old nil, :new \"1px 1px 2px #FFD700\"}, :border {:old \"2px solid #8B4513\", :new \"3px solid #D2691E\"}, :border-radius {:old \"10px\", :new \"15px\"}, :font-family {:old \"Oxygen Mono\", :new \"Courier New, monospace\"}, :margin {:old nil, :new \"10px\"}}] [8 {:old \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\", :new \"YO. Have I gone mad?\\nI'm afraid so, but let me tell you something,\\nthe best people usually are.\"}]]"
+      2,
+      "[[6 {:background-color {:old \"#FFFAF0\", :new \"rgba(255, 250, 240, 0.8)\"}, :margin-top {:old \"-8px\", :new nil}, :background-blend-mode {:old nil, :new \"overlay\"}, :background-image {:old nil, :new \"url('https://placekitten.com/800/600')\"}, :filter {:old nil, :new \"drop-shadow(0 0 10px rgba(0,0,0,0.3)) sepia(20%)\"}, :padding-top {:old \"6px\", :new nil}, :padding-left {:old \"14px\", :new nil}, :padding {:old nil, :new \"30px\"}, :border {:old \"2px solid #8B4513\", :new \"4px solid #8B4513\"}, :border-radius {:old \"10px\", :new \"15px\"}, :background-size {:old nil, :new \"cover\"}, :margin {:old nil, :new \"20px\"}}]]"
+      2},
+     :cardinality 73},
     :data
     {:data-type "string",
-     :distinct 6,
+     :distinct 8,
      :group-by? true,
      :commons
-     {"[\" tell a horror story about a dishwasher (no emojits).....\"]" 1,
-      "[\" tell a horror story about a dishwasher (no emojits)!.\"]" 1,
-      "[\" tell a short horror story about a dishwasher (no emojits)!.\"]" 1},
-     :cardinality 100}},
-   :rowcount 6},
-  :tmp-446910141-hist-sys
-  {:fields
-   {:kp
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"[:block-646 :fabric :fabric-hop-11]" 3},
-     :cardinality 33},
-    :key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":fabric-hop-11" 3},
-     :cardinality 33},
-    :updated
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"2024-07-28 00:57:22" 1, "2024-07-28 00:59:23" 1, "2024-07-28 01:02:27" 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":fabric" 3},
-     :cardinality 33},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-646" 3},
-     :cardinality 33},
-    :diff_kp
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons
-     {"([0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])" 3},
-     :cardinality 33},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":beneficial-fat-badger-0" 3},
-     :cardinality 33},
-    :pre_data
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"[\"  tell a quick story about vampire rabbits in a sleepy little town\"]" 1,
-      "[\"  tell a quick story about vampire rabbits in a sleepy little town.,..\"]"
-      1,
-      "[\"  tell a quick story about vampire rabbits in a sleepy little town in autumn.,..\"]"
-      1},
-     :cardinality 100},
-    :diff
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"[[0 {:old \"  tell a quick story about vampire rabbits in a sleepy little town\", :new \"  tell a quick story about vampire rabbits in a sleepy little town.,..\"}]]"
-      1,
-      "[[0 {:old \"  tell a quick story about vampire rabbits in a sleepy little town.,..\", :new \"  tell a quick story about vampire rabbits in a sleepy little town in autumn.,..\"}]]"
-      1,
-      "[[0 {:old \"  tell a quick story about vampire rabbits in a sleepy little town in autumn.,..\", :new \"  tell a quick story about vampire rabbits in a sleepy little town in autumn in new england\"}]]"
-      1},
-     :cardinality 100},
-    :data
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"[\"  tell a quick story about vampire rabbits in a sleepy little town.,..\"]"
-      1,
-      "[\"  tell a quick story about vampire rabbits in a sleepy little town in autumn.,..\"]"
-      1,
-      "[\"  tell a quick story about vampire rabbits in a sleepy little town in autumn in new england\"]"
-      1},
-     :cardinality 100}},
-   :rowcount 3},
+     {"[:box :align :center :justify :center :style {:color \"#D2691E\", :font-size \"56px\", :font-weight 700, :background-color \"#FFFAF0\", :margin-top \"-8px\", :padding-top \"6px\", :padding-left \"14px\", :border \"2px solid #8B4513\", :border-radius \"10px\", :font-family \"Oxygen Mono\"} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]"
+      6,
+      "[:box :align :center :justify :center :style {:box-shadow \"0 4px 8px rgba(0, 0, 0, 0.1)\", :color \"#8B4513\", :font-size \"48px\", :font-weight 700, :background-color \"#FFF5E6\", :padding \"20px\", :text-shadow \"1px 1px 2px #FFD700\", :border \"3px solid #D2691E\", :border-radius \"15px\", :font-family \"Courier New, monospace\", :margin \"10px\"} :child \"YO. Have I gone mad?\\nI'm afraid so, but let me tell you something,\\nthe best people usually are.\"]"
+      2,
+      "[:box :align :center :justify :center :style {:color \"#D2691E\", :font-size \"56px\", :font-weight 700, :background-color \"rgba(255, 250, 240, 0.8)\", :background-blend-mode \"overlay\", :background-image \"url('https://placekitten.com/800/600')\", :filter \"drop-shadow(0 0 10px rgba(0,0,0,0.3)) sepia(20%)\", :padding \"30px\", :border \"4px solid #8B4513\", :border-radius \"15px\", :background-size \"cover\", :font-family \"Oxygen Mono\", :margin \"20px\"} :child \"YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are.\"]"
+      2},
+     :cardinality 53}},
+   :rowcount 15},
+  :tmp-578267773-hist-sys {:fields {}, :rowcount 0},
   :fabric-hop-8
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 3,
+     :distinct 1,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 3},
+   :rowcount 1},
   :state-drag-3
   {:fields
    {:state
@@ -1712,6 +2239,17 @@
      :commons {183 1, 968 1, 633 1},
      :cardinality 100}},
    :rowcount 68},
+  :fabric-hop-16 {:fields {}, :rowcount 0},
+  :tmp--1873620494-hist-sys {:fields {}, :rowcount 0},
+  :fabric-hop-37
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 24,
+     :group-by? true,
+     :commons {},
+     :cardinality 96}},
+   :rowcount 25},
   :shape-drag-7
   {:fields
    {:shape
@@ -1748,74 +2286,146 @@
      :commons {},
      :cardinality 100}},
    :rowcount 1},
-  :kit-results-sys {:fields {}, :rowcount 0}},
+  :tmp-1712068299-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-94 :views :oz]" 9},
+     :cardinality 11},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":oz" 9},
+     :cardinality 11},
+    :updated
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons
+     {"2024-07-30 08:09:56" 1, "2024-07-30 07:47:16" 1, "2024-07-30 07:42:16" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 9},
+     :cardinality 11},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-94" 9},
+     :cardinality 11},
+    :diff_kp
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"([0 1 :layer 0 1 :encoding :color :aggregate :new] [0 1 :layer 0 1 :encoding :color :aggregate :new] [0 1 :layer 0 1 :encoding :color :aggregate :old] [0 1 :layer 0 1 :encoding :color :aggregate :old] [0 1 :layer 0 1 :encoding :color :aggregate] [0 1 :layer 0 1 :encoding :color :type :new] [0 1 :layer 0 1 :encoding :color :type :new] [0 1 :layer 0 1 :encoding :color :type :old] [0 1 :layer 0 1 :encoding :color :type :old] [0 1 :layer 0 1 :encoding :color :type] [0 1 :layer 0 1 :encoding :color :field :new] [0 1 :layer 0 1 :encoding :color :field :new] [0 1 :layer 0 1 :encoding :color :field :old] [0 1 :layer 0 1 :encoding :color :field :old] [0 1 :layer 0 1 :encoding :color :field] [0 1 :layer 0 1 :encoding :color :legend :new :title] [0 1 :layer 0 1 :encoding :color :legend :new :title] [0 1 :layer 0 1 :encoding :color :legend :new] [0 1 :layer 0 1 :encoding :color :legend :old] [0 1 :layer 0 1 :encoding :color :legend :old] [0 1 :layer 0 1 :encoding :color :legend] [0 1 :layer 0 1 :encoding :color :scale :scheme :new] [0 1 :layer 0 1 :encoding :color :scale :scheme :new] [0 1 :layer 0 1 :encoding :color :scale :scheme :old] [0 1 :layer 0 1 :encoding :color :scale :scheme :old] [0 1 :layer 0 1 :encoding :color :scale :scheme] [0 1 :layer 0 1 :encoding :color :scale] [0 1 :layer 0 1 :encoding :color] [0 1 :layer 0 1 :encoding :y :sort :new :order] [0 1 :layer 0 1 :encoding :y :sort :new :order] [0 1 :layer 0 1 :encoding :y :sort :new :field] [0 1 :layer 0 1 :encoding :y :sort :new :field] [0 1 :layer 0 1 :encoding :y :sort :new :op] [0 1 :layer 0 1 :encoding :y :sort :new :op] [0 1 :layer 0 1 :encoding :y :sort :new] [0 1 :layer 0 1 :encoding :y :sort :old] [0 1 :layer 0 1 :encoding :y :sort :old] [0 1 :layer 0 1 :encoding :y :sort] [0 1 :layer 0 1 :encoding :y] [0 1 :layer 0 1 :encoding] [0 1 :layer 0 1] [0 1 :layer 0 0] [0 1 :layer 0 0] [0 1 :layer 0] [0 1 :layer] [0 1] [0 0] [0 0] [0])"
+      4,
+      "([0 1 :layer 0 1 :encoding :color :aggregate :new] [0 1 :layer 0 1 :encoding :color :aggregate :new] [0 1 :layer 0 1 :encoding :color :aggregate :old] [0 1 :layer 0 1 :encoding :color :aggregate :old] [0 1 :layer 0 1 :encoding :color :aggregate] [0 1 :layer 0 1 :encoding :color :type :new] [0 1 :layer 0 1 :encoding :color :type :new] [0 1 :layer 0 1 :encoding :color :type :old] [0 1 :layer 0 1 :encoding :color :type :old] [0 1 :layer 0 1 :encoding :color :type] [0 1 :layer 0 1 :encoding :color :field :new] [0 1 :layer 0 1 :encoding :color :field :new] [0 1 :layer 0 1 :encoding :color :field :old] [0 1 :layer 0 1 :encoding :color :field :old] [0 1 :layer 0 1 :encoding :color :field] [0 1 :layer 0 1 :encoding :color :legend :new] [0 1 :layer 0 1 :encoding :color :legend :new] [0 1 :layer 0 1 :encoding :color :legend :old :title] [0 1 :layer 0 1 :encoding :color :legend :old :title] [0 1 :layer 0 1 :encoding :color :legend :old] [0 1 :layer 0 1 :encoding :color :legend] [0 1 :layer 0 1 :encoding :color :scale :scheme :new] [0 1 :layer 0 1 :encoding :color :scale :scheme :new] [0 1 :layer 0 1 :encoding :color :scale :scheme :old] [0 1 :layer 0 1 :encoding :color :scale :scheme :old] [0 1 :layer 0 1 :encoding :color :scale :scheme] [0 1 :layer 0 1 :encoding :color :scale] [0 1 :layer 0 1 :encoding :color] [0 1 :layer 0 1 :encoding :y :sort :new] [0 1 :layer 0 1 :encoding :y :sort :new] [0 1 :layer 0 1 :encoding :y :sort :old :order] [0 1 :layer 0 1 :encoding :y :sort :old :order] [0 1 :layer 0 1 :encoding :y :sort :old :field] [0 1 :layer 0 1 :encoding :y :sort :old :field] [0 1 :layer 0 1 :encoding :y :sort :old :op] [0 1 :layer 0 1 :encoding :y :sort :old :op] [0 1 :layer 0 1 :encoding :y :sort :old] [0 1 :layer 0 1 :encoding :y :sort] [0 1 :layer 0 1 :encoding :y] [0 1 :layer 0 1 :encoding] [0 1 :layer 0 1] [0 1 :layer 0 0] [0 1 :layer 0 0] [0 1 :layer 0] [0 1 :layer] [0 1] [0 0] [0 0] [0])"
+      4,
+      "([0 1 :layer 0 1 :encoding :color :scale :new :scheme] [0 1 :layer 0 1 :encoding :color :scale :new :scheme] [0 1 :layer 0 1 :encoding :color :scale :new] [0 1 :layer 0 1 :encoding :color :scale :old] [0 1 :layer 0 1 :encoding :color :scale :old] [0 1 :layer 0 1 :encoding :color :scale] [0 1 :layer 0 1 :encoding :color] [0 1 :layer 0 1 :encoding] [0 1 :layer 0 1] [0 1 :layer 0 0] [0 1 :layer 0 0] [0 1 :layer 0] [0 1 :layer] [0 1 :config :new :title :titleColor] [0 1 :config :new :title :titleColor] [0 1 :config :new :title :titleFont] [0 1 :config :new :title :titleFont] [0 1 :config :new :title :labelFont] [0 1 :config :new :title :labelFont] [0 1 :config :new :title :subtitleFont] [0 1 :config :new :title :subtitleFont] [0 1 :config :new :title :font] [0 1 :config :new :title :font] [0 1 :config :new :title] [0 1 :config :new :mark :font] [0 1 :config :new :mark :font] [0 1 :config :new :mark] [0 1 :config :new :header :titleColor] [0 1 :config :new :header :titleColor] [0 1 :config :new :header :titleFont] [0 1 :config :new :header :titleFont] [0 1 :config :new :header :labelFont] [0 1 :config :new :header :labelFont] [0 1 :config :new :header] [0 1 :config :new :legend :titleFont] [0 1 :config :new :legend :titleFont] [0 1 :config :new :legend :stroke] [0 1 :config :new :legend :stroke] [0 1 :config :new :legend :titleColor] [0 1 :config :new :legend :titleColor] [0 1 :config :new :legend :labelColor] [0 1 :config :new :legend :labelColor] [0 1 :config :new :legend :legendFont] [0 1 :config :new :legend :legendFont] [0 1 :config :new :legend :labelFont] [0 1 :config :new :legend :labelFont] [0 1 :config :new :legend] [0 1 :config :new :axis :axisFont] [0 1 :config :new :axis :axisFont] [0 1 :config :new :axis :tickColor] [0 1 :config :new :axis :tickColor] [0 1 :config :new :axis :gridColor] [0 1 :config :new :axis :gridColor] [0 1 :config :new :axis :domain] [0 1 :config :new :axis :domain] [0 1 :config :new :axis :labelFont] [0 1 :config :new :axis :labelFont] [0 1 :config :new :axis :titleColor] [0 1 :config :new :axis :titleColor] [0 1 :config :new :axis :titleFont] [0 1 :config :new :axis :titleFont] [0 1 :config :new :axis :labelColor] [0 1 :config :new :axis :labelColor] [0 1 :config :new :axis :font] [0 1 :config :new :axis :font] [0 1 :config :new :axis :grid] [0 1 :config :new :axis :grid] [0 1 :config :new :axis :domainColor] [0 1 :config :new :axis :domainColor] [0 1 :config :new :axis] [0 1 :config :new :view :stroke] [0 1 :config :new :view :stroke] [0 1 :config :new :view] [0 1 :config :new] [0 1 :config :old] [0 1 :config :old] [0 1 :config] [0 1] [0 0] [0 0] [0])"
+      1},
+     :cardinality 33},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":powerful-oval-gorilla-17" 9},
+     :cardinality 11},
+    :pre_data
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"[:vega-lite {:layer [{:encoding {:y {:field :country, :type \"ordinal\"}, :x {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"pastel2\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-84}, :config {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]"
+      4,
+      "[:vega-lite {:layer [{:encoding {:y {:field :country, :type \"ordinal\", :sort {:op \"sum\", :field :rows, :order \"descending\"}}, :x {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:field :rows, :type \"quantitative\", :aggregate \"sum\", :scale {:scheme \"viridis\"}, :legend {:title \"Row Count\"}}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-84}, :config {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]"
+      4,
+      "[:vega-lite {:layer [{:encoding {:y {:field :country, :type \"ordinal\"}, :x {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-84}, :config :theme/vega-defaults, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]"
+      1},
+     :cardinality 33},
+    :diff
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"[[1 {:layer [[0 {:encoding {:y {:sort {:old nil, :new {:op \"sum\", :field :rows, :order \"descending\"}}}, :color {:scale {:scheme {:old \"pastel2\", :new \"viridis\"}}, :legend {:old nil, :new {:title \"Row Count\"}}, :field {:old 1, :new :rows}, :type {:old \"ordinal\", :new \"quantitative\"}, :aggregate {:old nil, :new \"sum\"}}}}]]}]]"
+      4,
+      "[[1 {:layer [[0 {:encoding {:y {:sort {:old {:op \"sum\", :field :rows, :order \"descending\"}, :new nil}}, :color {:scale {:scheme {:old \"viridis\", :new \"pastel2\"}}, :legend {:old {:title \"Row Count\"}, :new nil}, :field {:old :rows, :new 1}, :type {:old \"quantitative\", :new \"ordinal\"}, :aggregate {:old \"sum\", :new nil}}}}]]}]]"
+      4,
+      "[[1 {:config {:old :theme/vega-defaults, :new {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}}, :layer [[0 {:encoding {:color {:scale {:old :theme/vega-default-color-scheme, :new {:scheme \"pastel2\"}}}}}]]}]]"
+      1},
+     :cardinality 33},
+    :data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:vega-lite {:layer [{:encoding {:y {:field :country, :type \"ordinal\"}, :x {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"pastel2\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-84}, :config {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]"
+      5,
+      "[:vega-lite {:layer [{:encoding {:y {:field :country, :type \"ordinal\", :sort {:op \"sum\", :field :rows, :order \"descending\"}}, :x {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:field :rows, :type \"quantitative\", :aggregate \"sum\", :scale {:scheme \"viridis\"}, :legend {:title \"Row Count\"}}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-84}, :config {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]"
+      4},
+     :cardinality 22}},
+   :rowcount 9},
+  :kit-results-sys {:fields {}, :rowcount 0},
+  :fabric-hop-31
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 23},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
+     :cardinality 100}},
+   :rowcount 131}},
  :default-col-widths
  {:virtual-panel
-  {:kick-886683213 ##Inf, :kick-1209586950 ##Inf, :kick-102013411 ##Inf},
+  {:kick--967205375 461,
+   :kit-query--15841505520-agg 461,
+   :kit-query--15841505520-detail 461,
+   :kick-1441652288 ##Inf,
+   :kick--1760573456 100,
+   :kick-28095721 ##Inf},
+  :block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
   :block-198 {:setlists-drag-2 102},
-  :block-760
-  {:panel-history-drag-client-name-43-hist-25220258741 ##Inf,
-   :panel-history-drag-client-name-43-hist-116-1164804289 230,
-   :panel-history-drag-client-name-43-hist-58-710381691 205,
-   :panel-history-drag-client-name-43-hist-95220258741 230,
-   :panel-history-drag-client-name-43-hist-55316142108 230,
-   :panel-history-drag-client-name-43-hist-5316142108 230,
-   :panel-history-drag-client-name-43-hist-35-1164804289 230,
-   :panel-history-drag-client-name-43 230,
-   :panel-history-drag-client-name-43-hist-69316142108 ##Inf,
-   :panel-history-drag-client-name-43-hist-591767058264 ##Inf,
-   :panel-history-drag-client-name-43-hist-68220258741 230,
-   :panel-history-drag-client-name-43-hist-95-710381691 205,
-   :panel-history-drag-client-name-43-hist-76-1164804289 ##Inf,
-   :panel-history-drag-client-name-43-hist-119-1164804289 ##Inf,
-   :panel-history-drag-client-name-43-hist-74-1164804289 ##Inf,
-   :panel-history-drag-client-name-43-hist-39-1164804289 230,
-   :panel-history-drag-client-name-43-hist-11-1164804289 230,
-   :panel-history-drag-client-name-43-hist-24316142108 230,
-   :panel-history-drag-client-name-43-hist-58316142108 ##Inf,
-   :panel-history-drag-client-name-43-hist-48220258741 230,
-   :panel-history-drag-client-name-43-hist-110-1164804289 230,
-   :panel-history-drag-client-name-43-hist-11316142108 230,
-   :panel-history-drag-client-name-43-hist-29316142108 230,
-   :panel-history-drag-client-name-43-hist-641767058264 205,
-   :panel-history-drag-client-name-43-hist-621767058264 230,
-   :panel-history-drag-client-name-43-hist-80-1164804289 230,
-   :panel-history-drag-client-name-43-hist-102-710381691 ##Inf,
-   :panel-history-drag-client-name-43-hist-6-710381691 230,
-   :panel-history-drag-client-name-43-hist-121220258741 ##Inf,
-   :panel-history-drag-client-name-43-hist-116316142108 ##Inf,
-   :panel-history-drag-client-name-43-hist-23316142108 ##Inf,
-   :panel-history-drag-client-name-43-hist-84316142108 230,
-   :panel-history-drag-client-name-43-hist-60-1164804289 ##Inf},
-  :block-3848
-  {:panel-history-drag-31 100,
-   :panel-history-drag-31-hist-64940932387 106,
-   :panel-history-drag-31-hist-120940932387 106,
-   :panel-history-drag-31-hist-105940932387 106,
-   :panel-history-drag-31-hist-77924154399 106,
-   :panel-history-drag-31-hist-1091206207988 106},
-  :block-2964 {:panel-history-drag-11 ##Inf},
+  :block-760 {:panel-history-drag-client-name-43 230},
+  :block-3848 {:panel-history-drag-31 1061},
+  :block-7138 {:DISTRICT-drag-37 180},
   :block-8963 {:shows-drag-22 108},
-  :block-10950 {:panel-materialized-history-drag-client-name-29 ##Inf},
-  :system-connections-list* {:connections-sys 176},
+  :block-204 {:gen-viz-828 355, :gen-viz-94 711},
+  :block-8805 {:duration-hours-drag-43 180},
+  :block-94 {:gen-viz-84 205},
+  :system-connections-list* {:connections-sys 186},
   :block-6308 {:tour-name-drag-11 180},
-  :block-9929
-  {:panel-history-drag-client-name-40-hist-97-822696584 100,
-   :panel-history-drag-client-name-40 100,
-   :panel-history-drag-client-name-40-hist-122-581671041 100,
-   :panel-history-drag-client-name-40-hist-30-581671041 ##Inf,
-   :panel-history-drag-client-name-40-hist-84-581671041 100,
-   :panel-history-drag-client-name-40-hist-85-581671041 100,
-   :panel-history-drag-client-name-40-hist-120-581671041 ##Inf,
-   :panel-history-drag-client-name-40-hist-62-581671041 100,
-   :panel-history-drag-client-name-40-hist-21-581671041 100,
-   :panel-history-drag-client-name-40-hist-12-581671041 100,
-   :panel-history-drag-client-name-40-hist-0-822696584 ##Inf,
-   :panel-history-drag-client-name-40-hist-20-822696584 ##Inf},
-  :system-fields-list* {:fields-sys 226},
-  :block-10069 {:panel-resolved-history-drag-client-name-18 ##Inf},
-  :block-2361 {:large-bgss 311, :new-clojure-9 311},
-  :system-tables-list* {:tables-sys 178}},
+  :block-9929 {:panel-history-drag-client-name-40 100},
+  :system-fields-list* {:fields-sys 237},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :block-6837
+  {:kits-drag-36 109,
+   :kits-drag-36-hist-57341432645 109,
+   :kits-drag-36-hist-75-218001980 109},
+  :block-719 {:chat-drag-6 211},
+  :block-7034 {:chat-drag-22 100},
+  :block-2361 {:new-clojure-9 311},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :system-tables-list* {:tables-sys 187},
+  :block-3392 {:offenses-drag-26 100},
+  :block-4346 {:offenses-drag-24 100}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -1826,7 +2436,10 @@
   "azure oyster"
   "fat hawk"
   "baby-blue duck"
-  "octohedral snake"],
+  "octohedral snake"
+  "cerulean antelope"
+  "graceful gnat"],
+ :auto-run? true,
  :selected-cols nil,
  :server
  {:settings
@@ -2114,276 +2727,171 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {},
- :editor? true,
- :buffy? true,
- :memory [1998087099 1867217423 4294705152],
- :client-name :beneficial-fat-badger-0,
+ :lines? false,
+ :editor? false,
+ :buffy? false,
+ :memory [1446569459 1287039995 4294705152],
+ :client-name :powerful-oval-gorilla-17,
+ :peek? false,
+ :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2964, :h 1574},
+ :window {:w 2517, :h 1504},
  :quake-console? false,
  :implicit-rowsets
  {:solver
-  [nil
-   :new-clojure-9
-   :new-clojure-10
+  [:fabric-hop-8
+   :fabric-hop-12
    :fabric-hop-11
-   :fabric-hop-8
-   :fabric-hop-10
    :fabric-hop-9
+   :fabric-hop-10
+   :fabric-hop-13
+   nil
    :virtual-view
-   :fabric-hop-12]},
+   :new-clojure-9
+   :fabric-hop
+   :fabric-hop-1
+   :fabric-hop-6
+   :fabric-hop-5
+   :fabric-hop-7
+   :fabric-hop-2
+   :fabric-hop-4
+   :fabric-hop-14
+   :fabric-hop-15
+   :fabric-hop-16
+   :fabric-hop-18
+   :fabric-hop-19
+   :fabric-hop-20
+   :fabric-hop-21
+   :fabric-hop-22
+   :fabric-hop-25
+   :fabric-hop-26
+   :fabric-hop-27
+   :fabric-hop-28
+   :fabric-hop-29
+   :fabric-hop-30
+   :fabric-hop-31
+   :fabric-hop-32
+   :fabric-hop-33
+   :fabric-hop-34
+   :fabric-hop-35
+   :fabric-hop-36
+   :fabric-hop-37
+   :fabric-hop-38
+   :fabric-hop-39
+   :fabric-hop-40
+   :fabric-hop-41
+   :fabric-hop-42]},
  :post-meta
- {:panel-history-drag-31 {:* {:rowcount 127}},
-  :fields-sys {:* {:rowcount 10}},
-  :tmp--679760891-hist-sys {:* {:rowcount 5}},
-  :panel-history-drag-client-name-40 {:* {:rowcount 3298}},
-  :tmp-404636901-hist-sys {:* {:rowcount 1}},
-  :tmp-1525288419-hist-sys {:* {:rowcount 6}},
-  :tables-sys {:* {:rowcount 26}},
-  :panel_history {:* {:rowcount 0}},
-  :panel_materialized_history {},
-  :panel-history-drag-client-name-43 {:* {:rowcount 4}},
+ {:flow-fn-sys {:* {:rowcount 131}},
+  :panel-history-drag-31 {},
+  :fields-sys {:* {:rowcount 12}},
+  :panel-history-drag-client-name-40 {:* {:rowcount 40723}},
+  :tmp-265471656-hist-sys {:* {:rowcount 15}},
+  :tmp-1702993825-hist-sys {:* {:rowcount 0}},
+  :gen-viz-797 {:* {:rowcount 317}},
+  :chat-drag-22 {:* {:rowcount 22953}},
+  :tmp--1399192217-hist-sys {:* {:rowcount 0}},
   :flows-sys {:* {:rowcount 99}},
-  :tmp--1473185323-hist-sys {:* {:rowcount 0}},
-  :tmp-1215231624-hist-sys {:* {:rowcount 0}},
+  :DISTRICT-drag-37 {:* {:rowcount 13}},
   :large-bgss {},
-  :tmp-453648805-hist-sys {:* {:rowcount 5}},
-  :tmp--1284598422-hist-sys {:* {:rowcount 0}},
-  :tmp--1760665799-hist-sys {:* {:rowcount 2}},
-  :tmp-2109860946-hist-sys {:* {:rowcount 5}},
-  :shows-drag-22 {:* {:rowcount 2214}},
-  :connections-sys {:* {:rowcount 9}},
-  :tmp--943541296-hist-sys {:* {:rowcount 2}},
-  :tmp-338024901-hist-sys {:* {:rowcount 3}},
-  :tmp--1637744073-hist-sys {:* {:rowcount 0}},
-  :tmp--1489849301-hist-sys {:* {:rowcount 6}},
-  :tmp-446910141-hist-sys {:* {:rowcount 3}},
+  :tmp-1954942012-hist-sys {:* {:rowcount 0}},
+  :kits-drag-36 {:* {:rowcount 4808}},
+  :offenses-drag-24 {:* {:rowcount 319073}},
+  :tmp--1041439146-hist-sys {:* {:rowcount 2}},
+  :offenses-drag-26 {:* {:rowcount 319073}},
+  :ufo_sightings {},
+  :tmp--818218896-hist-sys {:* {:rowcount 0}},
+  :gen-viz-84 {:* {:rowcount 6}},
+  :tmp-952860608-hist-sys {:* {:rowcount 0}},
+  :tmp-1034462477-hist-sys {:* {:rowcount 0}},
+  :tmp-1626017590-hist-sys {:* {:rowcount 15}},
+  :tmp-578267773-hist-sys {:* {:rowcount 0}},
+  :tmp--1873620494-hist-sys {:* {:rowcount 0}},
+  :tmp-1712068299-hist-sys {:* {:rowcount 9}},
   :kit-results-sys {:* {:rowcount 0}}},
  :flow-estimates
- {"get-my-colors1968011927-solver-flow-"
-  {:times 1, :run-id "77b96ac7-5e35-49b4-9175-f0f0b31970a4"},
-  "get-my-colors159609670-solver-flow-"
-  {:times 1, :run-id "1fedfc5d-1cca-4fcc-a814-e640b757a9c3"}},
+ {:* {:times 4537, :run-id :raw-custom-override904233747},
+  "*" {:times 4.328, :run-id "solver/raw-custom-override904233747"},
+  :solver/raw-custom-override904233747
+  {:times 4474, :run-id :solver/raw-custom-override904233747},
+  "solver/raw-custom-override904233747"
+  {:times 4.328, :run-id "solver/raw-custom-override904233747"},
+  :raw-custom-override80422331 {:times 3.183, :run-id :raw-custom-override80422331},
+  :raw-custom-override-1228195875
+  {:times 2.747, :run-id :raw-custom-override-1228195875},
+  :raw-custom-override1049394575
+  {:times 2.79, :run-id :raw-custom-override1049394575},
+  :raw-custom-override904233747
+  {:times 4.328, :run-id :raw-custom-override904233747},
+  :raw-custom-override2046524522
+  {:times 2.757, :run-id :raw-custom-override2046524522},
+  :test {:times [2 3 2 33 22], :run-id "fsdfsdfsdff2f23f"}},
  :status
- {:alert1 {:alerts :alert2},
+ {:alert1 {:alerts :fabric-response},
   :heartbeat
   {:kick
-   [:solver-status/beneficial-fat-badger-0>raw-custom-override1126093666>running?
-    :solver/raw-custom-override-717243467
-    :solver/raw-custom-override1578545480
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1373946244>running?
-    :solver/raw-custom-override-1641877810
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-402804876>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1457984358>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-2131993281>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1751528235>running?
-    :solver/raw-custom-override414057382
-    :solver/raw-custom-override644528140
-    :solver/raw-custom-override-925629838
-    :solver/raw-custom-override-428217321
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1265892278>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-862484216>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1259853651>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override128332843>running?
-    :solver/raw-custom-override-685753357
-    :solver-status/beneficial-fat-badger-0>raw-custom-override314395174>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override661376815>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-492032394>running?
-    :solver/raw-custom-override-1053165171
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1194221241>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-496567410>running?
-    :solver/raw-custom-override-310746823
-    :solver/raw-custom-override-536177701
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-659661721>running?
-    :solver/raw-custom-override-416767533
-    :solver-status/beneficial-fat-badger-0>raw-custom-override644528140>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-45910559>running?
-    :solver/raw-custom-override-859632434
-    :solver/raw-custom-override1884960837
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1646341433>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1884960837>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-103240780>running?
-    :solver/raw-custom-override968287259
-    :solver/raw-custom-override128332843
-    :solver/get-my-colors1968011927
-    :solver/raw-custom-override-126007335
-    :solver-status/beneficial-fat-badger-0>raw-custom-override82488447>running?
-    :solver/raw-custom-override-1387088273
-    :solver/raw-custom-override44724218
-    :solver/raw-custom-override-1646341433
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1541134551>running?
-    :solver/raw-custom-override-1913891514
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1340267968>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1057281877>running?
-    :solver/raw-custom-override-1554075845
-    :solver/raw-custom-override82488447
-    :solver/raw-custom-override-1340267968
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1554075845>running?
-    :solver/raw-custom-override-862484216
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-159153112
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1122959336>running?
-    :solver/raw-custom-override-402804876
-    :solver/raw-custom-override-659661721
-    :solver/raw-custom-override1678539502
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1199937812>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1004985780>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1141615093>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override164075625>running?
-    :solver/raw-custom-override937355221
-    :solver/raw-custom-override-1259853651
-    :solver/raw-custom-override1840627691
-    :solver/raw-custom-override-1004985780
-    :solver/raw-custom-override-2131993281
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-171568823>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override579248065>running?
-    :solver/get-my-colors159609670
-    :solver-status/beneficial-fat-badger-0>raw-custom-override919987435>running?
-    :solver/raw-custom-override-496567410
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-159153112>running?
-    :solver/raw-custom-override1987368925
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1565067380>running?
-    :solver/raw-custom-override-1265892278
-    :solver/raw-custom-override249928743
-    :solver/raw-custom-override2127591858
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-536177701>running?
-    :solver/raw-custom-override-1199937812
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-81508988>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1871699188>running?
-    :solver-status/beneficial-fat-badger-0>get-my-colors159609670>running?
-    :solver/raw-custom-override2115418060
-    :solver-status/beneficial-fat-badger-0>raw-custom-override631642833>running?
-    :solver/raw-custom-override-1565067380
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1987368925>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1694571796>running?
-    :solver/raw-custom-override-542425777
-    :solver/raw-custom-override586633470
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1427542912>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-24586914>running?
-    :solver/raw-custom-override-803597781
-    :solver/raw-custom-override-1194221241
-    :solver/raw-custom-override1400903254
-    :solver/raw-custom-override-45910559
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-803597781>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-507884058>running?
-    :solver/raw-custom-override689614207
-    :solver/raw-custom-override963336279
-    :solver-meta/raw-custom-override-159153112
-    :solver-status/beneficial-fat-badger-0>raw-custom-override689614207>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override249928743>running?
-    :solver/raw-custom-override-125833411
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-416767533>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-125833411>running?
-    :solver/raw-custom-override-589783320
-    :solver/raw-custom-override-1872986154
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1053165171>running?
-    :solver/raw-custom-override-492032394
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-242543175>running?
-    :solver/raw-custom-override-1536567117
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1405754820>running?
-    :solver/raw-custom-override-1185663166
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1641877810>running?
-    :solver/raw-custom-override1102049158
-    :solver/raw-custom-override-81508988
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-2049347547>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-542425777>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1840627691>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override2127591858>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override2068373320>running?
-    :solver/raw-custom-override-1550914123
-    :solver-status/beneficial-fat-badger-0>raw-custom-override218058812>running?
-    :solver/raw-custom-override1457984358
-    :solver-status/beneficial-fat-badger-0>raw-custom-override688430984>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1678539502>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1550914123>running?
-    :solver/raw-custom-override-1122959336
-    :solver-status/beneficial-fat-badger-0>raw-custom-override414057382>running?
-    :solver/raw-custom-override117296286
-    :solver/raw-custom-override-24586914
-    :solver-meta/raw-custom-override-159153112>output>evald-result>out
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1543719005>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-717243467>running?
-    :solver/raw-custom-override631642833
-    :solver/raw-custom-override-171568823
-    :solver/raw-custom-override-1427542912
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1102049158>running?
-    :solver/raw-custom-override-1057281877
-    :solver/raw-custom-override1234331395
-    :solver/raw-custom-override-507884058
-    :solver/raw-custom-override937406175
-    :solver/raw-custom-override-2049347547
-    :solver/raw-custom-override-23861408
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1578545480>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1256344063>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override937355221>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-589783320>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override2115418060>running?
-    :solver/raw-custom-override1871699188
-    :solver/raw-custom-override-1792284980
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-501659433>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1234331395>running?
-    :solver/raw-custom-override-1976156606
-    :solver/raw-custom-override-242543175
-    :solver/raw-custom-override-739308746
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-23861408>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-10369474>running?
-    :solver/raw-custom-override218058812
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1872986154>running?
-    :solver/raw-custom-override-1201009121
+   [:solver-status/powerful-oval-gorilla-17>raw-custom-override-1147822927>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-756082740>running?
+    :solver/raw-custom-override1687053888
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-1194149429>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override2146419938>running?
+    :solver/raw-custom-override-734141286
+    :solver/raw-custom-override534534452
+    :solver-status/powerful-oval-gorilla-17>get-my-colors-396000205>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override245030643>running?
+    :solver-status/powerful-oval-gorilla-17>get-my-colors-1512377934>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override83410652>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override2046524522>running?
+    :solver/raw-custom-override402996376
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override424363711>running?
+    :solver/raw-custom-override522122080
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-1904113983>running?
+    :solver/raw-custom-override424363711
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override1687053888>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override1887501016>running?
+    :solver/raw-custom-override-1147822927
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override402996376>running?
+    :solver/raw-custom-override-1904113983
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-978638521>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-75660809>running?
+    :solver/raw-custom-override-1664367913
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-472064361>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override534534452>running?
+    :solver/raw-custom-override-472064361
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override1071121844>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override522122080>running?
+    :solver/raw-custom-override2146419938
+    :solver/raw-custom-override-756082740
+    :solver/raw-custom-override-1183465142
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-1183465142>running?
+    :solver/get-my-colors-396000205
+    :solver/raw-custom-override1071121844
     :flow-status/live-scratch-flow>*running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1895051898>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1400903254>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1792284980>running?
-    :solver/raw-custom-override-1373946244
-    :solver/raw-custom-override-382769635
-    :solver/raw-custom-override-2105513493
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1185663166>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-925629838>running?
-    :solver-status/beneficial-fat-badger-0>get-my-colors1968011927>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-739308746>running?
-    :solver/raw-custom-override-1541134551
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1913891514>running?
-    :solver/raw-custom-override-1141615093
-    :solver/raw-custom-override2068373320
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1387088273>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override1331998518>running?
-    :solver/raw-custom-override-1895051898
-    :solver-status/beneficial-fat-badger-0>raw-custom-override586633470>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override117296286>running?
-    :solver/raw-custom-override919987435
-    :solver/raw-custom-override-1256344063
-    :solver-status/beneficial-fat-badger-0>raw-custom-override963336279>running?
-    :solver/raw-custom-override-159153112
-    :solver/raw-custom-override-1751528235
-    :solver/raw-custom-override-501659433
-    :solver/raw-custom-override1331998518
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-859632434>running?
-    :solver/raw-custom-override314395174
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1536567117>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1201009121>running?
-    :solver/raw-custom-override1126093666
-    :solver/raw-custom-override-1405754820
-    :solver/raw-custom-override661376815
-    :solver/raw-custom-override164075625
-    :solver/raw-custom-override-10369474
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-685753357>running?
-    :solver/raw-custom-override-103240780
-    :solver/raw-custom-override688430984
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-382769635>running?
-    :solver/raw-custom-override-1694571796
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-310746823>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-1976156606>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override937406175>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-126007335>running?
-    :solver/raw-custom-override-1543719005
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-428217321>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override968287259>running?
-    :solver-status/beneficial-fat-badger-0>raw-custom-override44724218>running?
-    :solver/raw-custom-override579248065
-    :solver-status/beneficial-fat-badger-0>raw-custom-override-2105513493>running?]}},
+    :solver/raw-custom-override1887501016
+    :solver/raw-custom-override-978638521
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override1780744916>running?
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-1437802051>running?
+    :solver/raw-custom-override2046524522
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-980021103>running?
+    :solver/raw-custom-override1780744916
+    :solver/raw-custom-override-1437802051
+    :solver/raw-custom-override245030643
+    :solver/raw-custom-override-980021103
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-734141286>running?
+    :solver/raw-custom-override83410652
+    :solver/raw-custom-override-75660809
+    :solver-status/powerful-oval-gorilla-17>raw-custom-override-1664367913>running?
+    :solver/get-my-colors-1512377934
+    :solver/raw-custom-override-1194149429]},
+  :alert3 {:alerts :fabric-response},
+  :alert2 {:alerts :alert2},
+  nil {nil nil},
+  "kick-solver!" {:kick :fabric-hop-13},
+  "kick-test!" {:kick :kit-results-sys}},
  :screen-name "duality-of-lepus",
  :recos-page2 0,
- :selected-tab "octohedral snake",
+ :selected-tab "sapphire ape",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -2395,22 +2903,23 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   242232
+   186381
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
- {:setlists 1669794951,
-  :shows 89957543,
-  :panel_history 1380488842,
-  :panel_materialized_history -156535464,
-  :panel_resolved_history 1778616730},
- :panels-hash -607527434,
+ {:panel_history 1380488842,
+  :kits 1883252379,
+  :ufo_sightings 484893751,
+  :offenses -505802446,
+  :setlists 1669794951,
+  :shows 89957543},
+ :panels-hash -996823157,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1752246297,
+ :user-params-hash 1825705101,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash -1660956983,
+ :session-hash 1149912735,
  :resolved-queries
  {:panel-history-drag-31
   {:select
@@ -2445,6 +2954,24 @@
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}],
    :group-by [:date_posted]},
+  :chat-drag-22
+  {:select
+   [:client_name
+    :flow_id
+    :id
+    :item_data
+    :item_hash
+    :item_idx
+    :item_key
+    :item_name
+    :item_options
+    :item_type
+    :kit_name
+    :updated],
+   :from [[:kits :bb43s8]],
+   :where [:< :updated [:raw "datetime('now', '-2 hours')"]],
+   :_db-type "SQLITE",
+   :_last-run "04:02:07"},
   :panel-history-drag-client-name-43
   {:select [:client_name [[:count 1] :rowcnt]],
    :from [[:panel_history :oo960]],
@@ -2513,6 +3040,23 @@
        (vec (for [f files] {:ffilename (str f)})))}],
    :page 3,
    :_last-run "ds:32"},
+  :kits-drag-36
+  {:select
+   [:client_name
+    :flow_id
+    :id
+    :item_data
+    :item_hash
+    :item_idx
+    :item_key
+    :item_name
+    :item_options
+    :item_type
+    :kit_name
+    :updated],
+   :from [[:kits :bb438]],
+   :_db-type "SQLITE",
+   :_last-run "04:02:07"},
   :offenses-drag-24
   {:select
    [:DAY_OF_WEEK
@@ -2835,6 +3379,69 @@
      :child
      [:push ["flow-forever" ":open-input" 21555]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-474
+  {:h 3,
+   :w 6,
+   :root [14 15],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-18,
+   :opts
+   {:fabric-hop-18
+    {:model "gpt-4-turbo",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "56px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."],
+     :pattern "clover"}},
+   :name "block-474",
+   :fabric
+   {:fabric-hop-18
+    [" can you change this clover code to make the text green and jazzy?"]}},
+  :block-5907
+  {:h 3,
+   :w 6,
+   :root [38 21],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-31,
+   :opts
+   {:fabric-hop-31
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-5907",
+   :fabric
+   {:fabric-hop-31
+    [" can we change this up and make it more colorful and festive for autumn?"]}},
   :viz-shapes0-list*
   {:queries
    {:viz-shapes0-sys->-shape
@@ -2845,6 +3452,50 @@
       :viz-shapes0-sys->-shape/*.clicked
       [:*all= :viz-shapes0-sys->-shape/*.clicked []]]}},
    :selected-view :viz-shapes0-sys->-shape},
+  :block-4945
+  {:h 3,
+   :w 6,
+   :root [25 2],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-20,
+   :opts
+   {:fabric-hop-20
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context [" can you add a border to this for me please?"],
+     :pattern "clover"}},
+   :name "block-4945",
+   :fabric {:fabric-hop-20 [" can you add a green border to this please?"]}},
+  :block-10106
+  {:h 3,
+   :w 6,
+   :root [14 21],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-28,
+   :opts
+   {:fabric-hop-28
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-10106",
+   :fabric {:fabric-hop-28 [" can we change this to shades of green all over?"]}},
   :block-9485
   {:h 3,
    :w 6,
@@ -3099,6 +3750,69 @@
      :order-by [[:rowcnt :desc]]}},
    :root [1 18],
    :tab "star-shaped wallaby"},
+  :block-10550
+  {:h 3,
+   :w 6,
+   :root [38 18],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-25,
+   :opts
+   {:fabric-hop-25
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-10550",
+   :fabric
+   {:fabric-hop-25
+    [" lets give this a nice thick border and make the text in fancy colors please"]}},
+  :block-8573
+  {:h 3,
+   :w 6,
+   :root [8 15],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-29,
+   :opts
+   {:fabric-hop-29
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-8573",
+   :fabric
+   {:fabric-hop-29 [" can we make this in shades of orange and make it fancy?"]}},
   :block-8963
   {:h 7,
    :w 16,
@@ -3263,6 +3977,31 @@
    :opts {:fabric-hop-9 {:model "claude-3-opus-20240229", :pattern "tweet"}},
    :name "block-487",
    :fabric {:fabric-hop-9 [" tell a story abut dishwashers"]}},
+  :block-3950
+  {:clojure
+   {:new-clojure-12
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on, "
+          jvm-version
+          " Kbabdde"
+          "45 🥕🐇")))},
+   :name "block-3950",
+   :w 15,
+   :selected-view :fabric-hop-13,
+   :root [20 13],
+   :h 6,
+   :opts
+   {:fabric-hop-13
+    {:model "gpt-3.5-turbo",
+     :client-name :powerful-oval-gorilla-17,
+     :pattern "tweet"}},
+   :fabric {:fabric-hop-13 ["the dishwasher is hanuted. again."]},
+   :tab "cerulean antelope"},
   :block-9296-1
   {:h 3,
    :w 11,
@@ -3280,6 +4019,37 @@
    :name ":param/tetradss",
    :views {:param-val [:data-viewer :param/tetradss]},
    :queries {}},
+  :block-3896
+  {:h 3,
+   :w 6,
+   :root [19 25],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-27,
+   :opts
+   {:fabric-hop-27
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-3896",
+   :fabric
+   {:fabric-hop-27 [" can we change the font color and background color?"]}},
   :block-2536
   {:h 2,
    :w 16,
@@ -3317,6 +4087,36 @@
      :order-by [[:rowcnt :desc]]}},
    :root [25 8],
    :tab "sapphire ape"},
+  :block-1987
+  {:h 3,
+   :w 6,
+   :root [32 19],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-16,
+   :opts
+   {:fabric-hop-16
+    {:model "gpt-4-turbo",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "56px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."],
+     :pattern "clover"}},
+   :name "block-1987",
+   :fabric
+   {:fabric-hop-16 [" can you make the text green and give it a nice border?"]}},
   :block-10776
   {:name "block-10776",
    :w 10,
@@ -3328,10 +4128,24 @@
    {:fabric-hop-2 {:model "claude-3-5-sonnet-20240620", :pattern "analyze_debate"}},
    :fabric {:fabric-hop-2 [" flooded kitchen suprise!"]},
    :tab "azure oyster"},
+  :block-1700
+  {:h 5,
+   :w 8,
+   :root [25 18],
+   :tab "sapphire ape",
+   :selected-view :fabric-hop-42,
+   :opts
+   {:fabric-hop-42
+    {:model "gpt-3.5-turbo-0125",
+     :client-name :powerful-oval-gorilla-17,
+     :context {[:panels "none!" nil nil] nil},
+     :pattern "tweet"}},
+   :name "block-1700",
+   :fabric {:fabric-hop-42 [" haunted donut shop. spooky"]}},
   :block-10011
-  {:h 3,
-   :w 6,
-   :root [4 5],
+  {:h 5,
+   :w 10,
+   :root [2 3],
    :tab "octohedral snake",
    :selected-view :fabric-hop-12,
    :opts
@@ -3347,6 +4161,7 @@
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
    :w 9,
+   :selected-view :oz,
    :root [14 13],
    :h 5,
    :connection-id "bigfoot-ufos",
@@ -3369,13 +4184,38 @@
          :shape {:legend nil},
          :column {:field nil, :legend nil},
          :color
-         {:scale :theme/vega-default-color-scheme,
-          :legend nil,
-          :field 1,
-          :type "ordinal"}},
+         {:scale {:scheme "pastel2"}, :legend nil, :field 1, :type "ordinal"}},
         :mark {:type "bar", :tooltip {:content "encoding"}}}],
       :data {:values :gen-viz-84},
-      :config :theme/vega-defaults,
+      :config
+      {:view {:stroke "transparent"},
+       :axis
+       {:domainColor "#ffffff22",
+        :grid true,
+        :font "Lato",
+        :labelColor "#ffffff88",
+        :titleFont "Lato",
+        :titleColor "#ffffff99",
+        :labelFont "Lato",
+        :domain false,
+        :gridColor "#ffffff22",
+        :tickColor "#ffffff22",
+        :axisFont "Lato"},
+       :legend
+       {:labelFont "Lato",
+        :legendFont "Lato",
+        :labelColor "#ffffff99",
+        :titleColor "#ffffff99",
+        :stroke "#ffffff99",
+        :titleFont "Lato"},
+       :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+       :mark {:font "Lato"},
+       :title
+       {:font "Lato",
+        :subtitleFont "Lato",
+        :labelFont "Lato",
+        :titleFont "Lato",
+        :titleColor "#ffffff99"}},
       :width "container",
       :height :panel-height,
       :padding 4,
@@ -3501,6 +4341,21 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-9040
+  {:h 3,
+   :w 6,
+   :root [35 15],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-14,
+   :opts
+   {:fabric-hop-14
+    {:model "gpt-3.5-turbo",
+     :client-name :powerful-oval-gorilla-17,
+     :pattern "clover"}},
+   :name "block-9040",
+   :fabric
+   {:fabric-hop-14
+    [" can you give this a green border and a light yellow background? also change the font please"]}},
   :block-422
   {:h 4,
    :w 8,
@@ -3526,6 +4381,38 @@
      :child
      "When you want to know how things really work, study them when they're coming apart."]},
    :queries {}},
+  :block-1013
+  {:h 3,
+   :w 6,
+   :root [8 18],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-34,
+   :opts
+   {:fabric-hop-34
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context {[:panels :block-6837 nil nil] nil},
+     :pattern "clover"}},
+   :name "block-1013",
+   :fabric
+   {:fabric-hop-34
+    [" can we filter this to records that were updated in the last hour?"]}},
+  :block-353
+  {:h 5,
+   :w 12,
+   :root [27 15],
+   :tab "graceful gnat",
+   :selected-view :fabric-hop-38,
+   :opts
+   {:fabric-hop-38
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context {[:panels "none!" nil nil] nil},
+     :pattern "tweet"}},
+   :name "block-353",
+   :fabric
+   {:fabric-hop-38
+    [" a haunted new england night. spooky stuff!! apple cider, donuts maple syrups!!!"]}},
   :block-971
   {:h 9,
    :w 9,
@@ -3725,6 +4612,81 @@
       :font-family :theme/base-font}
      :child
      "It's a perfect day for planting seeds and planning adventures!"]}},
+  :block-166
+  {:h 3,
+   :w 6,
+   :root [41 15],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-24,
+   :opts
+   {:fabric-hop-24
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-166",
+   :fabric
+   {:fabric-hop-24
+    [" can you make the text a fancy orange and add a thick border in a complementary color please?"]}},
+  :block-8885
+  {:h 3,
+   :w 6,
+   :root [31 2],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-32,
+   :opts
+   {:fabric-hop-32
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:color "#D2691E",
+        :font-size "56px",
+        :font-weight 700,
+        :background-color "#FFFAF0",
+        :margin-top "-8px",
+        :padding-top "6px",
+        :padding-left "14px",
+        :border "2px solid #8B4513",
+        :border-radius "10px",
+        :font-family "Oxygen Mono"}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-8885",
+   :fabric {:fabric-hop-32 [" lets make this a bit more artistic. I trust you."]}},
+  :block-11422
+  {:pinned? false,
+   :name "block-11422",
+   :w 15,
+   :selected-view :clover-hop,
+   :root [27 1],
+   :h 13,
+   :opts {:clover-hop {}},
+   :tab "graceful gnat",
+   :views {:clover-hop [:data-viewer [:app-db [:flow-estimates]]]}},
   :block-7215
   {:h 4,
    :w 9,
@@ -3758,6 +4720,38 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
+  :block-9478
+  {:h 3,
+   :w 6,
+   :root [41 12],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-30,
+   :opts
+   {:fabric-hop-30
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-9478",
+   :fabric
+   {:fabric-hop-30
+    [" lets make this more fancy and festive with some summer colors"]}},
   :block-5318
   {:h 3,
    :w 6,
@@ -3804,6 +4798,73 @@
    :root [15 6],
    :tab "azure oyster",
    :minimized? true},
+  :block-6837
+  {:name "select-all-kits",
+   :w 27,
+   :selected-view :kits-drag-36,
+   :root [16 5],
+   :h 7,
+   :connection-id "system-db",
+   :queries
+   {:kits-drag-36
+    {:select
+     [:client_name
+      :flow_id
+      :id
+      :item_data
+      :item_hash
+      :item_idx
+      :item_key
+      :item_name
+      :item_options
+      :item_type
+      :kit_name
+      :updated],
+     :from [[:kits :bb438]],
+     :_db-type "SQLITE",
+     :_last-run "04:02:07"}},
+   :tab "cerulean antelope",
+   :views
+   {:new-view
+    [:box
+     :child
+     "heya"
+     :align
+     :center
+     :justify
+     :center
+     :size
+     "auto"
+     :style
+     {:font-size "22px"}]}},
+  :block-5394
+  {:h 5,
+   :w 12,
+   :root [20 20],
+   :tab "cerulean antelope",
+   :selected-view :hare-vw-4,
+   :name "block-5394",
+   :views
+   {:hare-vw-4
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:color "#D2691E",
+      :font-size "56px",
+      :font-weight 700,
+      :background-color "#FFFAF0",
+      :margin-top "-8px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :border "2px solid #8B4513",
+      :border-radius "10px",
+      :font-family "Oxygen Mono"}
+     :child
+     "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+   :queries {}},
   :block-3777-1
   {:h 7,
    :w 10,
@@ -3824,6 +4885,38 @@
      :child
      [:img {:src :solver/raw-custom-override136934373>10>0>2, :width "100%"}]]},
    :queries {}},
+  :block-295
+  {:h 3,
+   :w 6,
+   :root [14 12],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-23,
+   :opts
+   {:fabric-hop-23
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-295",
+   :fabric
+   {:fabric-hop-23
+    [" can you make the text a nice green and add a thick border please?"]}},
   :block-5700
   {:name "block-5700",
    :w 6,
@@ -3869,6 +4962,41 @@
    {:new-create-image
     ["A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, full-figured Scandinavian woman in her early 30s. She sports a full-face and long, flowing dark hair, buxom pinup build. The setting is in the picturesque wilderness of Cape Code America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise....  .   "]},
    :views {}},
+  :block-6278
+  {:h 3,
+   :w 6,
+   :root [19 2],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-33,
+   :opts
+   {:fabric-hop-33
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:color "#D2691E",
+        :font-size "56px",
+        :font-weight 700,
+        :background-color "#FFFAF0",
+        :margin-top "-8px",
+        :padding-top "6px",
+        :padding-left "14px",
+        :border "2px solid #8B4513",
+        :border-radius "10px",
+        :font-family "Oxygen Mono"}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-6278",
+   :fabric
+   {:fabric-hop-33
+    [" lets make this look fancy with some css filters and maybe a cat picture if you know of one."]}},
   :block-11155
   {:h 3,
    :w 6,
@@ -3954,6 +5082,33 @@
      :child
      [:string :param/generated-colors>second-darkest]]},
    :queries {}},
+  :block-7034
+  {:h 6,
+   :w 5,
+   :connection-id "system-db",
+   :name "chat-sql-select-all-kits",
+   :queries
+   {:chat-drag-22
+    {:select
+     [:client_name
+      :flow_id
+      :id
+      :item_data
+      :item_hash
+      :item_idx
+      :item_key
+      :item_name
+      :item_options
+      :item_type
+      :kit_name
+      :updated],
+     :from [[:kits :bb43s8]],
+     :where [:< :updated [:raw "datetime('now', '-2 hours')"]],
+     :_db-type "SQLITE",
+     :_last-run "04:02:07"}},
+   :views nil,
+   :root [37 26],
+   :tab "cerulean antelope"},
   :block-6121
   {:h 2,
    :w 16,
@@ -3978,6 +5133,35 @@
       "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-53
+  {:h 3,
+   :w 6,
+   :root [35 12],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-19,
+   :opts
+   {:fabric-hop-19
+    {:model "gpt-4-turbo",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "56px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."],
+     :pattern "clover"}},
+   :name "block-53",
+   :fabric {:fabric-hop-19 [" can you add a border to this for me please?"]}},
   :block-2361
   {:clojure
    {:new-clojure-9
@@ -4045,6 +5229,37 @@
    :root [1 1],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9},
+  :block-1870
+  {:h 3,
+   :w 6,
+   :root [25 25],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-15,
+   :opts
+   {:fabric-hop-15
+    {:model "gpt-4-turbo",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "56px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."],
+     :pattern "clover"}},
+   :name "block-1870",
+   :fabric
+   {:fabric-hop-15
+    ["can you change the font color to a nice green and the background to a nice pastel yellow please? "]}},
   :block-3158
   {:h 19,
    :w 13,
@@ -4054,6 +5269,36 @@
    :name "block-3158",
    :views {:hi [:data-viewer :solver-status/*client-name*]},
    :queries {}},
+  :block-8030
+  {:h 3,
+   :w 6,
+   :root [31 25],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-26,
+   :opts
+   {:fabric-hop-26
+    {:model "gpt-4o",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-5394 :views :hare-vw-4]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:font-size "56px",
+        :font-weight 700,
+        :padding-top "6px",
+        :padding-left "14px",
+        :margin-top "-8px",
+        :color :theme/editor-outer-rim-color,
+        :font-family :theme/base-font}
+       :child
+       "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]},
+     :pattern "clover"}},
+   :name "block-8030",
+   :fabric {:fabric-hop-26 [" can we change this to add some fun colors?"]}},
   :block-9030
   {:name "block-9030",
    :w 9,
@@ -4121,6 +5366,36 @@
      :from [[:offenses :ff277]]}},
    :root [1 10],
    :tab "star-shaped wallaby"},
+  :block-9192
+  {:h 3,
+   :w 6,
+   :root [14 18],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-22,
+   :opts
+   {:fabric-hop-22
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "56px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."],
+     :pattern "clover"}},
+   :name "block-9192",
+   :fabric
+   {:fabric-hop-22 [" can we make the text green and add a fun border to this?"]}},
   :block-6190
   {:h 31,
    :w 5,
@@ -4192,6 +5467,39 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"},
+  :block-7177
+  {:h 3,
+   :w 6,
+   :root [8 12],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-35,
+   :opts
+   {:fabric-hop-35
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     {[:panels :block-6837 :queries :kits-drag-36]
+      {:select
+       [:client_name
+        :flow_id
+        :id
+        :item_data
+        :item_hash
+        :item_idx
+        :item_key
+        :item_name
+        :item_options
+        :item_type
+        :kit_name
+        :updated],
+       :from [[:kits :bb438]],
+       :_db-type "SQLITE",
+       :_last-run "04:02:07"}},
+     :pattern "clover"}},
+   :name "block-7177",
+   :fabric
+   {:fabric-hop-35
+    [" can we change this to filter to only records that have been updated in the last 2 hours?"]}},
   :block-9353
   {:h 4,
    :w 9,
@@ -4199,8 +5507,37 @@
    :tab "azure oyster",
    :selected-view :fabric-hop,
    :name "block-9353",
-   :fabric {:fabric-hop [" haunted houses"]}}},
- :selected-block :block-10011,
+   :fabric {:fabric-hop [" haunted houses"]}},
+  :block-3699
+  {:h 3,
+   :w 6,
+   :root [32 22],
+   :tab "cerulean antelope",
+   :selected-view :fabric-hop-21,
+   :opts
+   {:fabric-hop-21
+    {:model "claude-3-5-sonnet-20240620",
+     :client-name :powerful-oval-gorilla-17,
+     :context
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "56px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."],
+     :pattern "clover"}},
+   :name "block-3699",
+   :fabric {:fabric-hop-21 [" can you add a green border to this please?"]}}},
+ :selected-block :block-94,
  :theme-colors-hashmap
  {"float" "#cac2c1",
   "boolean" "#a39cc7",
@@ -4233,16 +5570,18 @@
   :tables-sys
   {:db_schema "none",
    :db_catalog nil,
-   :connection_id "history-db",
+   :connection_id "system-db",
    :schema_cat nil,
-   :table_name "panel_resolved_history",
-   :fields 11},
+   :table_name "kits",
+   :fields 13},
+  :kick {:fabric-hop-13>tester>test-param123 ["fart fx service"]},
   :flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false,
    :flow-forever>final-math nil},
+  :server {},
   :files-sys
   {:file_path "./screens/aaa-run-amok.edn",
    :screen_name "aaa-run-amok",
@@ -4250,7 +5589,7 @@
    :queries 11,
    :ts "2024-07-03 09:31:06"},
   :time
-  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 21, :hour 20},
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 46, :hour 20},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image-51574-82843-4k.webp"},
@@ -4270,13 +5609,13 @@
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data [" tell a horror story about a dishwasher (no emojits)"],
-   :selected-view [:fabric :fabric-hop-12],
+   :selected-view-data nil,
+   :selected-view nil,
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path :new-clojure-9/vec-val,
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-10011,
+   :selected-block :block-94,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",
@@ -4385,9 +5724,9 @@
    :ts "2023-09-24 19:19:11"},
   :connections-sys
   {:database_name "*cache-db*",
-   :connection_id "history-db",
+   :connection_id "system-db",
    :styler_highlight_8717ss 1},
-  :sys {:selected-tab "octohedral snake", :selected-tab-idx 8},
+  :sys {:selected-tab "sapphire ape", :selected-tab-idx 1},
   :searches-sub-types-sys
   {:item_key "aaaah-wednesday-the-day",
    :is_live nil,

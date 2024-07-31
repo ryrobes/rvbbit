@@ -1,108 +1,8 @@
-{:orders
- {:jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :messages
-   :batches
-   :recent_batches
-   :recent_batches_per_second
-   :batches_per_second
-   :unix_ms
-   :messages_per_second
-   :recent_messages
-   :recent_messages_per_second
-   :recent_queries_run
-   :recent_queries_per_second
-   :queries_per_second
-   :sql_cache_size
-   :ws_peers
-   :subscriptions
-   :open_flow_channels
-   :uptime_seconds
-   :seconds_since_last_update
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :flow-fn-categories-sys [:category],
-  :flow-fn-all-sys [:name],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :connections-sys [:database_name :connection_id :styler_highlight_8717ss]},
+{:orders {},
  :reco-preview nil,
- :flow? false,
- :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111}},
+ :sql-source {},
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 131,
-     :group-by? true,
-     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 97, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 25},
-    :full_map
-    {:data-type "string",
-     :distinct 131,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 70,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 53},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 97, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 16},
-    :input_types
-    {:data-type "string",
-     :distinct 59,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 45},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 67, "" 17, ":string" 14},
-     :cardinality 10},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 97, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 131},
-  :fields-sys {:fields {}, :rowcount 0},
-  :gen-viz-1132
+ {:gen-viz-1132
   {:fields
    {:rows
     {:data-type "integer",
@@ -117,45 +17,6 @@
      :commons {"unknown" 1, "string" 1, "integer" 1},
      :cardinality 100}},
    :rowcount 7},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 23},
-     :cardinality 4},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 23},
-     :cardinality 4},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"system-db" 23},
-     :cardinality 4},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 23},
-     :cardinality 4},
-    :table_name
-    {:data-type "string",
-     :distinct 23,
-     :group-by? true,
-     :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
-     :cardinality 100},
-    :fields
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? false,
-     :commons {6 4, 5 3, 15 3},
-     :cardinality 56}},
-   :rowcount 23},
   :client-items-drag-item-key-5
   {:fields
    {:item_type
@@ -422,186 +283,6 @@
      :commons {1 269, 0 149, 2 51},
      :cardinality 1}},
    :rowcount 500},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 96,
-     :group-by? true,
-     :commons
-     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
-     :cardinality 96},
-    :file_path
-    {:data-type "string",
-     :distinct 99,
-     :group-by? true,
-     :commons
-     {"./flows/generated-flow-map.edn" 1,
-      "./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 34,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 66, "2024-06-22 18:16:16" 1, "2024-03-14 07:50:09" 1},
-     :cardinality 34}},
-   :rowcount 99},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {84 1, 177 1, 764 1},
-     :cardinality 100},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 104,
-     :group-by? true,
-     :commons {66.14 2, 55.67 2, 63.87 2},
-     :cardinality 93},
-    :uptime_seconds
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1259 1, 1364 1, 1004 1},
-     :cardinality 100},
-    :queries_per_second
-    {:data-type "float",
-     :distinct 4,
-     :group-by? true,
-     :commons {0 101, 1 8, 2 1},
-     :cardinality 3},
-    :recent_batches
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {5651 1, 7854 1, 10971 1},
-     :cardinality 100},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-07-28 19:53:10" 1, "2024-07-28 19:28:55" 1, "2024-07-28 19:52:55" 1},
-     :cardinality 100},
-    :subscriptions
-    {:data-type "integer",
-     :distinct 14,
-     :group-by? true,
-     :commons {313 28, 309 12, 305 11},
-     :cardinality 12},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 109,
-     :group-by? true,
-     :commons {65.14 2, 63.36 2, 63.68 1},
-     :cardinality 98},
-    :messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {53753 1, 54585 1, 78430 1},
-     :cardinality 100},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 8,
-     :group-by? true,
-     :commons {15 20, 14 20, 13 20},
-     :cardinality 7},
-    :sys_load
-    {:data-type "float",
-     :distinct 84,
-     :group-by? true,
-     :commons {2.54 4, 2.71 3, 2.33 3},
-     :cardinality 75},
-    :recent_batches_per_second
-    {:data-type "float",
-     :distinct 38,
-     :group-by? true,
-     :commons {12.47 8, 12.4 7, 12.2 7},
-     :cardinality 34},
-    :batches
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {5651 1, 7854 1, 10971 1},
-     :cardinality 100},
-    :unix_ms
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1722209500628 1, 1722209290628 1, 1722210655634 1},
-     :cardinality 100},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {5311 1, 5865 1, 4858 1},
-     :cardinality 100},
-    :recent_queries_run
-    {:data-type "integer",
-     :distinct 18,
-     :group-by? true,
-     :commons {10 24, 9 24, 23 10},
-     :cardinality 16},
-    :thread_count
-    {:data-type "integer",
-     :distinct 42,
-     :group-by? true,
-     :commons {254 7, 241 7, 250 6},
-     :cardinality 37},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {-1 111},
-     :cardinality 0},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {11 111},
-     :cardinality 0},
-    :recent_messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {3244 1, 66023 1, 24542 1},
-     :cardinality 100},
-    :recent_queries_per_second
-    {:data-type "float",
-     :distinct 19,
-     :group-by? true,
-     :commons {0.67 24, 0.6 24, 1.53 10},
-     :cardinality 17},
-    :batches_per_second
-    {:data-type "float",
-     :distinct 47,
-     :group-by? true,
-     :commons {12.51 7, 12.41 7, 12.38 6},
-     :cardinality 42},
-    :seconds_since_last_update
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {14 60, 15 50, -1 1},
-     :cardinality 2}},
-   :rowcount 111},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -711,15 +392,6 @@
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 8}},
    :rowcount 500},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
   :city-drag-26-1
   {:fields
    {:city
@@ -735,27 +407,6 @@
      :commons {1 500},
      :cardinality 0}},
    :rowcount 500},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 3, "*csv-import-db*" 1},
-     :cardinality 33},
-    :connection_id
-    {:data-type "string",
-     :distinct 9,
-     :group-by? true,
-     :commons {"history-db" 1, "imported" 1, "bigfoot-ufos" 1},
-     :cardinality 100},
-    :styler_highlight_8717ss
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {1 9},
-     :cardinality 11}},
-   :rowcount 9},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -956,21 +607,7 @@
      :group-by? false,
      :commons {1 5, 199 1, 1092 1},
      :cardinality 86}},
-   :rowcount 29},
-  :flow-fn-all-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 131,
-     :group-by? true,
-     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
-     :cardinality 100}},
-   :rowcount 131}},
- :default-col-widths
- {:virtual-panel {:kick--1764769189 152},
-  :system-connections-list* {:connections-sys ##Inf},
-  :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
+   :rowcount 29}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -1277,35 +914,38 @@
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [377529735 311977923 4294705152],
- :client-name :prepared-electric-blue-cattle-9,
+ :memory [420950560 396813492 4294705152],
+ :client-name :rewarding-circular-pig-34,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 4235, :h 1630},
+ :window {:w 5438, :h 1674},
  :quake-console? false,
- :post-meta
- {:jvm_stats {:* {:rowcount 111}},
-  :connections-sys {:* {:rowcount 9}},
-  :tables-sys {:* {:rowcount 23}}},
+ :post-meta {},
+ :flow-estimates
+ {"openai-image-gen-ladder3"
+  {:times 35, :run-id "be6a4cf4-c330-43d9-b600-bfd2cf392537"}},
  :status
  {:heartbeat
   {:kick
-   [:solver-status/prepared-electric-blue-cattle-9>send-to-upscaler-3>running?
+   [:solver-status/rewarding-circular-pig-34>send-to-upscaler-1>running?
     :solver-meta/send-to-upscaler-1>extra>runs
+    :solver-status/rewarding-circular-pig-34>send-to-upscaler-4>running?
     :flow/openai-image-gen-ladder>:output-revised-prompt
     :flow/openai-image-gen-ladder3>:relative-url-path-for-png-version
-    :solver-status/prepared-electric-blue-cattle-9>send-to-upscaler-4>running?
     :flow-status/openai-image-gen-ladder3>*running?
     :solver-meta/send-to-upscaler-2>extra>runs
     :flow/openai-image-gen-ladder3>:dominant-color
+    :solver-status/rewarding-circular-pig-34>send-to-upscaler-3>running?
     :solver-meta/send-to-upscaler-3>extra>runs
-    :solver-status/prepared-electric-blue-cattle-9>send-to-upscaler-2>running?
     :flow-status/live-scratch-flow>*running?
+    :solver-status/rewarding-circular-pig-34>send-to-upscaler-2>running?
     :time/second
     :solver-meta/send-to-upscaler-4>extra>runs
     :flow/openai-image-gen-ladder3>:save-base64-to-webp-file
-    :flow/openai-image-gen-ladder3>:output-revised-prompt
-    :solver-status/prepared-electric-blue-cattle-9>send-to-upscaler-1>running?]}},
+    :flow/openai-image-gen-ladder3>:output-revised-prompt]},
+  :alert2 {:alerts :alert2},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2}},
  :screen-name "looking-glass-redux-viking2",
  :recos-page2 0,
  :selected-tab "fat zebra",
@@ -1320,7 +960,7 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   682
+   61044
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap
@@ -1335,10 +975,9 @@
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
    :prompt-5
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise."}},
- :base-sniff-queries {:jvm_stats 1498154063},
- :panels-hash -2075032767,
+ :panels-hash 317950072,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -2011220285,
+ :user-params-hash 452261861,
  :grid-recos? true,
  :resolved-queries
  {:gen-viz-1132
@@ -2456,6 +2095,36 @@
    :tab "fat zebra",
    :root [52 30],
    :name "new banger?"},
+  :block-1939
+  {:h 4,
+   :w 5,
+   :views
+   {:view-clone
+    [:v-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-weight 700,
+      :font-size "25px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color "#379fb5",
+      :font-family "Nova Square"}
+     :children
+     [[:run-flow
+       ["openai-image-gen-ladder3"
+        "heavy3"
+        {:prompt
+         [:string3
+          "Use this prompt exactly as is with no modifications at all please. "
+          "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace. Her full lips are slightly parted, enhancing her allure. She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up."]}]]
+      [:img {:src "./images/gen/b64-image3-79986-26679.png", :width "90%"}]]]},
+   :name "clone-view-clone44",
+   :root [75 22],
+   :tab "fat zebra"},
   :block-292
   {:h 3,
    :w 10,
@@ -4248,7 +3917,7 @@
       :height-int :panel-height+80,
       :syntax "text"}]},
    :tab "fat zebra",
-   :root [79 24],
+   :root [91 28],
    :name "og winter enhanced"},
   :block-6963
   {:h 23,
@@ -4823,10 +4492,10 @@
    "./images/gen/b64-image-59678-4653.png",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :openai-image-gen-ladder3>save-base64-to-webp-file
-   "/home/ryanr/rvbbit-out/b64-image3-39393-31394.png",
+   "/home/ryanr/rvbbit-out/b64-image3-79986-26679.png",
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version nil,
-   :openai-image-gen-ladder3>dominant-color "#1f2c3c",
+   :openai-image-gen-ladder3>dominant-color "#2f3142",
    :counting-loop>open-fn-2 44,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt nil,
@@ -4858,7 +4527,7 @@
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
    :openai-image-gen-ladder3>relative-url-path-for-png-version
-   "./images/gen/b64-image3-39393-31394.png",
+   "./images/gen/b64-image3-79986-26679.png",
    :flow-forever>*running? false,
    :openai-image-gen-ladder2>*running? false,
    :openai-image-gen-ladder>execute-shell-command
@@ -4868,7 +4537,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :openai-image-gen-ladder3>output-revised-prompt
-   "A hyperrealistic depiction of a woman in her late twenties, of Irish-Scottish descent, with a full-figured appearance. She is situated in a New England-styled dystopian town set amidst a heavy snowstorm; the ambience leans towards a fusion of cyberpunk, vaporwave and vintage 20th-century noir aesthetics. The backdrop presents a mesmerizing midnight sky with silhouettes of forests suggesting the town's boundaries, and neon lights in rose pink, purple, and sky blue piercing through the otherwise shrouded landscape. Her long, free-flowing hair, a comprehensive tattoo showcasing wilderness and rabbit designs stretching to her neckline, and a symbolic pendant necklace are her salient features. Her slightly open, voluptuous lips embellish her charm. She is noticeably dressed from the mid-torso upwards, her clothing mirroring trends found in pin-up art from the late 1800s to early 1900s.",
+   "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace. Her full lips are slightly parted, enhancing her allure. She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up.",
    :counting-loop>final-value 44,
    :openai-image-gen-ladder2>output-revised-prompt
    "A highly detailed highly stylized & exaggerated pinup style illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly",
@@ -4886,7 +4555,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 53},
+  :time {:seconds nil, :second 8},
   :grid1-sys*
   {:flow_id "raw-custom-override-1328601774-solver-flow-",
    :run_id "7c6cbadb-3028-46fe-86ab-174d22a83ead",
@@ -4972,7 +4641,29 @@
     "Generate a high-definition, fantasy-inspired illustration in a 16:9 ratio. The scene is set in an otherworldly, yet characteristically New England small town during winter. The main figure is a Caucasian woman in her late 20s, with a robust, hyper curvaceous physique. She sports a sultry yet pleased expression, with long hair, full lips, and a slightly upturned nose. Intricate Celtic-style tattoos of rabbits and wilderness decorate her neck, collarbone, and shoulders. Her body emanates mysterious blue and pink lights. She's wearing a choker ribbon and a long necklace, encapsulating a confident, playful aura as she shares a sly glance with the viewer. This piece is influenced by pinup noir femme fatale and cyberpunk aesthetics, channeling a strong burlesque vibe."],
    :okay-orchid-koala
    ["  Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Florida beach during summer. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long hair, full pouty lips, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she casts a coy glance at the viewer. This artwork is inspired by pinup art, having a strong burlesque influence. "],
-   :selected-view-data nil,
+   :selected-view-data
+   [:v-box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-weight 700,
+     :font-size "25px",
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color "#379fb5",
+     :font-family "Nova Square"}
+    :children
+    [[:run-flow
+      ["openai-image-gen-ladder3"
+       "dynamic-mirror"
+       {:prompt
+        [:string3
+         "Use this prompt exactly as is with no modifications at all please. "
+         "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace. Her full lips are slightly parted, enhancing her allure. She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up."]}]]
+     [:img {:src "./images/gen/b64-image3-79986-26679.png", :width "90%"}]]],
    :skillful-viridian-falcon
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please: "
     ""
@@ -4985,7 +4676,7 @@
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:"
     ""
     "Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."],
-   :selected-view nil,
+   :selected-view [:views :view-clone],
    :fabulous-pink-eagle
    ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
@@ -5023,7 +4714,7 @@
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
    :tobacco? true,
-   :selected-block :block-9666,
+   :selected-block :block-1939,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""

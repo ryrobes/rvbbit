@@ -2506,7 +2506,7 @@
   [n] ;; cljs uses js "number" so core "float?" cant tell between int and float
   (and (number? n) (not= n (js/Math.floor n))))
 
-(defn insert-new-block-raw [root width height body runner syntax opts-map]
+(defn insert-new-block-raw [root width height body runner syntax opts-map no-selected?]
   (let [new-key            (str "block-" (rand-int 12345))
         clover?            (= runner :clover)
         clojure?           (= syntax "clojure")
@@ -2563,7 +2563,7 @@
     (tapp>> [:new-hop-block-valid-body valid-body [new-keyw] base-map])
     (if valid-body
       (do (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
-          (ut/tracked-dispatch [::select-block new-keyw])
+          (when no-selected? (ut/tracked-dispatch [::select-block new-keyw]))
           :success)
       :failed)))
 
@@ -7662,20 +7662,21 @@
 ;;                       ;[data-key  nil] ;(first (filter #(= (last %) data-key) runners))
 ;;                       )))
 
-(re-frame/reg-sub ::editor-panel-selected-view
-                  (fn [db _]
-                    (let [selected-block (get db :selected-block)
-                          panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view :opts)
-                          panel-pairs (apply concat (for [[k v] panel
-                                                          :when (map? v)]
-                                                      (for [vv (keys v)] [k vv])))
-                          chosen (try
-                                   (first (filter #(= (second %) (get @db/data-browser-query selected-block)) panel-pairs)) (catch :default _ nil))
-                          chosen (cond
-                                   (= (get @db/data-browser-query selected-block) :*) [nil nil]
-                                   (nil? chosen) (first panel-pairs)
-                                   :else chosen)]
-                      chosen)))
+(re-frame/reg-sub
+ ::editor-panel-selected-view
+ (fn [db _]
+   (let [selected-block (get db :selected-block)
+         panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view :opts)
+         panel-pairs (apply concat (for [[k v] panel
+                                         :when (map? v)]
+                                     (for [vv (keys v)] [k vv])))
+         chosen (try
+                  (first (filter #(= (second %) (get @db/data-browser-query selected-block)) panel-pairs)) (catch :default _ nil))
+         chosen (cond
+                  (= (get @db/data-browser-query selected-block) :*) [nil nil]
+                  (nil? chosen) (first panel-pairs)
+                  :else chosen)]
+     chosen)))
 
 
 (re-frame/reg-sub
@@ -10645,26 +10646,6 @@
                                                       :playsInline true
                                                       :ref (fn [x] (reset! video-ref x))}]])}))
                                               ;;:app-db (fn [kp] @(ut/tracked-sub ::app-db-clover {:keypath kp}))
-                                              ;;:app-db-keys (fn [kp] (vec (keys @(ut/tracked-sub ::app-db-clover {:keypath kp}))))
-              :execute (fn [pp]
-                         (when (map? pp)
-                           (let [mods (count (keys pp))]
-                             (doseq [[kk vv] pp]
-                               (let [hid      (hash [kk vv])
-                                     already? (some #(= hid (hash %)) @mutation-log)]
-                                 (when (not already?)
-                                   (do (ut/tapp>> [:forced-execution-from-honey-execute kk vv])
-                                       (swap! mutation-log conj hid)
-                                       (ut/tracked-dispatch [::update-workspace-raw kk vv])))))
-                             [re-com/box :child
-                              [re-com/box :size "none" :child (str "*ran " mods " board modification" (when (> mods 1) "s"))
-                               :style
-                               {;:background-color (str (theme-pull :theme/editor-outer-rim-color
-                                :border        (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
-                                :border-radius "10px"
-                                :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
-                                :padding-left  "12px"
-                                :padding-right "12px"}]])))
               :insert-alert (fn [[c w h d]] (ut/tracked-dispatch [::http/insert-alert c w h d]))
                                               ;;:invert-hex-color (fn [x] (ut/invert-hex-color x))
 
@@ -10933,6 +10914,8 @@
  (fn [db {:keys [panel-key data-key]}]
    (get-in db [:panels panel-key :opts data-key] {})))
 
+;;; [bricks/honeycomb panel-key :virtual-view w h view nil])
+
 (defn honeycomb ;; only for editor   ;; only for honey-frag             ;; only for history
   [panel-key &  [override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map]] ;; can sub lots of this
   (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace
@@ -11002,7 +10985,7 @@
         curr-view-mode (if curr-view-mode curr-view-mode
                            (or @(ut/tracked-sub ::current-view-mode {:panel-key panel-key :data-key selected-view}) :clover))
                        ;; mostly for honeycomb fragments
-        
+
         clover? (= curr-view-mode :clover)
 
         clover-fn (if clover-fn clover-fn
@@ -11073,7 +11056,7 @@
                      new-body (assoc solver-body :waiter placeholder-clover)]
                  new-body)
                body)
-        
+
         ;; _ (when (or (= panel-key :block-5662) (= panel-key :virtual-panel)) (tapp>> [:body2 panel-key body is-runner? curr-view-mode selected-view-type]))
 
         runner-rowset? (true?
@@ -11258,6 +11241,34 @@
                                                    (let [[_ keypath] v]
                                                      {v @(ut/tracked-sub ::app-db-clover {:keypath keypath})})))]
                           (walk/postwalk-replace logic-kps obody)))
+                                                      ;;:app-db-keys (fn [kp] (vec (keys @(ut/tracked-sub ::app-db-clover {:keypath kp}))))
+        execute (fn [pp]
+                   (when (map? pp)
+                     (let [mods (count (keys pp))]
+                       (doseq [[kk vv] pp]
+                         (let [hid      (hash [kk vv])
+                               already? (some #(= hid (hash %)) @mutation-log)]
+                           (when (not already?)
+                             (do (ut/tapp>> [:forced-execution-from-honey-execute kk vv])
+                                 (swap! mutation-log conj hid)
+                                 (ut/tracked-dispatch [::update-workspace-raw kk vv])))))
+                       [re-com/box :child
+                        [re-com/box :size "none" :child (str "*ran " mods " board modification" (when (> mods 1) "s"))
+                         :style
+                         {;:background-color (str (theme-pull :theme/editor-outer-rim-color
+                          :border        (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                          :border-radius "10px"
+                          :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
+                          :padding-left  "12px"
+                          :padding-right "12px"}]]
+                       )))
+
+        execution-walk  (fn [obody]
+                          (let [kps       (ut/extract-patterns obody :execute 2)
+                                logic-kps (into {} (for [v kps]
+                                                     (let [[_ exec-map] v]
+                                                       {v (execute exec-map)})))]
+                            (walk/postwalk-replace logic-kps obody)))
 
         hiccup-markdown (fn [obody]
                           (let [kps       (ut/extract-patterns obody :markdown 2)
@@ -11455,6 +11466,7 @@
         (cond->> body
           true                      (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
           (has-fn? :*this-block*)   (ut/postwalk-replacer {:*this-block* panel-key})
+          (has-fn? :execute)         execution-walk
             ;;(has-fn? :run-solver)     (ut/postwalk-replacer solver-clover-fn-walk-map) ;; has to run first since
             ;;it'll contain a clover sub param
           (has-fn? :run-solver)     solver-clover-walk ;;(conn/solver-clover-walk client-name panel-key)

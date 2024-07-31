@@ -1791,9 +1791,9 @@
 (def over-hop-bar (reagent/atom false))
 (def searcher-atom (reagent/atom nil))
 
-(defn insert-response-block [w h data runner syntax opts-map]
+(defn insert-response-block [w h data runner syntax opts-map no-selected?]
   (let [root (ut/find-safe-position h w)]
-    (bricks/insert-new-block-raw root w h data runner syntax opts-map)))
+    (bricks/insert-new-block-raw root w h data runner syntax opts-map no-selected?)))
 
 (defn ensure-quoted-string
   "Adds double quotes to a string if they don't already exist.
@@ -1812,7 +1812,8 @@
         client-name @(ut/tracked-sub ::bricks/client-name {})
         [runner-src data-key] @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
         selected-block    @(ut/tracked-sub ::bricks/selected-block {})
-        context-body      @(ut/tracked-sub ::bricks/get-view-data {:panel-key selected-block :runner runner-src :data-key data-key})
+        no-selected?      (or (nil? selected-block) (= selected-block "none!"))
+        context-body      (pr-str @(ut/tracked-sub ::bricks/get-view-data {:panel-key selected-block :runner runner-src :data-key data-key}))
         ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
         ;; is-rf-event? (and (or (= runner :views) (= runner :clover))
         ;;                   (cstr/starts-with? (cstr/trim command) "[:dispatch"))
@@ -1831,19 +1832,21 @@
         opts-map (if (= runner :fabric)
                    {:model (get @fbc-selected-model runner)
                     :client-name client-name
+                    :runner (or runner-src :views)
                     :context {[:panels selected-block runner-src data-key] context-body}
-                    :pattern (get @fbc-selected-pattern runner)} {})]
+                    :pattern (if (not no-selected?) "clover" (get @fbc-selected-pattern runner "tweet"))} 
+                   {})]
     (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
 
-    (let [resp (insert-response-block 6 3 command runner syntax opts-map)
+    (let [resp (insert-response-block 8 5 command runner syntax opts-map no-selected?)
           ee (str command "(" resp ")")]
           ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
           ;(re-frame/dispatch [::bricks/toggle-quake-console])
       ;(ut/tracked-dispatch [::bricks/toggle-quake-console-off])
       (ut/dispatch-delay 200 [::http/insert-alert
-                              [:v-box :children [[:box :child (str resp)]
-                                                 [:box :child (str command)
+                              [:v-box :children [;[:box :child (str resp)]
+                                                 [:box :child (str "running " command)
                                                   :style {:font-size "12px"}]]] 6 1.5 5])
       (swap! console-responses assoc command ee))))
 
@@ -1940,6 +1943,7 @@
         is-fabric?          (= (get @selected-mode :name) :fabric)
         fabric-settings     (when is-fabric? @(ut/tracked-sub ::bricks/fabric-settings {}))
         selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
+        no-selected?        (or (= selected-block "none!") (nil? selected-block))
         [runner data-key]   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
         has-nss?            (ut/ne? nss)
         ww                  (Math/floor (* ww  0.8))
@@ -1982,7 +1986,7 @@
                                         (cond
                                           is-fabric?
                                           [re-com/v-box
-                                           :children [(when (get @fbc-selected-model (get @selected-mode :name))
+                                           :children [(when (and (get @fbc-selected-model (get @selected-mode :name)) no-selected?)
                                                         (let [search-width 150
                                                               filtered-patterns (filterv #(cstr/includes? (str %) (str @searcher-atom))
                                                                                          (get fabric-settings :patterns))]

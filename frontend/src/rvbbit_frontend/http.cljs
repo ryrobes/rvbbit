@@ -424,6 +424,11 @@
          (assoc-in tracking-key (vec (distinct (conj (get-in db tracking-key []) data-key))))
          (assoc-in [:data data-key] data)))))
 
+(re-frame/reg-event-db 
+ ::refresh-kits 
+ (fn [db [_]] 
+   (ut/dissoc-in db [:query-history :kit-results-sys])))
+
 (def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
 (re-frame/reg-event-db
@@ -548,8 +553,12 @@
               estimate?                   (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))]
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
+          
+          (when (and alert? (cstr/includes? (str result) "Fabric")) 
+            (ut/tracked-dispatch [::refresh-kits]))
 
-          (when (cstr/starts-with? (str client-name) ":power" )  (ut/tapp>> [:msg-in (get result :task-id) (str (get result :ui-keypath)) (str result)]))
+
+          (when (cstr/starts-with? (str client-name) ":power")  (ut/tapp>> [:msg-in (get result :task-id) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -588,8 +597,8 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
-            
-            server-sub? 
+
+            server-sub?
             ;;(assoc-in db (vec (cons :click-param task-id)) (get result :status))
             (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
               (-> db
@@ -620,18 +629,18 @@
                                            flow-id    (get-in result [:task-id 1])
                                            trackers   (select-keys (get result :status) block-keys)]
                                        (-> db
-                                           (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1)) 
+                                           (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1))
                                                            [:flow-results :return-maps flow-id]
                                                            [:skip-me :yo :yo]))
                                            (assoc-in [:flow-results :tracker flow-id] trackers)))
-            
+
             estimate? (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
 
             flow-runner-sub? (let [rtn         (get result :status)
                                    mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
                                    return-maps (get-in db [:flow-results :return-maps] {})]
                                (if (= rtn :started) ;; TODO, this eliminates the nice animations, but ensures data delivery per block.
-                                 (assoc-in db task-id rtn) 
+                                 (assoc-in db task-id rtn)
                                  (-> db
                                      (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
                                                (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
@@ -642,8 +651,8 @@
                            (assoc-in [:status-data task-id ui-keypath]
                                      {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
                            (assoc :flow-subs (get result :status)))
-            
-            
+
+
 
             :else (-> db
                       (assoc-in [:status task-id ui-keypath] (get result :status))

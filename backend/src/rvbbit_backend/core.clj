@@ -1017,10 +1017,10 @@
                      (fn [] (wss/param-sql-sync)))
                    "Parameter Sync" 30)
 
-  (start-scheduler 45
-                   #(when (> (count (wss/client-subs-late-delivery 30000)) 0)
-                      (wss/sync-client-subs))
-                   "Sync Client Subs" 120)
+  ;; (start-scheduler 45
+  ;;                  #(when (> (count (wss/client-subs-late-delivery 30000)) 0)
+  ;;                     (wss/sync-client-subs))
+  ;;                  "Sync Client Subs" 120)
 
   ;; (start-scheduler 30
   ;;                  #(doseq [[name conn] @sql/client-db-pools]

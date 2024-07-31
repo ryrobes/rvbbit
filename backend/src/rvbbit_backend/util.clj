@@ -844,6 +844,8 @@
 
 (defn map-vals [m f] (into {} (for [[k v] m] [k (f v)])))
 
+
+
 (defn dissoc-recursive
   [data]
   (cond (map? data)    (-> data
@@ -878,6 +880,18 @@
         (map? x)  (into {} (map (fn [[k v]] [k (lists-to-vectors v)]) x))
         (coll? x) (mapv lists-to-vectors x)
         :else     x))
+
+
+(defn extract-map [data keys]
+  (let [data (lists-to-vectors data)]
+    (letfn [(find-map [d]
+              (cond
+                (and (map? d) (every? d keys)) d
+                (map? d) (some find-map (vals d))
+                (vector? d) (some find-map d)
+                :else nil))]
+      (find-map data))))
+
 
 (defn millis-to-date-string
   [millis]

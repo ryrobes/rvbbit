@@ -1378,22 +1378,28 @@
 
 (defn render-honey-comb-fragments
   [c & [w h sys-name]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
-  (let [panel-key :virtual-panel ;:block-4752 ;:hello-there-brother
-        key       :virtual-view ;:view ;:ufo-country ;:heya!
+  (let [;panel-key :virtual-panel ;:block-4752 ;:hello-there-brother
+        [panel-key key]       [(keyword (str "prando" (rand-int 123))) (keyword (str "vrando" (rand-int 123)))]  
+        ;key       :virtual-view ;:view ;:ufo-country ;:heya!
         type      (cond (vector? c)                         :view
                         (string? c)                         :view
                         (and (map? c) (nil? (get c :view))) :query
                         :else                               :both)
         data_d    c]
-    (cond (= type :view)  (let [view {key data_d} w (or w 11) h (or h 9)] [bricks/honeycomb panel-key :virtual-view w h view nil])
+    ;;(ut/tapp>> [:frag type data_d sys-name w h])
+    (cond (= type :view)  (let [view {key data_d}
+                                w (or w 11)
+                                h (or h 9)]
+                            [bricks/honeycomb panel-key key w h view nil])
           (= type :query) (let [temp-key (get data_d :_query-id (keyword (if sys-name (str sys-name) (str "kick-" (hash c)))))
                                 query    {temp-key (-> data_d ;(get data_d :queries)
                                                        (dissoc :cache?)
                                                        (dissoc :refresh-every))}
                                 h        (get data_d :_h (or h 6))
                                 w        (get data_d :_w (or w 10))]
-                            [re-com/box :size "none" :width (px (* w db/brick-size)) :height
-                             (px (- (* h db/brick-size) 30)) :child [bricks/honeycomb panel-key temp-key h w nil query]])
+                            [re-com/box :size "none" :width (px (* w db/brick-size)) 
+                             :height (px (- (* h db/brick-size) 30)) 
+                             :child [bricks/honeycomb panel-key temp-key h w nil query]])
           (= type :both)  (let [queries (get data_d :queries)
                                 qkeys   (into {}
                                               (for [q (keys queries)]
@@ -1408,6 +1414,12 @@
                              (get ndata :queries) ;(ut/postwalk-replacer qkeys queries)
                             ])
           :else           [bricks/honeycomb panel-key key 11 9])))
+
+
+
+
+
+
 
 (defonce ask-mutates-hover (reagent/atom nil))
 
@@ -1457,11 +1469,18 @@
         kit-name         (if (= kit-name :ai/calliope) :kick kit-name) ;;; tempo demo
         iname            (str (last kp))
         iname            (if (empty? iname) ":base" iname)
-        where-filter     [:and (if 
-                                (or (= kit-name :kick) (= kit-name :ai/calliope)) 
+        where-filter     [:and (if
+                                (or (= kit-name :kick) (= kit-name :ai/calliope))
                                  [:= :client_name (str client-name)]
                                  [:= 1 1])
                           [:= :item_name iname] [:= :kit_name (str kit-name)]]
+
+
+        [runner-src data-key] @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+        selected-block    @(ut/tracked-sub ::bricks/selected-block {})
+        src-kp           [selected-block runner-src data-key]
+
+
         kit-results      @(re-frame.core/subscribe [::conn/sql-data [:kit-results-sys]])
         kits             (kit-rows-to-map kit-results)
         kick-kit-name    (last (keys (get kits :kits)))
@@ -1609,6 +1628,7 @@
                                             :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
                                             :padding-left  "12px"
                                             :padding-right "12px"}]]
+
                        (or both? query?) [re-com/v-box :children
                                           [(bricks/draggable (draggable-spawn-fn key-gen c2)
                                                              "meta-menu"
@@ -1623,10 +1643,43 @@
                                                                 :margin-bottom "20px"
                                                                 :font-size     "19px"}]])
                                            [re-com/box :child [render-honey-comb-fragments c]]]]
+
+                       (cstr/includes? (str c) ":vega-lite")  ;; bricks/draggable breaks it, but not nivo and re?
+                       [re-com/box :padding "4px" :child [render-honey-comb-fragments c 10]]
+
+                      ;;  (or (not= runner-src :views)
+                      ;;      (not= runner-src :queries))
+
+                      ;;  (let [curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key selected-block :data-key data-key})
+                      ;;        opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key selected-block :data-key data-key})
+                      ;;        clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key selected-block :data-key data-key})
+                      ;;        temp-panel-key (keyword (cstr/replace (str "narr-" selected-block key "-" (hash c)) ":" ""))]
+                      ;;    [re-com/v-box :children
+                      ;;     [(bricks/draggable (draggable-spawn-fn key-gen c2)
+                      ;;                        "meta-menu"
+                      ;;                        [re-com/box :align :start :justify :start :child
+                      ;;                         [re-com/md-icon-button :src (at) :md-icon-name "zmdi-code-setting"
+                      ;;                          :style
+                      ;;                          {;:color (theme-pull :theme/editor-font-color nil)
+                      ;;                           :cursor        "grab"
+                      ;;                           :color         "orange"
+                      ;;                           :height        "15px"
+                      ;;                           :margin-top    "-2px"
+                      ;;                           :margin-bottom "20px"
+                      ;;                           :font-size     "19px"}]])
+                      ;;      [re-com/box :child
+                      ;;       [bricks/honeycomb temp-panel-key :virtual-view 8 8 {:virtual-view c} nil runner-src curr-view-mode clover-fn opts-map]
+                      ;;     ;;[render-honey-comb-fragments c]
+                      ;;       ]]])
+
+
+
                        :else             (bricks/draggable (draggable-spawn-fn key-gen c)
                                                            "meta-menu"
                                                            [re-com/box :padding "4px" :child
-                                                            [render-honey-comb-fragments c 10]])))]
+                                                            [render-honey-comb-fragments c 10]])
+                      ;;  :else [re-com/box :padding "4px" :child [render-honey-comb-fragments c 10]]
+                       ))]
               (when (not (empty? parameters)) [re-com/box :style {:font-size "17px"} :child "relevant parameters"])
               (when (not (empty? parameters)) [bricks/click-param-browser [rereparameters] 540 nil])
               (when (and (not (empty? parameters)) (not (empty? ask-mutates))) [re-com/gap :size "10px"])

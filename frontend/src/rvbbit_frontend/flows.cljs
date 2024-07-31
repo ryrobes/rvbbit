@@ -4665,8 +4665,26 @@
 
 
 
+(re-frame/reg-sub
+ ::running-solvers
+ (fn [db _]
+   (let [running-solver-keys (mapv #(keyword (str "solver/" (second (cstr/split (str %) ">"))))
+                                   (map first
+                                        (filter (fn [[k v]]
+                                                  (and
+                                                   (cstr/ends-with? (str k) ">running?")
+                                                   (= v true)
+                                                   ;(= v false)
+                                                   ))
+                                                (get-in db [:click-param :solver-status]))))
+         mapped-solvers (select-keys (ut/flip-map @db/solver-fn-lookup) running-solver-keys)
+         solver-view-names (mapv last (vals mapped-solvers))
+         ;both (into running-solver-keys solver-view-names)
+         both running-solver-keys
+         ]
+     (or both []))))
 
-
+(ut/tapp>> [:running-solvers @(ut/tracked-sub ::running-solvers {}) ])
 
 (re-frame/reg-sub 
  ::estimates 
@@ -4703,26 +4721,29 @@
                                (filterv #(not (or
                                                (cstr/includes? (str %) "Data was not sampled")
                                                (when (ut/ne? solver-assoc) (cstr/includes? (str %) (str solver-assoc)))
+                                               (cstr/includes? (str %) (str solver-assoc))
                                                (cstr/includes? (str %) (str " " (last selected-view) " ")))) alerts)
 
                                :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
          alerts          (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts)
          ;;_ (ut/tapp>> [:sel-view selected-view])
          estimates       @(ut/tracked-sub ::estimates {})
+         running-solver-views @(ut/tracked-sub ::running-solvers {}) ;;(conj @(ut/tracked-sub ::running-solvers {}) :*) ;; fabric that does not yet have a block id. hop-bar spawned.
          max-w           (apply max (for [a alerts :let [width (* (get a 1) db/brick-size)]] width))
          max-w           (if (or (nil? max-w) (< max-w 50))
                            300 ;420
                            max-w)
-         alerts          (if (> rs-running 0)
+         alerts          (if (or (> rs-running 0)  (> (count running-solver-views) 0))
                            (conj alerts
                                  [[:v-box :children
                                    (vec
                                     (into [[:box :child (str rs-running " flow" (when (> rs-running 1) "s") " running")]]
                                           (vec
-                                           (for [e    rs-running-list
+                                           (for [e    (into rs-running-list running-solver-views)
                                                  :let [fid    (ut/replacer e ":" "")
-                                                       run-id (get-in estimates [fid :run-id])
-                                                       est    (+ (js/Math.round (get-in estimates [fid :times] 0)) 1)
+                                                       run-id (get-in estimates [fid :run-id] "*")
+                                                       est    (+ (js/Math.round (get-in estimates [fid :times] 0)) 2)
+                                                      ;;  _ (ut/tapp>> [:prog e fid run-id est])
                                                        est?   (> est 1)]]
                                              [:v-box :padding "3px" :width (px max-w) ;;"215px"
                                               :size "auto" ;:justify :center
