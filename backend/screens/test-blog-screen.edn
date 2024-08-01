@@ -1,23 +1,439 @@
 {:orders
- {:shows (:query_error),
-  :shows-drag-29 [:location :show_date :show_id :show_name :title :tour_name :ts]},
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :gen-viz-797 [:rows :date_posted],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :gen-viz-94 [:diff],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :messages
+   :batches
+   :recent_batches
+   :recent_batches_per_second
+   :batches_per_second
+   :unix_ms
+   :messages_per_second
+   :recent_messages
+   :recent_messages_per_second
+   :recent_queries_run
+   :recent_queries_per_second
+   :queries_per_second
+   :sql_cache_size
+   :ws_peers
+   :subscriptions
+   :open_flow_channels
+   :uptime_seconds
+   :seconds_since_last_update
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :shows (:query_error),
+  :offenses-drag-24
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :shows-drag-29 [:location :show_date :show_id :show_name :title :tour_name :ts],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :offenses (:query_error),
+  :flow-fn-categories-sys [:category],
+  :gen-viz-84 [:rows :country],
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ss],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt],
+  :flow-fn-all-sys [:name]},
  :reco-preview nil,
+ :flow? false,
  :sql-source
- {:shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+ {:gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :offenses-drag-24
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :dd484]]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
   :shows-drag-29
   {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
    :from [[:shows :mm382]],
-   :_last-run "17:14:09"}},
+   :_last-run "17:14:09"},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :offenses
+  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
  :meta
  {nil
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 216,
+     :distinct 217,
      :group-by? true,
      :commons {},
      :cardinality 67}},
    :rowcount 321},
+  :flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 97, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 25},
+    :full_map
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
+    :inputs
+    {:data-type "string",
+     :distinct 70,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 53},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 97, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 16},
+    :input_types
+    {:data-type "string",
+     :distinct 59,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 45},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 67, "" 17, ":string" 14},
+     :cardinality 10},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 97, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 2}},
+   :rowcount 131},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"ts" 1, "tour_name" 1, "title" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TEXT" 6, "TIMESTAMP" 1},
+     :cardinality 28},
+    :data_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"string" 6, "datetime" 1},
+     :cardinality 28}},
+   :rowcount 7},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 7},
+     :cardinality 14},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 7},
+     :cardinality 14},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"met-on-tour" 7},
+     :cardinality 14},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 7},
+     :cardinality 14},
+    :table_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"tracks" 1, "shows" 1, "setlists" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? false,
+     :commons {8 2, 5 2, 12 1},
+     :cardinality 71}},
+   :rowcount 7},
   :gen-viz-797
   {:fields
    {:rows
@@ -33,6 +449,32 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 96,
+     :group-by? true,
+     :commons
+     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 99,
+     :group-by? true,
+     :commons
+     {"./flows/generated-flow-map.edn" 1,
+      "./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 66, "2024-06-22 18:16:16" 1, "2024-03-14 07:50:09" 1},
+     :cardinality 34}},
+   :rowcount 99},
   :gen-viz-94
   {:fields
    {:diff
@@ -42,6 +484,160 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {84 1, 177 1, 764 1},
+     :cardinality 100},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 104,
+     :group-by? true,
+     :commons {66.14 2, 55.67 2, 63.87 2},
+     :cardinality 93},
+    :uptime_seconds
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {1259 1, 1364 1, 1004 1},
+     :cardinality 100},
+    :queries_per_second
+    {:data-type "float",
+     :distinct 4,
+     :group-by? true,
+     :commons {0 101, 1 8, 2 1},
+     :cardinality 3},
+    :recent_batches
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {5651 1, 7854 1, 10971 1},
+     :cardinality 100},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 111,
+     :group-by? true,
+     :commons
+     {"2024-07-28 19:53:10" 1, "2024-07-28 19:28:55" 1, "2024-07-28 19:52:55" 1},
+     :cardinality 100},
+    :subscriptions
+    {:data-type "integer",
+     :distinct 14,
+     :group-by? true,
+     :commons {313 28, 309 12, 305 11},
+     :cardinality 12},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 109,
+     :group-by? true,
+     :commons {65.14 2, 63.36 2, 63.68 1},
+     :cardinality 98},
+    :messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {53753 1, 54585 1, 78430 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? true,
+     :commons {15 20, 14 20, 13 20},
+     :cardinality 7},
+    :sys_load
+    {:data-type "float",
+     :distinct 84,
+     :group-by? true,
+     :commons {2.54 4, 2.71 3, 2.33 3},
+     :cardinality 75},
+    :recent_batches_per_second
+    {:data-type "float",
+     :distinct 38,
+     :group-by? true,
+     :commons {12.47 8, 12.4 7, 12.2 7},
+     :cardinality 34},
+    :batches
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {5651 1, 7854 1, 10971 1},
+     :cardinality 100},
+    :unix_ms
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {1722209500628 1, 1722209290628 1, 1722210655634 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {5311 1, 5865 1, 4858 1},
+     :cardinality 100},
+    :recent_queries_run
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? true,
+     :commons {10 24, 9 24, 23 10},
+     :cardinality 16},
+    :thread_count
+    {:data-type "integer",
+     :distinct 42,
+     :group-by? true,
+     :commons {254 7, 241 7, 250 6},
+     :cardinality 37},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {-1 111},
+     :cardinality 0},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {11 111},
+     :cardinality 0},
+    :recent_messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {3244 1, 66023 1, 24542 1},
+     :cardinality 100},
+    :recent_queries_per_second
+    {:data-type "float",
+     :distinct 19,
+     :group-by? true,
+     :commons {0.67 24, 0.6 24, 1.53 10},
+     :cardinality 17},
+    :batches_per_second
+    {:data-type "float",
+     :distinct 47,
+     :group-by? true,
+     :commons {12.51 7, 12.41 7, 12.38 6},
+     :cardinality 42},
+    :seconds_since_last_update
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 60, 15 50, -1 1},
+     :cardinality 2}},
+   :rowcount 111},
   :time-freq-345d
   {:fields
    {:freq
@@ -262,6 +858,39 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :offenses
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
   :gen-viz-84
   {:fields
    {:rows
@@ -277,6 +906,27 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 3, "*csv-import-db*" 1},
+     :cardinality 33},
+    :connection_id
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"history-db" 1, "imported" 1, "bigfoot-ufos" 1},
+     :cardinality 100},
+    :styler_highlight_8717ss
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 9},
+     :cardinality 11}},
+   :rowcount 9},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -423,8 +1073,29 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30}},
- :default-col-widths {:block-3393 {:shows-drag-29 100}},
+   :rowcount 30},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
+     :cardinality 100}},
+   :rowcount 131}},
+ :default-col-widths
+ {:virtual-panel {:kick--1764769189 152},
+  :block-3393 {:shows-drag-29 100},
+  :block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-8805 {:duration-hours-drag-43 180},
+  :system-connections-list* {:connections-sys 126},
+  :system-fields-list* {:fields-sys 170},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :system-tables-list* {:tables-sys 133},
+  :block-4346 {:offenses-drag-24 100}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -437,7 +1108,8 @@
   "victorious hippopotamus"
   "amaranth mouse"
   "motivating falcon"
-  "beneficial seastar"],
+  "beneficial seastar"
+  "octohedral hog"],
  :selected-cols nil,
  :server
  {:settings
@@ -727,50 +1399,60 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [500106863 443024659 4294705152],
- :client-name :nutritious-electric-blue-dove-33,
+ :memory [872627262 852110962 4294705152],
+ :client-name :moving-spring-green-squirrel-22,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2964, :h 1715},
+ :window {:w 3078, :h 1664},
  :quake-console? false,
  :implicit-rowsets {:solver [nil]},
- :post-meta {:shows-drag-29 {:* {:rowcount 2214}}},
+ :post-meta
+ {:jvm_stats {:* {:rowcount 111}},
+  :offenses {},
+  :shows-drag-29 {:* {:rowcount 2214}},
+  :gen-viz-94 {:* {:rowcount 1}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :tables-sys {:* {:rowcount 7}},
+  :connections-sys {:* {:rowcount 9}}},
  :flow-estimates
- {"raw-custom-override-1023771282-solver-flow-"
-  {:times 30, :run-id "a943b008-9ddd-4588-b902-6fbc021a9a06"}},
+ {"raw-custom-override873159982-solver-flow-"
+  {:times 29, :run-id "c9764544-b1b8-4dee-a536-ab77712c54be"}},
  :status
  {:heartbeat
   {:kick
-   [:time/second=30
-    :solver/raw-custom-override-398032407
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override1894714944>running?
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override-1481048942>running?
+   [:solver/raw-custom-override1466769084
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override-7792312>running?
     :flow-status/flow-forever>*running?
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override-1678124655>running?
-    :solver-status/nutritious-electric-blue-dove-33>get-my-colors-1603304383>running?
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override492623466>running?
-    :solver-meta/raw-custom-override1178372753>output>evald-result>out
-    :solver/raw-custom-override492623466
-    :solver-status/nutritious-electric-blue-dove-33>get-my-colors274022621>running?
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override1918298477>running?
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override1178372753>running?
-    :time/second=0
-    :solver/raw-custom-override1918298477
-    :solver/raw-custom-override1178372753
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override-398032407>running?
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override-862928477>running?
-    :solver/raw-custom-override1894714944
-    :solver/raw-custom-override-1678124655
-    :solver/raw-custom-override-862928477
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override-1023771282>running?
+    :solver/raw-custom-override-7792312
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override-1320708833>running?
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override-284097642>running?
+    :solver-meta/raw-custom-override-76203263>output>evald-result>out
+    :solver-status/moving-spring-green-squirrel-22>get-my-colors-1791127909>running?
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override1548352368>running?
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override-76203263>running?
+    :solver/get-my-colors-1791127909
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override1466769084>running?
+    :solver/raw-custom-override-1320708833
+    :time/minute
+    :solver/get-my-colors1951735684
+    :solver-status/moving-spring-green-squirrel-22>get-my-colors1951735684>running?
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override873159982>running?
+    :solver/raw-custom-override-76203263
     :flow-status/live-scratch-flow>*running?
-    :solver/raw-custom-override-1342008593
-    :solver/raw-custom-override-1023771282
-    :solver/raw-custom-override-1481048942
-    :solver-status/nutritious-electric-blue-dove-33>raw-custom-override-1342008593>running?
-    :solver/get-my-colors-1603304383
-    :solver/get-my-colors274022621]},
-  :alert1 {:alerts :alert2}},
+    :solver/raw-custom-override790219099
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override1489300306>running?
+    :solver/raw-custom-override-284097642
+    :solver/raw-custom-override1548352368
+    :solver/raw-custom-override758539913
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override790219099>running?
+    :solver/raw-custom-override1489300306
+    :solver/raw-custom-override873159982
+    :solver-status/moving-spring-green-squirrel-22>raw-custom-override758539913>running?]},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
+  :alert2 {:alerts :alert2},
+  nil {nil nil},
+  "kick-solver!" {:kick :clojure-hop-7}},
  :screen-name "test-blog-screen",
  :recos-page2 0,
  :selected-tab "coffee llama",
@@ -778,83 +1460,27 @@
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
- [[[:h-box
-    :children
-    [[:v-box
-      :gap
-      "6px"
-      :children
-      [[:box :style {:font-size "16px"} :child "Data was not sampled."]
-       [:h-box
-        :style
-        {:font-size "13px"}
-        :gap
-        "12px"
-        :children
-        [[:v-box
-          :gap
-          "6px"
-          :children
-          [[:box :style {:font-size "15px"} :child "Structure"]
-           [:v-box
-            :style
-            {:opacity 0.9, :font-weight 700}
-            :children
-            [[:box
-              :child
-              [:h-box
-               :gap
-               "8px"
-               :justify
-               :between
-               :children
-               [[:box :style {:opacity 0.5} :child "key depth"] [:box :child "1"]]]]
-             [:box
-              :child
-              [:h-box
-               :gap
-               "8px"
-               :justify
-               :between
-               :children
-               [[:box :child "1"] [:box :style {:opacity 0.5} :child "values"]]]]
-             [:box
-              :child
-              [:h-box
-               :gap
-               "8px"
-               :justify
-               :between
-               :children
-               [[:box :style {:opacity 0.5} :child "est size"]
-                [:box :child "4 bytes"]]]]]]]]]]
-       [:box :style {:font-size "11px"} :child ""]
-       [:box
-        :style
-        {:font-size "11px", :opacity 0.4}
-        :child
-        ":raw-custom-override1178372753"]]]]]
-   13
-   nil
-   55483
-   745763877]
-  [[:box
+ [[[:box
     :child
     "sent screen save request to server... Please wait."
     :style
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   55487
+   268613
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:shows 89957543},
- :panels-hash -488696776,
+ :base-sniff-queries
+ {:shows 89957543,
+  :jvm_stats 1498154063,
+  :ufo_sightings 484893751,
+  :offenses -505802446},
+ :panels-hash 1988318591,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 834272078,
+ :user-params-hash -204238758,
  :grid-recos? true,
- :session-hash -1207424345,
+ :session-hash -449724953,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1230,7 +1856,7 @@
    :name "block-4185",
    :create-image
    {:create-image-hop-1
-    [" a beautiful irish woman sitting on the beach, long hair plumb lips, giving a coy glace to the camera, closeup from collarbone up, intricate tattoos on neck...."]}},
+    [" a beautiful irish woman sitting on the beach, long hair plumb lips, giving a coy glace to the camera, closeup from collarbone up, intricate tattoos on neck....  "]}},
   :block-135
   {:h 14,
    :w 3,
@@ -1625,6 +2251,15 @@
       :font-family :theme/base-font}
      :child
      :theme/universal-pop]},
+   :queries {}},
+  :block-2946
+  {:h 11,
+   :w 19,
+   :root [4 4],
+   :tab "octohedral hog",
+   :selected-view :hare-vw-2,
+   :name "block-2946",
+   :views {:hare-vw-2 [:terminal :server/cpu-chart]},
    :queries {}},
   :block-3477
   {:clojure
@@ -2397,7 +3032,7 @@
    {:clojure-hop-7
     (do
       (ns rvbbit-backend.websockets)
-      (let [rr [:time/second=30 :time/second=0]]
+      (let [rr :time/minute]
         (draw-stats
           [:cpu :sql-queries :sql-exec]
           [15 30 90 120 360]
@@ -2462,38 +3097,25 @@
    :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
+  :server
+  {:cpu-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 23 minutes, 15 seconds / noticeably up)          max 13.16%, min 2.68%, avg 5.23%   │\n│                                                                                                     │\n│                  ▁  .             ▆               ▇.               █              .                 │\n│  ▅               █  .             █            ▄  █.               █              .                 │\n│  █        ▄      █  .      ▂      █            █  █.               █         ▅    . ▇▃       ▃▅     │\n│  █  ▁ █   █ ▅  ▅ ██ .      █▃     █▆▃          █▂ █.▃    ▅▂   ▁ ▆  █▇       ▁█▂ ▅▂. ██   █  ▆██     │\n│ ▇█▇▄█▂█▄▁▄█▇██▅████▅.▆▅▅▄▇▃██▂▆█▇▇███▅▃▆▆█▃█▃▇███▅█.█▃▆▇███▄█████▅▄██▆▅█▇▄▄▇███▇██.▄██▅▆▅█▆▁███▄    │\n│(μ 4.94)              (μ 5.13) +4%                   (μ 5.09) -1%                                    │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         07:16:39\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 2 hours, 19 minutes, 30 seconds / noticeably up)  max 7.06%, min 2.86%, avg 4.33%   │\n│                                                                                                     │\n│                     .                              .                              .     █           │\n│      █  ▆  ▂        .                              .   ▁       ▂                  .▇  ▆ █  ▅ ▂▆▁    │\n│      █  █  █ ▁      . ▅  ▄      ▁▇  ▃    █  ▁  ▂   . █ █     ▃ █     ▃ ▆  █  ▅ ▇ ▆.█  █ █▂▄█ ███    │\n│ ▄▄ ▆▆█▃▄█ ▁█ █ ▄█ ▃▄.▁█▃▁█ ▁▃▃█▄██  █▁█▂▄█▇▂█▂▇█▆▇ . █ █▃ █▄▆█ █  █ ▁█▂█ ▃█▅▆█▇█▆█.██▇█▅████▆███    │\n│ ██▅██████▆██▆█▄█████.█████▇███████▆███████████████▆.██▂██▇██████▇██▆██████████████.█████████████    │\n│(μ 3.91)              (μ 4.13) +5%                   (μ 4.25) +3%                                    │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          07:16:39\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 3 hours, 6 minutes / noticeably up)               max 6.24%, min 2.62%, avg 4.12%   │\n│                                                                                                     │\n│                     .                              .                              .   ▂ ▂ █ ▃       │\n│        ▄            .       ▆ █                 ▄  .   ▃         ▂   ▁ ▂     ▁ ▄ ▄. ▂▁█ █ █▁█▂█▇    │\n│        █ ▂ ▅ ▄      .      ▁█▃█ ▇ ▂ ▂ ▄ █ ▆   ▅▁█ ▆. ▁ █▃▂ ▃█▂ ▅ █ ▁ █ █ ▂ ▇ █ █▂█. ███▅█ ██████    │\n│    ▄▃▄ █ █ █▁█ █ ▆▁█.▂▇ ▅▅▇████▄█▆█▆█▂█▄█▆█▂▇▇███▁█.▄█████▇███▂█▃█▇█▇█▅█▅█▁█▄█▁███.█████████████    │\n│ ▆█▂███▂███▆███▆█▆███.██▆███████████████████████████.██████████████████████████████.█████████████    │\n│(μ 3.49)              (μ 4.05) +14%                  (μ 4.18) +3%                                    │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        07:16:39\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 4 hours, 20 minutes / significantly up)           max 5.60%, min 2.71%, avg 3.94%   │\n│                                                                                                     │\n│ .                        ▅█                                                                         │\n│ .            ▄         ▄███                                                                         │\n│ .        ▂   █▁▅▂▅▇▆▃▆▃████                                                                         │\n│ .▄   ▇▂▃▂█▅▇███████████████                                                                         │\n│ .█▃▆███████████████████████                                                                         │\n│(μ 3.94)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      07:16:39\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 4 hours, 30 minutes / significantly up)           max 5.40%, min 3.03%, avg 3.99%   │\n│                                                                                                     │\n│ .        █                                                                                          │\n│ .       ▃█                                                                                          │\n│ .    ▆▄▅██                                                                                          │\n│ . ▁▃▅█████                                                                                          │\n│ .▄████████                                                                                          │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    07:16:39\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 5 hours / significantly up)                       max 5.40%, min 3.18%, avg 4.13%   │\n│                                                                                                     │\n│ .    █                                                                                              │\n│ .    █                                                                                              │\n│ .  ▄▇█                                                                                              │\n│ . ▂███                                                                                              │\n│ .▅████                                                                                              │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        07:16:39\n"},
   :time
-  {:now-seconds "Wednesday, April 24 1:43:57PM",
-   :month 4,
-   :minute 25,
-   :second 49,
-   :second=30 1722198870780,
-   :second=0 1722198900780},
+  {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 48, :second 49},
   :viz-tables-sys2 {:table_name :offenses-drag-26},
   :time-freq-345d.* {:freq [1 30 60]},
   :stats-types-34.* {:type ["sql-exec" "cpu" "mem" "load" "flows+"]},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data
-   (do
-     (ns rvbbit-backend.websockets)
-     (let [rr [:time/second=30 :time/second=0]]
-       (draw-stats [:cpu :sql-queries :sql-exec] [15 30 90 120 360] true :col-width)
-       (draw-client-stats
-         [:system-db]
-         [15 30 90 120 360]
-         [:rows :avg-exec]
-         true
-         :col-width
-         {:metrics-atom sql-metrics}))),
-   :selected-view [:clojure :clojure-hop-7],
+   :selected-view-data nil,
+   :selected-view nil,
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :well-cerise-kangaroo
    "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently.   The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity. ",
    :rel-image-path "images/large/b64-image3-48163-50841-4k.webp",
-   :selected-block :block-5042,
+   :selected-block :block-2946,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",

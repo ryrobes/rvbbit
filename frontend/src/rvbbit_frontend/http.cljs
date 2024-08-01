@@ -553,12 +553,12 @@
               estimate?                   (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))]
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
-          
+
           (when (and alert? (cstr/includes? (str result) "Fabric")) 
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/starts-with? (str client-name) ":power")  (ut/tapp>> [:msg-in (get result :task-id) (str (get result :ui-keypath)) (str result)]))
+          (when (cstr/includes? (str client-name) "-fat-")  (ut/tapp>> [:msg-in (get result :task-id) (get result :status) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -647,10 +647,11 @@
                                      (assoc-in task-id rtn))))
 
             heartbeat? (-> db
-                           (assoc-in [:status task-id ui-keypath] (get result :status))
+                           (assoc-in [:status task-id ui-keypath] (get-in result [:status :subs]))
                            (assoc-in [:status-data task-id ui-keypath]
                                      {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
-                           (assoc :flow-subs (get result :status)))
+                           (assoc :flow-subs (get-in result [:status :subs]))
+                           (assoc :valid-kits (into {} (get-in result [:status :kits]))))
 
 
 

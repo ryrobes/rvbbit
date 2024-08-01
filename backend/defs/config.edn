@@ -132,10 +132,10 @@
                                     Since this system is EDN based, all code has to be wrapped in a (do ..) form in order to be evaluated as a single expression. If a user-provided do block already exists, just use it, do not double wrap it - a single parent (do ...) form is all that is needed.
                                     Being saved in EDN also means that it cannot use Clojure artifacts that are invalid EDN - so, do not use the shorthand for anon functions (#(this %)), or shorthand atom derefs (@atom), or shortcode sets (#{}) always use the full for version for these things - instead w/o the special characters (deref, set, (fn[x]...))."
                      :icon "images/clojure-alt.svg"}
-           
+
            :fabric {:type :nrepl
                     :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
-                    :modes [ :text :markdown :clover :data :terminal]
+                    :modes [:text :markdown :clover :data :terminal]
                     :default "funny tweet about rabbits and clojure"
                     :syntax "text"
                     :ext ".txt"
@@ -156,7 +156,52 @@
                                          :model (or :*model "gpt-3.5-turbo")})}]
                     :description "AI framework: Uses the Fabric command line tool to access various local and remote LLM models with pre-defined 'patterns', + special context-aware RVBBIT patterns."
                     :icon "images/fbc-logo.gif"}
-           
+
+           :outliers {:type :nrepl
+                      :runner {:port 42999 :host "127.0.0.1"} 
+                      :modes [:text :clover :data :terminal]
+                      :hop-bar? false
+                      :default (let [clojure-version (clojure-version)
+                                     jvm-version (System/getProperty
+                                                  "java.version")]
+                                 (str
+                                  "🐇🥕 Outliers nREPL Library. Clojure "
+                                  clojure-version
+                                  " on " jvm-version " JVM "
+                                  " 🥕🐇"))
+                      :syntax "clojure"
+                      :ext ".clj"
+                      :kits {:get-outliers {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] pairs for things that are "eligible"
+                                                       (vec (apply concat (for [[k v] client-panels
+                                                                                :when (get v :queries)]
+                                                                            (for  [kk (keys (get v :queries))]
+                                                                              [k :queries kk])))))
+                                            :kit-fn (fn [client-panels client-data panel-key view-key]
+                                                      (fn [] (println (clojure-version) "Outliers Kit Runner called." (keys client-panels)))) ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
+                                            :icon "images/outliers.png"
+                                            :clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))}
+
+                             :get-outliers-maps {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :view-id] pairs for things that are "eligible"
+                                                            (vec (apply concat (for [[k v] client-data]
+                                                                                 (apply concat (for [[kk vv] v]
+                                                                                                 (for [[k3 v3] vv
+                                                                                                       :when (map? v3)]
+                                                                                                   [k kk k3])))))))
+                                                 :kit-fn (fn [client-panels client-data panel-key view-key]
+                                                           (fn [] (println (clojure-version) "Outliers Kit Runner called." (keys client-panels)))) ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
+                                                 :icon "images/outliers.png"
+                                                 :clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))}
+                             }
+                      :placeholder-on-running? true
+                      :clover-fn [:run-solver
+                                  {:signal false
+                                   :cache? false
+                                   :type :clojure
+                                   :input-map {}
+                                   :data :clover-body}]
+                      :description "Clojure REPL only used for the Outliers Kit Runner."
+                      :icon "images/fbc-logo.gif"}
+
            :shell {:type :nrepl ;; this is the built-in REPL that starts by default
                    :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
                    :modes [:text :data :terminal]

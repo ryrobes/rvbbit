@@ -100,6 +100,7 @@
 (def client-panels (atom {}))
 (def client-panels-resolved (atom {}))
 (def client-panels-materialized (atom {}))
+(def client-panels-data (atom {}))
 
 (def client-panels-history (atom {}))
 ;;(def client-panels-history (ut/thaw-atom {} "./data/atoms/client-panel-history-atom.edn"))
@@ -2787,7 +2788,7 @@
 (defn kick [client-name task-id sub-task thread-id thread-desc message-name & args]
   (let [ui-keypath   [:kick] ;;; ^ sub-task is the UI item-key in push ops
         payload      (vec args)
-        payload?     (not (empty? payload))
+        payload?     (ut/ne? payload)
         heartbeat?   (= sub-task :heartbeat)
         payload      (when (and payload? (not heartbeat?)) (wrap-payload payload thread-id thread-desc message-name))
         _ (when (and payload? (not heartbeat?))
@@ -2804,12 +2805,27 @@
                        (let [ssubs         (vec (keys (get @atoms-and-watchers cid {})))
                              subbed-subs   (vec (distinct (get @param-var-key-mapping cid [])))
                              sss-map       (into {} (for [[orig subbb] subbed-subs] {subbb orig}))
+                             runners       (get (config/settings) :runners)
+                            ;;  valid-kits    {}
+                             valid-kits    (try
+                                             (into {}
+                                                   (for [[k v] runners
+                                                         :when (get v :kits)]
+                                                     {k (into {}
+                                                              (for [[kit-name {:keys [when-fn]}] (get v :kits)]
+                                                                {kit-name
+                                                                 ((eval when-fn) (get @client-panels cid)
+                                                                                 (get @client-panels-data cid))}))}))
+                                             (catch Exception e (ut/pp [:kit-lookup-error e cid])))
+                             _ (ut/pp [:valid-kits cid valid-kits])
                              replaced-subs (walk/postwalk-replace sss-map ssubs)]
-                         replaced-subs)
+                         {:subs replaced-subs :kits valid-kits})
                        sub-task)]
         (when hb? (swap! ping-ts assoc cid (System/currentTimeMillis)))
         (push-to-client ui-keypath data cid queue-id task-id sub-task)))
     :sent!))
+
+;; (ut/pp (ut/keypaths @client-panels-data))
 
 (defn process-flow-map
   [fmap]
@@ -4555,42 +4571,34 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                            elapsed-ms
                            client-name))))))
 
+(defn ship-estimate [client-name solver-name times-key]
+  (try (let [prev-times       (get @times-atom times-key [-1])
+             times (ut/avg ;; avg based on last 10 runs, but only if >
+                    (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+         (when (not (nil? times))
+           (kick client-name [:estimate] {solver-name ;;(cstr/replace (str solver-name) ":" "solver/")
+                                          {:times (/ times 1000)
+                                           :run-id solver-name}}
+                 nil nil nil)))
+       (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
+
 (defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? is-history? cache-key ui-keypath]
   (try (let [repl-host                   (get-in runner-map [:runner :host])
              repl-port                   (get-in runner-map [:runner :port])
              is-fabric?                  (cstr/includes? (str vdata) "fabric-run")
              ;;_ (ut/pp [:nrepl-call runner-name is-fabric? solver-name client-name])
              pre-opts-map                (when is-fabric? (ut/extract-map vdata #{:pattern :model}))
-             fabric-times-key            (when is-fabric? (vec (flatten (remove symbol? (select-keys pre-opts-map [:pattern :model])))))
-             ;;fabric-times-key            (when is-fabric? (select-keys pre-opts-map [:pattern :model]))
-             _ (when is-fabric?
-                 (let [;;pre-opts-map      (ut/extract-map vdata #{:pattern :model})
-                       {:keys [pattern model runner context]} pre-opts-map
-                       view-name        (or (last (ffirst context)) :*)
-                       prev-times       (get @times-atom fabric-times-key [-1])
-                       ship-est         (fn [client-name]
-                                          (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
-                                                            (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))
-                                                     _ (ut/pp [:pre-fabric-run! pre-opts-map times view-name])]
-                                                 (when (not (nil? times))
-                                                   (kick client-name [:estimate] {;;solver-name 
-                                                                                  ;;"*" ;; 
-                                                                                  solver-name ;;(cstr/replace (str solver-name) ":" "solver/")
-                                                                                  {:times (/ times 1000) ;; ms to secs
-                                                                                   ;;:run-id "*"
-                                                                                   :run-id solver-name ;;(cstr/replace (str solver-name) ":" "solver/")
-                                                                                   }} 
-                                                         nil nil nil)))
-                                               (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))]
-                   (ship-est client-name)))
+             times-key                   (if is-fabric? 
+                                           (vec (flatten (remove symbol? (select-keys pre-opts-map [:pattern :model]))))
+                                           (into [:nrepl-solver] ui-keypath))
+             _                           (ship-estimate client-name solver-name times-key)
              {:keys [result elapsed-ms]} (ut/timed-exec
                                           (ppy/execute-in-thread-pools-but-deliver (keyword (str "serial-nrepl-instance/" (cstr/replace (str solver-name) ":" "")))
                                            ;;:nrepl-evals 
                                           ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
                                                                                    (fn []
                                                                                      (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
-             _                          (when is-fabric? (swap! times-atom assoc fabric-times-key 
-                                                                (conj (get @times-atom fabric-times-key) elapsed-ms)))
+
              output-full                 result
              sampled?                    (get-in output-full [:sampled :sampling-details])
              output                      (if sampled?
@@ -4609,6 +4617,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                        (try (count (last (get-in output-full [:evald-result :value])))
                                                             (catch Exception _ 0))))
              error?                      (err? output-full)
+             _                          (when (not error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) elapsed-ms)))
              runs                        (get @last-solvers-history-atom solver-name [])
              meta-extra                  {:extra {:last-processed timestamp-str
                                                   :cache-hit?     cache-hit?
@@ -4704,6 +4713,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
          (when (not error?) ;;(and use-cache? (not error?))
            (swap! solvers-cache-atom assoc cache-key [output output-full]))
          (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
+         (when (vector? ui-keypath) (swap! client-panels-data assoc-in (into [client-name] ui-keypath) output)) ;; <--- pricey, but its usefulness outweighs the memory ATM, external db, Redis, etc later.
 
         ;;  (kick  client-name "kick-solver!" (last ui-keypath) 
         ;;         "solver-log"  ;; thread name
@@ -4746,13 +4756,16 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
 ;;      ;;kick [client-name task-id       sub-task           thread-id     thread-desc                           message-name & args]                    payload-vec
 ;;      (kick  client-name "kick-solver!" (last ui-keypath) "solver-log"  (str "query-log-" (first ui-keypath)) (str "query-log-" (first ui-keypath))  [(str (ut/get-current-timestamp) " - query ran in " -1 " ms.")])
 
-
+;;  (ut/pp (keys @client-panels))
+;;  (ut/pp (keys @client-panels-data))
 
 (defn run-solver
   [solver-name client-name & [override-map override-input temp-solver-name ui-keypath]]
   (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
         _                     (swap! solvers-run inc)
-        timestamp             (System/currentTimeMillis)]
+        timestamp             (System/currentTimeMillis)
+        ;;_ (ut/pp  [:solver-run ui-keypath])
+        ]
 
   ;; (if @temp-running-elsewhere?
 
@@ -4884,6 +4897,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                      ;(swap! solver-status assoc-in [client-name solver-name :cache-served?] true)
                      ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
                      (swap! solver-status update-in [client-name solver-name] merge {:running? false, :cache-served? true, :stopped (System/currentTimeMillis)})
+                     (when (vector? ui-keypath) (swap! client-panels-data assoc-in (into [client-name] ui-keypath) output)) ;; <--- pricey, but its usefulness outweighs the memory ATM, external db, Redis, etc later.
                      output)
 
         (= runner-type :sql)
@@ -4935,6 +4949,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
             ;(swap! solver-status assoc-in [client-name solver-name :running?] false)
             ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
             (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
+            (when (vector? ui-keypath) (swap! client-panels-data assoc-in (into [client-name] ui-keypath) rows)) ;; <--- pricey, but its usefulness outweighs the memory ATM, external db, Redis, etc later.
             rows)
 
           (catch Throwable e
@@ -5050,6 +5065,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
           ;(swap! solver-status assoc-in [client-name solver-name :running?] false)
           ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
           (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
+          (when (vector? ui-keypath) (swap! client-panels-data assoc-in (into [client-name] ui-keypath) vdata)) ;; <--- pricey, but its usefulness outweighs the memory ATM, external db, Redis, etc later.
           vdata))
 
       ;; just in case?
@@ -5801,13 +5817,16 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
               output))
           (catch Exception e (ut/ppln [:error! e]))))))
 
+(def sniff-meta-guard (atom {}))
 
 (defn sniff-meta
   [ui-keypath honey-sql fields target-db client-name & [deep?]] ;; enqueue-task-sql-meta
-  (try (let [honey-sql (-> honey-sql
+  (try (let [ohoney-sql honey-sql
+             honey-sql (-> honey-sql
                            (dissoc :offset)
                            (dissoc :page)
                            (dissoc :limit)
+                           (dissoc :_last-run) ;; just in case
                            (dissoc :cache?))
              cnts      (into {}
                              (for [[[name f] hsql] (merge {[:rowcount :*] {:select [[[:count 1] :rowcnt]]
@@ -5826,6 +5845,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                                            ;; issues (distinct or
                                                                            ;; rowcount is
         ;;  (ut/pp [:running-meta-cnts ui-keypath client-name cnts])
+         (swap! sniff-meta-guard assoc-in [ui-keypath client-name] (hash ohoney-sql))
          (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts cnts))
        (catch Exception e (ut/pp [:error-w-sql-meta-cnts! e]))))
 
@@ -6384,8 +6404,12 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                   (get @sql/map-orders honey-sql-str))}
                         result-hash (hash result)]
                      ;(enqueue-task-sql-meta 
-                    (qp/slot-queue :sql-meta client-name
-                                   (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?)))
+                    
+                    (when (not= (hash honey-sql) (get-in @sniff-meta-guard [ui-keypath client-name])) ;; only on new sql construct
+                      (ut/pp [:sniff-meta! ui-keypath client-name])
+                      (qp/slot-queue :sql-meta client-name
+                                     (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?))))
+                    
                     (if sniffable?
                       (doall
                        (do
@@ -6480,14 +6504,15 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                      (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql))
                                                      )))
                     (do ;(swap! sql-cache assoc req-hash output)
-                      (kick client-name "kick-test!" (first ui-keypath)
-                            "query-log"
-                            (str "query-log " (first ui-keypath))
-                            (str "query-log " (first ui-keypath))
-                            [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms. ")
-                             [:text honey-sql-str2]
-                             [:edn (ut/truncate-nested (get honey-meta :fields))]
-                             ])
+                      ;; (kick client-name "kick-test!" (first ui-keypath) ;; <-- adds a kick kit panel entry for each query run, but adds up fast...
+                      ;;       "query-log"
+                      ;;       (str "query-log " (first ui-keypath))
+                      ;;       (str "query-log " (first ui-keypath))
+                      ;;       [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms. ")
+                      ;;        [:text honey-sql-str2]
+                      ;;        [:edn (ut/truncate-nested (get honey-meta :fields))]
+                      ;;        ])
+                      (swap! client-panels-data assoc-in [client-name :queries (first ui-keypath)] (get output :result)) ;; <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
              (catch Exception e

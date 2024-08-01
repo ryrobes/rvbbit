@@ -2519,6 +2519,7 @@
         new-keyw           (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
         new-keyw           (ut/safe-key new-keyw)
         tab                @(ut/tracked-sub ::selected-tab {})
+        block-name         (cstr/replace (str runner "-" new-key) ":" "")
         client-name        @(ut/tracked-sub ::client-name {})
         valid-body         (if (or clover? clojure?)
                              (try (edn/read-string (str body))
@@ -2534,9 +2535,9 @@
                                ;[(str (char 34) (cstr/trim (str body)) (char 34))]
                              [(str body)])
           ;;valid-body         (if (or clover? clojure?) valid-body [body])
-        opts-map-star       (merge 
-                             (into {} (for [[k v] opts-map] 
-                                       {(keyword (cstr/replace (str k) ":" "*")) v}))
+        opts-map-star       (merge
+                             (into {} (for [[k v] opts-map]
+                                        {(keyword (cstr/replace (str k) ":" "*")) v}))
                              {:*id (cstr/replace (str client-name "++" new-keyw "++" runner "++" view-name) ":" "")
                               ;; :*context (let [[runner data-key]     @(ut/tracked-sub ::editor-panel-selected-view {})
                               ;;                 selected-block  @(ut/tracked-sub ::selected-block {})]
@@ -2554,9 +2555,10 @@
                             :w             width
                             :root          root
                             :tab           tab
+                            :minimized?    (not (true? no-selected?))
                             :selected-view view-name
                             :opts          {view-name (or opts-map {})}
-                            :name          new-key
+                            :name          block-name
                             runner         {view-name valid-body}
                               ;:queries       {}
                             }]
@@ -3950,6 +3952,16 @@
          blocks (vec (filter #(cstr/includes? (str %) "/") blocks))]
      (or blocks []))))
 
+(re-frame/reg-sub
+ ::valid-block-kps-in-tab
+ (fn [db _]
+   (let [blocks (ut/deep-remove-keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab ""))
+                                                      (get db :panels)))
+                                     [:root :selected-mode :opts :root :selected-view])
+         blocks (filterv #(= (count %) 3)
+                         (ut/kvpaths blocks))]
+     (or blocks []))))
+
 
 (def searcher-atom (reagent/atom nil))
 
@@ -4029,12 +4041,15 @@
                                            (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
                                            (not (cstr/starts-with? (str (first %)) ":solver-status/"))
                                            (not (cstr/starts-with? (str (first %)) ":signal/"))
+                                           (and (not (cstr/starts-with? (str (first %)) ":server/"))
+                                                (not (cstr/ends-with? (str (first %)) "-chart")))
                                            (not (and (cstr/starts-with? (str (first %)) ":solver/")
                                                      (re-matches #".*\d" (str (first %)))))
                                            (not (cstr/ends-with? (str (first %)) "*running?"))
                                            (not (cstr/ends-with? (str (first %)) "/selected-view"))
                                            (not (cstr/ends-with? (str (first %)) "/selected-block"))
                                            (not (cstr/ends-with? (str (first %)) "/selected-view-data"))
+                                           (not (nil? (last %))) ;; no nil val params 
                                            (not (cstr/starts-with? (str (first %)) ":conn-list/"))
                                            (not (cstr/starts-with? (str (first %)) ":time/"))
                                            (not (cstr/starts-with? (str (first %)) ":sys/"))
@@ -8200,10 +8215,10 @@
  ::prune-alert
  (fn [db [_ alert-id]]
    (ut/tapp>> [:prune-alert alert-id])
-   (if alert-id 
+   (if (not= alert-id 0)
      (let [alerts (get db :alerts)]
        (assoc db :alerts (vec (remove #(= (last %) alert-id) alerts))))
-     db)))
+     (assoc db :alerts []))))
 
 ;;(ut/tracked-dispatch [::http/get-autocomplete-values])
 
@@ -10506,17 +10521,28 @@
                                  (when (< @progress 100) (recur)))]
                       (swap! progress-loops assoc uid loop)))
                   (swap! progress-bars assoc uid progress)
-                  (fn [] [re-com/progress-bar :model (if (> @progress 100) 100 @progress) :striped? true :bar-style
-                          {:color            (str (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil)) 67)
-                           :outline          "none"
-                           :border           "none"
-                           :transition       (str "all " transition-duration "s ease-in-out")
-                           :background-color (theme-pull :theme/editor-outer-rim-color nil)} :style
-                          {:font-family      (theme-pull :theme/base-font nil)
-                           :background-color "#00000000"
-                           :border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55)
-                           :outline          "none"
-                           :width            ww}])))
+                  (fn [] [re-com/progress-bar
+                          :model (if (> @progress 100) 100 @progress)
+                          :striped? true
+                          :bar-style {:color            (str (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil)) 67)
+                                      :outline          "none"
+                                      :border           "none"
+                                      :transition       (str "all " transition-duration "s ease-in-out")
+                                      :background-color (theme-pull :theme/editor-outer-rim-color nil)}
+                          :style {:font-family      (theme-pull :theme/base-font nil)
+                                  :background-color "#00000000"
+                                  :z-index 9999999
+                                  :border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55)
+                                  :outline          "none"
+                                  :width            ww}])))
+              :speak-only (fn [text]
+                            (let []
+                              (when (not (some #(= % text) @db/speech-log))
+                                (swap! db/speech-log conj text)
+                               ;;(ut/dispatch-delay 800 [::http/insert-alert (str text) 13 1 5])
+                                (ut/tracked-dispatch [::audio/text-to-speech11 panel-key ;:audio
+                                                      :speak (str text)]))
+                              (str text)))
               :speak (fn [text]
                        (let []
                          (when (not (some #(= % text) @db/speech-log))

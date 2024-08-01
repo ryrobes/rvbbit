@@ -20,7 +20,9 @@
    [talltale.core     :as tales]
    [rvbbit-frontend.db :as db]
    [talltale.core     :as tales]
-   [zprint.core       :as zp])
+   [zprint.core       :as zp]
+   [goog.string       :as gstring]
+   [goog.string.format :as gformat])
   (:import
    [goog.i18n              NumberFormat]
    [goog.i18n.NumberFormat Format]
@@ -47,6 +49,16 @@
         (map? x)     (into {} (map (fn [[k v]] [(stringify-keywords k) (stringify-keywords v)]) x))
         (coll? x)    (map stringify-keywords x)
         :else        x))
+
+(defn generate-uuid []
+  (let [random-str (gstring/getRandomString)
+        uuid (gstring/format "%s-%s-%s-%s-%s"
+                                 (subs random-str 0 8)
+                                 (subs random-str 8 12)
+                                 (subs random-str 12 16)
+                                 (subs random-str 16 20)
+                                 (subs random-str 20 32))]
+    uuid))
 
 (re-frame/reg-event-db
  ::write-tap-to-db

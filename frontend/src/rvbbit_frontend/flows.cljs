@@ -4668,7 +4668,11 @@
 (re-frame/reg-sub
  ::running-solvers
  (fn [db _]
-   (let [running-solver-keys (mapv #(keyword (str "solver/" (second (cstr/split (str %) ">"))))
+   (let [blocks (ut/deep-remove-keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab ""))
+                                                      (get db :panels)))
+                                     [:root :selected-mode :opts :root :selected-view])
+         blocks (filterv #(= (count %) 3) (ut/kvpaths blocks))
+         running-solver-keys (mapv #(keyword (str "solver/" (second (cstr/split (str %) ">"))))
                                    (map first
                                         (filter (fn [[k v]]
                                                   (and
@@ -4677,11 +4681,13 @@
                                                    ;(= v false)
                                                    ))
                                                 (get-in db [:click-param :solver-status]))))
-         mapped-solvers (select-keys (ut/flip-map @db/solver-fn-lookup) running-solver-keys)
-         solver-view-names (mapv last (vals mapped-solvers))
+         this-tab-lookups (select-keys @db/solver-fn-lookup (for [e blocks] [:panels (first e) (last e)]))
+         mapped-solvers (select-keys (ut/flip-map this-tab-lookups) running-solver-keys)
+         ;solver-view-names (mapv last (vals mapped-solvers))
          ;both (into running-solver-keys solver-view-names)
-         both running-solver-keys
-         ]
+         ;both running-solver-keys
+         both (keys mapped-solvers)
+   ]
      (or both []))))
 
 (ut/tapp>> [:running-solvers @(ut/tracked-sub ::running-solvers {}) ])
@@ -4693,8 +4699,9 @@
 
 (defn alert-box [& [panel-key data-key]]
   [bricks/reecatch
-   (let [;;;_ (ut/tapp>> [:sel panel-key data-key (str @db/last-focused)])
+   (let [;;_ (ut/tapp>> [:sel @(ut/tracked-sub ::bricks/valid-block-kps-in-tab {}) @db/solver-fn-lookup])
          rekt            [@db/kick-alert @db/pause-alerts]
+         kps-in-tab      @(ut/tracked-sub ::bricks/valid-block-kps-in-tab {})
          rs-running      @(ut/tracked-sub ::bricks/runstreams-running {})
          rs-running-list @(ut/tracked-sub ::bricks/runstreams-running-list {})
          selected-view   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
@@ -4702,6 +4709,7 @@
          editor?         @(ut/tracked-sub ::bricks/editor? {})
          in-panel?       (and (or panel-key data-key) editor?)
          ;;;_ (ut/tapp>> [panel-key data-key @db/solver-fn-lookup])
+         ;filtered-solver-lookup (select-keys @db/solver-fn-lookup (for [e kps-in-tab] [:panels (first e) (last e)]))
          solver-assoc    (cond in-panel?
                                (cstr/replace (str (get @db/solver-fn-lookup [:panels panel-key data-key])) ":solver/" "")
 
@@ -4726,36 +4734,68 @@
 
                                :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
          alerts          (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts)
-         ;;_ (ut/tapp>> [:sel-view selected-view])
+         alerts          (filterv #(if (cstr/includes? (str %) ":block-") 
+                                     (not (some (fn [x] (cstr/includes? (str %) (str x))) (mapv first kps-in-tab)))
+                                     true) alerts)
+        ;;alerts (filterv #(not (cstr/includes? (str %) ":block-8981")) alerts)
+         
          estimates       @(ut/tracked-sub ::estimates {})
          running-solver-views @(ut/tracked-sub ::running-solvers {}) ;;(conj @(ut/tracked-sub ::running-solvers {}) :*) ;; fabric that does not yet have a block id. hop-bar spawned.
+         ;;_ (ut/tapp>> [:alerts rs-running-list running-solver-views])
          max-w           (apply max (for [a alerts :let [width (* (get a 1) db/brick-size)]] width))
          max-w           (if (or (nil? max-w) (< max-w 50))
                            300 ;420
                            max-w)
          alerts          (if (or (> rs-running 0)  (> (count running-solver-views) 0))
                            (conj alerts
-                                 [[:v-box :children
+                                 [[:v-box 
+                                   :width (px max-w)
+                                   :size "none"
+                                   :children
                                    (vec
-                                    (into [[:box :child (str rs-running " flow" (when (> rs-running 1) "s") " running")]]
+                                    (into [[:box
+                                            :style {:font-size "15px"}
+                                            :child
+                                            (str (when (> rs-running 0) (str rs-running " flow" (when (> rs-running 1) "s") " running"))
+                                                 (when (and (> rs-running 0) (> running-solver-views 0)) ",")
+                                                 (when (> running-solver-views 0) (str running-solver-views " solver" (when (> running-solver-views 1) "s") " running")))]]
                                           (vec
                                            (for [e    (into rs-running-list running-solver-views)
-                                                 :let [fid    (ut/replacer e ":" "")
-                                                       run-id (get-in estimates [fid :run-id] "*")
-                                                       est    (+ (js/Math.round (get-in estimates [fid :times] 0)) 2)
-                                                      ;;  _ (ut/tapp>> [:prog e fid run-id est])
+                                                 :let [solver? (cstr/starts-with? (str e) ":solver/")
+                                                       fid    (-> e (ut/replacer ":" "") (ut/replacer "solver/" ""))
+                                                       run-id (get-in estimates [fid :run-id]  ;; flows are strings solvers and keywords. TODO, mess.
+                                                                      (get-in estimates [(keyword fid) :run-id] "*"))
+                                                       est    (+ (js/Math.round (get-in estimates [fid :times] ;; flows are strings solvers and keywords. TODO, mess.
+                                                                                        (get-in estimates [(keyword fid) :times] 0))) 1)
+                                                       ;;_ (ut/tapp>> [:est est run-id fid e (get-in estimates [fid :times] 0) (ut/flip-map @db/solver-fn-lookup)])
                                                        est?   (> est 1)]]
-                                             [:v-box :padding "3px" :width (px max-w) ;;"215px"
+                                             [:v-box :padding "3px"
+                                              :width (px max-w) ;;"215px"
                                               :size "auto" ;:justify :center
-                                              :style {:font-size "11px"} :children
-                                              [[:box :size "auto" :style {:padding-left "5px"} :child (str fid)]
-                                               (when est? ;true ;est?
-                                                 [:box :child [:progress-bar [(- max-w 15) est (str e run-id)]] :height "25px"
-                                                  :padding "3px"])
-                                               (when est? ;true ;est?
-                                                 [:box :align :end :style
-                                                  {:font-size "10px" :font-weight 400 :padding-right "5px"} :child
-                                                  (str "estimate: " (ut/format-duration-seconds est))])]]))))] 4
+                                              :style {:font-size "11px"}
+                                              :children [[:box
+                                                          :size "none"
+                                                          :width (px max-w)
+                                                          :style {:padding-left "5px" :opacity 0.75}
+                                                          :child (str fid)]
+                                                         (when solver?
+                                                           [:box
+                                                            :size "none"
+                                                            :width (px max-w)
+                                                            :style {:padding-left "5px" :font-size "14px"}
+                                                            :child (str (vec (rest (get (ut/flip-map @db/solver-fn-lookup) e))))])
+
+                                                         (when est? ;true ;est?
+                                                           [:box
+                                                            :child [:progress-bar [(- max-w 15)
+                                                                                   est (str e run-id (when solver? (ut/generate-uuid)))]]
+                                                            :height "25px"
+                                                            :padding "3px"])
+                                                         (when est? ;true ;est?
+                                                           [:box
+                                                            :align :end
+                                                            :style {:font-size "10px" :font-weight 400 :padding-right "5px"}
+                                                            :child (str "estimate: " (ut/format-duration-seconds est))])]]))))] 4
                                   (+ 1.25 (* 1.05 rs-running) (when (= 1 rs-running) -0.275)) 0])
                            alerts)
          alerts-cnt      (try (count alerts) (catch :default _ 0))
@@ -4785,7 +4825,8 @@
             ;:overflow      "hidden"
             :margin-right "12px"
             :margin-top   "-4px"
-            :font-size    "34px"}] [re-com/gap :size "44px"]
+            :font-size    "34px"}] 
+          [re-com/gap :size "44px"]
           [re-com/v-box
            :gap "12px"
            :children ;(into (for [e (range rs-running)] [re-com/box :child "o"])
@@ -4798,11 +4839,13 @@
                        alert-id    (last a)
                     ;; _ (ut/tapp>> [:alert abody])
                        ]]
-             [re-com/box :size "none" :attr
-              (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
+             [re-com/box :size "none"
+              :attr (when (not push-codes?) 
+                      (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
+              ;:attr {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])}
               :width (when (> width 0) (px width))
               :height "auto" ;;(when (> height 0) (px height))
-              :style {:overflow      "hidden"}
+              :style {:overflow      (when in-panel? "hidden")}
               :child [buffy/render-honey-comb-fragments
                       abody
                       (get a 1) ;; width 

@@ -1981,7 +1981,7 @@
                                                                          :font-weight 400
                                                                          :opacity 0.8}]]])
 
-                                                  (if (not @hide-responses?)
+                                                  (if false ;; (not @hide-responses?)
                                                     (str (get @console-responses (last @console-history) "")) ""))]
                                         (cond
                                           is-fabric?
@@ -2765,7 +2765,8 @@
                                                                                                ^{:key (str "cm-" selected-block s-kp spy-hash   ;; important!
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [re-com/h-box
-                                                                                                :children [[bricks/reecatch
+                                                                                                :children [
+                                                                                                           [bricks/reecatch
                                                                                                             [flows/alert-box selected-block data-key]]
                                                                                                            [bricks/panel-code-box
                                                                                                             (fn [] selected-block) ;; sneaky sneaky, react.... :/
@@ -2788,7 +2789,8 @@
                                                                                                ^{:key (str "cm-string-" selected-block s-kp spy-hash   ;; important!
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [re-com/h-box
-                                                                                                :children [[bricks/reecatch
+                                                                                                :children [
+                                                                                                           [bricks/reecatch
                                                                                                             [flows/alert-box selected-block data-key]]
                                                                                                            [bricks/panel-string-box
                                                                                                             (fn [] selected-block)

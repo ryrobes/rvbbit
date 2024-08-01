@@ -1051,13 +1051,15 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler (* 3600 8) ;; 8 hours
-                   reboot-reactor-and-resub
-                   "Reboot Atom Reactor & nREPL server" (* 3600 8))
+  ;; (start-scheduler (* 3600 8) ;; 8 hours - caused CPU freakout... quqeue party / sql-meta related. todo
+  ;;                  reboot-reactor-and-resub
+  ;;                  "Reboot Atom Reactor & nREPL server" (* 3600 8))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
   ;;                  "Purge Idle Queues" 7200)
+
+;; (qp/cleanup-inactive-queues 0) 
 
   ;;(when debug? 
   (start-scheduler 1
@@ -1258,6 +1260,8 @@
                            (ut/ppa [:freezing-flow-results-atom])
                            (with-open [wtr (io/writer "./data/atoms/flow-db-results-atom.edn")]
                              (binding [*out* wtr] (prn @flow-db/results-atom)))
+                           (ut/zprint-file "./defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
+                           (ut/zprint-file "./defs/solvers.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
                            ;(ut/ppa [:clearing-cache-db])
                            ;(shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-logs/*"))
