@@ -1913,8 +1913,9 @@
 
 (def client-batches (atom {}))
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :tracker :alert :alert1 :alert2 :alert3}) ;; to not skip old dupes
 (def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
+
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :estimate [:estimate] :tracker :alert :alert1 :alert2 :alert3}) ;; to not skip old dupes
 
 (defn sub-push-loop ;; legacy, but flawed?
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -1929,88 +1930,31 @@
                                         (recur (conj res item))
                                         res))
                    items-by-task-id (group-by :task-id items)
-                   latest-items     (mapv (fn [group] (if
-                                                       (contains? valid-groups (first group))
-                                                        group (last group)))
-                                          (vals items-by-task-id))]
+                  ;;  latest-items     (mapv (fn [group] (if
+                  ;;                                      (contains? valid-groups (first group))
+                  ;;                                       group (last group)))
+                  ;;                         (vals items-by-task-id))
+                  latest-items     (mapv (fn [[task-id group]] ;; actually works now. lol
+                                           (if (contains? valid-groups task-id)
+                                             group
+                                             [(last group)]))
+                                         items-by-task-id)
+                   ]
                (if (not-empty latest-items)
                  (let [_ (swap! client-batches update client-name (fnil inc 0))
                       ;;; _ (when (> 1 (count latest-items)) (ut/pp [:sending (count latest-items) :items-to client-name]))
-                       message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
+                       message (if (= 1 (count latest-items)) (first latest-items) latest-items)
+                       ;message (if (= 1 (count latest-items))
+                       ;          [(first latest-items)]
+                       ;          latest-items)
+                       ]
                    (when (async/>! results message) (recur)))
                  (recur)))
              (recur)))
          (catch Throwable e (ut/pp [:subscription-err!! sub-name (str e) data]) (async/go-loop [] (recur))))
     results))
 
-;; (defn sub-push-loop
-;;   [client-name data cq sub-name]
-;;   (when (not (get @cq client-name)) (new-client client-name))
-;;   (inc-score! client-name :booted true)
-;;   (let [results (async/chan (async/sliding-buffer 100))]
-;;     (try (async/go-loop []
-;;            (async/<! (async/timeout (safe-get-timeout client-name)))
-;;            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
-;;              (let [items            (loop [res []]
-;;                                       (if-let [item (ut/dequeue! queue-atom)]
-;;                                         (recur (conj res item))
-;;                                         res))
-;;                    ;;_ (ut/pp  [:sub-loop client-name items])
-;;                    items-by-task-id (group-by :task-id items)
-;;                    latest-items     (mapcat (fn [[task-id group]]
-;;                                               (if (contains? valid-groups task-id)
-;;                                                 group  ; Keep all items for valid groups
-;;                                                 [(last group)]))  ; Only keep the last item for other groups
-;;                                             items-by-task-id)]
-;;                (if (not-empty latest-items)
-;;                  (let [_ (swap! client-batches update client-name (fnil inc 0))
-;;                        message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
-;;                    (when (async/>! results message) (recur)))
-;;                  (recur)))
-;;              (recur)))
-;;          (catch Throwable e (ut/pp [:subscription-err!! sub-name (str e) data]) (async/go-loop [] (recur))))
-;;     results))
 
-;; (defn sub-push-loop
-;;   [client-name data cq sub-name]
-;;   (when (not (get @cq client-name)) (new-client client-name))
-;;   (inc-score! client-name :booted true)
-;;   (let [results (async/chan (async/sliding-buffer 100))]
-;;     (try
-;;       (async/go-loop []
-;;         (async/<! (async/timeout (safe-get-timeout client-name)))
-;;         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
-;;           (let [items (loop [res []]
-;;                         (if-let [item (ut/dequeue! queue-atom)]
-;;                           (recur (conj res item))
-;;                           res))
-;;                 items-by-task-id (group-by :task-id items)]
-
-;;             ;; Process valid-groups items first, sending each individually
-;;             (doseq [[task-id group] items-by-task-id
-;;                     :when (contains? valid-groups task-id)
-;;                     item group]
-;;               (swap! client-batches update client-name (fnil inc 0))
-;;               (async/>! results item))
-
-;;             ;; Process non-valid-groups items, sending only the latest
-;;             (let [latest-non-valid-items (keep (fn [[task-id group]]
-;;                                                  (when-not (contains? valid-groups task-id)
-;;                                                    (last group)))
-;;                                                items-by-task-id)]
-;;               (when (seq latest-non-valid-items)
-;;                 (swap! client-batches update client-name (fnil inc 0))
-;;                 (let [message (if (= 1 (count latest-non-valid-items))
-;;                                 (first latest-non-valid-items)
-;;                                 latest-non-valid-items)]
-;;                   (async/>! results message))))
-
-;;             (recur))
-;;           (recur)))
-;;       (catch Throwable e
-;;         (ut/pp [:subscription-err!! sub-name (str e) data])
-;;         (async/go-loop [] (recur))))
-;;     results))
 
 
 (defmethod wl/handle-subscription :server-push2
@@ -2494,7 +2438,7 @@
       (ring-resp/not-found "File not found"))))
 
 (defn package-settings-for-client []
-  (let [settings (merge (config/settings)
+  (let [settings (merge (ut/deep-remove-keys (config/settings) [:when-fn :kit-fn])
                         {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
                          :kits    {} ;;config/kit-fns
                          :screens (vec (map :screen_name
@@ -2807,17 +2751,18 @@
                              sss-map       (into {} (for [[orig subbb] subbed-subs] {subbb orig}))
                              runners       (get (config/settings) :runners)
                             ;;  valid-kits    {}
-                             valid-kits    (try
-                                             (into {}
-                                                   (for [[k v] runners
-                                                         :when (get v :kits)]
-                                                     {k (into {}
-                                                              (for [[kit-name {:keys [when-fn]}] (get v :kits)]
-                                                                {kit-name
-                                                                 ((eval when-fn) (get @client-panels cid)
-                                                                                 (get @client-panels-data cid))}))}))
-                                             (catch Exception e (ut/pp [:kit-lookup-error e cid])))
-                             _ (ut/pp [:valid-kits cid valid-kits])
+                             valid-kits  
+                                               (into {} (for [[k v] runners
+                                                     :when (get v :kits)]
+                                                (into {}
+                                                          (for [[kit-name {:keys [when-fn]}] (get v :kits)]
+                                                            {[k kit-name]
+                                                             (try
+                                                               ((eval when-fn) (get @client-panels cid)
+                                                                               (get @client-panels-data cid))
+                                                               (catch Exception e (ut/pp [:when-fn-error k kit-name cid (str e)])))}))))
+
+                            ;;  _ (ut/pp [:valid-kits cid valid-kits])
                              replaced-subs (walk/postwalk-replace sss-map ssubs)]
                          {:subs replaced-subs :kits valid-kits})
                        sub-task)]
@@ -2825,7 +2770,9 @@
         (push-to-client ui-keypath data cid queue-id task-id sub-task)))
     :sent!))
 
-;; (ut/pp (ut/keypaths @client-panels-data))
+;; (ut/pp (distinct (mapv #(take 4 %) (ut/keypaths @client-panels-data))))
+;; (ut/pp (distinct (mapv #(take 4 %) (ut/keypaths @client-panels))))
+;; (ut/pp (get-in @client-panels-data [:efficient-fat-mallard-1 ]))
 
 (defn process-flow-map
   [fmap]
@@ -6095,6 +6042,8 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
            (try
              (doall ;;;; ? fixed the socket laziness? (no pun intended)
               (let [;last-known-fields (get honey-sql :last-known-fields [])
+                    times-key (into [:sql-query] ui-keypath)
+                    _ (ship-estimate client-name (first ui-keypath) times-key)
                     repl-host (get-in honey-sql (or (first (filter #(= (last %) :repl-host) (ut/kvpaths honey-sql))) [:nope]))
                     repl-port (get-in honey-sql (or (first (filter #(= (last %) :repl-port) (ut/kvpaths honey-sql))) [:nope]))
                     honey-sql (ut/deep-remove-keys honey-sql [:repl-host :repl-port])
@@ -6117,6 +6066,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                     data-literal-code? (false? (when (or literal-data? post-sniffed-literal-data?)
                                                  (let [dl (get-in honey-sql data-literals)]
                                                    (and (vector? dl) (map? (first dl))))))
+                    
                     data-literals-data (get-in honey-sql data-literals)
                     honey-sql (cond post-sniffed-literal-data?                      (walk/postwalk-replace @literal-data-map
                                                                                                            orig-honey-sql)
@@ -6512,7 +6462,8 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                       ;;        [:text honey-sql-str2]
                       ;;        [:edn (ut/truncate-nested (get honey-meta :fields))]
                       ;;        ])
-                      (swap! client-panels-data assoc-in [client-name :queries (first ui-keypath)] (get output :result)) ;; <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
+                      (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
+                      (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result)) ;; <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
              (catch Exception e
@@ -8932,3 +8883,6 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
 ;;              :input "tell a very short story about vampire rabbits ransacking a sleepy new england town"
 ;;              :client-name :beneficial-fat-badger-0
 ;;              :pattern "tweet"})
+
+
+

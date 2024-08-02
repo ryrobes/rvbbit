@@ -558,7 +558,7 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "-fat-")  (ut/tapp>> [:msg-in (get result :task-id) (get result :status) (str (get result :ui-keypath)) (str result)]))
+          (when (cstr/includes? (str client-name) "polished")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (str (get result :status)) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -651,7 +651,7 @@
                            (assoc-in [:status-data task-id ui-keypath]
                                      {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
                            (assoc :flow-subs (get-in result [:status :subs]))
-                           (assoc :valid-kits (into {} (get-in result [:status :kits]))))
+                           (assoc :valid-kits (get-in result [:status :kits])))
 
 
 

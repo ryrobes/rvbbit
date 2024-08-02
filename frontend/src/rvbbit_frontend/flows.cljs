@@ -4690,7 +4690,7 @@
    ]
      (or both []))))
 
-(ut/tapp>> [:running-solvers @(ut/tracked-sub ::running-solvers {}) ])
+;; (ut/tapp>> [:running-solvers @(ut/tracked-sub ::running-solvers {}) ])
 
 (re-frame/reg-sub 
  ::estimates 
@@ -4699,11 +4699,12 @@
 
 (defn alert-box [& [panel-key data-key]]
   [bricks/reecatch
-   (let [;;_ (ut/tapp>> [:sel @(ut/tracked-sub ::bricks/valid-block-kps-in-tab {}) @db/solver-fn-lookup])
+   (let [;;_ (ut/tapp>> [:queries-running @(ut/tracked-sub ::bricks/queries-running {}) ])
          rekt            [@db/kick-alert @db/pause-alerts]
          kps-in-tab      @(ut/tracked-sub ::bricks/valid-block-kps-in-tab {})
          rs-running      @(ut/tracked-sub ::bricks/runstreams-running {})
          rs-running-list @(ut/tracked-sub ::bricks/runstreams-running-list {})
+         queries-running @(ut/tracked-sub ::bricks/queries-running {})
          selected-view   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
          selected-block  @(ut/tracked-sub ::bricks/selected-block {})
          editor?         @(ut/tracked-sub ::bricks/editor? {})
@@ -4746,7 +4747,9 @@
          max-w           (if (or (nil? max-w) (< max-w 50))
                            300 ;420
                            max-w)
-         alerts          (if (or (> rs-running 0)  (> (count running-solver-views) 0))
+         alerts          (if (or (> rs-running 0)  
+                                 (> (count running-solver-views) 0)
+                                 (> (count queries-running) 0))
                            (conj alerts
                                  [[:v-box 
                                    :width (px max-w)
@@ -4760,14 +4763,15 @@
                                                  (when (and (> rs-running 0) (> running-solver-views 0)) ",")
                                                  (when (> running-solver-views 0) (str running-solver-views " solver" (when (> running-solver-views 1) "s") " running")))]]
                                           (vec
-                                           (for [e    (into rs-running-list running-solver-views)
+                                           (for [e    (into queries-running (into rs-running-list running-solver-views))
                                                  :let [solver? (cstr/starts-with? (str e) ":solver/")
-                                                       fid    (-> e (ut/replacer ":" "") (ut/replacer "solver/" ""))
-                                                       run-id (get-in estimates [fid :run-id]  ;; flows are strings solvers and keywords. TODO, mess.
-                                                                      (get-in estimates [(keyword fid) :run-id] "*"))
-                                                       est    (+ (js/Math.round (get-in estimates [fid :times] ;; flows are strings solvers and keywords. TODO, mess.
-                                                                                        (get-in estimates [(keyword fid) :times] 0))) 1)
-                                                       ;;_ (ut/tapp>> [:est est run-id fid e (get-in estimates [fid :times] 0) (ut/flip-map @db/solver-fn-lookup)])
+                                                       query?  (and (not solver?) (keyword? e))
+                                                       fid    (if query? e (-> e (ut/replacer ":" "") (ut/replacer "solver/" "")))
+                                                       {:keys [times run-id]} (get-in estimates [fid]  ;; flows are strings, solvers/queries are keywords. TODO, mess.
+                                                                                      (get-in estimates [(keyword fid)]
+                                                                                              (get-in estimates [(cstr/replace (str fid) ":" "")] "*")))
+                                                       est    (+ (js/Math.round (or times 0)) 1)
+                                                       ;;_ (ut/tapp>> [:est rs-running-list solver? query? est run-id fid e (get-in estimates [fid :times] 0) (ut/flip-map @db/solver-fn-lookup)])
                                                        est?   (> est 1)]]
                                              [:v-box :padding "3px"
                                               :width (px max-w) ;;"215px"
@@ -4788,7 +4792,10 @@
                                                          (when est? ;true ;est?
                                                            [:box
                                                             :child [:progress-bar [(- max-w 15)
-                                                                                   est (str e run-id (when solver? (ut/generate-uuid)))]]
+                                                                                   est (str e run-id 
+                                                                                            ;(when solver? (ut/generate-uuid))
+                                                                                            (ut/generate-uuid)
+                                                                                            )]]
                                                             :height "25px"
                                                             :padding "3px"])
                                                          (when est? ;true ;est?

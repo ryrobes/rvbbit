@@ -4317,10 +4317,24 @@
             :font-size    "15px"}] :width "20px" :height "20px" :style
           {:position "fixed" :z-index 98 :bottom 0 :right 49 :background-color "#00000022" :color "white"}]
          [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-refresh" :tooltip "refresh all" :on-click
-           #(do (ut/tracked-dispatch [::bricks/refresh-all])) :style
-           {:color "#ffffff" :cursor "pointer" :margin-top "-2px" :padding-left "2px" :font-size "15px"}] :width "20px" :height
-          "20px" :style {:position "fixed" :z-index 98 :bottom 0 :right 26 :background-color "#00000022" :color "white"}]
+          [re-com/md-icon-button
+           :src (at)
+           :md-icon-name "zmdi-refresh"
+           :tooltip "refresh all"
+           :on-click #(do (ut/tracked-dispatch [::bricks/refresh-all]))
+           :style {:color "#ffffff" 
+                   :cursor "pointer" 
+                   :margin-top "-2px" 
+                   :padding-left "2px" 
+                   :font-size "15px"}] 
+          :width "20px" 
+          :height "20px" 
+          :style {:position "fixed" 
+                  :z-index 98 
+                  :bottom 0 
+                  :right 26 
+                  :background-color "#00000022" 
+                  :color "white"}]
          [re-com/box :child
           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-save" :tooltip "save board (Ctrl-S)" :on-click
            #(do (ut/tracked-dispatch [::http/save :skinny screen-name])) :style
