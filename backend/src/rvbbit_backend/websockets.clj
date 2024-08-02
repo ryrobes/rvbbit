@@ -65,6 +65,7 @@
    [java.io                                BufferedReader InputStreamReader]))
 
 (defonce flow-status (atom {}))
+(defonce kit-status (atom {}))
 (defonce cpu-usage (atom []))
 (defonce solver-usage (atom []))
 (defonce push-usage (atom []))
@@ -178,6 +179,7 @@
 (defonce last-signals-history-child-atoms (atom {}))
 (defonce last-solvers-data-child-atoms (atom {}))
 (defonce flow-status-child-atoms (atom {}))
+(defonce kit-status-child-atoms (atom {}))
 (defonce tracker-child-atoms (atom {}))
 (defonce server-child-atoms (atom {}))
 (defonce flow-tracker-child-atoms (atom {}))
@@ -223,6 +225,7 @@
    [:master-solver-watcher  last-solvers-atom  solver-child-atoms :solver]
    [:master-solver-meta-watcher  last-solvers-atom-meta  solver-meta-child-atoms :solver-meta]
    [:master-flow-status-watcher  flow-status  flow-status-child-atoms :flow-status]
+   [:master-kit-status-watcher  kit-status  kit-status-child-atoms :kit-status]
    [:master-data-watcher  last-solvers-data-atom  last-solvers-data-child-atoms :data]
    [:master-signal-history-watcher  last-signals-history-atom  last-signals-history-child-atoms :signal-history]
    [:master-server-watcher server-atom server-child-atoms :server]
@@ -574,6 +577,7 @@
          :solver (atom {})
          :solver-meta (atom {})
          :flow-status (atom {})
+         :kit-status  (atom {})
          :data (atom {})
          :signal-history (atom {})
          :server (atom {})
@@ -598,9 +602,9 @@
 
 ;;(ut/pp (for [[k v] @sharded-atoms] {k (keys @v)}))
 
-(ut/pp (for [s @(get @sharded-atoms :flow-status)] s))
+;;(ut/pp (for [s @(get @sharded-atoms :flow-status)] s))
 
-(ut/pp (for [s @(get @sharded-atoms :flow)] s))
+;;(ut/pp (for [s @(get @sharded-atoms :flow)] s))
 
 
 ;; (defn get-atom-splitter-deep
@@ -1794,10 +1798,10 @@
          client-name
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
-  (ppy/execute-in-thread-pools :boomerang-heartbeat
-                               (fn []
-                                 (doseq [fk (vec (keys (get @atoms-and-watchers client-name {})))]
-                                   (sub-to-value client-name fk)))) ;; resub just in case?
+  ;; (ppy/execute-in-thread-pools :boomerang-heartbeat
+  ;;                              (fn []
+  ;;                                (doseq [fk (vec (keys (get @atoms-and-watchers client-name {})))]
+  ;;                                  (sub-to-value client-name fk)))) ;; resub just in case?
   (let [cstats  (client-statuses)
         latency (get-in cstats [client-name :client-latency])
         server-subs (get-in cstats [client-name :server-subs])
@@ -1915,7 +1919,7 @@
 
 (def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :estimate [:estimate] :tracker :alert :alert1 :alert2 :alert3}) ;; to not skip old dupes
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status :estimate [:estimate] :tracker :alert :alert1 :alert2 :alert3}) ;; to not skip old dupes
 
 (defn sub-push-loop ;; legacy, but flawed?
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -2740,7 +2744,7 @@
         data         (merge {:sent! task-id :to client-name :at (str (ut/get-current-timestamp)) :payload payload}
                             (when payload? {:payload-kp [sub-task task-id]}))
         queue-id     -1
-        destinations (cond (= client-name :all)   (vec (keys @client-queues))
+        destinations (cond (= client-name :all)   (vec (remove #(= % :rvbbit) (keys @client-queues)))
                            (keyword? client-name) [client-name]
                            :else                  client-name)]
     (doseq [cid destinations]
@@ -2750,17 +2754,15 @@
                              subbed-subs   (vec (distinct (get @param-var-key-mapping cid [])))
                              sss-map       (into {} (for [[orig subbb] subbed-subs] {subbb orig}))
                              runners       (get (config/settings) :runners)
-                            ;;  valid-kits    {}
-                             valid-kits  
-                                               (into {} (for [[k v] runners
-                                                     :when (get v :kits)]
-                                                (into {}
-                                                          (for [[kit-name {:keys [when-fn]}] (get v :kits)]
-                                                            {[k kit-name]
-                                                             (try
-                                                               ((eval when-fn) (get @client-panels cid)
-                                                                               (get @client-panels-data cid))
-                                                               (catch Exception e (ut/pp [:when-fn-error k kit-name cid (str e)])))}))))
+                             valid-kits   (into {} (for [[k v] runners
+                                                         :when (get v :kits)]
+                                                     (into {}
+                                                           (for [[kit-name {:keys [when-fn]}] (get v :kits)]
+                                                             {[k kit-name]
+                                                              (try
+                                                                ((eval when-fn) (get @client-panels cid)
+                                                                                (get @client-panels-data cid))
+                                                                (catch Exception e (ut/pp [:when-fn-error k kit-name cid (str e)])))}))))
 
                             ;;  _ (ut/pp [:valid-kits cid valid-kits])
                              replaced-subs (walk/postwalk-replace sss-map ssubs)]
@@ -3338,6 +3340,27 @@
      ;                      ))
     ))
 
+(defmethod wl/handle-push :run-kit
+  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]
+  (let [kit-runner-key (keyword kit-runner-key)]
+    (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
+    (swap! kit-status assoc-in [kit-runner-key :running?] true)
+    (Thread/sleep 45000)
+    (swap! kit-status assoc-in [kit-runner-key :running?] false)
+    (alert! client-name
+            [:v-box :children
+             [[:box :child (str "kit run " kit-keypath " " kit-runner-key)]
+              [:box :child (str "tset")]
+              ;; [:box :style {:font-size "11px"}
+              ;;  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]
+              ]]
+            10
+            2.1
+            33)
+    (ut/pp [:finished-kit-from client-name ui-keypath])))
+
+;; (ut/pp @flow-status)
+
 (declare run-solver)
 
 ;;; run-solver  [solver-name client-name & [override-map override-input temp-solver-name keypath]]
@@ -3756,6 +3779,7 @@
                                                                   (System/currentTimeMillis))
                                                         (assoc-in [client-name flow-key :last-push]
                                                                   (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
+                                           (when (cstr/includes? (str client-name) "-fat-")  (ut/pp [:running-push! flow-key client-name new-value]))
                                           ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
                                           ;;                               (fn []
                                           ;;                                 (when (or (not= flow-key :time/now)
@@ -3924,6 +3948,7 @@
         repl-ns?        (= base-type :repl-ns)
         solver-status?  (= base-type :solver-status)
         flow-status?    (= base-type :flow-status)
+        kit-status?     (= base-type :kit-status)
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)
         ;base-type       (if status? :flow-status base-type)
@@ -3939,6 +3964,7 @@
                           repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           flow-status?    keypath ;;(vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          kit-status?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           time?           (vec (rest keypath))
                           server?         (vec (rest keypath))
@@ -4019,6 +4045,7 @@
           signal? (= base-type :signal)
           solver? (= base-type :solver)
           flow-status? (= base-type :flow-status)
+          kit-status? (= base-type :kit-status)
           data? (= base-type :data)
           solver-meta? (= base-type :solver-meta)
           repl-ns?        (= base-type :repl-ns)
@@ -4037,6 +4064,7 @@
                     repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     flow-status?    keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    kit-status?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     time?           (vec (rest keypath))
                     screen?         (vec (rest sub-path))
@@ -4208,8 +4236,11 @@
                                                             (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                             lv)
       (= base-type :flow-status)                  (get-in @flow-status
-                                                            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                                                            lv)
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :kit-status)                  (get-in @kit-status
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :signal-history)               (get-in @last-signals-history-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -5328,6 +5359,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
         (= base-type :repl-ns)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :solver-status)                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :flow-status)                  keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+        (= base-type :kit-status)                   (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :signal-history)               (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
         (= base-type :server)                       client-param-path
         (= base-type :screen)                       (vec (rest sub-path))
@@ -5356,6 +5388,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
         flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
         client-param-path       (if (or (= base-type :flow-status)
+                                        ;;(= base-type :kit-status)
                                         (= base-type :flow)) flow-client-param-path other-client-param-path)
         client-keypath          (client-kp flow-key keypath base-type sub-path client-param-path)
         ssp                     (break-up-flow-key-ext flow-key-orig)
@@ -5421,6 +5454,10 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                                              (vec (rest (rest sub-path)))))
                                                                   lv)
               (= base-type :flow-status)                  (get-in @flow-status keypath lv)
+              (= base-type :kit-status)                   (get-in @kit-status
+                                                                  (vec (into [(keyword (second sub-path))]
+                                                                             (vec (rest (rest sub-path)))))
+                                                                  lv)
               :else                                       (get-in @flow-db/results-atom keypath lv))
             nil
             nil

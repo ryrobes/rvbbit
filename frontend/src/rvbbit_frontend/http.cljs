@@ -429,7 +429,7 @@
  (fn [db [_]] 
    (ut/dissoc-in db [:query-history :kit-results-sys])))
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :repl-ns :flow-status :signal-history :panel :client})
 
 (re-frame/reg-event-db
   ::simple-response
@@ -459,6 +459,7 @@
                                               (contains? valid-task-ids (get-in % [:task-id 0]))
                                               (not heartbeat?))) result)
             result-subs (get grouped-results true)
+            result-subs (filterv #(not (nil? (get % :status))) result-subs) ;; no point in nil updates.
             result (get grouped-results false)
             ;; _ (doseq [rr result-subs] ;; is it rowset? if so lets put it in :data also
             ;;     (let [data (get rr :status)
@@ -483,7 +484,9 @@
             ;;         all-single-values-set
             ;;         (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :set-val %) data)
             ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
-            _ (doseq [rr result-subs] ;; populate the :data key with the rowset data if it exists
+            _ (doseq [rr result-subs
+                      ;:when (not (nil? (get rr  :status)))
+                      ] ;; populate the :data key with the rowset data if it exists
                 (let [data (get rr :status)
                       ;; all-maps (and (vector? data) (every? map? data))
                       ;; all-keys-match (and all-maps
@@ -518,9 +521,13 @@
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
                             {} result-subs)]
         
-        ;; (ut/tapp>> [:batch-of-messages (count result) :grouped-update (count result-subs)
-        ;;             (vec (for [r result] (str (get r :task-id))))
-        ;;             (vec (for [r result-subs] (str (get r :task-id))))])
+        (doseq [r result-subs]
+          (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)]))
+        
+        ;; (ut/tapp>> [;:batch-of-messages (count result) 
+        ;;             :grouped-update (count result-subs)
+        ;;             (str (vec (for [r result] (str (get r :task-id)))))
+        ;;             (str (vec (for [r result-subs] (str (get r :task-id)))))])
         
         (re-frame/dispatch [::update-sub-counts result-subs])
         (swap! batches-received inc)
@@ -558,7 +565,7 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "polished")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (str (get result :status)) (str (get result :ui-keypath)) (str result)]))
+          (when (cstr/includes? (str client-name) "-fat-")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (get result :status) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -822,6 +829,7 @@
                             (ut/dissoc-in [:click-param :solver-status])
                             (ut/dissoc-in [:click-param :solver])
                             (ut/dissoc-in [:click-param :flow-status])
+                            (ut/dissoc-in [:click-param :kit-status])
                             (ut/dissoc-in [:click-param :signal])
                             (dissoc :data)
                             (dissoc :flows) ;;; mostly ephemeral with the UI....

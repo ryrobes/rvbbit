@@ -1834,26 +1834,25 @@
  :editor? false,
  :buffy? false,
  :valid-kits
- {:outliers
-  {:get-outliers
-   [[:block-414 :queries :gen-viz-797]
-    [:block-1123 :queries :location-drag-25]
-    [:block-3393 :queries :shows-drag-29]
-    [:block-135 :queries :stats-types-34]
-    [:block-11609 :queries :city-drag-26]
-    [:block-7416 :queries :rowcnt-drag-2]
-    [:block-10810 :queries :time-freq-345d]
-    [:block-204 :queries :gen-viz-828]
-    [:block-204 :queries :gen-viz-94]
-    [:block-8805 :queries :duration-hours-drag-43]
-    [:block-94 :queries :gen-viz-84]
-    [:block-7319 :queries :shape-drag-7]
-    [:block-3777 :queries :state-drag-3]
-    [:block-6582 :queries :kits-drag-26]
-    [:block-1449 :queries :ufo-sightings-drag-9]
-    [:block-4346 :queries :offenses-drag-24]],
-   :get-outliers-maps []}},
- :memory [1008890527 926220187 4294705152],
+ {[:outliers :get-outliers]
+  [[:block-414 :queries :gen-viz-797]
+   [:block-1123 :queries :location-drag-25]
+   [:block-3393 :queries :shows-drag-29]
+   [:block-135 :queries :stats-types-34]
+   [:block-11609 :queries :city-drag-26]
+   [:block-7416 :queries :rowcnt-drag-2]
+   [:block-10810 :queries :time-freq-345d]
+   [:block-204 :queries :gen-viz-828]
+   [:block-204 :queries :gen-viz-94]
+   [:block-8805 :queries :duration-hours-drag-43]
+   [:block-94 :queries :gen-viz-84]
+   [:block-7319 :queries :shape-drag-7]
+   [:block-3777 :queries :state-drag-3]
+   [:block-6582 :queries :kits-drag-26]
+   [:block-1449 :queries :ufo-sightings-drag-9]
+   [:block-4346 :queries :offenses-drag-24]],
+  [:outliers :get-outliers-maps] [[:block-6979 :clojure :new-clojure-8]]},
+ :memory [1553303075 1516537295 4294705152],
  :client-name :efficient-fat-mallard-1,
  :runstreams-lookups
  {"flow-forever"
@@ -2071,6 +2070,7 @@
     :solver-status/efficient-fat-mallard-1>raw-custom-override2027600861>running?
     :solver-status/efficient-fat-mallard-1>raw-custom-override-834238199>running?
     :solver/raw-custom-override2027600861
+    :time/minute
     :solver-status/efficient-fat-mallard-1>raw-custom-override1741745686>running?
     :solver/raw-custom-override1102182644
     :solver/raw-custom-override257937760
@@ -2099,7 +2099,8 @@
     :solver/get-my-colors872602644]},
   :alert1 {:alerts :alert2},
   :alert2 {:alerts :alert2},
-  :alert3 {:alerts :alert2}},
+  :alert3 {:alerts :alert2},
+  nil {nil nil}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "black crow",
@@ -2114,18 +2115,18 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   156572
+   183620
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries
  {:ufo_sightings 484893751, :offenses -505802446, :kits 1883252379},
- :panels-hash 750953485,
+ :panels-hash 1403454417,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -292118956,
+ :user-params-hash 779480391,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash -1097189860,
+ :session-hash -224112163,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -2881,13 +2882,13 @@
       (defn fibonacci [n]
         (loop [a 0 b 1 result []]
           (if (= (count result) n) result (recur b (+ a b) (conj result a)))))
-      {:fibonacci-sequence (fibonacci 33)})},
+      {:fibonacci-sequence (fibonacci 45)})},
    :name "block-6979",
-   :w 6,
+   :w 10,
    :selected-mode {:new-clojure-8 :edn},
    :selected-view :new-clojure-8,
-   :root [13 9],
-   :h 10,
+   :root [35 18],
+   :h 6,
    :queries {},
    :tab "black crow",
    :views
@@ -3214,7 +3215,7 @@
         :reset "[0m"})
       (def stalactite-chars ["█" "▇" "▆" "▅" "▄" "▃" "▂" "▁"])
       (def drip-chars ["." "•" "°"])
-      (def tt :time/second)
+      (def tt :time/minute)
       (defn normalize-values [values]
         (let [max-val (apply max values) min-val (apply min values)]
           (if (= max-val min-val)
@@ -3313,6 +3314,7 @@
    :display {:new-clojure-9 :output},
    :queries {},
    :tab "black crow",
+   :minimized? false,
    :views
    {:hare-vw-3
     [:box
@@ -3953,7 +3955,7 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :time
-  {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 59, :second 32},
+  {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 39, :second 55},
   :viz-tables-sys2 {:table_name :offenses-drag-26},
   :time-freq-345d.* {:freq [1 30 60]},
   :stats-types-34.* {:type ["sql-exec" "cpu" "mem" "load" "flows+"]},
@@ -3961,15 +3963,109 @@
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   (let [clojure-version (clojure-version)
-         jvm-version (System/getProperty "java.version")]
-     (str
-       "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
-       clojure-version
-       " on "
-       jvm-version
-       " JVM tech"
-       " 🥕🐇")),
+   (do
+     (ns rvbbit-backend.websockets
+       (:require [clojure.string :as cstr]))
+     (def ansi-colors
+      {:green "[32m",
+       :yellow "[33m",
+       :red "[31m",
+       :blue "[34m",
+       :magenta "[35m",
+       :cyan "[36m",
+       :reset "[0m"})
+     (def stalactite-chars ["█" "▇" "▆" "▅" "▄" "▃" "▂" "▁"])
+     (def drip-chars ["." "•" "°"])
+     (def tt :time/second)
+     (defn normalize-values [values]
+       (let [max-val (apply max values) min-val (apply min values)]
+         (if (= max-val min-val)
+           (repeat (count values) 0.5)
+           (map (fn [x] (/ (- x min-val) (- max-val min-val))) values))))
+     (defn generate-stalactite [height value color]
+       (let [stalactite-height (int (* height value))
+             stalactite (take stalactite-height (cycle stalactite-chars))
+             empty-space (repeat (- height stalactite-height) " ")]
+         (str
+           (color ansi-colors)
+           (cstr/join (concat stalactite empty-space))
+           (:reset ansi-colors))))
+     (defn generate-drips [height value prev-value]
+       (when (> prev-value value)
+         (let [drip-height (int (* height (- prev-value value)))
+               drips (take drip-height (cycle drip-chars))
+               empty-space (repeat (- height drip-height) " ")]
+           (cstr/join (concat empty-space drips)))))
+     (defn create-visualization [width height cpu-usage mem-usage thread-usage]
+       (let [cpu-width (int (* width 0.33))
+             mem-width (int (* width 0.33))
+             thread-width (- width cpu-width mem-width)
+             history-length (min 10 (count cpu-usage))
+             recent-cpu (take history-length (reverse cpu-usage))
+             recent-mem (take history-length (reverse mem-usage))
+             recent-thread (take history-length (reverse thread-usage))
+             normalized-cpu (normalize-values recent-cpu)
+             normalized-mem (normalize-values recent-mem)
+             normalized-thread (normalize-values recent-thread)
+             cpu-cols (map-indexed
+                        (fn [idx val]
+                          (str
+                            (generate-stalactite height val :red)
+                            (when (> idx 0)
+                              (generate-drips
+                                height
+                                val
+                                (nth normalized-cpu (dec idx))))))
+                        normalized-cpu)
+             mem-cols (map-indexed
+                        (fn [idx val]
+                          (str
+                            (generate-stalactite height val :blue)
+                            (when (> idx 0)
+                              (generate-drips
+                                height
+                                val
+                                (nth normalized-mem (dec idx))))))
+                        normalized-mem)
+             thread-cols (map-indexed
+                           (fn [idx val]
+                             (str
+                               (generate-stalactite height val :green)
+                               (when (> idx 0)
+                                 (generate-drips
+                                   height
+                                   val
+                                   (nth normalized-thread (dec idx))))))
+                           normalized-thread)
+             cpu-section (take cpu-width (cycle cpu-cols))
+             mem-section (take mem-width (cycle mem-cols))
+             thread-section (take thread-width (cycle thread-cols))
+             all-cols (concat cpu-section mem-section thread-section)
+             rows (apply map str all-cols)]
+         (cstr/join "\n" rows)))
+     (defn generate-visualization [width height cpu-usage mem-usage thread-usage]
+       (let [visualization (create-visualization
+                             width
+                             height
+                             cpu-usage
+                             mem-usage
+                             thread-usage)
+             summary ""
+             padding (apply str (repeat (- width (count summary)) " "))]
+         (str
+           visualization
+           "\n"
+           (:green ansi-colors)
+           summary
+           padding
+           (:reset ansi-colors))))
+     (println
+       (generate-visualization
+         :col-width
+         28
+         (take-last 100 @cpu-usage)
+         (take-last 100 @mem-usage)
+         (take-last 100 @thread-usage)))),
    :selected-view [:clojure :new-clojure-9],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],

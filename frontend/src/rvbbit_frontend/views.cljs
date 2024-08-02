@@ -3776,7 +3776,7 @@
                                pp                (get db :click-param)
                                pp-without-fs     (ut/remove-keys pp
                                                                  (into (map first fs)
-                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :flow-status :data :repl-ns
+                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :flow-status :data :repl-ns :kit-status 
                                                                         :signal-history :solver-meta nil]))
                                click-param-autos (vec (filter #(not (cstr/includes? (str %) "function"))
                                                               (distinct (flatten
@@ -3808,7 +3808,7 @@
                           pp            (get db :click-param)
                           pp-without-fs (ut/remove-keys pp
                                                         (into (map first fs)
-                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :flow-status :solver-meta :repl-ns nil]))]
+                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :flow-status :kit-status :solver-meta :repl-ns nil]))]
                       (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub ::user-params-hash (fn [db] (get db :user-params-hash)))

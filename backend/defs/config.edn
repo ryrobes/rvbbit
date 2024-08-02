@@ -182,14 +182,14 @@
                                             :clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))}
 
                              :get-outliers-maps {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
-                                                            (apply concat (for [[k v] client-data]
+                                                            (vec (apply concat (for [[k v] client-data]
                                                                             (apply concat (for [[kk vv] v]
                                                                                             (for [[k3 v3] vv
-                                                                                                  :when (map v3)]
-                                                                                              [k kk k3]))))))
+                                                                                                  :when (map? v3)]
+                                                                                              [k kk k3])))))))
                                                  :kit-fn (fn [client-panels client-data panel-key view-key]
                                                            (fn [] (println (clojure-version) "Outliers Kit Runner called." (keys client-panels)))) ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
-                                                 :icon "zmdi-dishwasher"
+                                                 :icon "zmdi-map"
                                                  :clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))}
                              }
                       :placeholder-on-running? true

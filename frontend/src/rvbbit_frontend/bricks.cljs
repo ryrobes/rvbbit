@@ -1030,6 +1030,7 @@
 (defn only-relevant-tabs [panels-map selected-tab]
   (recursive-panel-filter panels-map selected-tab))
 
+(defonce temp-extra-subs (atom [])) ;; flushed on refresh, still better than subbing for lots of stuff that wont likely ever need it.
 
 (re-frame/reg-sub
  ::get-flow-subs
@@ -1088,6 +1089,7 @@
                                                                    (cstr/starts-with? (str %) ":repl-ns/")
                                                                    (cstr/starts-with? (str %) ":solver-status/")
                                                                    (cstr/starts-with? (str %) ":flow-status/")
+                                                                   (cstr/starts-with? (str %) ":kit-status/")
                                                                    (cstr/starts-with? (str %) ":data/")
                                                                    (cstr/starts-with? (str %) ":signal-history/")
                                                                    (cstr/starts-with? (str %) ":panel/")
@@ -1181,7 +1183,7 @@
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))
          subs-vec (vec (distinct
-                        (concat flow-runners clover-solver-outputs chunk-charts  
+                        (concat flow-runners clover-solver-outputs chunk-charts @temp-extra-subs
                                      ;;client-namespaces-refs 
                                      ;;client-namespace-intros 
                                 client-ns-intro-map
@@ -3654,7 +3656,7 @@
              ]
 
        ;;(swap! last-view-highlighted-hash assoc kvec view-code-hash)
-         (tapp>> [:ran-update-panel-highlight-code-on (str kvec)])
+        ;;  (tapp>> [:ran-update-panel-highlight-code-on (str kvec)])
 
          (if (not value-spy?)
            (highlight-codes-only codes selected-block data-key editor?
@@ -8362,10 +8364,10 @@
            (assoc :sql-str (select-keys (get db :sql-str) keepers))
            (assoc :sql-source (select-keys (get db :sql-source) keepers))
            (assoc :query-history (select-keys (get db :query-history) (filter #(not (cstr/ends-with? (str %) "-sys*")) keepers)))
-           (assoc :click-param (into {}
-                                     (for [[k v] (get db :click-param)
-                                           :when (and (not (cstr/starts-with? (str k) ":kit-")) (not (nil? k)) (not (nil? v)))]
-                                       {k v})))
+          ;;  (assoc :click-param (into {}
+          ;;                            (for [[k v] (get db :click-param)
+          ;;                                  :when (and (not (cstr/starts-with? (str k) ":kit-")) (not (nil? k)) (not (nil? v)))]
+          ;;                              {k v})))
            (ut/dissoc-in [:panels "none!"])
            (ut/dissoc-in [:panels :queries])
            (ut/dissoc-in [:panels :views])
@@ -8375,10 +8377,11 @@
            (ut/dissoc-in [:panels "none!"])
            (ut/dissoc-in [:panels :queries])
            (ut/dissoc-in [:panels :views])
-           (assoc :click-param (into {}
-                                     (for [[k v] (get db :click-param)
-                                           :when (and (not (cstr/starts-with? (str k) ":kit-")) (not (nil? k)) (not (nil? v)))]
-                                       {k v}))))))))  ;; garbage keys created by external edit with bad files
+          ;;  (assoc :click-param (into {}
+          ;;                            (for [[k v] (get db :click-param)
+          ;;                                  :when (and (not (cstr/starts-with? (str k) ":kit-")) (not (nil? k)) (not (nil? v)))]
+          ;;                              {k v})))
+           )))))  ;; garbage keys created by external edit with bad files
 
 
 (re-frame/reg-sub
@@ -12274,12 +12277,35 @@
 (defn render-icon
   [icon num]
   (if (and (ut/ne? icon) (not (nil? icon)))
-    (if (cstr/includes? icon "zmdi")
-      [re-com/md-icon-button :src (at) :md-icon-name icon :style
-       {;:color bcolor :cursor "grab"
-        :font-size "15px"} :attr {}]
-      [re-com/box :size "none" :height (px (* num db/brick-size)) :child [:img {:src icon :width "100%"}]])
+    (if (or (cstr/starts-with? icon "zmdi-") (cstr/starts-with? icon "fa-"))
+      [re-com/md-icon-button 
+       :src (at) 
+       :md-icon-name icon
+       :style {;:color bcolor :cursor "grab"
+               :font-size "15px"} :attr {}]
+      [re-com/box 
+       :size "none" 
+       :height (px (* num db/brick-size)) 
+       :child [:img {:src icon :width "100%"}]])
     " "))
+
+(defn render-kit-icon [icon & [class]]
+  (if (and (ut/ne? icon) (not (nil? icon)))
+    (if (or (cstr/starts-with? icon "zmdi-") 
+            (cstr/starts-with? icon "fa-"))
+      [re-com/md-icon-button
+       :src (at)
+       :class class
+       :md-icon-name icon
+       :style {;:color bcolor :cursor "grab"
+               :transform-origin "7.5px 10px"
+               :font-size "15px"}]
+      [re-com/box
+       :size "none"
+       :child [:img {:src icon 
+                     :transform-origin "7.5px 10px"
+                     :width "20px"}]])
+    (render-kit-icon "zmdi-pizza")))
 
 (re-frame/reg-sub
  ::iconized
@@ -12422,6 +12448,8 @@
      :changed (into {} (map (fn [k] [k {:from (map1 k) :to (map2 k)}]) changed))}))
 
 (defn maybedoall [] (let [hover-highlight? (or @param-hover @query-hover)] (if hover-highlight? doall seq)))
+
+
 
 (defn grid
   [& [tab]]
@@ -12570,6 +12598,7 @@
                selected-view                                (cond viz-reco? reco-selected
                                                                   (and (nil? selected-view) no-view? (seq sql-keys)) (first sql-keys)
                                                                   :else selected-view)
+               selected-view-type                           @(ut/tracked-sub ::view-type {:panel-key brick-vec-key :view selected-view})
                ;is-grid?                                     @(ut/tracked-subscribe [::is-grid? brick-vec-key selected-view])
                is-grid?                                     @(ut/tracked-sub ::is-grid-alpha? {:panel-key brick-vec-key :view selected-view})
                is-pinned?                                   @(ut/tracked-subscribe [::is-pinned? brick-vec-key])
@@ -12804,9 +12833,9 @@
                                    [honeycomb brick-vec-key])]))]
                   (if (or (and (not ghosted?) (not no-ui?)) selected?)
                     (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view}])
-                          _ (tapp>> [:valid-kits! valid-kits brick-vec-key selected-view @(ut/tracked-sub ::valid-kits {}) 
-                                     @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view}])
-                                     ])
+                          ;; _ (tapp>> [:valid-kits! valid-kits brick-vec-key selected-view @(ut/tracked-sub ::valid-kits {}) 
+                          ;;            @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view}])
+                          ;;            ])
                           ] 
                       ^{:key (str "brick-" brick-vec "-footer")}
                       [re-com/box :size "none" :width (px (- block-width 4)) :height "15px" :style
@@ -12820,7 +12849,7 @@
                             ^{:key (str "brick-" brick-vec "-footer-sql-keys-wrap")}
                             [re-com/h-box
                              :size "auto"
-                             :style {:border "1px solid pink"}
+                             ;:style {:border "1px solid pink"}
                              :justify :between 
                              :children [^{:key (str "brick-" brick-vec "-footer-sql-keys")}
                                         [re-com/h-box 
@@ -12938,31 +12967,59 @@
                                                                         @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                                          {:keypath [:viz-tables-sys2/table_name]})))
                                                             (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name]
-                                                                                  s]))) :style
-                                                     {:font-size        "14px"
-                                                      :cursor           "pointer"
-                                                      :color            (if (not (or block-selected?
-                                                                                     viz-reco?
-                                                                                     hover-q?
-                                                                                     parent-of-selected?
-                                                                                     upstream?
-                                                                                     downstream?))
-                                                                          fcolor
-                                                                          bcolor)
-                                                      :height           "17px"
-                                                      :background-color "#00000000" ;bcolor
-                                                      :padding-left     "2px"
-                                                      :padding-right    "2px"}]])]]))))]
+                                                                                  s])))
+                                                     :style {:font-size        "14px"
+                                                             :cursor           "pointer"
+                                                             :color            (if (not (or block-selected?
+                                                                                            viz-reco?
+                                                                                            hover-q?
+                                                                                            parent-of-selected?
+                                                                                            upstream?
+                                                                                            downstream?))
+                                                                                 fcolor
+                                                                                 bcolor)
+                                                             :height           "17px"
+                                                             :background-color "#00000000" ;bcolor
+                                                             :padding-left     "2px"
+                                                             :padding-right    "2px"}]])]]))))]
 
                                         [re-com/h-box 
-                                         :style {:border "1px solid pink" 
-                                                 :color "pink" :margin-top "-4px"}
+                                         :style {;:border "1px solid pink" 
+                                                 ;:color "pink" 
+                                                 :margin-top "-4px"}
                                          ;:height "15px" 
                                          ;:width "20px"
                                          :gap "5px"
                                          :children (vec (for [e valid-kits
-                                                              :let [icon (get-in block-runners [ (first e) :kits (last e) :icon])]]
-                                                          [re-com/box :child (str icon)]))]
+                                                              :let [icon (get-in block-runners [(first e) :kits (last e) :icon])
+                                                                    kit-runner-key (str "kit-runner" (hash (str client-name brick-vec-key selected-view (first e) (last e))))
+                                                                    running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
+                                                                    running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                                                                    trig!        [@waiting?]
+                                                                    class        (cond
+                                                                                   running? "rotate linear infinite"
+                                                                                   (get @waiting? kit-runner-key) "rotate-reverse linear infinite"
+                                                                                   :else "")]]
+                                                          [re-com/box 
+                                                           :attr {:on-click (fn []
+                                                                              (when (not running?)
+                                                                                (swap! waiting? assoc kit-runner-key true)
+                                                                                (swap! temp-extra-subs conj running-key)
+                                                                                (let [fstr (str "kit-runner " kit-runner-key)
+                                                                                      w    (/ (count fstr) 4.1)]
+                                                                                  (ut/tracked-dispatch
+                                                                                   [::wfx/push   :default
+                                                                                    {:kind       :run-kit
+                                                                                     :kit-keypath e
+                                                                                     :kit-runner-key kit-runner-key
+                                                                                     :panel-key   brick-vec-key
+                                                                                     :data-key    selected-view
+                                                                                     :runner      selected-view-type
+                                                                                     :client-name client-name
+                                                                                     :ui-keypath     [:panels brick-vec-key selected-view-type selected-view]}])
+                                                                                  (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                                                                                  (js/setTimeout #(swap! waiting? assoc kit-runner-key false) 5000))))}
+                                                           :child (render-kit-icon icon class)]))]
                                         
                                         ]]))
                          (cond selected?  
