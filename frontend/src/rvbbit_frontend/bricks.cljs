@@ -12986,7 +12986,9 @@
                                         [re-com/h-box 
                                          :style {;:border "1px solid pink" 
                                                  ;:color "pink" 
-                                                 :margin-top "-4px"}
+                                                 :z-index (when block-selected? 999999)
+                                                 :margin-right (when block-selected? "30px")
+                                                 :margin-top (if block-selected? "-6px" "-4px")}
                                          ;:height "15px" 
                                          ;:width "20px"
                                          :gap "5px"
@@ -13018,6 +13020,7 @@
                                                                                      :client-name client-name
                                                                                      :ui-keypath     [:panels brick-vec-key selected-view-type selected-view]}])
                                                                                   (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                                                                                  (tapp>> [:clicked-kit running-key])
                                                                                   (js/setTimeout #(swap! waiting? assoc kit-runner-key false) 5000))))}
                                                            :child (render-kit-icon icon class)]))]
                                         

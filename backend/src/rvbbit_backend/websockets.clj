@@ -57,9 +57,11 @@
    [clojure.walk              :as walk]
    [clj-time.coerce           :as coerce]
    [rvbbit-backend.config     :as config]
-   [honey.sql                 :as honey])
+   [honey.sql                 :as honey]
+   [markdown-to-hiccup.core :as m])
   (:import
    [com.github.vertical_blank.sqlformatter SqlFormatter]
+   [java.nio.file Paths]
    [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
    [java.lang                              ProcessBuilder]
    [java.io                                BufferedReader InputStreamReader]))
@@ -102,6 +104,7 @@
 (def client-panels-resolved (atom {}))
 (def client-panels-materialized (atom {}))
 (def client-panels-data (atom {}))
+(def client-panels-metadata (atom {}))
 
 (def client-panels-history (atom {}))
 ;;(def client-panels-history (ut/thaw-atom {} "./data/atoms/client-panel-history-atom.edn"))
@@ -1649,15 +1652,26 @@
 (def transit-file-mapping (ut/thaw-atom {} "./data/atoms/transit-file-mapping-atom.edn"))
 
 (defn write-transit-data
-  [data query-key client-name table-name]
+  [data query-key client-name table-name & [meta?]]
   (let [base-dir        "./transit-data"
         client-name-str (cstr/replace (str client-name) ":" "")
         filepath        (str base-dir "/" client-name-str)
-        file            (str filepath "/" table-name ".transit")]
-    ;; (ut/pp [:save-transit file (count data) :rows])
-    (swap! transit-file-mapping assoc [client-name query-key] {:file file :ts (ut/today-yyyymmdd-hhmm)})
+        file            (str filepath "/" table-name (when meta? ".meta") ".transit")
+        abs-filepath (.toString (.toAbsolutePath (Paths/get file (into-array String []))))]
+    (ut/pp [:save-transit abs-filepath (try (count data) (catch Exception _ -1)) :rows])
+    (swap! transit-file-mapping assoc-in [client-name query-key (if meta? :meta-file :file)] abs-filepath)
     (ext/create-dirs filepath)
-    (with-open [out (io/output-stream file)] (transit/write (transit/writer out :msgpack) data))))
+    (with-open [out (io/output-stream file)] (transit/write (transit/writer out :msgpack) data))
+    ;file
+    abs-filepath))
+
+(defn read-transit-data
+  [file-path]
+  (let [abs-filepath (.toString (.toAbsolutePath (Paths/get file-path (into-array String []))))]
+    (if (.exists (io/file abs-filepath))
+      (with-open [in (io/input-stream abs-filepath)]
+        (transit/read (transit/reader in :msgpack)))
+      (throw (ex-info "File not found" {:file abs-filepath})))))
 
 (defn insert-rowset
   [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
@@ -1798,10 +1812,10 @@
          client-name
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
-  ;; (ppy/execute-in-thread-pools :boomerang-heartbeat
-  ;;                              (fn []
-  ;;                                (doseq [fk (vec (keys (get @atoms-and-watchers client-name {})))]
-  ;;                                  (sub-to-value client-name fk)))) ;; resub just in case?
+  (ppy/execute-in-thread-pools :boomerang-heartbeat
+                               (fn []
+                                 (doseq [fk (vec (keys (get @atoms-and-watchers client-name {})))]
+                                   (sub-to-value client-name fk)))) ;; resub just in case?
   (let [cstats  (client-statuses)
         latency (get-in cstats [client-name :client-latency])
         server-subs (get-in cstats [client-name :server-subs])
@@ -2442,7 +2456,7 @@
       (ring-resp/not-found "File not found"))))
 
 (defn package-settings-for-client []
-  (let [settings (merge (ut/deep-remove-keys (config/settings) [:when-fn :kit-fn])
+  (let [settings (merge (ut/deep-remove-keys (config/settings) [:when-fn :kit-expr])
                         {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
                          :kits    {} ;;config/kit-fns
                          :screens (vec (map :screen_name
@@ -3340,24 +3354,99 @@
      ;                      ))
     ))
 
+(declare clover-lookup ship-estimate)
+
+;; (ut/pp @transit-file-mapping)
+;; (ut/pp (keys @transit-file-mapping))
+;; (reset! transit-file-mapping {})
+
 (defmethod wl/handle-push :run-kit
-  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]
-  (let [kit-runner-key (keyword kit-runner-key)]
-    (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
-    (swap! kit-status assoc-in [kit-runner-key :running?] true)
-    (Thread/sleep 45000)
-    (swap! kit-status assoc-in [kit-runner-key :running?] false)
-    (alert! client-name
-            [:v-box :children
-             [[:box :child (str "kit run " kit-keypath " " kit-runner-key)]
-              [:box :child (str "tset")]
-              ;; [:box :style {:font-size "11px"}
-              ;;  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]
-              ]]
-            10
-            2.1
-            33)
-    (ut/pp [:finished-kit-from client-name ui-keypath])))
+  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]  
+  (try
+    (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
+          kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
+          times-key       (into kit-keypath ui-keypath)
+          _ (ship-estimate client-name kit-runner-key times-key)
+          _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
+          _ (swap! kit-status assoc-in [kit-runner-key :running?] true)
+          host-runner     runner
+          [kit-runner
+           kit-name]      kit-keypath
+          runner-map      (config/settings)
+          kit-runner-fn   (get-in runner-map [:runners kit-runner :kits kit-name :kit-expr])
+          output-type     (get-in runner-map [:runners kit-runner :kits kit-name :output])
+          repl-host       (get-in runner-map [:runners kit-runner :runner :host])
+          repl-port       (get-in runner-map [:runners kit-runner :runner :port])
+          clover-kw        (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
+          clover-lookup-map (into {} (for [kw clover-kw] {kw (clover-lookup client-name kw)}))
+          context-data    (merge
+                           clover-lookup-map
+                           {:client-panels (get @client-panels client-name)
+                            :client-panels-data (get @client-panels-data client-name)
+                            :client-panels-metadata (get @client-panels-metadata client-name)
+                            :panel-key panel-key
+                            :data-key data-key
+                            :ui-keypath [:panels panel-key host-runner data-key]})
+          transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
+          limited-postwalk-map (merge
+                                {:transit-file transit-file ;; all client context maps
+                                 :transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
+                                 :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
+                                clover-lookup-map
+                                (select-keys context-data [:panel-key :data-key :ui-keypath]))
+          _ (ut/pp [:debug-kit runner kit-keypath (str kit-runner-fn) repl-host repl-port transit-file])
+          loaded-kit-runner-fn (walk/postwalk-replace limited-postwalk-map
+                                                      kit-runner-fn)
+          _ (ut/pp [:debug-kit2 runner kit-keypath (str loaded-kit-runner-fn) repl-host repl-port transit-file])
+          {:keys [result elapsed-ms]} (ut/timed-exec
+                                       (ppy/execute-in-thread-pools-but-deliver
+                                        (keyword (str "serial-kit-instance/" kit-runner-key-str))
+                                        (fn []
+                                          (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key-str))))
+          error?   (cstr/includes? (cstr/lower-case (str result)) " error ") ;; lame , get codes later 
+          output (get-in result [:evald-result :value])
+          console (get-in result [:evald-result :out])]
+
+      ;(ut/pp [:kit-runner-output result elapsed-ms])
+
+      (when (and (= output-type :kit-map)
+                 (and (vector? output)  
+                      (map? (first output))))
+        (ut/pp [:inserting-into-kit-results-table.. (count output)])
+        (doseq [kk output]
+          (insert-kit-data kk
+                           (hash kk)
+                           data-key ;(last ui-keypath)
+                           "query-log" ;;kit-expr-push"
+                           :kick
+                           elapsed-ms
+                           client-name)))
+
+      (Thread/sleep 6000)
+
+      (alert! client-name
+              [:v-box
+               :padding "5px"
+               :gap "10px"
+               :children
+               [[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
+                [:box
+                 ;:style {:font-size "11px"}
+                 :child (str "done")]
+                ;; (when (ut/ne? console) [:box
+                ;;                         :style {:border "1px solid #ffffff22"
+                ;;                                 :border-radius "14px"}
+                ;;                         :child [:terminal console]])
+                [:box :style {:font-size "11px" :opacity 0.7}
+                 :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+              13
+              nil
+              11)
+      (swap! kit-status assoc-in [kit-runner-key :running?] false)
+      (when true ;; (not error?) 
+        (swap! times-atom assoc times-key (conj (get @times-atom times-key) elapsed-ms)))
+      (ut/pp [:finished-kit-from client-name ui-keypath]))
+      (catch Exception e (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key e ]))))
 
 ;; (ut/pp @flow-status)
 
@@ -3779,7 +3868,7 @@
                                                                   (System/currentTimeMillis))
                                                         (assoc-in [client-name flow-key :last-push]
                                                                   (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
-                                           (when (cstr/includes? (str client-name) "-fat-")  (ut/pp [:running-push! flow-key client-name new-value]))
+                                          ;;  (when (cstr/includes? (str client-name) "-fat-")  (ut/pp [:running-push! flow-key client-name new-value]))
                                           ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
                                           ;;                               (fn []
                                           ;;                                 (when (or (not= flow-key :time/now)
@@ -6411,7 +6500,8 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                         cache-table-name
                                                         {:honey-sql honey-sql :connection-id connection-id})
                                                  (let [result (vec (for [r result] (assoc r :rows 1)))] ;;; hack
-                                                   (insert-rowset result cache-table-name (first ui-keypath) client-name (keys (first result))))
+                                                   (insert-rowset result cache-table-name (first ui-keypath) client-name (keys (first result)))
+                                                   (write-transit-data honey-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true))
                                                  (doall
                                                   (do
                                                     (do (ut/pp [[:recos-started-for (first ui-keypath)] :via client-name ui-keypath
@@ -6499,8 +6589,15 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                       ;;        [:text honey-sql-str2]
                       ;;        [:edn (ut/truncate-nested (get honey-meta :fields))]
                       ;;        ])
-                      (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
-                      (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result)) ;; <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
+                      (ppy/execute-in-thread-pools
+                       :data-io-ops ;; potentially expensive and blocking
+                       (fn []
+                         (write-transit-data (get output :result-meta) (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                         (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))
+                         (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
+                         (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
+                         (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result))))
+                      ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
              (catch Exception e

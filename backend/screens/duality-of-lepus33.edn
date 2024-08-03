@@ -1,32 +1,386 @@
 {:orders
- {:fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :connections-sys [:database_name :connection_id :styler_highlight_8717ss]},
+ {:setlists-drag-2 [:show_id :song_name :song_order :ts],
+  :gen-viz-797 [:rows :date_posted],
+  :gen-viz-94 [:diff],
+  :DISTRICT-drag-37 [:DISTRICT :rowcnt],
+  :large-bgss (:query_error),
+  :shows (:query_error),
+  :offenses-drag-24
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :tour-name-drag-11 [:tour_name :rowcnt],
+  :offenses-drag-26
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :offenses (:query_error),
+  :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
+  :gen-viz-84 [:rows :country],
+  :gen-viz-342 [:rows :song_order],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt],
+  :setlists (:query_error)},
  :reco-preview "-1489866873",
- :sql-source {},
+ :sql-source
+ {:setlists-drag-2
+  {:select [:show_id :song_name :song_order :ts],
+   :from [[:setlists :hh333]],
+   :_last-run "05:53:09"},
+  :gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :DISTRICT-drag-37
+  {:select [:DISTRICT [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Location
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :ff277]]}
+     :cc125]],
+   :group-by [:DISTRICT],
+   :order-by [[:rowcnt :desc]]},
+  :large-bgss
+  {:select [:*],
+   :connection-id :*client-name*,
+   :from
+   [{:data
+     (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
+           rel-dir "./images/large/"
+           files (->>
+                   (file-seq (clojure.java.io/file dir))
+                   (filter (fn [x] (.isFile x)))
+                   (filter
+                     (fn [x]
+                       (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                   (map (fn [x] (.getName x))))]
+       (println (count files))
+       (vec (for [f files] {:ffilename (str f)})))}],
+   :page 2,
+   :_last-run "14:04:15"},
+  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :offenses-drag-24
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :dd484]]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :tour-name-drag-11
+  {:select [:tour_name [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:location :show_date :show_id :show_name :title :tour_name :ts],
+      :from [[:shows :pp193]]}
+     :kk455]],
+   :group-by [:tour_name],
+   :order-by [[:rowcnt :desc]]},
+  :offenses-drag-26
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :ff277]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :offenses
+  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
+  :shows-drag-22
+  {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
+   :from [[:shows :pp193]],
+   :_last-run "21:10:04"},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :gen-viz-342
+  {:select [[[[:count 1]] :rows] :song_order],
+   :from
+   [{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}],
+   :group-by [:song_order]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]},
+  :setlists
+  {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111}},
  :meta
- {:fields-sys
+ {nil
   {:fields
-   {:field_name
+   {:vec-val
     {:data-type "string",
-     :distinct 7,
+     :distinct 52,
      :group-by? true,
-     :commons {"ts" 1, "tour_name" 1, "title" 1},
-     :cardinality 100},
-    :field_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"TEXT" 6, "TIMESTAMP" 1},
-     :cardinality 28},
-    :data_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"string" 6, "datetime" 1},
-     :cardinality 28}},
-   :rowcount 7},
+     :commons {},
+     :cardinality 100}},
+   :rowcount 52},
   :setlists-drag-2
   {:fields
    {:show_id
@@ -57,45 +411,6 @@
      :commons {"2023-09-24 19:19:12" 500},
      :cardinality 0}},
    :rowcount 500},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 7},
-     :cardinality 14},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 7},
-     :cardinality 14},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"met-on-tour" 7},
-     :cardinality 14},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 7},
-     :cardinality 14},
-    :table_name
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons {"tracks" 1, "shows" 1, "setlists" 1},
-     :cardinality 100},
-    :fields
-    {:data-type "integer",
-     :distinct 5,
-     :group-by? false,
-     :commons {8 2, 5 2, 12 1},
-     :cardinality 71}},
-   :rowcount 7},
   :gen-viz-797
   {:fields
    {:rows
@@ -139,14 +454,26 @@
   {:fields
    {:query_error
     {:data-type "string",
-     :distinct 3,
+     :distinct 4,
      :group-by? true,
      :commons
-     {"{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
-      "(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: large_bgss)" 1},
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
      :cardinality 100}},
-   :rowcount 3},
+   :rowcount 4},
+  :shows
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :offenses-drag-24
   {:fields
    {:SHOOTING
@@ -419,6 +746,30 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :offenses
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :shows-drag-22
   {:fields
    {:location
@@ -500,27 +851,6 @@
      :commons {8 1, 18 1, 10 1},
      :cardinality 100}},
    :rowcount 25},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 7, "SQLite" 3, "*csv-import-db*" 1},
-     :cardinality 27},
-    :connection_id
-    {:data-type "string",
-     :distinct 11,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
-     :cardinality 100},
-    :styler_highlight_8717ss
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {1 11},
-     :cardinality 9}},
-   :rowcount 11},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -653,12 +983,33 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30}},
+   :rowcount 30},
+  :setlists
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 121},
-  :system-tables-list* {:tables-sys 129},
-  :system-fields-list* {:fields-sys 165},
-  :block-12262 {:new-clojure-9 100}},
+ {:block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-198 {:setlists-drag-2 102},
+  :block-7138 {:DISTRICT-drag-37 180},
+  :block-8963 {:shows-drag-22 108},
+  :block-8805 {:duration-hours-drag-43 180},
+  :block-6308 {:tour-name-drag-11 180},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :block-2361 {:large-bgss 311},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :block-3392 {:offenses-drag-26 100},
+  :block-4346 {:offenses-drag-24 100}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -674,9 +1025,58 @@
  {:settings
   {:harvest-on-boot? true,
    :default "./screens/looking-glass-redux.edn",
+   :new-block-rand
+   ["Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "It's no use going back to yesterday, because I was a different person then."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "Curiouser and curiouser!"
+    "If you don't know where you are going any road can take you there."
+    "We're all mad here."
+    "I can't go back to yesterday because I was a different person then."
+    "It's always tea-time."
+    "Begin at the beginning and go on till you come to the end; then stop."
+    "I knew who I was this morning, but I've changed a few times since then."
+    "How long is forever? Sometimes, just one second."
+    "If everybody minded their own business, the world would go around a great deal faster than it does."
+    "I don't think... then you shouldn't talk, said the Hatter."
+    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+    "Well, I never heard it before, but it sounds uncommon nonsense."
+    "Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "We're all mad here."
+    "How long is forever? Sometimes, just one second."
+    "The world is full of obvious things which nobody by any chance ever observes."
+    "Reality is that which, when you stop believing in it, doesn't go away."
+    "The sky above the port was the color of television, tuned to a dead channel."
+    "Information wants to be free."
+    "The future is already here – it's just not evenly distributed."
+    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+    "The 'Net is a waste of time, and that's exactly what's right about it."
+    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+    "The street finds its own uses for things."
+    "Accelerated world. Accelerated nervous system to go with it."
+    "The future has arrived — it's just not evenly distributed yet."
+    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+    "When you want to know how things really work, study them when they're coming apart."
+    "The human sensory system is a lot more complex and weird than most people realize."
+    "Time moves in one direction, memory in another."
+    "The only thing that keeps you sane is to think that it's all a bad dream."
+    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+    "Secrets are not the same as surprises."
+    "Neuromancer. The lane to the land of the dead."],
    :eleven-labs-api-key nil,
    :modes
-   {:pre
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
@@ -687,12 +1087,10 @@
        :font-family :theme/monospaced-font}}
      [:string3 :*data]],
     :edn [:edn :*data],
-    :text [:console :*data],
-    :terminal [:terminal :*data],
-    :data [:data-viewer :*data],
+    :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
-    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
-    :clover [:box :child :*data]},
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
    :kits {},
    :clover-templates
    {:color-theft
@@ -813,7 +1211,6 @@
     "light-theme"
     "literal-data-test"
     "looking-glass-conway"
-    "looking-glass-redux"
     "looking-glass-redux-conway2"
     "looking-glass-redux-mix5"
     "looking-glass-redux-test"
@@ -859,11 +1256,13 @@
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "repl-demo-july23"
     "repl-tests-3"
     "retro-machines"
     "riffle-test"
     "server-stats"
     "server-stats2"
+    "server-stats2a"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
@@ -876,6 +1275,7 @@
     "tallica-param-test2"
     "tangerine-dreams"
     "technicolor-shanny"
+    "test-blog-screen"
     "the-future-soon"
     "the-generated-lass"
     "the-generated-lass-glow"
@@ -908,16 +1308,88 @@
  :runstreams {},
  :editor? false,
  :buffy? false,
- :memory [96358341 70883161 4294705152],
- :client-name :awesome-erin-butterfly-13,
+ :valid-kits
+ {[:outliers :get-outliers]
+  [[:block-414 :queries :gen-viz-797]
+   [:reco-preview :queries :query-preview]
+   [:viz-shapes0-list* :queries :viz-shapes0-sys->-shape]
+   [:block-11609 :queries :city-drag-26]
+   [:block-7416 :queries :rowcnt-drag-2]
+   [:block-198 :queries :setlists-drag-2]
+   [:block-7138 :queries :DISTRICT-drag-37]
+   [:block-8963 :queries :shows-drag-22]
+   [:block-204 :queries :gen-viz-828]
+   [:block-204 :queries :gen-viz-94]
+   [:block-8805 :queries :duration-hours-drag-43]
+   [:block-94 :queries :gen-viz-84]
+   [:block-6308 :queries :tour-name-drag-11]
+   [:block-958 :queries :gen-viz-342]
+   [:block-7319 :queries :shape-drag-7]
+   [:block-3777 :queries :state-drag-3]
+   [:block-2361 :queries :large-bgss]
+   [:block-1449 :queries :ufo-sightings-drag-9]
+   [:block-3392 :queries :offenses-drag-26]
+   [:block-4346 :queries :offenses-drag-24]]},
+ :memory [717573512 696384712 4294705152],
+ :client-name :whole-thin-pheasant-28,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2102, :h 1060},
- :post-meta {:tables-sys {:* {:rowcount 7}}, :connections-sys {:* {:rowcount 11}}},
- :status {:heartbeat {:kick []}},
+ :window {:w 2199, :h 1569},
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil]},
+ :post-meta
+ {:gen-viz-797 {:* {:rowcount 317}},
+  :city-drag-26 {:* {:rowcount 19899}},
+  :DISTRICT-drag-37 {:* {:rowcount 13}},
+  :state-drag-3 {:* {:rowcount 68}},
+  :large-bgss {},
+  :offenses-drag-26 {:* {:rowcount 319073}}},
+ :flow-estimates
+ {:raw-custom-override328889001
+  {:times 0.027, :run-id :raw-custom-override328889001},
+  :setlists-drag-2 {:times 0.006, :run-id :setlists-drag-2},
+  :raw-custom-override425436116
+  {:times 0.687, :run-id :raw-custom-override425436116},
+  :gen-viz-797 {:times 0.21, :run-id :gen-viz-797},
+  :gen-viz-94 {:times 0.141, :run-id :gen-viz-94},
+  :offenses-drag-24 {:times 0.051, :run-id :offenses-drag-24},
+  :rowcnt-drag-2 {:times 0.146, :run-id :rowcnt-drag-2},
+  :tour-name-drag-11 {:times 0.002, :run-id :tour-name-drag-11},
+  :offenses-drag-26 {:times 0.017, :run-id :offenses-drag-26},
+  :gen-viz-828 {:times 0.073, :run-id :gen-viz-828},
+  :shows-drag-22 {:times 0.009, :run-id :shows-drag-22},
+  :gen-viz-84 {:times 0.182, :run-id :gen-viz-84},
+  :gen-viz-342 {:times 0.009, :run-id :gen-viz-342},
+  :ufo-sightings-drag-9 {:times 0.065, :run-id :ufo-sightings-drag-9},
+  :duration-hours-drag-43 {:times 0.083, :run-id :duration-hours-drag-43},
+  :city-drag-26 {:times 0.134, :run-id :city-drag-26},
+  :state-drag-3 {:times 0.102, :run-id :state-drag-3},
+  :shape-drag-7 {:times 0.113, :run-id :shape-drag-7}},
+ :status
+ {:heartbeat
+  {:kick
+   [:repl-ns/whole-thin-pheasant-28
+    :solver-meta/raw-custom-override-1610584445>extra
+    :solver/get-my-colors-1335189655
+    :solver/raw-custom-override136934373>10>0>2
+    :solver/raw-custom-override-1610584445>howdy-str
+    :time/minute
+    :solver-status/whole-thin-pheasant-28>raw-custom-override1606062804>running?
+    :time/hour
+    :solver/get-my-colors-770976302
+    :solver/raw-custom-override1606062804
+    :solver-status/whole-thin-pheasant-28>get-my-colors-770976302>running?
+    :solver/raw-custom-override328889001
+    :solver-status/whole-thin-pheasant-28>get-my-colors-1335189655>running?
+    :flow-status/live-scratch-flow>*running?
+    :solver-meta/raw-custom-override-1610584445>output>evald-result>out
+    :solver-status/whole-thin-pheasant-28>raw-custom-override328889001>running?]},
+  :alert3 {:alerts :alert2},
+  :alert1 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
  :screen-name "duality-of-lepus33",
  :recos-page2 0,
- :selected-tab "thin crane",
+ :selected-tab "azure oyster",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -929,12 +1401,18 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   490
-   1100038046]],
+   118961
+   -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
+ :base-sniff-queries
+ {:setlists 1669794951,
+  :shows 89957543,
+  :ufo_sightings 484893751,
+  :offenses -505802446},
+ :panels-hash 1953866342,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -221110949,
+ :user-params-hash -2039147966,
  :grid-recos? true,
  :resolved-queries
  {:setlists-drag-2
@@ -1119,7 +1597,7 @@
   :shows-drag-22
   {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
    :from [[:shows :pp193]],
-   :_last-run "05:52:51"},
+   :_last-run "21:10:04"},
   :gen-viz-84
   {:select [[[:count 1] :rows] :country],
    :from
@@ -1386,7 +1864,7 @@
       (swap! my-atom merge {:new-key "hey"}))},
    :name "block-2769",
    :w 9,
-   :selected-mode {:new-clojure-2 :text},
+   :selected-mode {:new-clojure-2 :data},
    :selected-view :new-clojure-2,
    :root [5 6],
    :h 7,
@@ -1471,7 +1949,7 @@
    {:shows-drag-22
     {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
      :from [[:shows :pp193]],
-     :_last-run "05:52:51"}},
+     :_last-run "21:10:04"}},
    :root [15 14],
    :tab "azure oyster"},
   :block-204
@@ -1796,18 +2274,6 @@
      :child
      [:speak-click
       "It's a perfect day for planting seeds and planning adventures!"]]}},
-  :block-9645
-  {:clojure
-   {:my-atom43
-    "(do  (let [last-run :repl-ns/repl-yummy-wide-buffalo-17-clojure>introspected] (println last-run) (deref my-atom)))"},
-   :name "introspected my-atom",
-   :w 7,
-   :selected-mode {:my-atom43 :edn},
-   :selected-view :my-atom43,
-   :root [29 4],
-   :h 4,
-   :connection-id :yummy-wide-buffalo-17,
-   :tab "azure oyster"},
   :block-9369
   {:h 3,
    :w 16,
@@ -2193,8 +2659,8 @@
      :child
      "hi!"]}},
   :block-12330
-  {:h 3,
-   :w 6,
+  {:h 4,
+   :w 9,
    :root [32 20],
    :tab "azure oyster",
    :selected-view :hare-vw,
@@ -2478,7 +2944,7 @@
    :queries 11,
    :ts "2024-07-03 09:31:06"},
   :time
-  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 38, :hour 14},
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 2, :hour 6},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image-51574-82843-4k.webp"},
@@ -2498,21 +2964,38 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   (let [clojure-version (clojure-version)
-         jvm-version (System/getProperty "java.version")]
-     (str
-       "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
-       clojure-version
-       " on "
-       jvm-version
-       " JVM tech"
-       " 🥕🐇")),
-   :selected-view [:clojure :new-clojure-9],
+   (do
+     (let [clojure-version (clojure-version)
+           jvm-version (System/getProperty "java.version")]
+       :introspect!
+       (println "HUUGE33?! Yes. Giant.")
+       (println "the hour is " :time/hour)
+       (def message2 "far side")
+       (defn teste [] 123333)
+       (defonce my-atom (atom {:test 123}))
+       (doseq [e (range :time/minute)] (println (str "minute " (inc e) "!")))
+       {:howdy-str
+        (str
+          "🐇🥕 Sup!"
+          :time/hour
+          ":"
+          :time/minute
+          " Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇"),
+        :min :time/minute,
+        :jvm-version jvm-version,
+        :clojure-version clojure-version})
+     (swap! my-atom merge {:new-key "hey"})),
+   :selected-view [:clojure :new-clojure-2],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-12262,
+   :selected-block :block-2769,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",
@@ -2621,7 +3104,7 @@
    :tour_name "World Magnetic",
    :ts "2023-09-24 19:19:11"},
   :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
-  :sys {:selected-tab "thin crane", :selected-tab-idx 7},
+  :sys {:selected-tab "azure oyster", :selected-tab-idx 5},
   :searches-sub-types-sys
   {:item_key "aaaah-wednesday-the-day",
    :is_live nil,

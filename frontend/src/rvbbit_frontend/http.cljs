@@ -521,8 +521,8 @@
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
                             {} result-subs)]
         
-        (doseq [r result-subs]
-          (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)]))
+        ;; (doseq [r result-subs]
+        ;;   (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)]))
         
         ;; (ut/tapp>> [;:batch-of-messages (count result) 
         ;;             :grouped-update (count result-subs)

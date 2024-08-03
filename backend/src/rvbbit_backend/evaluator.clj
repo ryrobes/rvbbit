@@ -216,7 +216,7 @@
 
 
 (defn insert-rowset
-  [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
+  [rowset table-name keypath client-name & [columns-vec db-conn queue-name metadata]]
   ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
   (if (ut/ne? rowset)
     (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
@@ -451,35 +451,36 @@
   [code repl-host repl-port client-name id]
 
   (let [_           (swap! nrepls-run inc)
-        s           (str code) ;; ? why convert. TODO: remove
+        ;s           code ;;(str code) ;; ? why convert. TODO: remove
         eval-cache? false ;true ; (cstr/includes? s ";:::cache-me")
-        cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim s))))]
+        cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim (str code)))))]
     ;(ut/pp [:repl :started (str code) client-name id])
     (if false ;(and (not (nil? (get @eval-cache cache-hash))) eval-cache?)
       (do ;(println "cache-hit" cache-hash)
         (get @eval-cache cache-hash))
       (let [nrepl?           true ;(cstr/includes? s ":::use-nrepl")
-            ext-nrepl?       (cstr/includes? s ":::ext-nrepl") ;; from rabbit.edn
-            custom-nrepl?    (cstr/includes? s ":::custom-nrepl")
-            custom-nrepl-map (cond ext-nrepl?                                          {:host ext-repl-host
-                                                                                        :port ext-repl-port}
-                                   (and (not (nil? repl-host)) (not (nil? repl-port))) {:host repl-host ;; override repl
-                                                                                        :port repl-port}
-                                   custom-nrepl?                                       (first ;; parse out conn deets, old data-rabbit fn
-                                                                                        (remove nil?
-                                                                                                (for [l (cstr/split s #"\n")]
-                                                                                                  (when (cstr/includes?
-                                                                                                         l
-                                                                                                         ":::custom-nrepl")
-                                                                                                    (edn/read-string
-                                                                                                     (last (cstr/split
-                                                                                                            l
-                                                                                                            #":::custom-nrepl")))))))
-                                   :else                                               {:host "127.0.0.1" :port 8181})
-            nrepl-port       (get custom-nrepl-map :port)
-            nrepl-host       (get custom-nrepl-map :host)]
+            ;ext-nrepl?       (cstr/includes? s ":::ext-nrepl") ;; from rabbit.edn
+            ;custom-nrepl?    (cstr/includes? s ":::custom-nrepl")
+            ;; custom-nrepl-map (cond ext-nrepl?                                          {:host ext-repl-host
+            ;;                                                                             :port ext-repl-port}
+            ;;                        (and (not (nil? repl-host)) (not (nil? repl-port))) {:host repl-host ;; override repl
+            ;;                                                                             :port repl-port}
+            ;;                        custom-nrepl?                                       (first ;; parse out conn deets, old data-rabbit fn
+            ;;                                                                             (remove nil?
+            ;;                                                                                     (for [l (cstr/split s #"\n")]
+            ;;                                                                                       (when (cstr/includes?
+            ;;                                                                                              l
+            ;;                                                                                              ":::custom-nrepl")
+            ;;                                                                                         (edn/read-string
+            ;;                                                                                          (last (cstr/split
+            ;;                                                                                                 l
+            ;;                                                                                                 #":::custom-nrepl")))))))
+            ;;                        :else                                               {:host "127.0.0.1" :port 8181})
+            ;; nrepl-port       (get custom-nrepl-map :port)
+            ;; nrepl-host       (get custom-nrepl-map :host)
+            ]
         (if (not nrepl?) ;; never going to happen here TODO: remove? straight eval...
-          (let [eval-output  (try (if (string? code) (load-string s) (eval code))
+          (let [eval-output  (try (if (string? code) (load-string code) (eval code))
                                   (catch Exception e {:server-eval-error [] :error (ex-message e) :data (ex-data e)}))
                 output-type  (type eval-output) ;;; old data-rabbit code, will revisit
                 eval-output0 (cond (or (cstr/starts-with? (str output-type) "class tech.v3.dataset.impl")
@@ -491,11 +492,12 @@
                 {:evald-result eval-output0}))
           (let
            [e (try
-                (with-open [conn (nrepl/connect :host nrepl-host :port nrepl-port)]
+                (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
                   (let [user-fn-str   (slurp "./user.clj")
                         ;gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id])
                         ;                               (cstr/replace  "_" "-")
                         ;                               (cstr/replace  "--" "-")))
+                        custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
                         gen-ns        (cstr/replace
                                        (str "repl-" (str client-name) "-"
                                             (if (vector? id)
@@ -505,9 +507,9 @@
                                               (-> (str id)
                                                   (cstr/replace  "_" "-")
                                                   (cstr/replace  "--" "-")))) ":" "")
-                        user-fn-str   (if (not (cstr/includes? (str s) "(ns "))
+                        user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
                                         (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
-                        s             (str user-fn-str "\n" s)
+                        s             (str user-fn-str "\n" code)
                         skt           (nrepl/client conn 60000000)
                         msg           (nrepl/message skt {:op "eval" :code s})
                         rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
@@ -543,7 +545,7 @@
                                (not (nil? client-name))
                                (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
                       (qp/serial-slot-queue :nrepl-introspection client-name
-                                            (fn [] (update-namespace-state-async nrepl-host nrepl-port client-name id code ns-str))))
+                                            (fn [] (update-namespace-state-async repl-host repl-port client-name id code ns-str))))
 
 
 
@@ -561,7 +563,7 @@
                                                  explicit about what you want, output-wise)"
                        "\n")
                       nil)]
-                    {:evald-result (merge {:nrepl-conn custom-nrepl-map
+                    {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
                                            :cause      (str (ex-cause ee))
                                            :err-data   (str (ex-data ee))
                                            :error      (ex-message ee)}
@@ -570,7 +572,7 @@
             ns-str (get-in e [:evald-result :ns] "user")]
             (do ;(println "cache miss" cache-hash (keys @eval-cache))
               ;(swap! eval-cache assoc cache-hash e)
-              (logger (str (ut/keypath-munger [ns-str nrepl-host nrepl-port client-name id]) "-eval") e)
+              (logger (str (ut/keypath-munger [ns-str repl-host repl-port client-name id]) "-eval") e)
               ;;(ut/pp [:repl (str code) client-name id :result e])
               e) ;; nrepl://127.0.0.1:44865
             ))))))
