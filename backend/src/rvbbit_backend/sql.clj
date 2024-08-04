@@ -389,7 +389,7 @@
   (let [;queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)
         db-kw (-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)]
      ;(qp/serial-slot-queue :sql-serial :sql
-     (ppy/execute-in-thread-pools-but-deliver :sql-serial-everything
+     (ppy/execute-in-thread-pools-but-deliver :sqlite-serial-writes
      ;(keyword (str "sql-serial/" (cstr/replace (str db-kw) ":" ""))) ;; :sql-serial db-kw ;; (str db-spec) ;; queue-name
      (fn []
        (swap! sql-exec-run inc)
@@ -413,7 +413,7 @@
   ;(enqueue-task-sql db-spec
   (let [queue-name (str db-spec)]
     ;(qp/serial-slot-queue :sql-serial2 queue-name
-    (ppy/execute-in-thread-pools-but-deliver :sql-serial-everything ;;:serial-filter-sql-db
+    (ppy/execute-in-thread-pools-but-deliver :sqlite-serial-writes ;;:serial-filter-sql-db
      (fn []
        (swap! sql-exec-run inc)
        (swap! sql-exec-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)

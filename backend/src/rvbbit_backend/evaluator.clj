@@ -447,134 +447,252 @@
 
 
 
-(defn repl-eval
-  [code repl-host repl-port client-name id]
+;; (defn repl-eval
+;;   [code repl-host repl-port client-name id]
 
+;;   (let [_           (swap! nrepls-run inc)
+;;         ;s           code ;;(str code) ;; ? why convert. TODO: remove
+;;         eval-cache? false ;true ; (cstr/includes? s ";:::cache-me")
+;;         cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim (str code)))))]
+;;     ;(ut/pp [:repl :started (str code) client-name id])
+;;     (if false ;(and (not (nil? (get @eval-cache cache-hash))) eval-cache?)
+;;       (do ;(println "cache-hit" cache-hash)
+;;         (get @eval-cache cache-hash))
+;;       (let [nrepl?           true]
+;;         (if (not nrepl?) ;; never going to happen here TODO: remove? straight eval...
+;;           (let [eval-output  (try (if (string? code) (load-string code) (eval code))
+;;                                   (catch Exception e {:server-eval-error [] :error (ex-message e) :data (ex-data e)}))
+;;                 output-type  (type eval-output) ;;; old data-rabbit code, will revisit
+;;                 eval-output0 (cond (or (cstr/starts-with? (str output-type) "class tech.v3.dataset.impl")
+;;                                        (cstr/starts-with? (str output-type) "class clojure.lang.Var"))
+;;                                    [:pre (str eval-output)]
+;;                                    :else eval-output)]
+;;             (do (when debug?
+;;                   (println ["   !**NOT REPL**!   " (newline) (str output-type) (newline) eval-output]))
+;;                 {:evald-result eval-output0}))
+;;           (let
+;;            [e (try
+;;                 (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
+;;                   (let [user-fn-str   (slurp "./user.clj")
+;;                         ;gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id])
+;;                         ;                               (cstr/replace  "_" "-")
+;;                         ;                               (cstr/replace  "--" "-")))
+;;                         custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
+;;                         gen-ns        (cstr/replace
+;;                                        (str "repl-" (str client-name) "-"
+;;                                             (if (vector? id)
+;;                                               (-> (ut/keypath-munger id)
+;;                                                   (cstr/replace  "_" "-")
+;;                                                   (cstr/replace  "--" "-"))
+;;                                               (-> (str id)
+;;                                                   (cstr/replace  "_" "-")
+;;                                                   (cstr/replace  "--" "-")))) ":" "")
+;;                         user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
+;;                                         (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
+;;                         s             (str user-fn-str "\n" code)
+;;                         skt           (nrepl/client conn 60000000)
+;;                         msg           (nrepl/message skt {:op "eval" :code s})
+;;                         rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
+;;                                                    (nrepl/response-values msg)))
+;;                         rsp           (nrepl/combine-responses msg)
+;;                         msg-out       (vec (remove nil? (for [m msg] (get m :out))))
+;;                         merged-values rsp-read
+;;                         sampled-values (try
+;;                                          (safe-sample-with-description (first rsp-read))
+;;                                         ;; ^^ revist when we have multi output repl calls - for now, just one output, one result (since front-end embeds DO block)
+;;                                          (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
+;;                         output        {:evald-result
+;;                                        (-> rsp
+;;                                            (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
+;;                                            (assoc :value merged-values)
+;;                                            ;(assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
+;;                                            (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
+;;                                            (dissoc :id)
+;;                                            (dissoc :session))
+;;                                        :sampled sampled-values}
+;;                         ns-str (get-in output [:evald-result :ns] "user")]
+
+;;                     (swap! repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
+;;                            (vec (distinct (conj (get-in @repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
+
+;;                     ;;; :repl-ns/repl-client-namespaces-map>*client-name*
+
+;;                     ;;(swap! repl-client-namespaces-map update-in [client-name] (fnil conj #{}) gen-ns)
+
+;;                     ;; when only?
+;;                     (when (and (cstr/includes? (str code) ":introspect!")
+;;                                (not= client-name :rvbbit)
+;;                                (not (nil? client-name))
+;;                                (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
+;;                       (qp/serial-slot-queue :nrepl-introspection client-name
+;;                                             (fn [] (update-namespace-state-async repl-host repl-port client-name id code ns-str))))
+;;                     output))
+
+;;                 (catch Exception ee
+;;                   (let
+;;                    [error-msg (ex-message ee)
+;;                     added-errors
+;;                     (if (cstr/includes? error-msg "Could not read response value")
+;;                       (str
+;;                        "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str. 
+;;                                             (Rabbit cares about 'values' first, not printing, so you may have to be 
+;;                                                  explicit about what you want, output-wise)"
+;;                        "\n")
+;;                       nil)]
+;;                     {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
+;;                                            :cause      (str (ex-cause ee))
+;;                                            :err-data   (str (ex-data ee))
+;;                                            :error      (ex-message ee)}
+;;                                           (when (not (nil? added-errors))
+;;                                             {:rabbit-added added-errors}))})))
+;;             ns-str (get-in e [:evald-result :ns] "user")]
+;;             (do ;(println "cache miss" cache-hash (keys @eval-cache))
+;;               ;(swap! eval-cache assoc cache-hash e)
+;;               (logger (str (ut/keypath-munger [ns-str repl-host repl-port client-name id]) "-eval") e)
+;;               ;;(ut/pp [:repl (str code) client-name id :result e])
+;;               e) ;; nrepl://127.0.0.1:44865
+;;             ))))))
+
+;; (defonce incremental-output (atom []))
+;; @incremental-output
+
+;; (defn repl-eval [code repl-host repl-port client-name id] ;; bare bones, but working
+;;   (let [_ (swap! nrepls-run inc)
+;;         e (try
+;;             (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
+;;               (let [user-fn-str   (slurp "./user.clj")
+;;                     custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
+;;                     gen-ns        (cstr/replace
+;;                                    (str "repl-" (str client-name) "-"
+;;                                         (if (vector? id)
+;;                                           (-> (ut/keypath-munger id)
+;;                                               (cstr/replace  "_" "-")
+;;                                               (cstr/replace  "--" "-"))
+;;                                           (-> (str id)
+;;                                               (cstr/replace  "_" "-")
+;;                                               (cstr/replace  "--" "-")))) ":" "")
+;;                     user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
+;;                                     (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
+;;                     s             (str user-fn-str "\n" code)
+;;                     skt           (nrepl/client conn 60000000)
+;;                     msg           (nrepl/message skt {:op "eval" :code s})
+;;                     rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
+;;                                                (nrepl/response-values msg)))
+;;                     rsp           (nrepl/combine-responses msg)
+;;                     msg-out       (vec (remove nil? (for [m msg] (get m :out))))
+;;                     merged-values rsp-read
+;;                     sampled-values (try
+;;                                      (safe-sample-with-description (first rsp-read))
+;;                                       ;; ^^ revist when we have multi output repl calls - for now, just one output, one result (since front-end embeds DO block)
+;;                                      (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
+;;                     output        {:evald-result
+;;                                    (-> rsp
+;;                                        (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
+;;                                        (assoc :value merged-values)
+;;                                                        ;(assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
+;;                                        (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
+;;                                        (dissoc :id)
+;;                                        (dissoc :session))
+;;                                    :sampled sampled-values}]
+;;                 output))
+
+;;             (catch Exception ee
+;;               (let
+;;                [error-msg (ex-message ee)
+;;                 added-errors
+;;                 (if (cstr/includes? error-msg "Could not read response value")
+;;                   (str
+;;                    "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str. 
+;;                                                         (Rabbit cares about 'values' first, not printing, so you may have to be 
+;;                                                              explicit about what you want, output-wise)"
+;;                    "\n")
+;;                   nil)]
+;;                 {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
+;;                                        :cause      (str (ex-cause ee))
+;;                                        :err-data   (str (ex-data ee))
+;;                                        :error      (ex-message ee)}
+;;                                       (when (not (nil? added-errors))
+;;                                         {:rabbit-added added-errors}))})))]
+;;     e))
+
+(defonce nrepl-output-atom (atom {}))
+;; (reset! nrepl-output-atom {})
+;; (ut/pp (keys @nrepl-output-atom))
+;; (ut/pp (into {} (for [kp (vec (distinct (filterv #(= (count %) 2) (ut/kvpaths @nrepl-output-atom))))] {kp (count (get-in @nrepl-output-atom kp))})))
+;; (ut/pp (get @nrepl-output-atom :worthy-bronze-grasshopper-42))
+
+(defn repl-eval [code repl-host repl-port client-name id ui-keypath]
   (let [_           (swap! nrepls-run inc)
-        ;s           code ;;(str code) ;; ? why convert. TODO: remove
-        eval-cache? false ;true ; (cstr/includes? s ";:::cache-me")
-        cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim (str code)))))]
-    ;(ut/pp [:repl :started (str code) client-name id])
-    (if false ;(and (not (nil? (get @eval-cache cache-hash))) eval-cache?)
-      (do ;(println "cache-hit" cache-hash)
-        (get @eval-cache cache-hash))
-      (let [nrepl?           true ;(cstr/includes? s ":::use-nrepl")
-            ;ext-nrepl?       (cstr/includes? s ":::ext-nrepl") ;; from rabbit.edn
-            ;custom-nrepl?    (cstr/includes? s ":::custom-nrepl")
-            ;; custom-nrepl-map (cond ext-nrepl?                                          {:host ext-repl-host
-            ;;                                                                             :port ext-repl-port}
-            ;;                        (and (not (nil? repl-host)) (not (nil? repl-port))) {:host repl-host ;; override repl
-            ;;                                                                             :port repl-port}
-            ;;                        custom-nrepl?                                       (first ;; parse out conn deets, old data-rabbit fn
-            ;;                                                                             (remove nil?
-            ;;                                                                                     (for [l (cstr/split s #"\n")]
-            ;;                                                                                       (when (cstr/includes?
-            ;;                                                                                              l
-            ;;                                                                                              ":::custom-nrepl")
-            ;;                                                                                         (edn/read-string
-            ;;                                                                                          (last (cstr/split
-            ;;                                                                                                 l
-            ;;                                                                                                 #":::custom-nrepl")))))))
-            ;;                        :else                                               {:host "127.0.0.1" :port 8181})
-            ;; nrepl-port       (get custom-nrepl-map :port)
-            ;; nrepl-host       (get custom-nrepl-map :host)
-            ]
-        (if (not nrepl?) ;; never going to happen here TODO: remove? straight eval...
-          (let [eval-output  (try (if (string? code) (load-string code) (eval code))
-                                  (catch Exception e {:server-eval-error [] :error (ex-message e) :data (ex-data e)}))
-                output-type  (type eval-output) ;;; old data-rabbit code, will revisit
-                eval-output0 (cond (or (cstr/starts-with? (str output-type) "class tech.v3.dataset.impl")
-                                       (cstr/starts-with? (str output-type) "class clojure.lang.Var"))
-                                   [:pre (str eval-output)]
-                                   :else eval-output)]
-            (do (when debug?
-                  (println ["   !**NOT REPL**!   " (newline) (str output-type) (newline) eval-output]))
-                {:evald-result eval-output0}))
-          (let
-           [e (try
-                (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
-                  (let [user-fn-str   (slurp "./user.clj")
-                        ;gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id])
-                        ;                               (cstr/replace  "_" "-")
-                        ;                               (cstr/replace  "--" "-")))
-                        custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
-                        gen-ns        (cstr/replace
-                                       (str "repl-" (str client-name) "-"
-                                            (if (vector? id)
-                                              (-> (ut/keypath-munger id)
-                                                  (cstr/replace  "_" "-")
-                                                  (cstr/replace  "--" "-"))
-                                              (-> (str id)
-                                                  (cstr/replace  "_" "-")
-                                                  (cstr/replace  "--" "-")))) ":" "")
-                        user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
-                                        (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
-                        s             (str user-fn-str "\n" code)
-                        skt           (nrepl/client conn 60000000)
-                        msg           (nrepl/message skt {:op "eval" :code s})
-                        rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
-                                                   (nrepl/response-values msg)))
-                        rsp           (nrepl/combine-responses msg)
-                        msg-out       (vec (remove nil? (for [m msg] (get m :out))))
-                        merged-values rsp-read
-                        sampled-values (try
-                                         (safe-sample-with-description (first rsp-read))
-                                        ;; ^^ revist when we have multi output repl calls - for now, just one output, one result (since front-end embeds DO block)
-                                         (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
-                        output        {:evald-result
-                                       (-> rsp
-                                           (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
-                                           (assoc :value merged-values)
-                                           ;(assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
-                                           (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
-                                           (dissoc :id)
-                                           (dissoc :session))
-                                       :sampled sampled-values}
-                        ns-str (get-in output [:evald-result :ns] "user")]
+        output-atom (atom [])
+        e (try
+            (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
+              (let [user-fn-str   (slurp "./user.clj")
+                    custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
+                    gen-ns        (cstr/replace
+                                   (str "repl-" (str client-name) "-"
+                                        (if (vector? id)
+                                          (-> (ut/keypath-munger id)
+                                              (cstr/replace  "_" "-")
+                                              (cstr/replace  "--" "-"))
+                                          (-> (str id)
+                                              (cstr/replace  "_" "-")
+                                              (cstr/replace  "--" "-")))) ":" "")
+                    user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
+                                    (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
+                    s             (str user-fn-str "\n" code)
+                    client        (nrepl/client conn 600000000)
 
-                    (swap! repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
-                           (vec (distinct (conj (get-in @repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
+                    ; process each message, but still block for the final result
+                    process-msg   (fn [msg]
+                                    (when-let [out (:out msg)]
+                                      (swap! output-atom conj out)
+                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom)
+                                      ;(println "Real-time output:" out)
+                                      )
+                                    (when-let [err (:err msg)]
+                                      (swap! output-atom conj err)
+                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom)
+                                      ;(println "Real-time error:" err)
+                                      )
+                                    msg)
 
-                    ;;; :repl-ns/repl-client-namespaces-map>*client-name*
+                    ; Send the eval message and process each response
+                    responses     (doall (map process-msg (nrepl/message client {:op "eval" :code s})))
 
-                    ;;(swap! repl-client-namespaces-map update-in [client-name] (fnil conj #{}) gen-ns)
+                    rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
+                                               (nrepl/response-values responses)))
+                    rsp           (nrepl/combine-responses responses)
+                    msg-out       @output-atom
+                    merged-values rsp-read
+                    sampled-values (try
+                                     (safe-sample-with-description (first rsp-read))
+                                     (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
+                    output        {:evald-result
+                                   (-> rsp
+                                       (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
+                                       (assoc :value merged-values)
+                                       (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
+                                       (dissoc :id)
+                                       (dissoc :session))
+                                   :sampled sampled-values}]
+                output))
 
-                    ;; when only?
-                    (when (and (cstr/includes? (str code) ":introspect!")
-                               (not= client-name :rvbbit)
-                               (not (nil? client-name))
-                               (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
-                      (qp/serial-slot-queue :nrepl-introspection client-name
-                                            (fn [] (update-namespace-state-async repl-host repl-port client-name id code ns-str))))
-
-
-
-
-                    output))
-
-                (catch Exception ee
-                  (let
-                   [error-msg (ex-message ee)
+            (catch Exception ee
+              (let [error-msg (ex-message ee)
                     added-errors
                     (if (cstr/includes? error-msg "Could not read response value")
                       (str
                        "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str. 
-                                            (Rabbit cares about 'values' first, not printing, so you may have to be 
-                                                 explicit about what you want, output-wise)"
+                        (Rabbit cares about 'values' first, not printing, so you may have to be 
+                        explicit about what you want, output-wise)"
                        "\n")
                       nil)]
-                    {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
-                                           :cause      (str (ex-cause ee))
-                                           :err-data   (str (ex-data ee))
-                                           :error      (ex-message ee)}
-                                          (when (not (nil? added-errors))
-                                            {:rabbit-added added-errors}))})))
-            ns-str (get-in e [:evald-result :ns] "user")]
-            (do ;(println "cache miss" cache-hash (keys @eval-cache))
-              ;(swap! eval-cache assoc cache-hash e)
-              (logger (str (ut/keypath-munger [ns-str repl-host repl-port client-name id]) "-eval") e)
-              ;;(ut/pp [:repl (str code) client-name id :result e])
-              e) ;; nrepl://127.0.0.1:44865
-            ))))))
+                {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
+                                       :cause      (str (ex-cause ee))
+                                       :err-data   (str (ex-data ee))
+                                       :error      (ex-message ee)}
+                                      (when (not (nil? added-errors))
+                                        {:rabbit-added added-errors}))})))]
+    e))
 
 

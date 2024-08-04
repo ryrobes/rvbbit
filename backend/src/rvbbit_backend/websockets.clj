@@ -3366,7 +3366,7 @@
   (try
     (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
           kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
-          times-key       (into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
+          times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
           _ (ship-estimate client-name kit-runner-key times-key)
           _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
           _ (swap! kit-status assoc-in [kit-runner-key :running?] true)
@@ -3448,7 +3448,7 @@
                                        (ppy/execute-in-thread-pools-but-deliver
                                         (keyword (str "serial-kit-instance/" kit-runner-key-str))
                                         (fn []
-                                          (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key-str))))
+                                          (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
           error?   (cstr/includes? (cstr/lower-case (str result)) " error ") ;; lame , get codes later 
           output (get-in result [:evald-result :value])
           console (get-in result [:evald-result :out])]
@@ -3457,8 +3457,9 @@
 
       ;;(ut/pp  [:result result])
       (when (and (= output-type :kit-map)
-                 (and (vector? output)  
-                      (map? (first output))))
+                 ;(and (vector? output)  
+                 ;     (map? (first output)))
+                 )
         (ut/pp [:inserting-into-kit-results-table.. (count output)])
         (doseq [kk output]
           (insert-kit-data kk
@@ -3493,7 +3494,7 @@
               11)
       (swap! kit-status assoc-in [kit-runner-key :running?] false)
       (when true ;; (not error?) 
-        (swap! times-atom assoc times-key (conj (get @times-atom times-key) elapsed-ms)))
+        (swap! times-atom assoc times-key (conj (get @times-atom times-key []) elapsed-ms)))
       (ut/pp [:finished-kit-from client-name ui-keypath]))
       (catch Exception e (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key e ]))))
 
@@ -4713,7 +4714,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                            ;;:nrepl-evals 
                                           ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
                                                                                    (fn []
-                                                                                     (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
+                                                                                     (evl/repl-eval vdata repl-host repl-port client-name solver-name ui-keypath))))
 
              output-full                 result
              sampled?                    (get-in output-full [:sampled :sampling-details])
@@ -5394,6 +5395,10 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
           (ppy/close-cached-thread-pool p))
         (swap! atoms-and-watchers dissoc k) ;; remove client from watchers atom (should already be empty from unsub, but just in case)
         (swap! client-queues dissoc k)
+        (swap! client-panels dissoc k)
+        (swap! client-panels-data dissoc k)
+        (swap! client-panels-metadata dissoc k)
+        (swap! client-panels-history dissoc k)
         (swap! ack-scoreboard dissoc k)))
     (catch Exception e (ut/pp [:purge-client-queues-error e]))))
 
@@ -6339,7 +6344,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                                             'http-call      'rvbbit-backend.websockets/http-call
                                                                             'flatten-map    'rvbbit-backend.websockets/flatten-map}
                                                                            literals)
-                                                              output-full (evl/repl-eval literals repl-host repl-port client-name ui-keypath)
+                                                              output-full (evl/repl-eval literals repl-host repl-port client-name (keyword (str "honey-literal-" (hash honey-sql))) ui-keypath)
                                                               output      (last (get-in output-full [:evald-result :value]))
                                                               output-full (-> output-full
                                                                               (assoc-in [:evald-result :output-lines]
@@ -6750,59 +6755,59 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
            deep-meta?]}]
   (swap! q-calls inc)
   (inc-score! client-name :push)
-  (when (keyword? kit-name) ;;; all kit stuff. deprecated?
-    ;(enqueue-task2
-    (qp/serial-slot-queue :general-serial :general
-    ;(ppy/execute-in-thread-pools :general-serial                      
-                          (fn []
-                            (try ;; save off the full thing... or try
-                              (let [;kit-name :outliers
-                                    _ (push-to-client ui-keypath [:kit-status (first ui-keypath)] client-name 2 kit-name :started)
-                                    output     (query-runstream kind
-                                                                ui-keypath
-                                                                honey-sql
-                                                                false
-                                                                false
-                                                                connection-id
-                                                                client-name
-                                                                -2
-                                                                panel-key
-                                                                clover-sql
-                                                                deep-meta?
-                                                                false) ;; -2 has 1m row limit. yikes.
-                                    fullrows   (get output :result)
-                                    fullrows   (vec (for [r fullrows] (assoc r :rows 1)))
-                                    kp         (str (ut/unkeyword (get-in output [:ui-keypath 0] "unknown")))
-                                    rows       (count fullrows)
-                                    meta       (-> (get output :result-meta)
-                                                   (assoc :original-honey (get output :original-honey))
-                                                   (assoc :connection-id (get output :connection-id)))
-                                    mpath      (str "./kit-rowsets/" kp ".meta.edn")
-                                    path       (str "./kit-rowsets/" kp ".edn")
-                                    query-hash (hash honey-sql)
-                                    ttype      :queries]
-                                (spit path (pr-str fullrows) :append false)
-                                (spit mpath (pr-str meta) :append false)
-                                (ut/pp [:saved-full-to path rows :rows])
-                                (ut/pp [:repl-exec-for kit-name])
-                                (let [repl-fn      (get-in config/kit-fns [kit-name :fn]) ;'(+ (rand-int 12345)
-                                      repl-command (walk/postwalk-replace
-                                                    {:query honey-sql :query-name (first ui-keypath) :kit-name kit-name :panel-name panel-key}
-                                                    repl-fn)
-                                      _ (when kit-name (ut/pp [:running-kit kit-name]))
-                                      repl-host    (get-in config/kit-fns [kit-name :repl :host])
-                                      repl-port    (get-in config/kit-fns [kit-name :repl :port])
-                                      output-full  (timed-expr (evl/repl-eval repl-command repl-host repl-port client-name kit-name))
-                                      elapsed-ms   (get output-full :elapsed-ms)
-                                      output-full  (get output-full :result) ;; from timed map
-                                      output       (last (get-in output-full [:evald-result :value]))
-                                      _ (ut/pp [:**************************** :repl-output :****************************])
-                                      _ (ut/pp (ut/limited (get-in output-full [:evald-result :out]) 5))
-                                      _ (ut/pp [:**************************** :repl-output :****************************])
-                                      kit-keys     (count (keys output))]
-                                  (insert-kit-data output query-hash ui-keypath ttype kit-name elapsed-ms)
-                                  (push-to-client ui-keypath [:kit-status (first ui-keypath)] client-name 2 kit-name :done kit-keys elapsed-ms))) ;)
-                              (catch Exception e (ut/pp [:save-full-error (str e) :err-end]))))))
+  ;; (when (keyword? kit-name) ;;; all kit stuff. deprecated?
+  ;;   ;(enqueue-task2
+  ;;   (qp/serial-slot-queue :general-serial :general
+  ;;   ;(ppy/execute-in-thread-pools :general-serial                      
+  ;;                         (fn []
+  ;;                           (try ;; save off the full thing... or try
+  ;;                             (let [;kit-name :outliers
+  ;;                                   _ (push-to-client ui-keypath [:kit-status (first ui-keypath)] client-name 2 kit-name :started)
+  ;;                                   output     (query-runstream kind
+  ;;                                                               ui-keypath
+  ;;                                                               honey-sql
+  ;;                                                               false
+  ;;                                                               false
+  ;;                                                               connection-id
+  ;;                                                               client-name
+  ;;                                                               -2
+  ;;                                                               panel-key
+  ;;                                                               clover-sql
+  ;;                                                               deep-meta?
+  ;;                                                               false) ;; -2 has 1m row limit. yikes.
+  ;;                                   fullrows   (get output :result)
+  ;;                                   fullrows   (vec (for [r fullrows] (assoc r :rows 1)))
+  ;;                                   kp         (str (ut/unkeyword (get-in output [:ui-keypath 0] "unknown")))
+  ;;                                   rows       (count fullrows)
+  ;;                                   meta       (-> (get output :result-meta)
+  ;;                                                  (assoc :original-honey (get output :original-honey))
+  ;;                                                  (assoc :connection-id (get output :connection-id)))
+  ;;                                   mpath      (str "./kit-rowsets/" kp ".meta.edn")
+  ;;                                   path       (str "./kit-rowsets/" kp ".edn")
+  ;;                                   query-hash (hash honey-sql)
+  ;;                                   ttype      :queries]
+  ;;                               (spit path (pr-str fullrows) :append false)
+  ;;                               (spit mpath (pr-str meta) :append false)
+  ;;                               (ut/pp [:saved-full-to path rows :rows])
+  ;;                               (ut/pp [:repl-exec-for kit-name])
+  ;;                               (let [repl-fn      (get-in config/kit-fns [kit-name :fn]) ;'(+ (rand-int 12345)
+  ;;                                     repl-command (walk/postwalk-replace
+  ;;                                                   {:query honey-sql :query-name (first ui-keypath) :kit-name kit-name :panel-name panel-key}
+  ;;                                                   repl-fn)
+  ;;                                     _ (when kit-name (ut/pp [:running-kit kit-name]))
+  ;;                                     repl-host    (get-in config/kit-fns [kit-name :repl :host])
+  ;;                                     repl-port    (get-in config/kit-fns [kit-name :repl :port])
+  ;;                                     output-full  (timed-expr (evl/repl-eval repl-command repl-host repl-port client-name kit-name))
+  ;;                                     elapsed-ms   (get output-full :elapsed-ms)
+  ;;                                     output-full  (get output-full :result) ;; from timed map
+  ;;                                     output       (last (get-in output-full [:evald-result :value]))
+  ;;                                     _ (ut/pp [:**************************** :repl-output :****************************])
+  ;;                                     _ (ut/pp (ut/limited (get-in output-full [:evald-result :out]) 5))
+  ;;                                     _ (ut/pp [:**************************** :repl-output :****************************])
+  ;;                                     kit-keys     (count (keys output))]
+  ;;                                 (insert-kit-data output query-hash ui-keypath ttype kit-name elapsed-ms)
+  ;;                                 (push-to-client ui-keypath [:kit-status (first ui-keypath)] client-name 2 kit-name :done kit-keys elapsed-ms))) ;)
+  ;;                             (catch Exception e (ut/pp [:save-full-error (str e) :err-end]))))))
   (doall
    (if (or (cstr/includes? (str ui-keypath) "query-preview-block") ;; queue up the inviz
            (cstr/includes? (str ui-keypath) "query-preview-inviz"))

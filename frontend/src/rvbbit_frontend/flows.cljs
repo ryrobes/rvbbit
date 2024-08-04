@@ -4822,7 +4822,8 @@
                                                             :child [:progress-bar [(- max-w 15)
                                                                                    est (str e run-id 
                                                                                             ;(when solver? (ut/generate-uuid))
-                                                                                            (ut/generate-uuid)
+                                                                                            ;(ut/generate-uuid)
+                                                                                            (rand-int 12345)
                                                                                             )]]
                                                             :height "25px"
                                                             :padding "3px"])
