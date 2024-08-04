@@ -182,7 +182,7 @@
                                                        :panel-key
                                                        :transit-rowset
                                                        :transit-rowset-meta
-                                                       true
+                                                       ;;false ;;true
                                                        ) 
                                              ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
                                             :icon "zmdi-pizza"

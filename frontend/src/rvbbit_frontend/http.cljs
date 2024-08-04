@@ -31,14 +31,14 @@
 (re-frame/reg-sub
  ::pending-requests
  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
-   (vals (get-in db [::sockets socket-id :requests]))))
+   (vals (get-in db [:websocket-fx.core/sockets socket-id :requests]))))
 
 (re-frame/reg-sub
  ::open-subscriptions
  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
-   (get-in db [::sockets socket-id :subscriptions])))
+   (get-in db [:websocket-fx.core/sockets socket-id :subscriptions])))
 
-(defonce last-http-panel-push (atom nil))
+(defonce last-http-panel-push (atom nil))  
 
 (re-frame/reg-event-db
  ::update-panels-hash
@@ -561,11 +561,12 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
-          (when (and alert? (cstr/includes? (str result) "Fabric")) 
+          (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ")
+                                (cstr/includes? (cstr/lower-case (str result)) "kit ")))
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "-fat-")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (get result :status) (str (get result :ui-keypath)) (str result)]))
+          (when (cstr/includes? (str client-name) "-thin-")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (get result :status) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))

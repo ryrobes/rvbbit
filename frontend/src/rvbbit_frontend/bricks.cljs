@@ -10465,11 +10465,20 @@
                                                                       :id (str panel-key "-" selected-view)
                                                                       :width (+ px-width-int 70)
                                                                       :height (+ px-height-int 55)}])
-              :terminal (fn [x] [reactive-virtualized-console-viewer {:style {}
-                                                                      :text x
-                                                                      :id (str panel-key "-" selected-view)
-                                                                      :width (+ px-width-int 70)
-                                                                      :height (+ px-height-int 55)}])
+              :terminal (fn [x] [reactive-virtualized-console-viewer
+                                 {:style {}
+                                  :text x
+                                  :id (str panel-key "-" selected-view)
+                                  :width (+ px-width-int 70)
+                                  :height (+ px-height-int 55)}])
+
+              :terminal-custom (fn [[x w h]] [reactive-virtualized-console-viewer
+                                              {:style {}
+                                               :text x
+                                               :id (str panel-key "-" selected-view)
+                                               :width (+ w 70)
+                                               :height (+ h 55)}])
+
               :panel-code-box-single panel-code-box-single
               :code-box-single panel-code-box-single
               :vega-lite oz.core/vega-lite
@@ -12059,6 +12068,7 @@
           :client-name (get db :client-name)}]) db)
      db)))
 
+;; (ut/tracked-dispatch [::update-panels-hash])
 
 (re-frame/reg-event-db
  ::update-panels-hash
@@ -12066,21 +12076,24 @@
    (if (not @on-scrubber?) ;; dont want to push updates during scrubbing
      (let [pp          (get db :panels)
            ;;ppr         {} ;;; TEMP!
-           ;ppr         (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
-           ;                       {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace vv)})))}))
+          ;;  ppr         (into {}
+          ;;                    (for [[k v] pp] ;; super slow and lags out clients when panels edited
+          ;;                      {k (assoc v :queries (into {}
+          ;;                                                 (for [[kk vv] (get v :queries)]
+          ;;                                                   {kk (sql-alias-replace vv)})))}))
           ;;  ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
           ;;                          {k (materialize-values v)}))
            new-h       (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
-       (tapp>> [:running :update-panels-hash :event :expensive! "full send of all panels to server"])
-      ; (ut/dispatch-delay 800 [::http/insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
+      ; (tapp>> [:running :update-panels-hash :event :expensive! "full send of all panels to server"])
+       (ut/dispatch-delay 800 [::http/insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
        ;;(conn/push-panels-to-server pp ppr client-name)
        (ut/tracked-dispatch
         [::wfx/push :default
          {:kind :current-panels
           :panels pp
           :materialized-panels {} ;; ppm
-          :resolved-panels {} ;;ppr
+          :resolved-panels {} ;; ppr
           :client-name client-name}])
        (when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
        (assoc db :panels-hash new-h))
@@ -13007,6 +13020,7 @@
                                                                               (when (not running?)
                                                                                 (swap! waiting? assoc kit-runner-key true)
                                                                                 (swap! temp-extra-subs conj running-key)
+                                                                                (swap! db/kit-fn-lookup assoc [brick-vec-key selected-view] running-key)
                                                                                 (let [fstr (str "kit-runner " kit-runner-key)
                                                                                       w    (/ (count fstr) 4.1)]
                                                                                   (ut/tracked-dispatch

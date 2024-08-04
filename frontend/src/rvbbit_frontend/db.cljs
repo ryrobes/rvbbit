@@ -45,8 +45,9 @@
 
 (def param-code-hover (atom nil))
 
-(def solver-fn-runs (atom {}))    
-(def solver-fn-lookup (atom {}))           
+(defonce solver-fn-runs (atom {}))    
+(defonce solver-fn-lookup (atom {}))           
+(defonce kit-fn-lookup (atom {}))
 ;(def solver-fn-lookup-vec (atom {}))
 
 (def running-blocks (reagent/atom {}))

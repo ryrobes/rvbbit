@@ -58,7 +58,8 @@
    [clj-time.coerce           :as coerce]
    [rvbbit-backend.config     :as config]
    [honey.sql                 :as honey]
-   [markdown-to-hiccup.core :as m])
+   ;[markdown-to-hiccup.core :as m]
+   )
   (:import
    [com.github.vertical_blank.sqlformatter SqlFormatter]
    [java.nio.file Paths]
@@ -100,14 +101,17 @@
 
 (defonce timekeeper-failovers (atom {}))
 
-(def client-panels (atom {}))
+(def client-panels (ut/thaw-atom {} "./data/atoms/client-panels-atom.edn"))
 (def client-panels-resolved (atom {}))
 (def client-panels-materialized (atom {}))
-(def client-panels-data (atom {}))
-(def client-panels-metadata (atom {}))
+(def client-panels-data (ut/thaw-atom {} "./data/atoms/client-panels-data-atom.edn")) ;; TEMP
+(def client-panels-metadata (ut/thaw-atom {} "./data/atoms/client-panels-metadata-atom.edn"))
 
 (def client-panels-history (atom {}))
 ;;(def client-panels-history (ut/thaw-atom {} "./data/atoms/client-panel-history-atom.edn"))
+
+(defonce quick-sniff-hash (atom {}))
+(defonce honey-echo (ut/thaw-atom {} "./data/atoms/honey-echo-atom.edn"))
 
 (def heartbeat-seconds 15)
 
@@ -1658,7 +1662,7 @@
         filepath        (str base-dir "/" client-name-str)
         file            (str filepath "/" table-name (when meta? ".meta") ".transit")
         abs-filepath (.toString (.toAbsolutePath (Paths/get file (into-array String []))))]
-    (ut/pp [:save-transit abs-filepath (try (count data) (catch Exception _ -1)) :rows])
+    ;;(ut/pp [:save-transit abs-filepath (try (count data) (catch Exception _ -1)) :rows])
     (swap! transit-file-mapping assoc-in [client-name query-key (if meta? :meta-file :file)] abs-filepath)
     (ext/create-dirs filepath)
     (with-open [out (io/output-stream file)] (transit/write (transit/writer out :msgpack) data))
@@ -2274,13 +2278,10 @@
       (kvpaths [] diff ())
       (kvpaths diff))))
 
-
-
-
-
 (defn push-to-history-db [client-name panels comp-atom tname]
   (let [;;runner-keys (vec (keys (get (config/settings) :runners)))
         ;;_ (ut/pp [:runner-keys runner-keys])
+        panels (ut/deep-remove-keys panels []) ;; will remove :_keys 
         prev-data   (get @comp-atom client-name)
         ;;_           (ut/pp [:push-to-hist client-name tname (keys @comp-atom)])
         changed-paths (find-changed-paths prev-data panels)
@@ -2326,7 +2327,7 @@
                                                                                       :materialized (get materialized-panels p)}))
 
   (swap! client-panels assoc client-name panels) ;; the whole block map, will be mutating it with single updates later
-  (swap! client-panels-resolved assoc client-name resolved-panels)
+  (when (ut/ne? resolved-panels) (swap! client-panels-resolved assoc client-name resolved-panels))
   (swap! client-panels-materialized assoc client-name materialized-panels)
 
   (swap! panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions, important! 
@@ -3354,7 +3355,7 @@
      ;                      ))
     ))
 
-(declare clover-lookup ship-estimate)
+(declare clover-lookup ship-estimate query-runstream)
 
 ;; (ut/pp @transit-file-mapping)
 ;; (ut/pp (keys @transit-file-mapping))
@@ -3365,11 +3366,56 @@
   (try
     (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
           kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
-          times-key       (into kit-keypath ui-keypath)
+          times-key       (into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
           _ (ship-estimate client-name kit-runner-key times-key)
           _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
           _ (swap! kit-status assoc-in [kit-runner-key :running?] true)
           host-runner     runner
+          _ (when (= host-runner :queries) ;; we need the FULL table
+              (alert! client-name
+                      [:v-box
+                       :padding "5px"
+                       :gap "10px"
+                       :children
+                       [[:box :child (str "pull *full* query rows for analysis...")]
+                        [:box :style {:font-size "11px" :opacity 0.7}
+                         :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+                      18
+                      nil
+                      6)
+              ;; (ut/pp (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
+              ;;                (get-in @client-panels-resolved [client-name :connection-id])))
+              ;;(ut/pp (get-in @honey-echo [client-name data-key]))
+              ;;(ut/pp @honey-echo)
+              ;;(ut/pp (get @client-panels-resolved :polished-octohedral-mouse-27))
+              ;; (ut/pp @client-panels-resolved)
+              ;;(ut/pp [:HE (get-in @honey-echo [client-name data-key])])
+              (query-runstream :honey-xcall
+                               [data-key] ;;ui-keypath
+                               (dissoc (get-in @honey-echo [client-name data-key]) :connection-id)
+                               ;(get-in @client-panels-resolved [client-name host-runner data-key]) ;; we need the fully resolved SQL...
+                               false
+                               false
+                               (get-in @honey-echo [client-name data-key :connection-id])
+                              ;;  (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
+                              ;;          (get-in @client-panels-resolved [client-name :connection-id]))
+                               client-name
+                               -2 ;; -2 limits at 1M rows...
+                               panel-key
+                               nil
+                               false
+                               false)
+              (alert! client-name
+                      [:v-box
+                       :padding "5px"
+                       :gap "10px"
+                       :children
+                       [[:box :child (str "data pulled, running analysis...")]
+                        [:box :style {:font-size "11px" :opacity 0.7}
+                         :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+                      18
+                      nil
+                      6))
           [kit-runner
            kit-name]      kit-keypath
           runner-map      (config/settings)
@@ -3407,8 +3453,9 @@
           output (get-in result [:evald-result :value])
           console (get-in result [:evald-result :out])]
 
-      ;(ut/pp [:kit-runner-output result elapsed-ms])
+      ;;(ut/pp [:kit-runner-output result {:elapsed-ms? elapsed-ms}])
 
+      ;;(ut/pp  [:result result])
       (when (and (= output-type :kit-map)
                  (and (vector? output)  
                       (map? (first output))))
@@ -3422,24 +3469,26 @@
                            elapsed-ms
                            client-name)))
 
-      (Thread/sleep 6000)
+      ;;(Thread/sleep 6000)
 
       (alert! client-name
               [:v-box
                :padding "5px"
                :gap "10px"
                :children
-               [[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
-                [:box
-                 ;:style {:font-size "11px"}
-                 :child (str "done")]
-                ;; (when (ut/ne? console) [:box
-                ;;                         :style {:border "1px solid #ffffff22"
-                ;;                                 :border-radius "14px"}
-                ;;                         :child [:terminal console]])
+               [;;[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
+                [:box :child (str "kit run finished")]
+                ;; [:box
+                ;;  ;:style {:font-size "11px"}
+                ;;  :child (str "done")]
+                (when (ut/ne? console)
+                  [:box
+                   :style {:border "1px solid #ffffff22"
+                           :border-radius "14px"}
+                   :child [:terminal-custom [console (* 17 50) 250]]])
                 [:box :style {:font-size "11px" :opacity 0.7}
                  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-              13
+              18
               nil
               11)
       (swap! kit-status assoc-in [kit-runner-key :running?] false)
@@ -6149,12 +6198,13 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
          (swap! clover-sql-training-atom assoc clover-sql data-map))
        (catch Throwable e (ut/pp [:error-in-clover-sql-training-harvest! (str e)]))))
 
-(defonce quick-sniff-hash (atom {}))
+
 
 (defn query-runstream
   [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache?]
   (doall
    (let [;;_ (ut/pp [:honey-sql honey-sql])
+         _ (swap! honey-echo assoc-in [client-name (first ui-keypath)] (assoc honey-sql :connection-id connection-id))
          post-process-fn (get honey-sql :post-process-fn) ;; allowed at the top level only - will
          honey-sql (if (get honey-sql :limit) ;; this is a crap solution since we can't
                      {:select [:*] :from [honey-sql]}
@@ -6192,7 +6242,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                     data-literal-code? (false? (when (or literal-data? post-sniffed-literal-data?)
                                                  (let [dl (get-in honey-sql data-literals)]
                                                    (and (vector? dl) (map? (first dl))))))
-                    
+
                     data-literals-data (get-in honey-sql data-literals)
                     honey-sql (cond post-sniffed-literal-data?                      (walk/postwalk-replace @literal-data-map
                                                                                                            orig-honey-sql)
@@ -6210,8 +6260,8 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                     (= connection-id "autocomplete-db") autocomplete-db
                                     (= connection-id "history-db")      history-db
                                     (= connection-id "system")          system-db
-                                    (or (= connection-id :cache) 
-                                        (= connection-id "cache.db")  
+                                    (or (= connection-id :cache)
+                                        (= connection-id "cache.db")
                                         (nil? connection-id))           cache-db
                                     :else (get-connection-string connection-id))
                     has-pivot?
@@ -6480,12 +6530,12 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                   (get @sql/map-orders honey-sql-str))}
                         result-hash (hash result)]
                      ;(enqueue-task-sql-meta 
-                    
+
                     (when (not= (hash honey-sql) (get-in @sniff-meta-guard [ui-keypath client-name])) ;; only on new sql construct
                       (ut/pp [:sniff-meta! ui-keypath client-name])
                       (qp/slot-queue :sql-meta client-name
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?))))
-                    
+
                     (if sniffable?
                       (doall
                        (do
@@ -6501,7 +6551,8 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                         {:honey-sql honey-sql :connection-id connection-id})
                                                  (let [result (vec (for [r result] (assoc r :rows 1)))] ;;; hack
                                                    (insert-rowset result cache-table-name (first ui-keypath) client-name (keys (first result)))
-                                                   (write-transit-data honey-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true))
+                                                   ;(write-transit-data honey-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                                                   )
                                                  (doall
                                                   (do
                                                     (do (ut/pp [[:recos-started-for (first ui-keypath)] :via client-name ui-keypath
@@ -6521,8 +6572,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                                                                               [:= :table-name cache-table-name]
                                                                                                               nil
                                                                                                               nil
-                                                                                                              client-name
-                                                                                                              ))
+                                                                                                              client-name))
                                                            reco-count-sql {:select [[[:count 1] :cnt]]
                                                                            :from   [:combos]
                                                                            :where  [:= :table-name cache-table-name]}
@@ -6543,7 +6593,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                  ))))
                       (when sniff-worthy? ;; want details, but not yet the full expensive meta
                         ;(enqueue-task
-                        
+
                         (when (not= (hash honey-sql) (get @quick-sniff-hash [cache-table-name client-name]))
                           (qp/serial-slot-queue :general-serial :general
                         ;(ppy/execute-in-thread-pools :general-serial                      
@@ -6578,8 +6628,7 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                     ;; (ut/pp [[:quick-sniff-for (first ui-keypath)] :via client-name ui-keypath
                                     ;;         filtered-req-hash])
                                                      ))))
-                                                     (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql))
-                                                     )))
+                          (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql)))))
                     (do ;(swap! sql-cache assoc req-hash output)
                       ;; (kick client-name "kick-test!" (first ui-keypath) ;; <-- adds a kick kit panel entry for each query run, but adds up fast...
                       ;;       "query-log"
@@ -6589,10 +6638,17 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                       ;;        [:text honey-sql-str2]
                       ;;        [:edn (ut/truncate-nested (get honey-meta :fields))]
                       ;;        ])
-                      (ppy/execute-in-thread-pools
+                      ((if (= page -2)
+                         ppy/execute-in-thread-pools-but-deliver ;; we DO want to block in this situation...
+                         ppy/execute-in-thread-pools)
                        :data-io-ops ;; potentially expensive and blocking
                        (fn []
-                         (write-transit-data (get output :result-meta) (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                         (write-transit-data
+                          ;;(assoc (get output :result-meta) :connection-id connection-id)
+                          (-> (get output :result-meta)
+                              (assoc :original-honey (get output :original-honey))
+                              (assoc :connection-id (get output :connection-id)))
+                          (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
                          (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))
                          (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
                          (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
@@ -6622,6 +6678,28 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
               (runstream))))))
 
 
+(def kit-client-mapped (atom {}))
+
+;; (ut/pp @kit-client-mapped)
+
+(defn read-if-keyworded-str [x]
+  (if (cstr/starts-with? (str x) ":") (try (edn/read-string x) (catch Exception _ :error!)) (keyword x)))
+
+(defn kit-rows-to-map [rowset]
+  (try (let [mapped (into {}
+                          (for [[k v] (group-by :kit_name rowset)]
+                            {(read-if-keyworded-str k)
+                             {(read-if-keyworded-str (get (first v) :item_name))
+                              (into {}
+                                    (for [[k v] (group-by :item_key v)]
+                                      {(edn/read-string k) (merge (edn/read-string (get (first v) :item_options))
+                                                                  {;:id (get (first v) :id)
+                                                                   :data (vec (for [d v]
+                                                                                (merge {:id (get d :id)}
+                                                                                       (edn/read-string
+                                                                                        (get d :item_data)))))})}))}}))]
+         {:kits mapped})
+       (catch Exception _ {})))
 
 (defn insert-kit-data
   [output query-hash ui-keypath ttype kit-name elapsed-ms & [client-name flow-id]]
@@ -6657,12 +6735,14 @@ This is a standard Clojure REPL block. It executes Clojure code and returns the 
                                                                                                    :item_data    (pr-str i)}]]
                                                                                 row-map))]]
                                                            rowset)))]
-                            (when (not (= kkit-name ":kick")) ;; let kick "messages" pile up, dont swap out like a
+                            
+                            (when true ;;(not (= kkit-name ":kick")) ;; let kick "messages" pile up, dont swap out like a
                               (sql-exec system-db
                                         (to-sql {:delete-from [:kits]
                                                  :where       [:and [:= :kit_name kkit-name]
                                                                [:= :item_name
                                                                 (if (vector? ui-keypath) (str (first ui-keypath)) (str ui-keypath))]]})))
+                            (swap! kit-client-mapped assoc-in [client-name kkit-name] (kit-rows-to-map output-rows)) ;; *very* weird client row munging moved to server... TODO Aug'24
                             (sql-exec system-db (to-sql {:insert-into [:kits] :values output-rows}))))))
 
 (defmethod wl/handle-request :honey-xcall

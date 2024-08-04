@@ -338,11 +338,10 @@
 
 
 
-(defn read-if-keyworded-str
-  [x]
+(defn read-if-keyworded-str [x]
   (if (cstr/starts-with? (str x) ":") (try (edn/read-string x) (catch :default _ :error!)) (keyword x)))
-(defn kit-rows-to-map
-  [rowset]
+
+(defn kit-rows-to-map [rowset]
   (try (let [mapped (into {}
                           (for [[k v] (group-by :kit_name rowset)]
                             {(read-if-keyworded-str k)
@@ -403,7 +402,8 @@
                    :need-feedback "false"
                    :wip           "false"}]}]}
         react-hack @hide-diffs?
-        meta-object-msg (when (= mode :buffy2) @(ut/tracked-subscribe [::object-meta-chat kp]))]
+        ;meta-object-msg (when (= mode :buffy2) @(ut/tracked-subscribe [::object-meta-chat kp]))
+        ]
     (when (or (nil? (get @db/kit-keys kp)) (not (some #(= (get @db/kit-keys kp) %) narratives)))
       (swap! db/kit-keys assoc kp item-key))
     [(if (or (= mode :narratives) (or (= mode :kick) (= mode :buffy))) re-com/v-box re-com/h-box) :gap "9px" :align :center
@@ -1444,7 +1444,12 @@
           [re-com/box :size "auto" :align :center :justify :center :style
            {:opacity 0.45 :color (theme-pull :theme/editor-outer-rim-color nil)} :child (str "changes: " (keys v))]]]])]))
 
-
+(re-frame/reg-sub 
+ ::kit-run-waiting?
+ (fn [_ {:keys [panel-key data-key]}] 
+   (let [running-key (get @db/kit-fn-lookup [panel-key data-key])
+         running? @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})]
+     (or running? false))))
 
 (re-frame/reg-event-db
   ::delete-kit-item
@@ -1462,7 +1467,7 @@
         [r1 r2]          @(ut/tracked-subscribe [::bricks/query-waitings :kit-results-sys])
         running?         (or r1 r2)
         client-name      @(re-frame.core/subscribe [::bricks/client-name])
-        kit-name         (get @db/kit-mode kp)
+        kit-name         :kick ;(get @db/kit-mode kp)
         callie?          (= kit-name :ai/calliope)
         text-box?        true ;  (if (not callie?) true)
         text-box-height  (if callie? 310 110)
@@ -1473,14 +1478,12 @@
                                 (or (= kit-name :kick) (= kit-name :ai/calliope))
                                  [:= :client_name (str client-name)]
                                  [:= 1 1])
-                          [:= :item_name iname] [:= :kit_name (str kit-name)]]
-
-
-        [runner-src data-key] @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
-        selected-block    @(ut/tracked-sub ::bricks/selected-block {})
+                          [:= :item_name iname] 
+                          [:= :kit_name (str kit-name)]]
+        [runner-src 
+         data-key]       @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+        selected-block   @(ut/tracked-sub ::bricks/selected-block {})
         src-kp           [selected-block runner-src data-key]
-
-
         kit-results      @(re-frame.core/subscribe [::conn/sql-data [:kit-results-sys]])
         kits             (kit-rows-to-map kit-results)
         kick-kit-name    (last (keys (get kits :kits)))
@@ -1494,10 +1497,13 @@
         narrative-item   (if (and (> narrative-item (- (count narratives) 1)) (not running?) (not (= (count narratives) 0)))
                            (do (swap! kit-pages assoc kp (- (count narratives) 1)) (- (count narratives) 1))
                            narrative-item)
-        wait?            @(ut/tracked-subscribe [::bricks/reco-running? kit-context-name kit-name])
-        queued?          @(ut/tracked-subscribe [::bricks/reco-queued? kit-context-name kit-name])
+        ;;wait?            @(ut/tracked-subscribe [::bricks/reco-running? kit-context-name kit-name])
+        queued?          false ;@(ut/tracked-subscribe [::bricks/reco-queued? kit-context-name kit-name])
+        wait?            @(ut/tracked-sub ::kit-run-waiting? {:panel-key selected-block :data-key data-key})
         allow-mutate?    (get @kit-mutations kp false)
-        sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}]
+        sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}
+        ;sql-calls        {:kit-results-sys {:select [:item_key :item_data :kit_name :item_options] :from [:kits] :where where-filter}}
+        ]
     (ut/tapp>> [:kit-calls sql-calls])
     (doseq [[k query] sql-calls]
       (let [;query (ut/postwalk-replacer sql-params v)
@@ -1550,9 +1556,9 @@
                                                                (ut/replacer "/" "-")
                                                                (ut/replacer "." "-"))))
                                                v}))
-                     _ (when (and (not (empty? step-mutates)) selected? allow-mutate?)
+                     _ (when (and (ut/ne? step-mutates) selected? allow-mutate?)
                          (doseq [[kk vv] step-mutates] (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))
-                     _ (when (and (not (empty? parameters)) viewable?)
+                     _ (when (and (ut/ne? parameters) viewable?)
                          (dorun (ut/tapp>> [:reparameters reparameters])
                                 (ut/tracked-dispatch [::click-parameter [kit-name] reparameters])))]
               :when (if as-pages? selected? true)]
@@ -1680,11 +1686,11 @@
                                                             [render-honey-comb-fragments c 10]])
                       ;;  :else [re-com/box :padding "4px" :child [render-honey-comb-fragments c 10]]
                        ))]
-              (when (not (empty? parameters)) [re-com/box :style {:font-size "17px"} :child "relevant parameters"])
-              (when (not (empty? parameters)) [bricks/click-param-browser [rereparameters] 540 nil])
-              (when (and (not (empty? parameters)) (not (empty? ask-mutates))) [re-com/gap :size "10px"])
-              (when (not (empty? ask-mutates)) [re-com/box :style {:font-size "17px"} :child "possible board changes"])
-              (when (not (empty? ask-mutates)) [ask-mutates-render ask-mutates hpage])]] [re-com/gap :size "9px"]]])]])))
+              (when (ut/ne? parameters) [re-com/box :style {:font-size "17px"} :child "relevant parameters"])
+              (when (ut/ne? parameters) [bricks/click-param-browser [rereparameters] 540 nil])
+              (when (and (ut/ne? parameters) (ut/ne? ask-mutates)) [re-com/gap :size "10px"])
+              (when (ut/ne? ask-mutates) [re-com/box :style {:font-size "17px"} :child "possible board changes"])
+              (when (ut/ne? ask-mutates) [ask-mutates-render ask-mutates hpage])]] [re-com/gap :size "9px"]]])]])))
 
 (defonce title-edit-idx (reagent/atom nil))
 

@@ -1243,49 +1243,49 @@
     (tapp>> [:parent-z-index z-index]) ;; Print or use the z-index as needed
     z-index)) ;; Return the z-index
 
-;; (defn deep-remove-keys
-;;   [data keys-to-remove]
-;;   (let [key-remove-set (set keys-to-remove)]
-;;     (cond (map? data)    (->> data
-;;                               (reduce-kv (fn [acc k v]
-;;                                            (if (or (key-remove-set k) (and (keyword? k) (cstr/starts-with? (name k) "_")))
-;;                                              acc
-;;                                              (assoc acc k (deep-remove-keys v keys-to-remove))))
-;;                                          {})
-;;                               (into (empty data)))
-;;           (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
-;;           :else          data)))
-
 (defn deep-remove-keys
-  "Recursively removes specified keys and keys starting with '_' from nested data structures."
   [data keys-to-remove]
-  (let [key-remove-set (set keys-to-remove)
-        should-remove? (fn [k]
-                         (or (key-remove-set k)
-                             (and (keyword? k)
-                                  (cstr/starts-with? (name k) "_"))))]
-    (letfn [(remove-keys [x]
-              (cond
-                (map? x)
-                (persistent!
-                 (reduce-kv
-                  (fn [acc k v]
-                    (if (should-remove? k)
-                      acc
-                      (assoc! acc k (remove-keys v))))
-                  (transient (empty x))
-                  x))
+  (let [key-remove-set (set keys-to-remove)]
+    (cond (map? data)    (->> data
+                              (reduce-kv (fn [acc k v]
+                                           (if (or (key-remove-set k) (and (keyword? k) (cstr/starts-with? (name k) "_")))
+                                             acc
+                                             (assoc acc k (deep-remove-keys v keys-to-remove))))
+                                         {})
+                              (into (empty data)))
+          (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
+          :else          data)))
 
-                (vector? x)
-                (persistent!
-                 (reduce
-                  (fn [acc v]
-                    (conj! acc (remove-keys v)))
-                  (transient [])
-                  x))
+;; (defn deep-remove-keys
+;;   "Recursively removes specified keys and keys starting with '_' from nested data structures."
+;;   [data keys-to-remove]
+;;   (let [key-remove-set (set keys-to-remove)
+;;         should-remove? (fn [k]
+;;                          (or (key-remove-set k)
+;;                              (and (keyword? k)
+;;                                   (cstr/starts-with? (name k) "_"))))]
+;;     (letfn [(remove-keys [x]
+;;               (cond
+;;                 (map? x)
+;;                 (persistent!
+;;                  (reduce-kv
+;;                   (fn [acc k v]
+;;                     (if (should-remove? k)
+;;                       acc
+;;                       (assoc! acc k (remove-keys v))))
+;;                   (transient (empty x))
+;;                   x))
 
-                :else x))]
-      (remove-keys data))))
+;;                 (vector? x)
+;;                 (persistent!
+;;                  (reduce
+;;                   (fn [acc v]
+;;                     (conj! acc (remove-keys v)))
+;;                   (transient [])
+;;                   x))
+
+;;                 :else x))]
+;;       (remove-keys data))))
 
 (defn clean-sql-from-ui-keys-fn
   [query]
