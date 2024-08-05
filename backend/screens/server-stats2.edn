@@ -1,6 +1,11 @@
 {:orders
- {:kke192 [],
+ {:fields-sys [:field_name :field_type :data_type],
+  :kke192 (:query_error),
   :gen-viz-553 (:thread_count :clients :ts),
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :tmp--1549474592-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :new-query (:diff :mem_used :ts_hour),
   :cpu-query1 (:diff :used_memory_mb :cpu_usage :mps :ts1),
   :new-query-1
@@ -61,6 +66,7 @@
    :sys_load
    :used_memory_mb
    :ws_peers],
+  :flows-sys [:flow_id :file_path :last_modified],
   :gen-viz-1002 (:diff :used_memory_mb :cpu_usage :mps :ts1),
   :jvm_stats
   [:used_memory_mb
@@ -106,7 +112,21 @@
    :messages_per_second
    :recent_messages_per_second
    :ts],
-  :gen-viz-1002-clone-38 (:diff :used_memory_mb :ts1)},
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ss],
+  :gen-viz-1002-clone-38 (:diff :used_memory_mb :ts1),
+  :kit-results-sys
+  [:id
+   :item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :client_name
+   :flow_id
+   :updated]},
  :reco-preview nil,
  :sql-source
  {:kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
@@ -114,7 +134,7 @@
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "19:51:41",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from
    [{:select
@@ -148,7 +168,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "16:01:48",
+   :_last-run "00:56:47",
    :refresh-every 45,
    :from
    [{:select
@@ -193,7 +213,7 @@
   {:cache? false,
    :limit 180,
    :group-by [4],
-   :_last-run "19:51:40",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from
    [{:select
@@ -253,16 +273,16 @@
    {[:sys_load :heatmap-7696]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#bd96aa" "#131b28"] 20 :desc],
+     {:background-color [:heatmap ["#c2abb6" "#0d2248"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}},
     [:recent_messages_per_second :heatmap-2888]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#c44c4c" "#ec944c"] 20 :desc],
+     {:background-color [:heatmap ["#0d2248" "#e47c68"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "19:51:41",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
@@ -285,7 +305,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "19:52:10",
+   :_last-run "01:06:16",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -322,13 +342,13 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[3 :desc]],
-   :_last-run "19:51:40",
+   :_last-run "01:06:15",
    :where [:>= :recent_batches_per_second 0]},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [4],
-   :_last-run "19:51:41",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from
    [{:select
@@ -389,7 +409,7 @@
   {:cache? false,
    :limit 24,
    :group-by [2],
-   :_last-run "19:51:41",
+   :_last-run "01:06:16",
    :refresh-every 45,
    :from
    [[{:group-by [:ts1],
@@ -438,28 +458,49 @@
            row
            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))}},
  :meta
- {:kke192 {:fields {}},
+ {nil
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :fields-sys {:fields {}, :rowcount 0},
+  :kke192
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :gen-viz-553
   {:fields
    {:thread_count
     {:data-type "float",
-     :distinct 18,
+     :distinct 2,
      :group-by? true,
-     :commons {332.225 1, 358.1 1, 339.175 1},
+     :commons {275.76 1, 238.25 1},
      :cardinality 100},
     :clients
     {:data-type "float",
      :distinct 1,
      :group-by? true,
-     :commons {8 18},
-     :cardinality 5},
+     :commons {11 2},
+     :cardinality 50},
     :ts
     {:data-type "string",
-     :distinct 18,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-07-15 19:2" 1, "2024-07-15 18:5" 1, "2024-07-15 18:0" 1},
+     :commons {"2024-08-05 01:0" 1, "2024-08-05 00:5" 1},
      :cardinality 100}},
-   :rowcount 18},
+   :rowcount 2},
   :status-drag-0
   {:fields
    {:queries_run
@@ -614,304 +655,432 @@
      :commons {15 258, 14 241, -1 1},
      :cardinality 0}},
    :rowcount 500},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 5},
+     :cardinality 20},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 5},
+     :cardinality 20},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"imported" 5},
+     :cardinality 20},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 5},
+     :cardinality 20},
+    :table_name
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"superstore2" 1, "superstore" 1, "ref_us_zipcodes" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? false,
+     :commons {22 2, 7 1, 4 1},
+     :cardinality 80}},
+   :rowcount 5},
+  :tmp--1549474592-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-494 :queries :jvm-stats-drag-40]" 15},
+     :cardinality 6},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":jvm-stats-drag-40" 15},
+     :cardinality 6},
+    :updated
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"2024-08-03 07:22:09" 3, "2024-08-03 05:50:42" 1, "2024-08-03 05:58:37" 1},
+     :cardinality 86},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 15},
+     :cardinality 6},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-494" 15},
+     :cardinality 6},
+    :diff_kp
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"([:_last-run :new] [:_last-run :new] [:_last-run :old] [:_last-run :old] [:_last-run])"
+      11,
+      "([:page :new] [:page :new] [:page :old] [:page :old] [:page] [:_last-run :new] [:_last-run :new] [:_last-run :old] [:_last-run :old] [:_last-run])"
+      2,
+      "([:_last-run :new] [:_last-run :new] [:_last-run :old] [:_last-run :old] [:_last-run] [:style-rules :new [:* :higlight-2012756594] :style :border] [:style-rules :new [:* :higlight-2012756594] :style :border] [:style-rules :new [:* :higlight-2012756594] :style :background-color] [:style-rules :new [:* :higlight-2012756594] :style :background-color] [:style-rules :new [:* :higlight-2012756594] :style] [:style-rules :new [:* :higlight-2012756594] :logic 1 2] [:style-rules :new [:* :higlight-2012756594] :logic 1 2] [:style-rules :new [:* :higlight-2012756594] :logic 1 1] [:style-rules :new [:* :higlight-2012756594] :logic 1 1] [:style-rules :new [:* :higlight-2012756594] :logic 1 0] [:style-rules :new [:* :higlight-2012756594] :logic 1 0] [:style-rules :new [:* :higlight-2012756594] :logic 1] [:style-rules :new [:* :higlight-2012756594] :logic 0] [:style-rules :new [:* :higlight-2012756594] :logic 0] [:style-rules :new [:* :higlight-2012756594] :logic] [:style-rules :new [:* :higlight-2012756594]] [:style-rules :new] [:style-rules :old] [:style-rules :old] [:style-rules])"
+      1},
+     :cardinality 26},
+    :client_name
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {":polished-octohedral-mouse-27" 8,
+      ":encouraging-azure-dolphin-25" 3,
+      ":restored-desert-tiger-32" 2},
+     :cardinality 26},
+    :pre_data
+    {:data-type "string",
+     :distinct 15,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :where [:>= :recent_batches_per_second 0], :style-rules {[:* :higlight-2012756594] {:logic [:and [:= :ts \"2024-08-03 05:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}, [:* :higlight529006336] {:logic [:and [:= :ts \"2024-08-02 03:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :_last-run \"05:59:23\", :refresh-every :param/refresh-timer, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :batches :messages :recent_batches_per_second :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers]}"
+      1,
+      "{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :batches :messages :recent_batches_per_second :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers], :refresh-every :param/refresh-timer, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :_last-run \"00:44:36\", :where [:>= :recent_batches_per_second 0]}"
+      1,
+      "{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :batches :messages :recent_batches_per_second :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers], :refresh-every :param/refresh-timer, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :_last-run \"06:44:37\", :where [:>= :recent_batches_per_second 0]}"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 15,
+     :group-by? true,
+     :commons
+     {"{:style-rules {:old nil, :new {[:* :higlight-2012756594] {:logic [:and [:= :ts \"2024-08-03 05:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :_last-run {:old \"04:07:07\", :new \"05:49:26\"}}"
+      1,
+      "{:_last-run {:old \"03:44:18\", :new nil}}" 1,
+      "{:_last-run {:old \"06:44:11\", :new nil}}" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :batches :messages :recent_batches_per_second :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers], :refresh-every :param/refresh-timer, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :where [:>= :recent_batches_per_second 0]}"
+      6,
+      "{:cache? false, :where [:>= :recent_batches_per_second 0], :style-rules {[:* :higlight-2012756594] {:logic [:and [:= :ts \"2024-08-03 05:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}, [:* :higlight529006336] {:logic [:and [:= :ts \"2024-08-02 03:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :refresh-every :param/refresh-timer, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :batches :messages :recent_batches_per_second :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers]}"
+      3,
+      "{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :batches :messages :recent_batches_per_second :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers], :refresh-every :param/refresh-timer, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :_last-run \"03:44:07\", :where [:>= :recent_batches_per_second 0]}"
+      1},
+     :cardinality 53}},
+   :rowcount 15},
   :new-query
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 22,
+     :distinct 2,
      :group-by? true,
-     :commons {"+26" 2, "+27" 2, "+55" 1},
-     :cardinality 91},
+     :commons {"-11" 1, "392 MB" 1},
+     :cardinality 100},
     :mem_used
     {:data-type "float",
-     :distinct 24,
+     :distinct 2,
      :group-by? true,
-     :commons {7.84649199325E8 1, 9.9603873415E8 1, 1.3155957255384614E9 1},
+     :commons {3.998468078E8 1, 4.112400639230769E8 1},
      :cardinality 100},
     :ts_hour
     {:data-type "string",
-     :distinct 24,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-07-15 19:2" 1, "2024-07-15 18:5" 1, "2024-07-15 18:0" 1},
+     :commons {"2024-08-05 01:0" 1, "2024-08-05 00:5" 1},
      :cardinality 100}},
-   :rowcount 24},
+   :rowcount 2},
   :cpu-query1
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 175,
+     :distinct 10,
      :group-by? true,
-     :commons {"-25" 2, "-39" 2, "-833" 2},
-     :cardinality 97},
+     :commons {"-2575" 1, "+301" 1, "-1095" 1},
+     :cardinality 100},
     :used_memory_mb
     {:data-type "float",
-     :distinct 178,
+     :distinct 10,
      :group-by? true,
-     :commons {9227.75 2, 7949.75 2, 8399.75 1},
-     :cardinality 98},
+     :commons {10287.75 1, 9894.25 1, 10950 1},
+     :cardinality 100},
     :cpu_usage
     {:data-type "float",
-     :distinct 145,
+     :distinct 10,
      :group-by? true,
-     :commons {4.58 4, 5.95 4, 5.47 3},
-     :cardinality 80},
+     :commons {4.04 1, 4.87 1, 5.12 1},
+     :cardinality 100},
     :mps
     {:data-type "float",
-     :distinct 150,
+     :distinct 10,
      :group-by? true,
-     :commons {82.86 3, 84.47 3, 83.93 3},
-     :cardinality 83},
+     :commons {98.72 1, 99.28 1, 99.19 1},
+     :cardinality 100},
     :ts1
     {:data-type "string",
-     :distinct 180,
+     :distinct 10,
      :group-by? true,
-     :commons {"2024-07-15 18:35" 1, "2024-07-15 19:14" 1, "2024-07-15 19:12" 1},
+     :commons {"2024-08-05 01:02" 1, "2024-08-05 01:03" 1, "2024-08-05 01:06" 1},
      :cardinality 100}},
-   :rowcount 180},
+   :rowcount 10},
   :new-query-1
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {9025 1, 9146 1, 9038 1},
+     :commons {37 1, 591 1, 633 1},
      :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 47,
+     :distinct 37,
      :group-by? true,
-     :commons {84.81 2, 85.01 2, 84.07 2},
-     :cardinality 93},
+     :commons {96.47 2, 96.61 1, 101.14 1},
+     :cardinality 97},
     :uptime_seconds
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {13334 1, 13394 1, 13604 1},
+     :commons {209 1, 194 1, 434 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {0 50},
-     :cardinality 1},
+     :commons {1 36, -37 1, 3 1},
+     :cardinality 7},
     :recent_batches
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {128688 1, 127253 1, 129918 1},
+     :commons {5865 1, 5706 1, 1630 1},
      :cardinality 100},
     :sql_cache_size
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {0 50},
-     :cardinality 1},
+     :commons {0 38},
+     :cardinality 2},
     :styler_heatmap_2888
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {1 50},
-     :cardinality 1},
+     :commons {1 38},
+     :cardinality 2},
     :ts
     {:data-type "string",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
      :commons
-     {"2024-07-15 19:51:19" 1, "2024-07-15 19:50:19" 1, "2024-07-15 19:45:04" 1},
+     {"2024-08-05 01:04:41" 1, "2024-08-05 00:57:56" 1, "2024-08-05 01:05:26" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 1,
+     :distinct 5,
      :group-by? true,
-     :commons {160 50},
-     :cardinality 1},
+     :commons {269 19, 267 11, 266 4},
+     :cardinality 13},
     :messages_per_second
     {:data-type "float",
-     :distinct 14,
+     :distinct 37,
      :group-by? true,
-     :commons {81.98 8, 81.92 4, 82.03 4},
-     :cardinality 28},
+     :commons {100.38 2, 100.83 1, 100.58 1},
+     :cardinality 97},
     :messages
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {1069991 1, 1087835 1, 1086593 1},
+     :commons {27368 1, 52710 1, 33306 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 50,
+     :distinct 5,
      :group-by? true,
-     :commons {3128 1, 3097 1, 3071 1},
-     :cardinality 100},
+     :commons {12 20, 9 10, 13 5},
+     :cardinality 13},
     :sys_load
     {:data-type "float",
-     :distinct 49,
+     :distinct 37,
      :group-by? true,
-     :commons {5.23 2, 10.17 1, 5.21 1},
-     :cardinality 98},
+     :commons {6.71 2, 4.29 1, 3.27 1},
+     :cardinality 97},
     :recent_batches_per_second
     {:data-type "float",
-     :distinct 21,
+     :distinct 28,
      :group-by? true,
-     :commons {9.73 6, 10.27 5, 10.13 5},
-     :cardinality 41},
+     :commons {10.27 2, 11.27 2, 10.93 2},
+     :cardinality 73},
     :batches
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {128688 1, 127253 1, 129918 1},
+     :commons {5865 1, 5706 1, 1630 1},
      :cardinality 100},
     :unix_ms
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {1721087329237 1, 1721087089236 1, 1721087014236 1},
+     :commons {1722833951318 1, 1722834251320 1, 1722834341320 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 49,
+     :distinct 38,
      :group-by? true,
-     :commons {13038 2, 9117 1, 9055 1},
-     :cardinality 98},
+     :commons {10906 1, 7699 1, 7344 1},
+     :cardinality 100},
     :styler_heatmap_7696
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {1 50},
-     :cardinality 1},
+     :commons {1 38},
+     :cardinality 2},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 12,
+     :distinct 18,
      :group-by? true,
-     :commons {7 12, 6 7, 8 6},
-     :cardinality 23},
+     :commons {9 6, 10 5, 31 4},
+     :cardinality 47},
     :thread_count
     {:data-type "integer",
-     :distinct 24,
+     :distinct 27,
      :group-by? true,
-     :commons {327 6, 320 3, 333 3},
-     :cardinality 47},
+     :commons {272 2, 286 2, 250 2},
+     :cardinality 71},
     :internal_queries_run
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {0 50},
-     :cardinality 1},
+     :commons {0 38},
+     :cardinality 2},
     :open_flow_channels
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {-1 50},
-     :cardinality 1},
+     :commons {-1 38},
+     :cardinality 2},
     :ws_peers
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {8 50},
-     :cardinality 1},
+     :commons {11 38},
+     :cardinality 2},
     :recent_messages
     {:data-type "integer",
-     :distinct 50,
+     :distinct 38,
      :group-by? true,
-     :commons {1081509 1, 1105495 1, 1110580 1},
+     :commons {27374 1, 4858 1, 30294 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 12,
+     :distinct 19,
      :group-by? true,
-     :commons {0.47 12, 0.4 7, 0.53 6},
-     :cardinality 23},
+     :commons {0.6 6, 0.67 5, 2.07 4},
+     :cardinality 50},
     :batches_per_second
     {:data-type "float",
-     :distinct 4,
+     :distinct 34,
      :group-by? true,
-     :commons {9.56 28, 9.57 12, 9.58 9},
-     :cardinality 7},
+     :commons {12.01 2, 12.03 2, 12.04 2},
+     :cardinality 89},
     :seconds_since_last_update
     {:data-type "integer",
-     :distinct 2,
+     :distinct 3,
      :group-by? true,
-     :commons {15 28, 14 22},
-     :cardinality 3}},
-   :rowcount 50},
+     :commons {14 24, 15 13, -1 1},
+     :cardinality 7}},
+   :rowcount 38},
   :client-stats-drag-33
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {16 2, 24 2, 27 1},
-     :cardinality 75},
-    :push
-    {:data-type "integer",
      :distinct 8,
      :group-by? true,
-     :commons {182176 1, 13214 1, 1247 1},
+     :commons {33 2, 24 2, 16 2},
+     :cardinality 72},
+    :push
+    {:data-type "integer",
+     :distinct 11,
+     :group-by? true,
+     :commons {4873 1, 1856 1, 1181 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 8,
      :group-by? true,
-     :commons {16 2, 24 2, 27 1},
-     :cardinality 75},
+     :commons {33 2, 24 2, 16 2},
+     :cardinality 72},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 8,
+     :distinct 10,
      :group-by? true,
-     :commons {13.53 1, 1.13 1, 0.07 1},
-     :cardinality 100},
+     :commons {2.13 2, 2.27 1, 3.27 1},
+     :cardinality 90},
     :last_seen_seconds
     {:data-type "integer",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {14 8},
-     :cardinality 12},
+     :commons {14 8, 13 2, 12 1},
+     :cardinality 27},
     :memory
     {:data-type "string",
-     :distinct 8,
+     :distinct 11,
      :group-by? true,
-     :commons {"2879.6479" 1, "1284.9463" 1, "1525.3243" 1},
+     :commons {"394.047" 1, "895.8051" 1, "835.3143" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-07-15 19:51:49" 8},
-     :cardinality 12},
+     :commons {"2024-08-05 01:06:11" 11},
+     :cardinality 9},
     :styler_highlight_8717
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {0 7, 1 1},
-     :cardinality 25},
+     :commons {0 10, 1 1},
+     :cardinality 18},
     :client_latency
     {:data-type "integer",
-     :distinct 8,
+     :distinct 11,
      :group-by? true,
-     :commons {523 1, 188 1, 123 1},
+     :commons {744 1, 211 1, 286 1},
      :cardinality 100},
     :ack
     {:data-type "integer",
-     :distinct 3,
+     :distinct 2,
      :group-by? true,
-     :commons {921 4, 922 3, 812 1},
-     :cardinality 37},
+     :commons {37 9, 38 2},
+     :cardinality 18},
     :client_name
     {:data-type "string",
-     :distinct 8,
+     :distinct 11,
      :group-by? true,
      :commons
-     {":vivacious-wide-llama-36" 1,
-      ":stellar-indigo-snake-37" 1,
-      ":quiet-chocolate-heron-42" 1},
+     {":worthy-bronze-grasshopper-42" 1,
+      ":seemly-spring-bud-hummingbird-31" 1,
+      ":elegant-magenta-sheep-34" 1},
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {"14 seconds" 8},
-     :cardinality 12}},
-   :rowcount 8},
+     :commons {"14 seconds" 8, "13 seconds" 2, "12 seconds" 1},
+     :cardinality 27}},
+   :rowcount 11},
   :query-4704
   {:fields
    {:test_name
@@ -931,149 +1100,175 @@
   {:fields
    {:ts1
     {:data-type "string",
-     :distinct 500,
+     :distinct 37,
      :group-by? true,
      :commons
-     {"2024-07-15 18:53:19" 1, "2024-07-15 18:21:34" 1, "2024-07-15 19:22:19" 1},
+     {"2024-08-05 01:04:41" 1, "2024-08-05 00:57:56" 1, "2024-08-05 01:05:26" 1},
      :cardinality 100},
     :queries_run
     {:data-type "integer",
-     :distinct 500,
+     :distinct 37,
      :group-by? true,
-     :commons {8879 1, 8202 1, 7564 1},
+     :commons {591 1, 633 1, 469 1},
      :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 260,
+     :distinct 36,
      :group-by? true,
-     :commons {84.47 10, 82.74 7, 84.07 7},
-     :cardinality 51},
+     :commons {96.47 2, 96.61 1, 101.14 1},
+     :cardinality 97},
     :sql_cache_size
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {0 500},
-     :cardinality 0},
+     :commons {0 37},
+     :cardinality 2},
     :ts
     {:data-type "string",
-     :distinct 14,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-07-15 19:2" 40, "2024-07-15 18:5" 40, "2024-07-15 18:0" 40},
-     :cardinality 2},
+     :commons {"2024-08-05 01:0" 25, "2024-08-05 00:5" 12},
+     :cardinality 5},
     :messages
     {:data-type "integer",
-     :distinct 500,
+     :distinct 37,
      :group-by? true,
-     :commons {947987 1, 835887 1, 893836 1},
+     :commons {27368 1, 52710 1, 33306 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 500,
+     :distinct 5,
      :group-by? true,
-     :commons {2163 1, 1861 1, 2819 1},
-     :cardinality 100},
+     :commons {12 20, 9 10, 13 5},
+     :cardinality 13},
     :sys_load
     {:data-type "float",
-     :distinct 347,
+     :distinct 36,
      :group-by? true,
-     :commons {3.79 7, 3.51 6, 4.37 4},
-     :cardinality 69},
+     :commons {6.71 2, 4.29 1, 3.27 1},
+     :cardinality 97},
     :recent_batches_per_second
     {:data-type "float",
-     :distinct 50,
+     :distinct 27,
      :group-by? true,
-     :commons {10.2 30, 9.73 27, 10 27},
-     :cardinality 10},
+     :commons {10.27 2, 11.27 2, 10.93 2},
+     :cardinality 72},
     :batches
     {:data-type "integer",
-     :distinct 500,
+     :distinct 37,
      :group-by? true,
-     :commons {128688 1, 114072 1, 100196 1},
+     :commons {5865 1, 5706 1, 1630 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 478,
+     :distinct 37,
      :group-by? true,
-     :commons {9117 2, 8909 2, 9511 2},
-     :cardinality 95},
+     :commons {10906 1, 7699 1, 7344 1},
+     :cardinality 100},
     :thread_count
     {:data-type "integer",
-     :distinct 81,
+     :distinct 27,
      :group-by? true,
-     :commons {338 19, 335 18, 340 17},
-     :cardinality 16},
+     :commons {272 2, 286 2, 258 2},
+     :cardinality 72},
     :internal_queries_run
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {0 500},
-     :cardinality 0},
+     :commons {0 37},
+     :cardinality 2},
     :open_flow_channels
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {-1 500},
-     :cardinality 0},
+     :commons {-1 37},
+     :cardinality 2},
     :ws_peers
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {8 500},
-     :cardinality 0},
+     :commons {11 37},
+     :cardinality 2},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 22,
+     :distinct 18,
      :group-by? true,
-     :commons {0.47 83, 0.93 72, 0.4 53},
-     :cardinality 4}},
-   :rowcount 500},
+     :commons {0.6 6, 0.67 5, 2.07 4},
+     :cardinality 48}},
+   :rowcount 37},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 96,
+     :group-by? true,
+     :commons
+     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 99,
+     :group-by? true,
+     :commons
+     {"./flows/generated-flow-map.edn" 1,
+      "./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 66, "2024-06-22 18:16:16" 1, "2024-03-14 07:50:09" 1},
+     :cardinality 34}},
+   :rowcount 99},
   :gen-viz-1002
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 18,
+     :distinct 2,
      :group-by? true,
-     :commons {"-165" 1, "-94" 1, "+227" 1},
+     :commons {"-195" 1, "9929 MB" 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "float",
-     :distinct 18,
+     :distinct 2,
      :group-by? true,
-     :commons {10320.33 1, 8354.17 1, 7991.38 1},
+     :commons {9734 1, 9928.58 1},
      :cardinality 100},
     :cpu_usage
     {:data-type "float",
-     :distinct 16,
+     :distinct 2,
      :group-by? true,
-     :commons {5.84 2, 4.57 2, 4.79 1},
-     :cardinality 88},
+     :commons {6.15 1, 5.77 1},
+     :cardinality 100},
     :mps
     {:data-type "float",
-     :distinct 17,
+     :distinct 2,
      :group-by? true,
-     :commons {84.43 2, 84.11 1, 84.89 1},
-     :cardinality 94},
+     :commons {98.92 1, 98.36 1},
+     :cardinality 100},
     :ts1
     {:data-type "string",
-     :distinct 18,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-07-15 19:2" 1, "2024-07-15 18:5" 1, "2024-07-15 18:0" 1},
+     :commons {"2024-08-05 01:0" 1, "2024-08-05 00:5" 1},
      :cardinality 100}},
-   :rowcount 18},
+   :rowcount 2},
   :jvm_stats
   {:fields
    {:queries_run
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {2708 1, 3143 1, 2187 1},
+     :commons {1320 1, 362 1, 432 1},
      :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 111,
+     :distinct 96,
      :group-by? true,
-     :commons {151.47 1, 136.28 1, 156.78 1},
-     :cardinality 100},
+     :commons {91.87 4, 94.67 3, 91.74 3},
+     :cardinality 86},
     :uptime_seconds
     {:data-type "integer",
      :distinct 111,
@@ -1084,13 +1279,13 @@
     {:data-type "float",
      :distinct 4,
      :group-by? true,
-     :commons {3 99, 4 10, 2 1},
+     :commons {0 104, 1 5, 2 1},
      :cardinality 3},
     :recent_batches
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {19158 1, 7179 1, 11119 1},
+     :commons {14512 1, 7257 1, 16772 1},
      :cardinality 100},
     :sql_cache_size
     {:data-type "integer",
@@ -1103,74 +1298,74 @@
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-07-14 20:17:40" 1, "2024-07-14 20:17:10" 1, "2024-07-14 20:22:40" 1},
+     {"2024-08-02 03:59:47" 1, "2024-08-02 03:55:17" 1, "2024-08-02 04:02:17" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 2,
+     :distinct 4,
      :group-by? true,
-     :commons {411 110, 148 1},
-     :cardinality 1},
+     :commons {278 103, 238 4, 262 3},
+     :cardinality 3},
     :messages_per_second
     {:data-type "float",
-     :distinct 96,
+     :distinct 69,
      :group-by? true,
-     :commons {146.29 6, 146.42 5, 146.31 2},
-     :cardinality 86},
+     :commons {95.79 5, 95.86 4, 95.89 4},
+     :cardinality 62},
     :messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {12350 1, 135303 1, 160456 1},
+     :commons {135178 1, 29822 1, 35565 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 111,
+     :distinct 9,
      :group-by? true,
-     :commons {246 1, 212 1, 63 1},
-     :cardinality 100},
+     :commons {16 20, 14 20, 15 20},
+     :cardinality 8},
     :sys_load
     {:data-type "float",
-     :distinct 102,
+     :distinct 91,
      :group-by? true,
-     :commons {2.88 3, 4.21 2, 3.52 2},
-     :cardinality 91},
+     :commons {3.19 5, 3.92 3, 4.24 3},
+     :cardinality 81},
     :recent_batches_per_second
     {:data-type "float",
-     :distinct 58,
+     :distinct 49,
      :group-by? true,
-     :commons {12.27 6, 12.47 5, 13.4 5},
-     :cardinality 52},
+     :commons {11.93 9, 12.67 7, 11.53 5},
+     :cardinality 44},
     :batches
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {19158 1, 7179 1, 11119 1},
+     :commons {14512 1, 7257 1, 16772 1},
      :cardinality 100},
     :unix_ms
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1721002915214 1, 1721003635213 1, 1721003695213 1},
+     :commons {1722585917230 1, 1722584912230 1, 1722586277230 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 111,
+     :distinct 110,
      :group-by? true,
-     :commons {7974 1, 7804 1, 3946 1},
-     :cardinality 100},
+     :commons {8517 2, 10860 1, 10535 1},
+     :cardinality 99},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 36,
+     :distinct 26,
      :group-by? true,
-     :commons {45 11, 47 8, 44 8},
-     :cardinality 32},
+     :commons {6 30, 5 15, 26 11},
+     :cardinality 23},
     :thread_count
     {:data-type "integer",
-     :distinct 53,
+     :distinct 38,
      :group-by? true,
-     :commons {406 6, 403 6, 374 5},
-     :cardinality 47},
+     :commons {245 9, 251 8, 256 7},
+     :cardinality 34},
     :internal_queries_run
     {:data-type "integer",
      :distinct 1,
@@ -1187,31 +1382,31 @@
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {18 111},
+     :commons {12 111},
      :cardinality 0},
     :recent_messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {190917 1, 105895 1, 5609 1},
+     :commons {31249 1, 152526 1, 48556 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 36,
+     :distinct 28,
      :group-by? true,
-     :commons {3 11, 3.13 8, 2.93 8},
-     :cardinality 32},
+     :commons {0.4 30, 0.33 15, 0.47 11},
+     :cardinality 25},
     :batches_per_second
     {:data-type "float",
-     :distinct 83,
+     :distinct 57,
      :group-by? true,
-     :commons {12.67 5, 12.82 5, 12.73 4},
-     :cardinality 74},
+     :commons {11.99 9, 12.09 8, 12.1 5},
+     :cardinality 51},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 3,
      :group-by? true,
-     :commons {14 70, 15 40, -1 1},
+     :commons {14 73, 15 37, -1 1},
      :cardinality 2}},
    :rowcount 111},
   :status-drag-28
@@ -1468,113 +1663,113 @@
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 9,
      :group-by? true,
-     :commons {26 9, 17 4, 24 2},
-     :cardinality 33},
+     :commons {16 2, 24 2, 9 1},
+     :cardinality 81},
     :queue_size
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 18},
-     :cardinality 5},
+     :commons {nil 11},
+     :cardinality 9},
     :push
-    {:data-type "integer",
-     :distinct 18,
-     :group-by? true,
-     :commons {246823 1, 131816 1, 2725 1},
-     :cardinality 100},
-    :client_subs
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {26 9, 17 4, 24 2},
-     :cardinality 33},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 16,
-     :group-by? true,
-     :commons {1.07 3, 5.13 1, 5 1},
-     :cardinality 88},
-    :uptime_seconds
-    {:data-type "float",
-     :distinct 18,
-     :group-by? true,
-     :commons {40625.485 1, 40633.323 1, 40634.538 1},
-     :cardinality 100},
-    :uptime
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons
-     {"11 hours, 16 minutes, 58 seconds" 5,
-      "11 hours, 17 minutes, 1 second" 4,
-      "11 hours, 17 minutes, 0 second" 3},
-     :cardinality 38},
-    :last_seen_seconds
     {:data-type "integer",
      :distinct 11,
      :group-by? true,
-     :commons {14 8, 8 1, 10 1},
-     :cardinality 61},
+     :commons {151192 1, 756176 1, 183903 1},
+     :cardinality 100},
+    :client_subs
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {16 2, 24 2, 9 1},
+     :cardinality 81},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 11,
+     :group-by? true,
+     :commons {7.33 1, 3.13 1, 2.13 1},
+     :cardinality 100},
+    :uptime_seconds
+    {:data-type "float",
+     :distinct 11,
+     :group-by? true,
+     :commons {102749.991 1, 102749.71 1, 102749.769 1},
+     :cardinality 100},
+    :uptime
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"28 hours, 32 minutes, 16 seconds" 3,
+      "28 hours, 32 minutes, 14 seconds" 3,
+      "28 hours, 32 minutes, 11 seconds" 2},
+     :cardinality 54},
+    :last_seen_seconds
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 7, 13 3, 8 1},
+     :cardinality 27},
     :memory
     {:data-type "string",
-     :distinct 14,
+     :distinct 11,
      :group-by? true,
-     :commons {"560.7605" 3, "527.3819" 3, "141.1438" 1},
-     :cardinality 77},
+     :commons {"802.1596" 1, "774.0637" 1, "769.3612" 1},
+     :cardinality 100},
     :queue_distro
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"nil" 18},
-     :cardinality 5},
+     :commons {"nil" 11},
+     :cardinality 9},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-07-15 07:33:25" 18},
-     :cardinality 5},
+     :commons {"2024-08-03 08:17:17" 11},
+     :cardinality 9},
     :messages_per_second
     {:data-type "float",
-     :distinct 13,
+     :distinct 10,
      :group-by? true,
-     :commons {3.29 3, 1.08 3, 3.33 2},
-     :cardinality 72},
+     :commons {1.47 2, 7.38 1, 0.49 1},
+     :cardinality 90},
     :client_latency
     {:data-type "integer",
-     :distinct 18,
+     :distinct 11,
      :group-by? true,
-     :commons {9593 1, 9374 1, 6370 1},
+     :commons {677 1, 169 1, 973 1},
      :cardinality 100},
     :ack
     {:data-type "integer",
-     :distinct 2,
+     :distinct 3,
      :group-by? true,
-     :commons {2708 11, 2709 7},
-     :cardinality 11},
+     :commons {6840 6, 6841 3, 6831 2},
+     :cardinality 27},
     :booted_ts
     {:data-type "integer",
-     :distinct 18,
+     :distinct 11,
      :group-by? true,
-     :commons {1721002569778 1, 1721002568764 1, 1721002571761 1},
+     :commons {1722584690367 1, 1722584687245 1, 1722584691152 1},
      :cardinality 100},
     :client_name
     {:data-type "string",
-     :distinct 18,
+     :distinct 11,
      :group-by? true,
      :commons
-     {":distinguished-star-shaped-gorilla-3" 1,
-      ":tranquil-viridian-swan-33" 1,
-      ":willing-plum-codfish-15" 1},
+     {":seemly-spring-bud-hummingbird-31" 1,
+      ":elegant-magenta-sheep-34" 1,
+      ":restored-desert-tiger-32" 1},
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 11,
+     :distinct 3,
      :group-by? true,
-     :commons {"14 seconds" 8, "7 seconds" 1, "less than a second" 1},
-     :cardinality 61}},
-   :rowcount 18},
+     :commons {"14 seconds" 7, "13 seconds" 3, "8 seconds" 1},
+     :cardinality 27}},
+   :rowcount 11},
   :query-11325
   {:fields
    {:table_name
@@ -1599,6 +1794,27 @@
      :commons {37 1},
      :cardinality 100}},
    :rowcount 1},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 3, "*csv-import-db*" 1},
+     :cardinality 33},
+    :connection_id
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"history-db" 1, "imported" 1, "bigfoot-ufos" 1},
+     :cardinality 100},
+    :styler_highlight_8717ss
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 9},
+     :cardinality 11}},
+   :rowcount 9},
   :query-6018
   {:fields
    {:attribute_name
@@ -1618,29 +1834,256 @@
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {"+703" 1, "+368" 1, "+823" 1},
+     :commons {"-153" 1, "9887 MB" 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "float",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {8935 1, 8232 1, 7864 1},
+     :commons {9734 1, 9887 1},
      :cardinality 100},
     :ts1
     {:data-type "string",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {"15-19" 1, "15-18" 1, "15-17" 1},
+     :commons {"05-01" 1, "05-00" 1},
      :cardinality 100}},
-   :rowcount 4},
-  :reco-counts {:fields {}, :rowcount 0}},
+   :rowcount 2},
+  :reco-counts {:fields {}, :rowcount 0},
+  :kit-results-sys
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 1, 0 1},
+     :cardinality 100},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:options {:pages? true, :search? false, :actions? false}, :parameters {}, :mutates {}, :description \"Top 2 Outlier by Severity\"}"
+      2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-08-03 08:35:44" 2},
+     :cardinality 50},
+    :item_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"1796102128" 2},
+     :cardinality 50},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"query-log" 2},
+     :cardinality 50},
+    :item_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":jvm-stats-drag-40" 2},
+     :cardinality 50},
+    :flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 2},
+     :cardinality 50},
+    :id
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {452 1, 451 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":secure-azure-yellow-jacket-33" 2},
+     :cardinality 50},
+    :item_data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"{:name \"2. When grouping by ts and aggregating by :rows there are values that are lower than the mean  by 16.\", :highlight-columns {:jvm-stats-drag-40 [:ts]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-494 :queries :jvm-stats-drag-40 :style-rules [:* :higlight-135723437]] {:logic [:and [:= :ts \"2024-08-03 08:3\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"39.58621\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"2.0736536922434174\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"174\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:ts]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":ts\"] [:box :child \"\\\"2024-08-03 08:3\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:ts [[:count 1] :rows]], :from [:query/jvm-stats-drag-40], :_query-id :kit-query--1357234370-agg, :_h 4, :connection-id \"system-db\", :group-by [:ts], :style-rules {[:* :highlight-group] {:logic [:and [:= :ts \"2024-08-03 08:3\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :asc]]} \"All rows in this group:\" {:select [:*], :from [:query/jvm-stats-drag-40], :_query-id :kit-query--1357234370-detail, :_h 8, :connection-id \"system-db\", :where [:*if :kit-query--1357234370-agg/*.clicked [:*all= :kit-query--1357234370-agg/*.clicked [:ts]] [:and [:= :ts \"2024-08-03 08:3\"]]]}], :order 1}"
+      1,
+      "{:name \"1. When grouping by ts and aggregating by :rows there are values that are lower than the mean  by 20.\", :highlight-columns {:jvm-stats-drag-40 [:ts]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-494 :queries :jvm-stats-drag-40 :style-rules [:* :higlight529006336]] {:logic [:and [:= :ts \"2024-08-02 03:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"39.58621\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"2.0736536922434174\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"174\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:ts]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":ts\"] [:box :child \"\\\"2024-08-02 03:4\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:ts [[:count 1] :rows]], :from [:query/jvm-stats-drag-40], :_query-id :kit-query-5290063360-agg, :_h 4, :connection-id \"system-db\", :group-by [:ts], :style-rules {[:* :highlight-group] {:logic [:and [:= :ts \"2024-08-02 03:4\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :asc]]} \"All rows in this group:\" {:select [:*], :from [:query/jvm-stats-drag-40], :_query-id :kit-query-5290063360-detail, :_h 8, :connection-id \"system-db\", :where [:*if :kit-query-5290063360-agg/*.clicked [:*all= :kit-query-5290063360-agg/*.clicked [:ts]] [:and [:= :ts \"2024-08-02 03:4\"]]]}], :order 0}"
+      1},
+     :cardinality 100},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":top-outliers" 2},
+     :cardinality 50},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":kick" 2},
+     :cardinality 50}},
+   :rowcount 2}},
  :default-col-widths
- {:block-494 {:jvm-stats-drag-40 100},
+ {:prando21 {:kit-query-3770279380-detail 461, :kit-query-20162065410-detail 461},
+  :block-494
+  {:jvm-stats-drag-40-hist-891125916159 ##Inf,
+   :jvm-stats-drag-40-hist-47-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-31-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-111125916159 ##Inf,
+   :jvm-stats-drag-40-hist-54-747599149 100,
+   :jvm-stats-drag-40-hist-27-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-67553699827 ##Inf,
+   :jvm-stats-drag-40-hist-1001125916159 100,
+   :jvm-stats-drag-40-hist-14-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-16-1767958659 100,
+   :jvm-stats-drag-40-hist-43-1553440077 ##Inf,
+   :jvm-stats-drag-40-hist-17-747599149 100,
+   :jvm-stats-drag-40-hist-58-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-511255371092 ##Inf,
+   :jvm-stats-drag-40-hist-9-747599149 ##Inf,
+   :jvm-stats-drag-40 100,
+   :jvm-stats-drag-40-hist-78136176142 ##Inf,
+   :jvm-stats-drag-40-hist-701125916159 100,
+   :jvm-stats-drag-40-hist-76-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-801125916159 ##Inf,
+   :jvm-stats-drag-40-hist-88-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-1031255371092 ##Inf,
+   :jvm-stats-drag-40-hist-74-1553440077 ##Inf,
+   :jvm-stats-drag-40-hist-112-747599149 100,
+   :jvm-stats-drag-40-hist-81-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-118-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-341482962306 100,
+   :jvm-stats-drag-40-hist-50553699827 ##Inf,
+   :jvm-stats-drag-40-hist-991125916159 ##Inf,
+   :jvm-stats-drag-40-hist-60-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-77-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-3136176142 ##Inf,
+   :jvm-stats-drag-40-hist-221125916159 ##Inf,
+   :jvm-stats-drag-40-hist-82-1553440077 ##Inf,
+   :jvm-stats-drag-40-hist-661125916159 ##Inf,
+   :jvm-stats-drag-40-hist-87-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-1181482962306 ##Inf,
+   :jvm-stats-drag-40-hist-34136176142 ##Inf,
+   :jvm-stats-drag-40-hist-491125916159 100,
+   :jvm-stats-drag-40-hist-36-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-56-747599149 ##Inf,
+   :jvm-stats-drag-40-hist-7-1767958659 ##Inf,
+   :jvm-stats-drag-40-hist-361255371092 ##Inf,
+   :jvm-stats-drag-40-hist-64553699827 ##Inf,
+   :jvm-stats-drag-40-hist-51-1767958659 ##Inf,
+   :jvm-stats-drag-40-hist-431482962306 ##Inf},
+  :prando52 {:kit-query-5290063360-detail 100},
+  :prando114
+  {:kit-query-7206240030-detail 461,
+   :kit-query-20162065410-agg 461,
+   :kit-query-3770279380-detail 461},
+  :prando2 {:kit-query-3770279380-detail 461},
   :block-8179 {:client-stats-drag-33 141},
+  :prando77 {:kit-query-3770279380-detail 461},
+  :prando43 {:kit-query--4993494550-agg ##Inf},
+  :prando75 {:kit-query-7523998450-detail 461},
+  :prando47 {:kit-query--1357234370-detail 100},
+  :prando122 {:kit-query-2218368560-detail ##Inf},
+  :prando7 {:kit-query--12958893580-agg ##Inf},
+  :prando62 {:kit-query--15106217100-agg 461},
+  :prando60
+  {:kit-query-3770279380-detail 461,
+   :kit-query-16728557380-detail ##Inf,
+   :kit-query--1357234370-agg 230},
+  :prando65 {:kit-query--4993494550-agg 461},
+  :prando59
+  {:kit-query-7206240030-detail 461,
+   :kit-query-2218368560-detail 461,
+   :kit-query-5290063360-agg 230},
+  :prando112 {:kit-query-13162751150-agg 461},
+  :prando46 {:kit-query-2218368560-detail 461},
+  :prando110 {:kit-query-20162065410-detail 461},
+  :prando66
+  {:kit-query-5703154440-detail 461,
+   :kit-query-12958178020-agg 461,
+   :kit-query-5703154440-agg 461},
   :block-3438 {:new-query-1 100},
-  :block-7876 {:new-query 170}},
+  :prando9 {:kit-query-3770279380-agg 461},
+  :prando35 {:kit-query-12958178020-detail ##Inf},
+  :prando111
+  {:kit-query--15106217100-detail 461,
+   :kit-query--18279869890-agg 461,
+   :kit-query-7206240030-agg 461,
+   :kit-query-5703154440-detail 461},
+  :prando54 {:kit-query--12958893580-agg 461},
+  :prando84 {:kit-query--4993494550-detail 461},
+  :prando26 {:kit-query--1357234370-agg 230},
+  :prando74 {:kit-query-2218368560-agg 461},
+  :prando38 {:kit-query-13162751150-detail 461, :kit-query-5703154440-detail 461},
+  :prando13 {:kit-query-3770279380-agg 461},
+  :prando14 {:kit-query-2218368560-agg 461},
+  :prando18 {:kit-query-2218368560-detail 461, :kit-query-5290063360-detail 100},
+  :system-connections-list* {:connections-sys 126},
+  :prando117 {:kit-query-5703154440-agg 461},
+  :prando56 {:kit-query-5703154440-detail 461},
+  :prando76 {:kit-query-5703154440-agg 461, :kit-query-3770279380-agg 461},
+  :prando92 {:kit-query-2218368560-detail 461},
+  :system-fields-list* {:fields-sys ##Inf},
+  :prando22 {:kit-query-7523998450-detail 461},
+  :prando87 {:kit-query--1357234370-detail 100},
+  :prando11
+  {:kit-query-10256346480-agg 461,
+   :kit-query--4993494550-detail ##Inf,
+   :kit-query-7206240030-detail 461,
+   :kit-query-7523998450-agg 461},
+  :prando83 {:kit-query-7523998450-agg 461},
+  :prando82 {:kit-query-20162065410-agg 461},
+  :prando30 {:kit-query-20162065410-agg 461},
+  :prando29 {:kit-query-2218368560-agg 461},
+  :prando67 {:kit-query-7206240030-agg 461},
+  :prando16 {:kit-query--1357234370-agg 230},
+  :prando97 {:kit-query-20162065410-agg 461},
+  :prando71 {:kit-query-13162751150-detail 461},
+  :prando45 {:kit-query--18279869890-detail 461},
+  :prando36 {:kit-query-7523998450-detail 461, :kit-query-3770279380-agg 461},
+  :prando8 {:kit-query-20162065410-agg 461, :kit-query-7206240030-agg 461},
+  :prando57 {:kit-query--12958893580-detail 461, :kit-query-16728557380-agg ##Inf},
+  :prando3 {:kit-query-10256346480-detail 461},
+  :prando17 {:kit-query-5290063360-agg 230},
+  :prando89
+  {:kit-query-12958178020-agg 461,
+   :kit-query-16728557380-detail 461,
+   :kit-query-10256346480-agg 461,
+   :kit-query-10256346480-detail 461,
+   :kit-query-7206240030-detail 461},
+  :prando15 {:kit-query-3770279380-detail 461},
+  :prando91 {:kit-query-5703154440-detail 461, :kit-query-20162065410-detail 461},
+  :prando107 {:kit-query-2218368560-detail 461},
+  :prando85 {:kit-query--18279869890-detail 461},
+  :prando1 {:kit-query-12958178020-agg ##Inf},
+  :prando70 {:kit-query--18279869890-agg 461},
+  :prando12
+  {:kit-query-3770279380-agg 461,
+   :kit-query-20162065410-detail 461,
+   :kit-query-3770279380-detail 461},
+  :prando80 {:kit-query-12958178020-detail 461},
+  :prando49 {:kit-query-3770279380-agg 461},
+  :prando48 {:kit-query-5703154440-agg 461},
+  :prando90 {:kit-query-12958178020-detail 461},
+  :prando100 {:kit-query-7523998450-agg 461, :kit-query-3770279380-agg 461},
+  :system-tables-list* {:tables-sys 133},
+  :prando19 {:kit-query-5703154440-agg 461, :kit-query-13162751150-agg ##Inf},
+  :prando94 {:kit-query--12958893580-detail ##Inf},
+  :prando20 {:kit-query-2218368560-agg 461, :kit-query-5290063360-agg 230},
+  :prando109 {:kit-query-2218368560-agg 461, :kit-query--1357234370-detail 100},
+  :prando37 {:kit-query-5290063360-detail 100},
+  :prando27 {:kit-query-16728557380-agg 461},
+  :prando101 {:kit-query-2218368560-agg 461, :kit-query-7206240030-agg 461}},
  :runstream-drops nil,
  :tabs
  ["welcome to the party pal"
@@ -1656,9 +2099,58 @@
  {:settings
   {:harvest-on-boot? true,
    :default "./screens/looking-glass-redux.edn",
+   :new-block-rand
+   ["Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "It's no use going back to yesterday, because I was a different person then."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "Curiouser and curiouser!"
+    "If you don't know where you are going any road can take you there."
+    "We're all mad here."
+    "I can't go back to yesterday because I was a different person then."
+    "It's always tea-time."
+    "Begin at the beginning and go on till you come to the end; then stop."
+    "I knew who I was this morning, but I've changed a few times since then."
+    "How long is forever? Sometimes, just one second."
+    "If everybody minded their own business, the world would go around a great deal faster than it does."
+    "I don't think... then you shouldn't talk, said the Hatter."
+    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+    "Well, I never heard it before, but it sounds uncommon nonsense."
+    "Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "We're all mad here."
+    "How long is forever? Sometimes, just one second."
+    "The world is full of obvious things which nobody by any chance ever observes."
+    "Reality is that which, when you stop believing in it, doesn't go away."
+    "The sky above the port was the color of television, tuned to a dead channel."
+    "Information wants to be free."
+    "The future is already here – it's just not evenly distributed."
+    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+    "The 'Net is a waste of time, and that's exactly what's right about it."
+    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+    "The street finds its own uses for things."
+    "Accelerated world. Accelerated nervous system to go with it."
+    "The future has arrived — it's just not evenly distributed yet."
+    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+    "When you want to know how things really work, study them when they're coming apart."
+    "The human sensory system is a lot more complex and weird than most people realize."
+    "Time moves in one direction, memory in another."
+    "The only thing that keeps you sane is to think that it's all a bad dream."
+    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+    "Secrets are not the same as surprises."
+    "Neuromancer. The lane to the land of the dead."],
    :eleven-labs-api-key nil,
    :modes
-   {:pre
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
@@ -1669,12 +2161,10 @@
        :font-family :theme/monospaced-font}}
      [:string3 :*data]],
     :edn [:edn :*data],
-    :text [:console :*data],
-    :terminal [:terminal :*data],
-    :data [:data-viewer :*data],
+    :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
-    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
-    :clover [:box :child :*data]},
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
    :kits {},
    :clover-templates
    {:color-theft
@@ -1795,7 +2285,6 @@
     "light-theme"
     "literal-data-test"
     "looking-glass-conway"
-    "looking-glass-redux"
     "looking-glass-redux-conway2"
     "looking-glass-redux-mix5"
     "looking-glass-redux-test"
@@ -1841,11 +2330,13 @@
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "repl-demo-july23"
     "repl-tests-3"
     "retro-machines"
     "riffle-test"
     "server-stats"
     "server-stats2"
+    "server-stats2a"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
@@ -1858,6 +2349,7 @@
     "tallica-param-test2"
     "tangerine-dreams"
     "technicolor-shanny"
+    "test-blog-screen"
     "the-future-soon"
     "the-generated-lass"
     "the-generated-lass-glow"
@@ -1890,57 +2382,189 @@
  :runstreams nil,
  :editor? false,
  :buffy? false,
- :memory [1473485550 1217241390 4294705152],
+ :valid-kits
+ {[:outliers :get-outliers]
+  [[:block-494 :queries :jvm-stats-drag-40]
+   [:block-1956 :queries :cpu-query1]
+   [:block-10778 :queries :gen-viz-1002]
+   [:block-8179 :queries :client-stats-drag-33]
+   [:block-7876 :queries :new-query]
+   [:block-8356 :queries :query-291]
+   [:block-9727 :queries :gen-viz-553]
+   [:block-11587 :queries :status-drag-28]
+   [:block-2784 :queries :status-drag-0]
+   [:block-3438 :queries :new-query-1]
+   [:block-901 :queries :gen-viz-1002-clone-38]
+   [:block-2388 :queries :query-6018]
+   [:block-2762 :queries :query-11325]
+   [:block-6431 :queries :query-4704]
+   [:block-7837 :queries :tests-drag-12]]},
+ :memory [475446822 375549362 4294705152],
  :sched
- {:new-query 44156,
-  :jvm-stats-drag-40 44127,
-  :cpu-query1 44127,
-  :gen-viz-1002 44127,
-  :gen-viz-553 44127,
-  :new-query-1 44127,
-  :gen-viz-1002-clone-38 44127,
-  :client-stats-drag-33 44132},
- :client-name :intellectual-pyramidal-gerbil-39,
+ {:new-query 139378,
+  :jvm-stats-drag-40 139372,
+  :cpu-query1 139372,
+  :gen-viz-1002 139372,
+  :client-stats-drag-33 139347,
+  :gen-viz-553 139372,
+  :new-query-1 139372,
+  :gen-viz-1002-clone-38 139372},
+ :client-name :secure-azure-yellow-jacket-33,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 3173, :h 1630},
+ :window {:w 3340, :h 1710},
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil]},
  :post-meta
- {:jvm-stats-drag-40 {:* {:rowcount 919}},
-  :cpu-query1 {:* {:rowcount 180}},
-  :gen-viz-1002 {:* {:rowcount 18}},
-  :client-stats-drag-33 {:* {:rowcount 8}},
-  :new-query {:* {:rowcount 24}},
-  :gen-viz-553 {:* {:rowcount 18}},
-  :new-query-1 {:* {:rowcount 50}},
-  :gen-viz-1002-clone-38 {:* {:rowcount 4}}},
+ {:jvm-stats-drag-40 {:* {:rowcount 6814}},
+  :gen-viz-1002 {:* {:rowcount 0}},
+  :new-query {:* {:rowcount 0}},
+  :gen-viz-1002-clone-38 {:* {:rowcount 0}},
+  :tables-sys {:* {:rowcount 5}},
+  :flows-sys {:* {:rowcount 99}},
+  :kit-results-sys {:* {:rowcount 20}}},
+ :flow-estimates
+ {:fields-sys {:times 0.002, :run-id :fields-sys},
+  :jvm-stats-drag-40-hist-891125916159
+  {:times 0.159, :run-id :jvm-stats-drag-40-hist-891125916159},
+  :jvm-stats-drag-40-hist-47-747599149
+  {:times 0.141, :run-id :jvm-stats-drag-40-hist-47-747599149},
+  :jvm-stats-drag-40-hist-111125916159
+  {:times 0.183, :run-id :jvm-stats-drag-40-hist-111125916159},
+  :jvm-stats-drag-40-hist-54-747599149
+  {:times 0.168, :run-id :jvm-stats-drag-40-hist-54-747599149},
+  :gen-viz-553 {:times 0.022, :run-id :gen-viz-553},
+  :jvm-stats-drag-40-hist-27-747599149
+  {:times 0.141, :run-id :jvm-stats-drag-40-hist-27-747599149},
+  :tables-sys {:times 0.001, :run-id :tables-sys},
+  :tmp--1549474592-hist-sys {:times 0.015, :run-id :tmp--1549474592-hist-sys},
+  :jvm-stats-drag-40-hist-1001125916159
+  {:times 0.138, :run-id :jvm-stats-drag-40-hist-1001125916159},
+  :jvm-stats-drag-40-hist-14-747599149
+  {:times 0.158, :run-id :jvm-stats-drag-40-hist-14-747599149},
+  :jvm-stats-drag-40-hist-16-1767958659
+  {:times 0.144, :run-id :jvm-stats-drag-40-hist-16-1767958659},
+  :jvm-stats-drag-40-hist-43-1553440077
+  {:times 0.165, :run-id :jvm-stats-drag-40-hist-43-1553440077},
+  :jvm-stats-drag-40-hist-17-747599149
+  {:times 0.136, :run-id :jvm-stats-drag-40-hist-17-747599149},
+  :jvm-stats-drag-40-hist-58-747599149
+  {:times 0.15, :run-id :jvm-stats-drag-40-hist-58-747599149},
+  :new-query {:times 0.003, :run-id :new-query},
+  :raw-custom-override-292719992
+  {:times 0.028, :run-id :raw-custom-override-292719992},
+  :cpu-query1 {:times 0.021, :run-id :cpu-query1},
+  :new-query-1 {:times 0.027, :run-id :new-query-1},
+  :jvm-stats-drag-40-hist-511255371092
+  {:times 0.162, :run-id :jvm-stats-drag-40-hist-511255371092},
+  :client-stats-drag-33 {:times 0.006, :run-id :client-stats-drag-33},
+  :kit-query--1357234370-detail
+  {:times 0.005, :run-id :kit-query--1357234370-detail},
+  :jvm-stats-drag-40-hist-9-747599149
+  {:times 0.175, :run-id :jvm-stats-drag-40-hist-9-747599149},
+  :jvm-stats-drag-40 {:times 0.039, :run-id :jvm-stats-drag-40},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :jvm-stats-drag-40-hist-701125916159
+  {:times 0.146, :run-id :jvm-stats-drag-40-hist-701125916159},
+  :gen-viz-1002 {:times 0.021, :run-id :gen-viz-1002},
+  :raw-custom-override393647547
+  {:times 125.022, :run-id :raw-custom-override393647547},
+  :jvm_stats {:times 0.045, :run-id :jvm_stats},
+  :jvm-stats-drag-40-hist-76-747599149
+  {:times 0.166, :run-id :jvm-stats-drag-40-hist-76-747599149},
+  :jvm-stats-drag-40-hist-801125916159
+  {:times 0.161, :run-id :jvm-stats-drag-40-hist-801125916159},
+  :jvm-stats-drag-40-hist-88-747599149
+  {:times 0.161, :run-id :jvm-stats-drag-40-hist-88-747599149},
+  :jvm-stats-drag-40-hist-1031255371092
+  {:times 0.155, :run-id :jvm-stats-drag-40-hist-1031255371092},
+  :client_stats {:times 0.007, :run-id :client_stats},
+  :jvm-stats-drag-40-hist-74-1553440077
+  {:times 0.15, :run-id :jvm-stats-drag-40-hist-74-1553440077},
+  :jvm-stats-drag-40-hist-112-747599149
+  {:times 0.145, :run-id :jvm-stats-drag-40-hist-112-747599149},
+  :jvm-stats-drag-40-hist-81-747599149
+  {:times 0.156, :run-id :jvm-stats-drag-40-hist-81-747599149},
+  :kit-query--1357234370-agg {:times 0.005, :run-id :kit-query--1357234370-agg},
+  :jvm-stats-drag-40-hist-118-747599149
+  {:times 0.147, :run-id :jvm-stats-drag-40-hist-118-747599149},
+  :kit-query-5290063360-agg {:times 0.003, :run-id :kit-query-5290063360-agg},
+  :raw-custom-override2068880939
+  {:times 0.025, :run-id :raw-custom-override2068880939},
+  :kit-query-5290063360-detail {:times 0.002, :run-id :kit-query-5290063360-detail},
+  :jvm-stats-drag-40-hist-341482962306
+  {:times 0.145, :run-id :jvm-stats-drag-40-hist-341482962306},
+  :jvm-stats-drag-40-hist-991125916159
+  {:times 0.14, :run-id :jvm-stats-drag-40-hist-991125916159},
+  :jvm-stats-drag-40-hist-60-747599149
+  {:times 0.139, :run-id :jvm-stats-drag-40-hist-60-747599149},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :jvm-stats-drag-40-hist-77-747599149
+  {:times 0.156, :run-id :jvm-stats-drag-40-hist-77-747599149},
+  :jvm-stats-drag-40-hist-3136176142
+  {:times 0.381, :run-id :jvm-stats-drag-40-hist-3136176142},
+  :kit-runner1091171088 {:times 0.014, :run-id :kit-runner1091171088},
+  :gen-viz-1002-clone-38 {:times 0.018, :run-id :gen-viz-1002-clone-38},
+  :jvm-stats-drag-40-hist-221125916159
+  {:times 0.165, :run-id :jvm-stats-drag-40-hist-221125916159},
+  :jvm-stats-drag-40-hist-661125916159
+  {:times 0.181, :run-id :jvm-stats-drag-40-hist-661125916159},
+  :jvm-stats-drag-40-hist-87-747599149
+  {:times 0.179, :run-id :jvm-stats-drag-40-hist-87-747599149},
+  :jvm-stats-drag-40-hist-1181482962306
+  {:times 0.144, :run-id :jvm-stats-drag-40-hist-1181482962306},
+  :jvm-stats-drag-40-hist-491125916159
+  {:times 0.14, :run-id :jvm-stats-drag-40-hist-491125916159},
+  :jvm-stats-drag-40-hist-36-747599149
+  {:times 0.157, :run-id :jvm-stats-drag-40-hist-36-747599149},
+  :jvm-stats-drag-40-hist-56-747599149
+  {:times 0.176, :run-id :jvm-stats-drag-40-hist-56-747599149},
+  :jvm-stats-drag-40-hist-361255371092
+  {:times 0.162, :run-id :jvm-stats-drag-40-hist-361255371092},
+  :jvm-stats-drag-40-hist-64553699827
+  {:times 0.325, :run-id :jvm-stats-drag-40-hist-64553699827},
+  :jvm-stats-drag-40-hist-51-1767958659
+  {:times 0.147, :run-id :jvm-stats-drag-40-hist-51-1767958659},
+  :kit-results-sys {:times 0.001, :run-id :kit-results-sys}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
-    :client/*client-name*>stats>messages-per-second
-    :solver/raw-custom-override678537396
-    :solver/raw-custom-override1051689307
-    :client/*client-name*>stats>memory
+    :kit-status/kit-runner1091171088>running?
+    :solver-meta/raw-custom-override-292719992>output>evald-result>out
+    :solver/raw-custom-override2068880939
     :solver/colors-of-the-moment>dominant
-    :client/*client-name*>stats>recent-messages-per-second
+    :solver-status/secure-azure-yellow-jacket-33>raw-custom-override393647547
+    :client/*client-name*>stats>messages-per-second
+    :solver-meta/raw-custom-override393647547
+    :solver-meta/raw-custom-override-292719992
+    :client/*client-name*>stats>memory
     :solver/colors-of-the-moment-8k>most-contrasting-light
+    :solver-status/secure-azure-yellow-jacket-33>raw-custom-override-292719992>running?
+    :solver-status/secure-azure-yellow-jacket-33>raw-custom-override2068880939>running?
     :time/minute
     :server/uptime
     :solver/colors-of-the-moment>data-colors
+    :client/*client-name*>stats>recent-messages-per-second
     :solver/colors-of-the-moment>colors>2
     :solver/colors-of-the-moment>colors>1
-    :client/*client-name*>stats>client-latency
+    :solver-status/secure-azure-yellow-jacket-33>raw-custom-override-292719992
+    :solver-meta/raw-custom-override393647547>output>evald-result>out
+    :solver-status/secure-azure-yellow-jacket-33>raw-custom-override393647547>running?
     :solver/colors-of-the-moment>brightest
-    :solver-status/intellectual-pyramidal-gerbil-39>raw-custom-override1051689307>running?
+    :solver/raw-custom-override-292719992
     :solver/wallpaper-of-the-moment
     :solver/colors-of-the-moment>most-contrasting-dark
     :flow-status/live-scratch-flow>*running?
     :solver/colors-of-the-moment>colors>0
     :time/second
     :solver/colors-of-the-moment>second-brightest
-    :solver-status/intellectual-pyramidal-gerbil-39>raw-custom-override678537396>running?
+    :solver/raw-custom-override393647547
+    :client/*client-name*>stats>client-latency
     :solver/colors-of-the-moment>darkest]},
-  :alert1 {:alerts :alert2}},
+  :alert1 {:alerts :alert2},
+  :alert2 {:alerts :alert2},
+  :alert3 {:alerts :alert2}},
  :screen-name "server-stats2",
  :recos-page2 0,
  :selected-tab "welcome to the party pal",
@@ -1955,1579 +2579,23 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   44121
-   1100038046]],
+   139342
+   -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
  {:jvm_stats 1498154063, :kke192 -995149087, :client_stats -175748261},
+ :panels-hash 563126643,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1986406835,
+ :user-params-hash -915624474,
  :grid-recos? true,
- :session-hash 1249850089,
- :taps
- [[:atom-sizes
-   :js-heap
-   "1,146MB"
-   :atoms-raw-ttl
-   "40.74MB"
-   {:ut/upstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/clover-walk-singles-map {:mb 0.125259, :keys 24},
-    :ut/process-key-tracker {:mb 2.0E-6, :keys 0},
-    :ut/extract-patterns-data {:mb 2.0E-6, :keys 0},
-    :ut/auto-font-atom {:mb 2.0E-6, :keys 0},
-    :ut/postwalk-replace-cache {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-cache {:mb 2.0E-6, :keys 0},
-    :ut/format-map-atom {:mb 2.0E-6, :keys 0},
-    :ut/data-typer-atom {:mb 0.007443, :keys 39},
-    :ut/upstream-cache {:mb 0.00185, :keys 1},
-    :ut/replacer-data {:mb 2.0E-6, :keys 0},
-    :ut/is-large-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/process-key-cache {:mb 2.0E-6, :keys 0},
-    :db/flow-results {:mb 2.0E-6, :keys 0},
-    :ut/split-cache {:mb 2.0E-6, :keys 0},
-    :ut/replacer-cache {:mb 2.0E-6, :keys 0},
-    :db/scrubbers {:mb 2.0E-6, :keys 0},
-    :ut/subq-mapping-alpha {:mb 0.003675, :keys 2},
-    :ut/postwalk-replace-data-cache {:mb 2.0E-6, :keys 0},
-    :ut/is-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-data {:mb 20.964634, :keys 4238},
-    :db/solver-fn-runs {:mb 0.001373, :keys 2},
-    :ut/coord-cache {:mb 2.0E-6, :keys 0},
-    :ut/map-boxes-cache {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-cache {:mb 19.102258, :keys 4238},
-    :ut/split-cache-data {:mb 2.0E-6, :keys 0},
-    :ut/safe-name-cache {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache {:mb 0.001843, :keys 1},
-    :ut/extract-patterns-cache {:mb 2.0E-6, :keys 0},
-    :ut/body-set-atom {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-tracker {:mb 2.0E-6, :keys 0},
-    :re-frame.db/app-db {:mb 0.528047, :keys 58},
-    :ut/clean-sql-atom {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/subq-panels-alpha {:mb 5.7E-5, :keys 4}}
-   "Mon Jul 15 2024 18:56:50 GMT-0400 (Eastern Daylight Time)"]
-  [:atom-sizes
-   :js-heap
-   "999MB"
-   :atoms-raw-ttl
-   "27.113MB"
-   {:ut/upstream-cache-tracker {:mb 0.001844, :keys 1},
-    :ut/clover-walk-singles-map {:mb 0.130545, :keys 25},
-    :ut/process-key-tracker {:mb 2.0E-6, :keys 0},
-    :ut/extract-patterns-data {:mb 2.0E-6, :keys 0},
-    :ut/auto-font-atom {:mb 2.0E-6, :keys 0},
-    :ut/postwalk-replace-cache {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-cache {:mb 2.0E-6, :keys 0},
-    :ut/format-map-atom {:mb 2.0E-6, :keys 0},
-    :ut/data-typer-atom {:mb 0.005456, :keys 32},
-    :ut/upstream-cache {:mb 0.00185, :keys 1},
-    :ut/replacer-data {:mb 2.0E-6, :keys 0},
-    :ut/is-large-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/process-key-cache {:mb 2.0E-6, :keys 0},
-    :db/flow-results {:mb 2.0E-6, :keys 0},
-    :ut/split-cache {:mb 2.0E-6, :keys 0},
-    :ut/replacer-cache {:mb 2.0E-6, :keys 0},
-    :db/scrubbers {:mb 2.0E-6, :keys 0},
-    :ut/subq-mapping-alpha {:mb 0.003675, :keys 2},
-    :ut/postwalk-replace-data-cache {:mb 2.0E-6, :keys 0},
-    :ut/is-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-data {:mb 13.842122, :keys 2929},
-    :db/solver-fn-runs {:mb 0.001372, :keys 2},
-    :ut/coord-cache {:mb 2.0E-6, :keys 0},
-    :ut/map-boxes-cache {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-cache {:mb 12.591626, :keys 2929},
-    :ut/split-cache-data {:mb 2.0E-6, :keys 0},
-    :ut/safe-name-cache {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache {:mb 0.001843, :keys 1},
-    :ut/extract-patterns-cache {:mb 2.0E-6, :keys 0},
-    :ut/body-set-atom {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-tracker {:mb 2.0E-6, :keys 0},
-    :re-frame.db/app-db {:mb 0.530316, :keys 58},
-    :ut/clean-sql-atom {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache-tracker {:mb 0.001844, :keys 1},
-    :ut/subq-panels-alpha {:mb 5.7E-5, :keys 4}}
-   "Mon Jul 15 2024 19:06:50 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:10:39 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:10:39 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:10:39 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:10:39 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:11:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:11:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:11:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:11:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:16 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:16 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:16 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:16 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:21 GMT-0400 (Eastern Daylight Time)"]
-  [:sizes
-   25
-   11
-   :block-8083
-   "Mon Jul 15 2024 19:12:21 GMT-0400 (Eastern Daylight Time)"]
-  [:atom-sizes
-   :js-heap
-   "1,088MB"
-   :atoms-raw-ttl
-   "67.897MB"
-   {:ut/upstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/clover-walk-singles-map {:mb 0.130545, :keys 25},
-    :ut/process-key-tracker {:mb 2.0E-6, :keys 0},
-    :ut/extract-patterns-data {:mb 2.0E-6, :keys 0},
-    :ut/auto-font-atom {:mb 2.0E-6, :keys 0},
-    :ut/postwalk-replace-cache {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-cache {:mb 2.0E-6, :keys 0},
-    :ut/format-map-atom {:mb 2.0E-6, :keys 0},
-    :ut/data-typer-atom {:mb 0.011484, :keys 51},
-    :ut/upstream-cache {:mb 0.00185, :keys 1},
-    :ut/replacer-data {:mb 2.0E-6, :keys 0},
-    :ut/is-large-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/process-key-cache {:mb 2.0E-6, :keys 0},
-    :db/flow-results {:mb 2.0E-6, :keys 0},
-    :ut/split-cache {:mb 2.0E-6, :keys 0},
-    :ut/replacer-cache {:mb 2.0E-6, :keys 0},
-    :db/scrubbers {:mb 2.0E-6, :keys 0},
-    :ut/subq-mapping-alpha {:mb 0.003675, :keys 2},
-    :ut/postwalk-replace-data-cache {:mb 2.0E-6, :keys 0},
-    :ut/is-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-data {:mb 35.159514, :keys 7045},
-    :db/solver-fn-runs {:mb 0.001373, :keys 2},
-    :ut/coord-cache {:mb 2.0E-6, :keys 0},
-    :ut/map-boxes-cache {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-cache {:mb 32.049627, :keys 7045},
-    :ut/split-cache-data {:mb 2.0E-6, :keys 0},
-    :ut/safe-name-cache {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache {:mb 0.001843, :keys 1},
-    :ut/extract-patterns-cache {:mb 2.0E-6, :keys 0},
-    :ut/body-set-atom {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-tracker {:mb 2.0E-6, :keys 0},
-    :re-frame.db/app-db {:mb 0.533451, :keys 58},
-    :ut/clean-sql-atom {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/subq-panels-alpha {:mb 5.7E-5, :keys 4}}
-   "Mon Jul 15 2024 19:16:52 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :client-statuses-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :atoms-and-watchers-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :cs-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :aw-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :distinct-watchers
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :running-flows
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :minute-run
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows [],
-    :minute-run 21}
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   1
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   2
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   3
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   4
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   5
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   6
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   7
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   8
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   1
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   2
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   3
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   4
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   5
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   6
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   7
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   8
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:15 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :client-statuses-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :atoms-and-watchers-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :cs-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :aw-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :distinct-watchers
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :running-flows
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :minute-run
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   1
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   2
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   3
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   4
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   5
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   6
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   7
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   8
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   1
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   2
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   3
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   4
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   5
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   6
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   7
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   8
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   ["game-of-life-test1"]
-   "Mon Jul 15 2024 19:22:20 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :client-statuses-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :atoms-and-watchers-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :cs-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :aw-keys
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :distinct-watchers
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :running-flows
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   :minute-run
-   {:client-statuses-keys 9,
-    :atoms-and-watchers-keys 9,
-    :cs-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :aw-keys
-    [:courageous-star-shaped-toad-44
-     :quiet-chocolate-heron-42
-     :legendary-peach-panda-42
-     :rvbbit
-     :stellar-indigo-snake-37
-     :vivacious-wide-llama-36
-     :active-coral-horse-20
-     :intellectual-pyramidal-gerbil-39
-     :pleasant-prismatic-echidna-43],
-    :distinct-watchers 160,
-    :running-flows ["game-of-life-test1"],
-    :minute-run 22}
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   1
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   2
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   3
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   4
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   5
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   6
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   7
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   8
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   1
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   2
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   3
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   4
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   5
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   6
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   7
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   8
-   [:courageous-star-shaped-toad-44
-    :quiet-chocolate-heron-42
-    :legendary-peach-panda-42
-    :rvbbit
-    :stellar-indigo-snake-37
-    :vivacious-wide-llama-36
-    :active-coral-horse-20
-    :intellectual-pyramidal-gerbil-39
-    :pleasant-prismatic-echidna-43]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:kk
-   0
-   ["game-of-life-test1"]
-   "Mon Jul 15 2024 19:22:26 GMT-0400 (Eastern Daylight Time)"]
-  [:atom-sizes
-   :js-heap
-   "1,248MB"
-   :atoms-raw-ttl
-   "108.103MB"
-   {:ut/upstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/clover-walk-singles-map {:mb 0.130545, :keys 25},
-    :ut/process-key-tracker {:mb 2.0E-6, :keys 0},
-    :ut/extract-patterns-data {:mb 2.0E-6, :keys 0},
-    :ut/auto-font-atom {:mb 2.0E-6, :keys 0},
-    :ut/postwalk-replace-cache {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-cache {:mb 2.0E-6, :keys 0},
-    :ut/format-map-atom {:mb 2.0E-6, :keys 0},
-    :ut/data-typer-atom {:mb 0.017473, :keys 71},
-    :ut/upstream-cache {:mb 0.00185, :keys 1},
-    :ut/replacer-data {:mb 2.0E-6, :keys 0},
-    :ut/is-large-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/process-key-cache {:mb 2.0E-6, :keys 0},
-    :db/flow-results {:mb 2.0E-6, :keys 0},
-    :ut/split-cache {:mb 2.0E-6, :keys 0},
-    :ut/replacer-cache {:mb 2.0E-6, :keys 0},
-    :db/scrubbers {:mb 2.0E-6, :keys 0},
-    :ut/subq-mapping-alpha {:mb 0.003675, :keys 2},
-    :ut/postwalk-replace-data-cache {:mb 2.0E-6, :keys 0},
-    :ut/is-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-data {:mb 56.163548, :keys 11103},
-    :db/solver-fn-runs {:mb 0.001373, :keys 2},
-    :ut/coord-cache {:mb 2.0E-6, :keys 0},
-    :ut/map-boxes-cache {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-cache {:mb 51.216609, :keys 11103},
-    :ut/split-cache-data {:mb 2.0E-6, :keys 0},
-    :ut/safe-name-cache {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache {:mb 0.001843, :keys 1},
-    :ut/extract-patterns-cache {:mb 2.0E-6, :keys 0},
-    :ut/body-set-atom {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-tracker {:mb 2.0E-6, :keys 0},
-    :re-frame.db/app-db {:mb 0.562001, :keys 58},
-    :ut/clean-sql-atom {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/subq-panels-alpha {:mb 5.7E-5, :keys 4}}
-   "Mon Jul 15 2024 19:26:55 GMT-0400 (Eastern Daylight Time)"]
-  [:atom-culling!
-   "deep-flatten-cache"
-   "56.163548mb"
-   "->"
-   "3.610581mb"
-   {:top-pct 0.99,
-    :hard-limit 100,
-    :cutoff-frequency 100,
-    :pre-mb 56.163548,
-    :distribution
-    {:culling {:cutoff-frequency 4, :above-threshold 3562, :below-threshold 7541},
-     :total-entries 11103,
-     :top-10-freq-vals
-     [198520 96450 55417 29472 23220 23174 23170 23166 23160 23030],
-     :bottom-10-freq-vals [1 2 3 4 5 6 7 8 9 10],
-     :top-10-percent 1096,
-     :middle-80-percent 9546,
-     :bottom-10-percent 461,
-     :frequency-buckets
-     {"1 - 4" 7714, "5 - 19" 1938, "20 - 99" 556, "100 - 499" 648, "500+" 247}},
-    :post-mb 3.610581,
-    :keeping 895,
-    :purging 10208}
-   "Mon Jul 15 2024 19:26:55 GMT-0400 (Eastern Daylight Time)"]
-  [:atom-sizes
-   :js-heap
-   "1,508MB"
-   :atoms-raw-ttl
-   "45.017MB"
-   {:ut/upstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/clover-walk-singles-map {:mb 0.130545, :keys 25},
-    :ut/process-key-tracker {:mb 2.0E-6, :keys 0},
-    :ut/extract-patterns-data {:mb 2.0E-6, :keys 0},
-    :ut/auto-font-atom {:mb 2.0E-6, :keys 0},
-    :ut/postwalk-replace-cache {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-cache {:mb 2.0E-6, :keys 0},
-    :ut/format-map-atom {:mb 2.0E-6, :keys 0},
-    :ut/data-typer-atom {:mb 0.02352, :keys 91},
-    :ut/upstream-cache {:mb 0.00185, :keys 1},
-    :ut/replacer-data {:mb 2.0E-6, :keys 0},
-    :ut/is-large-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/process-key-cache {:mb 2.0E-6, :keys 0},
-    :db/flow-results {:mb 2.0E-6, :keys 0},
-    :ut/split-cache {:mb 2.0E-6, :keys 0},
-    :ut/replacer-cache {:mb 2.0E-6, :keys 0},
-    :db/scrubbers {:mb 2.0E-6, :keys 0},
-    :ut/subq-mapping-alpha {:mb 0.003675, :keys 2},
-    :ut/postwalk-replace-data-cache {:mb 2.0E-6, :keys 0},
-    :ut/is-base64-atom {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-data {:mb 24.821877, :keys 5069},
-    :db/solver-fn-runs {:mb 0.001373, :keys 2},
-    :ut/coord-cache {:mb 2.0E-6, :keys 0},
-    :ut/map-boxes-cache {:mb 2.0E-6, :keys 0},
-    :ut/deep-flatten-cache {:mb 19.464232, :keys 4373},
-    :ut/split-cache-data {:mb 2.0E-6, :keys 0},
-    :ut/safe-name-cache {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache {:mb 0.001843, :keys 1},
-    :ut/extract-patterns-cache {:mb 2.0E-6, :keys 0},
-    :ut/body-set-atom {:mb 2.0E-6, :keys 0},
-    :ut/compound-keys-tracker {:mb 2.0E-6, :keys 0},
-    :re-frame.db/app-db {:mb 0.564378, :keys 58},
-    :ut/clean-sql-atom {:mb 2.0E-6, :keys 0},
-    :ut/downstream-cache-tracker {:mb 0.001845, :keys 1},
-    :ut/subq-panels-alpha {:mb 5.7E-5, :keys 4}}
-   "Mon Jul 15 2024 19:36:59 GMT-0400 (Eastern Daylight Time)"]
-  [:clearing-cache-atoms!
-   :intellectual-pyramidal-gerbil-39
-   "Mon Jul 15 2024 19:36:59 GMT-0400 (Eastern Daylight Time)"]],
+ :preview-keys2 [],
  :resolved-queries
  {:gen-viz-553
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "19:51:41",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from
    [{:select
@@ -3562,7 +2630,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "16:01:48",
+   :_last-run "00:56:47",
    :refresh-every 45,
    :from
    [{:select
@@ -3607,7 +2675,7 @@
   {:cache? false,
    :limit 180,
    :group-by [4],
-   :_last-run "19:51:40",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from
    [{:select
@@ -3667,16 +2735,16 @@
    {[:sys_load :heatmap-7696]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#bd96aa" "#131b28"] 20 :desc],
+     {:background-color [:heatmap ["#c2abb6" "#0d2248"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}},
     [:recent_messages_per_second :heatmap-2888]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#c44c4c" "#ec944c"] 20 :desc],
+     {:background-color [:heatmap ["#0d2248" "#e47c68"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "19:51:41",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
@@ -3699,7 +2767,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "19:52:10",
+   :_last-run "01:06:16",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -3767,13 +2835,13 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[3 :desc]],
-   :_last-run "19:51:40",
+   :_last-run "01:06:15",
    :where [:>= :recent_batches_per_second 0]},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [4],
-   :_last-run "19:51:41",
+   :_last-run "01:06:15",
    :refresh-every 45,
    :from
    [{:select
@@ -3852,7 +2920,10 @@
     :test_val_string
     :updated],
    :from [[:tests :aa558]],
-   :where [:*when {} [:*all= {} [:test_name]]],
+   :where
+   [:*when
+    {:test_name "total_rows", :rowcnt 77}
+    [:*all= {:test_name "total_rows", :rowcnt 77} [:test_name]]],
    :_last-run "17:58:37"},
   :query-11325
   {:select [:table_name [[:count 1] :rowcnt]],
@@ -3913,7 +2984,10 @@
        :test_val_string
        :updated],
       :from [[:tests :aa558]],
-      :where [:*when {} [:*all= {} [:test_name]]]}
+      :where
+      [:*when
+       {:test_name "total_rows", :rowcnt 77}
+       [:*all= {:test_name "total_rows", :rowcnt 77} [:test_name]]]}
      :ee553]],
    :_last-run "22:50:26"},
   :query-6018
@@ -3944,7 +3018,7 @@
   {:cache? false,
    :limit 24,
    :group-by [2],
-   :_last-run "19:51:41",
+   :_last-run "01:06:16",
    :refresh-every 45,
    :from
    [[{:group-by [:ts1],
@@ -4025,7 +3099,7 @@
      :cache? false,
      :from [[:jvm_stats :kke192]],
      :order-by [[3 :desc]],
-     :_last-run "19:51:40",
+     :_last-run "01:06:15",
      :where [:>= :recent_batches_per_second 0]}},
    :tab "welcome to the party pal",
    :minimized? false},
@@ -4077,7 +3151,7 @@
     {:cache? false,
      :limit 180,
      :group-by [4],
-     :_last-run "19:51:40",
+     :_last-run "01:06:15",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[4 :desc]],
@@ -4224,7 +3298,7 @@
     {:cache? false,
      :limit 18,
      :group-by [4],
-     :_last-run "19:51:41",
+     :_last-run "01:06:15",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[4 :desc]],
@@ -4400,7 +3474,7 @@
      :refresh-every 20,
      :order-by [[:client_name :asc]],
      :from [[:client_stats :ww254]],
-     :_last-run "19:52:10",
+     :_last-run "01:06:16",
      :style-rules
      {[:* :highlight-8717]
       {:logic [:= :client_name :*client-name-str],
@@ -4525,7 +3599,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 26,
      :group-by [2],
-     :_last-run "16:01:48",
+     :_last-run "00:56:47",
      :refresh-every :param/refresh-timer,
      :from
      [{:select
@@ -4660,7 +3734,7 @@
     {:cache? false,
      :limit 18,
      :group-by [3],
-     :_last-run "19:51:41",
+     :_last-run "01:06:15",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[:ts :desc]],
@@ -4865,7 +3939,7 @@
          :desc],
         :border "1px solid #00000000",
         :color "#ffffff"}}},
-     :_last-run "19:51:41",
+     :_last-run "01:06:15",
      :refresh-every :param/refresh-timer,
      :from [[:jvm_stats :zz596]],
      :order-by [[:ts :desc]],
@@ -4995,7 +4069,7 @@
     {:cache? false,
      :limit 24,
      :group-by [2],
-     :_last-run "19:51:41",
+     :_last-run "01:06:16",
      :refresh-every :param/refresh-timer,
      :from
      [[{:group-by [:ts1],
@@ -5173,6 +4247,45 @@
    :name "block-7665",
    :views {:hi [:data-viewer [:tetrads :solver/colors-of-the-moment>brightest]]},
    :queries {}},
+  :block-7259
+  {:clojure
+   {:new-clojure-3
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (doseq [e (range 5)] (Thread/sleep 5000) (println "ITS A SHITSHOW! " e "!"))
+        (str
+          "🐇🥕 YO! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :name "block-7259",
+   :w 10,
+   :selected-view :new-clojure-3,
+   :root [60 1],
+   :h 6,
+   :display {:new-clojure-3 :value},
+   :queries {},
+   :tab "welcome to the party pal",
+   :views
+   {:hare-vw-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's no use going back to yesterday, because I was a different person then."]}},
   :block-2388
   {:name "block-2388",
    :w 7,
@@ -5361,14 +4474,14 @@
       (let [tt :time/minute
             cs (client-statuses)
             fs (flow-statuses)
-            aw (deref atoms-and-watchers)
+            aw (deref rvbbit-backend.db/atoms-and-watchers)
             watchers (apply
                        concat
                        (vals
                          (into
                            {}
                            (for
-                             [[k v] (deref atoms-and-watchers)]
+                             [[k v] aw]
                              {k (vec (for [[k v] v] (get v :watch-key)))}))))]
         {:client-statuses-keys (count (keys cs)),
          :atoms-and-watchers-keys (count (keys aw)),
@@ -5385,25 +4498,7 @@
    :h 25,
    :queries {},
    :tab "welcome to the party pal",
-   :views
-   {:hare-vw
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-8083.:hi"}
-     :style
-     {:font-size "21px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "It's a perfect day for planting seeds and planning adventures!"]}},
+   :views {}},
   :block-2762
   {:name "block-2762",
    :w 8,
@@ -5656,19 +4751,19 @@
    :queries {}}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#8181e0",
-  "boolean" "#bdb696",
-  "map" "#7dd393",
-  "list" "#713f6c",
-  "string" "#dfe5d2",
-  "any" "#3b7f89",
-  "vector" "#39d2ce",
-  "keyword" "#e6cad8",
-  "rabbit-code" "#ce6f39",
-  "datetime" "#491b8b",
-  "integer" "#6ebbe7",
-  "unknown" "#732862",
-  "date" "#153630"},
+ {"float" "#ebcebf",
+  "boolean" "#c0b4a6",
+  "map" "#7ccd90",
+  "list" "#1e30c3",
+  "string" "#f0f0e9",
+  "any" "#69819a",
+  "vector" "#a48bb6",
+  "keyword" "#ede4e4",
+  "rabbit-code" "#7bb8ae",
+  "datetime" "#7b4961",
+  "integer" "#c2b6ab",
+  "unknown" "#aa0b6a",
+  "date" "#096528"},
  :click-param
  {:blocks-sys
   {:block_key ":*theme*",
@@ -5713,7 +4808,7 @@
    :seconds_since_last_update 15},
   :error-str-drag-13.* {},
   :flow {:live-scratch-flow>*running? false},
-  :server {:uptime "3 hours, 51 minutes, 42 seconds"},
+  :server {:uptime "11 minutes, 38 seconds"},
   :query-4704 {:test_name "total_rows", :rowcnt 77},
   :jvm-stats-drag-40
   {:ts1 "2024-07-09 23:59:14",
@@ -5738,12 +4833,12 @@
    :blocks 29,
    :queries 11,
    :ts "2024-06-06 10:18:48"},
-  :time {:second 52, :now-seconds "Monday, July 15th 7:51:52PM", :minute 51},
+  :time {:second 25, :now-seconds "Monday, August 5th 1:06:25AM", :minute 6},
   :client
   {:growing-cubic-boar-44>stats>recent-messages-per-second nil,
    :smile-cubic-koala-29>stats>recent-messages-per-second nil,
    :unwavering-champagne-fox-17>stats>messages-per-second nil,
-   :*client-name*>stats>messages-per-second 6.14,
+   :*client-name*>stats>messages-per-second 8.61,
    :fortunate-square-frog-25>stats>memory nil,
    :funny-lime-moose-14>stats>client-latency 218,
    :essential-cobalt-turtle-11>stats>client-latency 388,
@@ -5764,6 +4859,7 @@
    :intellectual-pyramidal-gerbil-39>stats>recent-messages-per-second 6.07,
    :prepared-cubic-yellow-jacket-20>stats>messages-per-second 1.57,
    :lively-cubic-opossum-32>stats>memory 433,
+   :secure-azure-yellow-jacket-33>stats>recent-messages-per-second 8.2,
    :free-pyramidal-zebra-21>stats>messages-per-second 7.64,
    :free-pyramidal-zebra-21>stats>memory 178.2314,
    :prepared-cubic-yellow-jacket-20>stats>client-latency 255,
@@ -5780,6 +4876,7 @@
    :cheery-gold-finch-26>stats>memory nil,
    :poised-viridian-walrus-38>stats>messages-per-second nil,
    :prominent-plum-serval-0>stats>memory nil,
+   :secure-azure-yellow-jacket-33>stats>client-latency 1553,
    :fortunate-square-frog-25>stats>messages-per-second nil,
    :good-pentagonal-guinea-pig-27>stats>memory nil,
    :truthful-circular-cattle-38>stats>messages-per-second nil,
@@ -5816,9 +4913,10 @@
    :upstanding-indigo-locust-39>stats>messages-per-second 0.56,
    :good-pentagonal-guinea-pig-27>stats>client-latency nil,
    :composed-cerulean-armadillo-7>stats>recent-messages-per-second nil,
+   :secure-azure-yellow-jacket-33>stats>memory 394.047,
    :growing-cubic-boar-44>stats>memory nil,
    :virtuous-spring-green-eagle-43>stats>messages-per-second nil,
-   :*client-name*>stats>memory 1357.9627,
+   :*client-name*>stats>memory 394.047,
    :lively-cubic-opossum-32>stats>recent-messages-per-second 5.4,
    :cheery-gold-finch-26>stats>recent-messages-per-second nil,
    :spiritual-pyramidal-raccoon-43>stats>client-latency 5332,
@@ -5834,7 +4932,7 @@
    :vibrant-short-termite-29>stats>client-latency 352,
    :poised-viridian-walrus-38>stats>client-latency nil,
    :virtuous-spring-green-eagle-43>stats>recent-messages-per-second nil,
-   :*client-name*>stats>recent-messages-per-second 6.73,
+   :*client-name*>stats>recent-messages-per-second 8.2,
    :prominent-plum-serval-0>stats>recent-messages-per-second nil,
    :composed-cerulean-armadillo-7>stats>messages-per-second nil,
    :essential-cobalt-turtle-11>stats>recent-messages-per-second 4.93,
@@ -5842,7 +4940,7 @@
    :brilliant-gold-mallard-13>stats>messages-per-second 0.54,
    :virtuous-spring-green-eagle-43>stats>client-latency nil,
    :unwavering-champagne-fox-17>stats>memory nil,
-   :*client-name*>stats>client-latency 485,
+   :*client-name*>stats>client-latency 1553,
    :vigorous-chocolate-eel-26>stats>memory nil,
    :free-pyramidal-zebra-21>stats>client-latency 282,
    :vigorous-chocolate-eel-26>stats>client-latency nil,
@@ -5850,6 +4948,7 @@
    :intellectual-pyramidal-gerbil-39>stats>memory 1012.1233,
    :composed-cerulean-armadillo-7>stats>client-latency nil,
    :vibrant-short-termite-29>stats>memory 187.814,
+   :secure-azure-yellow-jacket-33>stats>messages-per-second 8.61,
    :easy-narrow-wolf-19>stats>memory nil,
    :funny-lime-moose-14>stats>messages-per-second 6.99},
   :fields-drag-16.* {:table_name ["db_conn_drag_13" "error_str_drag_13"]},
@@ -5864,58 +4963,34 @@
    :theme-split-complement
    [:split-complements :solver/colors-of-the-moment>dominant],
    :selected-view-data
-   {:cache? false,
-    :where [:= :client_name :*client-name-str],
-    :limit 26,
-    :group-by [2],
-    :_last-run "16:01:48",
-    :refresh-every :param/refresh-timer,
-    :from
-    [{:select
-      [:client_name
-       :recent_messages_per_second
-       :messages_per_second
-       :mem_used
-       :batches
-       :packets
-       :ts],
-      :where [:= :client_name :*client-name-str],
-      :from [[:client_memory :ee183]],
-      :order-by [[:mem_time :desc]]}],
-    :order-by [[:ts :desc]],
-    :connection-id "system-db",
-    :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 13] :ts_hour]],
-    :post-process-fn
-    (fn [x]
-      (vec
-        (for
-          [idx
-           (range (count x))
-           :let
-           [rx
-            (vec (reverse x))
-            prev-row
-            (get rx (- idx 1) {:mem_used 0})
-            row
-            (get rx idx {:mem_used 0})
-            pre-mb
-            (/ (get prev-row :mem_used) 1048576)
-            mb
-            (/ (get row :mem_used) 1048576)
-            diff
-            (Math/round (- mb pre-mb))
-            pos
-            (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-          (merge
-            row
-            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
+   (do
+     (ns rvbbit-backend.websockets)
+     (let [tt :time/minute
+           cs (client-statuses)
+           fs (flow-statuses)
+           aw (deref atoms-and-watchers)
+           watchers (apply
+                      concat
+                      (vals
+                        (into
+                          {}
+                          (for
+                            [[k v] (deref atoms-and-watchers)]
+                            {k (vec (for [[k v] v] (get v :watch-key)))}))))]
+       {:client-statuses-keys (count (keys cs)),
+        :atoms-and-watchers-keys (count (keys aw)),
+        :cs-keys (vec (keys cs)),
+        :aw-keys (vec (keys aw)),
+        :distinct-watchers (count watchers),
+        :running-flows (vec (keys (filter (fn [x] (get (val x) :*running?)) fs))),
+        :minute-run tt})),
    :tt :solver/colors-of-the-moment>data-colors,
-   :selected-view [:queries :new-query],
+   :selected-view [:clojure :new-clojure-2],
    :theme-color4 :param/theme-tetrads>3,
    :_theme-color4 :solver/colors-of-the-moment>colors>1,
    :theme-tetrads [:tetrads :solver/colors-of-the-moment>brightest],
    :_theme-color3 :solver/colors-of-the-moment>dominant,
-   :selected-block :block-7876},
+   :selected-block :block-8083},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",

@@ -7,22 +7,35 @@
    [nrepl.server          :as nrepl-server]
    [nrepl.transport       :as transport]
    [rvbbit-backend.config :as config]
-   [clojure.walk :as walk]
-   [rvbbit-backend.sql        :as    sql
+   [rvbbit-backend.db     :as db]
+   [clojure.walk          :as walk]
+   [rvbbit-backend.sql    :as    sql
     :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
-   [rvbbit-backend.ddl        :as sqlite-ddl]
+   [rvbbit-backend.ddl    :as sqlite-ddl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.util   :as ut])
   (:import [java.util.concurrent TimeoutException TimeUnit]))
 
-
-
-
 (def ^:private initial-max-items 200)
 (def ^:private max-wire-size (* 50 1024)) ; 50KB, as per your example
 (def ^:private max-string-length 1000)
+(defonce eval-cache (atom {}))
+(def rabbit-config (config/settings)) ;; legacy
+(def debug? true)
+
+(def repl-server (atom nil))
+(def ext-repl-port (get-in rabbit-config [:ext-nrepl :port] 32999))
+(def ext-repl-host (get-in rabbit-config [:ext-nrepl :host] "127.0.0.1"))
+(def repl-port (get rabbit-config :nrepl-port 8181))
+
+(def nrepls-run (atom 0))
+(def nrepls-intros-run (atom 0))
+
+;; (def repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
+(defonce repl-introspection-child-atoms (atom {}))
+;(def repl-client-namespaces-map (atom {}))
 
 (defn- format-bytes
   "Format byte size to a human-readable string with appropriate unit."
@@ -189,31 +202,7 @@
       (not sampling-error?) (assoc :sampling-details sampling-details)
       error (assoc :error error))))
 
-
-
-
-
-
-;;(defn run [code] (eval code))
-
-(defonce eval-cache (atom {}))
-(def rabbit-config (config/settings)) ;; legacy
-(def debug? true)
-
-(def repl-server (atom nil))
-(def ext-repl-port (get-in rabbit-config [:ext-nrepl :port] 32999))
-(def ext-repl-host (get-in rabbit-config [:ext-nrepl :host] "127.0.0.1"))
-(def repl-port (get rabbit-config :nrepl-port 8181))
-
-(def nrepls-run (atom 0))
-(def nrepls-intros-run (atom 0))
-
 (defn strip-ansi-codes [s] (cstr/replace s #"\u001B\[[0-9;]*m" ""))
-
-(def repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
-(defonce repl-introspection-child-atoms (atom {}))
-;(def repl-client-namespaces-map (atom {}))
-
 
 (defn insert-rowset
   [rowset table-name keypath client-name & [columns-vec db-conn queue-name metadata]]
@@ -382,7 +371,7 @@
             ]
         (ut/pp [:repl {:introspected-repl-session introspection}])
           ;;(swap! repl-introspection-atom assoc-in split-ns introspection) ;; host and port for later?
-        (swap! repl-introspection-atom assoc-in [client-name ns-str] introspection) ;; host and port for later?
+        (swap! db/repl-introspection-atom assoc-in [client-name ns-str] introspection) ;; host and port for later?
           ;; (logger (str (ut/keypath-munger [ns-str host port client-name id]) "-intro")
           ;;         {:orig-code code
           ;;          :introspection introspection})
@@ -616,10 +605,12 @@
 ;;     e))
 
 (defonce nrepl-output-atom (atom {}))
+
 ;; (reset! nrepl-output-atom {})
 ;; (ut/pp (keys @nrepl-output-atom))
 ;; (ut/pp (into {} (for [kp (vec (distinct (filterv #(= (count %) 2) (ut/kvpaths @nrepl-output-atom))))] {kp (count (get-in @nrepl-output-atom kp))})))
-;; (ut/pp (get @nrepl-output-atom :worthy-bronze-grasshopper-42))
+;; (ut/pp (get @nrepl-output-atom :secure-azure-yellow-jacket-33))
+;; (ut/pp (get @db/last-solvers-atom-meta  :raw-custom-override393647547))
 
 (defn repl-eval [code repl-host repl-port client-name id ui-keypath]
   (let [_           (swap! nrepls-run inc)
@@ -641,17 +632,34 @@
                                     (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
                     s             (str user-fn-str "\n" code)
                     client        (nrepl/client conn 600000000)
+                    ;; console-key   (if (cstr/includes? (str id) "kit")
+                    ;;                 (keyword (str "kit/" (cstr/replace (str id) ":" "") ">output"))
+                    ;;                 (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>out")))
+                    is-kit?       (cstr/includes? (str id) "kit")
+                    ;; :solver-meta/raw-custom-override-48330736>output>evald-result>out
+                    push-to-console-clover (fn [o]
+                                             (if is-kit? ;; else solver call
+                                               (swap! db/kit-atom assoc-in [id :incremental] o)
+                                               (swap! db/last-solvers-atom-meta assoc-in [id :incremental] o)))
+
+                    ;; console-clover-kp (if (cstr/includes? (str id) "kit")
+                    ;;                     [id :output]
+                    ;;                     [id :output :evald-result :out])
+
 
                     ; process each message, but still block for the final result
                     process-msg   (fn [msg]
                                     (when-let [out (:out msg)]
                                       (swap! output-atom conj out)
-                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom)
+                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
+                                      (push-to-console-clover (cstr/join "" @output-atom))
                                       ;(println "Real-time output:" out)
                                       )
                                     (when-let [err (:err msg)]
                                       (swap! output-atom conj err)
-                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom)
+                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
+                                      ;(push-to-console-clover @output-atom)
+                                      (push-to-console-clover (cstr/join "" @output-atom))
                                       ;(println "Real-time error:" err)
                                       )
                                     msg)

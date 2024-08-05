@@ -429,7 +429,7 @@
  (fn [db [_]] 
    (ut/dissoc-in db [:query-history :kit-results-sys])))
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :repl-ns :flow-status :signal-history :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client})
 
 (re-frame/reg-event-db
   ::simple-response
@@ -831,6 +831,7 @@
                             (ut/dissoc-in [:click-param :solver])
                             (ut/dissoc-in [:click-param :flow-status])
                             (ut/dissoc-in [:click-param :kit-status])
+                            (ut/dissoc-in [:click-param :kit])
                             (ut/dissoc-in [:click-param :signal])
                             (dissoc :data)
                             (dissoc :flows) ;;; mostly ephemeral with the UI....

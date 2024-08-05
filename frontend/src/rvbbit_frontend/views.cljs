@@ -3003,7 +3003,8 @@
                                        solver-meta-spy?) (let [are-solver           (get @db/solver-fn-lookup [:panels selected-block data-key])
                                                                meta-data-ckp-str    (str (ut/replacer are-solver ":solver/" "solver-meta/"))
                                                                meta-data-ckp        (keyword meta-data-ckp-str)
-                                                               meta-data-ckp-output (keyword (str meta-data-ckp-str ">output>evald-result>out"))
+                                                               ;meta-data-ckp-output (keyword (str meta-data-ckp-str ">output>evald-result>out"))
+                                                               meta-data-ckp-output (keyword (str meta-data-ckp-str ">incremental"))
                                                                meta-data            (when are-solver
                                                                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                                                        {:keypath [meta-data-ckp]}))
@@ -3776,7 +3777,8 @@
                                pp                (get db :click-param)
                                pp-without-fs     (ut/remove-keys pp
                                                                  (into (map first fs)
-                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :flow-status :data :repl-ns :kit-status 
+                                                                       [:flow :time :server :flows-sys :client :solver :kit 
+                                                                        :solver-status :flow-status :data :repl-ns :kit-status 
                                                                         :signal-history :solver-meta nil]))
                                click-param-autos (vec (filter #(not (cstr/includes? (str %) "function"))
                                                               (distinct (flatten
@@ -3808,7 +3810,7 @@
                           pp            (get db :click-param)
                           pp-without-fs (ut/remove-keys pp
                                                         (into (map first fs)
-                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :flow-status :kit-status :solver-meta :repl-ns nil]))]
+                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :flow-status :kit :kit-status :solver-meta :repl-ns nil]))]
                       (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub ::user-params-hash (fn [db] (get db :user-params-hash)))

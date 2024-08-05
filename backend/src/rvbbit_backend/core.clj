@@ -30,8 +30,9 @@
    [ring.adapter.jetty9 :as jetty]
    [rvbbit-backend.queue-party  :as qp]
    [rvbbit-backend.assistants :as ass]
-   [rvbbit-backend.reactor :as rkt]
+   ;[rvbbit-backend.reactor :as rkt]
    [rvbbit-backend.config :as config]
+   [rvbbit-backend.db :as db]
    [rvbbit-backend.cruiser :as cruiser]
    [rvbbit-backend.embeddings :as em]
    [rvbbit-backend.evaluator :as evl]
@@ -129,7 +130,7 @@
                                          (reset! wss/autocomplete-view-atom (vec (filter #(and (not (cstr/includes? (str %) "/")) (keyword? %))
                                                                                          (distinct (into (vec (distinct (ut/deep-flatten vv)))
                                                                                                          @wss/autocomplete-view-atom)))))))
-                                     (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for
+                                     (swap! db/screens-atom assoc screen-name screen-data) ;; update master screen atom for
                                      (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
                                      (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
                                      (sql-exec system-db
@@ -494,10 +495,12 @@
   ;; (doseq [args wss/master-atom-map]
   ;;   (apply wss/master-watch-splitter-2deep args))
 
-  (doseq [[type atom] wss/master-reactor-atoms]
+  
+  ;; boot master watchers for defined atoms 
+  (doseq [[type atom] db/master-reactor-atoms]
     ;(swap! wss/sharded-atoms assoc type (atom {})) ;; bootstrap the child atom shard
     ;(swap! wss/sharded-atoms (fn [current-state] (assoc current-state type (atom {}))))
-    (wss/master-watch-splitter-deep
+    (db/master-watch-splitter-deep
      ;;(keyword (str "watcher-" (name type)))
      type
      atom))
@@ -973,7 +976,7 @@
   (defn reboot-reactor-and-resub []
     (evl/graceful-restart-nrepl-server!)
     (Thread/sleep 10000)
-    (wss/reboot-reactor!)
+    (db/reboot-reactor!)
     (Thread/sleep 10000)
     (wss/reload-signals-subs)
     (wss/reload-solver-subs))
@@ -997,7 +1000,7 @@
                                       (assoc (keyword (str "second=" (get ddate :second))) stamp)
                                       (assoc (keyword (str "minute=" (get ddate :minute))) stamp)
                                       (assoc (keyword (str "hour=" (get ddate :hour))) stamp))]
-                        (reset! wss/father-time ddate))
+                        (reset! db/father-time ddate))
                       (catch Exception e
                         (println "Error updating atom:" (.getMessage e))
                         (throw e)))
@@ -1038,7 +1041,7 @@
   ;;                  "(Re)Sniff Client SQL DBs" 30)
 
   (start-scheduler 600 ;; sketch for little gain?
-                   wss/clean-up-reactor
+                   db/clean-up-reactor
                    "Remove unneeded watchers from Reactor" 120)
 
   (start-scheduler 300 ;; was 5
@@ -1073,9 +1076,9 @@
                         (swap! wss/nrepl-usage conj @evl/nrepls-run)
                         (swap! wss/flow-usage conj @wss/flows-run)
                         (swap! wss/clover-params-usage conj @wss/param-sql-sync-rows)
-                        (swap! wss/watcher-usage conj (count (wss/current-watchers)))
-                        (swap! wss/sub-usage conj (count (wss/current-subs)))
-                        (swap! wss/sub-client-usage conj (count (wss/current-all-subs)))
+                        (swap! wss/watcher-usage conj (count (db/current-watchers)))
+                        (swap! wss/sub-usage conj (count (db/current-subs)))
+                        (swap! wss/sub-client-usage conj (count (db/current-all-subs)))
                         (swap! wss/mem-usage conj (ut/memory-used))
                         (let [thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
                               thread-count (.getThreadCount thread-mx-bean)]
@@ -1277,7 +1280,7 @@
                           (fn []
                             (let [;flows (if (or (nil? flows) (empty? flows))
                                   ]
-                              (swap! wss/flow-status merge
+                              (swap! db/flow-status merge
                                      (into
                                       {}
                                       (for [k     kks ;(keys @flow-db/results-atom)

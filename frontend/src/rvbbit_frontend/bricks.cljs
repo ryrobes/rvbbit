@@ -1090,6 +1090,7 @@
                                                                    (cstr/starts-with? (str %) ":solver-status/")
                                                                    (cstr/starts-with? (str %) ":flow-status/")
                                                                    (cstr/starts-with? (str %) ":kit-status/")
+                                                                   (cstr/starts-with? (str %) ":kit/")
                                                                    (cstr/starts-with? (str %) ":data/")
                                                                    (cstr/starts-with? (str %) ":signal-history/")
                                                                    (cstr/starts-with? (str %) ":panel/")
@@ -1115,7 +1116,9 @@
                                              :let [[p bid vid] kp]
                                              :when (and (= p :panels)
                                                         (= :output @(ut/tracked-sub ::repl-output-type {:panel-key bid :view-name vid})))]
-                                         (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">output>evald-result>out"))))
+                                         ;(keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">output>evald-result>out"))
+                                         (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">incremental"))
+                                         ))
          ;_ (tapp>> [:output-solvers clover-solvers  @db/solver-fn-lookup])
          warren-item             (get db :selected-warren-item)
          solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
@@ -1155,7 +1158,8 @@
                                                    (flatten (for [s in-editor-solvers0
                                                                   :let [meta-kw (str (ut/replacer s ":solver/" "solver-meta/"))
                                                                         ns-key (keyword meta-kw)
-                                                                        console-key (keyword (str meta-kw ">output>evald-result>out"))
+                                                                        ;;console-key (keyword (str meta-kw ">output>evald-result>out"))
+                                                                        console-key (keyword (str meta-kw ">incremental"))
                                                                         ;;ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})
                                                                         ]]
                                                               [(keyword (str (ut/replacer s ":solver/" (str "solver-status/" client-name-str ">"))))
@@ -1179,6 +1183,8 @@
                                                                      (ut/replacer ":" ""))
                                                                  (str ">running?")))])))
           ;; clover-solvers-running  []
+         _ (reset! temp-extra-subs  (vec (distinct @temp-extra-subs)))
+         _ (tapp>> [:temp-extra-subs @temp-extra-subs])
          signal-subs             (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))
@@ -11588,7 +11594,8 @@
 
         body (if (and is-runner? (= output-type :output))
                (let [solver-clover-kw (get @db/solver-fn-lookup [:panels panel-key selected-view])
-                     console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">output>evald-result>out"))
+                     ;console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">output>evald-result>out"))
+                     console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">incremental"))
                      console-body @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [console-clover-kw]})]
                  (if console-clover-kw
                    {selected-view
@@ -13009,6 +13016,7 @@
                                                               :let [icon (get-in block-runners [(first e) :kits (last e) :icon])
                                                                     kit-runner-key (str "kit-runner" (hash (str client-name brick-vec-key selected-view (first e) (last e))))
                                                                     running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
+                                                                    output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
                                                                     running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
                                                                     trig!        [@waiting?]
                                                                     class        (cond
@@ -13020,6 +13028,7 @@
                                                                               (when (not running?)
                                                                                 (swap! waiting? assoc kit-runner-key true)
                                                                                 (swap! temp-extra-subs conj running-key)
+                                                                                (swap! temp-extra-subs conj output-key)
                                                                                 (swap! db/kit-fn-lookup assoc [brick-vec-key selected-view] running-key)
                                                                                 (let [fstr (str "kit-runner " kit-runner-key)
                                                                                       w    (/ (count fstr) 4.1)]

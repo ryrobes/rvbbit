@@ -1451,6 +1451,14 @@
          running? @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})]
      (or running? false))))
 
+(re-frame/reg-sub
+ ::kit-console-incremental
+ (fn [_ {:keys [panel-key data-key]}]
+   (let [running-key (get @db/kit-fn-lookup [panel-key data-key])
+         console-key (keyword (-> (str running-key) (cstr/replace ">running?" ">incremental") (cstr/replace "-status" "") (cstr/replace ":" "")))
+         output @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [console-key]})]
+     output)))
+
 (re-frame/reg-event-db
   ::delete-kit-item
   (undoable)
@@ -1460,6 +1468,13 @@
     (assoc-in db [:data :kit-results-sys] (vec (filter #(not (= (get % :id) id)) (get-in db [:data :kit-results-sys]))))))
 
 (def mutation-log (reagent/atom []))
+
+;; (comment 
+;;   meta-data-ckp-output (keyword (str meta-data-ckp-str ">incremental"))
+;;   meta-data            (when are-solver
+;;                          @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+;;                                           {:keypath [meta-data-ckp]}))
+;;   )
 
 (defn narrative-box
   [panel-height panel-width kp]
@@ -1478,9 +1493,9 @@
                                 (or (= kit-name :kick) (= kit-name :ai/calliope))
                                  [:= :client_name (str client-name)]
                                  [:= 1 1])
-                          [:= :item_name iname] 
+                          [:= :item_name iname]
                           [:= :kit_name (str kit-name)]]
-        [runner-src 
+        [runner-src
          data-key]       @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
         selected-block   @(ut/tracked-sub ::bricks/selected-block {})
         src-kp           [selected-block runner-src data-key]
@@ -1500,6 +1515,8 @@
         ;;wait?            @(ut/tracked-subscribe [::bricks/reco-running? kit-context-name kit-name])
         queued?          false ;@(ut/tracked-subscribe [::bricks/reco-queued? kit-context-name kit-name])
         wait?            @(ut/tracked-sub ::kit-run-waiting? {:panel-key selected-block :data-key data-key})
+        console-output   @(ut/tracked-sub ::kit-console-incremental {:panel-key selected-block :data-key data-key})
+        _ (ut/tapp>> [:kit-console console-output])
         allow-mutate?    (get @kit-mutations kp false)
         sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}
         ;sql-calls        {:kit-results-sys {:select [:item_key :item_data :kit_name :item_options] :from [:kits] :where where-filter}}
@@ -1517,17 +1534,24 @@
       (reagent.core/next-tick #(scroll-to-bottom "chat-v-box")) ;; temp calliope demo
       (reagent.core/next-tick #(smooth-scroll-to-element "chat-v-box-parent" "chat-v-box")))
     (if (or wait? running? queued?)
-      [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
+      [re-com/v-box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
                                                                                                                    ;; of
        :width (px (- panel-width 12)) ;; minus size of border left and right and header
-       :align :center :justify :center :child
-       [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class
-        (if (or wait? queued?) "rotate-reverse linear infinite" "rotate linear infinite") :style
-        {:font-size        "45px" ;; "15px"
-         :opacity          0.45
-         :color            (theme-pull :theme/editor-outer-rim-color nil)
-         :transform-origin "22.5px 22px" ;; "7.5px 11px"
-        }]]
+       :align :center :justify :center :children
+       [[re-com/md-icon-button :md-icon-name "zmdi-refresh" :class
+         (if (or wait? queued?) "rotate-reverse linear infinite" "rotate linear infinite") :style
+         {:font-size        "45px" ;; "15px"
+          :opacity          0.45
+          :color            (theme-pull :theme/editor-outer-rim-color nil)
+          :transform-origin "22.5px 22px" ;; "7.5px 11px"
+          }]
+        [bricks/reactive-virtualized-console-viewer
+         {:style {}
+          :text console-output
+          :id (str "kit-" (hash kp) (hash src-kp))
+          :width 250
+          :height 250}]
+        ]]
       [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
                                                                                                                    ;; of
        :width (px (- panel-width 12)) ;; minus size of border left and right and header
@@ -1990,17 +2014,13 @@
         audio-playing?  @(ut/tracked-subscribe [::audio/audio-playing?])
         hh              @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when
         ww              @(ut/tracked-subscribe [::subs/w])
-        panel-height    (* (.-innerHeight js/window) 0.8)
-        mode            (get @db/chat-mode kp (if (= "none!" (first kp)) :runstreams :history)) ;; default
-                                                                                                ;; to
-                                                                                                ;; snap
-                                                                                                ;; if
-                                                                                                ;; unselected
+        panel-height    (* (.-innerHeight js/window) 0.9)
+        mode            (get @db/chat-mode kp (if (= "none!" (first kp)) :runstreams :history))
         kmode           (get @db/kit-mode kp)
         text-box?       (or (= mode :snapshots) (= mode :buffy) (= mode :narratives) (= mode :kick))
         valid-kits      @(ut/tracked-subscribe [::valid-kits])
         narrative-mode? (some #(= % (last kp)) (keys valid-kits))
-        choices         (into (if (and (not (= "none!" (first kp))) (not (empty? valid-kits)))
+        choices         (into (if (and (not (= "none!" (first kp))) (ut/ne? valid-kits))
                                 (vec (map (fn [k] [:narratives k]) (keys valid-kits)))
                                 [])
                               (vec (remove nil?

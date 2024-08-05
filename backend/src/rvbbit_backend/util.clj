@@ -162,6 +162,10 @@
 
 (defn where-dissect [clause] (let [parts (break-out-parts clause)] (cons clause (remove #(= clause %) parts))))
 
+(defn serializable?
+  [value]
+  (and (not (clojure.string/includes? (pr-str value) "#object")) (not (clojure.string/includes? (pr-str value) "#error"))))
+
 (defn thaw-atom
   "Thaws an atom from disk or creates a new one if the file doesn't exist."
   [initial-state file-path & [out?]]
@@ -175,10 +179,6 @@
     (when (not out?) ;; we dont want to manage some of these, do it manually
       (swap! managed-atoms assoc file-path a))
     a))
-
-(defn serializable?
-  [value]
-  (and (not (clojure.string/includes? (pr-str value) "#object")) (not (clojure.string/includes? (pr-str value) "#error"))))
 
 (defn freeze-atoms
   "Freezes all managed atoms to disk."
@@ -206,7 +206,9 @@
 (defn freeze-atom
   "Freezes a single atom to disk."
   [file-path]
-  (let [a (get @managed-atoms file-path)] (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
+  (let [a (get @managed-atoms file-path)] 
+    (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
+
 
 (def terminal (TerminalFactory/get))
 (defn get-terminal-width [] (try (.getWidth terminal) (catch Throwable _ 85)))
