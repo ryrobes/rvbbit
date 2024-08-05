@@ -641,6 +641,7 @@
                                              (if is-kit? ;; else solver call
                                                (swap! db/kit-atom assoc-in [id :incremental] o)
                                                (swap! db/last-solvers-atom-meta assoc-in [id :incremental] o)))
+                    _ (push-to-console-clover (str "starting "  id " " ui-keypath))
 
                     ;; console-clover-kp (if (cstr/includes? (str id) "kit")
                     ;;                     [id :output]

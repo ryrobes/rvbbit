@@ -1549,8 +1549,8 @@
          {:style {}
           :text console-output
           :id (str "kit-" (hash kp) (hash src-kp))
-          :width 250
-          :height 250}]
+          :width (- panel-width 20)
+          :height (- panel-height 120)}]
         ]]
       [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
                                                                                                                    ;; of

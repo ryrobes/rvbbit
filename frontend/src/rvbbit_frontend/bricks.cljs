@@ -1184,7 +1184,7 @@
                                                                  (str ">running?")))])))
           ;; clover-solvers-running  []
          _ (reset! temp-extra-subs  (vec (distinct @temp-extra-subs)))
-         _ (tapp>> [:temp-extra-subs @temp-extra-subs])
+        ;; _ (tapp>> [:temp-extra-subs @temp-extra-subs])
          signal-subs             (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))

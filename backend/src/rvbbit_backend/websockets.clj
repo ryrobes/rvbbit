@@ -2250,7 +2250,7 @@
      ;                      ))
     ))
 
-(declare clover-lookup ship-estimate query-runstream)
+(declare ship-estimate query-runstream)
 
 ;; (ut/pp @transit-file-mapping)
 ;; (ut/pp (keys @transit-file-mapping))
@@ -2319,7 +2319,7 @@
           repl-host       (get-in runner-map [:runners kit-runner :runner :host])
           repl-port       (get-in runner-map [:runners kit-runner :runner :port])
           clover-kw        (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
-          clover-lookup-map (into {} (for [kw clover-kw] {kw (clover-lookup client-name kw)}))
+          clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
           context-data    (merge
                            clover-lookup-map
                            {:client-panels (get @client-panels client-name)
@@ -3311,7 +3311,7 @@
                                   solver-name)
           vdata-clover-walk-map (into {}
                                       (for [kp vdata-clover-kps]
-                                        {kp (try (clover-lookup :rvbbit kp)
+                                        {kp (try (db/clover-lookup :rvbbit kp)
                                                  (catch Exception e
                                                    (ut/pp [:clover-lookup-error kp e])
                                                    (str "clover-param-lookup-error " kp)))}))

@@ -33,6 +33,7 @@
 (defonce splitter-stats (volatile! {}))
 (defonce atoms-and-watchers (atom {}))
 (defonce watcher-log (atom {}))
+(defonce client-click-params (atom {}))
 
 (defonce last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
 (defonce last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
@@ -337,7 +338,10 @@
                                                                 (System/currentTimeMillis))
                                                       (assoc-in [client-name flow-key :last-push]
                                                                 (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
-                                          ;;  (when (cstr/includes? (str client-name) "-fat-")  (ut/pp [:running-push! flow-key client-name new-value]))
+                                         
+                                         (swap! client-click-params assoc-in [client-name flow-key] new-value) ;; for diffing later
+
+                                        ;;   (when (cstr/includes? (str client-name) "-bronze-")  (ut/pp [:running-push! flow-key client-name keypath new-value]))
                                           ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
                                           ;;                               (fn []
                                           ;;                                 (when (or (not= flow-key :time/now)

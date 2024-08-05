@@ -566,7 +566,7 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "-thin-")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (get result :status) (str (get result :ui-keypath)) (str result)]))
+          ;; (when (cstr/includes? (str client-name) "-bronze-")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (get result :status) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
