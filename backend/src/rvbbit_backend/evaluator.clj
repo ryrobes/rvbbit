@@ -637,11 +637,11 @@
                     ;;                 (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>out")))
                     is-kit?       (cstr/includes? (str id) "kit")
                     ;; :solver-meta/raw-custom-override-48330736>output>evald-result>out
-                    push-to-console-clover (fn [o]
+                    push-to-console-clover (fn [o kk]
                                              (if is-kit? ;; else solver call
-                                               (swap! db/kit-atom assoc-in [id :incremental] o)
-                                               (swap! db/last-solvers-atom-meta assoc-in [id :incremental] o)))
-                    _ (push-to-console-clover (str "starting "  id " " ui-keypath))
+                                               (swap! db/kit-atom assoc-in [id kk] o)
+                                               (swap! db/last-solvers-atom-meta assoc-in [id kk] o)))
+                    _ (push-to-console-clover (str "starting "  id " " ui-keypath) :incremental)
 
                     ;; console-clover-kp (if (cstr/includes? (str id) "kit")
                     ;;                     [id :output]
@@ -653,14 +653,14 @@
                                     (when-let [out (:out msg)]
                                       (swap! output-atom conj out)
                                       (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
-                                      (push-to-console-clover (cstr/join "" @output-atom))
+                                      (push-to-console-clover (cstr/join "" @output-atom) :incremental)
                                       ;(println "Real-time output:" out)
                                       )
                                     (when-let [err (:err msg)]
                                       (swap! output-atom conj err)
                                       (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
                                       ;(push-to-console-clover @output-atom)
-                                      (push-to-console-clover (cstr/join "" @output-atom))
+                                      (push-to-console-clover (cstr/join "" @output-atom) :incremental)
                                       ;(println "Real-time error:" err)
                                       )
                                     msg)
@@ -671,16 +671,17 @@
                     rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
                                                (nrepl/response-values responses)))
                     rsp           (nrepl/combine-responses responses)
-                    msg-out       @output-atom
+                    ;msg-out       @output-atom
                     merged-values rsp-read
                     sampled-values (try
                                      (safe-sample-with-description (first rsp-read))
                                      (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
+                    _ (push-to-console-clover (cstr/join "" @output-atom) :out)
                     output        {:evald-result
                                    (-> rsp
                                        (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                        (assoc :value merged-values)
-                                       (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
+                                       ;(assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
                                        (dissoc :id)
                                        (dissoc :session))
                                    :sampled sampled-values}]

@@ -2256,6 +2256,45 @@
 ;; (ut/pp (keys @transit-file-mapping))
 ;; (reset! transit-file-mapping {})
 
+(defn create-ansi-box [content]
+  (let [border-color "\u001b[38;5;213m"  ; Pink
+        text-color "\u001b[36m"          ; Cyan
+        bold "\u001b[1m"                 ; Bold
+        reset "\u001b[0m"
+        width 60
+        top-bottom (str border-color "+" (apply str (repeat (- width 2) "-")) "+" reset)
+        wrap-line (fn [line]
+                    (if (<= (count line) (- width 2))
+                      [line]
+                      (let [words (clojure.string/split line #"\s+")
+                            lines (reduce (fn [acc word]
+                                            (let [last-line (last acc)
+                                                  new-line (str last-line " " word)]
+                                              (if (<= (count new-line) (- width 2))
+                                                (conj (vec (butlast acc)) new-line)
+                                                (conj acc word))))
+                                          [""]
+                                          words)]
+                        (filter #(ut/ne? %) lines))))
+        content-lines (mapcat wrap-line (clojure.string/split-lines content))
+        formatted-lines (map-indexed 
+                          (fn [idx line]
+                            (let [padding (quot (- width 2 (count line)) 2)
+                                  left-padding (apply str (repeat padding " "))
+                                  right-padding (apply str (repeat (- width 2 (count line) padding) " "))
+                                  formatted (str left-padding line right-padding)]
+                              (str border-color "│" reset text-color
+                                   (if (zero? idx) bold "")
+                                   formatted
+                                   (if (zero? idx) reset "")
+                                   reset border-color "│" reset)))
+                          content-lines)]
+    (clojure.string/join "\n"
+                         (concat [top-bottom]
+                                 formatted-lines
+                                 [top-bottom]))))
+
+
 (defmethod wl/handle-push :run-kit
   [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]  
   (try
@@ -2266,6 +2305,11 @@
           _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
           _ (swap! db/kit-status assoc-in [kit-runner-key :running?] true)
           host-runner     runner
+          _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+                   (create-ansi-box
+                    (str "starting kit run " (ut/millis-to-date-string (System/currentTimeMillis)) "\n "
+                         (str kit-keypath "\n " ui-keypath "\n")
+                         )))
           _ (when (= host-runner :queries) ;; we need the FULL table
               (alert! client-name
                       [:v-box
@@ -2346,15 +2390,15 @@
                                           (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
           error?   (cstr/includes? (cstr/lower-case (str result)) " error ") ;; lame , get codes later 
           output (get-in result [:evald-result :value])
-          console (get-in result [:evald-result :out])]
+          ;console (get-in result [:evald-result :out])
+          ]
 
       ;;(ut/pp [:kit-runner-output result {:elapsed-ms? elapsed-ms}])
 
       ;;(ut/pp  [:result result])
       (when (and (= output-type :kit-map)
-                 ;(and (vector? output)  
-                 ;     (map? (first output)))
-                 )
+                 (and (vector? output)
+                      (map? (first output))))
         (ut/pp [:inserting-into-kit-results-table.. (count output)])
         (doseq [kk output]
           (insert-kit-data kk
@@ -2377,11 +2421,11 @@
                 ;; [:box
                 ;;  ;:style {:font-size "11px"}
                 ;;  :child (str "done")]
-                (when (ut/ne? console)
-                  [:box
-                   :style {:border "1px solid #ffffff22"
-                           :border-radius "14px"}
-                   :child [:terminal-custom [console (* 17 50) 250]]])
+                ;; (when (ut/ne? console)
+                ;;   [:box
+                ;;    :style {:border "1px solid #ffffff22"
+                ;;            :border-radius "14px"}
+                ;;    :child [:terminal-custom [console (* 17 50) 250]]])
                 [:box :style {:font-size "11px" :opacity 0.7}
                  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
               18

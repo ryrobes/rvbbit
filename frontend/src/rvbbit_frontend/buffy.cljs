@@ -361,6 +361,8 @@
 
 (declare render-honey-comb-fragments)
 
+(defonce console-or-kit-mode? (reagent/atom {}))
+
 (defn option-buttons
   [kp mode]
   (let [;meta-fields-msg @(ut/tracked-subscribe [::table-meta-chat])
@@ -382,8 +384,9 @@
                      (keys (get-in kits [:kits kit-name kit-context-name])))
         narrative-items (when (or (= mode :narratives) (or (= mode :kick) (= mode :buffy)))
                           (count (get-in kits [:kits kit-name kit-context-name curr-narrative :data])))
+        console-mode? (get @console-or-kit-mode? kp false)
         narrative-item (get @kit-pages kp 0)
-        ai-assignments
+        ai-assignments ;; calliope mock ui test honeycomb
           {:select [:*]
            :order-by [[:need-feedback :desc]]
            :style-rules {[:* :highlight-3109s] {:logic [:= :need-feedback "true"]
@@ -431,9 +434,12 @@
                {;:background-color "orange" :border "1px solid yellow"
                 :color       (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                 :overflow    "auto"
-                :font-weight 700} :height "44px" :child (str narrative-desc)]
+                :font-weight 700} 
+               :height "44px" 
+               :child (str narrative-desc)]
               [re-com/h-box :gap "10px" :justify :between :children
-               [[re-com/h-box :children
+               [[re-com/h-box
+                 :children
                  [[re-com/single-dropdown :model curr-narrative :width "135px" :style
                    {:background-color "#00000045" :border-radius "10px" :border "1px solid #ffffff18"} :on-change
                    #(swap! db/kit-keys assoc kp %) :choices (vec (map (fn [n] {:id n :label n}) narratives))]]]
@@ -445,14 +451,22 @@
                   :cursor           "pointer"
                   :background-color "#00000045"
                   :border-radius    "10px"
-                  :border           "1px solid #ffffff18"} :children
-                 [[re-com/box :child "allow step"] [re-com/box :child "mutations?"]]]
+                  :border           "1px solid #ffffff18"}
+                 :children
+                 [[re-com/box :child "allow step"]
+                  [re-com/box :child "mutations?"]]]
                 [re-com/h-box ;; moode :buffy implied
                  :padding "8px" :style
                  {;:background-color "orange"
                   :color         (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                   :border-radius "6px"
-                  :border        "1px solid #ffffff19"} :height "35px" :size "auto" :justify :between :align :center :gap "6px"
+                  :border        "1px solid #ffffff19"}
+                 :height "35px"
+                 ;:width "235px"
+                 :size "auto"
+                 :justify :between
+                 :align :center
+                 :gap "6px"
                  :children
                  (let [mmin      0
                        mmax      (- narrative-items 1)
@@ -461,10 +475,20 @@
                    [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-chevron-left" :on-click
                      #(when (not is-first?) (swap! kit-pages assoc kp (dec narrative-item))) :style
                      {:color (theme-pull :theme/editor-outer-rim-color nil) :cursor "pointer" :font-size "23px"}]
-                    [re-com/slider :model narrative-item :on-change #(swap! kit-pages assoc kp %) :min 0 :max mmax :width "245px"]
+                    [re-com/slider :model narrative-item :on-change #(swap! kit-pages assoc kp %) :min 0 :max mmax :width "225px"]
                     [re-com/md-icon-button :src (at) :md-icon-name "zmdi-chevron-right" :on-click
                      #(when (not is-last?) (swap! kit-pages assoc kp (inc narrative-item))) :style
-                     {:color (theme-pull :theme/editor-outer-rim-color nil) :cursor "pointer" :font-size "23px"}]])]]]]
+                     {:color (theme-pull :theme/editor-outer-rim-color nil) :cursor "pointer" :font-size "23px"}]])]
+                [re-com/box
+                 :align :center
+                 :justify :center
+                 :attr {:on-click #(swap! console-or-kit-mode? assoc kp (not (get @console-or-kit-mode? kp false)))}
+                 :child [re-com/md-icon-button
+                         :src (at)
+                         :md-icon-name (if console-mode? "fa-solid fa-sliders" "fa-solid fa-file-lines")
+                         :style {:color (theme-pull :theme/editor-outer-rim-color nil)}]
+                     ;:style {:color (theme-pull :theme/editor-outer-rim-color nil)} 
+                 :width "20px"]]]]
            :else
              [[re-com/h-box :size "none" :height "33px" :width "580px" :padding "6px" :justify :between :align :center :children
                [;[re-com/box :child "rabbit worker"]
@@ -1449,7 +1473,7 @@
  (fn [_ {:keys [panel-key data-key]}] 
    (let [running-key (get @db/kit-fn-lookup [panel-key data-key])
          running? @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})]
-     (or running? false))))
+     running?)))
 
 (re-frame/reg-sub
  ::kit-console-incremental
@@ -1516,11 +1540,10 @@
         queued?          false ;@(ut/tracked-subscribe [::bricks/reco-queued? kit-context-name kit-name])
         wait?            @(ut/tracked-sub ::kit-run-waiting? {:panel-key selected-block :data-key data-key})
         console-output   @(ut/tracked-sub ::kit-console-incremental {:panel-key selected-block :data-key data-key})
-        _ (ut/tapp>> [:kit-console console-output])
+        console-mode?    (get @console-or-kit-mode? kp false)
+        ;;_ (ut/tapp>> [:kit-console console-output])
         allow-mutate?    (get @kit-mutations kp false)
-        sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}
-        ;sql-calls        {:kit-results-sys {:select [:item_key :item_data :kit_name :item_options] :from [:kits] :where where-filter}}
-        ]
+        sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}]
     (ut/tapp>> [:kit-calls sql-calls])
     (doseq [[k query] sql-calls]
       (let [;query (ut/postwalk-replacer sql-params v)
@@ -1530,152 +1553,175 @@
             unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
         (when (and (or (not data-exists?) unrun-sql?) (not (or wait? queued?))) (sql-data [k] query))))
     (ut/tapp>> [:narratives kit-name kits @db/chat-mode @db/kit-mode])
-    (if false ; true
-      (reagent.core/next-tick #(scroll-to-bottom "chat-v-box")) ;; temp calliope demo
-      (reagent.core/next-tick #(smooth-scroll-to-element "chat-v-box-parent" "chat-v-box")))
-    (if (or wait? running? queued?)
-      [re-com/v-box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
-                                                                                                                   ;; of
-       :width (px (- panel-width 12)) ;; minus size of border left and right and header
-       :align :center :justify :center :children
-       [[re-com/md-icon-button :md-icon-name "zmdi-refresh" :class
-         (if (or wait? queued?) "rotate-reverse linear infinite" "rotate linear infinite") :style
-         {:font-size        "45px" ;; "15px"
-          :opacity          0.45
-          :color            (theme-pull :theme/editor-outer-rim-color nil)
-          :transform-origin "22.5px 22px" ;; "7.5px 11px"
-          }]
-        [bricks/reactive-virtualized-console-viewer
-         {:style {}
-          :text console-output
-          :id (str "kit-" (hash kp) (hash src-kp))
-          :width (- panel-width 20)
-          :height (- panel-height 120)}]
-        ]]
-      [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
-                                                                                                                   ;; of
-       :width (px (- panel-width 12)) ;; minus size of border left and right and header
-       :attr {:id "chat-v-box-parent"} :style {:overflow "auto" :border-radius "16px"} :child
-       [re-com/v-box :padding "4px" :gap "11px" :children
-        (for [{:keys [name content order parameters id step-mutates ask-mutates] :as page} narratives
-              :let  [idx            (try (.indexOf narratives page) (catch :default _ 0))
-                     selected?      (if callie? (= page (last narratives)) (= idx narrative-item)) ;; callie
-                     hpage          (hash page)
-                     viewable?      (or (not as-pages?) selected?)
-                     reparameters   (into {} ;; for param spawning
-                                          (for [[k v] parameters]
-                                            {(keyword (-> (str (ut/safe-name kit-context-name)
-                                                               ">" (ut/safe-name curr-narrative)
-                                                               ">" (ut/safe-name k))
-                                                          (ut/replacer "/" "-")
-                                                          (ut/replacer "." "-")))
-                                               v}))
-                     rereparameters (into {} ;; for ui
-                                          (for [[k v] parameters]
-                                            {(keyword (str (ut/safe-name kit-name)
-                                                           "/"
-                                                           (-> (str (ut/safe-name kit-context-name)
-                                                                    ">" (ut/safe-name curr-narrative)
-                                                                    ">" (ut/safe-name k))
-                                                               (ut/replacer "/" "-")
-                                                               (ut/replacer "." "-"))))
-                                               v}))
-                     _ (when (and (ut/ne? step-mutates) selected? allow-mutate?)
-                         (doseq [[kk vv] step-mutates] (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))
-                     _ (when (and (ut/ne? parameters) viewable?)
-                         (dorun (ut/tapp>> [:reparameters reparameters])
-                                (ut/tracked-dispatch [::click-parameter [kit-name] reparameters])))]
-              :when (if as-pages? selected? true)]
-          [re-com/v-box :size "auto" :padding "9px" :attr {:id (if selected? "chat-v-box" (str "chat-v-box-" order "-" hpage))}
-           :style
-           {:margin-left      "5px"
-            :box-shadow       (when (and (not as-pages?) selected?)
-                                (str "inset 0px 0px 2px 2px " (theme-pull :theme/editor-outer-rim-color nil) 33))
-            :border-radius    "12px" ;; (str (theme-pull :theme/editor-outer-rim-color nil) 15)
-            :background-color (if (and (not as-pages?) selected?) "#00000065" "#00000045")} :children
-           [[re-com/v-box :size "auto" :gap "11px" :justify :between :align :center :children
-             [[re-com/h-box :size "none" :width (px (- panel-width 40)) :justify :between :align :center :children
-               [[re-com/box :size "auto" :style
-                 {;:border "1px solid red"
-                  :padding-left "10px"
-                  :cursor       "pointer"
-                  :user-select  "none"} :attr {:on-click #(swap! kit-pages assoc kp idx)} :child
-                 (if (not callie?)
-                   [re-com/box :style {:color (theme-pull :theme/editor-outer-rim-color nil) :font-size "16px" :font-weight 500}
-                    :size "auto" :child (str name)]
-                   "")]
-                (when (or (= kit-name :kick) (= kit-name :ai/calliope))
-                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
-                   #(ut/tracked-dispatch [::delete-kit-item [:and [:= :id id] where-filter] id]) :style
-                   {:color        (str (theme-pull :theme/editor-outer-rim-color nil) (if selected? 33 16))
-                    :cursor       "pointer"
-                    :height       "15px"
-                    :margin-right (if callie? "10px" "6px")
-                    :margin-top   (if callie? "0px" "-15px")
-                    :font-size    "19px"}])]]
-              [re-com/v-box :size "none" :padding "6px" :width (px (- panel-width 40)) :align :center :justify :center :style
-               {;:opacity 0.4
-                :font-size     "12px"
-                :border-radius "13px"
-                :transform     "translate(0)"
-                :font-weight   500} :gap "14px" :children
-               (for [c    content
-                     :let [;_ (ut/tapp>> [:render type data_d key temp-key])
-                           type               (cond (vector? c)                         :view
-                                                    (string? c)                         :view
-                                                    (and (map? c) (nil? (get c :view))) :query
-                                                    :else                               :both)
-                           query?             (= type :query)
-                           both?              (= type :both)
-                           signal?            (or (try (empty? c) (catch :default _ false)) (keyword? c))
-                           c2                 (if (and both? (not (nil? (get c :view))))
-                                                (-> c ;; special mod for drag spawn
-                                                    (assoc :views {:view (get c :view)})
-                                                    (dissoc :view))
-                                                c)
-                           execute?           (and (vector? c) (= :execute (first c)))
-                           mods               (when execute? (count (keys (get c 1))))
-                           _ (when execute?
-                               (let [pp (get c 1)]
-                                 (doseq [[kk vv] pp]
-                                   (let [hid      (hash [kk vv])
-                                         already? (some #(= hid (hash %)) @mutation-log)]
-                                     (when (not already?)
-                                       (do (ut/tapp>> [:forced-execution-from-kick kk vv])
-                                           (swap! mutation-log conj hid)
-                                           (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))))))
-                           draggable-spawn-fn (if (or both? query?) bricks/sql-spawner-chat bricks/view-spawner-chat)
-                           key-gen            (let [kk (if query? (last kp) kp)] (if (nil? kk) (ut/safe-key "kick") kk))]]
-                 (cond signal?           nil ;; do nothing, not actual content, a flow signal sneaking in
-                       execute?          [re-com/box :width "580px" :align :end :justify :end :style {:margin-right "30px"} :child
-                                          [re-com/box :size "none" :child
-                                           (str "*ran " mods " board modification" (when (> mods 1) "s")) :style
-                                           {;:background-color (str (theme-pull
+    
+    (when (not console-mode?)
+      (if false ; true
+        (reagent.core/next-tick #(scroll-to-bottom "chat-v-box")) ;; temp calliope demo
+        (reagent.core/next-tick #(smooth-scroll-to-element "chat-v-box-parent" "chat-v-box"))))
+    
+    (if (and console-mode? (not wait?))
+      [re-com/box
+       ;:style {:border "1px solid pink"}
+       :size "none"
+       :height (px (- panel-height 12 25 (when text-box? text-box-height)))
+       :child  [bricks/reactive-virtualized-console-viewer
+                {:style {}
+                 :text console-output
+                 :follow? true
+                 :id (str "kit-" (hash kp) (hash src-kp))
+                 :width (- panel-width 22)
+                 :height (- panel-height 12 35 (when text-box? text-box-height))}]]
+      (if (or wait? running? queued?)
+        [re-com/v-box
+         :padding "5px"
+         :size "none"
+         :height (px (- panel-height 12 25 (when text-box? text-box-height)))
+         :width (px (- panel-width 12)) ;; minus size of border left and right and header
+         :align :center
+         :justify :center
+         :children [[re-com/md-icon-button :md-icon-name "zmdi-refresh" :class
+                     (if (or wait? queued?) "rotate-reverse linear infinite" "rotate linear infinite") :style
+                     {:font-size        "45px" ;; "15px"
+                      :opacity          0.45
+                      :color            (theme-pull :theme/editor-outer-rim-color nil)
+                      :transform-origin "22.5px 22px" ;; "7.5px 11px"
+                      }]
+                    [bricks/reactive-virtualized-console-viewer
+                     {:style {}
+                      :text console-output
+                      :follow? true
+                      :id (str "kit-" (hash kp) (hash src-kp))
+                      :width (- panel-width 20)
+                      :height (- panel-height 120)}]]]
+        [re-com/box
+         :padding "5px"
+         :size "none"
+         :height (px (- panel-height 12 25 (when text-box? text-box-height)))
+         :width (px (- panel-width 12)) ;; minus size of border left and right and header
+         :attr {:id "chat-v-box-parent"}
+         :style {:overflow "auto" :border-radius "16px"} :child
+         [re-com/v-box
+          :padding "4px"
+          :gap "11px"
+          :children (for [{:keys [name content order parameters id step-mutates ask-mutates] :as page} narratives
+                          :let  [idx            (try (.indexOf narratives page) (catch :default _ 0))
+                                 selected?      (if callie? (= page (last narratives)) (= idx narrative-item)) ;; callie
+                                 hpage          (hash page)
+                                 viewable?      (or (not as-pages?) selected?)
+                                 reparameters   (into {} ;; for param spawning
+                                                      (for [[k v] parameters]
+                                                        {(keyword (-> (str (ut/safe-name kit-context-name)
+                                                                           ">" (ut/safe-name curr-narrative)
+                                                                           ">" (ut/safe-name k))
+                                                                      (ut/replacer "/" "-")
+                                                                      (ut/replacer "." "-")))
+                                                         v}))
+                                 rereparameters (into {} ;; for ui
+                                                      (for [[k v] parameters]
+                                                        {(keyword (str (ut/safe-name kit-name)
+                                                                       "/"
+                                                                       (-> (str (ut/safe-name kit-context-name)
+                                                                                ">" (ut/safe-name curr-narrative)
+                                                                                ">" (ut/safe-name k))
+                                                                           (ut/replacer "/" "-")
+                                                                           (ut/replacer "." "-"))))
+                                                         v}))
+                                 _ (when (and (ut/ne? step-mutates) selected? allow-mutate?)
+                                     (doseq [[kk vv] step-mutates] (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))
+                                 _ (when (and (ut/ne? parameters) viewable?)
+                                     (dorun (ut/tapp>> [:reparameters reparameters])
+                                            (ut/tracked-dispatch [::click-parameter [kit-name] reparameters])))]
+                          :when (if as-pages? selected? true)]
+                      [re-com/v-box :size "auto" :padding "9px" :attr {:id (if selected? "chat-v-box" (str "chat-v-box-" order "-" hpage))}
+                       :style
+                       {:margin-left      "5px"
+                        :box-shadow       (when (and (not as-pages?) selected?)
+                                            (str "inset 0px 0px 2px 2px " (theme-pull :theme/editor-outer-rim-color nil) 33))
+                        :border-radius    "12px" ;; (str (theme-pull :theme/editor-outer-rim-color nil) 15)
+                        :background-color (if (and (not as-pages?) selected?) "#00000065" "#00000045")} :children
+                       [[re-com/v-box :size "auto" :gap "11px" :justify :between :align :center :children
+                         [[re-com/h-box :size "none" :width (px (- panel-width 40)) :justify :between :align :center :children
+                           [[re-com/box :size "auto" :style
+                             {;:border "1px solid red"
+                              :padding-left "10px"
+                              :cursor       "pointer"
+                              :user-select  "none"} :attr {:on-click #(swap! kit-pages assoc kp idx)} :child
+                             (if (not callie?)
+                               [re-com/box :style {:color (theme-pull :theme/editor-outer-rim-color nil) :font-size "16px" :font-weight 500}
+                                :size "auto" :child (str name)]
+                               "")]
+                            (when (or (= kit-name :kick) (= kit-name :ai/calliope))
+                              [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
+                               #(ut/tracked-dispatch [::delete-kit-item [:and [:= :id id] where-filter] id]) :style
+                               {:color        (str (theme-pull :theme/editor-outer-rim-color nil) (if selected? 33 16))
+                                :cursor       "pointer"
+                                :height       "15px"
+                                :margin-right (if callie? "10px" "6px")
+                                :margin-top   (if callie? "0px" "-15px")
+                                :font-size    "19px"}])]]
+                          [re-com/v-box :size "none" :padding "6px" :width (px (- panel-width 40)) :align :center :justify :center :style
+                           {;:opacity 0.4
+                            :font-size     "12px"
+                            :border-radius "13px"
+                            :transform     "translate(0)"
+                            :font-weight   500} :gap "14px" :children
+                           (for [c    content
+                                 :let [;_ (ut/tapp>> [:render type data_d key temp-key])
+                                       type               (cond (vector? c)                         :view
+                                                                (string? c)                         :view
+                                                                (and (map? c) (nil? (get c :view))) :query
+                                                                :else                               :both)
+                                       query?             (= type :query)
+                                       both?              (= type :both)
+                                       signal?            (or (try (empty? c) (catch :default _ false)) (keyword? c))
+                                       c2                 (if (and both? (not (nil? (get c :view))))
+                                                            (-> c ;; special mod for drag spawn
+                                                                (assoc :views {:view (get c :view)})
+                                                                (dissoc :view))
+                                                            c)
+                                       execute?           (and (vector? c) (= :execute (first c)))
+                                       mods               (when execute? (count (keys (get c 1))))
+                                       _ (when execute?
+                                           (let [pp (get c 1)]
+                                             (doseq [[kk vv] pp]
+                                               (let [hid      (hash [kk vv])
+                                                     already? (some #(= hid (hash %)) @mutation-log)]
+                                                 (when (not already?)
+                                                   (do (ut/tapp>> [:forced-execution-from-kick kk vv])
+                                                       (swap! mutation-log conj hid)
+                                                       (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))))))
+                                       draggable-spawn-fn (if (or both? query?) bricks/sql-spawner-chat bricks/view-spawner-chat)
+                                       key-gen            (let [kk (if query? (last kp) kp)] (if (nil? kk) (ut/safe-key "kick") kk))]]
+                             (cond signal?           nil ;; do nothing, not actual content, a flow signal sneaking in
+                                   execute?          [re-com/box :width "580px" :align :end :justify :end :style {:margin-right "30px"} :child
+                                                      [re-com/box :size "none" :child
+                                                       (str "*ran " mods " board modification" (when (> mods 1) "s")) :style
+                                                       {;:background-color (str (theme-pull
                                             ;:theme/editor-outer-rim-color nil)
-                                            :border        (str "1px solid "
-                                                                (str (theme-pull :theme/editor-outer-rim-color nil) 45))
-                                            :border-radius "10px"
-                                            :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
-                                            :padding-left  "12px"
-                                            :padding-right "12px"}]]
+                                                        :border        (str "1px solid "
+                                                                            (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                                                        :border-radius "10px"
+                                                        :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
+                                                        :padding-left  "12px"
+                                                        :padding-right "12px"}]]
 
-                       (or both? query?) [re-com/v-box :children
-                                          [(bricks/draggable (draggable-spawn-fn key-gen c2)
-                                                             "meta-menu"
-                                                             [re-com/box :align :start :justify :start :child
-                                                              [re-com/md-icon-button :src (at) :md-icon-name "zmdi-code-setting"
-                                                               :style
-                                                               {;:color (theme-pull :theme/editor-font-color nil)
-                                                                :cursor        "grab"
-                                                                :color         "orange"
-                                                                :height        "15px"
-                                                                :margin-top    "-2px"
-                                                                :margin-bottom "20px"
-                                                                :font-size     "19px"}]])
-                                           [re-com/box :child [render-honey-comb-fragments c]]]]
+                                   (or both? query?) [re-com/v-box :children
+                                                      [(bricks/draggable (draggable-spawn-fn key-gen c2)
+                                                                         "meta-menu"
+                                                                         [re-com/box :align :start :justify :start :child
+                                                                          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-code-setting"
+                                                                           :style
+                                                                           {;:color (theme-pull :theme/editor-font-color nil)
+                                                                            :cursor        "grab"
+                                                                            :color         "orange"
+                                                                            :height        "15px"
+                                                                            :margin-top    "-2px"
+                                                                            :margin-bottom "20px"
+                                                                            :font-size     "19px"}]])
+                                                       [re-com/box :child [render-honey-comb-fragments c]]]]
 
-                       (cstr/includes? (str c) ":vega-lite")  ;; bricks/draggable breaks it, but not nivo and re?
-                       [re-com/box :padding "4px" :child [render-honey-comb-fragments c 10]]
+                                   (cstr/includes? (str c) ":vega-lite")  ;; bricks/draggable breaks it, but not nivo and re?
+                                   [re-com/box :padding "4px" :child [render-honey-comb-fragments c 10]]
 
                       ;;  (or (not= runner-src :views)
                       ;;      (not= runner-src :queries))
@@ -1704,17 +1750,17 @@
 
 
 
-                       :else             (bricks/draggable (draggable-spawn-fn key-gen c)
-                                                           "meta-menu"
-                                                           [re-com/box :padding "4px" :child
-                                                            [render-honey-comb-fragments c 10]])
+                                   :else             (bricks/draggable (draggable-spawn-fn key-gen c)
+                                                                       "meta-menu"
+                                                                       [re-com/box :padding "4px" :child
+                                                                        [render-honey-comb-fragments c 10]])
                       ;;  :else [re-com/box :padding "4px" :child [render-honey-comb-fragments c 10]]
-                       ))]
-              (when (ut/ne? parameters) [re-com/box :style {:font-size "17px"} :child "relevant parameters"])
-              (when (ut/ne? parameters) [bricks/click-param-browser [rereparameters] 540 nil])
-              (when (and (ut/ne? parameters) (ut/ne? ask-mutates)) [re-com/gap :size "10px"])
-              (when (ut/ne? ask-mutates) [re-com/box :style {:font-size "17px"} :child "possible board changes"])
-              (when (ut/ne? ask-mutates) [ask-mutates-render ask-mutates hpage])]] [re-com/gap :size "9px"]]])]])))
+                                   ))]
+                          (when (ut/ne? parameters) [re-com/box :style {:font-size "17px"} :child "relevant parameters"])
+                          (when (ut/ne? parameters) [bricks/click-param-browser [rereparameters] 540 nil])
+                          (when (and (ut/ne? parameters) (ut/ne? ask-mutates)) [re-com/gap :size "10px"])
+                          (when (ut/ne? ask-mutates) [re-com/box :style {:font-size "17px"} :child "possible board changes"])
+                          (when (ut/ne? ask-mutates) [ask-mutates-render ask-mutates hpage])]] [re-com/gap :size "9px"]]])]]))))
 
 (defonce title-edit-idx (reagent/atom nil))
 

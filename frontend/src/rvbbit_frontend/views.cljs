@@ -2844,12 +2844,16 @@
                    :children [;[re-com/box :child (str "queries & views")]
                               [re-com/h-box
                                :gap "1px"
-                               :children [[re-com/box :child "queries & views"]
+                               :align :center
+                               :justify :center
+                               :children [[re-com/box :child "slices" 
+                                           ;:align :center :justify :center
+                                           ]
                                           [re-com/md-icon-button
                                            :attr {:on-click #(reset! hide-panel-2? true)}
                                            :md-icon-name "zmdi-chevron-left"
                                            :style {:font-size "17px"
-                                                   :margin-top "-2px"
+                                                   ;:margin-top "-2px"
                                                    :opacity 0.88}]
                                           [re-com/box :child (str data-key-type)
                                            :style {;:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
@@ -3321,16 +3325,23 @@
                                                             :justify :between :children
                                                             [[re-com/h-box
                                                               :gap "1px"
-                                                              :children [[re-com/box 
+                                                              :align :center
+                                                              :justify :center
+                                                              :children [[re-com/box
                                                                           :style {:padding-left (when vertical? "5px")}
                                                                           :child "parameters"]
                                                                          [re-com/md-icon-button
                                                                           :attr {:on-click #(reset! hide-panel-3? true)}
                                                                           :md-icon-name "zmdi-chevron-left"
                                                                           :style {:font-size "17px"
-                                                                                  :margin-top "-2px"
+                                                                                  ;:margin-top "-2px"
                                                                                   :opacity 0.88}]]]
-                                                             [re-com/h-box :gap "3px" :style {:font-size "11px" :margin-top "3px"} :children
+                                                             [re-com/h-box
+                                                              :gap "3px"
+                                                              :style {:font-size "11px" :margin-top "3px"}
+                                                              :align :center
+                                                              :justify :center
+                                                              :children
                                                               (vec (for [f (keys @db/param-filter)]
                                                                      [re-com/box :child (ut/safe-name f) :attr
                                                                       {:on-click #(swap! db/param-filter assoc f (not (get @db/param-filter f false)))} :style

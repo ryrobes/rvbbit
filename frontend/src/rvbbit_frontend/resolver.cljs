@@ -150,6 +150,7 @@
                                     ;;      (ut/tapp>> [:run-solver-req-map-resolver! override? (str (first this)) lets-go? (not run?) req-map
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go?
+                                         (swap! db/kit-run-ids assoc (keyword new-solver-name) (ut/generate-uuid))
                                          (ut/tracked-dispatch [::wfx/push :default req-map])
                                          (swap! db/solver-fn-lookup assoc fkp sub-param)
                                          ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])

@@ -4798,7 +4798,7 @@
                                                                                       (get-in estimates [(keyword fid)]
                                                                                               (get-in estimates [(cstr/replace (str fid) ":" "")] "*")))
                                                        est    (+ (js/Math.round (or times 0)) 1)
-                                                       _ (ut/tapp>> [:est solver? query? est run-id fid e (get-in estimates [fid :times] 0) (ut/flip-map @db/solver-fn-lookup)])
+                                                       ;;_ (ut/tapp>> [:est solver? query? est run-id  fid e (get-in estimates [fid :times] 0) (ut/flip-map @db/solver-fn-lookup)])
                                                        est?   (> est 1)
                                                        ]]
                                              [:v-box :padding "3px"
@@ -4821,9 +4821,11 @@
                                                            [:box
                                                             :child [:progress-bar [(- max-w 15)
                                                                                    est (str e run-id 
+                                                                                   (get @db/kit-run-ids e)
+                                                                                   ;(get @bricks/kit-run-ids kit-run-ids)
                                                                                             ;(when solver? (ut/generate-uuid))
                                                                                             ;(ut/generate-uuid)
-                                                                                            (rand-int 12345)
+                                                                                            ;(rand-int 12345)
                                                                                             )]]
                                                             :height "25px"
                                                             :padding "3px"])

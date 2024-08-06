@@ -379,6 +379,7 @@
                                     ;;      (ut/tapp>> [:run-solver-req-map-conns! override? (str (first this)) lets-go? (not run?) req-map
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go?
+                                         (swap! db/kit-run-ids assoc (keyword new-solver-name) (ut/generate-uuid))
                                          (ut/tracked-dispatch [::wfx/push :default req-map])
                                          (swap! db/solver-fn-lookup assoc fkp sub-param)
                                          ;(ut/tracked-dispatch [::update-solver-fn-lookup fkp sub-param])
@@ -1164,6 +1165,7 @@
          ;                                     :*client-name* client-name
          ;                                     :*client-name-str (pr-str client-name)} honey-modded)
          ]
+     (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
        [::wfx/request :default
         {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call) 
@@ -1219,6 +1221,7 @@
            ;                                     :*client-name-str (str client-name)} honey-modded)
            ]
        (do (when (not (nil? refresh-every)) (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
+           (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message     {:kind          :honey-xcall
                                                 :ui-keypath    keypath

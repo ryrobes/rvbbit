@@ -15,7 +15,7 @@
    ["codemirror/addon/hint/show-hint.js"]
    ["codemirror/mode/clojure/clojure.js"]
    ["codemirror/mode/shell/shell.js"]
-   ["codemirror/mode/julia/julia.js"]
+   ["codemirror/mode/julia/julia.js"] 
    ["codemirror/mode/markdown/markdown.js"]
    ["codemirror/mode/python/python.js"]
    ["codemirror/mode/r/r.js"]
@@ -25,9 +25,9 @@
    ["react-drag-and-drop" :as rdnd]
    ["react-map-gl" :default Map
     :refer   [Layer Marker Source]]
-   [react]
-
-   [clojure.data :as cdata]
+   ;[react]
+   ;[clojure.data :as cdata]
+   [rvbbit-frontend.vbunny    :as vbunny]
 
    ["ansi-to-html" :as AnsiToHtml]
    [zprint.core       :as zp]
@@ -52,8 +52,8 @@
    ;[re-frame.alpha :as rfa]
    [re-frame.core :as re-frame]
    [reagent.core :as reagent]
-   [reagent.ratom :as ratom]
-   [garden.color :as    color]
+   ;[reagent.ratom :as ratom]
+   ;[garden.color :as    color]
    ;[reagent.dom :as rdom]
    [rvbbit-frontend.audio :as audio]
    [rvbbit-frontend.connections :as conn]
@@ -404,14 +404,16 @@
 
 
 
-(re-frame/reg-sub ::materialized-theme
-                  (fn [db _]
-                    (let [tt (get-in db [:click-param :theme])
-                          tt (ut/postwalk-replacer {:text :_text} tt)
-                          tt (resolver/logic-and-params tt nil)]
-                      (ut/tapp>> [:materialized-theme (get db :client-name) (ut/postwalk-replacer {:_text :text} tt)]))
-                    nil))
+(re-frame/reg-sub
+ ::materialized-theme
+ (fn [db _]
+   (let [tt (get-in db [:click-param :theme])
+         tt (ut/postwalk-replacer {:text :_text} tt)
+         tt (resolver/logic-and-params tt nil)]
+     (ut/tapp>> [:materialized-theme (get db :client-name) (ut/postwalk-replacer {:_text :text} tt)]))
+   nil))
 
+;; (tapp>> [:materialized-theme (str @(ut/tracked-sub ::materialized-theme {}))])
 
 
 
@@ -440,436 +442,6 @@
 (re-frame/reg-sub ::theme-pull-sub (fn [_ {:keys [cmp-key fallback test-fn]}] (theme-pull-fn cmp-key fallback test-fn)))
 
 (defn theme-pull [cmp-key fallback & test-fn] @(ut/tracked-sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn}))
-
-
-
-(def scrollbar-stylev
-  {:scrollbar-width "thin"
-   :scrollbar-color (str (theme-pull :theme/universal-pop-color nil) "#00000033")
-   :&::-webkit-scrollbar {:height "10px"}
-   :&::-webkit-scrollbar-track {:background "#2a2a2a"
-                                :border-radius "5px"}
-   :&::-webkit-scrollbar-thumb {:background "#4a4a4a"
-                                :border-radius "15px"}
-   :&::-webkit-scrollbar-thumb:hover {:background "#6a6a6a"}})
-
-(defn safe-subvec [v start end]
-  (let [start (max 0 start)
-        end (min (count v) end)]
-    (if (< start end)
-      (subvec v start end)
-      [])))
-
-(def scroll-state (reagent/atom {}))
-;;(defonce node-ref (reagent/atom {}))
-
-(defn px- [x]
-  (try (edn/read-string (cstr/replace (str x) "px" "")) (catch :default _ 0)))
-
-(defn clean-child-map [children id]
-  (let [res (ut/deep-remove-keys children [:on-click :on-context-menu :on-double-click :on-hover :on-mouse-down
-                                           :on-mouse-up :on-mouse-move :on-mouse-out :on-mouse-over :on-mouse-enter])]
-    ;;(tapp>> [(hash children) (hash res) :in children :out res ])
-    res))
-
-(defn calculate-v-heights [new-children id & [internal?]]
-  (let [new-heights (mapv second new-children)
-        new-cumulative-heights (reduce
-                                (fn [acc height]
-                                  (conj acc (+ (or (last acc) 0) height)))
-                                []
-                                new-heights)
-        children-hash (hash (clean-child-map new-children id))]
-    ;(tapp>> [:re-calc-v-h id children-hash internal?])
-    (swap! scroll-state update id assoc
-           :heights new-heights
-           :children-hash children-hash
-           :cumulative-heights new-cumulative-heights
-           :total-height (last new-cumulative-heights))))
-
-(defn virtualized-v-box [{:keys [children style width height id] :as props}]
-  (let [node-ref (reagent/atom {})
-        find-start-index (fn [scroll-top]
-                           (let [cumulative-heights (get-in @scroll-state [id :cumulative-heights])]
-                             (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
-                                       (range (count cumulative-heights)))
-                                 0)))
-        update-visible-range (fn [container-height scroll-top]
-                               (let [start (find-start-index scroll-top)
-                                     initial-end (find-start-index (+ scroll-top container-height))
-                                     end (loop [idx initial-end]
-                                           (let [current-height (- (get-in @scroll-state [id :cumulative-heights idx] 0)
-                                                                   (get-in @scroll-state [id :cumulative-heights start] 0))]
-                                             (if (or (>= current-height container-height) (>= idx (count children)))
-                                               (min (inc idx) (count children))
-                                               (recur (inc idx)))))
-                                     end (max end (min (count children) (+ start 1)))] ; Ensure at least 2 items are rendered
-                                 (swap! scroll-state update id assoc
-                                        :scroll-top scroll-top
-                                        :start start
-                                        :end end)))
-        handle-scroll (fn [e]
-                        (let [container-height (.. e -target -clientHeight)
-                              scroll-top (.. e -target -scrollTop)]
-                          (update-visible-range container-height scroll-top)))
-        set-scroll-position (fn [node]
-                              (when node
-                                (let [{:keys [scroll-top total-height]} (get @scroll-state id)
-                                      max-scroll (- total-height height)
-                                      target-scroll (min (or scroll-top 0) max-scroll)]
-                                  (set! (.-scrollTop node) target-scroll)
-                                  (update-visible-range height target-scroll))))]
-
-    (reagent/create-class
-     {:component-did-mount
-      (fn [this [_ old-props] [_ new-props]]
-        (let [
-              ;yes? (not= (hash (clean-child-map (:children new-props) id)) (get-in @scroll-state [id :children-hash]))
-              ;yes? (not= (hash (:children new-props)) (get-in @scroll-state [id :children-hash]))
-              ]
-          ;(when yes? (calculate-v-heights children id))
-          ;(calculate-v-heights children id)
-          (set-scroll-position (get @node-ref id))))
-
-      ;; :should-component-update ;; might be better to just let reagent handle this w the meta ^:id
-      ;; (fn [this [_ old-props] [_ new-props]]
-      ;;   (let [;yes? (and (not= (hash (:children new-props)) (get-in @scroll-state [id :children-hash]))
-      ;;         ;          (or (not= (:children old-props) (:children new-props))
-      ;;         ;              (not= (:width old-props) (:width new-props))
-      ;;         ;              (not= (:height old-props) (:height new-props))
-      ;;         ;              (not= (:id old-props) (:id new-props))))
-      ;;         yes? (not= (hash (clean-child-map (:children new-props) id)) 
-      ;;                    (get-in @scroll-state [id :children-hash]))]
-      ;;     ;(when yes? (calculate-v-heights (:children new-props) id)) ;; sneaky side-effect to avoid explicit re-calc each time
-      ;;     ;(when yes? (tapp>> [:rerendered-vv]))
-      ;;     yes?))
-
-      ;; :component-did-update ;; never seemed to fire. taking out for now
-      ;; (fn [this old-argv]
-      ;;   (let [new-argv (reagent/argv this)
-      ;;         old-children (get-in old-argv [1 :children])
-      ;;         new-children (get-in new-argv [1 :children])]
-      ;;     (when (not= old-children new-children) 
-      ;;      ;(not= (hash (clean-child-map new-children)) (get-in @scroll-state [id :children-hash]))
-      ;;       ;(tapp>> [:updated-v-bx?])
-      ;;      ;(not= old-children new-children)
-      ;;       ;(calculate-v-heights new-children id true)
-      ;;       (js/requestAnimationFrame #(set-scroll-position (get @node-ref id))))))
-
-      :component-will-unmount
-      (fn []
-        (when-let [node (get @node-ref id)]
-          (.removeEventListener node "scroll" handle-scroll)))
-
-      :reagent-render
-      (fn [{:keys [children style width height id] :as props}]
-        (let [{:keys [start end cumulative-heights total-height] :or {start 0 end 0}} (get @scroll-state id)
-              visible-children (safe-subvec children start end)
-              v-box-style (merge {:overflow-y "auto"
-                                  :overflow-x "hidden"}
-                                 style
-                                 scrollbar-stylev)]
-          [:div (merge
-                 (dissoc props :children :initial-scroll)
-                 {:style (merge v-box-style
-                                {:width (str width "px")
-                                 :height (str height "px")})
-                  :on-scroll handle-scroll
-                  :ref #(swap! node-ref assoc id %)})
-           [:div {:style {:height (str total-height "px")
-                          :position "relative"}}
-            (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
-              ^{:key (str id (+ start index))}
-              [:div {:style {:position "absolute"
-                             :top (str (if (zero? (+ start index))
-                                         0
-                                         (try (nth cumulative-heights (dec (+ start index))) (catch :default _ 0))) "px")
-                             :height (str child-height "px")
-                             :width (str child-width "px")}}
-               child])
-            (let [ttl (- (count children) 1)
-                  rendered (- (- (- start end)) 1)
-                  ss  (+ start 1)
-                  ee (min end ttl)
-                  all? (= rendered ttl)
-                  ee (if all? (dec ee) ee)
-                  ttl (if all? (dec ttl) ttl)
-                  rendered (if all? (dec rendered) rendered)]
-              [:div {:style {:position "fixed"
-                             :bottom 15
-                             :font-size "11px"
-                             :right 13
-                             :font-family (theme-pull :theme/base-font nil)
-                             :color "#ffffff55"}}
-               (str ss "-" ee " of " ttl " (" rendered  " rendered)")])]]))})))
-
-
-;; (defn reactive-virtualized-v-box [props]
-;;   (fn [props]
-;;      (let [id (get props :id)
-;;            children (clean-child-map (get props :children []) id)]
-;;        (when (not= (get-in @scroll-state [id :children-hash]) (hash children))
-;;          (calculate-v-heights children id true))
-;;        [:f> (with-meta virtualized-v-box
-;;               {:key (hash children)})
-;;         props])))
-
-(defn reactive-virtualized-v-box [props]
-  (fn [props]
-    (calculate-v-heights (get props :children) (get props :id) true)
-    [:f> (with-meta virtualized-v-box
-           {:key (hash [(clean-child-map (get props :children) nil) (get props :id)])})
-     props]))
-
-;; (defn reactive-virtualized-v-box [props]
-;;   (let [update-key (reagent/atom 0)]
-;;     (fn [props]
-;;       (let [children (:children props)]
-;;         ;; Force recalculation and update
-;;         (calculate-v-heights children (:id props))
-;;         (reagent/after-render #(swap! update-key inc))
-
-;;         ;; Render the component with a key based on children and update-key
-;;         [:f> (with-meta virtualized-v-box
-;;                {:key (str (hash children) "-" @update-key)})
-;;          props]))))
-
-(defn vv-box [w h num] ;; test fn
-  [reactive-virtualized-v-box {:children (vec (for [i (range num)
-                                                    :let [hh 145]]
-                                                [w hh
-                                                 [re-com/box
-                                                  :size "none"
-                                                  :height (str hh "px") :width (str (- w 20) "px")
-                                                  :style {:border "1px solid white"}
-                                                  :child (str "heys " i)]]))
-                               :id (str h w)
-                               :height h
-                               :width w}])
-
-(defn virtual-v-box [& {:keys [id children height width attr] :as cfg-map}]
-  (let [width  (if (string? width)  (px- width) width)
-        height (if (string? height) (px- height) height)
-        children (vec (cons [10 10 [:div {:style {}} " "]] (conj children [10 10 [:div {:style {}} " "]]))) 
-        ;; empty div on bottom and top cleans up some virtual-dom scrolling fuckery, gets more accurate recalc sizes
-        id (or id (get attr :id)) ;; in case mixed with re-com, which will throw if given root level :id key
-        id (str id "-" height width)
-        cfg-map (-> cfg-map
-                    (assoc :width width)
-                    (assoc :children children)
-                    (assoc :height height)
-                    (assoc :id id))]
-    [reactive-virtualized-v-box cfg-map]))
-
-
-(def h-scroll-state (reagent/atom {}))
-
-(defn virtualized-h-box [{:keys [children style width height id] :as props}]
-  (let [node-ref (reagent/atom nil)
-        calculate-widths (fn [new-children]
-                           (let [new-widths (mapv first new-children)
-                                 new-cumulative-widths (reduce
-                                                        (fn [acc width]
-                                                          (conj acc (+ (or (last acc) 0) width)))
-                                                        []
-                                                        new-widths)]
-                             (swap! h-scroll-state update id assoc
-                                    :widths new-widths
-                                    :cumulative-widths new-cumulative-widths
-                                    :total-width (last new-cumulative-widths))))
-
-        find-start-index (fn [scroll-left]
-                           (let [cumulative-widths (get-in @h-scroll-state [id :cumulative-widths])]
-                             (or (some #(when (> (nth cumulative-widths % 0) scroll-left) %)
-                                       (range (count cumulative-widths)))
-                                 0)))
-
-        update-visible-range (fn [container-width scroll-left]
-                               (let [start (find-start-index scroll-left)
-                                     end (find-start-index (+ scroll-left container-width))
-                                     end (min (count children) (+ end 2))] ; Add 2 for buffer
-                                 (swap! h-scroll-state update id assoc
-                                        :scroll-left scroll-left
-                                        :start start
-                                        :end end)))
-
-        handle-scroll (fn [e]
-                        (let [container-width (.. e -target -clientWidth)
-                              scroll-left (.. e -target -scrollLeft)]
-                          (update-visible-range container-width scroll-left)))
-
-        set-scroll-position (fn [node]
-                              (when node
-                                (let [{:keys [scroll-left total-width]} (get @h-scroll-state id)
-                                      max-scroll (- total-width width)
-                                      target-scroll (min (or scroll-left 0) max-scroll)]
-                                  (set! (.-scrollLeft node) target-scroll)
-                                  (update-visible-range width target-scroll))))]
-
-    (reagent/create-class
-     {:component-did-mount
-      (fn [this]
-        (calculate-widths children)
-        (set-scroll-position @node-ref))
-
-      :component-did-update
-      (fn [this old-argv]
-        (let [new-argv (reagent/argv this)
-              old-children (get-in old-argv [1 :children])
-              new-children (get-in new-argv [1 :children])]
-          (when (not= (count old-children) (count new-children))
-            (calculate-widths new-children)
-            (js/requestAnimationFrame #(set-scroll-position @node-ref)))))
-
-      :reagent-render
-      (fn [{:keys [children style width height id] :as props}]
-        (let [{:keys [start end cumulative-widths total-width] :or {start 0 end 0}} (get @h-scroll-state id)
-              visible-children (safe-subvec children start end)
-              h-box-style (merge {:overflow-x "auto"
-                                  :overflow-y "hidden"
-                                  ;:border "1px solid cyan"
-                                  }
-                                 style
-                                 scrollbar-stylev)]
-          [:div (merge
-                 (dissoc props :children :initial-scroll)
-                 {:style (merge h-box-style
-                                {:width (str width "px")
-                                 :height (str height "px")})
-                  :on-scroll handle-scroll
-                  :ref #(reset! node-ref %)})
-           [:div {:style {:width (str total-width "px")
-                          :height "100%"
-                          :position "relative"}}
-            (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
-              ^{:key (+ start index)}
-              [:div {:style {:position "absolute"
-                             :left (str (if (zero? (+ start index))
-                                          0
-                                          (try (nth cumulative-widths (dec (+ start index))) (catch :default _ 0))) "px")
-                             :height "100%"
-                             :width (str child-width "px")}}
-               child])
-            [:div {:style {:position "fixed"
-                           :top 41
-                           :left 22
-                           :color "white"}}
-             (str "Showing items " start " to " end " of " (count children))]]]))})))
-
-;; (defn virtualized-h-box [{:keys [children style width height id] :as props}]
-;;   (let [calculate-widths (fn [new-children]
-;;                            (let [new-widths (mapv first new-children)
-;;                                  new-cumulative-widths (reduce
-;;                                                         (fn [acc width]
-;;                                                           (conj acc (+ (or (last acc) 0) width)))
-;;                                                         []
-;;                                                         new-widths)]
-;;                              (swap! h-scroll-state update id assoc
-;;                                     :widths new-widths
-;;                                     :cumulative-widths new-cumulative-widths
-;;                                     :total-width (last new-cumulative-widths))))
-
-;;         find-start-index (fn [scroll-left]
-;;                            (let [cumulative-widths (get-in @h-scroll-state [id :cumulative-widths])]
-;;                              (or (some #(when (> (nth cumulative-widths % 0) scroll-left) %)
-;;                                        (range (count cumulative-widths)))
-;;                                  0)))
-
-;;         update-visible-range (fn [container-width scroll-left]
-;;                                (let [start (find-start-index scroll-left)
-;;                                      end (find-start-index (+ scroll-left container-width))
-;;                                      end (min (count children) (+ end 2))] ; Add 2 for buffer
-;;                                  (swap! h-scroll-state update id assoc
-;;                                         :scroll-left scroll-left
-;;                                         :start start
-;;                                         :end end)))
-
-;;         handle-scroll (fn [e]
-;;                         (let [container-width (.. e -target -clientWidth)
-;;                               scroll-left (.. e -target -scrollLeft)]
-;;                           (update-visible-range container-width scroll-left)))
-
-;;         set-scroll-position (fn [node]
-;;                               (when node
-;;                                 (let [{:keys [scroll-left total-width]} (get @h-scroll-state id)
-;;                                       max-scroll (- total-width width)
-;;                                       target-scroll (min (or scroll-left 0) max-scroll)]
-;;                                   (set! (.-scrollLeft node) target-scroll)
-;;                                   (update-visible-range width target-scroll))))]
-
-;;     (reagent/create-class
-;;      {:component-did-mount
-;;       (fn [this]
-;;         (calculate-widths children)
-;;         (set-scroll-position (rdom/dom-node  this)))
-
-;;       :component-did-update
-;;       (fn [this old-argv]
-;;         (let [new-argv (reagent/argv this)
-;;               old-children (get-in old-argv [1 :children])
-;;               new-children (get-in new-argv [1 :children])]
-;;           (when (not= (count old-children) (count new-children))
-;;             (calculate-widths new-children)
-;;             (js/requestAnimationFrame #(set-scroll-position (rdom/dom-node  this))))))
-
-;;       :reagent-render
-;;       (fn [{:keys [children style width height id] :as props}]
-;;         (let [{:keys [start end cumulative-widths total-width] :or {start 0 end 0}} (get @h-scroll-state id)
-;;               visible-children (safe-subvec children start end)
-;;               h-box-style (merge {:overflow-x "auto"
-;;                                   :overflow-y "hidden"
-;;                                   ;:border "1px solid cyan"
-;;                                   }
-;;                                  style
-;;                                  scrollbar-stylev)]
-;;           [:div (merge
-;;                  (dissoc props :children :initial-scroll)
-;;                  {:style (merge h-box-style
-;;                                 {:width (str width "px")
-;;                                  :height (str height "px")})
-;;                   :on-scroll handle-scroll})
-;;            [:div {:style {:width (str total-width "px")
-;;                           :height "100%"
-;;                           :position "relative"}}
-;;             (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
-;;               ^{:key (+ start index)}
-;;               [:div {:style {:position "absolute"
-;;                              :left (str (if (zero? (+ start index))
-;;                                           0
-;;                                           (try (nth cumulative-widths (dec (+ start index))) (catch :default _ 0))) "px")
-;;                              :height "100%"
-;;                              :width (str child-width "px")}}
-;;                child])
-;;             [:div {:style {:position "fixed"
-;;                            :top 41
-;;                            :left 22
-;;                            :color "white"}}
-;;              (str "Showing items " start " to " end " of " (count children))]]]))})))
-
-(defn reactive-virtualized-h-box [props]
-  (fn [props]
-    [:f> (with-meta virtualized-h-box
-           {:key (hash (:children props))})
-     props]))
-
-(defn vh-box [w h num] ;; your test fn
-  [reactive-virtualized-h-box {:children (vec (for [i (range num)
-                                                    :let [ww 145]]
-                                                [ww h
-                                                 [re-com/box
-                                                  :size "none"
-                                                  :width (str ww "px") :height (str (- h 20) "px")
-                                                  :style {:border "1px solid white"}
-                                                  :child (str "heys " i)]]))
-                               :id (str h w)
-                               :height h
-                               :width w}])
-
-(defn virtual-h-box [& {:keys [id children height width] :as cfg-map}]
-  (let []
-    [reactive-virtualized-h-box cfg-map]))
-
-
 
 
 
@@ -8311,8 +7883,8 @@
            :ut/subq-mapping-alpha          ut/subq-mapping-alpha
            :db/flow-results                db/flow-results
            :db/scrubbers                   db/scrubbers
-           :scroll-state                   scroll-state
-           :h-scroll-state                 h-scroll-state
+           :scroll-state                   vbunny/scroll-state
+           :h-scroll-state                 vbunny/h-scroll-state
            :opened-boxes                   opened-boxes 
            :opened-boxes-code              opened-boxes-code
            :db/context-box                 db/context-box
@@ -8865,7 +8437,7 @@
           main-boxes
           [(if inner? ;; dont want to double-bag virtual v-boxes, shit gets weird
              re-com/v-box
-             virtual-v-box)
+             vbunny/virtual-v-box)
            ;re-com/v-box ;(if cells? re-com/h-box re-com/v-box)   
            :width (when (not inner?) (px inner-w))
            :height (when (not inner?) (px inner-h))
@@ -10253,7 +9825,7 @@
                                            :dangerouslySetInnerHTML
                                            {:__html t}}]]))
         props (-> props (assoc :children text-boxes) (dissoc :text))]
-    [virtual-v-box props]))
+    [vbunny/virtual-v-box props]))
 
 
 
@@ -10478,9 +10050,10 @@
                                   :width (+ px-width-int 70)
                                   :height (+ px-height-int 55)}])
 
-              :terminal-custom (fn [[x w h]] [reactive-virtualized-console-viewer
+              :terminal-custom (fn [[x w h follow?]] [reactive-virtualized-console-viewer
                                               {:style {}
                                                :text x
+                                               :follow? follow?
                                                :id (str panel-key "-" selected-view)
                                                :width (+ w 70)
                                                :height (+ h 55)}])
@@ -11411,7 +10984,7 @@
                                                           ;;                                       :id (str panel-key "-" selected-view)
                                                           ;;                                       :width (+ px-width-int 70)
                                                           ;;                                       :height (+ px-height-int 55)}]
-                                                          [virtual-v-box {:children splitt
+                                                          [vbunny/virtual-v-box {:children splitt
                                                                           ;:id (str panel-key "-" selected-view) 
                                                                           :width (+ px-width-int 70)
                                                                           :height (+ px-height-int 55)
@@ -11512,6 +11085,7 @@
                                   ;;  _ (when lets-go?
                                   ;;      (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) @db/solver-fn-runs]))
                                    _ (when lets-go?
+                                       (swap! db/kit-run-ids assoc (keyword new-solver-name) (ut/generate-uuid))
                                        (ut/tracked-dispatch [::wfx/push :default req-map])
                                        ;;(ut/tracked-dispatch [::add-placeholder-value new-solver-name])
                                        (swap! db/solver-fn-lookup assoc fkp sub-param)
@@ -11617,8 +11191,8 @@
                                       :px re-com.util/px
                                       :icon re-com/md-icon-button
                                       :md-icon re-com/md-icon-button
-                                      :vv-box #(vv-box  (+ px-width-int 70) (+ px-height-int 55) %)
-                                      :vh-box #(vh-box  (+ px-width-int 70) (+ px-height-int 55) %)
+                                      :vv-box #(vbunny/vv-box  (+ px-width-int 70) (+ px-height-int 55) %)
+                                      :vh-box #(vbunny/vh-box  (+ px-width-int 70) (+ px-height-int 55) %)
                                       :h-box re-com/h-box
                                       :hbox re-com/h-box
                                       :vbox re-com/v-box} body)
@@ -12470,6 +12044,10 @@
 (defn maybedoall [] (let [hover-highlight? (or @param-hover @query-hover)] (if hover-highlight? doall seq)))
 
 
+(re-frame/reg-sub
+ ::block-in-alert?
+ (fn [db [_ panel-key]]
+   (cstr/includes? (str (get db :alerts)) (str panel-key))))
 
 (defn grid
   [& [tab]]
@@ -12634,6 +12212,7 @@
                 ;;         (and no-view? (seq sql-keys))     sql-keys
                 ;;         :else                             (into (into all-views sql-keys) (keys runners)))
                mixed-keys                                   (vec (into (into all-views sql-keys) (keys runners)))
+               alerted?                                     @(ut/tracked-subscribe [::block-in-alert? brick-vec-key])
                 ;; _ (tapp>> [:prunners brick-vec-key mixed-keys (keys runners)])
                zz                                           (if (or selected? hover-q?) (+ z 50) (+ z 10))
                theme-base-block-style                       (theme-pull :theme/base-block-style {})
@@ -12715,8 +12294,9 @@
                                                                               "1px 1px " (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
                                                                               " "        (theme-pull :theme/editor-outer-rim-color nil))
                                          :else                               "none")))
-                               :border (cond ;editor-panel? "0px solid #bc798c"
-                              ;;selected?           "2px solid #9973e0"
+                               :transition "border 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out"
+                               :border (cond
+                                         alerted?            "2px solid #ffb400"
                                          selected?           (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
                                          viz-reco?           "2px dashed #ffb400"
                                          hover-q?            "2px solid #c7005d"
@@ -13026,6 +12606,7 @@
                                                           [re-com/box 
                                                            :attr {:on-click (fn []
                                                                               (when (not running?)
+                                                                                (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
                                                                                 (swap! waiting? assoc kit-runner-key true)
                                                                                 (swap! temp-extra-subs conj running-key)
                                                                                 (swap! temp-extra-subs conj output-key)

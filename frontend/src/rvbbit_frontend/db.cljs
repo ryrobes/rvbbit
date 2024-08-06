@@ -22,6 +22,7 @@
 
 (defonce cm-focused? (reagent/atom false))
 (defonce last-focused (reagent/atom nil))
+(defonce  kit-run-ids (atom {}))  
 
 (defonce unsafe-keys (atom #{}))
 
