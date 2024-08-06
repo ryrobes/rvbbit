@@ -4,11 +4,12 @@
             [rvbbit-frontend.utility        :as ut]
             [rvbbit-frontend.db             :as db]
             [rvbbit-frontend.connections    :as conn]
-            [reagent.dom                    :as rdom]
+            ;[reagent.dom                    :as rdom]
             [re-com.core                    :as re-com]
             [clojure.string                 :as cstr]
             [clojure.edn                    :as edn]
-            [rvbbit-frontend.resolver       :as resolver]))
+            [rvbbit-frontend.resolver       :as resolver]
+            [react]))
 
 (comment "custom virtualized v-box/h-box used for terminal and other things - data-viewer, etc") 
 
@@ -91,6 +92,25 @@
 ;;            :children-hash children-hash
 ;;            :cumulative-heights new-cumulative-heights
 ;;            :total-height (last new-cumulative-heights))))
+
+(defn calculate-v-heights [new-children id & [internal?]]
+  (let [new-heights (mapv second new-children)
+        new-cumulative-heights (reduce
+                                (fn [acc height]
+                                  (conj acc (+ (or (last acc) 0) height)))
+                                []
+                                new-heights)
+        children-hash (hash (clean-child-map new-children id))]
+    (swap! scroll-state update id
+           (fn [state]
+             (let [;old-total-height (:total-height state 0)
+                   new-total-height (last new-cumulative-heights)]
+               (-> state
+                   (assoc :heights new-heights)
+                   (assoc :children-hash children-hash)
+                   (assoc :cumulative-heights new-cumulative-heights)
+                   (update :max-height #(max (or % 0) new-total-height))
+                   (assoc :total-height new-total-height)))))))
 
 ;; (defn virtualized-v-box [{:keys [children style width height id] :as props}]
 ;;   (let [node-ref (reagent/atom {})
@@ -241,24 +261,7 @@
 ;;                (str ss "-" ee " of " ttl " (" rendered  " rendered)")])]]))})))
 
 
-(defn calculate-v-heights [new-children id & [internal?]]
-  (let [new-heights (mapv second new-children)
-        new-cumulative-heights (reduce
-                                (fn [acc height]
-                                  (conj acc (+ (or (last acc) 0) height)))
-                                []
-                                new-heights)
-        children-hash (hash (clean-child-map new-children id))]
-    (swap! scroll-state update id
-           (fn [state]
-             (let [old-total-height (:total-height state 0)
-                   new-total-height (last new-cumulative-heights)]
-               (-> state
-                   (assoc :heights new-heights)
-                   (assoc :children-hash children-hash)
-                   (assoc :cumulative-heights new-cumulative-heights)
-                   (update :max-height #(max (or % 0) new-total-height))
-                   (assoc :total-height new-total-height)))))))
+
 
 (defn virtualized-v-box [{:keys [children style width height id follow?] :as props}]
   (let [node-ref (reagent/atom nil)
@@ -307,15 +310,18 @@
 
     (reagent/create-class
      {:component-did-mount
+      ;; (fn [this]
+      ;;   (let [node (rdom/dom-node this)]
+      ;;     (reset! node-ref node)
+      ;;     (set-scroll-position node)))
+      
       (fn [this]
-        (let [node (rdom/dom-node this)]
-          (reset! node-ref node)
-          (set-scroll-position node)))
+               (set-scroll-position @node-ref))
 
-      :component-did-update
-      (fn [this old-argv new-argv]
-        (let [node @node-ref]
-          (set-scroll-position node)))
+      ;; :component-did-update
+      ;; (fn [this old-argv new-argv]
+      ;;   (let [node @node-ref]
+      ;;     (set-scroll-position node)))
 
       :component-will-unmount
       (fn []
@@ -376,17 +382,18 @@
      props]))
 
 (defn vv-box [w h num] ;; test fn
-  [reactive-virtualized-v-box {:children (vec (for [i (range num)
-                                                    :let [hh 145]]
-                                                [w hh
-                                                 [re-com/box
-                                                  :size "none"
-                                                  :height (str hh "px") :width (str (- w 20) "px")
-                                                  :style {:border "1px solid white"}
-                                                  :child (str "heys " i)]]))
-                               :id (str h w)
-                               :height h
-                               :width w}])
+  [reactive-virtualized-v-box
+   {:children (vec (for [i (range num)
+                         :let [hh 145]]
+                     [w hh
+                      [re-com/box
+                       :size "none"
+                       :height (str hh "px") :width (str (- w 20) "px")
+                       :style {:border "1px solid white"}
+                       :child (str "heys " i)]]))
+    :id (str h w)
+    :height h
+    :width w}])
 
 (defn virtual-v-box [& {:keys [id children height width attr] :as cfg-map}]
   (let [width  (if (string? width)  (px- width) width)

@@ -1512,6 +1512,13 @@
      db)))
 
 (re-frame/reg-event-db
+ ::update-workspace-raw-dissoc
+ (undoable)
+ (fn [db [_ keypath value]]
+   (tapp>> [:update-raw-dissoc keypath value])
+   (ut/dissoc-in db keypath)))
+
+(re-frame/reg-event-db
  ::add-query
  (undoable)
  (fn [db [_ panel-key query-key query]]
@@ -10812,7 +10819,7 @@
                               (let [kps       (ut/extract-patterns obody :auto-size-px 2)
                                     logic-kps (into {} (for [v kps] (let [[_ l] v] {v (ut/auto-font-size-px l h w)})))] ;(=
                                 (walk/postwalk-replace logic-kps obody)))
-        ;; onclick-walk-map2 (fn [obody]
+        ;; onclick-walk-map2 (fn [obody] ;; vsql version....?
         ;;                     (let [kps       (ut/extract-patterns obody :set-parameter 3)
         ;;                           logic-kps (into {}
         ;;                                           (for [v kps]
@@ -10826,6 +10833,16 @@
         ;;                                                    (ut/tracked-dispatch [::conn/click-parameter [panel-key]
         ;;                                                                          {raw-param-key pval}]))})))]
         ;;                       (walk/postwalk-replace logic-kps obody)))
+        onclick-walk-map2 (fn [obody]
+                            (let [kps       (ut/extract-patterns obody :set-parameter 3) 
+                                  logic-kps (into {}
+                                                  (for [v kps]
+                                                    (let [[_ pkey pval] v]
+                                                      {v (fn []
+                                                           ;(ut/tracked-dispatch [::conn/click-parameter [panel-key] {pkey pval}])
+                                                           (ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] pval])
+                                                           )})))]
+                              (walk/postwalk-replace logic-kps obody)))
         map-walk-map2 (fn [obody]
                         (let [kps       (ut/extract-patterns obody :map 3)
                               logic-kps (into {}
@@ -10891,25 +10908,27 @@
                           (walk/postwalk-replace logic-kps obody)))
                                                       ;;:app-db-keys (fn [kp] (vec (keys @(ut/tracked-sub ::app-db-clover {:keypath kp}))))
         execute (fn [pp]
-                   (when (map? pp)
-                     (let [mods (count (keys pp))]
-                       (doseq [[kk vv] pp]
-                         (let [hid      (hash [kk vv])
-                               already? (some #(= hid (hash %)) @mutation-log)]
-                           (when (not already?)
-                             (do (ut/tapp>> [:forced-execution-from-honey-execute kk vv])
-                                 (swap! mutation-log conj hid)
-                                 (ut/tracked-dispatch [::update-workspace-raw kk vv])))))
-                       [re-com/box :child
-                        [re-com/box :size "none" :child (str "*ran " mods " board modification" (when (> mods 1) "s"))
-                         :style
-                         {;:background-color (str (theme-pull :theme/editor-outer-rim-color
-                          :border        (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
-                          :border-radius "10px"
-                          :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
-                          :padding-left  "12px"
-                          :padding-right "12px"}]]
-                       )))
+                  (when (map? pp)
+                    (let [mods (count (keys pp))]
+                      (doseq [[kk vv] pp]
+                        (let [hid      (hash [kk vv])
+                              already? false ;(some #(= hid (hash %)) @mutation-log)
+                              ]
+                          (when (not already?)
+                            (do (ut/tapp>> [:forced-execution-from-honey-execute kk vv])
+                                (swap! mutation-log conj hid)
+                                (if (= vv :delete)
+                                  (ut/tracked-dispatch [::update-workspace-raw-dissoc kk vv])
+                                  (ut/tracked-dispatch [::update-workspace-raw kk vv]))))))
+                      [re-com/box :child
+                       [re-com/box :size "none" :child (str "*ran " mods " board modification" (when (> mods 1) "s"))
+                        :style
+                        {;:background-color (str (theme-pull :theme/editor-outer-rim-color
+                         :border        (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                         :border-radius "10px"
+                         :color         (str (theme-pull :theme/editor-outer-rim-color nil) 45) ;"#000000"
+                         :padding-left  "12px"
+                         :padding-right "12px"}]])))
 
         execution-walk  (fn [obody]
                           (let [kps       (ut/extract-patterns obody :execute 2)
@@ -10986,14 +11005,14 @@
                                                           ;;                                       :height (+ px-height-int 55)}]
                                                           [vbunny/virtual-v-box {:children splitt
                                                                           ;:id (str panel-key "-" selected-view) 
-                                                                          :width (+ px-width-int 70)
-                                                                          :height (+ px-height-int 55)
-                                                                          :style {:color (ut/choose-text-color (let [bgc (or (str (theme-pull :theme/editor-background-color nil)) "#000000")
-                                                                                                                     bgc (if (> (count bgc) 7) (subs bgc 0 7) bgc)] bgc))
-                                                                                  :font-family (theme-pull :theme/base-font nil)
-                                                                                  :font-size "14px"
+                                                                                 :width (+ px-width-int 70)
+                                                                                 :height (+ px-height-int 55)
+                                                                                 :style {:color (ut/choose-text-color (let [bgc (or (str (theme-pull :theme/editor-background-color nil)) "#000000")
+                                                                                                                            bgc (if (> (count bgc) 7) (subs bgc 0 7) bgc)] bgc))
+                                                                                         :font-family (theme-pull :theme/base-font nil)
+                                                                                         :font-size "14px"
                                                                                   ;:padding "5px"
-                                                                                  }}])
+                                                                                         }}])
                                                           ;)
                                                         })))]
                             (walk/postwalk-replace logic-kps obody)))
@@ -11132,7 +11151,7 @@
           (has-fn? :=)              =-walk-map2 ;; test, needs to be first - "and" after...
           (has-fn? :if)             if-walk-map2 ;; ifs needs special treatment - must
           (has-fn? :when)           when-walk-map2 ;; test!
-          ;;(has-fn? :set-parameter)  onclick-walk-map2 ;; test!
+          (has-fn? :set-parameter)  onclick-walk-map2
           (has-fn? :into)           into-walk-map2
           (has-fn? :auto-size-px)   auto-size-walk-map2
           (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
@@ -12212,7 +12231,7 @@
                 ;;         (and no-view? (seq sql-keys))     sql-keys
                 ;;         :else                             (into (into all-views sql-keys) (keys runners)))
                mixed-keys                                   (vec (into (into all-views sql-keys) (keys runners)))
-               alerted?                                     @(ut/tracked-subscribe [::block-in-alert? brick-vec-key])
+               alerted?                                     false ;@(ut/tracked-subscribe [::block-in-alert? brick-vec-key])
                 ;; _ (tapp>> [:prunners brick-vec-key mixed-keys (keys runners)])
                zz                                           (if (or selected? hover-q?) (+ z 50) (+ z 10))
                theme-base-block-style                       (theme-pull :theme/base-block-style {})

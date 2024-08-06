@@ -1544,7 +1544,7 @@
         ;;_ (ut/tapp>> [:kit-console console-output])
         allow-mutate?    (get @kit-mutations kp false)
         sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}]
-    (ut/tapp>> [:kit-calls sql-calls])
+    ;; (ut/tapp>> [:kit-calls sql-calls])
     (doseq [[k query] sql-calls]
       (let [;query (ut/postwalk-replacer sql-params v)
             ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -1552,7 +1552,7 @@
             data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
             unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
         (when (and (or (not data-exists?) unrun-sql?) (not (or wait? queued?))) (sql-data [k] query))))
-    (ut/tapp>> [:narratives kit-name kits @db/chat-mode @db/kit-mode])
+    ;; (ut/tapp>> [:narratives kit-name kits @db/chat-mode @db/kit-mode])
     
     (when (not console-mode?)
       (if false ; true

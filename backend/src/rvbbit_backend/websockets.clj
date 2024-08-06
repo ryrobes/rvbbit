@@ -832,7 +832,7 @@
 
 (def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :kit  :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status :estimate [:estimate] :tracker :alert :alert1 :alert2 :alert3}) ;; to not skip old dupes
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status :estimate [:estimate] :tracker :alert :alerts :alert1 :alert2 :alert3}) ;; to not skip old dupes
 
 (defn sub-push-loop ;; legacy, but flawed?
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -2294,34 +2294,111 @@
                                  formatted-lines
                                  [top-bottom]))))
 
+;; (ut/pp [:clpp (get-in @client-panels [:worthy-bronze-grasshopper-42 :block-6308])])
+;; (ut/pp (keys (:worthy-bronze-grasshopper-42 @db/params-atom)))
+;; (ut/pp (ut/dissoc-in db/params-atom [:worthy-bronze-grasshopper-42 :block-8309]))
 
 (defmethod wl/handle-push :run-kit
   [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]  
   (try
-    (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
-          kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
-          times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
-          _ (ship-estimate client-name kit-runner-key times-key)
-          _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
-          _ (swap! db/kit-status assoc-in [kit-runner-key :running?] true)
-          host-runner     runner
-          _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
-                   (create-ansi-box
-                    (str "starting kit run " (ut/millis-to-date-string (System/currentTimeMillis)) "\n "
-                         (str kit-keypath "\n " ui-keypath "\n")
-                         )))
-          _ (when (= host-runner :queries) ;; we need the FULL table
-              (alert! client-name
-                      [:v-box
-                       :padding "5px"
-                       :gap "10px"
-                       :children
-                       [[:box :child (str "pull *full* query rows for analysis...")]
-                        [:box :style {:font-size "11px" :opacity 0.7}
-                         :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-                      18
-                      nil
-                      6)
+     (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
+           kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
+           times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
+           [kit-runner
+            kit-name]      kit-keypath
+           runner-map      (config/settings)
+           kit-runner-fn   (get-in runner-map [:runners kit-runner :kits kit-name :kit-expr])
+           kit-view-fns    (get-in runner-map [:runners kit-runner :kits kit-name :kit-view-exprs])
+           output-type     (get-in runner-map [:runners kit-runner :kits kit-name :output])
+           repl-host       (get-in runner-map [:runners kit-runner :runner :host])
+           repl-port       (get-in runner-map [:runners kit-runner :runner :port])
+           _ (ship-estimate client-name kit-runner-key times-key)
+           _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
+           _ (swap! db/kit-status assoc-in [kit-runner-key :running?] true)
+           host-runner     runner
+           kit-view?       (ut/ne? kit-view-fns)
+           clover-kw1       (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
+           clover-kw2       (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-view-fns))
+           clover-kw        (set (into clover-kw1 clover-kw2))
+           clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
+           context-data    (merge
+                            clover-lookup-map
+                            {:client-panels (get @client-panels client-name)
+                             :client-panels-data (get @client-panels-data client-name)
+                             :client-panels-metadata (get @client-panels-metadata client-name)
+                             :panel-key panel-key
+                             :data-key data-key
+                             :ui-keypath [:panels panel-key host-runner data-key]})
+           transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
+           limited-postwalk-map (merge
+                                 {:transit-file transit-file}
+                                 clover-lookup-map
+                                 (select-keys context-data [:panel-key :data-key :ui-keypath]))
+
+           _ (when kit-view? ;; render and set kit views to gather options for the user before we execute the kit
+               (alert! client-name
+                       [:box :child "waiting on user kit options..."]
+                       10
+                       nil
+                       4)
+               (let [response-path [client-name panel-key :go!]
+                     timeout-ms 30000 ; 5 mins
+                     start-time (System/currentTimeMillis)
+                     loaded-kit-view-fns (walk/postwalk-replace limited-postwalk-map kit-view-fns)
+                     rendered-views (ut/timed-exec
+                                     (ppy/execute-in-thread-pools-but-deliver
+                                      (keyword (str "serial-kit-instance/" kit-runner-key-str))
+                                      (fn []
+                                        (evl/repl-eval (first loaded-kit-view-fns) repl-host repl-port client-name kit-runner-key ui-keypath))))
+                     _ (do
+                ;; Send things to the client here 
+                        ;; [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
+                         (push-to-client ui-keypath [] client-name 1 :kit-view (get rendered-views :result)))
+                     user-response (loop []
+                                     (let [current-value (get-in @db/params-atom response-path)
+                                           elapsed-time (- (System/currentTimeMillis) start-time)]
+                                       (cond
+                                         (= current-value :go!) :continue
+                                         (= current-value :cancel!) :abort
+                                         (> elapsed-time timeout-ms) :timeout
+                                         :else (do (Thread/sleep 100) (recur)))))
+                     _ (when user-response
+                         (push-to-client ui-keypath [] client-name 1 :kit-view-remove []))
+                     _ (when (= user-response :abort)
+                         (throw (ex-info "User cancelled the operation" {:type :user-cancel})))
+                     _ (when (= user-response :timeout)
+                         (throw (ex-info "Operation timed out waiting for user response" {:type :timeout})))]
+                 (Thread/sleep 2000)))
+           ;;kit-opts (when kit-view? )
+
+
+           added-postwalk-map (merge limited-postwalk-map ;; add in view opts if any 
+                          (get-in @db/params-atom [client-name panel-key]))
+           
+           _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+                    (create-ansi-box
+                     (str "starting kit run " (ut/millis-to-date-string (System/currentTimeMillis)) "\n "
+                          (str kit-keypath "\n " ui-keypath "\n"
+                               (when (ut/ne? added-postwalk-map)
+                                 (str "added user opts: \n"
+                                      (doall
+                                       (apply str
+                                              (for [[k v] added-postwalk-map]
+                                                (str k "  " v "\n"))))))))))
+           _ (Thread/sleep 6000)
+
+           _ (when (= host-runner :queries) ;; we need the FULL table
+               (alert! client-name
+                       [:v-box
+                        :padding "5px"
+                        :gap "10px"
+                        :children
+                        [[:box :child (str "pull *full* query rows for analysis...")]
+                         [:box :style {:font-size "11px" :opacity 0.7}
+                          :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+                       18
+                       nil
+                       6)
               ;; (ut/pp (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
               ;;                (get-in @client-panels-resolved [client-name :connection-id])))
               ;;(ut/pp (get-in @honey-echo [client-name data-key]))
@@ -2329,95 +2406,88 @@
               ;;(ut/pp (get @client-panels-resolved :polished-octohedral-mouse-27))
               ;; (ut/pp @client-panels-resolved)
               ;;(ut/pp [:HE (get-in @honey-echo [client-name data-key])])
-              (query-runstream :honey-xcall
-                               [data-key] ;;ui-keypath
-                               (dissoc (get-in @honey-echo [client-name data-key]) :connection-id)
+               (query-runstream :honey-xcall
+                                [data-key] ;;ui-keypath
+                                (dissoc (get-in @honey-echo [client-name data-key]) :connection-id)
                                ;(get-in @client-panels-resolved [client-name host-runner data-key]) ;; we need the fully resolved SQL...
-                               false
-                               false
-                               (get-in @honey-echo [client-name data-key :connection-id])
+                                false
+                                false
+                                (get-in @honey-echo [client-name data-key :connection-id])
                               ;;  (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
                               ;;          (get-in @client-panels-resolved [client-name :connection-id]))
-                               client-name
-                               -2 ;; -2 limits at 1M rows...
-                               panel-key
-                               nil
-                               false
-                               false)
-              (alert! client-name
-                      [:v-box
-                       :padding "5px"
-                       :gap "10px"
-                       :children
-                       [[:box :child (str "data pulled, running analysis...")]
-                        [:box :style {:font-size "11px" :opacity 0.7}
-                         :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-                      18
-                      nil
-                      6))
-          [kit-runner
-           kit-name]      kit-keypath
-          runner-map      (config/settings)
-          kit-runner-fn   (get-in runner-map [:runners kit-runner :kits kit-name :kit-expr])
-          output-type     (get-in runner-map [:runners kit-runner :kits kit-name :output])
-          repl-host       (get-in runner-map [:runners kit-runner :runner :host])
-          repl-port       (get-in runner-map [:runners kit-runner :runner :port])
-          clover-kw        (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
-          clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
-          context-data    (merge
-                           clover-lookup-map
-                           {:client-panels (get @client-panels client-name)
-                            :client-panels-data (get @client-panels-data client-name)
-                            :client-panels-metadata (get @client-panels-metadata client-name)
-                            :panel-key panel-key
-                            :data-key data-key
-                            :ui-keypath [:panels panel-key host-runner data-key]})
-          transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
-          limited-postwalk-map (merge
-                                {:transit-file transit-file ;; all client context maps
-                                 :transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
-                                 :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
-                                clover-lookup-map
-                                (select-keys context-data [:panel-key :data-key :ui-keypath]))
-          _ (ut/pp [:debug-kit runner kit-keypath (str kit-runner-fn) repl-host repl-port transit-file])
-          loaded-kit-runner-fn (walk/postwalk-replace limited-postwalk-map
-                                                      kit-runner-fn)
-          _ (ut/pp [:debug-kit2 runner kit-keypath (str loaded-kit-runner-fn) repl-host repl-port transit-file])
-          {:keys [result elapsed-ms]} (ut/timed-exec
-                                       (ppy/execute-in-thread-pools-but-deliver
-                                        (keyword (str "serial-kit-instance/" kit-runner-key-str))
-                                        (fn []
-                                          (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
-          error?   (cstr/includes? (cstr/lower-case (str result)) " error ") ;; lame , get codes later 
-          output (get-in result [:evald-result :value])
+                                client-name
+                                -2 ;; -2 limits at 1M rows...
+                                panel-key
+                                nil
+                                false
+                                false)
+               (alert! client-name
+                       [:v-box
+                        :padding "5px"
+                        :gap "10px"
+                        :children
+                        [[:box :child (str "data pulled, running analysis...")]
+                         [:box :style {:font-size "11px" :opacity 0.7}
+                          :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+                       18
+                       nil
+                       6))
+
+          ;; clover-kw        (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
+          ;; clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
+          ;; context-data    (merge
+          ;;                  clover-lookup-map
+          ;;                  {:client-panels (get @client-panels client-name)
+          ;;                   :client-panels-data (get @client-panels-data client-name)
+          ;;                   :client-panels-metadata (get @client-panels-metadata client-name)
+          ;;                   :panel-key panel-key
+          ;;                   :data-key data-key
+          ;;                   :ui-keypath [:panels panel-key host-runner data-key]})
+          ;; transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
+           limited-postwalk-map (merge added-postwalk-map 
+                                 {:transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
+                                  :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
+                                 limited-postwalk-map)
+           _ (ut/pp [:debug-kit runner kit-keypath (str kit-runner-fn) repl-host repl-port transit-file])
+           loaded-kit-runner-fn (walk/postwalk-replace limited-postwalk-map
+                                                       kit-runner-fn)
+           _ (ut/pp [:debug-kit2 runner kit-keypath (str loaded-kit-runner-fn) repl-host repl-port transit-file])
+           {:keys [result elapsed-ms]} (ut/timed-exec
+                                        (ppy/execute-in-thread-pools-but-deliver
+                                         (keyword (str "serial-kit-instance/" kit-runner-key-str))
+                                         (fn []
+                                           (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
+           error?   (cstr/includes? (cstr/lower-case (str result)) " error ") ;; lame , get codes later 
+           output (get-in result [:evald-result :value])
           ;console (get-in result [:evald-result :out])
-          ]
+           ]
 
       ;;(ut/pp [:kit-runner-output result {:elapsed-ms? elapsed-ms}])
 
       ;;(ut/pp  [:result result])
-      (when (and (= output-type :kit-map)
-                 (and (vector? output)
-                      (map? (first output))))
-        (ut/pp [:inserting-into-kit-results-table.. (count output)])
-        (doseq [kk output]
-          (insert-kit-data kk
-                           (hash kk)
-                           data-key ;(last ui-keypath)
-                           "query-log" ;;kit-expr-push"
-                           :kick
-                           elapsed-ms
-                           client-name)))
+       (when (and (= output-type :kit-map)
+                 ;(and (vector? output)
+                 ;     (map? (first output)))
+                  )
+         (ut/pp [:inserting-into-kit-results-table.. (count output)])
+         (doseq [kk output]
+           (insert-kit-data kk
+                            (hash kk)
+                            data-key ;(last ui-keypath)
+                            "query-log" ;;kit-expr-push"
+                            :kick
+                            elapsed-ms
+                            client-name)))
 
       ;;(Thread/sleep 6000)
 
-      (alert! client-name
-              [:v-box
-               :padding "5px"
-               :gap "10px"
-               :children
-               [;;[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
-                [:box :child (str "kit run finished")]
+       (alert! client-name
+               [:v-box
+                :padding "5px"
+                :gap "10px"
+                :children
+                [;;[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
+                 [:box :child (str "kit run finished")]
                 ;; [:box
                 ;;  ;:style {:font-size "11px"}
                 ;;  :child (str "done")]
@@ -2426,15 +2496,15 @@
                 ;;    :style {:border "1px solid #ffffff22"
                 ;;            :border-radius "14px"}
                 ;;    :child [:terminal-custom [console (* 17 50) 250]]])
-                [:box :style {:font-size "11px" :opacity 0.7}
-                 :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-              18
-              nil
-              11)
-      (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
-      (when true ;; (not error?) 
-        (swap! times-atom assoc times-key (conj (get @times-atom times-key []) elapsed-ms)))
-      (ut/pp [:finished-kit-from client-name ui-keypath]))
+                 [:box :style {:font-size "11px" :opacity 0.7}
+                  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+               18
+               nil
+               11)
+       (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
+       (when true ;; (not error?) 
+         (swap! times-atom assoc times-key (conj (get @times-atom times-key []) elapsed-ms)))
+       (ut/pp [:finished-kit-from client-name ui-keypath]))
       (catch Exception e (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key e ]))))
 
 ;; (ut/pp @flow-status)

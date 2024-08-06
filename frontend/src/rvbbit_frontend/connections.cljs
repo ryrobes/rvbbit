@@ -764,9 +764,7 @@
                          (let [cc (get-in db (cons :click-param keypath))]
                            (assoc-in db
                              (cons :click-param keypath)
-                             (if (and (not (= (first keypath) :param)) (= cc value)) ;; unset to nil
-                                                                                     ;; if same
-                                                                                     ;; value
+                             (if (and (not (= (first keypath) :param)) (= cc value)) 
                                nil
                                value)))))
 

@@ -548,6 +548,8 @@
               kick?                       (= ui-keypath :kick)
               counts?                     (= task-id :cnts)
               heartbeat?                  (= task-id :heartbeat)
+              kit-view?                   (= task-id :kit-view)
+              kit-view-remove?            (= task-id :kit-view-remove)
               alert?                      (cstr/starts-with? (str task-id) ":alert")
               server-sub?                 (and kick?
                                                (contains? valid-task-ids (get-in result [:task-id 0]))
@@ -566,7 +568,10 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          ;; (when (cstr/includes? (str client-name) "-bronze-")  (ut/tapp>> [:msg-in estimate? (str (get result :task-id)) (get result :status) (str (get result :ui-keypath)) (str result)]))
+          (when (cstr/includes? (str client-name) "-maroon-")  
+            (ut/tapp>> [:msg-in kit-view? (str (get result :task-id)) (str ui-keypath) 
+                        ;(str (get-in result [:status :evald-result :value 0]))
+                        (get result :status) (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -605,6 +610,12 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
+
+            kit-view? (assoc-in db [:panels (get-in result [:ui-keypath 1]) :views :kvw1] (get-in result [:status :evald-result :value 0]))
+
+            kit-view-remove? (-> db
+                                 (ut/dissoc-in  [:panels (get-in result [:ui-keypath 1]) :views :kvw1])
+                                 (ut/dissoc-in  [:click-param (get-in result [:ui-keypath 1]) :go!]))
 
             server-sub?
             ;;(assoc-in db (vec (cons :click-param task-id)) (get result :status))

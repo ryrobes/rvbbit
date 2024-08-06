@@ -160,7 +160,7 @@
            :outliers {:type :nrepl
                       :runner {:port 45999 :host "127.0.0.1"} 
                       :modes [:text :clover :data :terminal]
-                      :hop-bar? false
+                      :hop-bar? false ;; only used for the kit runner menu on query slice panels 
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
@@ -177,7 +177,36 @@
                                                                             (for  [kk (keys (get v :queries))]
                                                                               [k :queries kk])))))
                                             :output :kit-map
-                                            :kit-expr (rabbit-kit-outliers.core/get-outliers
+                                            :kit-view-exprs [(let [panel-key :panel-key
+                                                                   opt1 (keyword (str (cstr/replace (str panel-key) ":" "") "/opts-key1"))
+                                                                   opt2 (keyword (str (cstr/replace (str panel-key) ":" "") "/opts-key2"))] ;; runs in the host nrepl
+                                                               [:v-box :children
+                                                                [[:h-box
+                                                                  :gap "10px"
+                                                                  :children (for [rr (range 4)]
+                                                                              [:box
+                                                                               :padding "6px"
+                                                                               :child (str "opt1" rr)
+                                                                               :style {:border "1px solid red" 
+                                                                                       :background-color [:when [:= opt1 rr] "pink"]
+                                                                                       :font-size "22px" :cursor "pointer"}
+                                                                               :attr {:on-click [:set-parameter :opts-key1 rr]}])]
+                                                                 [:h-box
+                                                                  :gap "10px"
+                                                                  :children (for [rr (range 5)]
+                                                                              [:box
+                                                                               :padding "6px"
+                                                                               :child (str "opt2" rr)
+                                                                               :style {:border "1px solid red"
+                                                                                       :background-color [:when [:= opt2 rr] "cyan"]
+                                                                                       :font-size "22px" :cursor "pointer"}
+                                                                               :attr {:on-click [:set-parameter :opts-key2 rr]}])]
+                                                                 [:h-box :children [[:string3 opt1] [:string3 opt2]] :gap "10px"]
+                                                                 [:box
+                                                                  :style {:border "1px solid red" :cursor "pointer"}
+                                                                  :child "GO?"
+                                                                  :attr {:on-click [:set-parameter :go! :go!]}]]])]
+                                            :kit-expr (rabbit-kit-outliers.core/get-outliers  ;; runs in the host nrepl
                                                        :data-key
                                                        :panel-key
                                                        :transit-rowset
