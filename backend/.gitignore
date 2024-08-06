@@ -10,3 +10,4 @@ pom.xml.asc
 /.prepl-port
 .hgignore
 .hg/
+/checkouts
