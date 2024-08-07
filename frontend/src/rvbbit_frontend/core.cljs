@@ -11,6 +11,7 @@
     [rvbbit-frontend.config  :as config]
     [rvbbit-frontend.db      :as db]
     [rvbbit-frontend.events  :as events]
+    [rvbbit-frontend.block-patrol  :as bp]
     [rvbbit-frontend.flows   :as flows]
     [rvbbit-frontend.http    :as http]
     [rvbbit-frontend.signals :as signals]
@@ -85,14 +86,20 @@
 
 
 
-(defn dispatch-keyup-rules [] (ut/tracked-dispatch-sync [::rp/set-keyup-rules {:event-keys [[[::alt-key-up] [{:keyCode 67}]]]}]))
+(defn dispatch-keyup-rules [] 
+  (ut/tracked-dispatch-sync [::rp/set-keyup-rules {:event-keys [[[::alt-key-up] [{:keyCode 67}]]]}]))
 
-(re-frame/reg-sub ::memory-usage-breached-threshold?
-                  (fn [db _] (let [{:keys [_ used ttl-heap]} (get db :memory)] (> (/ used ttl-heap) 0.75))))
+(re-frame/reg-sub
+ ::memory-usage-breached-threshold?
+ (fn [db _] 
+   (let [{:keys [_ used ttl-heap]} (get db :memory)] (> (/ used ttl-heap) 0.75))))
 
-(defonce root-key (reagent.core/atom (cljs.core/random-uuid)))
+(defonce root-key 
+  (reagent.core/atom (cljs.core/random-uuid)))
 
-(defn root [] (fn [] [[:div {:key @root-key} [views/main-panel]]]))
+(defn root [] 
+  (fn [] [[:div {:key @root-key} 
+           [views/main-panel]]]))
 
 (defn clear-cache-and-reload!
   [] ;;; TEST!
@@ -104,21 +111,21 @@
 
 
 
-(re-frame/reg-event-db ::purge-sub-cache!
-                       (fn [db]
-                         (let [client-name       (get db :client-name)
-                               [total used heap] (get db :memory)]
-                           (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:"
-                                       (ut/bytes-to-mb heap)])
-                           (let [pct-used     (/ used total)
-                                 pct-used-str (str (.. pct-used (toFixed 1)) "%")]
-                             (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
-                             (clear-cache-and-reload!)
-                             db))))
+(re-frame/reg-event-db
+ ::purge-sub-cache!
+ (fn [db]
+   (let [client-name       (get db :client-name)
+         [total used heap] (get db :memory)]
+     (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:"
+                 (ut/bytes-to-mb heap)])
+     (let [pct-used     (/ used total)
+           pct-used-str (str (.. pct-used (toFixed 1)) "%")]
+       (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
+       (clear-cache-and-reload!)
+       db))))
 
 
-(defn dispatch-poller-rules
-  []
+(defn dispatch-poller-rules []
   (ut/tracked-dispatch
     [::poll/set-rules
      [{:interval                 10 
@@ -131,7 +138,7 @@
        :poll-when                [::bricks/update-flow-statuses?]
        :dispatch-event-on-start? true} 
       
-      {:interval                 120 
+      {:interval                 3600 
        :event                    [::bricks/clean-up-reco-previews] 
        :dispatch-event-on-start? false}
       
@@ -174,6 +181,11 @@
       {:interval                 3600 ;; expensive, testing
        :event                    [::http/get-autocomplete-values]
        :dispatch-event-on-start? true}
+      
+      {:interval                 5
+       :event                    [::bp/deal-with-changed-panels]
+       :poll-when                [::bp/panels-changed?]
+       :dispatch-event-on-start? false}
 
       ;; {:interval 1000 
       ;;  :event [::bricks/update-metadata-tabs] 

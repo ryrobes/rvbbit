@@ -49,13 +49,17 @@
 
 (def scrollbar-stylev
   {:scrollbar-width "thin"
-   :scrollbar-color (str (theme-pull :theme/universal-pop-color nil) "#00000033")
-   :&::-webkit-scrollbar {:height "10px"}
-   :&::-webkit-scrollbar-track {:background "#2a2a2a"
+   ;;:scrollbar-color (str (theme-pull :theme/universal-pop-color nil) "#00000033")
+   :scrollbar-color (str (theme-pull :theme/editor-outer-rim-color nil) "#00000033")
+   "--webkit-scrollbar" {;:height "10px"
+                          ;:opacity 0.8
+                          :border-radius "5px"}
+   "--webkit-scrollbar-track" {:background "#2a2a2a"
                                 :border-radius "5px"}
-   :&::-webkit-scrollbar-thumb {:background "#4a4a4a"
+   "--webkit-scrollbar-thumb" {:background "#4a4a4a"
+                                :opacity 0.8
                                 :border-radius "15px"}
-   :&::-webkit-scrollbar-thumb:hover {:background "#6a6a6a"}})
+   "--webkit-scrollbar-thumb:hover" {:background "#6a6a6a"}})
 
 (defn safe-subvec [v start end]
   (let [start (max 0 start)
@@ -332,6 +336,8 @@
       (fn [{:keys [children style width height id follow?] :as props}]
         (let [{:keys [start end cumulative-heights max-height scroll-top]
                :or {start 0 end 0 scroll-top 0}} (get @scroll-state id)
+              end (if (cstr/includes? id "history-v-box") 
+                    (inc end) end) ;; get an extra block for history...
               visible-children (safe-subvec children start end)
               v-box-style (merge {:overflow-y "auto"
                                   :overflow-x "hidden"}
@@ -356,7 +362,7 @@
                              :width (str child-width "px")}}
                child])
             
-            (let [ttl (- (count children) 1)
+            (let [ttl (- (count children) 1) ;; just debug bottom labels
                   rendered (- (- (- start end)) 1)
                   ss  (+ start 1)
                   ee (min end ttl)
@@ -398,7 +404,9 @@
 (defn virtual-v-box [& {:keys [id children height width attr] :as cfg-map}]
   (let [width  (if (string? width)  (px- width) width)
         height (if (string? height) (px- height) height)
-        children (vec (cons [10 10 [:div {:style {}} " "]] (conj children [10 10 [:div {:style {}} " "]])))
+        children (vec (cons [20 20 [:div {:style {}} " "]] 
+                            (conj children [20 20 [:div {:style {}} " "]])
+                            ))
         ;; empty div on bottom and top cleans up some virtual-dom scrolling fuckery, gets more accurate recalc sizes
         id (or id (get attr :id)) ;; in case mixed with re-com, which will throw if given root level :id key
         id (str id "-" height width)

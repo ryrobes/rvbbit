@@ -1431,7 +1431,8 @@
                                                                     (for
                                                                      [i (range 45)]
                                                                       {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}}}
-                      runners-items (into {} (for [[k v] (-> block-runners-map (dissoc :views) (dissoc :queries))]
+                      runners-items (into {} (for [[k v] (-> block-runners-map (dissoc :views) (dissoc :queries))
+                                                   :when (get v :slice-bar? true)]
                                                {k {:base-key k  :default (get v :default)}}))
                         ;;_ (ut/tapp>> [:runners-items  runners runners-items combo-items])
                       combo-items (merge combo-items runners-items)]

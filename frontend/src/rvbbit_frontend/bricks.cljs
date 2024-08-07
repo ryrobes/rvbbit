@@ -375,7 +375,7 @@
                 (when (not (nil? dataUrl)) (ut/tracked-dispatch [(if save? ::http/save-screen-snap ::http/save-snap) dataUrl]))))
             (fn [error] (ut/tapp>> ["Error taking screenshot:" error])))
      (when (not save?)
-       (ut/tracked-dispatch [::update-panels-hash])
+       ;(ut/tracked-dispatch [::update-panels-hash])
        (ut/tracked-dispatch
         [::wfx/request :default
          {:message {:kind :session-snaps :client-name (get db :client-name)} :on-response [::save-sessions] :timeout 15000}]))
@@ -1506,7 +1506,7 @@
  (undoable)
  (fn [db [_ keypath value]]
    (tapp>> [:update-raw keypath value])
-   (ut/tracked-dispatch [::update-panels-hash])
+   ;(ut/tracked-dispatch [::update-panels-hash])
    (if (not (= (get-in db keypath) value))
      (assoc-in db keypath value)
      db)))
@@ -1548,7 +1548,7 @@
  (fn [db [_ value]]
    (ut/tapp>> [:updating-selected [:panels (get db :selected-block)] :with value])
    ;(ut/tracked-dispatch [::send-panel-updates [(get db :selected-block)]])
-   (ut/tracked-dispatch [::update-panels-hash])
+   ;(ut/tracked-dispatch [::update-panels-hash])
    (assoc-in db [:panels (get db :selected-block)] value)))
 
 (re-frame/reg-event-db
@@ -1557,7 +1557,7 @@
  (fn [db [_ key value]]
    (ut/tapp>> [:updating-selected-key [:panels (get db :selected-block) key] :with value])
    ;(ut/tracked-dispatch [::send-panel-updates [(get db :selected-block)]])
-   (ut/tracked-dispatch [::update-panels-hash])
+   ;(ut/tracked-dispatch [::update-panels-hash])
    (assoc-in db [:panels (get db :selected-block) key] value)))
 
 (re-frame/reg-event-db
@@ -1567,7 +1567,7 @@
    (let [kp (vec (into [:panels (get db :selected-block)] key))]
      (ut/tapp>> [:updating-selected-key-cons kp :with value])
      ;(ut/tracked-dispatch [::send-panel-updates [(get db :selected-block)]])
-     (ut/tracked-dispatch [::update-panels-hash])
+     ;(ut/tracked-dispatch [::update-panels-hash])
      (assoc-in db kp value))))
 
 (re-frame/reg-event-db
@@ -6333,10 +6333,11 @@
         deeper-upstream? false ; (some #(= % panel-key) (ut/cached-upstream-search subq-mapping
         kit-callout-fields []
         child-parts (into kit-callout-fields
-                          (cond parent-of-selected? (vec ;;
-                                                     (ut/deep-flatten (merge @(ut/tracked-sub ::panel-sql-calls
-                                                                                              {:panel-key selected-block})
-                                                                             @(ut/tracked-sub ::views {:panel-key selected-block}))))
+                          (cond parent-of-selected?
+                                (vec
+                                 (ut/deep-flatten (merge @(ut/tracked-sub ::panel-sql-calls
+                                                                          {:panel-key selected-block})
+                                                         @(ut/tracked-sub ::views {:panel-key selected-block}))))
                                 :else               []))
         hide?
         #_{:clj-kondo/ignore [:not-empty?]}
@@ -6362,8 +6363,9 @@
         post-metadata @(ut/tracked-sub ::conn/sql-post-metadata-alpha {:keypath data-keypath})
         stylers @(ut/tracked-subscribe [::stylers panel-key query-key])
         rowcount (get metadata :rowcount)
+        history-rowset? (cstr/includes? (str query-key) "-hist-")
         full-rowcount (get-in post-metadata [:* :rowcount])
-        rows-per-page (if (= page-num -1) full-rowcount 200)
+        rows-per-page (if (= page-num -1) full-rowcount (if history-rowset? 50 200))
         curr-row-start (+ (- (* page-num rows-per-page) rows-per-page) 1)
         curr-row-end (+ rows-per-page curr-row-start)
         curr-row-str (str curr-row-start " - " (if (> full-rowcount curr-row-end) curr-row-end full-rowcount))
@@ -10599,8 +10601,10 @@
         ww (* w db/brick-size)
         hh (* h db/brick-size)
         client-name @(ut/tracked-sub ::client-name {})
-        px-width-int (if runner-type ww (- ww 100))
-        px-height-int (if runner-type hh (- hh 105))
+        ;px-width-int (if runner-type ww (- ww 100))
+        ;px-height-int (if runner-type hh (- hh 105))
+        px-width-int (- ww 100)
+        px-height-int (- hh 105)
         selected-view (if override-view override-view selected-view)
         selected-view (if (nil? selected-view) (first all-keys) selected-view)
         selected-view-type @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
@@ -10834,14 +10838,13 @@
         ;;                                                                          {raw-param-key pval}]))})))]
         ;;                       (walk/postwalk-replace logic-kps obody)))
         onclick-walk-map2 (fn [obody]
-                            (let [kps       (ut/extract-patterns obody :set-parameter 3) 
+                            (let [kps       (ut/extract-patterns obody :set-parameter 3)
                                   logic-kps (into {}
                                                   (for [v kps]
                                                     (let [[_ pkey pval] v]
                                                       {v (fn []
                                                            ;(ut/tracked-dispatch [::conn/click-parameter [panel-key] {pkey pval}])
-                                                           (ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] pval])
-                                                           )})))]
+                                                           (ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] pval]))})))]
                               (walk/postwalk-replace logic-kps obody)))
         map-walk-map2 (fn [obody]
                         (let [kps       (ut/extract-patterns obody :map 3)
@@ -11696,7 +11699,8 @@
           :resolved-panels {} ;; ppr
           :client-name client-name}])
        (when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
-       (assoc db :panels-hash new-h))
+       ;(assoc db :panels-hash new-h)
+       db)
      db)))
 
 ;;[:data-viewer [:app-db [:server :settings :runners]]]

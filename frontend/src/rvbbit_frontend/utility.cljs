@@ -1256,6 +1256,25 @@
           (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
           :else          data)))
 
+(defn deep-remove-underscore-keys
+  [data]
+  (cond
+    (map? data)
+    (persistent!
+     (reduce-kv
+      (fn [acc k v]
+        (if (and (keyword? k) (cstr/starts-with? (name k) "_"))
+          acc
+          (assoc! acc k (deep-remove-underscore-keys v))))
+      (transient {})
+      data))
+
+    (vector? data)
+    (mapv deep-remove-underscore-keys data)
+
+    :else
+    data))
+
 ;; (defn deep-remove-keys
 ;;   "Recursively removes specified keys and keys starting with '_' from nested data structures."
 ;;   [data keys-to-remove]

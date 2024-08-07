@@ -24,6 +24,7 @@
     [re-frame.core           :as re-frame]
     [reagent.core            :as reagent]
     [rvbbit-frontend.audio   :as audio]
+    [rvbbit-frontend.vbunny   :as vbunny]
     [rvbbit-frontend.bricks  :as    bricks
                              :refer [theme-pull]]
     [rvbbit-frontend.connections :as conn]
@@ -268,14 +269,17 @@
   [width-int height-int value]
   (let [;sql-hint? (cstr/includes? (str value) ":::sql-string")
        ]
-    [re-com/box :size "auto" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
-     {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
-      :font-size     "14px"
-      :overflow      "auto"
-      :border-radius "12px"
-      :font-weight   700} :child
+    [re-com/box
+     :size "none"
+     :width (px (- width-int 24))
+     :height (px (+ height-int 24))
+     :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+             :font-size     "14px"
+             :overflow      "auto"
+             :border-radius "12px"
+             :font-weight   700} :child
      [(reagent/adapt-react-class cm/UnControlled)
-      {:value   (ut/format-map (- width-int 24) (str value))
+      {:value   (ut/format-map 480 (str value))
        :options {:mode              "clojure"
                  :lineWrapping      true
                  :lineNumbers       true
@@ -286,7 +290,7 @@
                  :detach            true
                  :readOnly          true ;true
                  :theme             (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage"
-                }}]]))
+                 }}]]))
 
 (re-frame/reg-event-db ::save-rs-value
                        (fn [db [_ flow-id kkey source value]]
@@ -1504,7 +1508,7 @@
   [panel-height panel-width kp]
   (let [;hist-key  (keyword (str "tmp-" (hash (first kp)) "-hist-sys")) ;;  :history-log-sys
         [r1 r2]          @(ut/tracked-subscribe [::bricks/query-waitings :kit-results-sys])
-        running?         (or r1 r2)
+        running?         false ;(or r1 r2)
         client-name      @(re-frame.core/subscribe [::bricks/client-name])
         kit-name         :kick ;(get @db/kit-mode kp)
         callie?          (= kit-name :ai/calliope)
@@ -1571,7 +1575,7 @@
                  :id (str "kit-" (hash kp) (hash src-kp))
                  :width (- panel-width 22)
                  :height (- panel-height 12 35 (when text-box? text-box-height))}]]
-      (if (or wait? running? queued?)
+      (if wait? ;;(or wait? running? queued?)
         [re-com/v-box
          :padding "5px"
          :size "none"
@@ -1579,13 +1583,16 @@
          :width (px (- panel-width 12)) ;; minus size of border left and right and header
          :align :center
          :justify :center
-         :children [[re-com/md-icon-button :md-icon-name "zmdi-refresh" :class
-                     (if (or wait? queued?) "rotate-reverse linear infinite" "rotate linear infinite") :style
-                     {:font-size        "45px" ;; "15px"
-                      :opacity          0.45
-                      :color            (theme-pull :theme/editor-outer-rim-color nil)
-                      :transform-origin "22.5px 22px" ;; "7.5px 11px"
-                      }]
+         :children [[re-com/md-icon-button 
+                     :md-icon-name "zmdi-refresh" 
+                     :class "rotate-reverse linear infinite" ;;(if (or wait? queued?) "rotate-reverse linear infinite" "rotate linear infinite")
+                     :style {:font-size        "45px" ;; "15px"
+                             :opacity          0.7
+                             :height           "50px"
+                             ;:border           "1px solid red"
+                             :color            (theme-pull :theme/editor-outer-rim-color nil)
+                             :transform-origin "22.5px 22px" ;; "7.5px 11px"
+                             }]
                     [bricks/reactive-virtualized-console-viewer
                      {:style {}
                       :text console-output
@@ -1958,7 +1965,7 @@
                                    :from     [:panel_history]
                                    :connection-id "history-db"
                                    :group-by [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated] ;; distinct
-                                   :limit    15
+                                   :limit    10
                                    :order-by [[:updated :desc]]
                                    :where    [:= :kp (str kp)]}}
         history-log     @(re-frame.core/subscribe [::conn/sql-data [hist-key]])]
@@ -1971,77 +1978,110 @@
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query "history-db")))))
-    (reagent.core/next-tick #(smooth-scroll-to-bottom "chat-v-box-parent" "chat-v-box"))
+    
+    ;;(reagent.core/next-tick #(smooth-scroll-to-bottom "chat-v-box-parent" "chat-v-box"))
+
     [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
                                                                                                                  ;; of
      :width (px (- panel-width 12)) ;; minus size of border left and right and header
-     :attr {:id "chat-v-box-parent"} :style {:overflow "auto" :border-radius "16px"} :child
-     [re-com/v-box
-      :gap "11px"
-      :children (doall
-                 (for [{:keys [client_name data diff diff_kp key kp panel_key pre_data type updated] :as full} (reverse history-log)]
-                   (let [diff           (try (edn/read-string diff) (catch :default _ [:cannot-read-val!]))
-                         panel_key      (try (edn/read-string panel_key) (catch :default _ :nope-cant-work-panel_key))
-                         diff-str       (str (remove nil? diff))
-                         is-last?       (= (last (reverse history-log)) full)
-                         diff-str       (if (> (count diff-str) 45) (str (subs diff-str 0 45) "...") (subs diff-str 0 45))
-                         data_d         (try (edn/read-string data) (catch :default _ :nope-cant-work-data_d))
-                         kp_d           (try (edn/read-string kp) (catch :default _ :nope-cant-work-kp_d))
-                         kp_d           (if (some #(or (= % :viz-gen) (= % :*) (= % :base)) kp_d)
-                                          [(first kp_d)] ;(vec (ut/postwalk-replacer {:* :base :viz-gen
-                                          kp_d)
-                         block-runners  (vec (keys (dissoc @(ut/tracked-sub ::bricks/block-runners {}) :views :queries)))
-                         has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
-                         key            (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
-                         temp-key       (keyword (str (ut/replacer (str key) #":" "") "-hist-" (rand-int 123) (hash data)))
-                         typek          (try (edn/read-string type) (catch :default _ type))]
-                     (ut/tapp>> [:history-log type full kp_d data_d key])
-                     [re-com/v-box :gap "5px" :size "none" :style
-                      {;:border (str "2px solid " (theme-pull :theme/editor-rim-color nil))
-                       }:attr {:id (if is-last? "chat-v-box" (str "chat-v-box-" (hash full)))} :children
-                      [;[re-com/box :child (str kp)]
-                       [re-com/h-box :justify :between :align :center :height "33px" :padding "9px" :style
-                        {:background-color (str (theme-pull :theme/editor-rim-color nil) 99) :border-radius "12px" :cursor "pointer"} :attr
-                        {:on-click #(ut/tracked-dispatch [::update-item kp_d data_d])} :children
-                        [[re-com/box :padding "4px" :style {:font-weight 700 :font-size "15px"} :child "" ; diff-str
-                          ]
-                         [re-com/box :style {:font-size "16px" :opacity 0.5 :color (str (theme-pull :theme/editor-font-color nil) 78)}
-                          :child (str updated)]]]
-                       [re-com/box :style {;:zoom 0.6 
-                                           :transform "translate(0)"} :child
-                        (cond has-flow-drop?      ""
-                              (= type ":views")
-                              (let [view {key data_d}] [bricks/honeycomb panel_key key 11 8 view nil])
+     :attr {:id "chat-v-box-parent"} :style {:overflow "auto" :border-radius "16px"}
+     :child
+     ;[re-com/v-box
+     ; :gap "11px"
+    [vbunny/virtual-v-box 
+     {:id (str "history-v-box-" (hash kp))
+      :follow? true
+      :width (px (- panel-width 30))
+      :height (px (- panel-height 12 25 (when text-box? text-box-height)))
+      :children (vec (doall
+                      (for [{:keys [client_name data diff diff_kp key kp panel_key pre_data type updated] :as full} (reverse history-log)]
+                        (let [diff           (try (edn/read-string diff) (catch :default _ [:cannot-read-val!]))
+                              diff-lines     (count (cstr/split-lines (ut/format-map 480 (str diff))))
+                              panel_key      (try (edn/read-string panel_key) (catch :default _ :nope-cant-work-panel_key))
+                              diff-str       (str diff) ;; (str (remove nil? diff))
+                              ;is-last?       (= (last (reverse history-log)) full)
+                              str-lim         50
+                              diff-str       (if (> (count diff-str) str-lim)
+                                               (str (subs diff-str 0 str-lim) "...")
+                                               ;(subs diff-str 0 str-lim)
+                                               diff-str)
+                              data_d         (try (edn/read-string data) (catch :default _ :nope-cant-work-data_d))
+                              kp_d           (try (edn/read-string kp) (catch :default _ :nope-cant-work-kp_d))
+                              kp_d           (if (some #(or (= % :viz-gen) (= % :*) (= % :base)) kp_d)
+                                               [(first kp_d)] ;(vec (ut/postwalk-replacer {:* :base :viz-gen
+                                               kp_d)
+                              diff-height    (min (* diff-lines 18.5) 400)
+                              hist-block-h   (+ 405 diff-height) ;; dynamic later
+                              block-runners  (vec (keys (dissoc @(ut/tracked-sub ::bricks/block-runners {}) :views :queries)))
+                              has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
+                              key            (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
+                              temp-key       (keyword (str (ut/replacer (str key) #":" "") "-hist-" (rand-int 123) (hash data)))
+                              typek          (try (edn/read-string type) (catch :default _ type))]
+                          (ut/tapp>> [:history-log diff-lines type (str diff) key])
+                          [650 hist-block-h
+                           [re-com/v-box
+                            :gap "5px"
+                            :width (px (- panel-width 46))
+                            :height (px hist-block-h)
+                            :size "none"
+                            ;:style {:border (str "2px solid " (theme-pull :theme/editor-rim-color nil))}
+                            :style {:border (str "2px solid transparent")}
+                            ;:attr {:id (if is-last? "chat-v-box" (str "chat-v-box-" (hash full)))}
+                            :children
+                            [;[re-com/box :child (str kp)]
+                             [re-com/h-box 
+                              :justify :between 
+                              :align :center 
+                              :height "33px" :padding "9px"
+                              :style {;:background-color (str (theme-pull :theme/editor-rim-color nil) 99)
+                                      :border (str "2px solid " (theme-pull :theme/editor-rim-color nil))
+                                      :border-radius "12px"
+                                      :margin-bottom "5px"
+                                      :opacity 0.7
+                                      :color (str (theme-pull :theme/editor-font-color nil) 78)
+                                      :cursor "pointer"}
+                              :attr {:on-click #(ut/tracked-dispatch [::update-item kp_d data_d])}
+                              :children [[re-com/box :padding "4px" 
+                                          :style {:font-size "13px"} 
+                                          :child diff-str]
+                                         [re-com/box
+                                          :style {:font-size "17px"}
+                                          :child (str updated)]]]
+                             [re-com/box :style {;:zoom 0.6 
+                                                 :transform "translate(0)"} :child
+                              (cond has-flow-drop?      ""
+                                    (= type ":views")
+                                    (let [view {key data_d}] [bricks/honeycomb panel_key key 11 8 view nil])
 
-                              ;(= type ":clojure")
-                              (some #(= % typek) block-runners)
-                              (let [view {:virtual-view data_d}
-                                    curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key panel_key :data-key key})
-                                    opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key panel_key :data-key key})
-                                    clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key panel_key :data-key key})
-                                    temp-panel-key (keyword (cstr/replace (str "hist-" panel_key key "-" (hash updated)) ":" ""))] 
-                                [bricks/honeycomb temp-panel-key :virtual-view 10 8 view nil typek curr-view-mode clover-fn opts-map])
+                            ;(= type ":clojure")
+                                    (some #(= % typek) block-runners)
+                                    (let [view {:virtual-view data_d}
+                                          curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key panel_key :data-key key})
+                                          opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key panel_key :data-key key})
+                                          clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key panel_key :data-key key})
+                                          temp-panel-key (keyword (cstr/replace (str "hist-" panel_key key "-" (hash updated)) ":" ""))]
+                                      [bricks/honeycomb temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map])
 
-                              (= type ":queries") (let [query {temp-key (-> data_d ;(get data_d :queries)
-                                                                            (dissoc :cache?)
-                                                                            (dissoc :refresh-every))}]
-                                                    [bricks/honeycomb panel_key temp-key 11 8 nil query])
-                              (= type ":base")    (let [queries (get data_d :queries)
-                                                        views   (get data_d :views)
-                                                        qkeys   (into {}
-                                                                      (for [q (keys queries)]
-                                                                        {q (keyword (str (ut/replacer (str q) #":" "")
-                                                                                         "-hist-"
-                                                                                         (rand-int 123)
-                                                                                         (hash data_d)))}))
-                                                        ndata   (ut/postwalk-replacer qkeys data_d)]
-                                                    [bricks/honeycomb panel_key
-                                                     (get data_d :selected-view) 11 8
-                                                     (get ndata :views)
-                                                     (get ndata :queries)])
-                              :else               [bricks/honeycomb panel_key key 11 8])] 
-                              [code-box 580 nil diff]
-                       [re-com/gap :size "10px"]]])))]]))
+                                    (= type ":queries") (let [query {temp-key (-> data_d ;(get data_d :queries)
+                                                                                  (dissoc :cache?)
+                                                                                  (dissoc :refresh-every))}]
+                                                          [bricks/honeycomb panel_key temp-key 11 8 nil query])
+                                    (= type ":base")    (let [queries (get data_d :queries)
+                                                              views   (get data_d :views)
+                                                              qkeys   (into {}
+                                                                            (for [q (keys queries)]
+                                                                              {q (keyword (str (ut/replacer (str q) #":" "")
+                                                                                               "-hist-"
+                                                                                               (rand-int 123)
+                                                                                               (hash data_d)))}))
+                                                              ndata   (ut/postwalk-replacer qkeys data_d)]
+                                                          [bricks/honeycomb panel_key
+                                                           (get data_d :selected-view) 11 8
+                                                           (get ndata :views)
+                                                           (get ndata :queries)])
+                                    :else               [bricks/honeycomb panel_key key 11 8])]
+                             [code-box 575 diff-height diff]
+                             [re-com/gap :size "10px"]]]]))))}]]))
 
 (re-frame/reg-event-db ::refresh-kits (fn [db [_]] (ut/dissoc-in db [:query-history :kit-results-sys])))
 

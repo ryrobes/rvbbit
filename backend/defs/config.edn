@@ -140,6 +140,7 @@
                     :syntax "text"
                     :ext ".txt"
                     :hop-function? true
+                    :slice-bar? false
                     :placeholder-on-running? true
                     :clover-fn [:run-solver
                                 {:signal false
@@ -161,10 +162,11 @@
                       :runner {:port 45999 :host "127.0.0.1"} 
                       :modes [:text :clover :data :terminal]
                       :hop-bar? false ;; only used for the kit runner menu on query slice panels 
+                      :slice-bar? false
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
-                                 (str
+                                 (str ;; default, never going to see this code, just a placeholder since this is a kit runner REPL only :hop-bar? false :slice-bar? false
                                   "🐇🥕 Outliers nREPL Library. Clojure "
                                   clojure-version
                                   " on " jvm-version " JVM "
@@ -187,7 +189,7 @@
                                                                               [:box
                                                                                :padding "6px"
                                                                                :child (str "opt1" rr)
-                                                                               :style {:border "1px solid red" 
+                                                                               :style {:border "1px solid #ffffff33"
                                                                                        :background-color [:when [:= opt1 rr] "pink"]
                                                                                        :font-size "22px" :cursor "pointer"}
                                                                                :attr {:on-click [:set-parameter :opts-key1 rr]}])]
@@ -197,22 +199,30 @@
                                                                               [:box
                                                                                :padding "6px"
                                                                                :child (str "opt2" rr)
-                                                                               :style {:border "1px solid red"
+                                                                               :style {:border "1px solid #ffffff33"
                                                                                        :background-color [:when [:= opt2 rr] "cyan"]
                                                                                        :font-size "22px" :cursor "pointer"}
                                                                                :attr {:on-click [:set-parameter :opts-key2 rr]}])]
-                                                                 [:h-box :children [[:string3 opt1] [:string3 opt2]] :gap "10px"]
-                                                                 [:box
-                                                                  :style {:border "1px solid red" :cursor "pointer"}
-                                                                  :child "GO?"
-                                                                  :attr {:on-click [:set-parameter :go! :go!]}]]])]
+                                                                 [:h-box 
+                                                                  :children [[:string3 opt1] [:string3 opt2]] :gap "10px"]
+                                                                 [:h-box
+                                                                  :justify :between
+                                                                  :children [[:box
+                                                                              :style {:border "1px solid green" :cursor "pointer"}
+                                                                              :child "GO?"
+                                                                              :attr {:on-click [:set-parameter :go! :go!]}]
+                                                                             [:box
+                                                                              :style {:border "1px solid red" :cursor "pointer"}
+                                                                              :child "CANCEL"
+                                                                              :attr {:on-click [:set-parameter :go! :cancel!]}]]]]])]
                                             :kit-expr (rabbit-kit-outliers.core/get-outliers  ;; runs in the host nrepl
                                                        :data-key
                                                        :panel-key
                                                        :transit-rowset
                                                        :transit-rowset-meta
+                                                       :opts-map
                                                        ;;false ;;true
-                                                       ) 
+                                                       )
                                              ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
                                             :icon "zmdi-pizza"
                                             ;:clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))

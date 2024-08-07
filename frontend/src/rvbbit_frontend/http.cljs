@@ -52,7 +52,7 @@
               ;;                        {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace vv)})))}))
               ;; ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
               ;;                         {k (materialize-values v)}))
-           new-h       (hash pp) ;; (hash (ut/remove-underscored pp))
+           ;new-h       (hash pp) ;; (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
        (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
        (ut/dispatch-delay 800 [::insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
@@ -61,11 +61,14 @@
         [::wfx/push :default
          {:kind :current-panels
           :panels pp
+          :everything? true
           :materialized-panels {} ;ppm
           :resolved-panels {} ;ppr
           :client-name client-name}])
      ;;(when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
-       (assoc db :panels-hash new-h)) db)))
+       ;(assoc db :panels-hash new-h)
+       db
+       ) db)))
 
 
 (defn options [x]
@@ -91,7 +94,7 @@
                    :on-response [::simple-response-boot-no-load] ;; just get
                                                                                        ;; settings,
                                                                                        ;; in case
-                   :on-timeout  [::imeout-response [:boot :get-settings]]
+                   :on-timeout  [::timeout-response [:boot :get-settings]]
                    :timeout     15000}]]}))
 
 (re-frame/reg-event-fx 
@@ -611,10 +614,10 @@
 
           (cond
 
-            kit-view? (assoc-in db [:panels (get-in result [:ui-keypath 1]) :views :kvw1] (get-in result [:status :evald-result :value 0]))
+            kit-view? (assoc-in db [:panels (get-in result [:ui-keypath 1]) :views :_kvw1] (get-in result [:status :evald-result :value 0]))
 
             kit-view-remove? (-> db
-                                 (ut/dissoc-in  [:panels (get-in result [:ui-keypath 1]) :views :kvw1])
+                                 (ut/dissoc-in  [:panels (get-in result [:ui-keypath 1]) :views :_kvw1])
                                  (ut/dissoc-in  [:click-param (get-in result [:ui-keypath 1]) :go!]))
 
             server-sub?

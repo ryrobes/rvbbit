@@ -1210,73 +1210,38 @@
   (swap! comp-atom assoc client-name panels))
 
 
+(ut/pp (keys (get @client-panels :agreeable-long-squirrel-2)))
+(ut/pp (keys @client-panels))
+
+
 (defmethod wl/handle-push :current-panels
-  [{:keys [panels client-name resolved-panels materialized-panels]}]
+  [{:keys [panels client-name resolved-panels materialized-panels everything?]}]
+  (ut/pp [:panels-push! client-name (keys panels)])
+  (let [panels (if everything? panels 
+                   (merge (get @client-panels client-name) panels))]
+    
 
   ;; (qp/serial-slot-queue :panel-update-serial :serial
   ;;  (fn [] (ext/write-panels client-name panels))) ;; push to file system for beholder cascades
 
-  (doseq [p (keys panels)]
-    (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
-                                                                                      :resolved (get resolved-panels p)
-                                                                                      :materialized (get materialized-panels p)}))
+    ;; (doseq [p (keys panels)]
+    ;;   (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
+    ;;                                                                                     :resolved (get resolved-panels p)
+    ;;                                                                                     :materialized (get materialized-panels p)}))
 
-  (swap! client-panels assoc client-name panels) ;; the whole block map, will be mutating it with single updates later
-  (when (ut/ne? resolved-panels) (swap! client-panels-resolved assoc client-name resolved-panels))
-  (swap! client-panels-materialized assoc client-name materialized-panels)
+    (swap! client-panels assoc client-name panels) ;; the whole block map, will be mutating it with single updates later
 
-  (swap! db/panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions, important! 
+    ;; (when (ut/ne? resolved-panels)
+    ;;   (swap! client-panels-resolved assoc client-name resolved-panels))
+    ;; (swap! client-panels-materialized assoc client-name materialized-panels)
 
-  (ut/pp [:panels-push! client-name])
+    (swap! db/panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions, important! 
 
-  (qp/serial-slot-queue :panel-update-serial :serial
-                        (fn [] (push-to-history-db client-name panels last-panels "panel")))
-  
-  (push-to-history-db client-name panels last-panels "panel")
+    (qp/serial-slot-queue :panel-update-serial :serial
+                          (fn [] (push-to-history-db client-name panels last-panels "panel")))
 
-    ;;  (do
-    ;;    (let [;resolved-panels resolved-panels ;; remove _ keys? Panels panels ;; remove _ keys?
-    ;;          runner-keys (vec (keys (get (config/settings) :runners)))
-    ;;          prev-hashes (hash-objects (get @last-panels client-name) runner-keys)
-    ;;          this-hashes (hash-objects panels runner-keys)
-    ;;          diffy       (data/diff this-hashes prev-hashes)
-    ;;          diffy-kps   (vec (filter #(and (not (= (count %) 1)) 
-    ;;                                         (not (= (last %) :views)) 
-    ;;                                         (not (= (last %) :queries)))
-    ;;                                   (ut/kvpaths (first diffy))))
-    ;;          dd          (data-objects panels runner-keys)
-    ;;          pdd         (data-objects (get @last-panels client-name) runner-keys)]
-    ;; ;(send panel-history ;; shouldnt the whole thing be in an agent sync block? rapid updates
-
-    ;;      (let [;dd (data-objects panels)
-    ;;            rows          (vec (for [kp   diffy-kps
-    ;;                                     :let [data  (get-in dd kp)
-    ;;                                           pdata (get-in pdd kp)
-    ;;                                           pdiff (first (data/diff data pdata))]]
-    ;;                                 {:kp          (str kp)
-    ;;                                  :client_name (str client-name)
-    ;;                                  :data        (pr-str data)
-    ;;                                  :pre_data    (pr-str pdata)
-    ;;                                  :diff        (pr-str pdiff)
-    ;;                                  :diff_kp     (pr-str (ut/kvpaths pdiff))
-    ;;                                  :panel_key   (str (get kp 0))
-    ;;                                  :key         (str (get kp 2))
-    ;;                                  :type        (str (get kp 1))}))
-    ;;            ins-sql       {:insert-into [:panel-history] :values rows}
-    ;;            board-ins-sql {:insert-into [:board-history] :values [{:client_name (str client-name) :data (pr-str panels)}]}]
-    ;;        (sql-exec history-db (to-sql board-ins-sql))
-    ;;        (when (ut/ne? rows) (sql-exec history-db (to-sql ins-sql))))
-    ;;      (swap! last-panels assoc client-name panels)))
-                          ;;))
-
-  ;; (qp/serial-slot-queue :panel-update-serial :serial
-  ;;                       (fn [] (push-to-history-db client-name resolved-panels last-panels-resolved "panel-resolved")))
-  
-  ;; (qp/serial-slot-queue :panel-update-serial :serial
-  ;;                       (fn [] (push-to-history-db client-name materialized-panels last-panels-materialized "panel-materialized")))
-  
-  
-  )
+    ;; (push-to-history-db client-name panels last-panels "panel")
+    ))
 
 (defn run-shell-command
   "execute a generic shell command and return output as a map of timing and seq of str lines"
@@ -2335,6 +2300,7 @@
                                  clover-lookup-map
                                  (select-keys context-data [:panel-key :data-key :ui-keypath]))
 
+          ;; big blocking step for shipping kit fn view UI, but times out after a minute and cancels
            _ (when kit-view? ;; render and set kit views to gather options for the user before we execute the kit
                (alert! client-name
                        [:box :child "waiting on user kit options..."]
@@ -2342,7 +2308,7 @@
                        nil
                        4)
                (let [response-path [client-name panel-key :go!]
-                     timeout-ms 30000 ; 5 mins
+                     timeout-ms 60000 ; 1 mins
                      start-time (System/currentTimeMillis)
                      loaded-kit-view-fns (walk/postwalk-replace limited-postwalk-map kit-view-fns)
                      rendered-views (ut/timed-exec
@@ -2371,9 +2337,9 @@
                  (Thread/sleep 2000)))
            ;;kit-opts (when kit-view? )
 
-
+           opts-map (dissoc (get-in @db/params-atom [client-name panel-key]) :go!)
            added-postwalk-map (merge limited-postwalk-map ;; add in view opts if any 
-                          (get-in @db/params-atom [client-name panel-key]))
+                          opts-map)
            
            _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
                     (create-ansi-box
@@ -2385,7 +2351,7 @@
                                        (apply str
                                               (for [[k v] added-postwalk-map]
                                                 (str k "  " v "\n"))))))))))
-           _ (Thread/sleep 6000)
+           _ (Thread/sleep 3000)
 
            _ (when (= host-runner :queries) ;; we need the FULL table
                (alert! client-name
@@ -2444,7 +2410,8 @@
           ;;                   :data-key data-key
           ;;                   :ui-keypath [:panels panel-key host-runner data-key]})
           ;; transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
-           limited-postwalk-map (merge added-postwalk-map 
+           limited-postwalk-map (merge added-postwalk-map {:opts-map opts-map} 
+                                   ;; ^^ re-adding a 'literal' opts-map key just for redundancy - even thought the keys already exist in the root map
                                  {:transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
                                   :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
                                  limited-postwalk-map)
@@ -2457,8 +2424,8 @@
                                          (keyword (str "serial-kit-instance/" kit-runner-key-str))
                                          (fn []
                                            (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
-           error?   (cstr/includes? (cstr/lower-case (str result)) " error ") ;; lame , get codes later 
-           output (get-in result [:evald-result :value])
+           error?   (cstr/includes? (cstr/lower-case (str result)) " error ")  ;; lame , get codes later 
+           output   (get-in result [:evald-result :value])
           ;console (get-in result [:evald-result :out])
            ]
 
@@ -4807,9 +4774,11 @@
                        (assoc :cached? true)
                        (assoc :query-ms nil))) ;; return output ;; :query-ms query-ms
                   (let [page-num page ;(get honey-sql :page)
-                        per-page-limit (cond (= page-num -1) 50000
-                                             (= page-num -2) 1000000 ;; yikes. revisit TODO
-                                             :else           per-page-limit)
+                        per-page-limit (cond
+                                         ;;(cstr/includes? (str ui-keypath) "-hist-") 50 ;; tiny sample for history view
+                                         (= page-num -1) 50000
+                                         (= page-num -2) 1000000 ;; yikes. revisit TODO
+                                         :else           per-page-limit)
                         honey-sql (if literal-data?
                                     honey-sql ;; dont mutate literal data rowsets
                                     (cond (and page-num (and (not (= page-num -2)) (not (= page-num -1))))
@@ -4819,7 +4788,7 @@
                         honey-sql-str (when (not literal-data?) ;; no query!
                                         (if (or (= page-num -1) (= page-num -2)) ;; or limit
                                           (to-sql honey-sql)
-                                          (to-sql (assoc honey-sql :limit 500))))
+                                          (to-sql (assoc honey-sql :limit (if (cstr/includes? (str ui-keypath) "-hist-") 50 500)))))
                         honey-sql-str2 (first honey-sql-str)
                             ;;;_ (async/thread (get-clover-sql-training clover-sql honey-sql-str2)) ;; ONLY
                         honey-result (timed-expr (if literal-data?
