@@ -20,6 +20,7 @@
 (defonce params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
 (defonce panels-atom (ut/thaw-atom {} "./data/atoms/panels-atom.edn"))
 (defonce solver-status (atom {}))
+(defonce query-metadata (ut/thaw-atom {} "./data/atoms/query-metadata.edn"))
 (defonce last-signals-history-atom (ut/thaw-atom {} "./data/atoms/last-signals-history-atom.edn"))
 (defonce last-signal-value-atom (ut/thaw-atom {} "./data/atoms/last-signal-value-atom.edn"))
 (defonce last-signals-atom-stamp (ut/thaw-atom {} "./data/atoms/last-signals-atom-stamp.edn"))

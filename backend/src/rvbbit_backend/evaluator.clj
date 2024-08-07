@@ -671,7 +671,7 @@
                     rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
                                                (nrepl/response-values responses)))
                     rsp           (nrepl/combine-responses responses)
-                    ;msg-out       @output-atom
+                    msg-out       @output-atom
                     merged-values rsp-read
                     sampled-values (try
                                      (safe-sample-with-description (first rsp-read))
@@ -681,7 +681,7 @@
                                    (-> rsp
                                        (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                        (assoc :value merged-values)
-                                       ;(assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
+                                       (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
                                        (dissoc :id)
                                        (dissoc :session))
                                    :sampled sampled-values}]

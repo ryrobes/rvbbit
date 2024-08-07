@@ -759,14 +759,15 @@
         val))))
 
 
-(re-frame/reg-event-db ::click-parameter
-                       (fn [db [_ keypath value]]
-                         (let [cc (get-in db (cons :click-param keypath))]
-                           (assoc-in db
-                             (cons :click-param keypath)
-                             (if (and (not (= (first keypath) :param)) (= cc value)) 
-                               nil
-                               value)))))
+(re-frame/reg-event-db
+ ::click-parameter
+ (fn [db [_ keypath value]]
+   (let [cc (get-in db (cons :click-param keypath))]
+     (assoc-in db
+               (cons :click-param keypath)
+               (if (and (not (= (first keypath) :param)) (= cc value))
+                 nil
+                 value)))))
 
 (re-frame/reg-event-db 
  ::declick-parameter 
@@ -776,9 +777,9 @@
    (ut/dissoc-in db (vec (cons :click-param keypath)))))
 
 (re-frame/reg-event-db
-  ::cell-click-parameter
-  (fn [db [_ keypath value]]
-    (ut/tapp>> [:cell-click-parameter keypath value])
+ ::cell-click-parameter
+ (fn [db [_ keypath value]]
+   (ut/tapp>> [:cell-click-parameter keypath value])
     (let [cc      (get-in db (cons :click-param keypath))
           new     (vec (distinct (cond (vector? cc) (vec (conj cc value))
                                        (nil? cc)    [value]

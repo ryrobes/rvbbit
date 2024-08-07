@@ -471,7 +471,9 @@
             ;;                               (let [first-keys (set (keys (first data)))]
             ;;                                 (every? #(and (= first-keys (set (keys %)))
             ;;                                               (every? keyword? (keys %)))
-            ;;                                         data)))]
+            ;;                                         data)))
+            ;;           all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+            ;;           all-single-values-set (and (set? data) (every? (complement coll?) data))]
             ;;       (when all-keys-match
             ;;         (ut/tracked-dispatch [::insert-implicit-rowset data
             ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
@@ -552,6 +554,7 @@
               counts?                     (= task-id :cnts)
               heartbeat?                  (= task-id :heartbeat)
               kit-view?                   (= task-id :kit-view)
+              kit-view-opts?              (= task-id :kit-view-opts)
               kit-view-remove?            (= task-id :kit-view-remove)
               alert?                      (cstr/starts-with? (str task-id) ":alert")
               server-sub?                 (and kick?
@@ -614,7 +617,14 @@
 
           (cond
 
-            kit-view? (assoc-in db [:panels (get-in result [:ui-keypath 1]) :views :_kvw1] (get-in result [:status :evald-result :value 0]))
+            kit-view? (-> db
+                          (assoc-in [:panels (get-in result [:ui-keypath 1]) :views :_kvw1]
+                                    (get-in result [:status :evald-result :value 0]))
+                          (assoc-in [:panels (get-in result [:ui-keypath 1]) :selected-view]
+                                    :_kvw1))
+
+            kit-view-opts? (update-in db [:click-param (get-in result [:ui-keypath 1])]
+                                      #(merge % (get result :status)))
 
             kit-view-remove? (-> db
                                  (ut/dissoc-in  [:panels (get-in result [:ui-keypath 1]) :views :_kvw1])

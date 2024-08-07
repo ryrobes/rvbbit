@@ -277,16 +277,16 @@
 
 (defn sql-formatter
   [sql-str]
-  (try (let [res (pr-str (SqlFormatter/format sql-str))] 
-         (if (nil? res) sql-str res)) 
+  (try (let [res (pr-str (SqlFormatter/format sql-str))]
+         (if (nil? res) sql-str res))
        (catch Exception _ sql-str)))
 
 (defn flatten-map
   ([m] (flatten-map m '()))
   ([m prefix]
    (if (map? m)
-     (reduce-kv (fn [acc k v] 
-                  (let [new-prefix (conj prefix k)] 
+     (reduce-kv (fn [acc k v]
+                  (let [new-prefix (conj prefix k)]
                     (merge acc (flatten-map v new-prefix)))) {} m)
      (let [key-str   (clojure.string/join "-" (map name prefix))
            final-key (if (re-matches #"\d.*" key-str) (str "_" key-str) key-str)]
@@ -296,12 +296,12 @@
   (into {}
         (group-by first
                   (vec
-                   (for [kp (filter #(= (count %) 3) (ut/kvpaths m)) 
-                         :let [v (get-in m kp)] 
+                   (for [kp (filter #(= (count %) 3) (ut/kvpaths m))
+                         :let [v (get-in m kp)]
                          :when (not (= :done v))] [v kp])))))
 
-(defn clean-key [k] 
-  (if (keyword? k) 
+(defn clean-key [k]
+  (if (keyword? k)
     (keyword (clojure.string/replace (name k) #"/" "")) k))
 
 (defn recursive-clean [data]
@@ -382,74 +382,74 @@
 
 (defn make-http-call [req]
   (ppy/execute-in-thread-pools-but-deliver :make-http-call ;; try to combat random stackoverflows from this call - new stack in thread pool wrapper
-   (fn []
-     (try
-       (let [{:keys [url headers query-params method body file save-to] :or {method :get}} req
-             http-method     (case method
-                               :get     client/get
-                               :post    client/post
-                               :put     client/put
-                               :delete  client/delete
-                               :head    client/head
-                               :options client/options
-                               :patch   client/patch
-                               :GET     client/get
-                               :POST    client/post
-                               :PUT     client/put
-                               :DELETE  client/delete
-                               :HEAD    client/head
-                               :OPTIONS client/options
-                               :PATCH   client/patch
-                               (throw (IllegalArgumentException.
-                                       {:error
-                                        (str "Unknown http method: "
-                                             method)})))
-             body2             (if (nil? body)
-                                 {:query-params query-params}
-                                 (if (nil? file)
-                                   {:body (json/generate-string body)}
-                                   {:multipart
-                                    [{:name     "file"
-                                      :content  (slurp file)
-                                      :filename (last
-                                                 (clojure.string/split
-                                                  file
-                                                  #"/"))}
-                                     {:name    "purpose"
-                                      :content "assistants"}]}))
-             response            (try (http-method url
-                                                   (merge {:as
-                                                           (if save-to
-                                                             :byte-array
-                                                             :json)
-                                                           :headers headers
-                                                           :debug false}
-                                                          body2))
-                                      (catch Exception e
-                                        {;:error (str e)
-                                         :error (parse-error-body e)
-                                         :class (str (type e))}))]
-         (cond (:error response)                            (do ;(ut/pp [:http-call2-error response
+                                           (fn []
+                                             (try
+                                               (let [{:keys [url headers query-params method body file save-to] :or {method :get}} req
+                                                     http-method     (case method
+                                                                       :get     client/get
+                                                                       :post    client/post
+                                                                       :put     client/put
+                                                                       :delete  client/delete
+                                                                       :head    client/head
+                                                                       :options client/options
+                                                                       :patch   client/patch
+                                                                       :GET     client/get
+                                                                       :POST    client/post
+                                                                       :PUT     client/put
+                                                                       :DELETE  client/delete
+                                                                       :HEAD    client/head
+                                                                       :OPTIONS client/options
+                                                                       :PATCH   client/patch
+                                                                       (throw (IllegalArgumentException.
+                                                                               {:error
+                                                                                (str "Unknown http method: "
+                                                                                     method)})))
+                                                     body2             (if (nil? body)
+                                                                         {:query-params query-params}
+                                                                         (if (nil? file)
+                                                                           {:body (json/generate-string body)}
+                                                                           {:multipart
+                                                                            [{:name     "file"
+                                                                              :content  (slurp file)
+                                                                              :filename (last
+                                                                                         (clojure.string/split
+                                                                                          file
+                                                                                          #"/"))}
+                                                                             {:name    "purpose"
+                                                                              :content "assistants"}]}))
+                                                     response            (try (http-method url
+                                                                                           (merge {:as
+                                                                                                   (if save-to
+                                                                                                     :byte-array
+                                                                                                     :json)
+                                                                                                   :headers headers
+                                                                                                   :debug false}
+                                                                                                  body2))
+                                                                              (catch Exception e
+                                                                                {;:error (str e)
+                                                                                 :error (parse-error-body e)
+                                                                                 :class (str (type e))}))]
+                                                 (cond (:error response)                            (do ;(ut/pp [:http-call2-error response
                                                              ;:body-sent body2])
-                                                              {:error response :message (:error response)})
-               (cstr/includes? (str response) "status 400") (do ;(ut/pp [:http-call2-error-400 response
+                                                                                                      {:error response :message (:error response)})
+                                                       (cstr/includes? (str response) "status 400") (do ;(ut/pp [:http-call2-error-400 response
                                                              ;:body-sent body2])
-                                                              {:error response :message "400 code"})
-               :else                                        (if save-to
-                                                              (do (spit save-to (:body response)) {:success true :path save-to})
-                                                              (let [resp (recursive-clean (get response
-                                                                                               :body
-                                                                                               {:success true
-                                                                                                :status  (get response :status)}))
-                                                                    rr   (recursive-clean resp)
-                                                                    rrs  (pr-str rr)
-                                                                    tts  (cstr/replace rrs #":/" ":")
-                                                                    ttsr (edn/read-string tts)]
-                                                                ttsr))))
-       (catch Exception e ;{:error (str e)
-         {;:error (str e)
-          :error [(parse-error-body e) (str e)]
-          :class (str (type e))})))))
+                                                                                                      {:error response :message "400 code"})
+                                                       :else                                        (if save-to
+                                                                                                      (do (spit save-to (:body response)) {:success true :path save-to})
+                                                                                                      (let [resp (recursive-clean (get response
+                                                                                                                                       :body
+                                                                                                                                       {:success true
+                                                                                                                                        :status  (get response :status)}))
+                                                                                                            rr   (recursive-clean resp)
+                                                                                                            rrs  (pr-str rr)
+                                                                                                            tts  (cstr/replace rrs #":/" ":")
+                                                                                                            ttsr (edn/read-string tts)]
+                                                                                                        ttsr))))
+                                               (catch Exception e ;{:error (str e)
+                                                 {;:error (str e)
+                                                  :error [(parse-error-body e) (str e)]
+                                                  :class (str (type e))})))))
 
 
 (defmacro timed-expr
@@ -582,14 +582,14 @@
                                      (and (not (map? (first rowset))) (vector? rowset)) :vectors)
                columns-vec-arg columns-vec
                db-conn         (or db-conn cache-db)
-               rowset-fixed    (if (= rowset-type :vectors) 
-                                 (for [r rowset] (zipmap columns-vec-arg r)) 
+               rowset-fixed    (if (= rowset-type :vectors)
+                                 (for [r rowset] (zipmap columns-vec-arg r))
                                  rowset)
                columns         (keys (first rowset-fixed))
                table-name-str  (ut/unkeyword table-name)
                ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
                extra           {:queue (if (= db-conn cache-db) nil queue-name)
-                                :extras[ddl-str columns-vec-arg table-name table-name-str]}]
+                                :extras [ddl-str columns-vec-arg table-name table-name-str]}]
            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
            ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
            (write-transit-data rowset-fixed keypath client-name table-name-str)
@@ -851,12 +851,11 @@
                   ;;                                      (contains? valid-groups (first group))
                   ;;                                       group (last group)))
                   ;;                         (vals items-by-task-id))
-                  latest-items     (mapv (fn [[task-id group]] ;; actually works now. lol
-                                           (if (contains? valid-groups task-id)
-                                             group
-                                             [(last group)]))
-                                         items-by-task-id)
-                   ]
+                   latest-items     (mapv (fn [[task-id group]] ;; actually works now. lol
+                                            (if (contains? valid-groups task-id)
+                                              group
+                                              [(last group)]))
+                                          items-by-task-id)]
                (if (not-empty latest-items)
                  (let [_ (swap! client-batches update client-name (fnil inc 0))
                       ;;; _ (when (> 1 (count latest-items)) (ut/pp [:sending (count latest-items) :items-to client-name]))
@@ -905,7 +904,7 @@
                     :task-id     task-id
                     :data        (when (try (some #(= (first task-id) %) sub-task-ids) (catch Exception _ true)) ;; server sub doenst need :data, just :status (as val)
                                    [data ;; data is likely needed for :payload and :payload-kp that
-                                  (try (get (first reco-count) :cnt) (catch Exception _ reco-count))])
+                                    (try (get (first reco-count) :cnt) (catch Exception _ reco-count))])
                     :client-name client-name}))
         (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
           (new-client client-name)
@@ -1181,9 +1180,9 @@
         ;;_           (ut/pp [:push-to-hist client-name tname (keys @comp-atom)])
         changed-paths (find-changed-paths prev-data panels)
         diffy-kps   (vec (filter #(and ;(not (= (count %) 1))
-                                       (= (count %) 3)
+                                   (= (count %) 3)
                                        ;(not (some (fn [x] (= (last %) x)) runner-keys))
-                                       )
+                                   )
                                  changed-paths))
         ;;_ (ut/pp [:diffy  diffy-kps tname])
         ;;_ (ut/pp [:diffy2 tname  ])
@@ -1217,9 +1216,9 @@
 (defmethod wl/handle-push :current-panels
   [{:keys [panels client-name resolved-panels materialized-panels everything?]}]
   (ut/pp [:panels-push! client-name (keys panels)])
-  (let [panels (if everything? panels 
+  (let [panels (if everything? panels
                    (merge (get @client-panels client-name) panels))]
-    
+
 
   ;; (qp/serial-slot-queue :panel-update-serial :serial
   ;;  (fn [] (ext/write-panels client-name panels))) ;; push to file system for beholder cascades
@@ -2242,18 +2241,18 @@
                                           words)]
                         (filter #(ut/ne? %) lines))))
         content-lines (mapcat wrap-line (clojure.string/split-lines content))
-        formatted-lines (map-indexed 
-                          (fn [idx line]
-                            (let [padding (quot (- width 2 (count line)) 2)
-                                  left-padding (apply str (repeat padding " "))
-                                  right-padding (apply str (repeat (- width 2 (count line) padding) " "))
-                                  formatted (str left-padding line right-padding)]
-                              (str border-color "│" reset text-color
-                                   (if (zero? idx) bold "")
-                                   formatted
-                                   (if (zero? idx) reset "")
-                                   reset border-color "│" reset)))
-                          content-lines)]
+        formatted-lines (map-indexed
+                         (fn [idx line]
+                           (let [padding (quot (- width 2 (count line)) 2)
+                                 left-padding (apply str (repeat padding " "))
+                                 right-padding (apply str (repeat (- width 2 (count line) padding) " "))
+                                 formatted (str left-padding line right-padding)]
+                             (str border-color "│" reset text-color
+                                  (if (zero? idx) bold "")
+                                  formatted
+                                  (if (zero? idx) reset "")
+                                  reset border-color "│" reset)))
+                         content-lines)]
     (clojure.string/join "\n"
                          (concat [top-bottom]
                                  formatted-lines
@@ -2262,109 +2261,132 @@
 ;; (ut/pp [:clpp (get-in @client-panels [:worthy-bronze-grasshopper-42 :block-6308])])
 ;; (ut/pp (keys (:worthy-bronze-grasshopper-42 @db/params-atom)))
 ;; (ut/pp (ut/dissoc-in db/params-atom [:worthy-bronze-grasshopper-42 :block-8309]))
+;; (ut/pp @db/query-metadata)
 
 (defmethod wl/handle-push :run-kit
-  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]  
+  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]
   (try
-     (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
-           kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
-           times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
-           [kit-runner
-            kit-name]      kit-keypath
-           runner-map      (config/settings)
-           kit-runner-fn   (get-in runner-map [:runners kit-runner :kits kit-name :kit-expr])
-           kit-view-fns    (get-in runner-map [:runners kit-runner :kits kit-name :kit-view-exprs])
-           output-type     (get-in runner-map [:runners kit-runner :kits kit-name :output])
-           repl-host       (get-in runner-map [:runners kit-runner :runner :host])
-           repl-port       (get-in runner-map [:runners kit-runner :runner :port])
-           _ (ship-estimate client-name kit-runner-key times-key)
-           _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
-           _ (swap! db/kit-status assoc-in [kit-runner-key :running?] true)
-           host-runner     runner
-           kit-view?       (ut/ne? kit-view-fns)
-           clover-kw1       (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
-           clover-kw2       (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-view-fns))
-           clover-kw        (set (into clover-kw1 clover-kw2))
-           clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
-           context-data    (merge
-                            clover-lookup-map
-                            {:client-panels (get @client-panels client-name)
-                             :client-panels-data (get @client-panels-data client-name)
-                             :client-panels-metadata (get @client-panels-metadata client-name)
-                             :panel-key panel-key
-                             :data-key data-key
-                             :ui-keypath [:panels panel-key host-runner data-key]})
-           transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
-           limited-postwalk-map (merge
-                                 {:transit-file transit-file}
-                                 clover-lookup-map
-                                 (select-keys context-data [:panel-key :data-key :ui-keypath]))
+    (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
+          kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
+          times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
+          [kit-runner
+           kit-name]      kit-keypath
+          runner-map      (config/settings)
+          kit-runner-fn   (get-in runner-map [:runners kit-runner :kits kit-name :kit-expr])
+          kit-view-fns    (get-in runner-map [:runners kit-runner :kits kit-name :kit-view-exprs])
+          kit-view-opts   (get-in runner-map [:runners kit-runner :kits kit-name :kit-view-opts] {})
+          output-type     (get-in runner-map [:runners kit-runner :kits kit-name :output])
+          repl-host       (get-in runner-map [:runners kit-runner :runner :host])
+          repl-port       (get-in runner-map [:runners kit-runner :runner :port])
+          _ (ship-estimate client-name kit-runner-key times-key)
+          _ (ut/pp [:running-kit-from client-name ui-keypath kit-runner-key])
+          _ (swap! db/kit-status assoc-in [kit-runner-key :running?] true)
+          host-runner     runner
+          kit-view?       (ut/ne? kit-view-fns)
+          clover-kw1       (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
+          clover-kw2       (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-view-fns))
+          clover-kw        (set (into clover-kw1 clover-kw2))
+          clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
+          context-data    (merge
+                           clover-lookup-map
+                           {:client-panels (get @client-panels client-name)
+                            :client-panels-data (get @client-panels-data client-name)
+                            :client-panels-metadata (get @client-panels-metadata client-name)
+                            :query-metadata (get-in @db/query-metadata [client-name data-key])
+                            :panel-key panel-key
+                            :data-key data-key
+                            :ui-keypath [:panels panel-key host-runner data-key]})
+          transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
+          limited-postwalk-map (merge
+                                {:transit-file transit-file}
+                                clover-lookup-map
+                                (select-keys context-data [:panel-key :data-key :ui-keypath :query-metadata]))
+                                ;; ^^ only the smaller strucs will we allow to be postwalked, else they need to be loaded from the transit file(s)
 
           ;; big blocking step for shipping kit fn view UI, but times out after a minute and cancels
-           _ (when kit-view? ;; render and set kit views to gather options for the user before we execute the kit
-               (alert! client-name
-                       [:box :child "waiting on user kit options..."]
-                       10
-                       nil
-                       4)
-               (let [response-path [client-name panel-key :go!]
-                     timeout-ms 60000 ; 1 mins
-                     start-time (System/currentTimeMillis)
-                     loaded-kit-view-fns (walk/postwalk-replace limited-postwalk-map kit-view-fns)
-                     rendered-views (ut/timed-exec
-                                     (ppy/execute-in-thread-pools-but-deliver
-                                      (keyword (str "serial-kit-instance/" kit-runner-key-str))
-                                      (fn []
-                                        (evl/repl-eval (first loaded-kit-view-fns) repl-host repl-port client-name kit-runner-key ui-keypath))))
-                     _ (do
+          _ (when kit-view? ;; render and set kit views to gather options for the user before we execute the kit
+              ;; (alert! client-name ;; temp, way too many alerts
+              ;;         [:box :child "waiting on user kit options..."]
+              ;;         10
+              ;;         nil
+              ;;         4)
+               ;; set kit defaults on client
+              (when (ut/ne? kit-view-opts)
+                (push-to-client ui-keypath [] client-name 1 :kit-view-opts kit-view-opts))
+               ;; generate view clover and push it to the client, then we wait for the go! signal
+              (let [response-path [client-name panel-key :go!]
+                    timeout-ms (* 1000 240) ;; 4 minutes
+                    start-time (System/currentTimeMillis)
+                    loaded-kit-view-fns (walk/postwalk-replace limited-postwalk-map kit-view-fns)
+                    rendered-views (ut/timed-exec
+                                    (ppy/execute-in-thread-pools-but-deliver
+                                     (keyword (str "serial-kit-instance/" kit-runner-key-str))
+                                     (fn []
+                                       (evl/repl-eval (first loaded-kit-view-fns) repl-host repl-port client-name kit-runner-key ui-keypath))))
+                    view-fn-error (get-in rendered-views [:result :evald-result :error])
+                    _ (do
                 ;; Send things to the client here 
                         ;; [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-                         (push-to-client ui-keypath [] client-name 1 :kit-view (get rendered-views :result)))
-                     user-response (loop []
-                                     (let [current-value (get-in @db/params-atom response-path)
-                                           elapsed-time (- (System/currentTimeMillis) start-time)]
-                                       (cond
-                                         (= current-value :go!) :continue
-                                         (= current-value :cancel!) :abort
-                                         (> elapsed-time timeout-ms) :timeout
-                                         :else (do (Thread/sleep 100) (recur)))))
-                     _ (when user-response
-                         (push-to-client ui-keypath [] client-name 1 :kit-view-remove []))
-                     _ (when (= user-response :abort)
-                         (throw (ex-info "User cancelled the operation" {:type :user-cancel})))
-                     _ (when (= user-response :timeout)
-                         (throw (ex-info "Operation timed out waiting for user response" {:type :timeout})))]
-                 (Thread/sleep 2000)))
+                        (push-to-client ui-keypath [] client-name 1 :kit-view (if view-fn-error
+                                                                                [:box
+                                                                                 :align :center :justify :center
+                                                                                 :size "auto"
+                                                                                 :child [:string3 "error: " view-fn-error]]
+                                                                                (get rendered-views :result))))
+                    user-response (loop []
+                                    (let [current-value (get-in @db/params-atom response-path)
+                                          elapsed-time (- (System/currentTimeMillis) start-time)]
+                                      (cond
+                                        (= current-value :go!) :continue
+                                        (= current-value :cancel!) :abort
+                                        (> elapsed-time timeout-ms) :timeout
+                                        :else (do (Thread/sleep 100) (recur)))))
+                    _ (when user-response
+                        (push-to-client ui-keypath [] client-name 1 :kit-view-remove []))
+                    _ (when (= user-response :abort)
+                        (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
+                        (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+                               (create-ansi-box
+                                (str "kit run cancelled by user \n" 
+                                     (ut/millis-to-date-string (System/currentTimeMillis)) "\n ")))
+                        (throw (ex-info "User cancelled the operation" {:type :user-cancel})))
+                    _ (when (= user-response :timeout)
+                        (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
+                        (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+                               (create-ansi-box
+                                (str "kit run timeout waiting for user response \n" 
+                                     (ut/millis-to-date-string (System/currentTimeMillis)) "\n ")))
+                        (throw (ex-info "Operation timed out waiting for user response" {:type :timeout})))]
+                (Thread/sleep 2000)))
            ;;kit-opts (when kit-view? )
 
-           opts-map (dissoc (get-in @db/params-atom [client-name panel-key]) :go!)
-           added-postwalk-map (merge limited-postwalk-map ;; add in view opts if any 
-                          opts-map)
-           
-           _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
-                    (create-ansi-box
-                     (str "starting kit run " (ut/millis-to-date-string (System/currentTimeMillis)) "\n "
-                          (str kit-keypath "\n " ui-keypath "\n"
-                               (when (ut/ne? added-postwalk-map)
-                                 (str "added user opts: \n"
-                                      (doall
-                                       (apply str
-                                              (for [[k v] added-postwalk-map]
-                                                (str k "  " v "\n"))))))))))
-           _ (Thread/sleep 3000)
+          opts-map (dissoc (get-in @db/params-atom [client-name panel-key]) :go!)
+          added-postwalk-map (merge limited-postwalk-map ;; add in view opts if any 
+                                    opts-map)
 
-           _ (when (= host-runner :queries) ;; we need the FULL table
-               (alert! client-name
-                       [:v-box
-                        :padding "5px"
-                        :gap "10px"
-                        :children
-                        [[:box :child (str "pull *full* query rows for analysis...")]
-                         [:box :style {:font-size "11px" :opacity 0.7}
-                          :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-                       18
-                       nil
-                       6)
+          _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+                   (create-ansi-box
+                    (str "starting kit run " (ut/millis-to-date-string (System/currentTimeMillis)) "\n "
+                         (str kit-keypath "\n " ui-keypath "\n"
+                              (when (ut/ne? added-postwalk-map)
+                                (str "added user opts: \n"
+                                     (doall
+                                      (apply str
+                                             (for [[k v] (dissoc added-postwalk-map :query-metadata)]
+                                               (str k "  " v "\n"))))))))))
+          _ (Thread/sleep 3000)  ;; temp until we know the client has caught up
+          _ (when (= host-runner :queries) ;; we need the FULL table
+              (alert! client-name
+                      [:v-box
+                       :padding "5px"
+                       :gap "10px"
+                       :children
+                       [[:box :child (str "pull *full* query rows for analysis...")]
+                        [:box :style {:font-size "11px" :opacity 0.7}
+                         :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+                      18
+                      nil
+                      6)
               ;; (ut/pp (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
               ;;                (get-in @client-panels-resolved [client-name :connection-id])))
               ;;(ut/pp (get-in @honey-echo [client-name data-key]))
@@ -2372,32 +2394,32 @@
               ;;(ut/pp (get @client-panels-resolved :polished-octohedral-mouse-27))
               ;; (ut/pp @client-panels-resolved)
               ;;(ut/pp [:HE (get-in @honey-echo [client-name data-key])])
-               (query-runstream :honey-xcall
-                                [data-key] ;;ui-keypath
-                                (dissoc (get-in @honey-echo [client-name data-key]) :connection-id)
+              (query-runstream :honey-xcall
+                               [data-key] ;;ui-keypath
+                               (dissoc (get-in @honey-echo [client-name data-key]) :connection-id)
                                ;(get-in @client-panels-resolved [client-name host-runner data-key]) ;; we need the fully resolved SQL...
-                                false
-                                false
-                                (get-in @honey-echo [client-name data-key :connection-id])
+                               false
+                               false
+                               (get-in @honey-echo [client-name data-key :connection-id])
                               ;;  (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
                               ;;          (get-in @client-panels-resolved [client-name :connection-id]))
-                                client-name
-                                -2 ;; -2 limits at 1M rows...
-                                panel-key
-                                nil
-                                false
-                                false)
-               (alert! client-name
-                       [:v-box
-                        :padding "5px"
-                        :gap "10px"
-                        :children
-                        [[:box :child (str "data pulled, running analysis...")]
-                         [:box :style {:font-size "11px" :opacity 0.7}
-                          :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-                       18
-                       nil
-                       6))
+                               client-name
+                               -2 ;; -2 limits at 1M rows...
+                               panel-key
+                               nil
+                               false
+                               false)
+              (alert! client-name
+                      [:v-box
+                       :padding "5px"
+                       :gap "10px"
+                       :children
+                       [[:box :child (str "data pulled, running analysis...")]
+                        [:box :style {:font-size "11px" :opacity 0.7}
+                         :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+                      18
+                      nil
+                      6))
 
           ;; clover-kw        (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten kit-runner-fn))
           ;; clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
@@ -2410,51 +2432,51 @@
           ;;                   :data-key data-key
           ;;                   :ui-keypath [:panels panel-key host-runner data-key]})
           ;; transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
-           limited-postwalk-map (merge added-postwalk-map {:opts-map opts-map} 
+          limited-postwalk-map (merge added-postwalk-map {:opts-map opts-map}
                                    ;; ^^ re-adding a 'literal' opts-map key just for redundancy - even thought the keys already exist in the root map
-                                 {:transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
-                                  :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
-                                 limited-postwalk-map)
-           _ (ut/pp [:debug-kit runner kit-keypath (str kit-runner-fn) repl-host repl-port transit-file])
-           loaded-kit-runner-fn (walk/postwalk-replace limited-postwalk-map
-                                                       kit-runner-fn)
-           _ (ut/pp [:debug-kit2 runner kit-keypath (str loaded-kit-runner-fn) repl-host repl-port transit-file])
-           {:keys [result elapsed-ms]} (ut/timed-exec
-                                        (ppy/execute-in-thread-pools-but-deliver
-                                         (keyword (str "serial-kit-instance/" kit-runner-key-str))
-                                         (fn []
-                                           (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
-           error?   (cstr/includes? (cstr/lower-case (str result)) " error ")  ;; lame , get codes later 
-           output   (get-in result [:evald-result :value])
+                                      {:transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
+                                       :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
+                                      limited-postwalk-map)
+          _ (ut/pp [:debug-kit runner kit-keypath (str kit-runner-fn) repl-host repl-port transit-file])
+          loaded-kit-runner-fn (walk/postwalk-replace limited-postwalk-map
+                                                      kit-runner-fn)
+          _ (ut/pp [:debug-kit2 runner kit-keypath (str loaded-kit-runner-fn) repl-host repl-port transit-file])
+          {:keys [result elapsed-ms]} (ut/timed-exec
+                                       (ppy/execute-in-thread-pools-but-deliver
+                                        (keyword (str "serial-kit-instance/" kit-runner-key-str))
+                                        (fn []
+                                          (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
+          error?   (cstr/includes? (cstr/lower-case (str result)) " error ")  ;; lame , get codes later 
+          output   (get-in result [:evald-result :value])
           ;console (get-in result [:evald-result :out])
-           ]
+          ]
 
       ;;(ut/pp [:kit-runner-output result {:elapsed-ms? elapsed-ms}])
 
       ;;(ut/pp  [:result result])
-       (when (and (= output-type :kit-map)
+      (when (and (= output-type :kit-map)
                  ;(and (vector? output)
                  ;     (map? (first output)))
-                  )
-         (ut/pp [:inserting-into-kit-results-table.. (count output)])
-         (doseq [kk output]
-           (insert-kit-data kk
-                            (hash kk)
-                            data-key ;(last ui-keypath)
-                            "query-log" ;;kit-expr-push"
-                            :kick
-                            elapsed-ms
-                            client-name)))
+                 )
+        (ut/pp [:inserting-into-kit-results-table.. (count output)])
+        (doseq [kk output]
+          (insert-kit-data kk
+                           (hash kk)
+                           data-key ;(last ui-keypath)
+                           "query-log" ;;kit-expr-push"
+                           :kick
+                           elapsed-ms
+                           client-name)))
 
       ;;(Thread/sleep 6000)
 
-       (alert! client-name
-               [:v-box
-                :padding "5px"
-                :gap "10px"
-                :children
-                [;;[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
-                 [:box :child (str "kit run finished")]
+      (alert! client-name
+              [:v-box
+               :padding "5px"
+               :gap "10px"
+               :children
+               [;;[:box :child (str "kit run finished " kit-keypath " " kit-runner-key)]
+                [:box :child (str "kit run finished")]
                 ;; [:box
                 ;;  ;:style {:font-size "11px"}
                 ;;  :child (str "done")]
@@ -2463,16 +2485,16 @@
                 ;;    :style {:border "1px solid #ffffff22"
                 ;;            :border-radius "14px"}
                 ;;    :child [:terminal-custom [console (* 17 50) 250]]])
-                 [:box :style {:font-size "11px" :opacity 0.7}
-                  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-               18
-               nil
-               11)
-       (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
-       (when true ;; (not error?) 
-         (swap! times-atom assoc times-key (conj (get @times-atom times-key []) elapsed-ms)))
-       (ut/pp [:finished-kit-from client-name ui-keypath]))
-      (catch Exception e (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key e ]))))
+                [:box :style {:font-size "11px" :opacity 0.7}
+                 :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
+              18
+              nil
+              5)
+      (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
+      (when true ;; (not error?) 
+        (swap! times-atom assoc times-key (conj (get @times-atom times-key []) elapsed-ms)))
+      (ut/pp [:finished-kit-from client-name ui-keypath]))
+    (catch Exception e (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key e]))))
 
 ;; (ut/pp @flow-status)
 
@@ -2896,8 +2918,8 @@
         ;literal-data?  (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
         honey-modded   (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
         client-name    (or client-name :rvbbit)
-        honey-modded   (walk/postwalk-replace {:*client-name client-name 
-                                               :*client-name* client-name 
+        honey-modded   (walk/postwalk-replace {:*client-name client-name
+                                               :*client-name* client-name
                                                :*client-name-str (pr-str client-name)} honey-modded)
         ;client-name    (keyword (str (cstr/replace (str client-name) ":" "") ".via-solver"))
         client-cache?  false ;(if literal-data? (get honey-sql :cache? true) false)
@@ -2955,7 +2977,7 @@
     [:box
      :style {:font-size "16px"}
      :child (str (first sample-message-lines) ".")]
-  
+
     [:h-box
      :style {:font-size "13px"}
      :gap "12px"
@@ -2979,7 +3001,7 @@
                                                                       [:box
                                                                        :style {:opacity 0.5}
                                                                        :child "values"]]]
-  
+
                                                                     (cstr/includes? e "size")
                                                                     [:h-box
                                                                      :gap "8px"
@@ -2993,7 +3015,7 @@
                                                                                                      (.substring result 0 (- (.length result) 1))
                                                                                                      result)]
                                                                                      truncated)]]]
-  
+
                                                                     (cstr/starts-with? e "dimensions")
                                                                     [:h-box
                                                                      :gap "8px"
@@ -3007,7 +3029,7 @@
                                                                     :else e)]]
                                                       [:box
                                                        :child e]))]])]))]
-  
+
     [:box :style {:font-size "11px"} :child (str sample-error)]
     [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]]])
 
@@ -3098,12 +3120,10 @@
                               ;;               (cstr/join "\n" output)
                               ;;               output))
                               ;;:child [:speak (cstr/join " " (filter string? (parse-text-and-code output)))]
-                              :child (cstr/join " " (filter string? (parse-text-and-code output)))
-                              ]
-                             (try 
+                              :child (cstr/join " " (filter string? (parse-text-and-code output)))]
+                             (try
                                (when code-proc? [:execute (into {} (for [[k v] (apply merge (filter map? kit-content))] {k (edn/read-string v)}))])
-                               (catch Exception _ nil))
-                             ]]]]]
+                               (catch Exception _ nil))]]]]]
               16
               nil
               20 :fabric-response)
@@ -3151,7 +3171,7 @@
              is-fabric?                  (cstr/includes? (str vdata) "fabric-run")
              ;;_ (ut/pp [:nrepl-call runner-name is-fabric? solver-name client-name])
              pre-opts-map                (when is-fabric? (ut/extract-map vdata #{:pattern :model}))
-             times-key                   (if is-fabric? 
+             times-key                   (if is-fabric?
                                            (vec (flatten (remove symbol? (select-keys pre-opts-map [:pattern :model]))))
                                            (into [:nrepl-solver] ui-keypath))
              _                           (ship-estimate client-name solver-name times-key)
@@ -3284,10 +3304,10 @@
         ;;         (str "query-log-" (first ui-keypath))  
         ;;         ;[(str (ut/get-current-timestamp) " - solver ran in " elapsed-ms " ms.")]
 
-                
+
 
         ;;         )
-         
+
         ;;  (insert-kit-data kit-out  
         ;;                   (hash kit-out ) 
         ;;                   (last ui-keypath)
@@ -3377,7 +3397,7 @@
           ;use-cache?            (true?
           ;                       (or (true? (not (nil? temp-solver-name))) ;; temp test
           ;                           (true? (get solver-map :cache? false))))
-          
+
           is-history?           (true? (get solver-map :history? false))
           use-cache?            (or is-history? (true? (get solver-map :cache? false)))
           vdata                 (walk/postwalk-replace input-map (get solver-map :data))
@@ -3553,7 +3573,7 @@
                                               (get-in output [:return-maps flow-id return] output-val)
                                               output-val)
                 output-val                  (if (nil? output-val) "(returns nil value)" output-val)
-                   ;;_ (ut/pp [:solver-flow-return-val solver-name flow-id output-val])
+                _ (ut/pp [:solver-flow-return-val solver-name flow-id output-val])
                 output-full                 {:req        vdata
                                              :value      (-> (assoc output :return-maps
                                                                     (select-keys (get output :return-maps) [flow-id]))
@@ -3645,13 +3665,7 @@
       ;;              (assoc :time-running (ut/format-duration
       ;;                                    (:started solver)
       ;;                                    (System/currentTimeMillis))))))
-
-      
-
-
-
-
-)))
+      )))
 
 (defonce last-signals-history-atom-temp (atom {}))
 
@@ -3944,10 +3958,10 @@
         client-keypath          (db/client-kp flow-key keypath base-type sub-path client-param-path)
         ssp                     (db/break-up-flow-key-ext flow-key-orig)
         req-client-kp           (db/client-kp flow-key-orig
-                                           (vec (db/break-up-flow-key flow-key-orig))
-                                           base-type
-                                           ssp
-                                           (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" "")))
+                                              (vec (db/break-up-flow-key flow-key-orig))
+                                              base-type
+                                              ssp
+                                              (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" "")))
         ;;_ (ut/pp [:flow-key flow-key vars? flow-key-sub flow-key-split flow-key-split-sub]) ;; this
         _ (when vars? (swap! db/param-var-mapping assoc [client-name client-keypath] req-client-kp))
         _ (when vars? (swap! db/param-var-crosswalk assoc-in [client-name flow-key-orig] [flow-key [client-name client-keypath]]))
@@ -4025,7 +4039,7 @@
       (ut/pp [:signal-sub-to kk])
       (sub-to-value :rvbbit kk true))
     (reset! db/last-signals-atom (select-keys @db/last-signals-atom
-                                           (vec (filter #(not (cstr/includes? (str %) "/part-")) (keys @db/last-signals-atom))))) ;; clear
+                                              (vec (filter #(not (cstr/includes? (str %) "/part-")) (keys @db/last-signals-atom))))) ;; clear
                                                                                                                                ;; cache
                                                                                                                                ;; of
     (doseq [signal (keys @signals-atom)] ;; (re)process everythiung since we just got updated
@@ -4058,9 +4072,9 @@
                       (for [[k {:keys [base-type sub-type sub-path keypath]}] vvals
                             :let                                              [;;_ (when (not= base-type :time) (ut/pp
                                                                                v3 (get-in @(db/get-atom-from-keys base-type
-                                                                                                               sub-type
-                                                                                                               sub-path
-                                                                                                               keypath)
+                                                                                                                  sub-type
+                                                                                                                  sub-path
+                                                                                                                  keypath)
                                                                                           keypath
                                                                                           (get @db/last-values keypath))]] ;; extra
                                                                                                                            ;; cache
@@ -4173,29 +4187,29 @@
       (let [[flow-id step-id] keypath]
         ;;(ut/pp [:client-sub-flow-runner flow-id :step-id step-id :client-name client-name])
         (db/add-watcher keypath
-                     client-name
-                     send-reaction-runner
-                     (keyword (str "runner||" flow-id "||" (hash keypath)))
-                     :flow-runner
-                     flow-id)
+                        client-name
+                        send-reaction-runner
+                        (keyword (str "runner||" flow-id "||" (hash keypath)))
+                        :flow-runner
+                        flow-id)
         (db/add-watcher keypath
-                     client-name
-                     send-tracker-runner
-                     (keyword (str "tracker||" flow-id "||" (hash keypath)))
-                     :tracker
-                     flow-id)
+                        client-name
+                        send-tracker-runner
+                        (keyword (str "tracker||" flow-id "||" (hash keypath)))
+                        :tracker
+                        flow-id)
         (db/add-watcher keypath
-                     client-name
-                     send-tracker-block-runner
-                     (keyword (str "blocks||" flow-id "||" (hash keypath)))
-                     :tracker
-                     flow-id)
+                        client-name
+                        send-tracker-block-runner
+                        (keyword (str "blocks||" flow-id "||" (hash keypath)))
+                        :tracker
+                        flow-id)
         (db/add-watcher keypath
-                     client-name
-                     send-acc-tracker-runner
-                     (keyword (str "acc-tracker||" flow-id "||" (hash keypath)))
-                     :tracker
-                     flow-id)))
+                        client-name
+                        send-acc-tracker-runner
+                        (keyword (str "acc-tracker||" flow-id "||" (hash keypath)))
+                        :tracker
+                        flow-id)))
     (boomerang-client-subs client-name))
   [:copy-that client-name])
 
@@ -4208,13 +4222,13 @@
 
 (def sql-cache (atom (cache/lru-cache-factory {} :threshold 1000)))
 
-(defn lookup-cache-exists? [key] 
+(defn lookup-cache-exists? [key]
   (cache/has? @sql-cache key))
 
-(defn get-from-cache [key] 
+(defn get-from-cache [key]
   (cache/lookup @sql-cache key nil))
 
-(defn insert-into-cache [key value] 
+(defn insert-into-cache [key value]
   (swap! sql-cache assoc key value))
 
 (defonce conn-map (atom {}))
@@ -5028,16 +5042,17 @@
                          ppy/execute-in-thread-pools)
                        :data-io-ops ;; potentially expensive and blocking
                        (fn []
-                         (write-transit-data
-                          ;;(assoc (get output :result-meta) :connection-id connection-id)
-                          (-> (get output :result-meta)
-                              (assoc :original-honey (get output :original-honey))
-                              (assoc :connection-id (get output :connection-id)))
-                          (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
-                         (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))
-                         (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
-                         (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
-                         (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result))))
+                         (let [modded-meta (-> (get output :result-meta)
+                                               (assoc :original-honey (get output :original-honey))
+                                               (assoc :connection-id (get output :connection-id)))]
+                           (write-transit-data
+                            modded-meta
+                            (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                           (swap! db/query-metadata assoc-in [client-name (first ui-keypath)] modded-meta)
+                           (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))
+                           (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
+                           (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
+                           (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result)))))
                       ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
@@ -5058,7 +5073,7 @@
               (doall (let [async-result-chan (go (let [result-chan (queue-runstream runstream)]
                                                    (println "Waiting for result...") ; Debugging
                                                    (<! result-chan)))] ; This returns a channel
-                       (do (println "Getting result from async operation...") 
+                       (do (println "Getting result from async operation...")
                            (async/<!! async-result-chan)))) ; Blocking take from the chan
               (runstream))))))
 
@@ -5120,7 +5135,7 @@
                                                                                                    :item_data    (pr-str i)}]]
                                                                                 row-map))]]
                                                            rowset)))]
-                            
+
                             (when true ;;(not (= kkit-name ":kick")) ;; let kick "messages" pile up, dont swap out like a
                               (sql-exec system-db
                                         (to-sql {:delete-from [:kits]
@@ -5213,20 +5228,19 @@
                                                                                                          ; the channel
 
      (ppy/execute-in-thread-pools-but-deliver :query-runstreams  ; (keyword (str "query-runstream/" (cstr/replace client-name ":" "")))
-      (fn []
-     (query-runstream kind
-                      ui-keypath
-                      honey-sql
-                      client-cache?
-                      sniff?
-                      connection-id
-                      client-name
-                      page
-                      panel-key
-                      clover-sql
-                      deep-meta?
-                      false)))
-     )))
+                                              (fn []
+                                                (query-runstream kind
+                                                                 ui-keypath
+                                                                 honey-sql
+                                                                 client-cache?
+                                                                 sniff?
+                                                                 connection-id
+                                                                 client-name
+                                                                 page
+                                                                 panel-key
+                                                                 clover-sql
+                                                                 deep-meta?
+                                                                 false))))))
 
 (defn send-file-success
   [content filename]
@@ -5257,18 +5271,18 @@
                                          (try (float? (Float/parseFloat (first v))) (catch Exception _ false)) :float
                                          :else                                                                 :string)}))
          fdata-map-mod  (vec #_{:clj-kondo/ignore [:unresolved-symbol]}
-                             (cp/pfor pool
-                                      [row fdata-map] ;; cp/pfor pool
-                                      (into {}
-                                            (for [[k tt] ftypes-coerce]
-                                              {k ;[tt (get row k)]
-                                               (try (let [ff  #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                                              (get row k nil)
-                                                          fff (if (or (empty? ff) (= ff " ") (= ff "")) nil ff)]
-                                                      (cond (= tt :float)   (Float/parseFloat fff)
-                                                            (= tt :integer) (Long/parseLong fff)
-                                                            :else           (str fff)))
-                                                    (catch Exception e nil))}))))
+                         (cp/pfor pool
+                                  [row fdata-map] ;; cp/pfor pool
+                                  (into {}
+                                        (for [[k tt] ftypes-coerce]
+                                          {k ;[tt (get row k)]
+                                           (try (let [ff  #_{:clj-kondo/ignore [:unresolved-symbol]}
+                                                      (get row k nil)
+                                                      fff (if (or (empty? ff) (= ff " ") (= ff "")) nil ff)]
+                                                  (cond (= tt :float)   (Float/parseFloat fff)
+                                                        (= tt :integer) (Long/parseLong fff)
+                                                        :else           (str fff)))
+                                                (catch Exception e nil))}))))
          op-name        (str "csv: " file-path)]
      (ut/pp [:processing op-name])
      (sql-exec system-db
@@ -5287,7 +5301,7 @@
 
 (defn save-csv [request]
   (time (process-csv request))
-  (send-edn-success {:status "saved-csv" 
+  (send-edn-success {:status "saved-csv"
                      :screen (first (get request :edn-params))}))
 
 (defn save-alert-notification [client-name name fpath flow?]
@@ -5426,8 +5440,8 @@
           m
           (keys m)))
 
-(defn strunc [s] 
-  (let [s (str s) limit 80] 
+(defn strunc [s]
+  (let [s (str s) limit 80]
     (if (and s (> (count s) limit)) (subs s 0 limit) s)))
 
 (def param-sql-sync-rows (atom 0))
@@ -5470,13 +5484,13 @@
         solver-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) solver-rows)))
         solver-rows  (for [e solver-rows]
                        [(cstr/replace (str (first e)) ":" "") "solvers" (cstr/replace (str (second e)) ":" "")
-                        (str ":solver/" (cstr/replace (cstr/join ">" e) ":" "")) false 
+                        (str ":solver/" (cstr/replace (cstr/join ">" e) ":" "")) false
                         (strunc (ut/replace-large-base64 (get-in @db/last-solvers-atom e))) (display-name e) nil])
         signal-rows  (ut/keypaths2 (into {} (filter (fn [[k _]] (keyword? k)) @db/last-signals-atom)))
         signal-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) signal-rows)))
         signal-rows  (for [e signal-rows]
                        [(cstr/replace (str (first e)) ":" "") "signals" (cstr/replace (str (second e)) ":" "")
-                        (str ":signal/" (cstr/replace (cstr/join ">" e) ":" "")) false 
+                        (str ":signal/" (cstr/replace (cstr/join ">" e) ":" "")) false
                         (strunc (ut/replace-large-base64 (get-in @db/last-signals-atom e))) (display-name e) nil])
         panel-rows   (vec (filter #(or (= (get % 2) :views) (= (get % 2) :queries)) (ut/kvpaths @db/panels-atom)))
         panel-rows   (vec (distinct (map (fn [x] (vec (take 4 x))) panel-rows)))
@@ -5538,7 +5552,7 @@
         _ (sql-exec autocomplete-db (to-sql delete-sql) {:queue :autocomplete})]
     ;(enqueue-task3 
     ;(sql-exec autocomplete-db create-ddl {:queue :autocomplete})
-    
+
     (qp/serial-slot-queue :autocomplete-sql :sql
     ;(ppy/execute-in-thread-pools :general-serial                      
                           (fn []
@@ -5546,7 +5560,7 @@
                             ;(sql-exec autocomplete-db create-ddl {:queue :autocomplete})
                             ;(sql-exec autocomplete-db (to-sql delete-sql) {:queue :autocomplete})
                             (doseq [rr (partition-all 50 rows)]
-                              (sql-exec autocomplete-db 
+                              (sql-exec autocomplete-db
                                         (to-sql {:insert-into [:client_items] :values rr})
                                         {:queue :autocomplete}))))))
 
@@ -5619,8 +5633,8 @@
                         (catch Exception e (do (ut/pp [:update-flow-results>sql-error (str e)]) [])))
         insert-sql {:insert-into [:live_schedules] :values rows}]
     (when (ut/ne? rows)
-      (do 
-        (sql-exec flows-db (to-sql {:delete-from [:live_schedules]})) 
+      (do
+        (sql-exec flows-db (to-sql {:delete-from [:live_schedules]}))
         (sql-exec flows-db (to-sql insert-sql))))))
 
 (def checkpoint-atom (atom {}))
@@ -5679,17 +5693,17 @@
 ;; (ut/pp [:math-cache (count (keys @agg-cache))])
 
 (defn avg-chunks [chunk]
-    (let [cache-key (pr-str chunk)
-          cache (get @agg-cache cache-key)]
-      (if cache
-        cache
-        (let [sum (apply + chunk)
-              count (count chunk)
-              average (if (zero? sum)
-                        0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
-                        (/ sum count))] ;; Calculate average normally
-          (swap! agg-cache assoc cache-key average)
-          average))))
+  (let [cache-key (pr-str chunk)
+        cache (get @agg-cache cache-key)]
+    (if cache
+      cache
+      (let [sum (apply + chunk)
+            count (count chunk)
+            average (if (zero? sum)
+                      0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
+                      (/ sum count))] ;; Calculate average normally
+        (swap! agg-cache assoc cache-key average)
+        average))))
 
 (defn average-in-chunks [data chunk-size]
   (->> data
@@ -5815,7 +5829,7 @@
   (let [bright-colors (filter bright-color? (range 256))]
     (into {}
           (for [b bright-colors]
-            {(keyword (str "color" b)) 
+            {(keyword (str "color" b))
              (str "\u001b[38;5;" b "m")}))))
 
 ;; (defn generate-rgb-bg-color [r g b]
@@ -5886,147 +5900,146 @@
                  result))))))
 
 (defn draw-bar-graph [usage-vals label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
-     (try
-       (let [console-width (if width width (- (ut/get-terminal-width) 10))
-             rows 5
-             border-width 2
-             label-padding 4
-             time-marker-interval 30
+  (try
+    (let [console-width (if width width (- (ut/get-terminal-width) 10))
+          rows 5
+          border-width 2
+          label-padding 4
+          time-marker-interval 30
              ;values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
-             max-values (- console-width border-width label-padding 4)
-             truncated (take-last max-values usage-vals)
-             mmax (apply max truncated)
-             mmin (apply min truncated)
-             adjusted-min (* mmin 0.9) ; 90% to avoid zero bar 
-             value-range (- mmax adjusted-min)
-             normalized (if (zero? value-range)
-                          (repeat (count truncated) 0)
-                          (map #(int (/ (* (- % adjusted-min) (* rows 8)) value-range)) truncated))
-             bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
-             color-code (get ansi-colors color "")
-             reset-code "\u001B[0m"
-             colorize (fn [s] (str color-code s reset-code))
-             get-bar-char (fn [height row]
-                            (let [row-height (- height (* row 8))]
-                              (cond
-                                (and (zero? height) (not= row 0)) " "
-                                (and (zero? height) (zero? row)) "▁"
-                                (<= height (* row 8)) " "
-                                (> row-height 8) "█"
-                                :else (nth bar-chars row-height))))
-             border-line (apply str (repeat (- console-width 2) "─"))
-             border-top (str "╭" border-line "╮")
-             border-bottom (str "╰" border-line "╯")
-             time-span (count truncated)
-             seconds (* time-span freq)
-             trend (try
-                     (let [hchunk (Math/floor (/ (count truncated) 2))
-                           first-half (take hchunk truncated)
-                           second-half (drop hchunk truncated)
-                           avg-sec (ut/avgf second-half)
-                           avg-first (ut/avgf first-half)
-                           raw-pct (* (/ (- avg-sec avg-first) avg-first) 100)
-                           pct-chg (Math/abs (Math/ceil raw-pct))
-                           direction (cond (> raw-pct 0) "up"
-                                           (< raw-pct 0) "down"
-                                           :else "stable")
-                           magnitude (cond
-                                       (>= pct-chg 50) "dramatically"
-                                       (>= pct-chg 25) "significantly"
-                                       (>= pct-chg 10) "noticeably"
-                                       (>= pct-chg 5) "moderately"
-                                       (>= pct-chg 1) "slightly"
-                                       :else "marginally")]
-                       (cond
-                         (and (= direction "stable")
-                              (= avg-first avg-sec))
-                         "flat"
-                         (and (= direction "stable")
-                              (= (Math/floor avg-sec) (Math/floor avg-first)))
-                         "mostly stable"
-                         :else (str magnitude " " direction)))
-                     (catch Throwable _ "not enough data"))
-             label (str label-str
-                        (let [pref (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
-                              suff (str " max " (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
-                                        ", min " (ut/nf (float (apply min truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
-                                        ", avg " (ut/nf (float (ut/avgf truncated))) (when (not (= "%" symbol-str)) " ") symbol-str)
-                              fwidth (count (str  label-str pref suff))
-                              room? (< fwidth (- console-width 6))]
-                          (str pref
-                               (if room? (apply str (repeat (- (- console-width 6) fwidth ) " ")) "")
-                               suff))
-                        )
-             max-label-length (- console-width 6)
-             fitted-label (if (<= (count label) max-label-length)
-                            label
-                            (str (subs label 0 (- max-label-length 3)) "..."))
-             padding (str (apply str (repeat (- console-width (count fitted-label) 4) " ")) " ")
-             label-row (str "│ " (str "\u001B[1m" (colorize fitted-label) reset-code) padding "│")
-             start-index (- (count usage-vals) (count truncated))
+          max-values (- console-width border-width label-padding 4)
+          truncated (take-last max-values usage-vals)
+          mmax (apply max truncated)
+          mmin (apply min truncated)
+          adjusted-min (* mmin 0.9) ; 90% to avoid zero bar 
+          value-range (- mmax adjusted-min)
+          normalized (if (zero? value-range)
+                       (repeat (count truncated) 0)
+                       (map #(int (/ (* (- % adjusted-min) (* rows 8)) value-range)) truncated))
+          bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+          color-code (get ansi-colors color "")
+          reset-code "\u001B[0m"
+          colorize (fn [s] (str color-code s reset-code))
+          get-bar-char (fn [height row]
+                         (let [row-height (- height (* row 8))]
+                           (cond
+                             (and (zero? height) (not= row 0)) " "
+                             (and (zero? height) (zero? row)) "▁"
+                             (<= height (* row 8)) " "
+                             (> row-height 8) "█"
+                             :else (nth bar-chars row-height))))
+          border-line (apply str (repeat (- console-width 2) "─"))
+          border-top (str "╭" border-line "╮")
+          border-bottom (str "╰" border-line "╯")
+          time-span (count truncated)
+          seconds (* time-span freq)
+          trend (try
+                  (let [hchunk (Math/floor (/ (count truncated) 2))
+                        first-half (take hchunk truncated)
+                        second-half (drop hchunk truncated)
+                        avg-sec (ut/avgf second-half)
+                        avg-first (ut/avgf first-half)
+                        raw-pct (* (/ (- avg-sec avg-first) avg-first) 100)
+                        pct-chg (Math/abs (Math/ceil raw-pct))
+                        direction (cond (> raw-pct 0) "up"
+                                        (< raw-pct 0) "down"
+                                        :else "stable")
+                        magnitude (cond
+                                    (>= pct-chg 50) "dramatically"
+                                    (>= pct-chg 25) "significantly"
+                                    (>= pct-chg 10) "noticeably"
+                                    (>= pct-chg 5) "moderately"
+                                    (>= pct-chg 1) "slightly"
+                                    :else "marginally")]
+                    (cond
+                      (and (= direction "stable")
+                           (= avg-first avg-sec))
+                      "flat"
+                      (and (= direction "stable")
+                           (= (Math/floor avg-sec) (Math/floor avg-first)))
+                      "mostly stable"
+                      :else (str magnitude " " direction)))
+                  (catch Throwable _ "not enough data"))
+          label (str label-str
+                     (let [pref (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
+                           suff (str " max " (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+                                     ", min " (ut/nf (float (apply min truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+                                     ", avg " (ut/nf (float (ut/avgf truncated))) (when (not (= "%" symbol-str)) " ") symbol-str)
+                           fwidth (count (str  label-str pref suff))
+                           room? (< fwidth (- console-width 6))]
+                       (str pref
+                            (if room? (apply str (repeat (- (- console-width 6) fwidth) " ")) "")
+                            suff)))
+          max-label-length (- console-width 6)
+          fitted-label (if (<= (count label) max-label-length)
+                         label
+                         (str (subs label 0 (- max-label-length 3)) "..."))
+          padding (str (apply str (repeat (- console-width (count fitted-label) 4) " ")) " ")
+          label-row (str "│ " (str "\u001B[1m" (colorize fitted-label) reset-code) padding "│")
+          start-index (- (count usage-vals) (count truncated))
 
-             chunked-segments (atom [])
-             draw-row (fn [row-data row]
-                        (let [graph-data (apply str
-                                                (map-indexed
-                                                 (fn [idx ch]
-                                                   (if (zero? (rem (+ idx start-index) time-marker-interval))
-                                                     (do (when (= row 0) (swap! chunked-segments conj "X"))
-                                                         (str "." (colorize ch)))
-                                                     (do (when (= row 0) (swap! chunked-segments conj (nth truncated idx)))
-                                                         (colorize ch))))
-                                                 row-data))
-                              padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
-                          (str "│ " graph-data padding "│")))
-             agg-label (str ", " (if (= agg "avg") "averaged" "summed"))
-             legend (str (when (> freq 1)
-                           (str " freq: " freq))
-                         " (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str agg-label)) ")")
-             legend (cstr/replace legend ", -" " -")
-             legend (str legend (apply str (repeat (- console-width (count legend) 9) " ")) (.format (java.text.SimpleDateFormat. "HH:mm:ss") (java.util.Date.)))]
-         (println border-top)
-         (println label-row)
-         (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
-         (doseq [row (range (dec rows) -1 -1)]
-           (println (draw-row (map #(get-bar-char % row) normalized) row)))
+          chunked-segments (atom [])
+          draw-row (fn [row-data row]
+                     (let [graph-data (apply str
+                                             (map-indexed
+                                              (fn [idx ch]
+                                                (if (zero? (rem (+ idx start-index) time-marker-interval))
+                                                  (do (when (= row 0) (swap! chunked-segments conj "X"))
+                                                      (str "." (colorize ch)))
+                                                  (do (when (= row 0) (swap! chunked-segments conj (nth truncated idx)))
+                                                      (colorize ch))))
+                                              row-data))
+                           padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+                       (str "│ " graph-data padding "│")))
+          agg-label (str ", " (if (= agg "avg") "averaged" "summed"))
+          legend (str (when (> freq 1)
+                        (str " freq: " freq))
+                      " (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str agg-label)) ")")
+          legend (cstr/replace legend ", -" " -")
+          legend (str legend (apply str (repeat (- console-width (count legend) 9) " ")) (.format (java.text.SimpleDateFormat. "HH:mm:ss") (java.util.Date.)))]
+      (println border-top)
+      (println label-row)
+      (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+      (doseq [row (range (dec rows) -1 -1)]
+        (println (draw-row (map #(get-bar-char % row) normalized) row)))
          ;;(ut/pp [:start-index start-index (count truncated) (for [e (split-vector-at-x @chunked-segments)] (count e))])
-         (println (let [;visible-chunks-cnt (int (Math/ceil (/ (count truncated) time-marker-interval)))
-                        chunks (vec (split-vector-at-x @chunked-segments)) ;; (partition-all time-marker-interval truncated)
+      (println (let [;visible-chunks-cnt (int (Math/ceil (/ (count truncated) time-marker-interval)))
+                     chunks (vec (split-vector-at-x @chunked-segments)) ;; (partition-all time-marker-interval truncated)
                         ;;complete-chunks chunks ;; (vec (drop-last chunks))
-                        fchunks (vec (take-last (count chunks) (partition-all time-marker-interval usage-vals)))
+                     fchunks (vec (take-last (count chunks) (partition-all time-marker-interval usage-vals)))
                         ;;_ (ut/pp [:chunks-segs (count chunks) visible-chunks-cnt (count truncated)])
-                        value-strings (apply str (for [chunk-idx (range (count fchunks))
-                                                       :let [chunk (vec (get chunks chunk-idx))
-                                                             chunks-size (count chunk)
-                                                             final-chunk? (= chunk-idx (dec (count chunks)))
+                     value-strings (apply str (for [chunk-idx (range (count fchunks))
+                                                    :let [chunk (vec (get chunks chunk-idx))
+                                                          chunks-size (count chunk)
+                                                          final-chunk? (= chunk-idx (dec (count chunks)))
                                                              ;last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])
-                                                             last-chunk-full (if (> chunk-idx 0) (vec (get fchunks (- chunk-idx 1))) [0])
-                                                             chunk-full (vec (get fchunks chunk-idx))]]
-                                                   (let [avg-last (ut/avgf last-chunk-full)
-                                                         avg-this (ut/avgf chunk-full)
-                                                         diff-last (-  avg-this avg-last)
-                                                         vv (* (/ diff-last avg-this) 100)
-                                                         lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%"))
-                                                         lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
-                                                         lbc (count (str lb))
+                                                          last-chunk-full (if (> chunk-idx 0) (vec (get fchunks (- chunk-idx 1))) [0])
+                                                          chunk-full (vec (get fchunks chunk-idx))]]
+                                                (let [avg-last (ut/avgf last-chunk-full)
+                                                      avg-this (ut/avgf chunk-full)
+                                                      diff-last (-  avg-this avg-last)
+                                                      vv (* (/ diff-last avg-this) 100)
+                                                      lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%"))
+                                                      lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
+                                                      lbc (count (str lb))
                                                          ;;_ (ut/pp [:ll chunk-idx lbc chunks-size (count chunks) (count fchunks) (count chunk-full)  (apply + chunk-full)])
-                                                         ]
-                                                     (if (< lbc chunks-size)
+                                                      ]
+                                                  (if (< lbc chunks-size)
                                                       ;;  (if (= chunk-idx 0)
                                                       ;;    (str lb (apply str (repeat (- (+ 2 chunks-size) lbc) " ")))
                                                       ;;    (str lb (apply str (repeat (- 34 lbc ) " "))))
-                                                       (str lb (apply str (repeat (- (+ 2 chunks-size) lbc (if final-chunk? 2 0)) " ")))
-                                                       (apply str (repeat (+ 2 chunks-size (if final-chunk? -2 0)) " "))))))
-                        vals-line (str "│" "\u001B[1m"
-                                       (colorize value-strings)
-                                       reset-code)
-                        padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
-                    (str vals-line padding " │")))
-         (println border-bottom)
-         (println (str "\u001B[1m" (colorize legend) reset-code)))
-       (catch Throwable e
-         (ut/pp [:bar-graph-error! (str e)
-                 label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
+                                                    (str lb (apply str (repeat (- (+ 2 chunks-size) lbc (if final-chunk? 2 0)) " ")))
+                                                    (apply str (repeat (+ 2 chunks-size (if final-chunk? -2 0)) " "))))))
+                     vals-line (str "│" "\u001B[1m"
+                                    (colorize value-strings)
+                                    reset-code)
+                     padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
+                 (str vals-line padding " │")))
+      (println border-bottom)
+      (println (str "\u001B[1m" (colorize legend) reset-code)))
+    (catch Throwable e
+      (ut/pp [:bar-graph-error! (str e)
+              label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
 
 
 
@@ -6166,10 +6179,10 @@
 
 (defn database-sizes []
   (into {}  (for [[dbname dbtables] (get-table-sizes)]
-    {dbname {:tables (count (keys dbtables)) 
-             :avg-exec (ut/avgf (map last (filter #(= (first %) dbname) @sql/sql-query-log)))
-             :rows (apply + (vals dbtables))}})))
-    
+              {dbname {:tables (count (keys dbtables))
+                       :avg-exec (ut/avgf (map last (filter #(= (first %) dbname) @sql/sql-query-log)))
+                       :rows (apply + (vals dbtables))}})))
+
 ;;(ut/pp (database-sizes))
 
 ;; (ut/pp (sql-exec system-db "delete from client_memory where 1=1;"))
@@ -6290,7 +6303,7 @@
          ;;_ (ut/pp data-base)
              draw-label (fn [data color]
                           (let [[dv kkey _ _] data]
-                            (fig-render (str kkey 
+                            (fig-render (str kkey
                                              (let [vl (str (ut/nf (ut/rnd (ut/avg (take-last 10 dv)) 0)))
                                                    vll (count vl)
                                                    labl (count (str kkey))
@@ -6299,13 +6312,12 @@
                                                    ;_ (ut/pp [vl vll labl spc width])
                                                    ]
                                                ;(str (apply str (repeat (Math/ceil (/ (- width spc) 3)) " ")) vl)
-                                               (str " " vl))
-                                             ) color
+                                               (str " " vl))) color
                                         ;;"data/Cybermedium.flf" ;;(figlet/load-flf "data/Cybermedium.flf")
                                         )))
              draw-it (fn [ff color data]
                        (let [[data-vec kkey sym sum?] data
-                             data-vec (if limit? (take-last 
+                             data-vec (if limit? (take-last
                                                   ;(* (* ff width) 1.2)
                                                   (* ff width)
                                                   data-vec) data-vec)]
@@ -6318,9 +6330,7 @@
                                  ;;; _ (ut/pp [:dd dd])
                                   ;;dd (if (>= ff 15) (vec (drop-last dd)) dd)
                                   ;;dd (pop dd)
-                                  ] dd)
-                            
-                            )
+                                  ]dd))
                           ;(str kkey " : " kks) 
                           (str kkey)
                           sym :color color :freq ff :agg (if sum? "sum" "avg") :width width)))
@@ -6513,7 +6523,7 @@
                    sub-types (select-keys sub-types (filter #(not (cstr/includes? (str %) "||")) (keys sub-types)))
                    ;; ^^ flow tracker subs have messy keypath parents and are generally one-offs. noise.
                    server-subs ttl]
-               
+
                (swap! db/server-atom merge
                       {:cpu-chart      (ut/capture-output #(draw-stats [:cpu] [15 90 120 600 1800 3600] false 103 true))
                        :mem-chart      (ut/capture-output #(draw-stats [:mem] [15 90 120 600 1800 3600] false 103 true))
@@ -6527,7 +6537,7 @@
                        :memory         mm
                        :watchers       watchers
                        :subs           ttl})
-               
+
               ;;  (swap! server-atom assoc :cpu-chart (ut/capture-output #(draw-stats [:cpu] [15 90 120 600 1800 3600] false 103 true)))
               ;;  (swap! server-atom assoc :mem-chart (ut/capture-output #(draw-stats [:mem] [15 90 120 600 1800 3600] false 103 true)))
               ;;  (swap! server-atom assoc :threads-chart (ut/capture-output #(draw-stats [:threads] [15 90 120 600 1800 3600] false 103 true)))
@@ -6540,7 +6550,7 @@
                (ut/pp [(get @db/father-time :now-seconds)
                        :jvm-stats
                        {;:*cached-queries              (count @sql-cache)
-                       
+
                         ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
                         ;:clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
                         :schedulers-last-run          @scheduler-atom
@@ -6567,7 +6577,7 @@
         ;; (ut/pp [:latency-adaptations @dynamic-timeouts])
 
                   ;; [kks & [freqs label? width limit?]]
-         (draw-stats [:cpu :mem :threads] [15] false nil true)
+        (draw-stats [:cpu :mem :threads] [15] false nil true)
         ;; (draw-stats [:cpu :mem :threads] [15] false nil false)
 
         ;(ut/pp [:repl-introspections @evl/repl-introspection-atom])
@@ -6688,8 +6698,7 @@
         ;;       (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
         )
       ;;(catch Exception e (ut/pp [:jvm-stats (str e)]))
-      (catch clojure.lang.ExceptionInfo e (ut/ppln (.getData e)))
-      )))
+      (catch clojure.lang.ExceptionInfo e (ut/ppln (.getData e))))))
 
 
 
@@ -7055,22 +7064,22 @@
 ;(ext/create-dirs "./fabric-inputs") 
 
 (defn fabric-run [opts-map]
-   (doall
-    (let [_ (ut/pp [:fabric-run opts-map])
+  (doall
+   (let [_ (ut/pp [:fabric-run opts-map])
          ;context (get opts-map :context)
          ;pattern (get opts-map :pattern)
-          {:keys [context pattern model client-name runner id]} opts-map
+         {:keys [context pattern model client-name runner id]} opts-map
           ;view-name (when context (last (ffirst context)))
-          opts-map (cond ;(and context (= pattern "clover"))
+         opts-map (cond ;(and context (= pattern "clover"))
                          ;(assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n "))
 
-                         (and context (= pattern "clover"))
-                         (let [runner-hint (get-in (config/settings) [:runners runner :pattern-hint])]
-                           (assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n " 
-                                                       (when runner-hint 
-                                                         (str "##SPECIAL BLOCK TYPE INSTRUCTIONS:  \n" (str runner-hint) )))))
+                    (and context (= pattern "clover"))
+                    (let [runner-hint (get-in (config/settings) [:runners runner :pattern-hint])]
+                      (assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n "
+                                                  (when runner-hint
+                                                    (str "##SPECIAL BLOCK TYPE INSTRUCTIONS:  \n" (str runner-hint))))))
 
-                         :else opts-map)
+                    :else opts-map)
 
           ;; prev-times       (get @times-atom [pattern model] [-1])
           ;; ship-est         (fn [client-name]
@@ -7081,13 +7090,13 @@
           ;;                         (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
           ;; _ (ship-est client-name)
 
-          command (fabric (dissoc opts-map :context :runner))
-          result (run-shell-command command)
-          output (get result :output)]
-      (write-local-file (str "../fabric-sessions/" id)
-                        (str (ut/millis-to-date-string (System/currentTimeMillis)) " :" (get opts-map :model)
-                             "\n \n" output "\n \n \n") true)
-      [output opts-map])))
+         command (fabric (dissoc opts-map :context :runner))
+         result (run-shell-command command)
+         output (get result :output)]
+     (write-local-file (str "../fabric-sessions/" id)
+                       (str (ut/millis-to-date-string (System/currentTimeMillis)) " :" (get opts-map :model)
+                            "\n \n" output "\n \n \n") true)
+     [output opts-map])))
 
 
 ;; (kick :powerful-oval-gorilla-17 [:estimate] {:test {:times [2 3 2 33 22] :run-id "fsdfsdfsdff2f23f"}} nil nil nil)

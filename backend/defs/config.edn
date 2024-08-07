@@ -174,41 +174,57 @@
                       :syntax "clojure"
                       :ext ".clj"
                       :kits {:get-outliers {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
-                                                       (vec (apply concat (for [[k v] client-panels
+                                                       (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
                                                                                 :when (get v :queries)]
                                                                             (for  [kk (keys (get v :queries))]
                                                                               [k :queries kk])))))
                                             :output :kit-map
-                                            :kit-view-exprs [(let [panel-key :panel-key
-                                                                   opt1 (keyword (str (cstr/replace (str panel-key) ":" "") "/opts-key1"))
-                                                                   opt2 (keyword (str (cstr/replace (str panel-key) ":" "") "/opts-key2"))] ;; runs in the host nrepl
-                                                               [:v-box :children
-                                                                [[:h-box
-                                                                  :gap "10px"
-                                                                  :children (for [rr (range 4)]
-                                                                              [:box
-                                                                               :padding "6px"
-                                                                               :child (str "opt1" rr)
-                                                                               :style {:border "1px solid #ffffff33"
-                                                                                       :background-color [:when [:= opt1 rr] "pink"]
-                                                                                       :font-size "22px" :cursor "pointer"}
-                                                                               :attr {:on-click [:set-parameter :opts-key1 rr]}])]
+                                            :kit-view-opts {:max-combos 4 ;; will be applied, client-side when view starts up
+                                                            :dimensions-to-scan []}
+                                            :kit-view-exprs [(let [panel-key :panel-key  ;; runs in the host nrepl
+                                                                   max-combos (keyword (str (cstr/replace (str panel-key) ":" "") "/max-combos"))
+                                                                   query-meta :query-metadata
+                                                                   dimensions (vec (for [[k {:keys [:group-by?]}]
+                                                                                         (get query-meta :fields)
+                                                                                         :when group-by?] k))
+                                                                   dimensions-to-scan (keyword (str (cstr/replace (str panel-key) ":" "") "/dimensions-to-scan"))]
+                                                               [:v-box 
+                                                                :size "auto"
+                                                                :align :center
+                                                                :padding "6px"
+                                                                :gap "10px"
+                                                                :children
+                                                                [[:box :child "dimensional outliers options" 
+                                                                  :style {:font-weight 700
+                                                                          :font-size "45px"
+                                                                          :color "orange"
+                                                                          :font-family "Homemade Apple"}]
+                                                                 [:box :child "group-by dimensions to include"]
                                                                  [:h-box
-                                                                  :gap "10px"
-                                                                  :children (for [rr (range 5)]
+                                                                  :gap "8px"
+                                                                  :size "auto"
+                                                                  :children (for [dd dimensions]
                                                                               [:box
+                                                                               :size "auto"
                                                                                :padding "6px"
-                                                                               :child (str "opt2" rr)
+                                                                               :child (str dd)
                                                                                :style {:border "1px solid #ffffff33"
-                                                                                       :background-color [:when [:= opt2 rr] "cyan"]
-                                                                                       :font-size "22px" :cursor "pointer"}
-                                                                               :attr {:on-click [:set-parameter :opts-key2 rr]}])]
+                                                                                       :background-color [:when [:some dd dimensions-to-scan] "pink"]
+                                                                                       :font-size "18px" :cursor "pointer"}
+                                                                               :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])]
+                                                                 [:box :child "max dimension combos to run"]
                                                                  [:h-box 
-                                                                  :children [[:string3 opt1] [:string3 opt2]] :gap "10px"]
+                                                                  :gap "10px"
+                                                                  :children [[:slider :max-combos 2 10 1 200 max-combos]
+                                                                                    [:box :child [:string3 max-combos]]]]
                                                                  [:h-box
-                                                                  :justify :between
+                                                                  ;:justify :between
+                                                                  :style {:font-size "33px"
+                                                                          :font-weight 700}
+                                                                  :gap "10px"
                                                                   :children [[:box
-                                                                              :style {:border "1px solid green" :cursor "pointer"}
+                                                                              :style {:border "1px solid green"
+                                                                                      :cursor "pointer"}
                                                                               :child "GO?"
                                                                               :attr {:on-click [:set-parameter :go! :go!]}]
                                                                              [:box

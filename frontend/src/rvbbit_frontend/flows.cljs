@@ -4745,23 +4745,23 @@
          ;;_ (ut/tapp>> [:solver-lookup solver-assoc])
          ;; ^^ since from the servers perspective it has no :solver/ prefix, since solver calls are each kw unique (for now)
          alerts          @(ut/tracked-sub ::bricks/alerts {})
-         alerts          (cond in-panel?
-                               (filterv #(or
-                                          (cstr/includes? (str %) (str solver-assoc))
-                                          (cstr/includes? (str %) (str " " data-key " "))) alerts)
+        ;;  alerts          (cond in-panel?
+        ;;                        (filterv #(or
+        ;;                                   (cstr/includes? (str %) (str solver-assoc))
+        ;;                                   (cstr/includes? (str %) (str " " data-key " "))) alerts)
 
-                               (and editor? (vector? selected-view))
-                               (filterv #(not (or
-                                               (cstr/includes? (str %) "Data was not sampled")
-                                               (when (ut/ne? solver-assoc) (cstr/includes? (str %) (str solver-assoc)))
-                                               (cstr/includes? (str %) (str solver-assoc))
-                                               (cstr/includes? (str %) (str " " (last selected-view) " ")))) alerts)
+        ;;                        (and editor? (vector? selected-view))
+        ;;                        (filterv #(not (or
+        ;;                                        (cstr/includes? (str %) "Data was not sampled")
+        ;;                                        (when (ut/ne? solver-assoc) (cstr/includes? (str %) (str solver-assoc)))
+        ;;                                        (cstr/includes? (str %) (str solver-assoc))
+        ;;                                        (cstr/includes? (str %) (str " " (last selected-view) " ")))) alerts)
 
-                               :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
-         alerts          (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts)
-         alerts          (filterv #(if (cstr/includes? (str %) ":block-") 
-                                     (not (some (fn [x] (cstr/includes? (str %) (str x))) (mapv first kps-in-tab)))
-                                     true) alerts)
+        ;;                        :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
+        ;;  alerts          (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts)
+        ;;  alerts          (filterv #(if (cstr/includes? (str %) ":block-") 
+        ;;                              (not (some (fn [x] (cstr/includes? (str %) (str x))) (mapv first kps-in-tab)))
+        ;;                              true) alerts)
         ;;alerts (filterv #(not (cstr/includes? (str %) ":block-8981")) alerts)
          
          estimates       @(ut/tracked-sub ::estimates {})
@@ -4773,10 +4773,11 @@
          max-w           (if (or (nil? max-w) (< max-w 50))
                            300 ;420
                            max-w)
-         alerts          (if (or (> rs-running 0)  
+         alerts          (if (or (> rs-running 0)
                                  (> (count running-kits) 0)
                                  (> (count running-solver-views) 0)
                                  (> (count queries-running) 0))
+                           
                            (conj alerts
                                  [[:v-box 
                                    :width (px max-w)
