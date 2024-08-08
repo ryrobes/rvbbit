@@ -36,8 +36,8 @@
    (let [client-name (get db :client-name)]
      (ut/tapp>> [:pushing-panels-to-server (count (keys panels))])
      {:dispatch-later
-      [{:ms 800
-        :dispatch [::http/insert-alert [:box :child (str "Sending " (keys panels) " panels to server")] 12 1 5]}
+      [;{:ms 800
+       ; :dispatch [::http/insert-alert [:box :child (str "Sending " (keys panels) " panels to server")] 12 1 5]}
        {:ms 800
         :dispatch [::bricks/refresh-history-log]}]
       :dispatch

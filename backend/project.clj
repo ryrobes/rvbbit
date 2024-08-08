@@ -54,10 +54,10 @@
                        [io.pedestal/pedestal.jetty "0.6.4"]]
   :jvm-opts           ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
                        ;;"-Xmx32g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
-                       "-Xmx64g" ;; testing with 64g on my main dev machine
+                       "-Xmx82g" ;; testing with 64g on my main dev machine
                        ;;"-Xms32g" ;; testing
-                       ;;"-XX:+UseG1GC"
-                       ;;"-XX:MaxGCPauseMillis=200"
+                       "-XX:+UseG1GC"
+                       "-XX:MaxGCPauseMillis=200"
                        ;;"-Xss2048k" ;; testing with double the stack space to root out some intermittent flow-runner stack overflow issue... (flows calling flows calling...)
                        "-Xss1536k"
                        "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"] ;; datalevin specific

@@ -1309,7 +1309,7 @@
 (defn clean-sql-from-ui-keys-fn
   [query]
   (let [res (deep-remove-keys query
-                              [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta?
+                              [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta? :_last-run
                                :clicked-row-height :style-rules])]
     res))
 

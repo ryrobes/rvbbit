@@ -887,87 +887,104 @@
          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
      (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history keypath))))))))
 
-(re-frame/reg-event-db ::add-to-sql-history ;; :ran tap is good
-                       (fn [db [_ keypath query]]
-                         (let [;query (dissoc query :col-widths)
-                               query       (ut/clean-sql-from-ui-keys query)
-                               base-sniff? (true? (= (get query :limit) 111))]
-                           (if base-sniff?
-                             (-> db
-                                 (assoc-in (cons :base-sniff-queries keypath) (hash query))
-                                 (assoc-in (cons :query-history keypath) (hash query)))
-                             (assoc-in db (cons :query-history keypath) (hash query))))))
+(re-frame/reg-event-db
+ ::add-to-sql-history ;; :ran tap is good
+ (fn [db [_ keypath query]]
+   (let [;query (dissoc query :col-widths)
+         query       (ut/clean-sql-from-ui-keys query)
+         base-sniff? (true? (= (get query :limit) 111))
+         ;;_ (ut/tapp>> [:add-to-sql-history (str keypath) (hash query) (str query)])
+         ]
+     (if base-sniff?
+       (-> db
+           (assoc-in (cons :base-sniff-queries keypath) (hash query))
+           (assoc-in (cons :query-history keypath) (hash query)))
+       (assoc-in db (cons :query-history keypath) (hash query))))))
 
-(re-frame/reg-event-db ::add-to-sql-history-meta ;; :ran tap is good
-                       (fn [db [_ keypath query]]
-                         (let [;query (dissoc query :col-widths)
-                               query (ut/clean-sql-from-ui-keys query)]
-                           (assoc-in db (cons :query-history-meta keypath) (hash query)))))
+(re-frame/reg-event-db
+ ::add-to-sql-history-meta ;; :ran tap is good
+ (fn [db [_ keypath query]]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
+     (assoc-in db (cons :query-history-meta keypath) (hash query)))))
 
-(re-frame/reg-sub ::lookup-panel-key-by-query-key-alpha
-                  (fn [db {:keys [query-key]}]
-                    (first (remove nil?
-                             (for [[k v] (get db :panels)] (when (some #(= query-key %) (keys (get v :queries))) k))))))
+(re-frame/reg-sub
+ ::lookup-panel-key-by-query-key-alpha
+ (fn [db {:keys [query-key]}]
+   (first (remove nil?
+                  (for [[k v] (get db :panels)] (when (some #(= query-key %) (keys (get v :queries))) k))))))
 
-(re-frame/reg-event-db ::clear-query-history
-                       (fn [db [_ query-id]]
-                         (let [;panel @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
-                               panel @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key query-id})]
-                           (-> db
-                               (assoc-in [:panels panel :queries query-id :_last-run] (ut/get-time-format-str))
-                               (ut/dissoc-in [:query-history query-id])
-                               (ut/dissoc-in [:query-history-meta query-id])))))
+(re-frame/reg-event-db
+ ::clear-query-history
+ (fn [db [_ query-id]]
+   (let [;panel @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
+         panel @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key query-id})]
+     (-> db
+         (assoc-in [:panels panel :queries query-id :_last-run] (ut/get-time-format-str))
+         (ut/dissoc-in [:query-history query-id])
+         (ut/dissoc-in [:query-history-meta query-id])))))
 
-(re-frame/reg-sub ::sql-meta-not-run?
-                  (fn [db {:keys [keypath query]}]
-                    (let [;query (dissoc query :col-widths)
-                          query        (ut/clean-sql-from-ui-keys query)
-                          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
-                      (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history-meta keypath))))))))
+(re-frame/reg-sub
+ ::sql-meta-not-run?
+ (fn [db {:keys [keypath query]}]
+   (let [;query (dissoc query :col-widths)
+         query        (ut/clean-sql-from-ui-keys query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+     (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history-meta keypath))))))))
 
-(re-frame/reg-sub ::sql-style-not-run?
-                  (fn [db {:keys [keypath query pquery]}]
-                    (let [;query (dissoc query :col-widths)
-                          query        (ut/clean-sql-from-ui-keys query)
-                          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
-                      (and not-col-sel? (not (= (hash (str pquery query)) (get-in db (cons :query-history-style keypath))))))))
+(re-frame/reg-sub
+ ::sql-style-not-run?
+ (fn [db {:keys [keypath query pquery]}]
+   (let [;query (dissoc query :col-widths)
+         query        (ut/clean-sql-from-ui-keys query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+     (and not-col-sel? (not (= (hash (str pquery query)) (get-in db (cons :query-history-style keypath))))))))
 
-(re-frame/reg-sub ::sql-tab-not-run?
-                  (fn [db [_ keypath query pquery]]
-                    (let [;query (dissoc query :col-widths)
-                          query        (ut/clean-sql-from-ui-keys query)
-                          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
-                      (and not-col-sel? (not (= (hash (str pquery query)) (get-in db (cons :query-history-tab keypath))))))))
+(re-frame/reg-sub
+ ::sql-tab-not-run?
+ (fn [db [_ keypath query pquery]]
+   (let [;query (dissoc query :col-widths)
+         query        (ut/clean-sql-from-ui-keys query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+     (and not-col-sel? (not (= (hash (str pquery query)) (get-in db (cons :query-history-tab keypath))))))))
 
-(re-frame/reg-event-db ::add-to-sql-history-tab
-                       (fn [db [_ keypath query pquery]]
-                         (let [;query (dissoc query :col-widths)
-                               query (ut/clean-sql-from-ui-keys query)]
-                           (assoc-in db (cons :query-history-tab keypath) (hash (str pquery query))))))
+(re-frame/reg-event-db
+ ::add-to-sql-history-tab
+ (fn [db [_ keypath query pquery]]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
+     (assoc-in db (cons :query-history-tab keypath) (hash (str pquery query))))))
 
-(re-frame/reg-event-db ::add-to-sql-history-style ;; :ran tap is good
-                       (fn [db [_ keypath query pquery]]
-                         (ut/tapp>> [:ran-style keypath query])
-                         (let [;query (dissoc query :col-widths)
-                               query (ut/clean-sql-from-ui-keys query)]
-                           (assoc-in db (cons :query-history-style keypath) (hash (str pquery query))))))
+(re-frame/reg-event-db
+ ::add-to-sql-history-style ;; :ran tap is good
+ (fn [db [_ keypath query pquery]]
+   (ut/tapp>> [:ran-style keypath query])
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
+     (assoc-in db (cons :query-history-style keypath) (hash (str pquery query))))))
 
-(re-frame/reg-sub ::sql-condi-not-run?
-                  (fn [db {:keys [keypath query pquery]}]
-                    (let [;query (dissoc query :col-widths)
-                          query        (ut/clean-sql-from-ui-keys query)
-                          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
-                      (and not-col-sel? (not (= (hash (str pquery query)) (get-in db (cons :query-history-condi keypath))))))))
+(re-frame/reg-sub
+ ::sql-condi-not-run?
+ (fn [db {:keys [keypath query pquery]}]
+   (let [;query (dissoc query :col-widths)
+         query        (ut/clean-sql-from-ui-keys query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+     (and not-col-sel? (not (= (hash (str pquery query)) (get-in db (cons :query-history-condi keypath))))))))
 
-(re-frame/reg-event-db ::add-to-sql-history-condi
-                       (fn [db [_ keypath query pquery]]
-                         (let [;query (dissoc query :col-widths)
-                               query (ut/clean-sql-from-ui-keys query)]
-                           (assoc-in db (cons :query-history-condi keypath) (hash (str pquery query))))))
+(re-frame/reg-event-db
+ ::add-to-sql-history-condi
+ (fn [db [_ keypath query pquery]]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
+     (assoc-in db (cons :query-history-condi keypath) (hash (str pquery query))))))
 
-(re-frame/reg-sub ::condi-value (fn [db {:keys [condi-key]}] (true? (= 1 (get-in db [:post-condi condi-key 0 :v])))))
+(re-frame/reg-sub 
+ ::condi-value 
+ (fn [db {:keys [condi-key]}] (true? (= 1 (get-in db [:post-condi condi-key 0 :v])))))
 
-(re-frame/reg-sub ::client-name (fn [db] (get db :client-name)))
+(re-frame/reg-sub 
+ ::client-name 
+ (fn [db] (get db :client-name)))
 
 (defn theme-pull
   [cmp-key fallback & test-fn]
@@ -1137,6 +1154,7 @@
 (defn sql-data
   ([keypath honey-sql]
    (let [style-rules   (get honey-sql :style-rules)
+         orig-honey-sql honey-sql
          deep-meta?    (true? (= @deep-meta-on-deck (first keypath)))
          sniff?        (= (get @db/sniff-deck (first keypath)) :reco)
          kit-name      (when (and (not sniff?) (keyword? (get @db/sniff-deck (first keypath))))
@@ -1152,9 +1170,9 @@
          hselect       (get honey-sql :select)
          flat          (ut/deep-flatten honey-sql)
          client-name   @(ut/tracked-sub ::client-name {})
-         honey-sql  (ut/postwalk-replacer {:*client-name client-name
+         honey-sql     (ut/postwalk-replacer {:*client-name client-name
                                            :*client-name* client-name
-                                           :*client-name-str (str client-name)} honey-sql)
+                                           :*client-name-str (str client-name)} orig-honey-sql)
          
          ;;;;honey-sql     (assoc honey-sql :connection-id connection-id)
          literal-data? (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
@@ -1163,6 +1181,7 @@
          ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
          ;                                     :*client-name* client-name
          ;                                     :*client-name-str (pr-str client-name)} honey-modded)
+         ;_ (ut/tapp>> [:sql-run1 (str keypath) (str honey-sql)])
          ]
      (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
@@ -1183,13 +1202,16 @@
          :on-timeout  [::http/timeout-response [keypath honey-sql]]
          :timeout     50000}])
      (when deep-meta? (reset! deep-meta-on-deck nil)))
+   
    (when (not (nil? (get honey-sql :refresh-every)))
      (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
+   
    (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))
   
   ([keypath honey-sql connection-id]
    (doall
      (let [style-rules   (get honey-sql :style-rules)
+           orig-honey-sql honey-sql
            deep-meta?    (true? (= @deep-meta-on-deck (first keypath)))
            sniff?        (= (get @db/sniff-deck (first keypath)) :reco)
            kit-name      (when (and (not sniff?) (keyword? (get @db/sniff-deck (first keypath))))
@@ -1218,8 +1240,10 @@
            ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
            ;                                     :*client-name* client-name 
            ;                                     :*client-name-str (str client-name)} honey-modded)
+           ;_ (ut/tapp>> [:sql-run2 (str keypath) (str honey-sql) (hash honey-sql)])
            ]
-       (do (when (not (nil? refresh-every)) (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
+       (do (when (not (nil? refresh-every)) 
+             (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
            (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message     {:kind          :honey-xcall
@@ -1238,10 +1262,12 @@
                                   :on-timeout  [::http/timeout-response [keypath honey-sql]]
                                   :timeout     50000}])
            (when deep-meta? (reset! deep-meta-on-deck nil))
+
            (when (or kit-name ;; clear on deck atom
                      sniff?)
              (swap! db/sniff-deck dissoc (first keypath)))
-           (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))))))
+           
+           (ut/tracked-dispatch [::add-to-sql-history keypath orig-honey-sql]))))))
 
 
 
