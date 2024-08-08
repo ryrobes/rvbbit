@@ -4729,19 +4729,19 @@
          rs-running      @(ut/tracked-sub ::bricks/runstreams-running {})
          rs-running-list @(ut/tracked-sub ::bricks/runstreams-running-list {})
          queries-running @(ut/tracked-sub ::bricks/queries-running {})
-         selected-view   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
-         selected-block  @(ut/tracked-sub ::bricks/selected-block {})
+         ;selected-view   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+         ;selected-block  @(ut/tracked-sub ::bricks/selected-block {})
          editor?         @(ut/tracked-sub ::bricks/editor? {})
          in-panel?       (and (or panel-key data-key) editor?)
          ;;;_ (ut/tapp>> [panel-key data-key @db/solver-fn-lookup])
          ;filtered-solver-lookup (select-keys @db/solver-fn-lookup (for [e kps-in-tab] [:panels (first e) (last e)]))
-         solver-assoc    (cond in-panel?
-                               (cstr/replace (str (get @db/solver-fn-lookup [:panels panel-key data-key])) ":solver/" "")
+        ;;  solver-assoc    (cond in-panel?
+        ;;                        (cstr/replace (str (get @db/solver-fn-lookup [:panels panel-key data-key])) ":solver/" "")
 
-                               (and editor? (vector? selected-view))
-                               (cstr/replace (str (get @db/solver-fn-lookup [:panels selected-block (last selected-view)])) ":solver/" "")
+        ;;                        (and editor? (vector? selected-view))
+        ;;                        (cstr/replace (str (get @db/solver-fn-lookup [:panels selected-block (last selected-view)])) ":solver/" "")
 
-                               :else nil)
+        ;;                        :else nil)
          ;;_ (ut/tapp>> [:solver-lookup solver-assoc])
          ;; ^^ since from the servers perspective it has no :solver/ prefix, since solver calls are each kw unique (for now)
          alerts          @(ut/tracked-sub ::bricks/alerts {})
@@ -4762,7 +4762,7 @@
         ;;  alerts          (filterv #(if (cstr/includes? (str %) ":block-") 
         ;;                              (not (some (fn [x] (cstr/includes? (str %) (str x))) (mapv first kps-in-tab)))
         ;;                              true) alerts)
-        ;;alerts (filterv #(not (cstr/includes? (str %) ":block-8981")) alerts)
+        ;; alerts (filterv #(not (cstr/includes? (str %) ":block-8981")) alerts)
          
          estimates       @(ut/tracked-sub ::estimates {})
          running-kits    @(ut/tracked-sub ::running-kits {}) 

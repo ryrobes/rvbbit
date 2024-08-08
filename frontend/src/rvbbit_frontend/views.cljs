@@ -2767,8 +2767,8 @@
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [re-com/h-box
                                                                                                 :children [
-                                                                                                           [bricks/reecatch
-                                                                                                            [flows/alert-box selected-block data-key]]
+                                                                                                          ;;  [bricks/reecatch
+                                                                                                          ;;   [flows/alert-box selected-block data-key]]
                                                                                                            [bricks/panel-code-box
                                                                                                             (fn [] selected-block) ;; sneaky sneaky, react.... :/
                                                                                                             (fn [] s-kp)
@@ -2791,8 +2791,8 @@
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [re-com/h-box
                                                                                                 :children [
-                                                                                                           [bricks/reecatch
-                                                                                                            [flows/alert-box selected-block data-key]]
+                                                                                                          ;;  [bricks/reecatch
+                                                                                                          ;;   [flows/alert-box selected-block data-key]]
                                                                                                            [bricks/panel-string-box
                                                                                                             (fn [] selected-block)
                                                                                                             (fn [] s-kp)
@@ -3038,7 +3038,7 @@
                                        solver-meta-spy?) (let [are-solver           (get @db/solver-fn-lookup [:panels selected-block data-key])
                                                                meta-data-ckp-str    (str (ut/replacer are-solver ":solver/" "solver-meta/"))
                                                                meta-data-ckp        (keyword meta-data-ckp-str)
-                                                               out-type             @(ut/tracked-sub ::repl-output-type {:panel-key selected-block :view-name data-key})
+                                                               out-type             @(ut/tracked-sub ::bricks/repl-output-type {:panel-key selected-block :view-name data-key})
                                                                ;meta-data-ckp-output (keyword (str meta-data-ckp-str ">output>evald-result>out"))
                                                                meta-data-ckp-output (if (= out-type :output-live)
                                                                                       (keyword (str meta-data-ckp-str ">incremental"))
@@ -3204,7 +3204,7 @@
 
                                     [re-com/h-box
                                      :style {:font-size   "11px"
-                                           ;:margin-top "2px"
+                                             :margin-top "4px"
                                              :padding-right "14px"
                                              :font-weight 700}
                                      :justify :between

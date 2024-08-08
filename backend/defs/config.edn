@@ -181,7 +181,7 @@
                                             :output :kit-map
                                             :kit-view-opts {:max-combos 4 ;; will be applied, client-side when view starts up
                                                             :dimensions-to-scan []}
-                                            :kit-view-exprs [(let [panel-key :panel-key  ;; runs in the host nrepl
+                                            :kit-view-exprs [(let [panel-key :panel-key  ;; function "view" runs in the host nrepl
                                                                    max-combos (keyword (str (cstr/replace (str panel-key) ":" "") "/max-combos"))
                                                                    query-meta :query-metadata
                                                                    dimensions (vec (for [[k {:keys [:group-by?]}]
@@ -209,7 +209,8 @@
                                                                                :padding "6px"
                                                                                :child (str dd)
                                                                                :style {:border "1px solid #ffffff33"
-                                                                                       :background-color [:when [:some dd dimensions-to-scan] "pink"]
+                                                                                       :background-color [:when [:some dd dimensions-to-scan] "orange"]
+                                                                                       :color [:when [:some dd dimensions-to-scan] "black"]
                                                                                        :font-size "18px" :cursor "pointer"}
                                                                                :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])]
                                                                  [:box :child "max dimension combos to run"]
@@ -221,14 +222,15 @@
                                                                   ;:justify :between
                                                                   :style {:font-size "33px"
                                                                           :font-weight 700}
-                                                                  :gap "10px"
+                                                                  :gap "50px"
                                                                   :children [[:box
-                                                                              :style {:border "1px solid green"
+                                                                              :style {;:border "1px solid green"
                                                                                       :cursor "pointer"}
                                                                               :child "GO?"
                                                                               :attr {:on-click [:set-parameter :go! :go!]}]
                                                                              [:box
-                                                                              :style {:border "1px solid red" :cursor "pointer"}
+                                                                              :style {;:border "1px solid red" 
+                                                                                      :cursor "pointer"}
                                                                               :child "CANCEL"
                                                                               :attr {:on-click [:set-parameter :go! :cancel!]}]]]]])]
                                             :kit-expr (rabbit-kit-outliers.core/get-outliers  ;; runs in the host nrepl

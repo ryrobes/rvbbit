@@ -7022,7 +7022,18 @@
                             :padding          "0px"
                             :margin-top       "-3px"}]))))])
                   (when (not non-panel?)
-                    [re-com/box :size "auto" :style {:opacity 0.5 :padding-left "20px"} :child
+                    [re-com/box 
+                     :size "auto" 
+                     :justify :center ;:align :center
+                     :style {;:opacity 0.5 
+                             :color (theme-pull :theme/universal-pop-color nil)
+                             :font-weight 700
+                             ;:border "1px solid pink"
+                             :width "1330px"
+                             ;:margin-top "4px"
+                             :font-size "15px"
+                             :padding-left "20px"} 
+                     :child
                      (str ;(count waitings) " "
                       (get @db/context-box query-key " "))])]]))
             [re-com/h-box :children
@@ -7349,8 +7360,10 @@
 (re-frame/reg-event-db
  ::select-output-type
  (fn [db [_ panel-key view-name display]]
-   (assoc-in db [:panels panel-key :display view-name] display)))
-
+   (let [vbunny-keys (filterv #(not (cstr/starts-with? % (str panel-key))) (keys @vbunny/node-ref))]
+     (reset! vbunny/node-ref (select-keys @vbunny/node-ref vbunny-keys))
+     (reset! vbunny/scroll-state (select-keys @vbunny/scroll-state vbunny-keys))
+     (assoc-in db [:panels panel-key :display view-name] display))))
 
 ;;(ut/tapp>> [:ed  (str @(ut/tracked-sub ::editor-panel-selected-view2 {}))])
 
@@ -9966,8 +9979,8 @@
 (def waiting? (reagent/atom {}))
 
 (defn clover-walk-singles
-  [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view]
-  (let [kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view])
+  [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type]
+  (let [kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type])
         in-editor? (not (nil? override-view))
         cc (get @ut/clover-walk-singles-map kk)]
     (if cc ;(ut/ne? cc)
@@ -9992,6 +10005,7 @@
                                      text (vec (cstr/split text #"\n"))]
                                  [reactive-virtualized-console-viewer {:style {:font-weight 700 :font-size "18px"}
                                                                        :text text
+                                                                       :id (str panel-key "-" selected-view "-" output-type)
                                                                        :width ww
                                                                        :height (+ px-height-int 55)}])
                                [edn-box (+ px-width-int 70) (+ px-height-int 55) x] ;; else just use codemirror since it looks nicer
@@ -10052,13 +10066,13 @@
                                                                               ;:line-height "1.1"
                                                                               }
                                                                       :text (wrap-text (if (vector? x) (cstr/join "\n" x) (str x)) (/ (+ px-width-int 40) 9.5))
-                                                                      :id (str panel-key "-" selected-view)
+                                                                      :id (str panel-key "-" selected-view "-" output-type)
                                                                       :width (+ px-width-int 70)
                                                                       :height (+ px-height-int 55)}])
               :terminal (fn [x] [reactive-virtualized-console-viewer
                                  {:style {}
                                   :text x
-                                  :id (str panel-key "-" selected-view)
+                                  :id (str panel-key "-" selected-view "-" output-type)
                                   :width (+ px-width-int 70)
                                   :height (+ px-height-int 55)}])
 
@@ -10066,7 +10080,7 @@
                                                       {:style {}
                                                        :text x
                                                        :follow? follow?
-                                                       :id (str panel-key "-" selected-view)
+                                                       :id (str panel-key "-" selected-view "-" output-type)
                                                        :width (+ w 70)
                                                        :height (+ h 55)}])
 
@@ -11027,9 +11041,16 @@
                                       (not= selected-view-type :queries))
                                  selected-view-type
                                  :else :views)
+        view?  (= selected-view-type :views)
+        query? (= selected-view-type :queries)
         br @(ut/tracked-sub ::block-runners {})
         value-spy? (get-in @db/value-spy [panel-key selected-view] false)
         ;;_ (ut/tapp>>  [:selected-view-type selected-view selected-view-type])
+
+        is-runner? (or (and (not view?) (not query?)) runner-type)
+        output-type (if is-runner?
+                      @(ut/tracked-sub ::repl-output-type {:panel-key panel-key :view-name selected-view})
+                      :value)
 
         ;all-drops @(ut/tracked-sub ::all-drops-of-alpha {:ttype :*})
         ;drop-walks (into {}
@@ -11037,7 +11058,7 @@
         ;                   {d (fn [x] ;(run-drop x)
         ;                        [:box :child [:string x "hey"] :style {:color "red"}])}))
         ;;in-editor? (not (nil? override-view))
-        walk-map (clover-walk-singles panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view)
+        walk-map (clover-walk-singles panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type)
         ;;connection-id @(ut/tracked-subscribe [::panel-connection-id panel-key]) 
         connection-id @(ut/tracked-sub ::panel-connection-id-alpha {:panel-key panel-key})
 
@@ -11048,10 +11069,9 @@
                replacement-view ;{selected-view replacement-view}
                body)
 
-        view?  (= selected-view-type :views)
-        query? (= selected-view-type :queries)
 
-        is-runner? (or (and (not view?) (not query?)) runner-type)
+
+
 
         curr-view-mode (if curr-view-mode curr-view-mode
                            (or @(ut/tracked-sub ::current-view-mode {:panel-key panel-key :data-key selected-view}) :clover))
@@ -11306,15 +11326,28 @@
 
         body (if (and is-runner? (or (= output-type :output-live) (= output-type :output)))
                (let [solver-clover-kw (get @db/solver-fn-lookup [:panels panel-key selected-view])
-                     ;console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">output>evald-result>out"))
+                     running-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" (str "solver-status/" (cstr/replace (str client-name) ":" "") ">")) (str ">running?")))
                      console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/")
                                                      (if (= output-type :output-live)
                                                        ">incremental"
                                                        ">output>evald-result>out")))
+                     running? (when (= output-type :output-live)
+                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-clover-kw]}))
                      console-body @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [console-clover-kw]})]
                  (if console-clover-kw
                    {selected-view
-                    (ut/postwalk-replacer {:*data console-body} clover-fn)}
+                    (if (and (= output-type :output-live) running?)
+                      [re-com/v-box
+                       :children [[re-com/box
+                                   :child  ""
+                                   :height (px hh)  :width (px ww)
+                                   :style  {:background-image "url(images/running.gif)"
+                                            :position "absolute" :left 0 :top 0
+                                            :background-repeat "no-repeat"
+                                            :background-position "center"
+                                            :opacity 0.2}]
+                                  (ut/postwalk-replacer {:*data console-body} clover-fn)]]
+                      (ut/postwalk-replacer {:*data console-body} clover-fn))}
                    body)) body)
 
         ;; body (if data-viewer? ;; else they will try to render shit inside the vectors... 
@@ -12754,7 +12787,9 @@
                                                                                    (get @waiting? kit-runner-key) "rotate-reverse linear infinite"
                                                                                    :else "")]]
                                                           [re-com/box
-                                                           :attr {:on-click (fn []
+                                                           :attr {;:on-mouse-enter #(swap! db/context-box assoc selected-view "nREPL Kit: Generate Dimensional Outliers - Explore and Visualize (by @ryrobes)")
+                                                                  ;:on-mouse-leave #(swap! db/context-box dissoc selected-view)
+                                                                  :on-click (fn []
                                                                               (when (not running?)
                                                                                 (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
                                                                                 (swap! waiting? assoc kit-runner-key true)

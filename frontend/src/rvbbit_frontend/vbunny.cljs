@@ -69,6 +69,9 @@
       [])))
 
 (defonce scroll-state (reagent/atom {}))
+(defonce node-ref (reagent/atom {}))
+
+;; (ut/tapp>> [:scroll-state @scroll-state]) 
 
 (defn px- [x]
   (try (edn/read-string (cstr/replace (str x) "px" "")) 
@@ -268,7 +271,7 @@
 
 
 (defn virtualized-v-box [{:keys [children style width height id follow?] :as props}]
-  (let [node-ref (reagent/atom nil)
+  (let [;node-ref (reagent/atom nil)
         is-at-bottom (reagent/atom true)  ; Initialize as true
         update-visible-range (fn [container-height scroll-top]
                                (let [{:keys [cumulative-heights max-height total-height]} (get @scroll-state id)
@@ -320,7 +323,7 @@
       ;;     (set-scroll-position node)))
       
       (fn [this]
-               (set-scroll-position @node-ref))
+               (set-scroll-position (get @node-ref id)))
 
       ;; :component-did-update
       ;; (fn [this old-argv new-argv]
@@ -329,7 +332,7 @@
 
       :component-will-unmount
       (fn []
-        (when-let [node @node-ref]
+        (when-let [node (get @node-ref id)]
           (.removeEventListener node "scroll" handle-scroll)))
 
       :reagent-render
@@ -349,7 +352,7 @@
                                 {:width (str width "px")
                                  :height (str height "px")})
                   :on-scroll handle-scroll
-                  :ref #(when % (reset! node-ref %))})
+                  :ref #(when % (swap! node-ref assoc id %))})
            [:div {:style {:height (str max-height "px")
                           :position "relative"}}
             (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
@@ -362,21 +365,21 @@
                              :width (str child-width "px")}}
                child])
             
-            (let [ttl (- (count children) 1) ;; just debug bottom labels
-                  rendered (- (- (- start end)) 1)
-                  ss  (+ start 1)
-                  ee (min end ttl)
-                  all? (= rendered ttl)
-                  ee (if all? (dec ee) ee)
-                  ttl (if all? (dec ttl) ttl)
-                  rendered (if all? (dec rendered) rendered)]
-              [:div {:style {:position "fixed"
-                             :bottom 15
-                             :font-size "11px"
-                             :right 13
-                             :font-family (theme-pull :theme/base-font nil)
-                             :color "#ffffff55"}}
-               (str ss "-" ee " of " ttl " (" rendered  " rendered)")])
+            ;; (let [ttl (- (count children) 1) ;; just debug bottom labels
+            ;;       rendered (- (- (- start end)) 1)
+            ;;       ss  (+ start 1)
+            ;;       ee (min end ttl)
+            ;;       all? (= rendered ttl)
+            ;;       ee (if all? (dec ee) ee)
+            ;;       ttl (if all? (dec ttl) ttl)
+            ;;       rendered (if all? (dec rendered) rendered)]
+            ;;   [:div {:style {:position "fixed"
+            ;;                  :bottom 15
+            ;;                  :font-size "11px"
+            ;;                  :right 13
+            ;;                  :font-family (theme-pull :theme/base-font nil)
+            ;;                  :color "#ffffff55"}}
+            ;;    (str ss "-" ee " of " ttl " (" rendered  " rendered)")])
             
             ]]))})))
 

@@ -2266,6 +2266,7 @@
 ;; (ut/pp (keys (:worthy-bronze-grasshopper-42 @db/params-atom)))
 ;; (ut/pp (ut/dissoc-in db/params-atom [:worthy-bronze-grasshopper-42 :block-8309]))
 ;; (ut/pp @db/query-metadata)
+;; (reset! times-atom {})
 
 (defmethod wl/handle-push :run-kit
   [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]
