@@ -2822,7 +2822,7 @@
                    view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
                    output-type   @(ut/tracked-sub ::bricks/repl-output-type {:panel-key selected-block :view-name data-key})
                    rowset-data?  @(ut/tracked-sub ::bricks/has-rowset-data? {:panel-key selected-block :view-name data-key})
-                   modes         (remove nil? (distinct (conj (get view-type-map :modes) (when rowset-data? :rowset))))
+                   modes         (vec (remove nil? (distinct (conj (get view-type-map :modes) (when rowset-data? :rowset)))))
                    current-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key selected-block :data-key data-key})
                    runner? (and (not= data-key-type :views) (not= data-key-type :queries) (not= data-key-type :clover))
 
@@ -2865,17 +2865,17 @@
                                                    :padding-right "5px"
                                                    :background-color "#00000033"
                                                    :border-radius "7px"
-                                                   :font-size "13px"}]]]
+                                                   :font-size "12px"}]]]
 
                               (when runner?
                                 [re-com/h-box
                                  :size "none"
                                  :align :center
                                  :justify :center
-                                 :width "88px"
+                                 :width "112px"
                                  :style {;:margin-top "-1px"
                                          :color (str (theme-pull :theme/editor-outer-rim-color nil))
-                                         :font-size "13px"}
+                                         :font-size "12px"}
                               ; :justify :between 
                                  :children [[re-com/box
                                              :size "auto" :align :start  :justify :start
@@ -2891,6 +2891,18 @@
                                                                          "#00000033")}]
                                             [re-com/box
                                              :size "auto" :align :end :justify :end
+                                             :child "live"
+                                             :attr {:on-click #(ut/tracked-dispatch [::bricks/select-output-type selected-block data-key :output-live])}
+                                             :style {;:border-radius "0px 7px 7px 0px"
+                                                     :padding-left "4px"
+                                                     :padding-right "4px"
+                                                     :color (when (= output-type :output-live) "black")
+                                                     :cursor (when (not (= output-type :output-live)) "pointer")
+                                                     :background-color (if (= output-type :output-live)
+                                                                         (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                         "#00000033")}]
+                                            [re-com/box
+                                             :size "auto" :align :end :justify :end
                                              :child "output"
                                              :attr {:on-click #(ut/tracked-dispatch [::bricks/select-output-type selected-block data-key :output])}
                                              :style {:border-radius "0px 7px 7px 0px"
@@ -2900,13 +2912,29 @@
                                                      :cursor (when (not (= output-type :output)) "pointer")
                                                      :background-color (if (= output-type :output)
                                                                          (str (theme-pull :theme/editor-outer-rim-color nil))
-                                                                         "#00000033")}]]])
+                                                                         "#00000033")}]
+                                            ;; (if (= output-type :output)
+                                            ;;   [re-com/md-icon-button
+                                            ;;    :src (at)
+                                            ;;    :md-icon-name "zmdi-playlist-plus"
+                                            ;;    :on-click #(ut/tracked-dispatch [::bricks/select-output-type selected-block data-key :output-live])
+                                            ;;    :style {:color (theme-pull :theme/editor-outer-rim-color nil)
+                                            ;;            :font-size "20px"
+                                            ;;            :width "15px"
+                                            ;;            :padding-left "2px"
+                                            ;;            ;:margin-top "2px"
+                                            ;;            }]
+                                            ;;   [re-com/box :size "none" :width "15px" :child ""])
+                                            ]])
 
                               [re-com/h-box
                                :style {:padding-right "10px"}
-                               :gap "4px"
-                               :children (for [mode modes ;["clover" "text" "pretty" "rowset" "map-boxes"]
-                                               :let [bkgrd (str (theme-pull :theme/editor-outer-rim-color nil))
+                               :gap "1px"
+                               :children (for [mode-idx (range (count modes)) ;["clover" "text" "pretty" "rowset" "map-boxes"]
+                                               :let [mode (get modes mode-idx)
+                                                     is-last? (= mode-idx (dec (count modes)))
+                                                     is-first? (= mode-idx 0)
+                                                     bkgrd (str (theme-pull :theme/editor-outer-rim-color nil))
                                                      selected? (= mode current-view-mode)
                                                      bkgrd (if (> (count bkgrd) 7) (subs bkgrd 0 7)  bkgrd)]]
                                            [re-com/box :child (str mode)
@@ -2918,8 +2946,10 @@
                                                     :padding-left "3px"
                                                     :padding-right "3px"
                                                     ;:margin-top "2px"
-                                                    :border-radius "7px"
-                                                    :font-size "13px"}])]]
+                                                    :border-radius (cond is-last? "0px 7px 7px 0px"
+                                                                         is-first? "7px 0px 0px 7px"
+                                                                         :else "0px")
+                                                    :font-size "12px"}])]]
                    :style
                    {:font-weight 500
                     :color       (theme-pull :theme/editor-font-color nil)
@@ -3008,8 +3038,11 @@
                                        solver-meta-spy?) (let [are-solver           (get @db/solver-fn-lookup [:panels selected-block data-key])
                                                                meta-data-ckp-str    (str (ut/replacer are-solver ":solver/" "solver-meta/"))
                                                                meta-data-ckp        (keyword meta-data-ckp-str)
+                                                               out-type             @(ut/tracked-sub ::repl-output-type {:panel-key selected-block :view-name data-key})
                                                                ;meta-data-ckp-output (keyword (str meta-data-ckp-str ">output>evald-result>out"))
-                                                               meta-data-ckp-output (keyword (str meta-data-ckp-str ">incremental"))
+                                                               meta-data-ckp-output (if (= out-type :output-live)
+                                                                                      (keyword (str meta-data-ckp-str ">incremental"))
+                                                                                      (keyword (str meta-data-ckp-str ">output>evald-result>out")))
                                                                meta-data            (when are-solver
                                                                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                                                        {:keypath [meta-data-ckp]}))

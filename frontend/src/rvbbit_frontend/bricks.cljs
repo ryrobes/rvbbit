@@ -633,6 +633,7 @@
         ;;  client-namespace-intros (vec (for [nms @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath client-namespaces-refs})]
         ;;                                 (keyword (str "repl-ns/" nms ">introspected"))))
          selected-block          (get db :selected-block)
+         selected-view           @(ut/tracked-sub ::editor-panel-selected-view {})
          editor?                 (get db :editor?)
          flow?                   (get db :flow?)
          selected-tab            (get db :selected-tab)
@@ -686,11 +687,15 @@
          clover-solvers           (if all? clover-solvers-all clover-solvers-tab)
          ;;_ (tapp>> [:clover-solvers clover-solvers  @db/solver-fn-lookup @db/solver-fn-runs])
          clover-solver-outputs    (vec (for [[kk kp] (select-keys (ut/flip-map @db/solver-fn-lookup) clover-solvers)
-                                             :let [[p bid vid] kp]
+                                             :let [[p bid vid] kp
+                                                   out-type @(ut/tracked-sub ::repl-output-type {:panel-key bid :view-name vid})]
                                              :when (and (= p :panels)
-                                                        (= :output @(ut/tracked-sub ::repl-output-type {:panel-key bid :view-name vid})))]
-                                         ;(keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">output>evald-result>out"))
-                                         (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">incremental"))))
+                                                        (or
+                                                         (= out-type :output)
+                                                         (= out-type :output-live)))]
+                                         (if (= out-type :output)
+                                           (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">output>evald-result>out"))
+                                           (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">incremental")))))
          ;_ (tapp>> [:output-solvers clover-solvers  @db/solver-fn-lookup])
          warren-item             (get db :selected-warren-item)
          solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
@@ -730,8 +735,11 @@
                                                    (flatten (for [s in-editor-solvers0
                                                                   :let [meta-kw (str (ut/replacer s ":solver/" "solver-meta/"))
                                                                         ns-key (keyword meta-kw)
+                                                                        out-type @(ut/tracked-sub ::repl-output-type {:panel-key selected-block :view-name selected-view})
                                                                         ;;console-key (keyword (str meta-kw ">output>evald-result>out"))
-                                                                        console-key (keyword (str meta-kw ">incremental"))
+                                                                        console-key (if (= out-type :output-live)
+                                                                                     (keyword (str meta-kw ">incremental"))
+                                                                                     (keyword (str meta-kw ">output>evald-result>out")))
                                                                         ;;ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})
                                                                         ]]
                                                               [(keyword (str (ut/replacer s ":solver/" (str "solver-status/" client-name-str ">"))))
@@ -11296,10 +11304,13 @@
                       @(ut/tracked-sub ::repl-output-type {:panel-key panel-key :view-name selected-view})
                       :value)
 
-        body (if (and is-runner? (= output-type :output))
+        body (if (and is-runner? (or (= output-type :output-live) (= output-type :output)))
                (let [solver-clover-kw (get @db/solver-fn-lookup [:panels panel-key selected-view])
                      ;console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">output>evald-result>out"))
-                     console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">incremental"))
+                     console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/")
+                                                     (if (= output-type :output-live)
+                                                       ">incremental"
+                                                       ">output>evald-result>out")))
                      console-body @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [console-clover-kw]})]
                  (if console-clover-kw
                    {selected-view

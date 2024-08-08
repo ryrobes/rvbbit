@@ -1607,6 +1607,8 @@
   [sub-task subbed-subs]
   (let [replacements (into {} (map (fn [[k v]] [v k]) subbed-subs))] (map (fn [k] (get replacements k k)) sub-task)))
 
+(defonce kit-when-fn-cache (atom {}))
+
 (defn kick [client-name task-id sub-task thread-id thread-desc message-name & args]
   (let [ui-keypath   [:kick] ;;; ^ sub-task is the UI item-key in push ops
         payload      (vec args)
@@ -1628,14 +1630,16 @@
                              subbed-subs   (vec (distinct (get @db/param-var-key-mapping cid [])))
                              sss-map       (into {} (for [[orig subbb] subbed-subs] {subbb orig}))
                              runners       (get (config/settings) :runners)
-                             valid-kits   (into {} (for [[k v] runners
+                             valid-kits    (into {} (for [[k v] runners
                                                          :when (get v :kits)]
                                                      (into {}
                                                            (for [[kit-name {:keys [when-fn]}] (get v :kits)]
                                                              {[k kit-name]
                                                               (try
-                                                                ((eval when-fn) (get @client-panels cid)
-                                                                                (get @client-panels-data cid))
+                                                                (let [res ((eval when-fn) (get @client-panels cid)
+                                                                                          (get @client-panels-data cid))]
+                                                                  ;; not worth to cache given the moving parts needed to be hashed? revisit.
+                                                                  res)
                                                                 (catch Exception e (ut/pp [:when-fn-error k kit-name cid (str e)])))}))))
 
                             ;;  _ (ut/pp [:valid-kits cid valid-kits])
@@ -2293,6 +2297,8 @@
                             :client-panels-data (get @client-panels-data client-name)
                             :client-panels-metadata (get @client-panels-metadata client-name)
                             :query-metadata (get-in @db/query-metadata [client-name data-key])
+                            :height-int (* (get-in @client-panels [client-name panel-key :h]) 50)
+                            :width-int (* (get-in @client-panels [client-name panel-key :w]) 50)
                             :panel-key panel-key
                             :data-key data-key
                             :ui-keypath [:panels panel-key host-runner data-key]})
@@ -2300,7 +2306,7 @@
           limited-postwalk-map (merge
                                 {:transit-file transit-file}
                                 clover-lookup-map
-                                (select-keys context-data [:panel-key :data-key :ui-keypath :query-metadata]))
+                                (select-keys context-data [:panel-key :data-key :ui-keypath :query-metadata :height-int :width-int]))
                                 ;; ^^ only the smaller strucs will we allow to be postwalked, else they need to be loaded from the transit file(s)
 
           ;; big blocking step for shipping kit fn view UI, but times out after a minute and cancels
