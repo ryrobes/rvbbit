@@ -4616,7 +4616,7 @@
          honey-sql (ut/deep-remove-keys honey-sql [:post-process-fn]) ;; disregard if we have
          has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql)))
                        (catch Exception _ false))
-         data-call? (true? (and (not has-rql?) (ut/ne? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))))))
+         data-call? false ; (true? (and (not has-rql?) (ut/ne? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))))))
          runstream
          (fn []
            (try
@@ -4642,10 +4642,10 @@
                     post-sniffed-literal-data? (and (not literal-data?) ;false
                                                     (ut/ne? (filter #(= (last %) :data) (ut/kvpaths honey-sql)))
                                                     (not has-rql?)) ;; <-- look into, clashing
-                    data-literals (or (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))) [:nope])
-                    data-literal-code? (false? (when (or literal-data? post-sniffed-literal-data?)
-                                                 (let [dl (get-in honey-sql data-literals)]
-                                                   (and (vector? dl) (map? (first dl))))))
+                    data-literals [:nope] ;(or (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))) [:nope])
+                    data-literal-code? false ;(false? (when (or literal-data? post-sniffed-literal-data?)
+                                              ;   (let [dl (get-in honey-sql data-literals)]
+                                              ;     (and (vector? dl) (map? (first dl))))))
 
                     data-literals-data (get-in honey-sql data-literals)
                     honey-sql (cond post-sniffed-literal-data?                      (walk/postwalk-replace @literal-data-map
@@ -6593,32 +6593,32 @@
 
         ;;;(ut/pp [:pool-sizes pool-sizes])
 
-        ;; (ut/pp [:pool-sizes
-        ;;         (let [pool-sizes (query-pool-sizes)
-        ;;               pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
-        ;;                                                          :let [runs (get-in v [1 :tasks-run] 0)
-        ;;                                                                avgs (get-in v [1 :tasks-avg-ms] 0)]]
-        ;;                                                      [k (get-in v [1 :current-pool-size])
-        ;;                                                       {:runs runs
-        ;;                                                        :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
-        ;;                                                        :avg avgs}])))
-        ;;               ttls {:pools (count pairs) :threads (apply + (map second pairs))}
-        ;;               prev @pool-ttls-last]
-        ;;           (reset! pool-ttls-last ttls)
-        ;;           (into (sorted-map)
-        ;;                 {:pool-counts pairs
-        ;;                  :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
-        ;;                                                             (let [group-key (first (clojure.string/split (str k) #"\."))]
-        ;;                                                               (update acc group-key (fn [existing-runs]
-        ;;                                                                                       (if existing-runs
-        ;;                                                                                         (+ existing-runs runs)
-        ;;                                                                                         runs)))))
-        ;;                                                           {}
-        ;;                                                           pairs))
-        ;;                  :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
-        ;;                  :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
-        ;;                  :prev prev
-        ;;                  :now ttls}))])
+        (ut/pp [:pool-sizes
+                (let [pool-sizes (query-pool-sizes)
+                      pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
+                                                                 :let [runs (get-in v [1 :tasks-run] 0)
+                                                                       avgs (get-in v [1 :tasks-avg-ms] 0)]]
+                                                             [k (get-in v [1 :current-pool-size])
+                                                              {:runs runs
+                                                               :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
+                                                               :avg avgs}])))
+                      ttls {:pools (count pairs) :threads (apply + (map second pairs))}
+                      prev @pool-ttls-last]
+                  (reset! pool-ttls-last ttls)
+                  (into (sorted-map)
+                        {:pool-counts pairs
+                        ;;  :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
+                        ;;                                             (let [group-key (first (clojure.string/split (str k) #"\."))]
+                        ;;                                               (update acc group-key (fn [existing-runs]
+                        ;;                                                                       (if existing-runs
+                        ;;                                                                         (+ existing-runs runs)
+                        ;;                                                                         runs)))))
+                        ;;                                           {}
+                        ;;                                           pairs))
+                         :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
+                         :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
+                         :prev prev
+                         :now ttls}))])
 
         ;; (ut/pp [:client-cost (let [pool-sizes (query-pool-sizes)
         ;;                            clients (distinct 
@@ -6653,8 +6653,8 @@
         ;;(get @atoms-and-watchers :okay-short-crow-1)
 
 
-        ;; (let [ss (qp/get-queue-stats+)]
-        ;;   (ut/pp [:queue-party-stats+ ss]))
+        (let [ss (qp/get-queue-stats+)]
+          (ut/pp [:queue-party-stats+ ss]))
 
         ;; (ut/pp [:freeze-pop? @(get-atom-splitter-deep :time/now father-time)
         ;;         (get @father-time :now)
@@ -6777,7 +6777,7 @@
          (try
            (let [response (handler request)]
              (deliver response-promise response))
-           (catch Exception e
+           (catch Exception _
              (deliver response-promise {:status 500
                                         :headers {"Content-Type" "text/plain"}
                                         :body "Internal Server Error"})))))
@@ -6794,35 +6794,35 @@
 ;; net/websocket-handler actually creates it own thread pool w https://github.com/clj-commons/dirigiste
 ;; TODO investigate, this could be where the long-term compute leak is coming from...
 
-;; (def ring-options
-;;   {:port                 websocket-port
-;;    :join?                false
-;;    :async?               true
-;;    :input-buffer-size    32768
-;;    :output-buffer-size   131072
-;;    ;:idle-timeout         500000  ;; Reduced idle timeout
-;;    ;:max-idle-time        3000000 ;; Reduced max idle time
-;;    ;;:max-idle-time        15000
-;;    :max-message-size     6291456 ;; 6MB
-;;    :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
-;;    :allow-null-path-info true})
-
-(def ring-options ;; using stock jetty pool (JVM shared, assumably)
+(def ring-options
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :min-threads          1
-   :max-threads          50 ;; Increased max threads
-   :idle-timeout         10000
-   :max-idle-time        15000
-   ;:max-idle-time        15000
-   ;:input-buffer-size    131072 ;; default is 8192
-   ;:output-buffer-size   131072 ;; default is 32768
    :input-buffer-size    32768
    :output-buffer-size   131072
+   ;:idle-timeout         500000  ;; Reduced idle timeout
+   ;:max-idle-time        3000000 ;; Reduced max idle time
+   ;;:max-idle-time        15000
    :max-message-size     6291456 ;; 6MB
-   :websockets           ws-endpoints
+   :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
    :allow-null-path-info true})
+
+;; (def ring-options ;; using stock jetty pool (JVM shared, assumably)
+;;   {:port                 websocket-port
+;;    :join?                false
+;;    :async?               true
+;;    :min-threads          1
+;;    :max-threads          50 ;; Increased max threads
+;;    :idle-timeout         10000
+;;    :max-idle-time        15000
+;;    ;:max-idle-time        15000
+;;    ;:input-buffer-size    131072 ;; default is 8192
+;;    ;:output-buffer-size   131072 ;; default is 32768
+;;    :input-buffer-size    32768
+;;    :output-buffer-size   131072
+;;    :max-message-size     6291456 ;; 6MB
+;;    :websockets           ws-endpoints
+;;    :allow-null-path-info true})
 
 (defonce websocket-server (atom nil))
 

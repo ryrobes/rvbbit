@@ -922,50 +922,150 @@
     (js/Blob. #js [byte-array] options)))
 
 
-(defn data-typer-fn
+(defn data-typer
   [x] ;; exists in both block and db TODO - but they are different!!!
-  (cond (or (and (vector? x) (cstr/includes? (str x) "#object"))
-            (and (vector? x) (fn? (first x))) ;; ?
-            (and (vector? x) (cstr/starts-with? (str (first x)) ":re-com"))
-            (and (vector? x) (cstr/starts-with? (str (first x)) ":vega"))
-            (and (vector? x) (cstr/starts-with? (str (first x)) ":markdown"))
-            (and (vector? x) (cstr/starts-with? (str (first x)) ":div"))
-            (and (vector? x) (cstr/starts-with? (str (first x)) ":span"))
-            (and (vector? x) (is-hiccup? x)))
-        "render-object"
-        (string? x) "string"
-        (boolean? x) "boolean"
-        (or (and (or (list? x) (vector? x)) (ne? x) (every? map? x)) (and (vector-of-maps? x) (not (has-nested-map-values? x))))
-        "rowset" ;;; breaks shit? TODO
-        (vector? x) "vector"
-        (or (and (map? x) (contains? x :classname) (contains? x :subprotocol) (contains? x :subname))
-            (and (map? x) (contains? x :dbtype) (contains? x :dbname) (contains? x :user)))
-        "jdbc-conn"
-        (map? x) "map"
-        (list? x) "list"
-        (nil? x) "nil"
-        (int? x) "integer"
-        (set? x) "set"
-        (= (str (type x)) "cljs.core/LazySeq") "lazy"
-        (= cljs.core/LazySeq (type x)) "lazy"
-        (keyword? x) "keyword"
-        (float? x) "float"
-        (ifn? x) "function"
-        :else "unknown"))
+  (cond
+    ;; (or (and (vector? x) (cstr/includes? (str x) "#object"))
+    ;;     (and (vector? x) (fn? (first x))) ;; ?
+    ;;     (and (vector? x) (cstr/starts-with? (str (first x)) ":re-com"))
+    ;;     (and (vector? x) (cstr/starts-with? (str (first x)) ":vega"))
+    ;;     (and (vector? x) (cstr/starts-with? (str (first x)) ":markdown"))
+    ;;     (and (vector? x) (cstr/starts-with? (str (first x)) ":div"))
+    ;;     (and (vector? x) (cstr/starts-with? (str (first x)) ":span"))
+    ;;     (and (vector? x) (is-hiccup? x)))
+    ;; "render-object"
+    (string? x) "string"
+    (boolean? x) "boolean"
+    (or (and (or (list? x) (vector? x)) (ne? x) (every? map? x)) (and (vector-of-maps? x) (not (has-nested-map-values? x))))
+    "rowset" ;;; breaks shit? TODO
+    (vector? x) "vector"
+    (or (and (map? x) (contains? x :classname) (contains? x :subprotocol) (contains? x :subname))
+        (and (map? x) (contains? x :dbtype) (contains? x :dbname) (contains? x :user)))
+    "jdbc-conn"
+    (map? x) "map"
+    (list? x) "list"
+    (nil? x) "nil"
+    (int? x) "integer"
+    (set? x) "set"
+    (= (str (type x)) "cljs.core/LazySeq") "lazy"
+    (= cljs.core/LazySeq (type x)) "lazy"
+    (keyword? x) "keyword"
+    (float? x) "float"
+    (ifn? x) "function"
+    :else "unknown"))
 
 (def data-typer-atom (atom {}))
 
-(defn data-typer22 [x] (data-typer-fn x)) ;; raw
+;; (defn data-typer22 [x] (data-typer-fn x)) ;; raw
 
-(defn data-typer
-  [x]
-  (let [;x (str [x1 x2 x3])
-        cache (get @data-typer-atom x)]
-    (if (not (nil? cache))
-      cache
-      (let [deep (data-typer-fn x)]
-        (swap! data-typer-atom assoc x deep)
-        deep))))
+;; (defn data-typer
+;;   [x]
+;;   (let [cache (get @data-typer-atom x)]
+;;     (if (not (nil? cache))
+;;       cache
+;;       (let [deep (data-typer-fn x)]
+;;         (swap! data-typer-atom assoc x deep)
+;;         deep))))
+
+
+;; (def border-cache (atom {})) 
+
+;; (defn edge-flush? [edge1 edge2]
+;;   (= edge1 edge2))
+
+;; (defn touching-side? [selected-block other-blocks side]
+;;   (some (fn [other-block]
+;;           (let [[sx sy sh sw] selected-block
+;;                 [ox oy oh ow] other-block]
+;;             (case side
+;;               :left (edge-flush? sx (+ ox ow))
+;;               :right (edge-flush? (+ sx sw) ox)
+;;               :top (edge-flush? sy (+ oy oh))
+;;               :bottom (edge-flush? (+ sy sh) oy))))
+;;         other-blocks))
+
+;; (defn hash-input [style selected-block other-blocks is-radius?]
+;;   (hash [style selected-block (sort other-blocks) is-radius?]))
+
+;; (defn sticky-style [style selected-block other-blocks is-radius?]
+;;   (let [input-hash (hash-input style selected-block other-blocks is-radius?)]
+;;     (if-let [cached-result (get @border-cache input-hash)]
+;;       (do
+;;         ;(tapp>> ["Cache hit for" input-hash])
+;;         cached-result)
+;;       (let [;_ (tapp>> ["Selected block:" (str selected-block)])
+;;             ;_ (tapp>> ["Other blocks:" (str other-blocks)])
+;;             sides (if is-radius?
+;;                     [:top-left :top-right :bottom-right :bottom-left]
+;;                     [:top :right :bottom :left])
+;;             side-styles (for [side sides]
+;;                           (let [horizontal (if (#{:top-left :bottom-left} side) :left :right)
+;;                                 vertical (if (#{:top-left :top-right} side) :top :bottom)
+;;                                 touching-h (touching-side? selected-block other-blocks horizontal)
+;;                                 touching-v (touching-side? selected-block other-blocks vertical)]
+;;                             (if (or touching-h touching-v)
+;;                               (if is-radius? "0px" "none")
+;;                               style)))
+;;             result (if is-radius?
+;;                      (cstr/join " " side-styles)
+;;                      (cstr/join ", " side-styles))]
+;;         ;(tapp>> ["Result:" result])
+;;         (swap! border-cache assoc input-hash result)
+;;         result))))
+
+;; ;; Helper functions for easier use
+;; (defn sticky-border [border-style selected-block other-blocks]
+;;   (sticky-style border-style selected-block other-blocks false))
+
+;; (defn sticky-border-radius [radius selected-block other-blocks]
+;;   (sticky-style radius selected-block other-blocks true))
+
+
+(def border-radius-cache (atom {}))  
+
+(defn generate-occupied-coords [blocks]
+  (reduce (fn [occupied [bx by bh bw]]
+            (into occupied
+                  (for [x (range bx (+ bx bw))
+                        y (range by (+ by bh))]
+                    [x y])))
+          #{}
+          blocks))
+
+(defn adjacent-block? [occupied-coords x y]
+  (or (contains? occupied-coords [x (dec y)]) ;; Up
+      (contains? occupied-coords [(inc x) y]) ;; Right
+      (contains? occupied-coords [x (inc y)]) ;; Down
+      (contains? occupied-coords [(dec x) y]))) ;; Left
+
+(defn corner-exposed? [x y h w occupied-coords corner]
+  (case corner
+    :top-left (not (adjacent-block? occupied-coords x y))
+    :top-right (not (adjacent-block? occupied-coords (+ x w -1) y))
+    :bottom-left (not (adjacent-block? occupied-coords x (+ y h -1)))
+    :bottom-right (not (adjacent-block? occupied-coords (+ x w -1) (+ y h -1)))))
+
+(defn hash-input [radius selected-block other-blocks]
+  (hash [radius selected-block (sort other-blocks)]))
+
+(defn sticky-border-radius [radius selected-block other-blocks]
+  (let [cache-key (hash-input radius selected-block other-blocks)]
+    (if-let [cached-result (get @border-radius-cache cache-key)]
+      cached-result
+      (let [[x y h w] selected-block
+            occupied-coords (generate-occupied-coords other-blocks)
+            corners [:top-left :top-right :bottom-right :bottom-left]
+            corner-styles (for [corner corners]
+                            (if (corner-exposed? x y h w occupied-coords corner)
+                          radius
+                          "0px"))
+        result (cstr/join " " corner-styles)]
+        (swap! border-radius-cache assoc cache-key result)
+        result))))
+
+
+ 
+
 
 
 (defn contains-data?

@@ -1040,9 +1040,9 @@
   ;;                         cruiser/default-viz-shapes))))
   ;;                  "(Re)Sniff Client SQL DBs" 30)
 
-  (start-scheduler 600 ;; sketch for little gain?
-                   db/clean-up-reactor
-                   "Remove unneeded watchers from Reactor" 120)
+  ;; (start-scheduler 600 ;; sketch for little gain?
+  ;;                  db/clean-up-reactor
+  ;;                  "Remove unneeded watchers from Reactor" 120)
 
   (start-scheduler 300 ;; was 5
                    #(ppy/execute-in-thread-pools
@@ -1116,32 +1116,32 @@
   ;;                              (ut/format-duration (get v :started) (System/currentTimeMillis)))))
   ;;                  "Update Solver Statuses")
 
-  (start-scheduler (* 3600 3) ;; 3 hours
-                   #(do
-                      (let [destinations (vec (keys @wss/client-queues))]
-                        (doseq [d destinations]
-                          (wss/alert! d
-                                      [:v-box
-                                       :justify :center
-                                       :style {:opacity 0.7}
-                                       :children [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                                   :child [:box :child (str "Restarting Websocket Server. See you in ~45 seconds...")]]]]
-                                      10 1
-                                      45)))
-                      (Thread/sleep 10000)
-                      (wss/destroy-websocket-server!)
-                      (Thread/sleep 30000)
-                      (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
-                   "Restart Websocket Server, Test Debug" (* 3600 3))
+  ;; (start-scheduler (* 3600 3) ;; 3 hours
+  ;;                  #(do
+  ;;                     (let [destinations (vec (keys @wss/client-queues))]
+  ;;                       (doseq [d destinations]
+  ;;                         (wss/alert! d
+  ;;                                     [:v-box
+  ;;                                      :justify :center
+  ;;                                      :style {:opacity 0.7}
+  ;;                                      :children [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+  ;;                                                  :child [:box :child (str "Restarting Websocket Server. See you in ~45 seconds...")]]]]
+  ;;                                     10 1
+  ;;                                     45)))
+  ;;                     (Thread/sleep 10000)
+  ;;                     (wss/destroy-websocket-server!)
+  ;;                     (Thread/sleep 30000)
+  ;;                     (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
+  ;;                  "Restart Websocket Server, Test Debug" (* 3600 3))
 
-  (start-scheduler 15
-                   #(let [dbs (wss/database-sizes)]
-                      (qp/update-queue-stats-history) ;; has it's own timestamp key
-                      (doseq [[db dbv] dbs]
-                        (swap! wss/sql-metrics assoc db
-                               (conj (get @wss/sql-metrics db [])
-                                     dbv))))
-                   "Simple SQLite Db Stats" 60)
+  ;; (start-scheduler 15
+  ;;                  #(let [dbs (wss/database-sizes)]
+  ;;                     (qp/update-queue-stats-history) ;; has it's own timestamp key
+  ;;                     (doseq [[db dbv] dbs]
+  ;;                       (swap! wss/sql-metrics assoc db
+  ;;                              (conj (get @wss/sql-metrics db [])
+  ;;                                    dbv))))
+  ;;                  "Simple SQLite Db Stats" 60)
 
 
   (start-scheduler 15

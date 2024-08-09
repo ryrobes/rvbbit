@@ -17,11 +17,27 @@
 
 (declare logic-and-params)
 
+(re-frame/reg-sub
+ ::sizes-alpha
+ (fn [db {:keys [panel-key]}]
+   (into
+    (get-in db [:panels panel-key :root])
+    [(get-in db [:panels panel-key :h])
+     (get-in db [:panels panel-key :w])])))
 
+(re-frame/reg-sub ;; dupe from bricks, consolidate to more category focused namespace for all subs and events 
+ ::client-name 
+ (fn [db] (get db :client-name)))
 
-(re-frame/reg-sub ::client-name (fn [db] (get db :client-name)))
+(re-frame/reg-sub ;; dupe from bricks, consolidate to more category focused namespace for all subs and events 
+ ::all-roots-tab-sizes-current
+ (fn [db _]
+   (vec (for [[_ v] (into {} (filter #(and (not (get (val %) :minimized? false))
+                                           (not (get (val %) :hidden? false))
+                                           (= (get db :selected-tab) (get (val %) :tab ""))) (get db :panels)))]
+          (vec (into (get v :root) [(get v :h) (get v :w)]))))))
 
-(defn logic-and-params-fn
+(defn logic-and-params
   [block-map panel-key]
   (if (try (and (ut/ne? block-map) (or (map? block-map) (vector? block-map) (keyword? block-map))) (catch :default _ false))
     (let [;;valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/"))))
@@ -59,10 +75,34 @@
                                logic-kps (into {}
                                                (for [v kps]
                                                  (let [[_ l this that] v]
-                                                   {v (if (logic-and-params-fn l nil) ;; l
+                                                   {v (if (logic-and-params l nil) ;; l
                                                         this
                                                         that)})))]
                            (ut/postwalk-replacer logic-kps obody)))
+          sticky-border-radius (fn [obody]
+                                 (let [kps       (ut/extract-patterns obody :sticky-border-radius 2)
+                                       sel-size  @(ut/tracked-sub ::sizes-alpha {:panel-key panel-key})
+                                       sizes     @(ut/tracked-sub ::all-roots-tab-sizes-current {})
+                                       sizes     (filterv #(not= sel-size %) sizes)
+                                       ;;_ (ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size)])
+                                       logic-kps (into {} (for [v kps]
+                                                            (let [[_ px-val] v]
+                                                              {v (let [sbr (ut/sticky-border-radius px-val sel-size sizes)]
+                                                                   ;(ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size) :sbr (str sbr)])
+                                                                   sbr)})))]
+                                   (walk/postwalk-replace logic-kps obody)))
+          ;; sticky-border (fn [obody]
+          ;;              (let [kps       (ut/extract-patterns obody :sticky-border 2)
+          ;;                    sel-size  @(ut/tracked-sub ::sizes-alpha {:panel-key panel-key})
+          ;;                    sizes     @(ut/tracked-sub ::all-roots-tab-sizes-current {})
+          ;;                    sizes     (filterv #(not= sel-size %) sizes)
+          ;;                              ;;_ (ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size)])
+          ;;                    logic-kps (into {} (for [v kps]
+          ;;                                         (let [[_ px-val] v]
+          ;;                                           {v (let [sbr (ut/sticky-border px-val sel-size sizes)]
+          ;;                                                ;(ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size) :sbr (str sbr)])
+          ;;                                                sbr)})))]
+          ;;                (walk/postwalk-replace logic-kps obody)))          
           when-walk-map2 (fn [obody]
                            (let [kps       (ut/extract-patterns obody :when 3)
                                  logic-kps (into {} (for [v kps] (let [[_ l this] v] {v (when l this)})))]
@@ -160,9 +200,7 @@
                                      _ (when (and lets-go?
                                                   (not (some #(= % :time/now-seconds) clover-kps))
                                                   (not (some #(= % :time/second) clover-kps)))
-                                         (ut/dispatch-delay 100 [::http/insert-alert (ut/solver-alert-clover fkp clover-kps :resolver rtype) 11 1.7 3])
-
-                                         )]
+                                         (ut/dispatch-delay 100 [::http/insert-alert (ut/solver-alert-clover fkp clover-kps :resolver rtype) 11 1.7 3]))]
                                  {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))
           has-fn? (fn [k] (some #(= % k) obody-key-set))
@@ -180,6 +218,8 @@
                           (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS
                           (has-fn? :get-in)         get-in-walk
                           (has-fn? :=)              =-walk-map2
+                          (has-fn? :sticky-border-radius) sticky-border-radius
+                          ;; (has-fn? :sticky-border) sticky-border
                           (has-fn? :if)             if-walk-map2
                           (has-fn? :when)           when-walk-map2
                           (has-fn? :into)           into-walk-map2
@@ -199,13 +239,13 @@
                                                          (into {}
                                                                (for [k templated-strings-vals]
                                                                  {k @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                              {:keypath [k]})})))
+                                                                                     {:keypath [k]})})))
                                    {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
-      (if (ut/ne? (vec (ut/get-compound-keys out-block-map))) (logic-and-params-fn out-block-map panel-key) out-block-map))
+      (if (ut/ne? (vec (ut/get-compound-keys out-block-map))) (logic-and-params out-block-map panel-key) out-block-map))
     block-map))
 
 
-(re-frame/reg-sub ::logic-and-params (fn [_ {:keys [m p]}] (logic-and-params-fn m p)))
+;; (re-frame/reg-sub ::logic-and-params (fn [_ {:keys [m p]}] (logic-and-params-fn m p)))
 
-(defn logic-and-params [m p] @(ut/tracked-sub ::logic-and-params {:m m :p p}))
+;; (defn logic-and-params [m p] @(ut/tracked-sub ::logic-and-params {:m m :p p}))

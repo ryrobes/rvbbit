@@ -70,6 +70,9 @@
                     (= name :watchers/signal)
                     (ThreadPoolExecutor. 3 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
 
+                    (= name :query-runstreams)
+                    (ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.))
+
                     (or (cstr/includes? (str name) "flow-runner/")
                         (cstr/includes? (str name) "nrepl-eval/")
                         (cstr/includes? (str name) "query-runstream/")

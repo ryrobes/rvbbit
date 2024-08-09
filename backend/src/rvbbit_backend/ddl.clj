@@ -1188,6 +1188,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
          (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset rowset]))))
 
 (def sample-kit-output
+  
   {:top-20-outliers
      {:data
         [{:ask-mutates {"Highlight these in your source query?"
@@ -1232,6 +1233,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
           :order 0
           :parameters {}
           :step-mutates {}}
+         
          {:ask-mutates {"Highlight these in your source query?"
                           {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight1640170157]]
                              {:logic [:and [:= :YEAR 2016]]
