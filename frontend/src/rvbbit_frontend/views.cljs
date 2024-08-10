@@ -1424,13 +1424,14 @@
                                                     {:font-size "22px"}]}
                                    :query {:base-key :queries
                                            :default {:select [["heya, friendo" :greetings] [(rand-int 123) :count_stuff]]}}
-                                   :code-query {:base-key :queries
-                                                :default {:select [:*]
-                                                          :from
-                                                          [{:data '(vec
-                                                                    (for
-                                                                     [i (range 45)]
-                                                                      {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}}}
+                                  ;;  :code-query {:base-key :queries
+                                  ;;               :default {:select [:*]
+                                  ;;                         :from
+                                  ;;                         [{:data '(vec
+                                  ;;                                   (for
+                                  ;;                                    [i (range 45)]
+                                  ;;                                     {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}}
+                                   }
                       runners-items (into {} (for [[k v] (-> block-runners-map (dissoc :views) (dissoc :queries))
                                                    :when (get v :slice-bar? true)]
                                                {k {:base-key k  :default (get v :default)}}))

@@ -1,13 +1,15 @@
 {:orders
- {:fields-sys [:field_name :field_type :data_type],
-  :setlists-drag-2 [:show_id :song_name :song_order :ts],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+ {:setlists-drag-2 [:show_id :song_name :song_order :ts],
+  :new-clojure-2-sqlized [:kity :fart :kitty_str],
+  :raw_custom_override346250891__block_2361_clojure_large_bg_ (:query_error),
   :shows (:query_error),
+  :large-bg-sqlized [:ffilename],
   :tour-name-drag-11 [:tour_name :rowcnt],
+  :raw_custom_override_784714488__block_3284_clojure_new_clojure_2_ (:query_error),
   :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
+  :query-10917 [:rowcnt],
   :gen-viz-342 [:rows :song_order],
-  :connections-sys (:query_error),
+  :kitty-str-drag-25 [:kitty_str :rowcnt],
   :setlists (:query_error)},
  :reco-preview "-1489866873",
  :sql-source
@@ -15,13 +17,26 @@
   {:select [:show_id :song_name :song_order :ts],
    :from [[:setlists :hh333]],
    :_last-run "05:53:09"},
-  :setlists
-  {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111},
-  :shows-drag-22
-  {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
-   :from [[:shows :pp193]],
-   :_last-run "21:10:04"},
+  :new-clojure-2-sqlized
+  {:select [:*],
+   :connection-id :restored-star-shaped-moose-41,
+   :_sqlized-at "2024-08-10 16:26:21",
+   :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+   :_sqlized-hash -1870470529,
+   :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]},
+  :raw_custom_override346250891__block_2361_clojure_large_bg_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override346250891__block_2361_clojure_large_bg_],
+   :limit 111},
   :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :large-bg-sqlized
+  {:select [:*],
+   :connection-id :restored-star-shaped-moose-41,
+   :_sqlized-at "2024-08-10 16:24:05",
+   :_sqlized-by [:block-2361 :clojure :large-bg],
+   :_sqlized-hash 1851117399,
+   :from [:raw_custom_override346250891__block_2361_clojure_large_bg_]},
   :tour-name-drag-11
   {:select [:tour_name [[:count 1] :rowcnt]],
    :from
@@ -30,11 +45,46 @@
      :kk455]],
    :group-by [:tour_name],
    :order-by [[:rowcnt :desc]]},
+  :raw_custom_override_784714488__block_3284_clojure_new_clojure_2_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_],
+   :limit 111},
+  :shows-drag-22
+  {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
+   :from [[:shows :pp193]],
+   :_last-run "21:10:04"},
+  :query-10917
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select [:kitty_str [[:count 1] :rowcnt]],
+      :from
+      [[{:select [:*],
+         :_sqlized-at "2024-08-10 16:26:21",
+         :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+         :_sqlized-hash -1870470529,
+         :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]}
+        :zz529]],
+      :group-by [:kitty_str],
+      :order-by [[:rowcnt :desc]]}
+     :dd702]]},
   :gen-viz-342
   {:select [[[[:count 1]] :rows] :song_order],
    :from
    [{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}],
    :group-by [:song_order]},
+  :kitty-str-drag-25
+  {:_sqlize-hash -1870470529,
+   :select [:kitty_str [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*],
+      :_sqlized-at "2024-08-10 16:26:21",
+      :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+      :_sqlized-hash -1870470529,
+      :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]}
+     :zz529]],
+   :group-by [:kitty_str],
+   :order-by [[:rowcnt :desc]]},
   :kick--521967130
   {:select [:*],
    :from
@@ -1079,17 +1129,19 @@
      {:ffilename "b64-image5-18573-66220-4k.webp"}
      {:ffilename "test44aa33aaa.png"}
      {:ffilename "b64-image-53098-89065-4k.webp"}
-     {:ffilename "b64-image-91245-62437-4k.webp"}]}}},
+     {:ffilename "b64-image-91245-62437-4k.webp"}]}},
+  :setlists
+  {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111}},
  :meta
  {nil
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 52,
+     :distinct 1,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 52},
+   :rowcount 1},
   :fields-sys
   {:fields
    {:field_name
@@ -1338,6 +1390,27 @@
      :commons {6 4, 5 3, 15 3},
      :cardinality 60}},
    :rowcount 25},
+  :new-clojure-2-sqlized
+  {:fields
+   {:kity
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {84 1, 390 1, 49 1},
+     :cardinality 100},
+    :fart
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"fart783" 500},
+     :cardinality 0},
+    :kitty_str
+    {:data-type "string",
+     :distinct 499,
+     :group-by? true,
+     :commons {"59976!" 2, "393651!" 1, "630416!" 1},
+     :cardinality 99}},
+   :rowcount 500},
   :kits-drag-39
   {:fields
    {:item_options
@@ -1542,6 +1615,27 @@
       10},
      :cardinality 10}},
    :rowcount 10},
+  :new-clojure-2
+  {:fields
+   {:kity
+    {:data-type "integer",
+     :distinct 150,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :fart
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 0},
+    :kitty-str
+    {:data-type "string",
+     :distinct 149,
+     :group-by? true,
+     :commons {},
+     :cardinality 99}},
+   :rowcount 150},
   :fabric-hop-2
   {:fields
    {:vec-val
@@ -1639,6 +1733,18 @@
      :commons {":kick" 90},
      :cardinality 1}},
    :rowcount 90},
+  :raw_custom_override346250891__block_2361_clojure_large_bg_
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :shows
   {:fields
    {:query_error
@@ -1765,6 +1871,18 @@
       "2018-09-03 10:00:00.000000" 5,
       "2018-09-01 17:03:00.000000" 5},
      :cardinality 80}},
+   :rowcount 500},
+  :large-bg-sqlized
+  {:fields
+   {:ffilename
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"b64-image5-57853-95564-4k.webp" 1,
+      "b64-image3-65849-64925-4k.webp" 1,
+      "b64-image-83886-74618-4k.webp" 1},
+     :cardinality 100}},
    :rowcount 500},
   :rowcnt-drag-2
   {:fields
@@ -1939,6 +2057,18 @@
      :commons {73 16, 75 13, 76 9},
      :cardinality 44}},
    :rowcount 500},
+  :raw_custom_override_784714488__block_3284_clojure_new_clojure_2_
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :gen-viz-828
   {:fields
    {:agg
@@ -2044,6 +2174,15 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :query-10917
+  {:fields
+   {:rowcnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {166396 1},
+     :cardinality 100}},
+   :rowcount 1},
   :gen-viz-342
   {:fields
    {:rows
@@ -2059,6 +2198,21 @@
      :commons {8 1, 18 1, 10 1},
      :cardinality 100}},
    :rowcount 25},
+  :kitty-str-drag-25
+  {:fields
+   {:kitty_str
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"99855259!" 1, "54098070!" 1, "121867200!" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? false,
+     :commons {1 285, 2 213, 3 1},
+     :cardinality 0}},
+   :rowcount 500},
   :connections-sys
   {:fields
    {:query_error
@@ -2400,9 +2554,9 @@
   :block-6308 {:tour-name-drag-11 180},
   :virtual-panel {:kick--521967130 ##Inf},
   :block-2361 {:large-bg 311},
-  :system-connections-list* {:connections-sys 126},
-  :system-tables-list* {:tables-sys 133},
-  :system-fields-list* {:fields-sys 170}},
+  :block-3284 {:new-clojure-2-sqlized 170, :new-clojure-2 137},
+  :block-6523 {:kitty-str-drag-25 180},
+  :block-1254 {:query-10917 211}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -2718,55 +2872,71 @@
    [:block-8963 :queries :shows-drag-22]
    [:block-204 :queries :gen-viz-828]
    [:block-204 :queries :gen-viz-94]
+   [:block-6523 :queries :kitty-str-drag-25]
    [:block-8805 :queries :duration-hours-drag-43]
    [:block-94 :queries :gen-viz-84]
+   [:block-1254 :queries :query-10917]
    [:block-2954 :queries :STREET-drag-3]
    [:block-6308 :queries :tour-name-drag-11]
    [:block-958 :queries :gen-viz-342]
    [:block-7319 :queries :shape-drag-7]
+   [:block-3284 :queries :new-clojure-2-sqlized]
    [:block-3777 :queries :state-drag-3]
    [:block-11795 :queries :offenses-drag-18]
    [:block-1449 :queries :ufo-sightings-drag-9]
    [:block-3392 :queries :offenses-drag-26]
    [:block-4346 :queries :offenses-drag-24]
    [:block-11453 :queries :kits-drag-39]]},
- :memory [211774971 166135775 4294705152],
- :client-name :moving-spherical-oyster-21,
+ :memory [285892665 203126013 4294705152],
+ :client-name :restored-star-shaped-moose-41,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2654, :h 1523},
+ :window {:w 2459, :h 1540},
  :quake-console? false,
- :implicit-rowsets {:solver [nil :large-bg]},
- :post-meta {:gen-viz-342 {:* {:rowcount 25}}, :connections-sys {}},
+ :implicit-rowsets {:solver [nil :large-bg :new-clojure-2]},
+ :post-meta
+ {:gen-viz-342 {:* {:rowcount 25}},
+  :large-bg-sqlized {:* {:rowcount 1041}},
+  :new-clojure-2-sqlized {:* {:rowcount 66666}},
+  :kitty-str-drag-25 {:* {:rowcount 66217}},
+  :query-10917 {:* {:rowcount 1}}},
  :flow-estimates
- {:shows-drag-22 {:times 0.008, :run-id :shows-drag-22},
-  :gen-viz-342 {:times 0.018, :run-id :gen-viz-342},
-  :setlists-drag-2 {:times 0.007, :run-id :setlists-drag-2},
+ {:setlists-drag-2 {:times 0.007, :run-id :setlists-drag-2},
+  :new-clojure-2-sqlized {:times 0.001, :run-id :new-clojure-2-sqlized},
+  :large-bg-sqlized {:times 0.002, :run-id :large-bg-sqlized},
+  :raw-custom-override346250891
+  {:times 0.058, :run-id :raw-custom-override346250891},
   :tour-name-drag-11 {:times 0.001, :run-id :tour-name-drag-11},
-  :raw-custom-override-1339035646
-  {:times 0.051, :run-id :raw-custom-override-1339035646},
-  :raw-custom-override-1350702100
-  {:times 0.106, :run-id :raw-custom-override-1350702100},
-  :tables-sys {:times 0.001, :run-id :tables-sys},
-  :fields-sys {:times 0.001, :run-id :fields-sys}},
+  :shows-drag-22 {:times 0.009, :run-id :shows-drag-22},
+  :raw-custom-override-784714488
+  {:times 4.11, :run-id :raw-custom-override-784714488},
+  :query-10917 {:times 0.115, :run-id :query-10917},
+  :gen-viz-342 {:times 0.015, :run-id :gen-viz-342},
+  :kitty-str-drag-25 {:times 0.113, :run-id :kitty-str-drag-25}},
  :status
  {:heartbeat
   {:kick
-   [:solver/raw-custom-override-1416496928
+   [:solver/raw-custom-override346250891
+    :solver/get-my-colors-1256288661
     :solver-meta/raw-custom-override-1610584445>extra
+    :solver-status/restored-star-shaped-moose-41>raw-custom-override-1489583976>running?
+    :solver/raw-custom-override-784714488
     :solver/raw-custom-override136934373>10>0>2
-    :solver-status/moving-spherical-oyster-21>get-my-colors-1274201231>running?
-    :solver/get-my-colors-1274201231
-    :solver/raw-custom-override-1339035646
+    :solver-meta/raw-custom-override-784714488>output>evald-result>value-hash
+    :solver/get-my-colors1739835827
+    :solver/raw-custom-override-1489583976
+    :solver-status/restored-star-shaped-moose-41>get-my-colors1739835827>running?
+    :solver-meta/raw-custom-override-784714488>output>evald-result>out
+    :solver-status/restored-star-shaped-moose-41>raw-custom-override-784714488
+    :solver-status/restored-star-shaped-moose-41>raw-custom-override346250891>running?
+    :solver-status/restored-star-shaped-moose-41>raw-custom-override-784714488>running?
     :flow-status/live-scratch-flow>*running?
-    :solver/get-my-colors2110332784
-    :solver-status/moving-spherical-oyster-21>get-my-colors2110332784>running?
-    :solver-status/moving-spherical-oyster-21>raw-custom-override-1339035646>running?
-    :solver-status/moving-spherical-oyster-21>raw-custom-override-1416496928>running?
+    :solver-meta/raw-custom-override-784714488
+    :solver-status/restored-star-shaped-moose-41>get-my-colors-1256288661>running?
+    :solver-meta/raw-custom-override346250891>output>evald-result>value-hash
     :solver-meta/raw-custom-override-1610584445>output>evald-result>out]},
-  :alert2 {:alerts :alert2},
-  :alert3 {:alerts :alert2},
-  :alert1 {:alerts :alert2}},
+  :alert3 {:alerts :sample-detail},
+  :alert2 {:alerts :sample-detail}},
  :screen-name "duality-of-lepus33aa",
  :recos-page2 0,
  :selected-tab "azure oyster",
@@ -2781,16 +2951,21 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   1706
+   278
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :base-sniff-queries {:setlists 1669794951, :shows 89957543},
+ :base-sniff-queries
+ {:setlists 1669794951,
+  :shows 89957543,
+  :raw_custom_override346250891__block_2361_clojure_large_bg_ 364127516,
+  :raw_custom_override_784714488__block_3284_clojure_new_clojure_2_ -790440095},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -622366834,
+ :user-params-hash -1801214953,
  :grid-recos? true,
+ :preview-keys2 [],
  :resolved-queries
- {nil {:_last-run "11:06:25"},
+ {nil {:_last-run "16:27:28"},
   :OFFENSE-CODE-GROUP-drag-17
   {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt] :STREET :YEAR],
    :from
@@ -2844,6 +3019,13 @@
   {:select [:show_id :song_name :song_order :ts],
    :from [[:setlists :hh333]],
    :_last-run "05:53:09"},
+  :new-clojure-2-sqlized
+  {:select [:*],
+   :connection-id :restored-star-shaped-moose-41,
+   :_sqlized-at "2024-08-10 16:26:21",
+   :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+   :_sqlized-hash -1870470529,
+   :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]},
   :kits-drag-39
   {:select
    [:client_name
@@ -2938,6 +3120,13 @@
     :UCR_PART
     :YEAR],
    :from [[:offenses :dd484]]},
+  :large-bg-sqlized
+  {:select [:*],
+   :connection-id :restored-star-shaped-moose-41,
+   :_sqlized-at "2024-08-10 16:24:05",
+   :_sqlized-by [:block-2361 :clojure :large-bg],
+   :_sqlized-hash 1851117399,
+   :from [:raw_custom_override346250891__block_2361_clojure_large_bg_]},
   :rowcnt-drag-2
   {:select [[[:sum :rowcnt] :rowcnt_sum]],
    :from
@@ -3061,11 +3250,37 @@
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}],
    :group-by [:country]},
+  :query-10917
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select [:kitty_str [[:count 1] :rowcnt]],
+      :from
+      [[{:select [:*],
+         :_sqlized-at "2024-08-10 16:26:21",
+         :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+         :_sqlized-hash -1870470529,
+         :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]}
+        :zz529]],
+      :group-by [:kitty_str],
+      :order-by [[:rowcnt :desc]]}
+     :dd702]]},
   :gen-viz-342
   {:select [[[[:count 1]] :rows] :song_order],
    :from
    [{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}],
    :group-by [:song_order]},
+  :kitty-str-drag-25
+  {:_sqlize-hash -1870470529,
+   :select [:kitty_str [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*],
+      :_sqlized-at "2024-08-10 16:26:21",
+      :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+      :_sqlized-hash -1870470529,
+      :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]}
+     :zz529]],
+   :group-by [:kitty_str],
+   :order-by [[:rowcnt :desc]]},
   :ufo-sightings-drag-9
   {:select
    [:city
@@ -3167,7 +3382,7 @@
  :panels
  {nil
   {:queries
-   {:tmp-1712068299-hist-sys {:_last-run "10:17:09"}, nil {:_last-run "11:06:25"}}},
+   {:tmp-1712068299-hist-sys {:_last-run "10:17:09"}, nil {:_last-run "16:27:28"}}},
   :block-414
   {:mad-libs-combo-hash ["572062609" "ufo_sightings_drag_9"],
    :name "basic_timeseries - \"date_posted, rows\" - 769",
@@ -3559,6 +3774,21 @@
    :name ":param/tetradss",
    :views {:param-val [:data-viewer :param/tetradss]},
    :queries {}},
+  :block-6523
+  {:h 5,
+   :w 8,
+   :connection-id :restored-star-shaped-moose-41,
+   :name "drag-from-block-3284",
+   :queries
+   {:kitty-str-drag-25
+    {:_sqlize-hash
+     :solver-meta/raw-custom-override-784714488>output>evald-result>value-hash,
+     :select [:kitty_str [[:count 1] :rowcnt]],
+     :from [[:query/new-clojure-2-sqlized :zz529]],
+     :group-by [:kitty_str],
+     :order-by [[:rowcnt :desc]]}},
+   :root [30 12],
+   :tab "azure oyster"},
   :block-2536
   {:h 2,
    :w 16,
@@ -3690,6 +3920,34 @@
      :child
      "Well, I never heard it before, but it sounds uncommon nonsense."]},
    :queries {}},
+  :block-1254
+  {:name "block-1254",
+   :w 5,
+   :selected-view :query-10917,
+   :root [31 5],
+   :h 4,
+   :connection-id :restored-star-shaped-moose-41,
+   :queries
+   {:query-10917
+    {:select [[[:count 1] :rowcnt]], :from [[:query/kitty-str-drag-25 :dd702]]}},
+   :tab "azure oyster",
+   :views
+   {:hare-vw-3
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."]}},
   :block-1913
   {:h 2,
    :w 16,
@@ -3902,6 +4160,50 @@
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-3284
+  {:clojure
+   {:new-clojure-2
+    (do
+      (Thread/sleep 2500)
+      (vec
+        (for
+          [e (range 166666)]
+          {:kity e,
+           :fart "fart783",
+           :kitty-str (str (* (rand-int 3314) e) "!")})))},
+   :name "block-3284",
+   :w 13,
+   :selected-mode {:new-clojure-2 :edn},
+   :selected-view :new-clojure-2,
+   :root [3 19],
+   :h 7,
+   :queries
+   {:new-clojure-2-sqlized
+    {:select [:*],
+     :connection-id :restored-star-shaped-moose-41,
+     :_sqlized-at "2024-08-10 16:26:21",
+     :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override-784714488>output>evald-result>value-hash,
+     :from [:raw_custom_override_784714488__block_3284_clojure_new_clojure_2_]}},
+   :tab "azure oyster",
+   :views
+   {:hare-vw-2
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Why, sometimes I've believed as many as six impossible things before breakfast."]}},
   :block-7215
   {:h 4,
    :w 9,
@@ -4209,7 +4511,15 @@
    :root [38 2],
    :h 14,
    :connection-id :*client-name*,
-   :queries {},
+   :queries
+   {:large-bg-sqlized
+    {:select [:*],
+     :connection-id :restored-star-shaped-moose-41,
+     :_sqlized-at "2024-08-10 16:24:05",
+     :_sqlized-by [:block-2361 :clojure :large-bg],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override346250891>output>evald-result>value-hash,
+     :from [:raw_custom_override346250891__block_2361_clojure_large_bg_]}},
    :tab "azure oyster",
    :views {}},
   :block-1449
@@ -4504,27 +4814,18 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :style
-    {:font-size "45px",
-     :font-weight 700,
-     :padding-top "6px",
-     :padding-left "14px",
-     :margin-top "-8px",
-     :color :theme/editor-outer-rim-color,
-     :font-family :theme/monospaced-font}
-    :child
-    ":border-radius    [:sticky-border-radius \"33px\"]"],
-   :selected-view [:views :hare-vw-8],
+   (do
+     (Thread/sleep 2500)
+     (vec
+       (for
+         [e (range 166666)]
+         {:kity e, :fart "fart783", :kitty-str (str (* (rand-int 3314) e) "!")}))),
+   :selected-view [:clojure :new-clojure-2],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :large-bg/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-11761,
+   :selected-block :block-3284,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius [:sticky-border-radius "33px"],

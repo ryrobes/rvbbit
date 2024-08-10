@@ -3219,6 +3219,16 @@
              output                      (if error?
                                            (select-keys (get output-full :evald-result) [:root-ex :ex :err])
                                            output)
+             sqlized?                    (ut/ne? (get result :sqlized))
+
+             _ (when sqlized?
+                 (ppy/execute-in-thread-pools :sqlize-repl-rowset-push ;; dont want to delay the natural value returns
+                   (fn [] (let [query-map (get result :sqlized)]
+                            (ut/pp [:sqlized (get result :sqlized)])
+                            (ut/delay-execution 2000
+                                                (do (ut/pp [:sqlized query-map])
+                                                    (push-to-client ui-keypath [] client-name 2 :new-slice (into [:queries] query-map))))))))
+
              kit-out {:tester {:data
                                [{:ask-mutates {"Highlight these in your source query?"
                                                {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1584150552]]
@@ -3276,7 +3286,9 @@
                                                   :font-family  :theme/base-font}
                                                  :child
                                                  "YO. Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."]}}]}}]
+         
          (when is-fabric? (fabric-post-process client-name fabric-opts-map output elapsed-ms ui-keypath is-history?))
+
          (when sampled?
            (try
              (let [sample-message (get-in output-full [:sampled :message] "")
@@ -3290,6 +3302,7 @@
                        nil ;2.1
                        (if sample-details 8 20) :sample-detail))
              (catch Exception  e (ut/pp [:solver-repl-alert-error (str e) e]))))
+         
          (swap! db/last-solvers-atom assoc solver-name output)
          (swap! db/last-solvers-atom-meta assoc
                 solver-name
@@ -3326,8 +3339,8 @@
         ;;                   )
          ;;(insert-kit-data payload (hash payload) sub-task task-id ui-keypath 0 client-name "flow-id-here!"))
 
-
          output)
+       
        (catch Throwable e
          (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
                      ;(swap! solvers-running assoc-in [client-name solver-name] false)

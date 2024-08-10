@@ -408,10 +408,10 @@
 (defn virtual-v-box [& {:keys [id children height width attr] :as cfg-map}]
   (let [width  (if (string? width)  (px- width) width)
         height (if (string? height) (px- height) height)
-        _ (ut/tapp>> [:id id children])
-        children (vec (cons [20 20 [:div {:style {}} " "]]
-                            (conj children [20 20 [:div {:style {}} " "]])))
-        ;;children (vec (conj children [20 20 [:div {:style {}} " "]]))
+        ;; _ (ut/tapp>> [:id id children])
+        ;; children (vec (cons [20 20 [:div {:style {}} " "]]
+        ;;                     (conj children [20 20 [:div {:style {}} " "]])))
+        children (vec (conj children [20 20 [:div {:style {}} " "]]))
         ;; empty div on bottom and top cleans up some virtual-dom scrolling fuckery, gets more accurate recalc sizes
         id (or id (get attr :id)) ;; in case mixed with re-com, which will throw if given root level :id key
         id (str id "-" height width)

@@ -69,7 +69,9 @@
                          {}
                          new-panels-with-hashes)
          is-initial-boot? (empty? old-hashes)] ;; if nothing has a hash, it's the first time - dont trigger
-     (cond-> {:db (assoc db ::panel-hashes new-hashes)}
+     (cond-> {:db (-> db 
+                      (assoc ::panel-hashes new-hashes)
+                      (assoc-in [:click-param :panel-hash] new-hashes))}
        (and (not is-initial-boot?) (seq changed-panels))
        (assoc :push-changed-panels changed-panels)))))
 

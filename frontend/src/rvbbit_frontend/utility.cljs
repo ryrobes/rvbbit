@@ -1348,7 +1348,10 @@
   (let [key-remove-set (set keys-to-remove)]
     (cond (map? data)    (->> data
                               (reduce-kv (fn [acc k v]
-                                           (if (or (key-remove-set k) (and (keyword? k) (cstr/starts-with? (name k) "_")))
+                                           (if (or (key-remove-set k) (and (keyword? k)
+                                                                           (cstr/starts-with? (name k) "_")
+                                                                           (not (cstr/starts-with? (name k) "_sqlized"))
+                                                                           (not (cstr/starts-with? (name k) "_deps"))))
                                              acc
                                              (assoc acc k (deep-remove-keys v keys-to-remove))))
                                          {})

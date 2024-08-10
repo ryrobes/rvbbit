@@ -15,6 +15,7 @@
    [rvbbit-backend.ddl    :as sqlite-ddl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
+   [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.util   :as ut])
   (:import [java.util.concurrent TimeoutException TimeUnit]))
 
@@ -612,6 +613,23 @@
 ;; (ut/pp (get @nrepl-output-atom :secure-azure-yellow-jacket-33))
 ;; (ut/pp (get @db/last-solvers-atom-meta  :raw-custom-override393647547))
 
+(defn valid-keyword-string? [s]
+  (and (string? s)
+       (re-matches #"[a-zA-Z0-9*+!_?-]+" s)))
+
+(defn valid-rowset-key? [k]
+  (or (keyword? k)  ;; we only want to allow proper keys/field names. no string field names with spaces or something weird.
+      (valid-keyword-string? k))) ;; SQL spec should have never allow that crap anyways ~old man. "My Cool Field Name!" GTFO
+
+(defn rowset? [data]
+  (and (vector? data)
+       (ut/ne? data)
+       (every? map? data)
+       (let [first-keys (set (keys (first data)))]
+         (and (every? valid-rowset-key? first-keys)
+              (every? #(= (set (keys %)) first-keys) data)
+              (every? #(not-any? (fn [v] (or (map? v) (vector? v))) (vals %)) data)))))
+
 (defn repl-eval [code repl-host repl-port client-name id ui-keypath]
   (let [_           (swap! nrepls-run inc)
         output-atom (atom [])
@@ -647,7 +665,6 @@
                     ;;                     [id :output]
                     ;;                     [id :output :evald-result :out])
 
-
                     ; process each message, but still block for the final result
                     process-msg   (fn [msg]
                                     (when-let [out (:out msg)]
@@ -672,20 +689,44 @@
                                                (nrepl/response-values responses)))
                     rsp           (nrepl/combine-responses responses)
                     msg-out       @output-atom
-                    merged-values rsp-read
+                    merged-values rsp-read ;; "merged" as in a vector of values, but currently we are forcing a single value via DO blocks...
                     sampled-values (try
                                      (safe-sample-with-description (first rsp-read))
                                      (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
                     _ (push-to-console-clover (cstr/join "" @output-atom) :out)
+                    is-rowset?    (rowset? (first merged-values))
+                    sqlized       (atom nil)
                     output        {:evald-result
                                    (-> rsp
                                        (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                        (assoc :value merged-values)
+                                       (assoc :value-hash (hash merged-values))
                                        (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
                                        (dissoc :id)
                                        (dissoc :session))
                                    :sampled sampled-values}]
-                output))
+
+                (when is-rowset? (let [table-name (ut/keypath-munger [id ui-keypath])
+                                       query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
+                                   (reset! sqlized [query-name {:select [:*]
+                                                                :connection-id client-name
+                                                                :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
+                                                                :_sqlized-by ui-keypath
+                                                                :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
+                                                                :from [(keyword table-name)]}])
+                                    ;(qp/serial-slot-queue :sqlize-repl-rowset client-name
+                                   (ppy/execute-in-thread-pools-but-deliver
+                                    :sqlize-repl-rowset
+                                    (fn [] (insert-rowset (first merged-values)
+                                                          table-name
+                                                          nil
+                                                          nil
+                                                          (keys (first (first merged-values)))
+                                                          (sql/create-or-get-client-db-pool client-name)
+                                                          client-name)))
+                                   (ut/pp [:sqlized-repl-output! @sqlized])))
+
+                (merge output (when is-rowset? {:sqlized @sqlized}))))
 
             (catch Exception ee
               (let [error-msg (ex-message ee)
@@ -694,7 +735,7 @@
                       (str
                        "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str. 
                         (Rabbit cares about 'values' first, not printing, so you may have to be 
-                        explicit about what you want, output-wise)"
+                        explicit about what you want, output-wise). Tags don't cross the CLJ/CLJS 'blood-brain barrier' easily..."
                        "\n")
                       nil)]
                 {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}

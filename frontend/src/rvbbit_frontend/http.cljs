@@ -553,6 +553,7 @@
               kick?                       (= ui-keypath :kick)
               counts?                     (= task-id :cnts)
               heartbeat?                  (= task-id :heartbeat)
+              new-slice?                  (= task-id :new-slice)
               kit-view?                   (= task-id :kit-view)
               kit-view-opts?              (= task-id :kit-view-opts)
               kit-view-remove?            (= task-id :kit-view-remove)
@@ -574,10 +575,13 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "-maroon-")  
-            (ut/tapp>> [:msg-in kit-view? (str (get result :task-id)) (str ui-keypath) 
+          (when (cstr/includes? (str client-name) "-pyramidal-")  
+            (ut/tapp>> [:msg-in kit-view? new-slice? (str (get result :task-id)) (str ui-keypath) 
                         ;(str (get-in result [:status :evald-result :value 0]))
-                        (get result :status) (str (get result :ui-keypath)) (str result)]))
+                        (get result :status) (str (get result :ui-keypath)) (str result)
+                        
+                              
+                        ]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -603,6 +607,9 @@
                               mem-row)
                :flow-subs   (get db :flow-subs)
                :client-name (get db :client-name)}]))
+          
+
+
 
           (when alert? ;(and alert? not-sys-stats?) ; (and alert? (string? (first (get result
             (let [cnt      (get-in result [:data 0 0])
@@ -622,6 +629,11 @@
                                     (get-in result [:status :evald-result :value 0]))
                           (assoc-in [:panels (get-in result [:ui-keypath 1]) :selected-view]
                                     :_kvw1))
+
+            new-slice?    (let [kp [:panels (get-in result [:ui-keypath 0]) (get-in result [:status 0]) (get-in result [:status 1])]
+                                query-map (get-in result [:status 2])]
+                            ;(ut/tapp>> [:new-slice kp (get-in result [:status 2])])
+                            (assoc-in db kp query-map))
 
             kit-view-opts? (update-in db [:click-param (get-in result [:ui-keypath 1])]
                                       #(merge % (get result :status)))
@@ -851,6 +863,7 @@
                             (ut/dissoc-in [:click-param :signal-history])
                             (ut/dissoc-in [:click-param :solver-meta])
                             (ut/dissoc-in [:click-param :repl-ns])
+                            (ut/dissoc-in [:click-param :panel-hash])
                             (ut/dissoc-in [:click-param :solver-status])
                             (ut/dissoc-in [:click-param :solver])
                             (ut/dissoc-in [:click-param :flow-status])
