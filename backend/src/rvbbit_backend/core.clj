@@ -298,8 +298,7 @@
      file-path)))
 
 
-(defn watch-config-files
-  []
+(defn watch-config-files []
   (let [file-path "./defs/"]
     (beholder/watch #(when (or (cstr/ends-with? (str (get % :path)) "config.edn")
                                (cstr/ends-with? (str (get % :path)) "clover-templates.edn"))
@@ -313,6 +312,27 @@
                                        13 2
                                        5)
                            (wss/kick d [:settings] (wss/package-settings-for-client) 1 :none (str "file updated " (get % :path))))))
+                    file-path)))
+
+(defn watch-solver-files []
+  (let [file-path "./defs/"]
+    (beholder/watch #(when (or (cstr/ends-with? (str (get % :path)) "signals.edn")
+                               (cstr/ends-with? (str (get % :path)) "solvers.edn"))
+                       (let [signals? (cstr/ends-with? (str (get % :path)) "signals.edn")
+                             destinations (vec (keys @wss/client-queues))
+                             map-atom (if signals? wss/signals-atom wss/solvers-atom)
+                             _ (reset! map-atom (edn/read-string (slurp (str (get % :path)))))
+                             _ (ut/pp [:solver-file-change! signals? (get % :path)])]
+                         (doseq [d destinations]
+                           (wss/alert! d
+                                       [:v-box :justify :center :style {:opacity 0.7} :children
+                                        [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                          :child (str "Note: Server " (if signals? "signals" "solvers") " have been updated & received")]
+                                         [:box :child (str (get % :path))]]]
+                                       13 2
+                                       5)
+                           (wss/kick d (if signals? :signals-file :solvers-file) @map-atom 1 :none (str "file updated " (get % :path)))
+                           )))
                     file-path)))
 
 
@@ -436,6 +456,8 @@
   (defonce start-flow-watcher (watch-flows-folder))
   #_{:clj-kondo/ignore [:inline-def]}
   (defonce start-settings-watcher (watch-config-files))
+#_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-solver-watcher (watch-solver-files))
 
   (shutdown/add-hook! ::heads-up-msg #(ut/ppa "Shutting down now, commander!"))
   (sql-exec system-db "drop table if exists jvm_stats;")

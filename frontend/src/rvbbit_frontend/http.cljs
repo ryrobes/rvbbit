@@ -557,6 +557,8 @@
               kit-view?                   (= task-id :kit-view)
               kit-view-opts?              (= task-id :kit-view-opts)
               kit-view-remove?            (= task-id :kit-view-remove)
+              signals-file?               (= task-id :signals-file)
+              solvers-file?               (= task-id :solvers-file)
               alert?                      (cstr/starts-with? (str task-id) ":alert")
               server-sub?                 (and kick?
                                                (contains? valid-task-ids (get-in result [:task-id 0]))
@@ -624,6 +626,10 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
+            
+            signals-file? (assoc db :signals-map (get result :status))
+
+            solvers-file? (assoc db :solvers-map (get result :status))
 
             kit-view? (-> db
                           (assoc-in [:panels (get-in result [:ui-keypath 1]) :views :_kvw1]
