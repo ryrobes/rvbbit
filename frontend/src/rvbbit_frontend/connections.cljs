@@ -1171,12 +1171,13 @@
          flat          (ut/deep-flatten honey-sql)
          client-name   @(ut/tracked-sub ::client-name {})
          honey-sql     (ut/postwalk-replacer {:*client-name client-name
-                                           :*client-name* client-name
-                                           :*client-name-str (str client-name)} orig-honey-sql)
+                                              :*client-name* client-name
+                                              :*client-name-str (str client-name)} orig-honey-sql)
          
          ;;;;honey-sql     (assoc honey-sql :connection-id connection-id)
          literal-data? (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
          honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
+         honey-modded  (ut/clean-sql-from-ui-keys honey-modded) ;; only needed here, below it is handled server-side
          ;client-name   @(ut/tracked-subscribe [::client-name])
          ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
          ;                                     :*client-name* client-name
@@ -1207,7 +1208,7 @@
      (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
    
    (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))
-  
+   
   ([keypath honey-sql connection-id]
    (doall
      (let [style-rules   (get honey-sql :style-rules)
@@ -1222,8 +1223,8 @@
                                   [[:case (:logic logic) 1 :else 0] (keyword (str "styler_" (ut/safe-name name)))])))
            client-name   @(ut/tracked-sub ::client-name {})
            honey-sql  (ut/postwalk-replacer {:*client-name client-name
-                                                :*client-name* client-name
-                                                :*client-name-str (str client-name)} honey-sql)
+                                             :*client-name* client-name
+                                             :*client-name-str (str client-name)} honey-sql)
            connection-id (cond (get honey-sql :connection-id) (get honey-sql :connection-id)
                                (nil? connection-id)           "cache.db"
                                (= connection-id "system")     "system-db"
@@ -1240,7 +1241,7 @@
            ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
            ;                                     :*client-name* client-name 
            ;                                     :*client-name-str (str client-name)} honey-modded)
-           ;_ (ut/tapp>> [:sql-run2 (str keypath) (str honey-sql) (hash honey-sql)])
+          ;;  _ (ut/tapp>> [:sql-run2 (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
            ]
        (do (when (not (nil? refresh-every)) 
              (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))

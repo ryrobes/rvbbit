@@ -49,6 +49,7 @@
    [:master-params-watcher  params-atom  :client]
    [:master-panels-watcher  panels-atom  :panel]
    [:master-flow-watcher flow-db/results-atom  :flow]
+   [:master-flow-runner-watcher flow-db/results-atom  :flow-runner] ;; * a copy, but it maintainted separately - pruned, etc.
    [:master-nrepl-instrospection-watcher repl-introspection-atom  :repl-ns]
    [:master-solver-status-watcher  solver-status  :solver-status]
    [:master-signals-watcher  last-signals-atom  :signal]
@@ -68,6 +69,7 @@
          :client (atom {})
          :panel (atom {})
          :flow (atom {})
+         :flow-runner (atom {})
          :repl-ns (atom {})
          :solver-status (atom {})
          :signal (atom {})
@@ -112,6 +114,8 @@
            master-type (keyword (first (cstr/split (cstr/replace (str coded-keypath) ":" "") #"/")))
            path (rest parts)
            parsed-path (if (or (= master-type :flow)
+                               (= master-type :flow-runner)
+                               (= master-type :tracker)
                                (= master-type :flow-status))
                          (cons (str (second parts))
                                (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) (drop 2 parts)))
@@ -468,9 +472,9 @@
           sub-path (walk/postwalk-replace keypath-wildcards-map sub-path)
           watch-key (str :all "-" (str keypath) "-" sub-type "-" flow-key)
           base-type (first sub-path)
-          tracker? (= sub-type :tracker)
-          flow? (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
-          status? (and (cstr/includes? (str keypath) ":*") flow?)
+          ;tracker? (= sub-type :tracker)
+          ;flow? (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+          ;status? (and (cstr/includes? (str keypath) ":*") flow?)
           client? (= base-type :client)
           panel? (= base-type :panel)
           screen? (= base-type :screen) ;; (cstr/starts-with? (str flow-key)

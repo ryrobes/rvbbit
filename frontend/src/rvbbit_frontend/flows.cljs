@@ -37,6 +37,7 @@
     [rvbbit-frontend.bricks :as    bricks
                             :refer [theme-pull]]
     [rvbbit-frontend.buffy :as buffy]
+    [rvbbit-frontend.vbunny :as vbunny]
     [rvbbit-frontend.connections :as conn]
     [rvbbit-frontend.connections :refer [sql-data]]
     [rvbbit-frontend.db :as db]
@@ -496,8 +497,13 @@
 
 (defn has-done? [] (true? (some #(= % :done) (apply concat @(ut/tracked-subscribe [::flowmap-connections])))))
 
-(re-frame/reg-event-db ::add-live-flow-subs
-                       (fn [db [_ running-subs]] (assoc db :flow-subs (vec (into running-subs (get db :flow-subs))))))
+(re-frame/reg-event-db 
+ ::add-live-flow-subs
+ (fn [db [_ running-subs]]
+   (let [running-subs-keyed (vec (flatten (for [[k v] running-subs]
+                                            [(keyword (str "flow-runner/" k ">" (cstr/replace (str v) ":" "")))
+                                             (keyword (str "tracker/" k ">" (cstr/replace (str v) ":" "")))])))]
+     (assoc db :flow-subs (vec (into running-subs-keyed (get db :flow-subs)))))))
 
 ;; (re-frame/reg-event-db
 ;;  ::add-live-flow-subs
@@ -522,7 +528,7 @@
               running-subs         (vec (for [k (keys comps)] [flow-id k]))
               running-subs         (vec (into running-subs running-view-subs))
               watched?             (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
-              _ (ut/tapp>> [:comps comps running-subs watched?])
+              ;;_ (ut/tapp>> [:comps comps running-subs watched?])
               fstr                 (str "running flow " flow-id)
               w                    (/ (count fstr) 4.1)]
           (reset! editor-tooltip-atom (str flow-id " is running"))
@@ -532,14 +538,14 @@
           (when true
             (ut/tracked-dispatch [::add-live-flow-subs running-subs])
             (ut/tracked-dispatch
-              [::wfx/request :default
-               {:message {:kind :sub-to-running-values :flow-id flow-id :flow-keys running-subs :client-name client-name}
-                :timeout 15000}]))
+             [::wfx/request :default
+              {:message {:kind :sub-to-running-values :flow-id flow-id :flow-keys running-subs :client-name client-name}
+               :timeout 15000}]))
           (ut/tracked-dispatch
             [::wfx/request :default
              {:message     {:kind        :run-flow
                             :flow-id     flow-id
-                            :no-return?  false ;true  ;false ;true ;;false ; true ;false ;true  ;; if we arent
+                            :no-return?  true ;;false ;true ;;false ;true ;;false ;true  ;false ;true ;;false ; true ;false ;true  ;; if we arent
                             :file-image  {:flowmaps             @(ut/tracked-subscribe [::flowmap-raw])
                                           :opts                 @(ut/tracked-subscribe [::opts-map])
                                           :zoom                 @db/pan-zoom-offsets
@@ -556,10 +562,11 @@
           (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
           (ut/dissoc-in db [:flow-runner flow-id]))))))
 
-(re-frame/reg-sub ::flow-runner
-                  (fn [db [_ flow-id bid]]
-                    (and (not (empty? (get @db/running-blocks flow-id [])))
-                         (= (get-in db [:flow-runner flow-id bid] :started) :started))))
+(re-frame/reg-sub
+ ::flow-runner
+ (fn [db [_ flow-id bid]]
+   (and (not (empty? (get @db/running-blocks flow-id [])))
+        (= (get-in db [:flow-runner flow-id bid] :started) :started))))
 
 
 
@@ -580,14 +587,15 @@
 
 
 
-(re-frame/reg-sub ::is-running?
-                  (fn [db [_ bid flow-id & [only?]]]
-                    (let [;chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
-                          flow-running? @(ut/tracked-subscribe [::conn/clicked-parameter-key
-                                                                [(keyword (str "flow-status/" flow-id ">*running?"))]])
-                          running       (get-in db [:flow-results :tracker-blocks flow-id :running-blocks])]
-                      (cond (= bid :*) flow-running?
-                            :else      (true? (and flow-running? (some #(= bid %) running))))
+(re-frame/reg-sub 
+ ::is-running?
+ (fn [db [_ bid flow-id & [only?]]]
+   (let [;chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
+         flow-running? @(ut/tracked-subscribe [::conn/clicked-parameter-key
+                                             [(keyword (str "flow-status/" flow-id ">*running?"))]])
+         running       (get-in db [:flow-results :tracker-blocks flow-id :running-blocks])]
+     (cond (= bid :*) flow-running?
+           :else      (true? (and flow-running? (some #(= bid %) running))))
                       ;true
                       )))
 
@@ -688,7 +696,11 @@
         cells? (= block-id :cells)
         main-boxes
           [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)
-           :size "auto" :padding "5px" :width (when cells? "280px") :gap "2px" :style
+           :size "auto" 
+           :padding "5px" 
+           :width (if cells? "280px" "560px") 
+           :gap "2px" 
+           :style
            {:color       "black"
             :font-family (theme-pull :theme/base-font nil)
             :font-size   font-size ; "11px"
@@ -3040,6 +3052,7 @@
     11]])
 
 (defonce last-loaded-run-id (reagent/atom nil))
+(defonce flow-search (reagent/atom nil))
 
 (defn settings-block
   [flow-id ttype]
@@ -3053,6 +3066,7 @@
       (= ttype :run-history)
         (let [caller @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/client_name]])
               status @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/return_status]])
+              flow-day @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
               dropdown1
                 {:view    [:dropdown
                            {:choices     :gen-viz-812aaa
@@ -3067,6 +3081,7 @@
                  :queries {:gen-viz-812aaa {:select        [[:client_name :id] [:client_name :label]]
                                             :connection-id "flows-db"
                                             :from          [{:select [:client_name] :from [[:flow_history :uu9]] :group-by [1]}]
+                                            :where       (if @flow-search [:like :flow_id (str "%" (str @flow-search) "%")] [:= 1 1])
                                             :group-by      [:client_name]
                                             :order-by      [:client_name]}}}
               dropdown2 [:dropdown
@@ -3110,6 +3125,7 @@
                                                            :connection-id "flows-db"
                                                            :from          [[:flow_history :cc393]]
                                                            :where         [:and
+                                                                           (if @flow-search [:like :flow_id (str "%" (str @flow-search) "%")] [:= 1 1])
                                                                            (if caller [:= :client_name (str caller)] [:= 1 1]) ;; since
                                                                            (if status
                                                                              [:= :in_error :virtual-panel/return_status]
@@ -3141,9 +3157,10 @@
               vselected? @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
               grid-menu {:select        [:flow_id [[:count [:distinct :run_id]] :runs]]
                          :connection-id "flows-db"
-                         :col-widths    {:runs 45 :flow_id 220}
+                         :col-widths    {:runs 45 :flow_id 210}
                          :group-by      [1]
-                         :where         [:and (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                         :where         [:and (if @flow-search [:like :flow_id (str "%" (str @flow-search) "%")] [:= 1 1])
+                                         (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
                                          (if caller [:= :client_name (str caller)] [:= 1 1])
                                          (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                          :order-by      [[1 :asc]]
@@ -3195,11 +3212,37 @@
             (reset! last-loaded-run-id selected-run-id)
             (ut/tracked-dispatch [::http/load-flow-history selected-run-id selected-start-ts]))
           [re-com/v-box :children
-           [[re-com/h-box :size "auto" :height "60px" :width "750px" :justify :between :align :center :gap "40px" :style
+           [[re-com/h-box :size "auto" :height "60px" :width "750px"
+             :justify :between 
+             :align :center
+             :gap "50px"
+             :style
              {:font-size "15px"} :children
              [;[re-com/box :child [buffy/render-honey-comb-fragments dropdown1 5 2 true] :width
+
               [buffy/render-honey-comb-fragments dropdown1 5 2 "dropdown1-sys*"]
-              [buffy/render-honey-comb-fragments dropdown2 4 2 "dropdown2-sys*"] [re-com/box :child ""]]]
+              [re-com/box :child ""] [re-com/box :child ""]
+              [buffy/render-honey-comb-fragments dropdown2 5 2 "dropdown2-sys*"]
+
+              [re-com/input-text 
+               :model flow-search 
+               :on-change #(reset! flow-search %)
+               :change-on-blur? false 
+               :width "220px" 
+               :placeholder "flow search"
+               :style {:text-decoration  (when (ut/ne? @flow-search) "underline")
+                                      :border-radius "8px" ;:background-color "#ffffff" :color
+                                      :color         "#ffffff75"
+                                                    ;:outline       (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
+                                                    ;:color            "inherit"
+                                      :height "40px"
+                                      :border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
+                                      :outline          "none"
+                                      :text-align       "center"
+                                      :background-color "#00000000"}]
+              [re-com/box :child ""]
+              [re-com/box :child (str flow-day)]
+              ]]
             [re-com/box :size "none" :height "255px" :style {:font-size "15px"} :child
              [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 24 "viz1-sys*"]]
             [re-com/h-box :children
@@ -3329,76 +3372,107 @@
              [buffy/render-honey-comb-fragments grid1 12 5]]]])
       :else [re-com/box :child (str "unknown editor mode: " @editor-mode)])))
 
-(defn server-flows
-  [hh]
+
+;; [vbunny/virtual-v-box
+;;  :height (px (Math/floor (- height-int 113)))
+;;  :width (px (Math/floor (- width-int 33)))
+;;  :id (str "parameter-browser" selected-tab)
+;;                   ;:fixed? true
+;;                   ;; :style {:cursor "grab"
+;;                   ;;       ;:background-color (theme-pull :theme/editor-param-background-color nil)
+;;                   ;;         }
+;;                   ;:children (vec (interpose [(- width-int 50) 6 [:div ""]] v-boxes))
+;;  :children v-boxes]
+
+(defn server-flows [hh]
   (let [ss @(ut/tracked-sub ::bricks/flow-statuses {})
-        ss (vec (sort-by first (for [[k v] ss] [k v])))] ;; since maps wont keep key order in
-    [re-com/box :height (px hh) :style {:overflow "auto"} :child
-     [re-com/v-box :padding "3px" :style
-      {;:border "1px dashed white"
-       :color (theme-pull :theme/editor-outer-rim-color nil)} :gap "11px" :children
-      (for [[fid v] ss ;; could use key destructuring, but some keys are weird. meh, its fine w
-            :let    [;time-running (get v :*time-running)
-                     open-channels  (get v :channels-open?)
-                     channels       (get v :channels-open)
-                     started-by     (get v :*started-by)
-                     process?       (get v :process?)
-                     command        (get v :command)
-                     since-start    (get v :since-start)
-                     running-blocks (get v :running-blocks)
-                     running?       (get v :*running?)]]
-        [re-com/v-box :style
-         {:border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) (if running? 77 22))
-          :background-color (when running? (str (theme-pull :theme/editor-outer-rim-color nil) 15))
-          :filter           (when running? "brightness(200%)")} :children
-         [[re-com/h-box :padding "4px" :height "35px" :align :center :justify :between :children
-           [[re-com/box :child
-             (if (cstr/includes? (str fid) "/")
-               (let [spl    (ut/splitter (str fid) #"/")
-                     parent (first spl)
-                     sub    (last spl)]
-                 [re-com/v-box :children
-                  [[re-com/box :child (str "(sub-flow called from) " parent) :style {:font-size "9px"}]
-                   [re-com/box :child (str sub)]]])
-               (str fid)) :width "50%" :style {:padding-left "4px" :font-size "15px" :font-weight 700}]
-            [re-com/box :child
-             (cond running?      (str "running " (cstr/join " " running-blocks) " (" channels " chans) ")
-                   open-channels (str "idling (" channels " chans)")
-                   :else         "stopped") :width "34%"]
-            (if (not process?)
-              [re-com/md-icon-button :style {:font-size "20px"} :on-click
-               #(let [;flowmap @(ut/tracked-subscribe [::flowmap])
-                      client-name          @(ut/tracked-sub ::conn/client-name {})
-                      flowmap              @(ut/tracked-subscribe [::flowmap])
-                      flow-id              @(ut/tracked-subscribe [::selected-flow])
-                      flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
-                      server-flowmap       (process-flowmap2 flowmap flowmaps-connections flow-id)
-                      comps                (get server-flowmap :components) ;; (assoc (get
-                      running-view-subs    (vec (for [[k v] comps
-                                                      :when (get v :view)]
-                                                  [flow-id (keyword (str (ut/replacer (str k) ":" "") "-vw"))]))
-                      running-subs         (vec (for [k (keys comps)] [flow-id k]))
-                      running-subs         (vec (into running-subs running-view-subs))]
-                  (ut/tracked-dispatch [::http/load-flow-history fid nil])
-                  (ut/tracked-dispatch [::add-live-flow-subs running-subs])
-                  (ut/tracked-dispatch [::wfx/request :default
-                                        {:message {:kind        :sub-to-running-values
-                                                   :flow-id     fid
-                                                   :flow-keys   [] ;;running-subs
-                                                   :client-name client-name}
-                                         :timeout 15000000}])) :md-icon-name "zmdi-open-in-browser"]
-              [re-com/gap :size "20px"])
-            [re-com/md-icon-button :style {:font-size "20px"} :on-click
-             #(ut/tracked-dispatch [::wfx/request :default
-                                    {:message {:kind        :kill-flow
-                                               :flow-id     fid
-                                               :process?    process?
-                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
-                                     :timeout 15000000}]) :md-icon-name "zmdi-stop"]]]
-          [re-com/h-box :padding "4px" :height "35px" :align :center :style {:font-size "10px" :padding-right "20px"} :justify
-           :between :children
-           [[re-com/box :child (if process? (str "(external process) " command) (str "started by: " started-by)) :style
-             {:padding-left "4px" :font-weight 300}] (when (not process?) [re-com/box :child (str since-start)])]]]])]]))
+        ss (vec (sort-by first (for [[k v] ss] [k v]))) ;; since bigger maps wont keep key order in cljs
+        width 774
+        v-boxes (for [[fid v] ss ;; could use key destructuring, but some keys are weird. meh, its fine w
+                      :let    [;time-running (get v :*time-running)
+                               open-channels  (get v :channels-open?)
+                               channels       (get v :channels-open)
+                               started-by     (get v :*started-by)
+                               process?       (get v :process?)
+                               command        (get v :command)
+                               since-start    (get v :since-start)
+                               running-blocks (get v :running-blocks)
+                               running?       (get v :*running?)]]
+                  [re-com/v-box
+                   :style
+                   {:border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) (if running? 77 22))
+                    :background-color (when running? (str (theme-pull :theme/editor-outer-rim-color nil) 15))
+                    :filter           (when running? "brightness(200%)")} :children
+                   [[re-com/h-box :padding "4px" :height "35px" :align :center :justify :between :children
+                     [[re-com/box :child
+                       (if (cstr/includes? (str fid) "/")
+                         (let [spl    (ut/splitter (str fid) #"/")
+                               parent (first spl)
+                               sub    (last spl)]
+                           [re-com/v-box :children
+                            [[re-com/box :child (str "(sub-flow called from) " parent) :style {:font-size "9px"}]
+                             [re-com/box :child (str sub)]]])
+                         (str fid)) :width "50%" :style {:padding-left "4px" :font-size "15px" :font-weight 700}]
+                      [re-com/box :child
+                       (cond running?      (str "running " (cstr/join " " running-blocks) " (" channels " chans) ")
+                             open-channels (str "idling (" channels " chans)")
+                             :else         "stopped") :width "34%"]
+                      (if (not process?)
+                        [re-com/md-icon-button 
+                         :style {:font-size "20px"} 
+                         :on-click
+                         #(let [;flowmap @(ut/tracked-subscribe [::flowmap])
+                                client-name          @(ut/tracked-sub ::conn/client-name {})
+                                flowmap              @(ut/tracked-subscribe [::flowmap])
+                                flow-id              @(ut/tracked-subscribe [::selected-flow])
+                                flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+                                server-flowmap       (process-flowmap2 flowmap flowmaps-connections flow-id)
+                                comps                (get server-flowmap :components) ;; (assoc (get
+                                running-view-subs    (vec (for [[k v] comps
+                                                                :when (get v :view)]
+                                                            [flow-id (keyword (str (ut/replacer (str k) ":" "") "-vw"))]))
+                                running-subs         (vec (for [k (keys comps)] [flow-id k]))
+                                running-subs         (vec (into running-subs running-view-subs))]
+                            (ut/tracked-dispatch [::http/load-flow-history fid nil])
+                            (ut/tracked-dispatch [::add-live-flow-subs running-subs])
+                            (ut/tracked-dispatch [::wfx/request :default
+                                                  {:message {:kind        :sub-to-running-values
+                                                             :flow-id     fid
+                                                             :flow-keys   [] ;;running-subs
+                                                             :client-name client-name}
+                                                   :timeout 15000000}])) 
+                         :md-icon-name "zmdi-open-in-browser"]
+                        [re-com/gap :size "20px"])
+                      [re-com/md-icon-button :style {:font-size "20px"} :on-click
+                       #(ut/tracked-dispatch [::wfx/request :default
+                                              {:message {:kind        :kill-flow
+                                                         :flow-id     fid
+                                                         :process?    process?
+                                                         :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                                               :timeout 15000000}]) :md-icon-name "zmdi-stop"]]]
+                    [re-com/h-box :padding "4px" :height "35px" :align :center :style {:font-size "10px" :padding-right "20px"} :justify
+                     :between :children
+                     [[re-com/box :child (if process? (str "(external process) " command) (str "started by: " started-by)) :style
+                       {:padding-left "4px" :font-weight 300}] (when (not process?) [re-com/box :child (str since-start)])]]]])]
+   ; [re-com/box
+   ;  :height (px hh)
+   ;  :style {:overflow "auto"}
+   ;  :child
+    ;;  [re-com/v-box :padding "3px" :style
+    ;;   {;:border "1px dashed white"
+    ;;    :color (theme-pull :theme/editor-outer-rim-color nil)} 
+    ;;   :gap "11px"
+    ;;   :children
+    ;;   v-boxes]
+     [vbunny/virtual-v-box
+      :style {;:border "1px dashed white"
+              :color (theme-pull :theme/editor-outer-rim-color nil)}
+      :height (px hh)
+      :width (px width)
+      :id "server-flows-v-box2"
+      :children (mapv (fn [r] [(- width 20) 85 r]) v-boxes)]
+    ; ]
+    ))
 
 (re-frame/reg-sub ::opts-map
                   (fn [db _]
@@ -3417,8 +3491,9 @@
         flow-id    @(ut/tracked-subscribe [::selected-flow])
         dyn-width  (last @db/flow-editor-system-mode)
         ;;dyn-height ( @db/flow-editor-system-mode)
-        o-modes    [["flows running" 800] ["flow browser" 600] ["flow parts" 600] ["metrics" 990] ["KPIs" 990] ["signals" 990]
-                    ["rules" 990] ["flow history" 1200]]
+        o-modes    [["flows running" 800] ["flow browser" 600] ["flow parts" 600] ["metrics" 990] ["KPIs" 990] ["signals & solvers" 990]
+                    ;;["rules" 990] 
+                    ["flow history" 1200]]
         sql-calls  {:flow-fn-categories-sys {:select [:category] :from [:flow_functions] :group-by [1]}
                     :flow-fn-all-sys        {:select [:name] :from [:flow_functions] :group-by [1]}
                     :flow-fn-sys            {:select     [:name :description :full_map :inputs :icon :input_types :output_types
@@ -3486,7 +3561,7 @@
             (= (first @db/flow-editor-system-mode) "scheduler") [flow-details-block-container (first @db/flow-editor-system-mode)
                                                                  :system :system [settings-block flow-id :scheduler]
                                                                  "zmdi-chart-donut"]
-            (= (first @db/flow-editor-system-mode) "signals") [sig/signals-panel]
+            (= (first @db/flow-editor-system-mode) "signals & solvers") [sig/signals-panel]
             (= (first @db/flow-editor-system-mode) "flow history") [flow-details-block-container
                                                                     (first @db/flow-editor-system-mode) :system :system
                                                                     [settings-block flow-id :run-history] "zmdi-chart-donut"]
@@ -3575,7 +3650,7 @@
                 ;;    [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]
                 
                 ]]
-            :else [re-com/box :child "oops"])]]))
+            :else [re-com/box :child "[coming in the future]"])]]))
 
 (defn waffles
   [data w]
@@ -4095,7 +4170,7 @@
      (cond (and (try (not (empty? value)) (catch :default _ false)) b64?)
              [re-com/v-box :size "auto" :gap "10px" :children
               [[re-com/box :child (str "(**base64 string: ~" (.toFixed (/ (* (count (str value)) 6) 8 1024 1024) 2) " MB)")]
-               [re-com/box :size "auto" :child [:img {:src (str "data:image/png;base64," value)}]]]]
+               [re-com/box :size "auto" :child [:img {:src (str "data:image/png;base64," value) :width "560px" }]]]]
            (and (string? value)
                 (cstr/starts-with? value "http")
                 (or (cstr/ends-with? (cstr/lower-case value) "png")
@@ -4343,10 +4418,10 @@
         running?  @(ut/tracked-subscribe [::is-running? :* flow-id])
         data      @(ut/tracked-subscribe [::http/flow-results-tracker flow-id])
         ddata     (apply concat (for [[_ v] data] v))
-        sstart    (apply min (for [{:keys [start]} ddata] start))
+        sstart    (try (apply min (for [{:keys [start]} ddata] start)) (catch :default _ 0))
         eend      (if running?
                     (.now js/Date) ;@db/last-update
-                    (apply max (for [{:keys [end]} ddata] end)))
+                    (try (apply max (for [{:keys [end]} ddata] end)) (catch :default _ 0)))
         duration  (str (ut/nf (- eend sstart)) " ms")
         bdr       (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))]
     (if in-sidebar?
@@ -4359,7 +4434,8 @@
             :margin-left   "3px"
             :padding-left  "5px"
             :padding-right "5px"} :width "28px" :gap "10px" :children (block-icons blocks flow-id flow-select)]
-          [gantt-chart data (* 0.47 opw) flow-id]] :width (px opw)])
+           [gantt-chart data (* 0.47 opw) flow-id]
+          ] :width (px opw)])
       [re-com/v-box :children
        [[re-com/box :width (px pw) :height (px bg-height) :style
          {:position         "fixed"
@@ -4375,7 +4451,10 @@
           :margin-left      "4px"
           :border-top       bdr
           :backdrop-filter  "blur(4px)"
-          :top              top} :child [gantt-chart data gw flow-id]]
+          :top              top} :child
+          [gantt-chart data gw flow-id]
+        ;; (str "gantt-disabled for version 0.1")
+         ]
         [re-com/h-box :justify :between :align :center :height "30px" :size "none" :width (px (+ 3 pw)) :children
          [[re-com/box :style {:cursor "pointer" :text-decoration (if @gantt-log "none" "line-through")} :attr
            {:on-click #(reset! gantt-log (not @gantt-log))} :child (str "use log widths?")]
@@ -5068,7 +5147,7 @@
         flow-select          @(ut/tracked-sub ::selected-flow-block {})
         opts-map             @(ut/tracked-sub ::opts-map {})
         has-override?        (ut/ne? (get opts-map :overrides))
-        warren-open?         (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab
+        warren-open?         (and (= (get @db/flow-editor-system-mode 0) "signals & solvers") ;; signals tab
                                   @(ut/tracked-subscribe [::bricks/flow?]) ;; flow panel open
                              )
         details-panel-height (/ panel-height 1.25)

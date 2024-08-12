@@ -561,6 +561,7 @@
               server-sub?                 (and kick?
                                                (contains? valid-task-ids (get-in result [:task-id 0]))
                                                (not heartbeat?))
+              tracker?                    (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
               flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?))
               settings-update?            (and kick? (= (get-in result [:task-id 0]) :settings) (not heartbeat?))
               flow-runner-tracker-blocks? (and kick? (= (get-in result [:task-id 0]) :tracker-blocks) (not heartbeat?))
@@ -575,8 +576,8 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "-pyramidal-")  
-            (ut/tapp>> [:msg-in kit-view? new-slice? (str (get result :task-id)) (str ui-keypath) 
+          (when (cstr/includes? (str client-name) "prismatic")  
+            (ut/tapp>> [:msg-in tracker? flow-runner-acc-tracker? flow-runner-tracker-blocks? (str (get result :task-id)) (str ui-keypath) 
                         ;(str (get-in result [:status :evald-result :value 0]))
                         (get result :status) (str (get result :ui-keypath)) (str result)
                         
@@ -669,6 +670,7 @@
                                                                       {k (vec (cset/intersection (set block-keys)
                                                                                                  (set v)))}))]
                                           (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
+
             flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
                                            flow-id    (get-in result [:task-id 1])
                                            trackers   (select-keys (get result :status) block-keys)]
@@ -689,6 +691,30 @@
                                      (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
                                                (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
                                      (assoc-in task-id rtn))))
+
+            (and tracker? (get-in result [:status :start]))
+            (let [rtn         (get result :status)
+                  partial-flow-key (cstr/replace (str (last (get result :task-id))) ":" "")
+                  [flow-id step-id] (cstr/split partial-flow-key #">")
+                  step-id (keyword step-id)]
+              (ut/tapp>> [:tracker-blocks flow-id step-id rtn])
+              (assoc-in db [:flow-results :tracker flow-id step-id]
+                        rtn))
+
+            tracker? (let [rtn         (get result :status)
+                           partial-flow-key (cstr/replace (str (last (get result :task-id))) ":" "")
+                           [flow-id step-id] (cstr/split partial-flow-key #">")
+                           step-id (keyword step-id)
+                           ;mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
+                           ;return-maps (get-in db [:flow-results :return-maps] {})
+                           ]
+                       ;(ut/tapp>> [:tracker-update flow-id step-id rtn])
+                       (if (= rtn :started) ;; TODO, this eliminates the nice animations, but ensures data delivery per block.
+                         (assoc-in db task-id rtn)
+                         (-> db
+                             (assoc-in [:flow-results :return-maps flow-id step-id] rtn) ;; keeping
+                             ;(assoc-in [:flow-results :tracker flow-id step-id] rtn)
+                             )))
 
             heartbeat? (-> db
                            (assoc-in [:status task-id ui-keypath] (get-in result [:status :subs]))

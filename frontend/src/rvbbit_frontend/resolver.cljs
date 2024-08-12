@@ -246,6 +246,6 @@
     block-map))
 
 
-;; (re-frame/reg-sub ::logic-and-params (fn [_ {:keys [m p]}] (logic-and-params-fn m p)))
+(re-frame/reg-sub ::logic-and-params (fn [_ {:keys [m p]}] (logic-and-params m p)))
 
 ;; (defn logic-and-params [m p] @(ut/tracked-sub ::logic-and-params {:m m :p p}))

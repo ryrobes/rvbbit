@@ -698,23 +698,37 @@
                                            (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">incremental")))))
          ;_ (tapp>> [:output-solvers clover-solvers  @db/solver-fn-lookup])
          warren-item             (get db :selected-warren-item)
-         solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
+         solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals & solvers") (get db :flow?))
          solver                  (if (and (get-in db [:solvers-map warren-item :data]) solver-open?)
                                    [(keyword (str "solver/" (ut/replacer (str warren-item) ":" "")))
                                     (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">extra"))
                                     (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">output"))
                                     (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">error"))
+                                    (keyword (str "solver-status/" client-name-str ">" (ut/replacer (str warren-item) ":" "") ">running?"))
+                                    (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">incremental"))
                                     (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">history"))]
                                    [])
+         ss-filter-results       (fn [x y]
+                                   (if (or (nil? x) (empty? x))
+                                     y
+                                     (if (map? y)
+                                       (into {}
+                                             (filter (fn [[k v]]
+                                                       (or (cstr/includes? (cstr/lower-case (str k)) (cstr/lower-case x))
+                                                           (cstr/includes? (cstr/lower-case (str v)) (cstr/lower-case x))))
+                                                     y))
+                                       (vec (filter #(cstr/includes? (cstr/lower-case (str %)) (cstr/lower-case x)) y)))))
+         all-solvers             (ss-filter-results @db/signals-searcher-atom (get db :solvers-map))
+         all-signals             (ss-filter-results @db/signals-searcher-atom (get db :signals-map))
          solvers                 (if (and solver-open? (some #(= % "solvers") @db/selectors-open))
-                                   (vec (for [ss (keys (get db :solvers-map))]
+                                   (vec (for [ss (keys all-solvers)]
                                           (keyword (str "solver-meta/" (ut/replacer (str ss) ":" "") ">extra"))))
                                    [])
-         signals-mode?           (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals
+         signals-mode?           (and (= (get @db/flow-editor-system-mode 0) "signals & solvers") ;; signals
                                       (get db :flow?))
          signals-box-open?       (some #(= % "signals") @db/selectors-open)
          signal-ui-refs          (when signals-box-open?
-                                   (vec (for [ss (keys (get db :signals-map))]
+                                   (vec (for [ss (keys all-signals)]
                                           (keyword (str "signal/" (ut/replacer (str ss) ":" ""))))))
          signal-ui-part-refs     (when (and warren-item signals-mode?)
                                    (let [pps (ut/where-dissect (get-in db [:signals-map warren-item :signal]))]
@@ -738,8 +752,8 @@
                                                                         out-type @(ut/tracked-sub ::repl-output-type {:panel-key selected-block :view-name selected-view})
                                                                         ;;console-key (keyword (str meta-kw ">output>evald-result>out"))
                                                                         console-key (if (= out-type :output-live)
-                                                                                     (keyword (str meta-kw ">incremental"))
-                                                                                     (keyword (str meta-kw ">output>evald-result>out")))
+                                                                                      (keyword (str meta-kw ">incremental"))
+                                                                                      (keyword (str meta-kw ">output>evald-result>out")))
                                                                         ;;ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})
                                                                         ]]
                                                               [(keyword (str (ut/replacer s ":solver/" (str "solver-status/" client-name-str ">"))))
@@ -1055,28 +1069,42 @@
      ;(for [b blocks] (for [r runners-map] (get-in db [:panels b r])))
      )))
 
-(re-frame/reg-sub ::same-tab?
-                  (fn [db [_ panel-key1 panel-key2]]
-                    (= (get-in db [:panels panel-key1 :tab] "") (get-in db [:panels panel-key2 :tab] ""))))
+(re-frame/reg-sub 
+ ::same-tab?
+ (fn [db [_ panel-key1 panel-key2]]
+   (= (get-in db [:panels panel-key1 :tab] "") (get-in db [:panels panel-key2 :tab] ""))))
 
-(defn partition-keywords [keywords] (let [str-keywords (map str keywords)] (group-by #(cstr/includes? % "||") str-keywords)))
+(defn partition-keywords [keywords]
+  (let [str-keywords (map str keywords)]
+    (group-by #(or (cstr/includes? % "flow-runner")
+                   (cstr/includes? % "tracker")) str-keywords)))
 
-(re-frame/reg-sub ::partitioned-subs ;; in order to abuse re-frame subscription caching
-                  (fn [db _] (partition-keywords (get db :flow-subs []))))
+(re-frame/reg-sub 
+ ::partitioned-subs ;; in order to abuse re-frame subscription caching
+ (fn [db _] (partition-keywords (get db :flow-subs []))))
 
-(re-frame/reg-sub ::flow-watcher-subs :<- [::partitioned-subs] (fn [subs _] (get subs true [])))
+(re-frame/reg-sub 
+ ::flow-watcher-subs :<- [::partitioned-subs] (fn [subs _] (get subs true [])))
 
-(re-frame/reg-sub ::server-subs :<- [::partitioned-subs] (fn [subs _] (get subs false [])))
+(re-frame/reg-sub 
+ ::server-subs :<- [::partitioned-subs] (fn [subs _] (get subs false [])))
 
-(re-frame/reg-sub ::flow-watcher-subs-grouped
-                  :<-
-                  [::flow-watcher-subs]
-                  (fn [subs _]
-                    (if (empty? subs)
-                      {}
-                      (->> subs
-                           (map #(second (ut/splitter (str %) "||")))
-                           frequencies))))
+
+(re-frame/reg-sub
+ ::all-server-subs
+ (fn [db _] (get db :flow-subs [])))
+
+(re-frame/reg-sub
+ ::flow-watcher-subs-grouped
+ :<-
+ [::flow-watcher-subs]
+ (fn [subs _]
+   (if (empty? subs)
+     {}
+     (->> subs
+          (map #(second (ut/splitter (str %) "/")))
+          (map #(first (ut/splitter (str %) ">")))
+          frequencies))))
 
 (re-frame/reg-sub ::tabs
                   (fn [db]
@@ -3577,11 +3605,307 @@
                     y))
       (vec (filter #(cstr/includes? (cstr/lower-case (str %)) (cstr/lower-case x)) y)))))
 
-(defn click-param-browser
+
+(defn click-browser-vdata-rendered [width-int]
+  (let [click-params        @(ut/tracked-sub ::all-click-params {})
+        ;ph                  @param-hover ;; reaction hack
+        pf                  @db/param-filter
+        selected-block      @(ut/tracked-sub ::selected-block {})
+        ;selected-tab        @(ut/tracked-sub ::selected-tab {})
+                ;;_ (tapp>> [:gg (apply merge click-params)])
+        current-tab-queries (try         ;(map #(-> % ut/sql-keyword str)
+                              (into (into (vec @(ut/tracked-sub ::current-tab-queries {}))
+                                          (vec @(ut/tracked-sub ::current-tab-blocks {})))
+                                    (vec @(ut/tracked-sub ::current-tab-condis {})))
+                              (catch :default _ []))
+        current-tab-slices   @(ut/tracked-sub ::current-tab-slices {}) ;; contains ALL view names, makes above redunctant.  TODO
+                ;;_ (tapp>> [:current-tab-slices current-tab-slices])
+        valid-params-in-tab  @(ut/tracked-sub ::valid-params-in-tab {})
+                ;_ (tapp>> [:valid-params-in-tab valid-params-in-tab])
+        clover-params       (if @db/cm-focused? @(ut/tracked-sub ::clover-params-in-view {}) {})
+        grp (or (apply merge click-params) {})
+        filtered-params (into {}
+                              (filter
+                               #(and ;; filter out from the top bar toggle first....
+                                 (not (= (str (first %)) ":/")) ;; sometimes a garbo
+                                                                              ;; param sneaks in
+                                 (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
+                                 (not (cstr/starts-with? (str (first %)) ":panel-hash/"))
+                                 (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
+                                 (not (cstr/starts-with? (str (first %)) ":solver-status/"))
+                                 (not (cstr/starts-with? (str (first %)) ":signal/"))
+                                 (and (not (cstr/starts-with? (str (first %)) ":server/"))
+                                      (not (cstr/ends-with? (str (first %)) "-chart")))
+                                 (not (and (cstr/starts-with? (str (first %)) ":solver/")
+                                           (re-matches #".*\d" (str (first %)))))
+                                 (not (cstr/ends-with? (str (first %)) "*running?"))
+                                 (not (cstr/ends-with? (str (first %)) "/selected-view"))
+                                 (not (cstr/ends-with? (str (first %)) "/selected-block"))
+                                 (not (cstr/ends-with? (str (first %)) "/selected-view-data"))
+                                 (not (nil? (last %))) ;; no nil val params 
+                                 (not (cstr/starts-with? (str (first %)) ":conn-list/"))
+                                 (not (cstr/starts-with? (str (first %)) ":time/"))
+                                 (not (cstr/starts-with? (str (first %)) ":sys/"))
+                                 (not (cstr/starts-with? (str (first %)) ":client/"))
+                                 (not (cstr/starts-with? (str (first %)) (if (get pf :theme) ":theme/***" ":theme/")))
+                                 (not (cstr/starts-with? (str (first %)) (if (get pf :user) ":param/***" ":param/")))
+                                 (not (cstr/starts-with? (str (first %))
+                                                         (if (get pf :condis) ":condi/***" ":condi/")))
+                                 (if (get pf :this-tab? true)
+                                   (or
+                                    (some (fn [x] (= (str x) (str (first %)))) valid-params-in-tab) ;; TODO this is redundant and wasteful w slices here
+                                    (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-slices)
+                                    (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-queries))
+                                   true)
+                                 (not (cstr/includes? (str (first %)) "-sys/")))
+                               grp))
+                    ;;_ (tapp>>  [:grp click-params valid-params-in-tab])
+        searches?       (and (ut/ne? @searcher-atom) (>= (count (str @searcher-atom)) 2))
+        filter-keys     (if searches?
+                                     ;(vec (filter-search @searcher-atom (keys (into {} grp))))
+                          (vec (filter-search @searcher-atom (keys grp)))
+                          (vec (keys filtered-params)))
+        filtered-params (select-keys (into {} grp) filter-keys)
+        filtered-params (if @db/cm-focused? (select-keys grp clover-params) filtered-params)
+        ;is-not-empty?   (ut/ne? (remove empty? filtered-params))
+        v-boxes (vec (for [[k v] (sort filtered-params)]
+                       (let [psplit        (ut/splitter (ut/safe-name (str k)) "/")
+                             table         (-> (first psplit)
+                                               (ut/replacer #":" "")
+                                                                          ;(ut/replacer ".*" "") ;; was stopping deletion. do we need this for something else? 7/19/24
+                                               keyword)
+                             field         (keyword (last psplit))
+                             param-has-fn? (try (and (= (first v) :run-solver) (= table :param)) (catch :default _ false))
+                                                                                     ;;param-value (str @(ut/tracked-subscribe [::conn/clicked-parameter [table field]]))
+                             param-value   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                            {:keypath [(keyword (cstr/join "/"
+                                                                                           (map #(cstr/replace (str %) ":" "")
+                                                                                                [table field])))]})
+                             k k
+                             v             (str (or param-value v))
+                             meta          @(ut/tracked-sub ::meta-from-param-name {:param-name k})
+                             dtype         (if param-has-fn? (ut/data-typer param-value) (get meta :data-type))
+                                                                                    ;;  dtype         (try (if (and (= dtype "vector") (every? string? v)) "string" dtype)
+                                                                                    ;;                     (catch :default _ dtype)) ;; since stringified code is
+                             dcolor        (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
+                                                                                    ;;  _ (tapp>> [:params dtype dcolor v param-value])
+                             param-value   (str param-value) ;; since the rest expects it
+
+                                                                                     ;;  _ (ut/tapp>> [[table field]  param-value])
+                             is-map?       (or (= dtype "map") (= dtype "vector")) ;;assoc-happy data
+                             is-image?     (and (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
+                                                    (cstr/ends-with? (cstr/lower-case (str param-value)) ".webp")
+                                                    (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
+                                                    (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpeg")
+                                                    (cstr/ends-with? (cstr/lower-case (str param-value)) ".gif")
+                                                    (cstr/includes? (cstr/lower-case (str param-value)) "/images/")
+                                                    (cstr/includes? (cstr/lower-case (str param-value)) "/image/"))
+                                                (or
+                                                 (cstr/starts-with? (cstr/lower-case (str param-value)) "http")
+                                                 (cstr/starts-with? (cstr/lower-case (str param-value)) "./images")))
+                             is-b64?       (ut/is-base64? (str param-value))
+                             is-video?     (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
+                                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
+                             selected?     @(ut/tracked-subscribe [::has-query? selected-block table])
+                             display-v     (cond (= dtype "map") "{ ... map hidden ... }"
+                                                 is-b64?         "**huge base64 string**"
+                                                 :else           (str v))
+                             px-height     (max
+                                            (+ 10 (* (Math/ceil (/ (count (str display-v)) 40)) 20))
+                                            40)
+                             pwidth        (js/Math.floor (/ (count (str param-value)) 1.7))
+                             pwidth        (cond (> pwidth 30) 30
+                                                 (< pwidth 6)  6
+                                                 :else         pwidth)
+                             pheight       (js/Math.floor (/ pwidth 30))
+                             pheight       (cond (> pheight 3) 3
+                                                 (< pheight 1) 1
+                                                 :else         pheight)
+                             ;hovered?      (= k (first @param-hover))
+                             bvwidth (- width-int 50)
+                             bvheight (+ px-height 8)]
+                         {:psplit psplit :table table :field field :param-has-fn? param-has-fn? :display-v display-v
+                          :param-value param-value :v v :k k :meta meta :dtype dtype :dcolor dcolor
+                          :is-map? is-map? :is-image? is-image? :is-b64? is-b64? :is-video? is-video?
+                          :selected? selected? :px-height px-height :pwidth pwidth :pheight pheight :bvwidth bvwidth :bvheight bvheight})))]
+    v-boxes))
+
+
+;;@db/param-filter
+;;(reset! db/param-v-boxes (click-browser-vdata-rendered 350))   
+
+
+(defn click-param-browser-cached
+  [click-params width-int height-int]
+  
+  (let [ph                  @param-hover ;; reaction hack
+        pf                  @db/param-filter
+        selected-block      @(ut/tracked-sub ::selected-block {})
+        selected-tab        @(ut/tracked-sub ::selected-tab {})
+        ;;_ (tapp>> [:gg (apply merge click-params)])
+        current-tab-queries (try         ;(map #(-> % ut/sql-keyword str)
+                              (into (into (vec @(ut/tracked-sub ::current-tab-queries {}))
+                                          (vec @(ut/tracked-sub ::current-tab-blocks {})))
+                                    (vec @(ut/tracked-sub ::current-tab-condis {})))
+                              (catch :default _ []))
+        current-tab-slices   @(ut/tracked-sub ::current-tab-slices {}) ;; contains ALL view names, makes above redunctant.  TODO
+        ;;_ (tapp>> [:current-tab-slices current-tab-slices])
+        valid-params-in-tab  @(ut/tracked-sub ::valid-params-in-tab {})
+        ;_ (tapp>> [:valid-params-in-tab valid-params-in-tab])
+        clover-params       (if @db/cm-focused? @(ut/tracked-sub ::clover-params-in-view {}) {})
+        grp (or (apply merge click-params) {})
+        v-boxes (vec (for [{:keys [psplit  table  field  param-has-fn?
+                                   param-value  v k  meta  dtype  dcolor display-v
+                                   is-map?  is-image?  is-b64?  is-video?
+                                   selected?  px-height  pwidth  pheight  bvwidth  bvheight]} @db/param-v-boxes
+                           :let [hovered?      (= k (first @param-hover))]]
+                       [bvwidth
+                        bvheight
+                        (draggable ;(sql-spawner-filter :param [k table field])
+                         {:h         (cond is-image? 6
+                                           is-video? 9
+                                           is-map? 9
+                                           :else     (+ 2 pheight))
+                          :w         (cond is-image? 6
+                                           is-video? 13
+                                           is-map? 9
+                                           :else     pwidth)
+                          :root      [0 0]
+                          :drag-meta {:type :param :param-full k :param-type dtype :param-table table :param-field field}}
+                         "meta-menu"
+                         [re-com/v-box
+                          :height (px px-height)
+                          :width (px (- width-int 50))
+                          :size "none"
+                          :attr {:on-mouse-enter #(reset! param-hover [k table field])
+                                 :on-mouse-over  #(when (not hovered?) (reset! param-hover [k table field]))
+                                 :on-mouse-leave #(reset! param-hover nil)}
+                          :style {:border           (str "1px solid " dcolor)
+                                  :overflow       "hidden"
+                                                              ;:margin-bottom  "6px"
+                                  :background-color (if hovered? (str dcolor 55) (if selected? (str dcolor 20) "inherit"))}
+                          :children
+                          [[re-com/h-box :justify :between :children
+                            [[re-com/box :child
+                              (str (if hovered?
+                                     (let [chars (count (str k))
+                                           len   25
+                                           wide? (> chars len)]
+                                       (if wide? (str (subs (str k) 0 len) "...") (str k)))
+                                     (str k))
+                                   (when param-has-fn? " *ƒ"))
+                              :style {:color dcolor :font-weight 700 :font-size "13px"
+                                      :padding-left "4px" :padding-right "4px"}]
+
+                             (if hovered?
+                               [re-com/h-box
+                                :gap "4px"
+                                :children
+                                [[re-com/md-icon-button
+                                  :md-icon-name "zmdi-copy"
+                                  :style {:color        dcolor
+                                          :padding      "0px"
+                                          :margin-top   "-2px"
+                                          :margin-right "3px"
+                                          :font-size    "14px"
+                                          :height       "15px"}
+                                  :on-click #(ut/tracked-dispatch [::conn/copy-to-clipboard (str k)])]
+                                 [re-com/md-icon-button
+                                  :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close"
+                                  :style {:color        dcolor
+                                          :padding      "0px"
+                                          :margin-top   "-2px"
+                                          :margin-right "3px"
+                                          :font-size    "14px"
+                                          :height       "15px"}
+                                  :on-click #(ut/tracked-dispatch [::conn/declick-parameter [table field]])]]]
+                               [re-com/box
+                                :child (str dtype)
+                                :style {:color dcolor :font-size "10px" :padding-top "3px" :padding-left "4px" :padding-right "4px"}])]]
+                           [re-com/box
+                            :child
+                            (if (scrub/hex-color? v)
+                              [re-com/h-box
+                               :gap "7px"
+                               :children [(str v)
+                                          [re-com/box :src (at) :child " " :size "auto" :width "15px" :height "15px" :style
+                                           {:background-color (str v) :margin-top "2px" :padding-left "3px" :padding-right "3px"}]]]
+                              (if (nil? v)
+                                "NULL"
+                                display-v))
+                            :style (merge {:color          (str (theme-pull :theme/editor-font-color nil) 99) ; "#ffffff99"
+                                           :font-size      "13px"
+                                           :font-weight    700
+                                           :padding-left   "4px"
+                                           :padding-right  "4px"
+                                           :padding-bottom "2px"}
+                                          (if (nil? v) {:font-style "italic" :opacity 0.3} {})) :align :end]]])]))]
+    (if false ;@db/param-code-hover
+      [re-com/v-box :padding "6px" :width (px (- width-int 33)) :align :center :justify :between :gap "10px" :children
+       [[re-com/box :style
+         {:font-size        "14px"
+          :font-weight      700
+          :border-radius    "5px"
+          :color            (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")) ;; (theme-pull
+          :padding          "4px"
+          :background-color (get (theme-pull :theme/data-colors nil) "keyword")} :align :center :justify :center :child
+         (str @db/param-code-hover)]
+        (let [code @db/param-code-hover
+              code (try (edn/read-string code) (catch :default _ code))
+              vv   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
+          [re-com/box :size "auto" :width "100%" :style {:font-size "15px"} :child [map-boxes2 vv nil "" [] nil nil] :style
+           {;:color "white"
+            :border-radius "4px"}])]]
+      [re-com/v-box :children
+       [[re-com/h-box :padding "6px" :height "33px" :width (px (- width-int 33)) :align :center :justify :between :children
+         (if @db/cm-focused?
+           [[re-com/box :size "auto" :align :center :justify :center :style
+             {:color "#ffffff99" :font-size "14px" :font-weight 500} 
+             :child "clover params used in this view"]]
+           [[re-com/input-text :src (at) :model searcher-atom :width "93%" :on-change
+             #(reset! searcher-atom (let [vv (str %) ;; (cstr/trim (str %))
+                                          ]
+                                      (if (empty? vv) nil vv))) :placeholder "(search parameters)" :change-on-blur? false :style
+             {:text-decoration  (when (ut/ne? @searcher-atom) "underline")
+              :color            "inherit"
+              :border           "none"
+              :outline          "none"
+              :text-align       "center"
+              :background-color "#00000000"}]
+            [re-com/box :style
+             {;:border "1px solid maroon"
+              :opacity (if @searcher-atom 1.0 0.45)
+              :cursor  "pointer"} :width "20px" :align :center :justify :center :attr {:on-click #(reset! searcher-atom nil)}
+             :child "x"]])]
+
+        (when (ut/ne? grp)
+          [reecatch
+           [re-com/box
+            :size "none"
+            :width (px (- width-int 24))
+            :height (px (- height-int 103))
+            :style {:overflow-y "auto"
+                    :padding-top "4px"
+                    :overflow-x "hidden"}
+            :child (if (ut/ne? v-boxes)
+                     [vbunny/virtual-v-box
+                      :height (px (Math/floor (- height-int 113)))
+                      :width (px (Math/floor (- width-int 33)))
+                      :id (str "parameter-browser" selected-tab)
+                      :children v-boxes]
+                     [re-com/box
+                      :size "auto"
+                      :height "100px"
+                      :align :center :justify :center
+                      :child "no params found"])]])]])))
+
+
+(defn click-param-browser ;; has a very annoying scrolling problem. I've wasted too much time on this bullshit.
   [click-params width-int height-int]
   (let [ph                  @param-hover ;; reaction hack
         pf                  @db/param-filter
         selected-block      @(ut/tracked-sub ::selected-block {})
+        selected-tab        @(ut/tracked-sub ::selected-tab {})
         ;;_ (tapp>> [:gg (apply merge click-params)])
         current-tab-queries (try         ;(map #(-> % ut/sql-keyword str)
                               (into (into (vec @(ut/tracked-sub ::current-tab-queries {}))
@@ -3687,159 +4011,167 @@
                  filtered-params (if @db/cm-focused? (select-keys grp clover-params) filtered-params)
                  is-not-empty?   (ut/ne? (remove empty? filtered-params))
                  ;_ (tapp>> [:ser filtered-params])
+                 sorted-filtered (sort filtered-params)
+                 last-key (atom nil)
                  ]
               ;;(tapp>>  [:param-counts (count (keys filtered-params))])
              (if is-not-empty?
-               [vbunny/virtual-v-box
-                ;:gap "6px"
-                :height (px (- height-int 103))
-                :width (px (- width-int 33))
-                :id (str "parameter-browser" (hash filtered-params))
-                :style {:cursor "grab" 
-                        ;:background-color (theme-pull :theme/editor-param-background-color nil)
-                        }
-                :children
-                (for [[k v] (sort filtered-params)]
-                  (let [psplit        (ut/splitter (ut/safe-name (str k)) "/")
-                        table         (-> (first psplit)
-                                          (ut/replacer #":" "")
-                                           ;(ut/replacer ".*" "") ;; was stopping deletion. do we need this for something else? 7/19/24
-                                          keyword)
-                        field         (keyword (last psplit))
-                        param-has-fn? (try (and (= (first v) :run-solver) (= table :param)) (catch :default _ false))
+               (let [v-boxes (vec (for [[k v] (sort filtered-params)]
+                                    (let [psplit        (ut/splitter (ut/safe-name (str k)) "/")
+                                          table         (-> (first psplit)
+                                                            (ut/replacer #":" "")
+                                                            ;(ut/replacer ".*" "") ;; was stopping deletion. do we need this for something else? 7/19/24
+                                                            keyword)
+                                          field         (keyword (last psplit))
+                                          param-has-fn? (try (and (= (first v) :run-solver) (= table :param)) (catch :default _ false))
                                           ;;param-value (str @(ut/tracked-subscribe [::conn/clicked-parameter [table field]]))
-                        param-value   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                       {:keypath [(keyword (cstr/join "/"
-                                                                                      (map #(cstr/replace (str %) ":" "")
-                                                                                           [table field])))]})
-                        v             (str (or param-value v))
-                        meta          @(ut/tracked-sub ::meta-from-param-name {:param-name k})
-                        dtype         (if param-has-fn? (ut/data-typer param-value) (get meta :data-type))
-                                         ;;  dtype         (try (if (and (= dtype "vector") (every? string? v)) "string" dtype)
-                                         ;;                     (catch :default _ dtype)) ;; since stringified code is
-                        dcolor        (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
-                                         ;;  _ (tapp>> [:params dtype dcolor v param-value])
-                        param-value   (str param-value) ;; since the rest expects it
+                                          param-value   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                         {:keypath [(keyword (cstr/join "/"
+                                                                                                        (map #(cstr/replace (str %) ":" "")
+                                                                                                             [table field])))]})
+                                          v             (str (or param-value v))
+                                          meta          @(ut/tracked-sub ::meta-from-param-name {:param-name k})
+                                          dtype         (if param-has-fn? (ut/data-typer param-value) (get meta :data-type))
+                                                                      ;;  dtype         (try (if (and (= dtype "vector") (every? string? v)) "string" dtype)
+                                                                      ;;                     (catch :default _ dtype)) ;; since stringified code is
+                                          dcolor        (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
+                                                                      ;;  _ (tapp>> [:params dtype dcolor v param-value])
+                                          param-value   (str param-value) ;; since the rest expects it
 
-                                          ;;  _ (ut/tapp>> [[table field]  param-value])
-                        is-map?       (or (= dtype "map") (= dtype "vector")) ;;assoc-happy data
-                        is-image?     (and (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
-                                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".webp")
-                                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
-                                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpeg")
-                                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".gif")
-                                               (cstr/includes? (cstr/lower-case (str param-value)) "/images/")
-                                               (cstr/includes? (cstr/lower-case (str param-value)) "/image/"))
-                                           (or
-                                            (cstr/starts-with? (cstr/lower-case (str param-value)) "http")
-                                            (cstr/starts-with? (cstr/lower-case (str param-value)) "./images")))
-                        is-b64?       (ut/is-base64? (str param-value))
-                        is-video?     (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
-                                          (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
-                        selected?     @(ut/tracked-subscribe [::has-query? selected-block table])
-                        display-v     (cond (= dtype "map") "{ ... map hidden ... }"
-                                            is-b64?         "**huge base64 string**"
-                                            :else           (str v))
-                        px-height     (max
-                                       (+ 10 (* (Math/ceil (/ (count (str display-v)) 40)) 20))
-                                       40)
-                        pwidth        (js/Math.floor (/ (count (str param-value)) 1.7)) 
-                        pwidth        (cond (> pwidth 30) 30
-                                            (< pwidth 6)  6
-                                            :else         pwidth)
-                        pheight       (js/Math.floor (/ pwidth 30))
-                        pheight       (cond (> pheight 3) 3
-                                            (< pheight 1) 1
-                                            :else         pheight)
-                        hovered?      (= k (first @param-hover))] 
-                    [(- width-int 50) 
-                     (+ px-height 9)
-                     (draggable ;(sql-spawner-filter :param [k table field])
-                     {:h         (cond is-image? 6
-                                       is-video? 9
-                                       is-map? 9
-                                       :else     (+ 2 pheight))
-                      :w         (cond is-image? 6
-                                       is-video? 13
-                                       is-map? 9
-                                       :else     pwidth)
-                      :root      [0 0]
-                      :drag-meta {:type :param :param-full k :param-type dtype :param-table table :param-field field}}
-                     "meta-menu"
-                     [re-com/v-box
-                      :height (px px-height)
-                      :width (px (- width-int 50))
-                      :size "none"
-                      :attr {:on-mouse-enter #(reset! param-hover [k table field]) :on-mouse-leave #(reset! param-hover nil)}
-                      :style {:border           (str "1px solid " dcolor)
-                              :overflow       "hidden"
-                              :margin-bottom  "6px"
-                              :background-color (if hovered? (str dcolor 55) (if selected? (str dcolor 20) "inherit"))}
-                      :children
-                      [[re-com/h-box :justify :between :children
-                        [[re-com/box :child
-                          (str (if hovered?
-                                 (let [chars (count (str k))
-                                       len   25
-                                       wide? (> chars len)]
-                                   (if wide? (str (subs (str k) 0 len) "...") (str k)))
-                                 (str k))
-                               (when param-has-fn? " *ƒ"))
-                          :style {:color dcolor :font-weight 700 :font-size "13px"
-                                  :padding-left "4px" :padding-right "4px"}]
+                                                                       ;;  _ (ut/tapp>> [[table field]  param-value])
+                                          is-map?       (or (= dtype "map") (= dtype "vector")) ;;assoc-happy data
+                                          is-image?     (and (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
+                                                                 (cstr/ends-with? (cstr/lower-case (str param-value)) ".webp")
+                                                                 (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
+                                                                 (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpeg")
+                                                                 (cstr/ends-with? (cstr/lower-case (str param-value)) ".gif")
+                                                                 (cstr/includes? (cstr/lower-case (str param-value)) "/images/")
+                                                                 (cstr/includes? (cstr/lower-case (str param-value)) "/image/"))
+                                                             (or
+                                                              (cstr/starts-with? (cstr/lower-case (str param-value)) "http")
+                                                              (cstr/starts-with? (cstr/lower-case (str param-value)) "./images")))
+                                          is-b64?       (ut/is-base64? (str param-value))
+                                          is-video?     (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
+                                                            (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
+                                          selected?     @(ut/tracked-subscribe [::has-query? selected-block table])
+                                          display-v     (cond (= dtype "map") "{ ... map hidden ... }"
+                                                              is-b64?         "**huge base64 string**"
+                                                              :else           (str v))
+                                          px-height     (max
+                                                         (+ 10 (* (Math/ceil (/ (count (str display-v)) 40)) 20))
+                                                         40)
+                                          pwidth        (js/Math.floor (/ (count (str param-value)) 1.7))
+                                          pwidth        (cond (> pwidth 30) 30
+                                                              (< pwidth 6)  6
+                                                              :else         pwidth)
+                                          pheight       (js/Math.floor (/ pwidth 30))
+                                          pheight       (cond (> pheight 3) 3
+                                                              (< pheight 1) 1
+                                                              :else         pheight)
+                                          hovered?      (= k (first @param-hover))
+                                          new-field?    (not= table @last-key)
+                                          _ (reset! last-key table)]
+                                      [(- width-int 50)
+                                       (+ px-height (if new-field? 10 0))
+                                       (draggable ;(sql-spawner-filter :param [k table field])
+                                        {:h         (cond is-image? 6
+                                                          is-video? 9
+                                                          is-map? 9
+                                                          :else     (+ 2 pheight))
+                                         :w         (cond is-image? 6
+                                                          is-video? 13
+                                                          is-map? 9
+                                                          :else     pwidth)
+                                         :root      [0 0]
+                                         :drag-meta {:type :param :param-full k :param-type dtype :param-table table :param-field field}}
+                                        "meta-menu"
+                                        [re-com/v-box
+                                         :height (px px-height)
+                                         :width (px (- width-int 50))
+                                         :size "none"
+                                         :attr {:on-mouse-enter #(reset! param-hover [k table field])
+                                                :on-mouse-over  #(when (not hovered?) (reset! param-hover [k table field]))
+                                                :on-mouse-leave #(reset! param-hover nil)}
+                                         :style {:border           (str "1px solid " dcolor)
+                                                 :overflow       "hidden"
+                                            ;:margin-bottom  "6px"
+                                                 :background-color (if hovered? (str dcolor 55) (if selected? (str dcolor 20) "inherit"))}
+                                         :children
+                                         [[re-com/h-box :justify :between :children
+                                           [[re-com/box :child
+                                             (str (if hovered?
+                                                    (let [chars (count (str k))
+                                                          len   25
+                                                          wide? (> chars len)]
+                                                      (if wide? (str (subs (str k) 0 len) "...") (str k)))
+                                                    (str k))
+                                                  (when param-has-fn? " *ƒ"))
+                                             :style {:color dcolor :font-weight 700 :font-size "13px"
+                                                     :padding-left "4px" :padding-right "4px"}]
 
-                         (if hovered?
-                           [re-com/h-box
-                            :gap "4px"
-                            :children
-                            [[re-com/md-icon-button
-                              :md-icon-name "zmdi-copy"
-                              :style {:color        dcolor
-                                      :padding      "0px"
-                                      :margin-top   "-2px"
-                                      :margin-right "3px"
-                                      :font-size    "14px"
-                                      :height       "15px"}
-                              :on-click #(ut/tracked-dispatch [::conn/copy-to-clipboard (str k)])]
-                             [re-com/md-icon-button
-                              :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close"
-                              :style {:color        dcolor
-                                      :padding      "0px"
-                                      :margin-top   "-2px"
-                                      :margin-right "3px"
-                                      :font-size    "14px"
-                                      :height       "15px"}
-                              :on-click #(ut/tracked-dispatch [::conn/declick-parameter [table field]])]]]
-                           [re-com/box :child (str dtype) :style
-                            {:color dcolor :font-size "10px" :padding-top "3px" :padding-left "4px" :padding-right "4px"}])]]
-                       [re-com/box
-                        :child
-                        (if (scrub/hex-color? v)
-                          [re-com/h-box :gap "7px" :children
-                           [(str v)
-                            [re-com/box :src (at) :child " " :size "auto" :width "15px" :height "15px" :style
-                             {:background-color (str v) :margin-top "2px" :padding-left "3px" :padding-right "3px"}]]]
-                          (if (nil? v)
-                            "NULL"
-                            display-v)) :style
-                        (merge {:color          (str (theme-pull :theme/editor-font-color nil) 99) ; "#ffffff99"
-                                :font-size      "13px"
+                                            (if hovered?
+                                              [re-com/h-box
+                                               :gap "4px"
+                                               :children
+                                               [[re-com/md-icon-button
+                                                 :md-icon-name "zmdi-copy"
+                                                 :style {:color        dcolor
+                                                         :padding      "0px"
+                                                         :margin-top   "-2px"
+                                                         :margin-right "3px"
+                                                         :font-size    "14px"
+                                                         :height       "15px"}
+                                                 :on-click #(ut/tracked-dispatch [::conn/copy-to-clipboard (str k)])]
+                                                [re-com/md-icon-button
+                                                 :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close"
+                                                 :style {:color        dcolor
+                                                         :padding      "0px"
+                                                         :margin-top   "-2px"
+                                                         :margin-right "3px"
+                                                         :font-size    "14px"
+                                                         :height       "15px"}
+                                                 :on-click #(ut/tracked-dispatch [::conn/declick-parameter [table field]])]]]
+                                              [re-com/box
+                                               :child (str dtype)
+                                               :style {:color dcolor :font-size "10px" :padding-top "3px" :padding-left "4px" :padding-right "4px"}])]]
+                                          [re-com/box
+                                           :child
+                                           (if (scrub/hex-color? v)
+                                             [re-com/h-box
+                                              :gap "7px"
+                                              :children [(str v)
+                                                         [re-com/box :src (at) :child " " :size "auto" :width "15px" :height "15px" :style
+                                                          {:background-color (str v) :margin-top "2px" :padding-left "3px" :padding-right "3px"}]]]
+                                             (if (nil? v)
+                                               "NULL"
+                                               display-v))
+                                           :style (merge {:color          (str (theme-pull :theme/editor-font-color nil) 99) ; "#ffffff99"
+                                                          :font-size      "13px"
+                                                          :font-weight    700
+                                                          :padding-left   "4px"
+                                                          :padding-right  "4px"
+                                                          :padding-bottom "2px"}
+                                                         (if (nil? v) {:font-style "italic" :opacity 0.3} {})) :align :end]]])])))]
+                 ;;(tapp>> [:param-steps (str "parameter-browser" (hash filtered-params) width-int height-int) (- height-int 103) (- width-int 33)])
+                 [vbunny/virtual-v-box
+                  :height (px (Math/floor (- height-int 113)))
+                  :width (px (Math/floor (- width-int 33)))
+                  :id (str "parameter-browser" selected-tab)
+                  ;:fixed? true
+                  ;; :style {:cursor "grab"
+                  ;;       ;:background-color (theme-pull :theme/editor-param-background-color nil)
+                  ;;         }
+                  ;:children (vec (interpose [(- width-int 50) 6 [:div ""]] v-boxes))
+                  :children v-boxes])
+               [re-com/box
+                :size "auto"
+                :height "100px"
+                :align :center :justify :center
+                :child "no params found"]))]])]]))) ;]
 
-                                :font-weight    700
-                                :padding-left   "4px"
-                                :padding-right  "4px"
-                                :padding-bottom "2px"}
-                               (if (nil? v) {:font-style "italic" :opacity 0.3} {})) :align :end]]])]))]
-                               [re-com/box 
-                                :size "auto"
-                                :height "100px"
-                                :align :center :justify :center 
-                                :child "no params found"]
-                               ))]])]]))) ;]
 
 
-
-(defn click-param-browser-nbkup
+(defn click-param-browser-reg
   [click-params width-int height-int]
   (let [ph                  @param-hover ;; reaction hack
         pf                  @db/param-filter
@@ -3904,6 +4236,7 @@
                                                                             ;; param sneaks in
                                            (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
                                            (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
+                                           (not (cstr/starts-with? (str (first %)) ":panel-hash/"))
                                            (not (cstr/starts-with? (str (first %)) ":solver-status/"))
                                            (not (cstr/starts-with? (str (first %)) ":signal/"))
                                            (and (not (cstr/starts-with? (str (first %)) ":server/"))
@@ -6596,7 +6929,6 @@
 
         implied-rowset? @(ut/tracked-sub ::is-implied-rowset? {:data-keypath data-keypath})
         draggable (if implied-rowset? draggable-stub draggable)
-
         query-key (first data-keypath)
         w (get panel-map :w 11)
         h (get panel-map :h 10)
@@ -6801,7 +7133,7 @@
                                                 (not (= data-keypath [:blocks-sys])))
                                            385
                                            :else equal-width-final)
-                                     (and (some #(= % c) (keys custom-col-widths))) (get custom-col-widths c) ;; :col-wdiths
+                                     (some #(= % c) (keys custom-col-widths)) (get custom-col-widths c) ;; :col-wdiths
                                                                                                                ;; keys exists
                                                                                                                ;; in
                                      :else                                          equal-width-final)
@@ -7755,6 +8087,7 @@
                                  (for [[k v] (get-in db [:click-param])]
                                    (into {} (for [[kk vv] v] {(keyword (str (ut/safe-name k) "/" (ut/safe-name kk))) vv})))))))
 
+
 (re-frame/reg-sub
  ::all-click-params
  (fn [db]
@@ -7763,6 +8096,33 @@
          cc         (merge clicks all-condis)]
      (vec (remove empty?
                   (for [[k v] cc] (into {} (for [[kk vv] v] {(keyword (str (ut/safe-name k) "/" (ut/safe-name kk))) vv}))))))))
+
+;; (defn update-click-params-snapshot []
+;;   (let [current-params @(ut/tracked-sub ::all-click-params {})]
+;;     (reset! db/click-params-snapshot current-params)))
+
+(re-frame/reg-fx
+ :update-click-params-snapshot
+ (fn [_]
+   (let [current-params @(ut/tracked-sub ::all-click-params {})]
+     (reset! db/click-params-snapshot current-params))))
+
+(re-frame/reg-event-fx
+ ::update-click-params-snapshot
+ (fn [_ _]
+   {:update-click-params-snapshot nil}))
+
+;; (tapp>> [:update-click-params-snapshot! (update-click-params-snapshot)])
+
+(re-frame/reg-sub
+ ::all-click-params-snapshot
+ (fn [_ _]
+   (let [snapshot @db/click-params-snapshot]
+     (if (or (nil? snapshot) (empty? snapshot))
+       @(ut/tracked-sub ::all-click-params {})
+       snapshot))))
+
+
 
 ;;(tapp>> @(re-frame/subscribe [::all-click-params]))
 
@@ -10149,8 +10509,9 @@
                   :pair-fn {:hang? true}
                   :binding       {:force-nl? true}
                   :vector        {:respect-nl? true}
-                  :color?        true
-                    ;;:color-map     {}
+                  ;:color?        true
+                  ;;:color-map     {}
+                  ;:color-map     {:paren :pink}
                   :parse         {:interpose "\n\n"}}))
 
 
@@ -10279,7 +10640,7 @@
               :dropdown #(dropdown (try (assoc % :panel-key panel-key) (catch :default _ %)))
               :atom #(reagent/atom %)
               :get get
-                                             ;;:edn #(edn-box (+ px-width-int 70) (+ px-height-int 55) %)
+              ;;:edn #(edn-box (+ px-width-int 70) (+ px-height-int 55) %)
               :edn (fn [x] (let [viewer (choose-viewer (pr-str x))] ;; should we virtualize?
                              (if (= viewer :virtualized)
                                (let [text (if (vector? x) (cstr/join "\n" x) (pr-str x))
@@ -12557,7 +12918,6 @@
      :changed (into {} (map (fn [k] [k {:from (map1 k) :to (map2 k)}]) changed))}))
 
 (defn maybedoall [] (let [hover-highlight? (or @param-hover @query-hover)] (if hover-highlight? doall seq)))
-
 
 (re-frame/reg-sub
  ::block-in-alert?

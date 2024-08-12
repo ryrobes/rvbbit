@@ -97,6 +97,8 @@
 (defonce time-usage (atom []))
 (defonce scheduler-atom (atom {}))
 
+(defonce conn-map (atom {}))
+
 ;; (defonce watcher-log (atom {}))
 
 (defonce timekeeper-failovers (atom {}))
@@ -832,7 +834,7 @@
 
 (def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :kit  :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status :estimate [:estimate] :tracker :alert :alerts :alert1 :alert2 :alert3}) ;; to not skip old dupes
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status :estimate [:estimate] :tracker :condis [:tracker] :alert :alerts :alert1 :alert2 :alert3}) ;; to not skip old dupes
 
 (defn sub-push-loop ;; legacy, but flawed?
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -2884,16 +2886,22 @@
   [{:keys [client-name flow-key]}]
   (unsub-value client-name flow-key))
 
+;;(ut/pp (get @db/atoms-and-watchers :keen-aquamarine-raven-32))
+
 (defn remove-watchers-for-flow
   [flow-id & [client-name]]
-  (doseq [[c-name subs] @db/atoms-and-watchers
-          :let          [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))]
+  (doseq [[c-name subs] (if client-name 
+                          (select-keys @db/atoms-and-watchers [client-name]) 
+                            @db/atoms-and-watchers)
+          :let          [matching-subs (filter #(= (first (:keypath %)) flow-id) (vals subs))]
           :when         (ut/ne? matching-subs)]
     (ut/pp [:matching-subs c-name matching-subs])
     (doseq [sub matching-subs]
-      (do (ut/pp [:removing (count matching-subs) :watchers :for flow-id c-name
-                  [[(:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub)]]])
-          (db/remove-watcher (:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub))))))
+      (do ;; (ut/pp [:removing (count matching-subs) :watchers :for flow-id c-name
+          ;;         [[(:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub)]]])
+          (db/remove-watcher (:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub))
+                             ;;[keypath client-name sub-type flow-id flow-key]
+          ))))
 
 
 
@@ -3598,6 +3606,7 @@
                                              :value      (-> (assoc output :return-maps
                                                                     (select-keys (get output :return-maps) [flow-id]))
                                                              (dissoc :tracker)
+                                                             (dissoc :source-map) ;; dont need if we have SQL + flow history UI logs
                                                              (dissoc :tracker-history))
                                              :output-val output-val
                                              :flow-id    flow-id
@@ -3855,6 +3864,10 @@
           (unsub-value k s))
         (doseq [p (filter #(cstr/includes? (str %) (cstr/replace (str k) ":" "")) (keys @ppy/dyn-pools))]
           (ppy/close-cached-thread-pool p))
+        (let [conn (get @conn-map k)
+              cn (get conn :datasource)]
+          (ut/ppa [:shutting-down-connection-pool k cn])
+          (sql/close-pool cn))
         (swap! db/atoms-and-watchers dissoc k) ;; remove client from watchers atom (should already be empty from unsub, but just in case)
         (swap! client-queues dissoc k)
         (swap! client-panels dissoc k)
@@ -3925,7 +3938,7 @@
           first-tracker? (empty? (get-in @tracker-client-only [flow-id client-name]))]
       (when true ;running? ;; true ;(and new? running?) ;; (not= tracker last-tracker)
         (swap! tracker-client-only assoc-in [flow-id client-name] tracker)
-        (when false ;; DEPRECATED ;(not running?) ;; test to stop thrash... worth it?
+        (when false ;true ;; DEPRECATED ;(not running?) ;; test to stop thrash... worth it?
           (kick client-name (vec (cons :tracker keypath)) (if first-tracker? (assoc tracker :*start! [{}]) tracker) nil nil nil))
         (when (ut/ne? condis) ;; still need this little guy tho
           (kick client-name (vec (cons :condis keypath)) condis nil nil nil))))))
@@ -4202,35 +4215,95 @@
 (defmethod wl/handle-request :sub-to-running-values
   [{:keys [client-name flow-keys flow-id]}]
   (ut/pp [:sub-to-running-values client-name flow-keys])
-  (let [flow-keys (if (empty? flow-keys) (gen-flow-keys flow-id client-name) flow-keys)] ;; jumping
+  (let [ff flow-id
+        flow-keys (if (empty? flow-keys) 
+                    (gen-flow-keys flow-id client-name) 
+                    flow-keys)
+        ] ;; jumping
+    (ut/pp [:flow-keys flow-keys])
+
+;;  (db/add-watcher [flow-id :tracker-blocks]
+;;                  client-name
+;;                  send-tracker-block-runner
+;;                   ;(keyword (str "blocks||" flow-id "||" (hash keypath)))
+;;                  (keyword (str "flow-status/" flow-id ))
+;;                  :tracker
+;;                  flow-id)
+
     (doseq [keypath flow-keys]
-      (let [[flow-id step-id] keypath]
+      (let [[flow-id step-id] keypath
+            step-id (cstr/replace (str step-id) ":" "")]
         ;;(ut/pp [:client-sub-flow-runner flow-id :step-id step-id :client-name client-name])
+        ;;(db/add-watcher keypath client-name send-reaction flow-key :param-sub)
+
+                ;; (db/add-watcher keypath
+                ;;                 client-name
+                ;;                 send-tracker-runner
+                ;;         ;(keyword (str "tracker||" flow-id "||" (hash keypath)))
+                ;;                 (keyword (str "flow/" flow-id ">" step-id))
+                ;;                 :tracker
+                ;;                 flow-id)
+
+;; :running-blocks :done-blocks :error-blocks :waiting-blocks]
+
         (db/add-watcher keypath
                         client-name
-                        send-reaction-runner
-                        (keyword (str "runner||" flow-id "||" (hash keypath)))
+                        (fn [base-type keypath client-name new-value]
+                          ;(send-tracker-runner base-type keypath client-name new-value)
+                          (send-reaction-runner base-type keypath client-name new-value)
+                          ;(send-acc-tracker-runner base-type keypath client-name new-value)
+                          ;(send-tracker-block-runner base-type keypath client-name new-value)
+                          )
+                        ;(keyword (str "tracker||" flow-id "||" (hash keypath)))
+                        (keyword (str "flow-runner/" flow-id ">" step-id))
                         :flow-runner
-                        flow-id)
+                        ff)
+
+
         (db/add-watcher keypath
                         client-name
-                        send-tracker-runner
-                        (keyword (str "tracker||" flow-id "||" (hash keypath)))
+                        (fn [base-type keypath client-name new-value]
+                          (send-tracker-block-runner base-type keypath client-name new-value)
+                          (send-tracker-runner base-type keypath client-name new-value)
+                          (send-acc-tracker-runner base-type keypath client-name new-value)
+                                                  ;(send-acc-tracker-runner base-type keypath client-name new-value)
+                                                  ;(send-tracker-block-runner base-type keypath client-name new-value)
+                          )
+                                                ;(keyword (str "tracker||" flow-id "||" (hash keypath)))
+                        (keyword (str "tracker/" flow-id ">" step-id))
                         :tracker
-                        flow-id)
-        (db/add-watcher keypath
-                        client-name
-                        send-tracker-block-runner
-                        (keyword (str "blocks||" flow-id "||" (hash keypath)))
-                        :tracker
-                        flow-id)
-        (db/add-watcher keypath
-                        client-name
-                        send-acc-tracker-runner
-                        (keyword (str "acc-tracker||" flow-id "||" (hash keypath)))
-                        :tracker
-                        flow-id)))
-    (boomerang-client-subs client-name))
+                        ff)
+
+        ;; (db/add-watcher keypath
+        ;;                 client-name
+        ;;                 send-reaction-runner
+        ;;                 ;(keyword (str "runner||" flow-id "||" (hash keypath)))
+        ;;                 (keyword (str "flow/" flow-id ">" step-id))
+        ;;                 :flow-runner
+        ;;                 flow-id)
+        ;; (db/add-watcher keypath
+        ;;                 client-name
+        ;;                 send-tracker-runner
+        ;;                 (keyword (str "tracker||" flow-id "||" (hash keypath)))
+        ;;                 :tracker
+        ;;                 flow-id)
+        ;; (db/add-watcher keypath
+        ;;                 client-name
+        ;;                 send-tracker-block-runner
+        ;;                 ;(keyword (str "blocks||" flow-id "||" (hash keypath)))
+        ;;                 (keyword (str "flow/" flow-id ">" step-id))
+        ;;                 :tracker
+        ;;                 flow-id)
+
+        ;; (db/add-watcher keypath
+        ;;                 client-name
+        ;;                 send-acc-tracker-runner
+        ;;                 (keyword (str "flow/" flow-id ">" step-id))
+        ;;                 :tracker
+        ;;                 flow-id)
+        ))
+    ;; (boomerang-client-subs client-name)
+    )
   [:copy-that client-name])
 
 (defmethod wl/handle-request :open-ai-push
@@ -4251,7 +4324,7 @@
 (defn insert-into-cache [key value]
   (swap! sql-cache assoc key value))
 
-(defonce conn-map (atom {}))
+
 
 (defn get-connection-string [connection-id]
   (let [;conn (sql-query-one system-db (to-sql {:select [:original_connection_str] :from
@@ -4726,7 +4799,7 @@
                     completion-channel (async/chan) ;; moved to outer
                     data-literal-insert-error (atom nil)
                     honey-sql
-                    (if (or post-sniffed-literal-data? literal-data?)
+                    (if (or post-sniffed-literal-data? literal-data?) ;; 8/11/23 - ALL this logic is deprecated. double-check.
                       (let [;_ (ut/pp [:last-let? honey-sql])
                             cache-table cache-table-name ;(str (ut/keypath-munger ui-keypath)
                             honey-sql   (if data-literal-code? honey-sql (ut/lists-to-vectors honey-sql))
@@ -4849,7 +4922,7 @@
                                  (do (ut/pp [:transform (assoc orig-honey-sql :from [:data])])
                                      (let [res (ts/transform (assoc orig-honey-sql :from [:data]) result)] res))
                                  result)
-                        result (if has-rql?
+                        result (if has-rql? ;; RQL deprecated as well due to proper :post-process-fn REPL integration? ... except read-edn? double-check. TODO
                                  (let [walk-map (get-in @rql-holder ui-keypath)
                                        replaced
                                        (vec
@@ -4950,12 +5023,12 @@
                         result-hash (hash result)]
                      ;(enqueue-task-sql-meta 
 
-                    (when (not= (hash honey-sql) (get-in @sniff-meta-guard [ui-keypath client-name])) ;; only on new sql construct
+                    (when (not= (hash honey-sql) (get-in @sniff-meta-guard [ui-keypath client-name])) ;; sniff & push meta only on new sql construct
                       (ut/pp [:sniff-meta! ui-keypath client-name])
                       (qp/slot-queue :sql-meta client-name
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?))))
 
-                    (if sniffable?
+                    (if sniffable? ;; aka reco check. need to rename since it's hella confusing with all the sniffing.
                       (doall
                        (do
                          (swap! deep-run-list conj filtered-req-hash) ;; mark this as run
@@ -5010,7 +5083,8 @@
                                                                        reco-count
                                                                        (get run-it :elapsed-ms)))))) ;; vertica
                                                  ))))
-                      (when sniff-worthy? ;; want details, but not yet the full expensive meta
+                      
+                      (when sniff-worthy? ;; want details, but not yet the full expensive meta (again, naming is terrible and confusing)
                         ;(enqueue-task
 
                         (when (not= (hash honey-sql) (get @quick-sniff-hash [cache-table-name client-name]))
@@ -5048,6 +5122,7 @@
                                     ;;         filtered-req-hash])
                                                      ))))
                           (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql)))))
+                    
                     (do ;(swap! sql-cache assoc req-hash output)
                       ;; (kick client-name "kick-test!" (first ui-keypath) ;; <-- adds a kick kit panel entry for each query run, but adds up fast...
                       ;;       "query-log"
@@ -5059,21 +5134,25 @@
                       ;;        ])
                       ((if (= page -2)
                          ppy/execute-in-thread-pools-but-deliver ;; we DO want to block in this situation...
-                         ppy/execute-in-thread-pools)
-                       :data-io-ops ;; potentially expensive and blocking
-                       (fn []
-                         (let [modded-meta (-> (get output :result-meta)
-                                               (assoc :original-honey (get output :original-honey))
-                                               (assoc :connection-id (get output :connection-id)))]
-                           (write-transit-data
-                            modded-meta
-                            (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
-                           (swap! db/query-metadata assoc-in [client-name (first ui-keypath)] modded-meta)
-                           (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))
-                           (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
-                           (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
-                           (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result)))))
-                      ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
+                         ppy/execute-in-thread-pools) :data-io-ops
+                                                      (fn []
+                                                        (let [modded-meta (-> (get output :result-meta)
+                                                                              (assoc :original-honey (get output :original-honey))
+                                                                              (assoc :connection-id (get output :connection-id)))]
+                                                          (write-transit-data modded-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                                                          (swap! db/query-metadata assoc-in [client-name (first ui-keypath)] modded-meta)
+                                                          (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))
+                                                          (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
+                                                          (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
+                                                          (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result))
+                                                          ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
+                                                          (insert-rowset result ;; insert into client cache sql db for potential cross-joins 
+                                                                         cache-table-name ;; ^^ (TODO make optional and add option for full row cache, but regular UI SQL behavior)
+                                                                         (first ui-keypath)
+                                                                         client-name
+                                                                         (keys (first output))
+                                                                         (sql/create-or-get-client-db-pool client-name)
+                                                                         client-name))))
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
              (catch Exception e
@@ -6372,10 +6451,39 @@
 ;; (time (draw-stats [:cpu ] [15] false nil true))
  ;;  (time (draw-stats [:cpu ] [15] false nil false))
 
-
-
-
 (defonce pool-ttls-last (atom {}))
+
+(defn show-pool-sizes-report []
+  (ut/pp [:pool-sizes
+          (let [pool-sizes (query-pool-sizes)
+                pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
+                                                           :let [runs (get-in v [1 :tasks-run] 0)
+                                                                 avgs (get-in v [1 :tasks-avg-ms] 0)]
+                                                           :when (> (get-in v [1 :current-pool-size]) 0)]
+                                                       [k (get-in v [1 :current-pool-size])
+                                                        {:runs runs
+                                                         :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
+                                                         :avg avgs}])))
+                ttls {:pools (count pairs) :threads (apply + (map second pairs))}
+                prev @pool-ttls-last]
+            (reset! pool-ttls-last ttls)
+            (into (sorted-map)
+                  {:pool-counts pairs
+                   :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
+                                                              (let [group-key (first (clojure.string/split (str k) #"\."))]
+                                                                (update acc group-key (fn [existing-runs]
+                                                                                        (if existing-runs
+                                                                                          (+ existing-runs runs)
+                                                                                          runs)))))
+                                                            {}
+                                                            pairs))
+                   :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
+                   :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
+                   :prev prev
+                   :now ttls}))]))
+
+
+
 
 ;;;(mapv (fn [x] (cstr/replace (str x) ":" "")) (keys (rvbbit-backend.websockets/stats-keywords)))
 ;;;(mapv #(cstr/replace (str %) ":" "") (keys (stats-keywords)))
@@ -6521,6 +6629,7 @@
         ;;(let [fss (flow-statuses) fssk (vec (keys fss))] (ut/pp [:flow-status (select-keys fss fssk)]))
 
         ;;(ut/pp [:date-map @time-atom])
+
         ;; (ut/pp [:sql-errors!
         ;;         {:ttl     (count @sql/errors)
         ;;          :freq    (frequencies (mapv first @sql/errors))
@@ -6606,32 +6715,33 @@
 
         ;;;(ut/pp [:pool-sizes pool-sizes])
 
-        (ut/pp [:pool-sizes
-                (let [pool-sizes (query-pool-sizes)
-                      pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
-                                                                 :let [runs (get-in v [1 :tasks-run] 0)
-                                                                       avgs (get-in v [1 :tasks-avg-ms] 0)]]
-                                                             [k (get-in v [1 :current-pool-size])
-                                                              {:runs runs
-                                                               :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
-                                                               :avg avgs}])))
-                      ttls {:pools (count pairs) :threads (apply + (map second pairs))}
-                      prev @pool-ttls-last]
-                  (reset! pool-ttls-last ttls)
-                  (into (sorted-map)
-                        {:pool-counts pairs
-                        ;;  :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
-                        ;;                                             (let [group-key (first (clojure.string/split (str k) #"\."))]
-                        ;;                                               (update acc group-key (fn [existing-runs]
-                        ;;                                                                       (if existing-runs
-                        ;;                                                                         (+ existing-runs runs)
-                        ;;                                                                         runs)))))
-                        ;;                                           {}
-                        ;;                                           pairs))
-                         :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
-                         :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
-                         :prev prev
-                         :now ttls}))])
+        ;; (ut/pp [:pool-sizes
+        ;;         (let [pool-sizes (query-pool-sizes)
+        ;;               pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
+        ;;                                                          :let [runs (get-in v [1 :tasks-run] 0)
+        ;;                                                                avgs (get-in v [1 :tasks-avg-ms] 0)]
+        ;;                                                          :when (> (get-in v [1 :current-pool-size]) 0)]
+        ;;                                                      [k (get-in v [1 :current-pool-size])
+        ;;                                                       {:runs runs
+        ;;                                                        :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
+        ;;                                                        :avg avgs}])))
+        ;;               ttls {:pools (count pairs) :threads (apply + (map second pairs))}
+        ;;               prev @pool-ttls-last]
+        ;;           (reset! pool-ttls-last ttls)
+        ;;           (into (sorted-map)
+        ;;                 {:pool-counts pairs
+        ;;                  :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
+        ;;                                                             (let [group-key (first (clojure.string/split (str k) #"\."))]
+        ;;                                                               (update acc group-key (fn [existing-runs]
+        ;;                                                                                       (if existing-runs
+        ;;                                                                                         (+ existing-runs runs)
+        ;;                                                                                         runs)))))
+        ;;                                                           {}
+        ;;                                                           pairs))
+        ;;                  :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
+        ;;                  :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
+        ;;                  :prev prev
+        ;;                  :now ttls}))])
 
         ;; (ut/pp [:client-cost (let [pool-sizes (query-pool-sizes)
         ;;                            clients (distinct 

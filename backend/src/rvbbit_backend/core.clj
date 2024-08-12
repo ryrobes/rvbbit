@@ -495,7 +495,7 @@
   ;; (doseq [args wss/master-atom-map]
   ;;   (apply wss/master-watch-splitter-2deep args))
 
-  
+
   ;; boot master watchers for defined atoms 
   (doseq [[type atom] db/master-reactor-atoms]
     ;(swap! wss/sharded-atoms assoc type (atom {})) ;; bootstrap the child atom shard
@@ -964,6 +964,18 @@
   ;;   ;; Return a function to stop the scheduler
   ;;     #(async/close! stop-ch)))
 
+;; (ut/pp (doseq [[name conn] @sql/client-db-pools]
+;;          (qp/serial-slot-queue
+;;           :re-sniff-client-sql-dbs :single
+;;           (fn []
+;;             (cruiser/lets-give-it-a-whirl-no-viz
+;;              (cstr/replace (str name) ":" "")
+;;              {:datasource conn}
+;;              system-db
+;;              cruiser/default-sniff-tests
+;;              cruiser/default-field-attributes
+;;              cruiser/default-derived-fields
+;;              cruiser/default-viz-shapes)))))
 
 ;;  (qp/cleanup-inactive-queues 10)
 
@@ -974,10 +986,10 @@
  ;;  (ut/pp @watcher-log-atom)
 
   (defn reboot-reactor-and-resub []
-    (evl/graceful-restart-nrepl-server!)
-    (Thread/sleep 10000)
+    ;(evl/graceful-restart-nrepl-server!)
+    ;(Thread/sleep 10000)
     (db/reboot-reactor!)
-    (Thread/sleep 10000)
+    ;(Thread/sleep 10000)
     (wss/reload-signals-subs)
     (wss/reload-solver-subs))
 
@@ -1054,7 +1066,11 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  ;; (start-scheduler (* 3600 8) ;; 8 hours - caused CPU freakout... quqeue party / sql-meta related. todo
+  (start-scheduler (* 3600 3) ;; 3 hours
+                   reboot-reactor-and-resub
+                   "Reboot Reactor, Subs, Pools" (* 3600 3))
+
+  ;; (start-scheduler (* 3600 8) ;; 8 hours - caused CPU freakout... queue party / sql-meta related? todo
   ;;                  reboot-reactor-and-resub
   ;;                  "Reboot Atom Reactor & nREPL server" (* 3600 8))
 
@@ -1093,17 +1109,17 @@
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper");;)
 
-  (start-scheduler (* 3600 4) ;; 4 hours
+  (start-scheduler (* 3600 8) ;; 8 hours
                    #(do
                       (ut/pp [:CLEARING-OUT-DEEP-FLATTEN-CACHE]) ;; (ut/pp (ut/calculate-atom-size :current-size wss/solvers-cache-atom)) ;; super expensive on big atoms 
                       ;(ut/pp (sql-exec system-db "delete from client_memory where 1=1;"))
                       ;(ut/pp (sql-exec system-db "delete from jvm_stats where 1=1;"))
-                      ;(reset! wss/solvers-cache-hits-atom {})
-                      ;(reset! wss/solvers-cache-atom {})
+                      (reset! wss/solvers-cache-hits-atom {})
+                      (reset! wss/solvers-cache-atom {})
                       ;;(reset! sql/errors {}) ;; just for now
                       (reset! wss/agg-cache {}) ;; <--- bigggger
                       (reset! ut/df-cache {}))  ;; <--- big boy
-                   "Purge Solver & Deep-Flatten Cache" (* 3600 2))
+                   "Purge Solver & Deep-Flatten Cache" (* 3600 8))
 
   ;; (ut/calculate-atom-size :current-size ut/df-cache)
 

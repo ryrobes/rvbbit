@@ -81,24 +81,9 @@
   ;; functions change every time they are rendered, so we can't use them inside a diff or hash
   (let [res (ut/deep-remove-keys
              children
-             [:on-click :on-context-menu :on-double-click :on-hover :on-mouse-down
+             [:on-click :on-context-menu :on-double-click :on-hover :on-mouse-down :on-mouse-leave
               :on-mouse-up :on-mouse-move :on-mouse-out :on-mouse-over :on-mouse-enter])]
     res))
-
-;; (defn calculate-v-heights [new-children id & [internal?]]
-;;   (let [new-heights (mapv second new-children)
-;;         new-cumulative-heights (reduce
-;;                                 (fn [acc height]
-;;                                   (conj acc (+ (or (last acc) 0) height)))
-;;                                 []
-;;                                 new-heights)
-;;         children-hash (hash (clean-child-map new-children id))]
-;;     ;(tapp>> [:re-calc-v-h id children-hash internal?])
-;;     (swap! scroll-state update id assoc
-;;            :heights new-heights
-;;            :children-hash children-hash
-;;            :cumulative-heights new-cumulative-heights
-;;            :total-height (last new-cumulative-heights))))
 
 (defn calculate-v-heights [new-children id & [internal?]]
   (let [new-heights (mapv second new-children)
@@ -108,6 +93,7 @@
                                 []
                                 new-heights)
         children-hash (hash (clean-child-map new-children id))]
+    ;;(ut/tapp>> [:calculate-v-heights id new-heights new-cumulative-heights children-hash])
     (swap! scroll-state update id
            (fn [state]
              (let [;old-total-height (:total-height state 0)
@@ -118,157 +104,6 @@
                    (assoc :cumulative-heights new-cumulative-heights)
                    (update :max-height #(max (or % 0) new-total-height))
                    (assoc :total-height new-total-height)))))))
-
-;; (defn virtualized-v-box [{:keys [children style width height id] :as props}]
-;;   (let [node-ref (reagent/atom {})
-;;         find-start-index (fn [scroll-top]
-;;                            (let [cumulative-heights (get-in @scroll-state [id :cumulative-heights])]
-;;                              (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
-;;                                        (range (count cumulative-heights)))
-;;                                  0)))
-;;         update-visible-range (fn [container-height scroll-top]
-;;                                (let [start (find-start-index scroll-top)
-;;                                      initial-end (find-start-index (+ scroll-top container-height))
-;;                                      end (loop [idx initial-end]
-;;                                            (let [current-height (- (get-in @scroll-state [id :cumulative-heights idx] 0)
-;;                                                                    (get-in @scroll-state [id :cumulative-heights start] 0))]
-;;                                              (if (or (>= current-height container-height) (>= idx (count children)))
-;;                                                (min (inc idx) (count children))
-;;                                                (recur (inc idx)))))
-;;                                      end (max end (min (co
-;;                                         :end end)))
-;;         handle-scroll (fn [e]
-;;                         (let [container-height (.. e -target -clientHeight)
-;;                               scroll-top (.. e -target -scrollTop)]
-;;                           (update-visible-range container-height scroll-top)))
-;;         set-scroll-position (fn [node]
-;;                               (when node
-;;                                 (let [{:keys [scroll-top total-height]} (get @scroll-state id)
-;;                                       max-scroll (- total-height height)
-;;                                       target-scroll (min (or scroll-top 0) max-scroll)]
-;;                                   (set! (.-scrollTop node) target-scroll)
-;;                                   (update-visible-range height target-scroll))))]
-
-;;     (reagent/create-class
-;;      {:component-did-mount
-;;       (fn [this [_ old-props] [_ new-props]]
-;;         (set-scroll-position (get @node-ref id)))
-
-;;       :component-will-unmount
-;;       (fn []
-;;         (when-let [node (get @node-ref id)]
-;;           (.removeEventListener node "scroll" handle-scroll)))
-
-;;       :reagent-render
-;;       (fn [{:keys [children style width height id] :as props}]
-;;         (let [{:keys [start end cumulative-heights total-height] :or {start 0 end 0}} (get @scroll-state id)
-;;               visible-children (safe-subvec children start end)
-;;               v-box-style (merge {:overflow-y "auto"
-;;                                   :overflow-x "hidden"}
-;;                                  style
-;;                                  scrollbar-stylev)]
-;;           [:div (merge
-;;                  (dissoc props :children :initial-scroll)
-;;                  {:style (merge v-box-style
-;;                                 {:width (str width "px")
-;;                                  :height (str height "px")})
-;;                   :on-scroll handle-scroll
-;;                   :ref #(swap! node-ref assoc id %)})
-;;            [:div {:style {:height (str total-height "px")
-;;                           :position "relative"}}
-;;             (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
-;;               ^{:key (str id (+ start index))}
-;;               [:div {:style {:position "absolute"
-;;                              :top (str (if (zero? (+ start index))
-;;                                          0
-;;                                          (try (nth cumulative-heights (dec (+ start index))) (catch :default _ 0))) "px")
-;;                              :height (str child-height "px")
-;;                              :width (str child-width "px")}}
-;;                child])
-;;             (let [ttl (- (count children) 1)
-;;                   rendered (- (- (- start end)) 1)
-;;                   ss  (+ start 1)
-;;                   ee (min end ttl)
-;;                   all? (= rendered ttl)
-;;                   ee (if all? (dec ee) ee)
-;;                   ttl (if all? (dec ttl) ttl)
-;;                   rendered (if all? (dec rendered) rendered)]
-;;               [:div {:style {:position "fixed"
-;;                              :bottom 15
-;;                              :font-size "11px"
-;;                              :right 13
-;;                              :font-family (theme-pull :theme/base-font nil)
-;;                              :color "#ffffff55"}}
-;;                (str ss "-" ee " of " ttl " (" rendered  " rendered)")])]]))})))e id assoc
-;;                                         :scroll-top scroll-top
-;;                                         :start start
-;;                                         :end end)))
-;;         handle-scroll (fn [e]
-;;                         (let [container-height (.. e -target -clientHeight)
-;;                               scroll-top (.. e -target -scrollTop)]
-;;                           (update-visible-range container-height scroll-top)))
-;;         set-scroll-position (fn [node]
-;;                               (when node
-;;                                 (let [{:keys [scroll-top total-height]} (get @scroll-state id)
-;;                                       max-scroll (- total-height height)
-;;                                       target-scroll (min (or scroll-top 0) max-scroll)]
-;;                                   (set! (.-scrollTop node) target-scroll)
-;;                                   (update-visible-range height target-scroll))))]
-
-;;     (reagent/create-class
-;;      {:component-did-mount
-;;       (fn [this [_ old-props] [_ new-props]]
-;;         (set-scroll-position (get @node-ref id)))
-
-;;       :component-will-unmount
-;;       (fn []
-;;         (when-let [node (get @node-ref id)]
-;;           (.removeEventListener node "scroll" handle-scroll)))
-
-;;       :reagent-render
-;;       (fn [{:keys [children style width height id] :as props}]
-;;         (let [{:keys [start end cumulative-heights total-height] :or {start 0 end 0}} (get @scroll-state id)
-;;               visible-children (safe-subvec children start end)
-;;               v-box-style (merge {:overflow-y "auto"
-;;                                   :overflow-x "hidden"}
-;;                                  style
-;;                                  scrollbar-stylev)]
-;;           [:div (merge
-;;                  (dissoc props :children :initial-scroll)
-;;                  {:style (merge v-box-style
-;;                                 {:width (str width "px")
-;;                                  :height (str height "px")})
-;;                   :on-scroll handle-scroll
-;;                   :ref #(swap! node-ref assoc id %)})
-;;            [:div {:style {:height (str total-height "px")
-;;                           :position "relative"}}
-;;             (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
-;;               ^{:key (str id (+ start index))}
-;;               [:div {:style {:position "absolute"
-;;                              :top (str (if (zero? (+ start index))
-;;                                          0
-;;                                          (try (nth cumulative-heights (dec (+ start index))) (catch :default _ 0))) "px")
-;;                              :height (str child-height "px")
-;;                              :width (str child-width "px")}}
-;;                child])
-;;             (let [ttl (- (count children) 1)
-;;                   rendered (- (- (- start end)) 1)
-;;                   ss  (+ start 1)
-;;                   ee (min end ttl)
-;;                   all? (= rendered ttl)
-;;                   ee (if all? (dec ee) ee)
-;;                   ttl (if all? (dec ttl) ttl)
-;;                   rendered (if all? (dec rendered) rendered)]
-;;               [:div {:style {:position "fixed"
-;;                              :bottom 15
-;;                              :font-size "11px"
-;;                              :right 13
-;;                              :font-family (theme-pull :theme/base-font nil)
-;;                              :color "#ffffff55"}}
-;;                (str ss "-" ee " of " ttl " (" rendered  " rendered)")])]]))})))
-
-
-
 
 (defn virtualized-v-box [{:keys [children style width height id follow?] :as props}]
   (let [;node-ref (reagent/atom nil)
@@ -305,6 +140,29 @@
                                          (assoc :scroll-top scroll-top)
                                          (assoc :max-height new-max-height)))))
                           (update-visible-range container-height scroll-top)))
+        ;; find-start-index (fn [scroll-top]
+        ;;                    (let [cumulative-heights (get-in @scroll-state [id :cumulative-heights])]
+        ;;                      (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
+        ;;                                (range (count cumulative-heights)))
+        ;;                          0)))
+        ;; update-visible-range (fn [container-height scroll-top]
+        ;;                        (let [start (find-start-index scroll-top)
+        ;;                              initial-end (find-start-index (+ scroll-top container-height))
+        ;;                              end (loop [idx initial-end]
+        ;;                                    (let [current-height (- (get-in @scroll-state [id :cumulative-heights idx] 0)
+        ;;                                                            (get-in @scroll-state [id :cumulative-heights start] 0))]
+        ;;                                      (if (or (>= current-height container-height) (>= idx (count children)))
+        ;;                                        (min (inc idx) (count children))
+        ;;                                        (recur (inc idx)))))
+        ;;                              end (max end (min (count children) (+ start 1)))] ; Ensure at least 2 items are rendered
+        ;;                          (swap! scroll-state update id assoc
+        ;;                                 :scroll-top scroll-top
+        ;;                                 :start start
+        ;;                                 :end end)))
+        ;; handle-scroll (fn [e]
+        ;;                 (let [container-height (.. e -target -clientHeight)
+        ;;                       scroll-top (.. e -target -scrollTop)]
+        ;;                   (update-visible-range container-height scroll-top)))
         set-scroll-position (fn [node]
                               (when node
                                 (let [{:keys [scroll-top total-height]} (get @scroll-state id)
@@ -321,14 +179,18 @@
       ;;   (let [node (rdom/dom-node this)]
       ;;     (reset! node-ref node)
       ;;     (set-scroll-position node)))
-      
+
       (fn [this]
-               (set-scroll-position (get @node-ref id)))
+        (set-scroll-position (get @node-ref id)))
 
       ;; :component-did-update
       ;; (fn [this old-argv new-argv]
-      ;;   (let [node @node-ref]
+      ;;   (let [node (get @node-ref id)]
       ;;     (set-scroll-position node)))
+
+      ;; :component-did-update
+      ;; (fn [this]
+      ;;   (set-scroll-position (get @node-ref id)))
 
       :component-will-unmount
       (fn []
@@ -365,7 +227,7 @@
                              :height (str child-height "px")
                              :width (str child-width "px")}}
                child])
-            
+
             ;; (let [ttl (- (count children) 1) ;; just debug bottom labels
             ;;       rendered (- (- (- start end)) 1)
             ;;       ss  (+ start 1)
@@ -381,12 +243,12 @@
             ;;                  :font-family (theme-pull :theme/base-font nil)
             ;;                  :color "#ffffff55"}}
             ;;    (str ss "-" ee " of " ttl " (" rendered  " rendered)")])
-            
             ]]))})))
 
 (defn reactive-virtualized-v-box [props]
   (fn [props]
-    (calculate-v-heights (get props :children) (get props :id) true)
+    (calculate-v-heights (get props :children)
+                         (get props :id) true)
     [:f> (with-meta virtualized-v-box
            {:key (hash [(clean-child-map (get props :children) nil) (get props :id)])})
      props]))
@@ -405,7 +267,7 @@
     :height h
     :width w}])
 
-(defn virtual-v-box [& {:keys [id children height width attr] :as cfg-map}]
+(defn virtual-v-box [& {:keys [id children height width attr fixed?] :as cfg-map}]
   (let [width  (if (string? width)  (px- width) width)
         height (if (string? height) (px- height) height)
         ;; _ (ut/tapp>> [:id id children])

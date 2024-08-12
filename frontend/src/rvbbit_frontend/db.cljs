@@ -4,6 +4,11 @@
 
 (def brick-size 50)
 
+(def click-params-snapshot (atom nil))
+(def param-v-boxes (reagent/atom nil))
+(def solver-view-mode (reagent/atom "return value"))
+(def signals-searcher-atom (reagent/atom nil))
+
 (defonce search-box (reagent/atom nil))
 (defonce context-modal-pos (reagent/atom [0 0]))
 (defonce editor-mode (reagent/atom :meta))

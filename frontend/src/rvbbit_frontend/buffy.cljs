@@ -1407,7 +1407,8 @@
 (defn render-honey-comb-fragments
   [c & [w h sys-name]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
   (let [;panel-key :virtual-panel ;:block-4752 ;:hello-there-brother
-        [panel-key key]       [(keyword (str "prando" (rand-int 123))) (keyword (str "vrando" (rand-int 123)))]  
+        [panel-key key]       [(keyword (str "prando" (rand-int 123))) (keyword (str "vrando" (rand-int 123)))]
+        panel-key (if (cstr/ends-with? (str sys-name) "-sys*") :virtual-panel panel-key)
         ;key       :virtual-view ;:view ;:ufo-country ;:heya!
         type      (cond (vector? c)                         :view
                         (string? c)                         :view

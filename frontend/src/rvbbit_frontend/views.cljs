@@ -145,15 +145,15 @@
 (defn editor-panel-metadata
   []
   (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+        client-name @(ut/tracked-sub ::bricks/client-name {})
         sql-calls  {:connections-sys {:select [;:database_name
                                                [[:case [:like :connection_str "%csv%"] "*csv-import-db*"
                                                  [:like :connection_str "%cache%"] "*cache-db*" :else :database_name]
                                                 :database_name] :connection_id]
-                                       :style-rules
-                                      {[:* :highlight-8717ss]
-                                       {:logic [:like :connection_str "%t%"] ;;[:= :connection_str "cache.db" ;;:*client-name-str
-                                      ; ]
-                                        :style {:border "1px solid red"}}}
+                                      :style-rules {[:* :highlight-8717ssa]
+                                                    {:logic [:= :connection_str (cstr/replace (str client-name) ":" "")]
+                                                     :style {;:background-color "red"
+                                                             :border "1px solid red"}}}
                                       :where [:and [:not [:like :connection_str "%rvbbit%"]]
                                               [:in :connection_id {:select [:connection_id] :from [:fields] :group-by [1]}]] ;; only dbs that have tables logged
                                       :from   [:connections]}
@@ -166,20 +166,22 @@
         sql-params (into {}
                          (for [k [:connections-sys/connection_id]]
                            {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
-                              @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))]
+                            @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
                    ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
-               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
+               (when (or (not data-exists?) unrun-sql?)
+                 (conn/sql-data [k] query "system-db")))))
     [re-com/h-box 
      :size "auto" 
      :style {;:border "1px solid green"
              :color (str (theme-pull :theme/editor-font-color nil) 35)} ;; rows label under
      :children
-     [[re-com/box :size "auto" :child [bricks/magic-table :system-connections-list* [:connections-sys] (* single-width-bricks 0.3) bricks-tall [:database_name]]]
+     [[re-com/box :size "auto" :child 
+       [bricks/magic-table :system-connections-list* [:connections-sys] (* single-width-bricks 0.3) bricks-tall [:database_name]]]
       [re-com/box :size "auto" :child
        [bricks/magic-table :system-tables-list* [:tables-sys] (* single-width-bricks 0.8) bricks-tall [:db_schema :connection_id :db_catalog]]]]]))
 
@@ -2332,7 +2334,7 @@
                              :single-width single-width
                              :single-height single-height}
         _                   (when (not= @editor-dimensions atom-map) (reset! editor-dimensions atom-map))
-        click-params        @(ut/tracked-subscribe [::bricks/all-click-params])
+        click-params        @(ut/tracked-sub ::bricks/all-click-params {})
         sql-string          (bricks/materialize-one-sql selected-block data-key)
         reco-selected       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/combo_hash]})
         reco-combo          @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/combo_edn]})
@@ -4070,7 +4072,7 @@
         screen-name (ut/safe-name @(ut/tracked-subscribe_ [::bricks/screen-name]))
         client-name @(ut/tracked-subscribe_ [::bricks/client-name])
         flow-watcher-subs-grouped @(ut/tracked-subscribe_ [::bricks/flow-watcher-subs-grouped])
-        server-subs @(ut/tracked-subscribe_ [::bricks/server-subs])
+        server-subs @(ut/tracked-subscribe_ [::bricks/all-server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})

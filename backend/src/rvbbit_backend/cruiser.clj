@@ -1493,7 +1493,7 @@
 
 (defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
  (ppy/execute-in-thread-pools
-  (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
+  :captured-sniff ;; (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
   (fn [] (swap! sniffs inc)
     (doall
      (let [res?     (not (nil? resultset))
