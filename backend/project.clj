@@ -43,6 +43,8 @@
                        [clj-commons/clj-ssh "0.5.15"]
                        [com.ryrobes/flowmaps "0.31-SNAPSHOT"]
                        [nrepl "0.9.0"]
+                       ;[nrepl "1.3.0"]
+                       ;;[org.mentat/emmy "0.32.0"]
                        [shutdown "0.1.0-SNAPSHOT"]
                        [org.hsqldb/hsqldb "2.7.1"] ;; upper case forcing bullshit. useless as a
                        [com.h2database/h2 "2.1.214"]

@@ -1,0 +1,2363 @@
+{:orders
+ {:fields-sys [:field_name :field_type :data_type],
+  :tmp--2009310190-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :tmp-1940061562-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :tmp--770684224-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--2008307386-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp-1709060667-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :flow-id-drag-7 [:flow_id :rowcnt],
+  :flow-history-drag-33
+  [:flow_id
+   :run_id
+   :parent_run_id
+   :client_name
+   :in_error
+   :started
+   :start_ts
+   :ended
+   :elapsed
+   :elapsed_seconds
+   :human_elapsed
+   :overrides
+   :ts
+   :orig_flow_id],
+  :tmp--1445713863-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :flow_history (:query_error),
+  :tmp-1616968499-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp-485011727-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ssa],
+  :tmp-1567473053-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp-1564444874-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :orig-flow-id-drag-25 [:orig_flow_id :rowcnt]},
+ :reco-preview nil,
+ :sql-source
+ {:flow_history
+  {:select [:*], :connection-id "system-db", :from [:flow_history], :limit 111},
+  :orig-flow-id-drag-25
+  {:select [:orig_flow_id [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*], :from [[:flow_history :gg477]], :where [:!= :orig_flow_id nil]}
+     :gg846]],
+   :group-by [:orig_flow_id],
+   :order-by [[:rowcnt :desc]]},
+  :flow-id-drag-7
+  {:select [:flow_id [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*], :from [[:flow_history :gg477]], :where [:!= :orig_flow_id nil]}
+     :vv761]],
+   :group-by [:flow_id],
+   :order-by [[:rowcnt :desc]]},
+  :flow-history-drag-33
+  {:select [:*],
+   :from [[:flow_history :gg477]],
+   :where [:!= :orig_flow_id nil],
+   :_last-run "09:00:27"}},
+ :meta
+ {nil
+  {:fields
+   {:video
+    {:data-type "map", :distinct 1, :group-by? true, :commons {}, :cardinality 100},
+    :total_wows_in_movie
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :release_date
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :director
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :full_line
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :movie
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :year
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :poster
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :audio
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :current_wow_in_movie
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :timestamp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :movie_duration
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :character
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {"elapsed_seconds" 1, "in_error" 1, "flow_id" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"TEXT" 8, "INTEGER" 2, "REAL" 2},
+     :cardinality 35},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"string" 8, "integer" 2, "float" 2},
+     :cardinality 35}},
+   :rowcount 14},
+  :tmp--2009310190-hist-sys {:fields {}, :rowcount 0},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 7},
+     :cardinality 14},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 7},
+     :cardinality 14},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"flows-db" 7},
+     :cardinality 14},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 7},
+     :cardinality 14},
+    :table_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"live_schedules" 1, "fn_history" 1, "flows" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? false,
+     :commons {15 2, 7 1, 20 1},
+     :cardinality 85}},
+   :rowcount 7},
+  :tmp-1940061562-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-2789 :views :clover-hop]" 3},
+     :cardinality 33},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":clover-hop" 3},
+     :cardinality 33},
+    :updated
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2024-08-11 23:37:21" 1, "2024-08-11 23:37:37" 1, "2024-08-13 13:57:04" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 3},
+     :cardinality 33},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-2789" 3},
+     :cardinality 33},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([0 1 0 1 :new] [0 1 0 1 :new] [0 1 0 1 :old] [0 1 0 1 :old] [0 1 0 1] [0 1 0 0] [0 1 0 0] [0 1 0] [0 1] [0 0] [0 0] [0])"
+      3},
+     :cardinality 33},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {":keen-aquamarine-raven-32" 2, ":independent-rectangular-sea-urchin-27" 1},
+     :cardinality 66},
+    :pre_data
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"[:app-db [:flow-subs]]" 1,
+      "[:app-db [:signals-map]]" 1,
+      "[:app-db [:solvers-map]]" 1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"[[1 [[0 {:old :flow-subs, :new :signals-map}]]]]" 1,
+      "[[1 [[0 {:old :signals-map, :new :solvers-map}]]]]" 1,
+      "[[1 [[0 {:old :solvers-map, :new :flow-subs}]]]]" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"[:app-db [:signals-map]]" 1,
+      "[:app-db [:solvers-map]]" 1,
+      "[:app-db [:flow-subs]]" 1},
+     :cardinality 100}},
+   :rowcount 3},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 96,
+     :group-by? true,
+     :commons
+     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 99,
+     :group-by? true,
+     :commons
+     {"./flows/generated-flow-map.edn" 1,
+      "./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 66, "2024-06-22 18:16:16" 1, "2024-03-14 07:50:09" 1},
+     :cardinality 34}},
+   :rowcount 99},
+  :clover-hop
+  {:fields
+   {:vec-val
+    {:data-type "keyword",
+     :distinct 32,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 32},
+  :tmp--770684224-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-10956 :views :hare-vw-1]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hare-vw-1" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-08-13 13:46:04" 1, "2024-08-13 13:51:00" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-10956" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"([1 1 :new] [1 1 :new] [1 1 :old] [1 1 :old] [1 1] [1 0] [1 0] [1] [0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])"
+      1,
+      "([0 1 :new] [0 1 :new] [0 1 :old] [0 1 :old] [0 1] [0 0] [0 0] [0])" 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":independent-rectangular-sea-urchin-27" 2},
+     :cardinality 50},
+    :pre_data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :style {:font-size \"21px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"If everybody minded their own business, the world would go around a great deal faster than it does.\"]"
+      1,
+      "[:data-viewer :runstream/a-random-wow]" 1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[[0 {:old :box, :new :data-viewer}] [1 {:old :align, :new :runstream/a-random-wow}]]"
+      1,
+      "[[1 {:old :runstream/a-random-wow, :new :runstream/add-then-multiply}]]" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:data-viewer :runstream/a-random-wow]" 1,
+      "[:data-viewer :runstream/add-then-multiply]" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :tmp--2008307386-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-11178 :views :pulled-val-2]" 3},
+     :cardinality 33},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":pulled-val-2" 3},
+     :cardinality 33},
+    :updated
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2024-08-13 15:05:14" 1, "2024-08-13 15:36:29" 1, "2024-08-13 15:36:39" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 3},
+     :cardinality 33},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-11178" 3},
+     :cardinality 33},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([0 1 0 1 :new] [0 1 0 1 :new] [0 1 0 1 :old] [0 1 0 1 :old] [0 1 0 1] [0 1 0 0] [0 1 0 0] [0 1 0] [0 1] [0 0] [0 0] [0])"
+      3},
+     :cardinality 33},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":independent-rectangular-sea-urchin-27" 3},
+     :cardinality 33},
+    :pre_data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:box :size \"auto\" :align :center :justify :center :style {} :child [:string :flow/a-random-wow>:unpack-results-map>poster]]"
+      2,
+      "[:box :size \"auto\" :align :center :justify :center :style {} :child [:string :flow/a-random-wow>unpack-results-map>poster]]"
+      1},
+     :cardinality 66},
+    :diff
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[[10 [[1 {:old :flow/a-random-wow>:unpack-results-map>poster, :new :flow/a-random-wow>unpack-results-map>poster}]]]]"
+      2,
+      "[[10 [[1 {:old :flow/a-random-wow>unpack-results-map>poster, :new :flow/a-random-wow>:unpack-results-map>poster}]]]]"
+      1},
+     :cardinality 66},
+    :data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:box :size \"auto\" :align :center :justify :center :style {} :child [:string :flow/a-random-wow>unpack-results-map>poster]]"
+      2,
+      "[:box :size \"auto\" :align :center :justify :center :style {} :child [:string :flow/a-random-wow>:unpack-results-map>poster]]"
+      1},
+     :cardinality 66}},
+   :rowcount 3},
+  :tmp-1709060667-hist-sys {:fields {}, :rowcount 0},
+  :flow-id-drag-7
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"add-then-multiply" 1, "counting-loop" 1, "a-random-wow" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? false,
+     :commons {2 1, 5 1, 27 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :flow-history-drag-33
+  {:fields
+   {:started
+    {:data-type "integer",
+     :distinct 92,
+     :group-by? true,
+     :commons {1723562100143 1, 1723559100138 1, 1723569430922 1},
+     :cardinality 100},
+    :overrides
+    {:data-type "string",
+     :distinct 60,
+     :group-by? true,
+     :commons
+     {"{:rando-string nil}" 18,
+      "nil" 10,
+      "{:rando-string \"new parameter value!\"}" 6},
+     :cardinality 65},
+    :ended
+    {:data-type "integer",
+     :distinct 92,
+     :group-by? true,
+     :commons {1723570315026 1, 1723557900968 1, 1723557876940 1},
+     :cardinality 100},
+    :run_id
+    {:data-type "string",
+     :distinct 92,
+     :group-by? true,
+     :commons
+     {"c08eefa5-8d40-42dd-b6c1-b5f3bee34978" 1,
+      "69e1bf44-5c6e-4309-ac4c-935b5e77198f" 1,
+      "b716d4fa-a6cc-4407-82de-cce14679426c" 1},
+     :cardinality 100},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"less than a second" 61, "2 seconds" 26, "1 second" 5},
+     :cardinality 3},
+    :in_error
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 92},
+     :cardinality 1},
+    :ts
+    {:data-type "string",
+     :distinct 91,
+     :group-by? true,
+     :commons
+     {"2024-08-13 17:00:00" 2, "2024-08-13 14:03:57" 1, "2024-08-13 17:31:52" 1},
+     :cardinality 98},
+    :flow_id
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"colors-of-the-moment-solver-flow-" 58, "a-random-wow" 27, "counting-loop" 5},
+     :cardinality 4},
+    :start_ts
+    {:data-type "string",
+     :distinct 92,
+     :group-by? true,
+     :commons
+     {"2024-08-13 08:55:00" 1, "2024-08-13 10:05:00" 1, "2024-08-13 10:06:46" 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":rvbbit" 58, ":keen-aquamarine-raven-32" 34},
+     :cardinality 2},
+    :orig_flow_id
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"colors-of-the-moment-solver-flow-" 52,
+      "a-random-wow" 27,
+      "node-color-thief-js-webp" 6},
+     :cardinality 5},
+    :parent_run_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 92},
+     :cardinality 1},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 84,
+     :group-by? true,
+     :commons {2.097 3, 0.797 2, 0.005 2},
+     :cardinality 91},
+    :elapsed
+    {:data-type "float",
+     :distinct 84,
+     :group-by? true,
+     :commons {2097 3, 797 2, 876 2},
+     :cardinality 91}},
+   :rowcount 92},
+  :tmp--1445713863-hist-sys {:fields {}, :rowcount 0},
+  :flow_history
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :tmp-1616968499-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-11875 :views :hare-vw]" 1},
+     :cardinality 100},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hare-vw" 1},
+     :cardinality 100},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-08-13 15:04:19" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 1},
+     :cardinality 100},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-11875" 1},
+     :cardinality 100},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([0 1 :font-size :new] [0 1 :font-size :new] [0 1 :font-size :old] [0 1 :font-size :old] [0 1 :font-size] [0 1] [0 0] [0 0] [0])"
+      1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":independent-rectangular-sea-urchin-27" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :style {:font-size \"21px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"The 'Net is a waste of time, and that's exactly what's right about it.\"]"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[[6 {:font-size {:old \"21px\", :new \"33px\"}}]]" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :style {:font-size \"33px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"The 'Net is a waste of time, and that's exactly what's right about it.\"]"
+      1},
+     :cardinality 100}},
+   :rowcount 1},
+  :tmp-485011727-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-6772 :views :pulled-val-5]" 1},
+     :cardinality 100},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":pulled-val-5" 1},
+     :cardinality 100},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-08-13 15:46:59" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 1},
+     :cardinality 100},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-6772" 1},
+     :cardinality 100},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([0 1 0 1 :new] [0 1 0 1 :new] [0 1 0 1 :old] [0 1 0 1 :old] [0 1 0 1] [0 1 0 0] [0 1 0 0] [0 1 0] [0 1] [0 0] [0 0] [0])"
+      1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":independent-rectangular-sea-urchin-27" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :size \"auto\" :align :center :justify :center :style {} :child [:string :flow/a-random-wow>:unpack-results-map>audio]]"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[[10 [[1 {:old :flow/a-random-wow>:unpack-results-map>audio, :new :flow/a-random-wow>unpack-results-map>audio}]]]]"
+      1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :size \"auto\" :align :center :justify :center :style {} :child [:string :flow/a-random-wow>unpack-results-map>audio]]"
+      1},
+     :cardinality 100}},
+   :rowcount 1},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 3, "*csv-import-db*" 1},
+     :cardinality 33},
+    :connection_id
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"history-db" 1, "imported" 1, "bigfoot-ufos" 1},
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 9},
+     :cardinality 11}},
+   :rowcount 9},
+  :tmp-1567473053-hist-sys {:fields {}, :rowcount 0},
+  :tmp-1564444874-hist-sys {:fields {}, :rowcount 0},
+  :orig-flow-id-drag-25
+  {:fields
+   {:orig_flow_id
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"add-then-multiply" 1, "counting-loop" 1, "node-color-thief-js-webp" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? false,
+     :commons {2 1, 5 1, 6 1},
+     :cardinality 100}},
+   :rowcount 5}},
+ :default-col-widths
+ {:block-3962 {:orig-flow-id-drag-25 180},
+  :block-11231 {:flow-id-drag-7 180},
+  :block-10315 {:flow-history-drag-33 100},
+  :system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys 170}},
+ :runstream-drops nil,
+ :tabs ["strategic grill locations" "happy dinosaur"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :new-block-rand
+   ["Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "It's no use going back to yesterday, because I was a different person then."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "Curiouser and curiouser!"
+    "If you don't know where you are going any road can take you there."
+    "We're all mad here."
+    "I can't go back to yesterday because I was a different person then."
+    "It's always tea-time."
+    "Begin at the beginning and go on till you come to the end; then stop."
+    "I knew who I was this morning, but I've changed a few times since then."
+    "How long is forever? Sometimes, just one second."
+    "If everybody minded their own business, the world would go around a great deal faster than it does."
+    "I don't think... then you shouldn't talk, said the Hatter."
+    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+    "Well, I never heard it before, but it sounds uncommon nonsense."
+    "Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "We're all mad here."
+    "How long is forever? Sometimes, just one second."
+    "The world is full of obvious things which nobody by any chance ever observes."
+    "Reality is that which, when you stop believing in it, doesn't go away."
+    "The sky above the port was the color of television, tuned to a dead channel."
+    "Information wants to be free."
+    "The future is already here – it's just not evenly distributed."
+    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+    "The 'Net is a waste of time, and that's exactly what's right about it."
+    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+    "The street finds its own uses for things."
+    "Accelerated world. Accelerated nervous system to go with it."
+    "The future has arrived — it's just not evenly distributed yet."
+    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+    "When you want to know how things really work, study them when they're coming apart."
+    "The human sensory system is a lot more complex and weird than most people realize."
+    "Time moves in one direction, memory in another."
+    "The only thing that keeps you sane is to think that it's all a bad dream."
+    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+    "Secrets are not the same as surprises."
+    "Neuromancer. The lane to the land of the dead."],
+   :eleven-labs-api-key nil,
+   :modes
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
+    [:pre
+     {:style
+      {:color :theme/editor-outer-rim-color,
+       :background-color "#00000000",
+       :border "none",
+       :text-shadow "4px 4px 4px #00000088",
+       :font-size "17px",
+       :font-family :theme/monospaced-font}}
+     [:string3 :*data]],
+    :edn [:edn :*data],
+    :clover [:box :child :*data],
+    :pretty [:pretty-box :*data],
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
+   :kits {},
+   :clover-templates
+   {:color-theft
+    {:args [:*input],
+     :body
+     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
+    :pretty-box
+    {:args [:*input],
+     :body
+     [:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:color :theme/editor-outer-rim-color,
+       :font-size [:auto-size-px [:string3 :*input]]}
+      :child
+      [:string3 :*input]]},
+    :clj
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
+    :clj2
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
+    :cheese-burger
+    {:args [:x],
+     :body
+     [:box
+      :style
+      {:color "yellow", :font-size "23px"}
+      :child
+      [:string3 :x "CHEESEBURGER!"]]}},
+   :eleven-labs-default-voice-name "Not OG Buffy",
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alarm-clock-tv"
+    "alarm-clock1"
+    "alarm-clock2"
+    "alarm-clock22"
+    "alarm-clock23"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blackberries"
+    "blackberries2"
+    "blackberries3"
+    "blackberries3-narrow"
+    "blackberries3-narrow2"
+    "blank-blue"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "dirty-purple"
+    "duality-of-lepus"
+    "duality-of-lepus33"
+    "duality-of-lepus33aa"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "error-monitor-vanessa4"
+    "error-monitor-vanessa5"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "game-of-life"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "looking-glass-conway"
+    "looking-glass-redux-conway2"
+    "looking-glass-redux-mix5"
+    "looking-glass-redux-test"
+    "looking-glass-redux-viking"
+    "looking-glass-redux-viking2"
+    "looking-glass-redux2"
+    "looking-glass-redux23a"
+    "looking-glass-redux23abb"
+    "looking-glass-redux23b"
+    "looking-glass-redux2a"
+    "looking-glass-redux2aa"
+    "looking-glass-redux45"
+    "looking-glass-redux79"
+    "looking-glass-sine-wave"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "nostromo-console"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pensive-look2"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "pomp-girl1"
+    "pomp-girl2"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "repl-demo-july23"
+    "repl-tests-3"
+    "retro-machines"
+    "riffle-test"
+    "server-stats"
+    "server-stats2"
+    "server-stats2a"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "solver-test"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "system-monitor"
+    "system-monitor2"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "test-blog-screen"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-memo"
+    "the-memo2"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"]}},
+ :runstreams
+ {"a-random-wow"
+  {:open? true,
+   :open-outputs? true,
+   :values
+   {:open-input {:open? true},
+    :rando-string
+    {:open? false, :value :param/zealous-magenta-panda, :source :param}},
+   :drops? false,
+   :fire? false},
+  "add-then-multiply"
+  {:open? false,
+   :open-outputs? true,
+   :values
+   {:multiplier {:open? true}, :add-val-2 {:open? true}, :add-val-1 {:open? true}}},
+  "counting-loop" {:open? true, :open-outputs? true}},
+ :editor? false,
+ :buffy? true,
+ :valid-kits
+ {[:outliers :get-outliers]
+  [[:block-3962 :queries :orig-flow-id-drag-25]
+   [:block-11231 :queries :flow-id-drag-7]
+   [:block-10315 :queries :flow-history-drag-33]]},
+ :memory [806295170 757238002 4294705152],
+ :client-name :independent-rectangular-sea-urchin-27,
+ :runstreams-lookups
+ {"counting-loop"
+  {:open-inputs {:seed-value {:user-input 1, :defaults {}, :type :integer}},
+   :blocks
+   {:sleep-then-pass
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "32"},
+    :final-value
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "33"},
+    :open-fn-2
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "33"},
+    :last-even
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "32"},
+    :seed-value
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "1"},
+    :last-odd
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "33"}}},
+  "add-then-multiply"
+  {:open-inputs
+   {:multiplier {:user-input 45, :defaults {}, :type :integer},
+    :add-val-2 {:user-input 345, :defaults {}, :type :integer},
+    :add-val-1 {:user-input 345, :defaults {}, :type :integer}},
+   :blocks
+   {:multiplier
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "45"},
+    :*
+    {:type :integer,
+     :ttype :where,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "31050"},
+    :add-val-2
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "345"},
+    :+
+    {:type :integer,
+     :ttype :where,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "690"},
+    :add-val-1
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "345"}}},
+  "a-random-wow"
+  {:open-inputs
+   {:rando-string {:user-input "feed me, seymour!", :defaults {}, :type :string},
+    :open-input
+    {:user-input {:url "https://owen-wilson-wow-api.onrender.com/wows/random"},
+     :defaults {},
+     :type :map}},
+   :blocks
+   {:movie-name
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "Cars"},
+    :unpack-results-map_poster
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "https:/images.ctfassets.net/bs8ntwkklfua/6dsHUil72TJLYqbwYME..."},
+    :rando-string
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "feed me, seymour!"},
+    :full-wow-line
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "Wow! Look at that shine!"},
+    :unpack-results-map
+    {:type :map,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:video {:1080p \"https:/videos.ctfassets.net/bs8ntwkklfua/5D..."},
+    :open-input
+    {:type :map,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:url \"https://owen-wilson-wow-api.onrender.com/wows/random\"..."},
+    :unpack-results-map_video>480p
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "https:/videos.ctfassets.net/bs8ntwkklfua/6S9OEenSTv0KCwfsVKS..."},
+    :send-info-to-client-requested
+    {:type :keyword,
+     :ttype :kick,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample ":sent!"},
+    :open-fn-5
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "feed me, seymour!"},
+    :http-call-1
+    {:type :rowset,
+     :ttype :where,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "[{:video {:1080p \"https:/videos.ctfassets.net/bs8ntwkklfua/5..."},
+    :character
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "Lightning McQueen"},
+    :unpack-results-map_poster-vw
+    {:type :vector,
+     :ttype nil,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "(renderable view)"}}},
+  nil {:open-inputs nil, :blocks nil}},
+ :flow-editor? true,
+ :openai-api-key "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",
+ :window {:w 3180, :h 1354},
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil], :clover [:clover-hop]},
+ :post-meta
+ {:tmp--2009310190-hist-sys {:* {:rowcount 0}},
+  :tables-sys {:* {:rowcount 7}},
+  :tmp-1940061562-hist-sys {:* {:rowcount 2}},
+  :flows-sys {:* {:rowcount 99}},
+  :tmp--770684224-hist-sys {:* {:rowcount 2}},
+  :tmp--2008307386-hist-sys {:* {:rowcount 3}},
+  :tmp-1709060667-hist-sys {:* {:rowcount 0}},
+  :flow-history-drag-33 {:* {:rowcount 92}},
+  :tmp--1445713863-hist-sys {:* {:rowcount 0}},
+  :tmp-1616968499-hist-sys {:* {:rowcount 0}},
+  :tmp-485011727-hist-sys {:* {:rowcount 1}},
+  :tmp-1567473053-hist-sys {:* {:rowcount 0}},
+  :tmp-1564444874-hist-sys {:* {:rowcount 0}}},
+ :flow-estimates
+ {:fields-sys {:times 0.001, :run-id :fields-sys},
+  :tmp--2009310190-hist-sys {:times 0.018, :run-id :tmp--2009310190-hist-sys},
+  :raw-custom-override330071404
+  {:times 0.018, :run-id :raw-custom-override330071404},
+  :tables-sys {:times 0.001, :run-id :tables-sys},
+  :tmp-1940061562-hist-sys {:times 0.017, :run-id :tmp-1940061562-hist-sys},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :tmp--770684224-hist-sys {:times 0.02, :run-id :tmp--770684224-hist-sys},
+  :tmp--2008307386-hist-sys {:times 0.021, :run-id :tmp--2008307386-hist-sys},
+  :tmp-1709060667-hist-sys {:times 0.018, :run-id :tmp-1709060667-hist-sys},
+  :flow-id-drag-7 {:times 0.079, :run-id :flow-id-drag-7},
+  :flow-history-drag-33 {:times 0.026, :run-id :flow-history-drag-33},
+  :tmp--1445713863-hist-sys {:times 0.015, :run-id :tmp--1445713863-hist-sys},
+  "a-random-wow" {:times 2, :run-id "24954b69-4557-4033-9f00-ea02a6362106"},
+  "counting-loop" {:times 6, :run-id "101ba1ac-bd30-4242-a041-236d6dfc71c8"},
+  :tmp-1616968499-hist-sys {:times 0.017, :run-id :tmp-1616968499-hist-sys},
+  :tmp-485011727-hist-sys {:times 0.015, :run-id :tmp-485011727-hist-sys},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :tmp-1567473053-hist-sys {:times 0.016, :run-id :tmp-1567473053-hist-sys},
+  :tmp-1564444874-hist-sys {:times 0.018, :run-id :tmp-1564444874-hist-sys},
+  :orig-flow-id-drag-25 {:times 0.036, :run-id :orig-flow-id-drag-25}},
+ :status
+ {[:runstream :add-then-multiply>blocks]
+  {:kick
+   {:multiplier
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "45"},
+    :*
+    {:type :integer,
+     :ttype :where,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "31050"},
+    :add-val-2
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "345"},
+    :+
+    {:type :integer,
+     :ttype :where,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "690"},
+    :add-val-1
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "345"}}},
+  [:flow :a-random-wow>unpack-results-map]
+  {:kick
+   {:video
+    {:1080p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/2ygrvapfepBxq29s1ATrqZ/283f5c71fea455a819f909d6d7462281/Free_Birds_Wow_3_1080p.mp4",
+     :720p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/jt5iAFRWmS7tdU9QkDONQ/811f527a78122cf4a413ed222a093f03/Free_Birds_Wow_3_720p.mp4",
+     :480p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/2togAdJUf0CiLzaUkZ8PT6/e86971c7524774473fbaf8da99a62e4e/Free_Birds_Wow_3_480p.mp4",
+     :360p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/3fkvsnUeT3rh4KcidbwN2A/9047569c66830a547bfba6b53db02b9c/Free_Birds_Wow_3_360p.mp4"},
+    :total_wows_in_movie 3,
+    :release_date "2013-11-01",
+    :director "Jimmy Hayward",
+    :full_line
+    "Wow, I've never seen so many turkeys in one place actually doing things. I'm just shocked.",
+    :movie "Free Birds",
+    :year 2013,
+    :poster
+    "https:/images.ctfassets.net/bs8ntwkklfua/7MaIGsHazkYQr23iZVVrNr/a7d63846d09edd763a818a82a6b959e3/Free_Birds_Poster.jpg",
+    :audio
+    "https:/assets.ctfassets.net/bs8ntwkklfua/1TopGBvrw6AX93t4no7SJR/fb4ce974bfa1b7b542a2115096d2cc0e/Free_Birds_Wow_3.mp3",
+    :current_wow_in_movie 3,
+    :timestamp "00:34:12",
+    :movie_duration "01:31:03",
+    :character "Reggie"}},
+  :alert1 {:alerts :alert2},
+  [:flow :counting-loop>counting-loop]
+  {:kick
+   {:sleep-then-pass 32,
+    :final-value 33,
+    :done nil,
+    :open-fn-2 33,
+    :last-even 32,
+    :open-fn-2/x {:port-in? true, :open-fn-2/x 32},
+    :seed-value 1,
+    :nilly :skip,
+    :sleep-then-pass/x {:port-in? true, :sleep-then-pass/x 1},
+    :opts-map
+    {:flow-id "counting-loop",
+     :client-name :independent-rectangular-sea-urchin-27,
+     :debux? false,
+     :close-on-done? true,
+     :debug? false,
+     :opts
+     {:retry-on-error? false,
+      :retries 0,
+      :loops 33,
+      :debug? false,
+      :close-on-done? true,
+      :timeout 8000},
+     :timeout 8000,
+     :increment-id? false,
+     :run-id "9fe740d8-83ad-4a83-a2a4-4e6e8b268109"},
+    :last-odd 33,
+    :run-id "9fe740d8-83ad-4a83-a2a4-4e6e8b268109"}},
+  [:flow :a-random-wow>audio] {:kick nil},
+  [:flow :counting-loop>final-value] {:kick 33},
+  :heartbeat
+  {:kick
+   [:solver/raw-custom-override-1200522590
+    :flow/a-random-wow>:full-wow-line
+    :solver-status/independent-rectangular-sea-urchin-27>raw-custom-override330071404>running?
+    :flow/a-random-wow>:character
+    :runstream/add-then-multiply
+    :flow/a-random-wow>unpack-results-map>video>720p
+    :solver/raw-custom-override199600605
+    :flow/a-random-wow>unpack-results-map>poster
+    :flow/a-random-wow>:unpack-results-map>release_date
+    :flow-status/counting-loop>*running?
+    :solver-status/independent-rectangular-sea-urchin-27>raw-custom-override-1526705629>running?
+    :flow/a-random-wow>unpack-results-map>audio
+    :solver-status/independent-rectangular-sea-urchin-27>raw-custom-override-1200522590>running?
+    :flow-status/add-then-multiply>*running?
+    :solver/raw-custom-override-1526705629
+    :flow/a-random-wow>:unpack-results-map
+    :runstream/counting-loop
+    :solver/raw-custom-override330071404
+    :solver-status/independent-rectangular-sea-urchin-27>raw-custom-override199600605>running?
+    :flow-status/live-scratch-flow>*running?
+    :runstream/a-random-wow
+    :solver/raw-custom-override416212968
+    :solver-status/independent-rectangular-sea-urchin-27>raw-custom-override416212968>running?
+    :flow-status/a-random-wow>*running?
+    :flow/a-random-wow>:movie-name]},
+  [:flow :a-random-wow>unpack-results-map_poster-vw]
+  {:kick
+   [:img
+    {:src
+     "https:/images.ctfassets.net/bs8ntwkklfua/1M4wQc5Rkk9mlcKB5Z4fga/25fef21907983d1d667e7e28c6a0ed14/Marmaduke_Poster.jpg"}]},
+  [:flow :counting-loop>open-fn-2] {:kick 33},
+  [:runstream :counting-loop>flow-id] {:kick "counting-loop"},
+  [:runstream :counting-loop]
+  {:kick
+   {:flow-id "counting-loop",
+    :description nil,
+    :open-inputs {:seed-value {:user-input 1, :defaults {}, :type :integer}},
+    :blocks
+    {:sleep-then-pass
+     {:type :integer,
+      :ttype :open-fn,
+      :meta nil,
+      :last? false,
+      :defaults {},
+      :sample "32"},
+     :final-value
+     {:type :integer,
+      :ttype :open-fn,
+      :meta nil,
+      :last? true,
+      :defaults {},
+      :sample "33"},
+     :open-fn-2
+     {:type :integer,
+      :ttype :open-fn,
+      :meta nil,
+      :last? false,
+      :defaults {},
+      :sample "33"},
+     :last-even
+     {:type :integer,
+      :ttype :open-fn,
+      :meta nil,
+      :last? false,
+      :defaults {},
+      :sample "32"},
+     :seed-value
+     {:type :integer,
+      :ttype :open-block,
+      :meta nil,
+      :last? false,
+      :defaults {},
+      :sample "1"},
+     :last-odd
+     {:type :integer,
+      :ttype :open-fn,
+      :meta nil,
+      :last? false,
+      :defaults {},
+      :sample "33"}},
+    :found? true}},
+  [:flow :a-random-wow>full-wow-line]
+  {:kick
+   "Wow, I've never seen so many turkeys in one place actually doing things. I'm just shocked."},
+  [:flow :a-random-wow>http-call-1]
+  {:kick
+   [{:video
+     {:1080p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1D3dYblPTkLmPbUWBQBdNx/fe5631d27e0e69662c2e66bea0896eec/Marmaduke_Wow_1_1080p.mp4",
+      :720p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6VNT6Hkvqw36xCDKUoPpxV/87386160ab6e0e7cc19c9f028269db91/Marmaduke_Wow_1_720p.mp4",
+      :480p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3VyX5OmniKdLM7HCSSEMo7/4e77c7fe0a636531204814ad9fc5e55d/Marmaduke_Wow_1_480p.mp4",
+      :360p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3sEgfjKPFx1rFg3XPi1jUf/694edaa7cb9534ef767b0388d15e80b0/Marmaduke_Wow_1_360p.mp4"},
+     :total_wows_in_movie 4,
+     :release_date "2010-06-04",
+     :director "Tom Dey",
+     :full_line "Oh! Whoa, whoa, wow! Whoa! Hey, I wasn't done with that!",
+     :movie "Marmaduke",
+     :year 2010,
+     :poster
+     "https:/images.ctfassets.net/bs8ntwkklfua/1M4wQc5Rkk9mlcKB5Z4fga/25fef21907983d1d667e7e28c6a0ed14/Marmaduke_Poster.jpg",
+     :audio
+     "https:/assets.ctfassets.net/bs8ntwkklfua/3NlG7pugog0bSAFWFrDMqV/194d009df87bbd25f7d89adeff19c338/Marmaduke_Wow_1.mp3",
+     :current_wow_in_movie 1,
+     :timestamp "00:06:20",
+     :movie_duration "01:28:10",
+     :character "Marmaduke"}]},
+  [:flow :a-random-wow>release_date] {:kick nil},
+  :alert2 {:alerts :alert2},
+  [:flow :a-random-wow>720p] {:kick nil},
+  [:flow :a-random-wow>poster] {:kick nil},
+  [:flow :a-random-wow>character] {:kick "Reggie"},
+  :alert3 {:alerts :alert2}},
+ :screen-name "dirty-purple",
+ :recos-page2 0,
+ :selected-tab "happy dinosaur",
+ :col-names nil,
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts
+ [["running flow a-random-wow (with overrides)"
+   10.24390243902439
+   1
+   10912
+   -484606686]
+  [[:box
+    :child
+    "sent screen save request to server... Please wait."
+    :style
+    {:font-size "12px", :opacity 0.66}]
+   11
+   0.5
+   10920
+   -1247625457]],
+ :recos-page 0,
+ :rs-overrides-hashmap
+ {"a-random-wow" {:rando-string "new parameter value!"},
+  "add-then-multiply" nil,
+  "counting-loop" nil},
+ :base-sniff-queries {:flow_history -1964522657},
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :user-params-hash -1489570889,
+ :grid-recos? true,
+ :resolved-queries
+ {:orig-flow-id-drag-25
+  {:select [:orig_flow_id [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*], :from [[:flow_history :gg477]], :where [:!= :orig_flow_id nil]}
+     :gg846]],
+   :group-by [:orig_flow_id],
+   :order-by [[:rowcnt :desc]]},
+  :flow-id-drag-7
+  {:select [:flow_id [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*], :from [[:flow_history :gg477]], :where [:!= :orig_flow_id nil]}
+     :vv761]],
+   :group-by [:flow_id],
+   :order-by [[:rowcnt :desc]]},
+  :flow-history-drag-33
+  {:select [:*],
+   :from [[:flow_history :gg477]],
+   :where [:!= :orig_flow_id nil],
+   :_last-run "09:00:27"}},
+ :panels
+ {:block-10956
+  {:h 5,
+   :w 6,
+   :root [22 10],
+   :tab "strategic grill locations",
+   :selected-view :hare-vw-1,
+   :name "block-10956",
+   :views {:hare-vw-1 [:data-viewer :runstream/add-then-multiply>blocks]},
+   :queries {}},
+  :block-5107
+  {:h 4,
+   :w 6,
+   :tab "strategic grill locations",
+   :root [16 8],
+   :name "block-5107",
+   :selected-view :pulled-val,
+   :views
+   {:pulled-val
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {}
+     :child
+     [:string :flow/a-random-wow>http-call-1>0>poster]]},
+   :queries {}},
+  :block-3962
+  {:h 5,
+   :w 8,
+   :connection-id "flows-db",
+   :name "drag-from-select-all-flow_history",
+   :queries
+   {:orig-flow-id-drag-25
+    {:select [:orig_flow_id [[:count 1] :rowcnt]],
+     :from [[:query/flow-history-drag-33 :gg846]],
+     :group-by [:orig_flow_id],
+     :order-by [[:rowcnt :desc]]}},
+   :root [31 1],
+   :tab "strategic grill locations"},
+  :block-10244
+  {:h 3,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [34 22],
+   :name ":flow/a-random-wow>:movie-name",
+   :selected-view :param-val-7,
+   :views
+   {:param-val-7
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/a-random-wow>:movie-name]]},
+   :queries {}},
+  :block-8747
+  {:h 2,
+   :w 7,
+   :views
+   {:flow-play-runstreamed
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "25px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow ["a-random-wow" "run a-random-wow" :runstream-overrides]]]},
+   :name "flow-play-from-runstreams",
+   :root [17 21],
+   :tab "strategic grill locations"},
+  :block-11178
+  {:h 4,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [19 2],
+   :name "block-11178",
+   :selected-view :pulled-val-2,
+   :views
+   {:pulled-val-2
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {}
+     :child
+     [:string :flow/a-random-wow>unpack-results-map>poster]]},
+   :queries {}},
+  :block-11231
+  {:h 5,
+   :w 8,
+   :connection-id "flows-db",
+   :name "drag-from-select-all-flow_history",
+   :queries
+   {:flow-id-drag-7
+    {:select [:flow_id [[:count 1] :rowcnt]],
+     :from [[:query/flow-history-drag-33 :vv761]],
+     :group-by [:flow_id],
+     :order-by [[:rowcnt :desc]]}},
+   :root [31 6],
+   :tab "strategic grill locations"},
+  :block-2781
+  {:h 7,
+   :w 7,
+   :root [32 11],
+   :tab "strategic grill locations",
+   :selected-view :hare-vw-2,
+   :name "block-2781",
+   :views {:hare-vw-2 [:data-viewer :runstream/counting-loop>flow-id]},
+   :queries {}},
+  :block-8578
+  {:h 14,
+   :w 19,
+   :tab "happy dinosaur",
+   :root [2 9],
+   :name "block-8578",
+   :selected-view :pulled-val-1,
+   :views
+   {:pulled-val-1
+    [:box :style {} :child [:data-viewer :flow/a-random-wow>:unpack-results-map]]},
+   :queries {}},
+  :block-11059
+  {:h 6,
+   :w 7,
+   :root [32 19],
+   :tab "strategic grill locations",
+   :selected-view :hare-vw-3,
+   :name "block-11059",
+   :views {:hare-vw-3 [:data-viewer :flow/counting-loop]},
+   :queries {}},
+  :block-10315
+  {:h 7,
+   :w 29,
+   :connection-id "flows-db",
+   :name "select-all-flow_history",
+   :queries
+   {:flow-history-drag-33
+    {:select [:*],
+     :from [[:flow_history :gg477]],
+     :where [:!= :orig_flow_id nil],
+     :_last-run "09:00:27"}},
+   :root [2 1],
+   :tab "strategic grill locations"},
+  :block-6772
+  {:h 4,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [25 19],
+   :name "block-6772",
+   :selected-view :pulled-val-5,
+   :views
+   {:pulled-val-5
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {}
+     :child
+     [:string :flow/a-random-wow>unpack-results-map>audio]]},
+   :queries {}},
+  :block-10299
+  {:h 4,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [26 2],
+   :name "block-10299",
+   :selected-view :pulled-val-3,
+   :views
+   {:pulled-val-3
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {}
+     :child
+     [:string :flow/a-random-wow>unpack-results-map>video>720p]]},
+   :queries {}},
+  :block-8182
+  {:h 17,
+   :w 14,
+   :tab "strategic grill locations",
+   :root [2 9],
+   :name ":flow/a-random-wow>:unpack-results-map_poster-vw",
+   :selected-view :param-val,
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:honeycomb :flow/a-random-wow>:unpack-results-map_poster-vw]]},
+   :queries {}},
+  :block-4861
+  {:h 3,
+   :w 6,
+   :tab "strategic grill locations",
+   :root [19 23],
+   :name ":flow/counting-loop>:open-fn-2",
+   :selected-view :param-val-4,
+   :views
+   {:param-val-4
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/counting-loop>:open-fn-2]]},
+   :queries {}},
+  :block-1568
+  {:h 3,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [25 23],
+   :name ":flow/a-random-wow>:full-wow-line",
+   :selected-view :param-val-5,
+   :views
+   {:param-val-5
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/a-random-wow>:full-wow-line]]},
+   :queries {}},
+  :block-10959
+  {:name "views-block-10959",
+   :w 14,
+   :selected-view :clover-hop-1,
+   :root [33 2],
+   :h 19,
+   :opts {:clover-hop-1 {}},
+   :tab "happy dinosaur",
+   :minimized? false,
+   :views {:clover-hop-1 [:data-viewer [:app-db [:click-param :flow]]]}},
+  :block-11875
+  {:clojure
+   {:new-clojure
+    (do
+      (ns emmy.viz
+        (:require [emmy.env :refer :all]
+                  [emmy.mafs :as mafs]
+                  [emmy.viewer :as ev]))
+      (mafs/of-x {:y sin, :color :blue}))},
+   :name "block-11875",
+   :w 16,
+   :selected-view :hare-vw,
+   :root [2 1],
+   :h 8,
+   :display {:new-clojure :value},
+   :queries {},
+   :tab "happy dinosaur",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "33px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "The 'Net is a waste of time, and that's exactly what's right about it."]}},
+  :block-1388
+  {:h 5,
+   :w 8,
+   :tab "strategic grill locations",
+   :root [17 15],
+   :name ":flow/a-random-wow>:character",
+   :selected-view :param-val-1,
+   :views
+   {:param-val-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/a-random-wow>:character]]},
+   :queries {}},
+  :block-2893
+  {:h 4,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [24 10],
+   :name "block-2893",
+   :selected-view :pulled-val-4,
+   :views
+   {:pulled-val-4
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {}
+     :child
+     [:string :flow/a-random-wow>:unpack-results-map>release_date]]},
+   :queries {}},
+  :block-1519
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :zealous-magenta-panda,
+   :h 2,
+   :views
+   {:zealous-magenta-panda
+    [:open-input
+     {:kp [:param :zealous-magenta-panda],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "clojure"}]},
+   :tab "strategic grill locations",
+   :root [22 8],
+   :name "block-1519"},
+  :block-2789
+  {:name "views-block-2789",
+   :w 15,
+   :selected-mode {:clover-hop :edn},
+   :selected-view :clover-hop,
+   :root [40 1],
+   :h 22,
+   :opts {:clover-hop {}},
+   :tab "strategic grill locations",
+   :minimized? false,
+   :views {:clover-hop [:app-db [:flow-subs]]}},
+  :block-9232
+  {:h 4,
+   :w 6,
+   :tab "happy dinosaur",
+   :root [24 14],
+   :name ":flow/a-random-wow>:character",
+   :selected-view :param-val-6,
+   :views
+   {:param-val-6
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/a-random-wow>:character]]},
+   :queries {}},
+  :block-7640
+  {:h 3,
+   :w 6,
+   :tab "strategic grill locations",
+   :root [25 21],
+   :name ":flow/counting-loop>:final-value",
+   :selected-view :param-val-3,
+   :views
+   {:param-val-3
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/counting-loop>:final-value]]},
+   :queries {}},
+  :block-6686
+  {:name ":flow/a-random-wow>:http-call-1",
+   :w 6,
+   :selected-mode {:param-val-2 :clover},
+   :selected-view :param-val-2,
+   :root [25 15],
+   :h 6,
+   :queries {},
+   :tab "strategic grill locations",
+   :views {:param-val-2 [:data-viewer :flow/a-random-wow>:http-call-1]}}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#5dc963",
+  "any" "#ffffff",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#d6e367",
+  "unknown" "#c7005d",
+  "date" "#3b528b",
+  "rabbitsql" "#FC0FC0",
+  "nil" "#ff2147"},
+ :click-param
+ {:virtual-panel {:flow-day "2024-05-24", :value 274},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "flows-db",
+   :schema_cat nil,
+   :table_name "flow_history",
+   :fields 14},
+  :grid-menu-sys* nil,
+  :prando24 {:flow-day "2024-06-27", :value 898},
+  :flow
+  {:a-random-wow>720p
+   "https:/videos.ctfassets.net/bs8ntwkklfua/5lhTTAmEIN8I5S1i7MTVg7/6747465a53447c24c82272e8438ec3ba/Cars_Wow_1_720p.mp4",
+   :counting-loop
+   {:sleep-then-pass 32,
+    :final-value 33,
+    :done nil,
+    :open-fn-2 33,
+    :last-even 32,
+    :open-fn-2/x {:port-in? true, :open-fn-2/x 32},
+    :seed-value 1,
+    :nilly :skip,
+    :sleep-then-pass/x {:port-in? true, :sleep-then-pass/x 1},
+    :opts-map
+    {:flow-id "counting-loop",
+     :client-name :independent-rectangular-sea-urchin-27,
+     :debux? false,
+     :close-on-done? true,
+     :debug? false,
+     :opts
+     {:retry-on-error? false,
+      :retries 0,
+      :loops 33,
+      :debug? false,
+      :close-on-done? true,
+      :timeout 8000},
+     :timeout 8000,
+     :increment-id? false,
+     :run-id "6a79326d-68f8-4e54-b7b5-d922bb2e01fc"},
+    :last-odd 33,
+    :run-id "6a79326d-68f8-4e54-b7b5-d922bb2e01fc"},
+   :a-random-wow>unpack-results-map
+   {:video
+    {:1080p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/5DJiY3IWvjHjmfFT6mHWTE/63ad47ecaa6e65c094000175783f749e/Cars_Wow_1_1080p.mp4",
+     :720p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/5lhTTAmEIN8I5S1i7MTVg7/6747465a53447c24c82272e8438ec3ba/Cars_Wow_1_720p.mp4",
+     :480p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/6S9OEenSTv0KCwfsVKSU1D/5f1fa3b78d5e32614e3c0268be046a8a/Cars_Wow_1_480p.mp4",
+     :360p
+     "https:/videos.ctfassets.net/bs8ntwkklfua/53WsapSnF3QVs8mVmrtcGv/206095859241881bbd5c3add0c5b980a/Cars_Wow_1_360p.mp4"},
+    :total_wows_in_movie 5,
+    :release_date "2006-06-09",
+    :director "John Lasseter",
+    :full_line "Wow! Look at that shine!",
+    :movie "Cars",
+    :year 2006,
+    :poster
+    "https:/images.ctfassets.net/bs8ntwkklfua/6dsHUil72TJLYqbwYMEjH4/387a2d9994a2f1fb069d970a0f30ba32/Cars_Poster.jpg",
+    :audio
+    "https:/assets.ctfassets.net/bs8ntwkklfua/5wTwFaxcgg9E4QIwUXTJK4/9fbcc04e27d5860c9bf3febf72c9f20d/Cars_Wow_1.mp3",
+    :current_wow_in_movie 1,
+    :timestamp "00:14:12",
+    :movie_duration "01:56:36",
+    :character "Lightning McQueen"},
+   :counting-loop>open-fn-2 33,
+   :a-random-wow>poster
+   "https:/images.ctfassets.net/bs8ntwkklfua/6dsHUil72TJLYqbwYMEjH4/387a2d9994a2f1fb069d970a0f30ba32/Cars_Poster.jpg",
+   :a-random-wow>movie-name "Cars",
+   :a-random-wow>character "Lightning McQueen",
+   :a-random-wow>release_date "2006-06-09",
+   :a-random-wow>unpack-results-map_poster-vw
+   [:img
+    {:src
+     "https:/images.ctfassets.net/bs8ntwkklfua/6Zu7ux0JYrUWk0UC8vxPtj/d0da8bfbad670655779a9921ac514759/The_Haunting_Poster.jpg"}],
+   :a-random-wow>full-wow-line "Wow! Look at that shine!",
+   :a-random-wow>audio
+   "https:/assets.ctfassets.net/bs8ntwkklfua/5wTwFaxcgg9E4QIwUXTJK4/9fbcc04e27d5860c9bf3febf72c9f20d/Cars_Wow_1.mp3",
+   :a-random-wow>unpack-results-map>release_date "2006-06-09",
+   :a-random-wow>unpack-results-map>video>720p
+   "https:/videos.ctfassets.net/bs8ntwkklfua/5lhTTAmEIN8I5S1i7MTVg7/6747465a53447c24c82272e8438ec3ba/Cars_Wow_1_720p.mp4",
+   :a-random-wow>unpack-results-map>poster
+   "https:/images.ctfassets.net/bs8ntwkklfua/6dsHUil72TJLYqbwYMEjH4/387a2d9994a2f1fb069d970a0f30ba32/Cars_Poster.jpg",
+   :a-random-wow>unpack-results-map>audio
+   "https:/assets.ctfassets.net/bs8ntwkklfua/5wTwFaxcgg9E4QIwUXTJK4/9fbcc04e27d5860c9bf3febf72c9f20d/Cars_Wow_1.mp3",
+   :counting-loop>final-value 33,
+   :counting-loopcounting-loop
+   {:sleep-then-pass 32,
+    :final-value 33,
+    :done nil,
+    :open-fn-2 33,
+    :last-even 32,
+    :open-fn-2/x {:port-in? true, :open-fn-2/x 32},
+    :seed-value 1,
+    :nilly :skip,
+    :sleep-then-pass/x {:port-in? true, :sleep-then-pass/x 1},
+    :opts-map
+    {:flow-id "counting-loop",
+     :client-name :independent-rectangular-sea-urchin-27,
+     :debux? false,
+     :close-on-done? true,
+     :debug? false,
+     :opts
+     {:retry-on-error? false,
+      :retries 0,
+      :loops 33,
+      :debug? false,
+      :close-on-done? true,
+      :timeout 8000},
+     :timeout 8000,
+     :increment-id? false,
+     :run-id "6a79326d-68f8-4e54-b7b5-d922bb2e01fc"},
+    :last-odd 33,
+    :run-id "6a79326d-68f8-4e54-b7b5-d922bb2e01fc"},
+   :counting-loop>counting-loop
+   {:sleep-then-pass 32,
+    :final-value 33,
+    :done nil,
+    :open-fn-2 33,
+    :last-even 32,
+    :open-fn-2/x {:port-in? true, :open-fn-2/x 32},
+    :seed-value 1,
+    :nilly :skip,
+    :sleep-then-pass/x {:port-in? true, :sleep-then-pass/x 1},
+    :opts-map
+    {:flow-id "counting-loop",
+     :client-name :independent-rectangular-sea-urchin-27,
+     :debux? false,
+     :close-on-done? true,
+     :debug? false,
+     :opts
+     {:retry-on-error? false,
+      :retries 0,
+      :loops 33,
+      :debug? false,
+      :close-on-done? true,
+      :timeout 8000},
+     :timeout 8000,
+     :increment-id? false,
+     :run-id "9fe740d8-83ad-4a83-a2a4-4e6e8b268109"},
+    :last-odd 33,
+    :run-id "9fe740d8-83ad-4a83-a2a4-4e6e8b268109"},
+   :a-random-wow>http-call-1>0>poster
+   "https:/images.ctfassets.net/bs8ntwkklfua/6Zu7ux0JYrUWk0UC8vxPtj/d0da8bfbad670655779a9921ac514759/The_Haunting_Poster.jpg",
+   :a-random-wow>http-call-1
+   [{:video
+     {:1080p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/NiRJbAgDb0L7VWsUfavhf/58c90628eaf4ac7283b77a42523655c8/The_Haunting_Wow_2_1080p.mp4",
+      :720p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1oaLgXumERCrVYFNlIemVS/5f23e81ec8fcca8a0707dd01d750f3eb/The_Haunting_Wow_2_720p.mp4",
+      :480p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7gJCwsq8ae8h3ChzRLofXR/24bdd578de7a009dfb62028151404d28/The_Haunting_Wow_2_480p.mp4",
+      :360p
+      "https:/videos.ctfassets.net/bs8ntwkklfua/dviTTb9fuFuTSu5xNxy3d/95ee653558e2c36ee8b78c556d8473c2/The_Haunting_Wow_2_360p.mp4"},
+     :total_wows_in_movie 5,
+     :release_date "1999-07-23",
+     :director "Jan de Bont",
+     :full_line "Wow, you're so dominant.",
+     :movie "The Haunting",
+     :year 1999,
+     :poster
+     "https:/images.ctfassets.net/bs8ntwkklfua/6Zu7ux0JYrUWk0UC8vxPtj/d0da8bfbad670655779a9921ac514759/The_Haunting_Poster.jpg",
+     :audio
+     "https:/assets.ctfassets.net/bs8ntwkklfua/4cedRRK2wHf3EM6Btf3XXG/20a89f4233361ff516032e89a9e17dc5/The_Haunting_Wow_2.mp3",
+     :current_wow_in_movie 2,
+     :timestamp "00:23:30",
+     :movie_duration "01:52:37",
+     :character "Luke Sanderson"}]},
+  :server
+  {:solvers-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ solvers running (last 23 minutes, 15 seconds / slightly up) max 1.60 solvers, min 0.87 solvers...   │\n│                                                                                                     │\n│          ▁          .                             █.                   ▄          .         █       │\n│          █          .         ▂                   █.                   █          .         █       │\n│  ▄ ▁  ▄▁ █▄▁ ▄   ▄ ▁. ▄ ▁ ▄ ▁ █▁▁   ▁ ▄  ▁▄   ▄ ▁ █.▁▁ ▁ ▁ ▄ ▁ ▄   ▄ ▁ █ ▁  ▄▁   ▁. ▄  ▄▄ ▁ █ ▁     │\n│ ▅█▂█▅▂██▅███ █▅▅▂█▅█.▅█▂█▅█ █▅███▅▅▅█ █▅▂██▅▅▅█ █▅█.██▅█▅█ █▅█ █▅▅▅█▂█▅█▅█▅▂██▅▂▅█. █▅ ██▅█▅█▅█▅    │\n│ ████████████▇███████.██████▇█████████▇█████████▇███.██████▄███▇███████████████████.▇██▇█████████    │\n│(μ 1.10)              (μ 1.11) +1%                   (μ 1.10) -1%                                    │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ solvers running (last 1 hour / flat)         max 1.20 solvers, min 0.94 solvers, avg 1.11 solvers   │\n│                                                                                                     │\n│ . ▆   ▁  ▄  █   ▆  ▄  ▁   ▄  ▁ . ▅   ▄  ▅                                                           │\n│ . █▄▄▂█ ██  █▃▄▃█ ▂█▂▅█ ▄▄█▃▃█▂.▃█ ▄▃█ ▅█                                                           │\n│ . █████████████████████▇███████.██████▇██▁                                                          │\n│ .▂█████████████████████████████.██████████                                                          │\n│ .██████████████████████████████.██████████                                                          │\n│(μ 1.11)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ solvers running (last 1 hour / flat)         max 1.16 solvers, min 0.99 solvers, avg 1.11 solvers   │\n│                                                                                                     │\n│ . █ ▂  ▄ █  ▆ ▆  ▄ █  ▂ ▆  ▅ █                                                                      │\n│ . █▇█▄██▄█▅██▂█▃▇█▃█▄▅█▅█▄▅█▃█▆                                                                     │\n│ . █████████████████████████████                                                                     │\n│ .▆█████████████████████████████                                                                     │\n│ .██████████████████████████████                                                                     │\n│(μ 1.11)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ solvers running (last 1 hour / flat)         max 1.12 solvers, min 1.09 solvers, avg 1.11 solvers   │\n│                                                                                                     │\n│ . ▇▆▆▅█                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ solvers running (last 1 hour / flat)         max 1.11 solvers, min 1.11 solvers, avg 1.11 solvers   │\n│                                                                                                     │\n│ .▆█                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ solvers running (last 1 hour / not enough data) max 1.11 solvers, min 1.11 solvers, avg 1.11 s...   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        22:45:47\n",
+   :nrepl-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ nrepl calls run (last 23 minutes, 15 seconds / flat) max 1.20 evals, min 0.80 evals, avg 1.08 ...   │\n│                                                                                                     │\n│  ▂ ▂  █▂  █▂ ▂   ▂ ▂. ▂ ▂ ▂ ▂  ▂▂   ▂ ▂  ▂▂   ▂ ▂ █.▂▂   ▂ █ ▂ ▂   ▂ ▂ ▂ ▂  █▂   ▂. ▂  █▂ ▂ █ ▂     │\n│ ▄█ █▄ ██▄▄██ █▄▄ █▄█.▄█ █▄█ █▄ ██▄ ▄█ █▄ ██▄▄▄█ █▄█.██▄▄▄█ █▄█ █▄▄▄█ █▄█▄█▄ ██▄ ▄█. █▄ ██▄█▄█▄█▄    │\n│ ██▇██▁██████▁███▇███.██▇███▁██▁███▇██▁██▇██████▁███.██████ ███▁█████▇██████▁███▁██.▁██▁█████████    │\n│ ████████████████████.██████████████████████████████.██████ ███████████████████████.█████████████    │\n│ ████████████████████.██████████████████████████████.██████▆███████████████████████.█████████████    │\n│(μ 1.08)              (μ 1.07) -1%                   (μ 1.08) +1%                                    │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ nrepl calls run (last 1 hour / flat)               max 1.12 evals, min 0.93 evals, avg 1.07 evals   │\n│                                                                                                     │\n│ . ▆▃▁   ▆▃  █▁▁▁▆  ▄ ▄  ▁▃▃▁ ▁ .▁▄ ▁▁▃ ▃▆                                                           │\n│ . █████▆██▄▆█████▆▆█▆██▄██████▆.██▆███▄██                                                           │\n│ . █████████████████████████████.█████████▆                                                          │\n│ .▅█████████████████████████████.██████████                                                          │\n│ .██████████████████████████████.██████████                                                          │\n│(μ 1.07)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ nrepl calls run (last 1 hour / slightly up)        max 1.10 evals, min 0.98 evals, avg 1.07 evals   │\n│                                                                                                     │\n│ . █▅▂▂▆▂▂█▃▆▆ ▆ ▅▃ █▂▃▂▃▆▂▃▅ █▇                                                                     │\n│ . ███████████▇█████████████████                                                                     │\n│ .▁█████████████████████████████                                                                     │\n│ .██████████████████████████████                                                                     │\n│ .██████████████████████████████                                                                     │\n│(μ 1.07)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ nrepl calls run (last 1 hour / slightly up)        max 1.08 evals, min 1.06 evals, avg 1.07 evals   │\n│                                                                                                     │\n│ .▁▇▆▆▆█                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ nrepl calls run (last 1 hour / slightly up)        max 1.08 evals, min 1.07 evals, avg 1.07 evals   │\n│                                                                                                     │\n│ .▆█                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ nrepl calls run (last 1 hour / not enough data)    max 1.07 evals, min 1.07 evals, avg 1.07 evals   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        22:45:47\n",
+   :flows-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ flows run (last 23 minutes, 15 seconds / flat)     max 0.13 flows, min 0.07 flows, avg 0.07 flows   │\n│                                                                                                     │\n│          █          .         █                 █ █.                   █          .         █       │\n│          █          .         █                 █ █.                   █          .         █       │\n│          █          .         █                 █ █.                   █          .         █       │\n│          █          .         █                 █ █.                   █          .         █       │\n│ ▃▃▃▃▃▃▃▃▃█▃▃▃▃▃▃▃▃▃▃.▃▃▃▃▃▃▃▃▃█▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃█▃█.▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃█▃▃▃▃▃▃▃▃▃▃.▃▃▃▃▃▃▃▃▃█▃▃▃    │\n│(μ 0.07)              (μ 0.07) 0%                    (μ 0.07) 0%                    (μ 0.07) 0%      │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ flows run (last 1 hour / noticeably down)          max 0.11 flows, min 0.00 flows, avg 0.07 flows   │\n│                                                                                                     │\n│ . ▄    █▄                      .                                                                    │\n│ . █▄  ▄███  ▄  ▄█  ▄  ▄   ▄  ▄ . █   ▄  ▄                                                           │\n│ .██████████████████████████████.█████████                                                           │\n│ .██████████████████████████████.█████████                                                           │\n│ .██████████████████████████████.█████████▁                                                          │\n│(μ 0.07)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ flows run (last 1 hour / noticeably down)          max 0.10 flows, min 0.06 flows, avg 0.07 flows   │\n│                                                                                                     │\n│ . █   █                                                                                             │\n│ . █  ██     █                                                                                       │\n│ . █  ███    █           █                                                                           │\n│ . █ ████ █  █ █  █ █  █ █  █ █                                                                      │\n│ .█████████████████████████████▆                                                                     │\n│(μ 0.07)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ flows run (last 1 hour / noticeably down)          max 0.08 flows, min 0.07 flows, avg 0.07 flows   │\n│                                                                                                     │\n│ .█▄                                                                                                 │\n│ .██                                                                                                 │\n│ .███ ▄▁                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ flows run (last 1 hour / noticeably down)          max 0.08 flows, min 0.07 flows, avg 0.07 flows   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█▄                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ flows run (last 1 hour / not enough data)          max 0.07 flows, min 0.07 flows, avg 0.07 flows   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        22:45:47\n",
+   :mem-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ heap memory usage (last 23 minutes, 15 seconds / noticeably down) max 26,622.13 mb, min 9,968....   │\n│                                                                                                     │\n│    ▇   ▇    ▁▃    ▁▅.  ▁      ▁    ▁█   ▆    ▂▃    .▆         ▄                   .           ▃     │\n│   ██  ▇█   ▂██    ██.  █▅   ▁▇█    ██  ▇█   ▃██   ▃.█  ▄     ▆█    ▅   ▁    ▆▂    .▃▇        ▄█     │\n│  ▇██ ▂██  ▄███  ▁███. ▆██  ▁███  ▁▇██ ▃██  ▄███  ▃█.█  █▇   ███  ▁▇█▄  █   ▆██   ▅.██   ▆   ▁██▃    │\n│ ████ ███ ▁████ ▂████. ███ ▁████ ▂████ ███ ▃████ ▄██.█ ▁██ ▁████ ▃████ ▄█ ▂████  ██.██ ▂██  ▃████    │\n│ ████▃███▂█████▃█████.▃███▂█████▃█████▂███▄█████▄███.█▃███▃█████▃█████▆██▄█████▂▇██.██▄████▄█████    │\n│(μ 18,664.30)         (μ 18,178.70) -3%              (μ 16,873.14) -8%                               │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ heap memory usage (last 1 hour / moderately up) max 19,920.51 mb, min 10,390.00 mb, avg 17,049...   │\n│                                                                                                     │\n│ .        ▅   ▃        ▅ ▁▄▂▁  █.▄▅ ▁                                                                │\n│ .  ▃▅▄ ▅ ██▆▇█ █▄ █▆▅██▅████▆██.██ █▅▅▃ ▇                                                           │\n│ .  ███▆█▆█████▄██▆█████████████.██▅██████                                                           │\n│ .▂▇████████████████████████████.█████████                                                           │\n│ .██████████████████████████████.█████████▃                                                          │\n│(μ 17,208.90)                                                                                        │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ heap memory usage (last 1 hour / moderately up) max 21,243.39 mb, min 12,140.31 mb, avg 17,317...   │\n│                                                                                                     │\n│ .                       ▃     █                                                                     │\n│ .    ▃ ▁▁▇    ▄ █ ▆▄█▂▆▄█ ▅   █                                                                     │\n│ . ▆▂▄█ ████▆█▆█▃█▄███████▂█▃▆▁█                                                                     │\n│ . ████▅████████████████████████                                                                     │\n│ .▄█████████████████████████████                                                                     │\n│(μ 17,317.85)                                                                                        │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ heap memory usage (last 1 hour / moderately up) max 18,335.77 mb, min 15,761.52 mb, avg 17,212...   │\n│                                                                                                     │\n│ .   █▅                                                                                              │\n│ . ▄▃██▃                                                                                             │\n│ . █████                                                                                             │\n│ .▇█████                                                                                             │\n│ .██████                                                                                             │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ heap memory usage (last 1 hour / moderately up) max 17,833.37 mb, min 16,633.72 mb, avg 17,233...   │\n│                                                                                                     │\n│ . █                                                                                                 │\n│ . █                                                                                                 │\n│ .▇█                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ heap memory usage (last 1 hour / not enough data) max 17,218.34 mb, min 17,218.34 mb, avg 17,2...   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        22:45:47\n",
+   :cpu-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 23 minutes, 15 seconds / significantly down)      max 9.93%, min 0.90%, avg 2.99%   │\n│                                                                                                     │\n│      ▄  ▁           .                 ▁  ▆         .                   ▄          .       █         │\n│      █  █           .▅▃        ▅      █  █        ▃.   ▃               █          .     ▄ █         │\n│      █ ▂█           .██        █      █  █        █. ▄ █               █▃         .     █ █         │\n│      █▄██▄  ▂ ▁     .██  ▁ ▂  ▇█  ▁   █  █    ▃▂▄ █. █ █               ██         .     █ █ ▆       │\n│ ▆▅▆▇▅█████▅▅█▇█▆▅▆▆█.██▅██▆█▇▅██▆▆█▆▆▅█▆██▇▆▅▆███▂█.▆█▆█▃▆▄▄▁▃▅▄▂▁▁▁▂█▁██▃▁▁▂▁▂▅▁▁.▃▃▁▁▁█▁█▃█▄▃▃    │\n│(μ 3.20)              (μ 3.65) +12%                  (μ 2.26) -62%                                   │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 58 minutes, 30 seconds / noticeably down)         max 6.72%, min 1.40%, avg 3.31%   │\n│                                                                                                     │\n│ .█       ▂                     .                                                                    │\n│ .█       █  ▂            ▄     .                                                                    │\n│ .█  ▃    █  █ ▅ █▃▂ ▅ ▇  █     .                                                                    │\n│ .█▃ █ ▆ ▁█▆▄█▁█▂███▄█ █▁▆█▃▆▇█▇.███  ▆  █                                                           │\n│ .██▅█▂█▇███████████████████████.███▂▁█▁▆█                                                           │\n│(μ 3.51)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 1 hour / noticeably down)                         max 5.81%, min 1.39%, avg 3.27%   │\n│                                                                                                     │\n│ .▅     █                                                                                            │\n│ .█     █ ▂  ▁      ▄                                                                                │\n│ .█ ▃   █ █ ▆█▄▅▆ █ █ ▆▁█▁    ▃                                                                      │\n│ .█▄█ ▃▇█▅█▄█████▁███▂████▆ ▆ █                                                                      │\n│ .███▃█████████████████████▁█▁█▄                                                                     │\n│(μ 3.27)                                                                                             │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 1 hour / noticeably down)                         max 3.82%, min 2.27%, avg 3.29%   │\n│                                                                                                     │\n│ . ▅█                                                                                                │\n│ .▁██▄▇                                                                                              │\n│ .█████                                                                                              │\n│ .█████                                                                                              │\n│ .█████▅                                                                                             │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 1 hour / noticeably down)                         max 3.56%, min 3.05%, avg 3.31%   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█▆                                                                                                 │\n│ .██                                                                                                 │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ cpu usage (last 1 hour / not enough data)                         max 3.31%, min 3.31%, avg 3.31%   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        22:45:47\n",
+   :threads-chart
+   "╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ total threads (last 23 minutes, 15 seconds / slightly up) max 276.47 threads, min 200.60 threa...   │\n│                                                                                                     │\n│                     .                              .                              .          █      │\n│          ▂▇         .          ▇                ▆ █.█▁ ▁▁  ▁            ▅         .       ▂▅▇█▇▃    │\n│ ▅▃▆▆▅▃▆▅▄██▆▇█▅▃▇▇▅▅.▄▆▆▇▄▃▇  ▃█▇▅█▆▃▅▆▆▄▇▅▅▆▅▄▅█▆█.█████▇▆██▄▇▅▇▆▇▆▆▃▂▄██▆▇█▅▄▇▆▄.▅▆▆▅█▆▇██████    │\n│ ████████████████████.███████ ▆█████████████████████.██████████████████████████████.█████████████    │\n│ ████████████████████.██████████████████████████████.██████████████████████████████.█████████████    │\n│(μ 234.85)            (μ 233.74) 0%                  (μ 236.51) +1%                                  │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 15 (each segment is 7 minutes, 30 seconds - each tick is 15 seconds, averaged)         22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ total threads (last 1 hour / slightly down) max 288.87 threads, min 226.19 threads, avg 240.92...   │\n│                                                                                                     │\n│ .       █                      .                                                                    │\n│ .      ▄█                      .                                                                    │\n│ . ▇▄▄▂███▁▂ ▁   ▅▁ ▅▃▁    ▁    . ▃      ▇                                                           │\n│ .▂█████████▆█▇█▅██▇███▄▆▅▅█▅▅▃▆.▅██▇▅█▅▆█▆                                                          │\n│ .██████████████████████████████.██████████                                                          │\n│(μ 241.85)                                                                                           │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 90 (each segment is 45 minutes - each tick is 1 minute, 30 seconds, averaged)          22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ total threads (last 1 hour / slightly down) max 283.18 threads, min 230.39 threads, avg 241.31...   │\n│                                                                                                     │\n│ .     █                                                                                             │\n│ .    ▃█                                                                                             │\n│ . █▃▄██▃    ▃ ▂▅▁       ▂    ▄▆                                                                     │\n│ .▅██████▇█▇▇█████▄▅▇▆▅▄▅██▆▆▅██                                                                     │\n│ .██████████████████████████████                                                                     │\n│(μ 241.31)                                                                                           │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 120 (each segment is 1 hour - each tick is 2 minutes, averaged)                        22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ total threads (last 1 hour / slightly down) max 248.10 threads, min 234.81 threads, avg 240.99...   │\n│                                                                                                     │\n│ .▇█▁                                                                                                │\n│ .███▁▂▅                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│ .██████                                                                                             │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 600 (each segment is 5 hours - each tick is 10 minutes, averaged)                      22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ total threads (last 1 hour / slightly down) max 245.89 threads, min 235.99 threads, avg 240.94...   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█▄                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│ .██                                                                                                 │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 1800 (each segment is 15 hours - each tick is 30 minutes, averaged)                    22:45:47\n╭─────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ total threads (last 1 hour / not enough data) max 241.06 threads, min 241.06 threads, avg 241....   │\n│                                                                                                     │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│ .█                                                                                                  │\n│                                                                                                     │\n╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯\n freq: 3600 (each segment is 30 hours - each tick is 1 hour, averaged)                        22:45:47\n"},
+  :prando110 {:flow-day "2024-05-01", :value 338},
+  :flows-sys
+  {:flow_id "openai-image-gen",
+   :file_path "./flows/openai-image-gen.edn",
+   :last_modified "2024-03-13 11:22:50"},
+  :grid1-sys*
+  {:flow_id "raw-custom-override1493634357-solver-flow-",
+   :run_id "ff62cdaf-ebde-4bc1-b366-5bc16e75e60b",
+   :start_ts "2024-08-11 14:47:00",
+   :seconds -0.006,
+   :human_elapsed "-1 second",
+   :overrides "Yes",
+   :result "success",
+   :styler_highlight_8369aaa1 0},
+  :param
+  {:selected-block :block-9232,
+   :selected-view [:views :clover-hop-1],
+   :selected-view-data [:data-viewer [:app-db [:click-param :flow]]],
+   :zealous-magenta-panda "new parameter value!"},
+  :theme
+  {:theme-name "who ya gonna call?",
+   :codemirror-theme "ayu-mirage",
+   :editor-param-background-color "#0b1122",
+   :base-block-style {},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#0b031b",
+   :block-title-font-color "#ffffff",
+   :universal-pop-color "#9973e0",
+   :base-block-color "#0b1122",
+   :editor-rim-color "#0b1122",
+   :vega-default-color-scheme {:scheme "accent"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#5dc963",
+    "any" "#ffffff",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#d6e367",
+    "unknown" "#c7005d",
+    "date" "#3b528b",
+    "rabbitsql" "#FC0FC0",
+    "nil" "#ff2147"},
+   :editor-grid-selected-font-color "#ffffff",
+   :monospaced-font "IBM Plex Mono",
+   :editor-grid-selected-background-color "#FFA50087",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#33ffb7",
+   :grid-selected-font-color "#ffffff",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#8879bc",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/fake-brick5.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-color "#47555e",
+    :background-repeat "repeat"},
+   :editor-font-color "#ffffff",
+   :base-font "Oxygen Mono",
+   :block-tab-selected-font-color "#FFA500",
+   :editor-background-color "#000000",
+   :editor-grid-font-color "#ffffff"},
+  :flow-history-drag-33
+  {:started 1712728027335,
+   :overrides "{:image-path \"/home/ryanr/rvbbit-out/b64-image-52901-48658.png\"}",
+   :ended 1712728027984,
+   :run_id "a41493fc-ef90-40e7-b19a-074a54d013f4",
+   :human_elapsed "less than a second",
+   :in_error 0,
+   :ts "2024-04-10 05:47:08",
+   :flow_id "openai-image-gen-ladder/node-js-color-thief-script",
+   :start_ts "2024-04-10 01:47:07",
+   :client_name ":commendable-thin-mole-14",
+   :parent_run_id "30b31c03-ac20-4aba-ba5f-6bcb79e425ce",
+   :elapsed_seconds 0.649,
+   :elapsed 649},
+  :prando33 {:flow-day "2024-05-22", :value 1131},
+  :flow-runner nil,
+  :connections-sys
+  {:database_name "*cache-db*",
+   :connection_id "flows-db",
+   :styler_highlight_8717ssa 0},
+  :prando89 {:flow-day "2024-06-26", :value 1292},
+  :sys {:selected-tab "happy dinosaur", :selected-tab-idx 1},
+  :prando80 {:flow-day "2024-08-11", :value 6},
+  :tracker nil,
+  :prando93 {:flow-day "2024-07-24", :value 473}},
+ :selected-flow "live-scratch-flow"}

@@ -605,6 +605,10 @@
 
 (defonce temp-extra-subs (atom [])) ;; flushed on refresh, still better than subbing for lots of stuff that wont likely ever need it.
 
+
+
+
+
 (re-frame/reg-sub
  ::get-flow-subs
  (fn [db {:keys [all?]}]
@@ -624,16 +628,22 @@
                                                            (let [[_ that] v]
                                                              {v (keyword (str "solver-status/" client-name-str ">" (cstr/replace (str (first that)) ":" "") ">running?"))})))]
                                      (ut/postwalk-replacer logic-kps obody)))
+         selected-block          (get db :selected-block)
+         selected-view           @(ut/tracked-sub ::editor-panel-selected-view {})
+         kp             (vec (flatten [selected-block selected-view]))
+         mode           (get @db/chat-mode kp (if (= "none!" (first kp)) :runstreams :history))
          runstream-refs          (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (ut/deep-flatten (get db :runstreams)))))
-         runstreams              (vec (for [{:keys [flow-id]} @(ut/tracked-sub ::runstreams {})]
-                                        (keyword (str "flow-status/" flow-id ">*running?"))))
+         runstreams              (vec (remove nil? (flatten (for [{:keys [flow-id]} @(ut/tracked-sub ::runstreams {})]
+                                                              [(keyword (str "flow-status/" flow-id ">*running?")) ;; always sub to flow-status for runstreams
+                                                               (when (and (get db :buffy?) ;; only if panel is open, sub to runstream samples also 
+                                                                          (= mode :runstreams))
+                                                                 (keyword (str "runstream/" flow-id)))]))))
 
         ;;  client-namespaces-refs  [:repl-ns/repl-client-namespaces-map>*client-name*] ;; use client-name-str instead
         ;;  client-namespace-intros (vec (for [nms @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath client-namespaces-refs})]
         ;;                                 (keyword (str "repl-ns/" nms ">introspected"))))
-         selected-block          (get db :selected-block)
-         selected-view           @(ut/tracked-sub ::editor-panel-selected-view {})
+
          editor?                 (get db :editor?)
          flow?                   (get db :flow?)
          selected-tab            (get db :selected-tab)
@@ -663,6 +673,7 @@
                                                                    (cstr/starts-with? (str %) ":repl-ns/")
                                                                    (cstr/starts-with? (str %) ":solver-status/")
                                                                    (cstr/starts-with? (str %) ":flow-status/")
+                                                                   (cstr/starts-with? (str %) ":runstream/")
                                                                    (cstr/starts-with? (str %) ":kit-status/")
                                                                    (cstr/starts-with? (str %) ":kit/")
                                                                    (cstr/starts-with? (str %) ":data/")
@@ -801,74 +812,80 @@
      )))
 
 
-(re-frame/reg-sub ::stale-flow-subs?
-                  (fn [db _]
-                    (let [flow-open (get db :selected-flow)
-                          flow-open? (and (ut/ne? flow-open) (not= flow-open "live-scratch-flow") (get db :flow?))
+(re-frame/reg-sub
+ ::stale-flow-subs?
+ (fn [db _]
+   (let [flow-open (get db :selected-flow)
+         flow-open? (and (ut/ne? flow-open) (not= flow-open "live-scratch-flow") (get db :flow?))
                           ;;new   @(ut/tracked-sub ::get-flow-subs {})
-                          new   @(ut/tracked-sub ::get-flow-subs {})
-                          old   (get db :flow-subs [])
-                          deads (vec (cset/difference (set old) (set new)))
-                          deads (filterv #(not (cstr/includes? (str %) "||")) deads)
-                          stale? (if flow-open?
-                                   false
-                                   (ut/ne? deads))]
+         new   @(ut/tracked-sub ::get-flow-subs {})
+         old   (get db :flow-subs [])
+         deads (vec (cset/difference (set old) (set new)))
+         deads (filterv #(not (cstr/includes? (str %) "||")) deads)
+         stale? (if flow-open?
+                  false
+                  (ut/ne? deads))]
                       ;;(tapp>>  [:stale? stale? flow-open?])
-                      stale?)))
+     stale?)))
 
-(re-frame/reg-event-db ::unsub-to-flows
-                       (fn [db _]
-                         (let [new   @(ut/tracked-sub ::get-flow-subs {})
-                               old   (get db :flow-subs [])
-                               flow-open? (get db :flow?)
-                               old   (filterv #(and
-                                                (if flow-open? (not (cstr/includes? (str %) (str (get db :selected-flow)))) true)
-                                                (not (cstr/includes? (str %) "||"))) old)
-                               deads (vec (cset/difference (set old) (set new)))
-                               deads (filterv #(not (cstr/includes? (str %) "||")) deads) ;; dont mess with
-                               all-sub-flows @(ut/tracked-sub ::get-flow-subs {:all? true})
-                               _ (ut/tapp>> [:flow-unsub-change!  flow-open? (get db :client-name)
-                                             {:old old :new new :removing deads
-                                              ;;:unsubbing-but-keeping-inactive (cset/intersection (set deads) (set all-sub-flows))
-                                              }])]
-                           (doall (doseq [n deads]
-                                    (ut/tracked-dispatch [::http/unsub-to-flow-value n])
-                                    (when (not (some #(= n %) all-sub-flows)) ;; in other tabs, we dont remove the data, just temp unsub
-                                      (ut/tracked-dispatch [::conn/declick-parameter
-                                                            (vec (map keyword (ut/splitter (ut/replacer (str n) ":" "") #"/")))]))))
-                           (assoc db :flow-subs new))))
+(re-frame/reg-event-db
+ ::unsub-to-flows
+ (fn [db _]
+   (let [new   @(ut/tracked-sub ::get-flow-subs {})
+         old   (get db :flow-subs [])
+         flow-open? (get db :flow?)
+         old   (filterv #(and
+                          (if flow-open? (not (cstr/includes? (str %) (str (get db :selected-flow)))) true)
+                          (not (cstr/includes? (str %) "||"))) old)
+         deads (vec (cset/difference (set old) (set new)))
+         deads (filterv #(not (cstr/includes? (str %) "||")) deads) ;; dont mess with
+         all-sub-flows @(ut/tracked-sub ::get-flow-subs {:all? true})
+         _ (ut/tapp>> [:flow-unsub-change!  flow-open? (get db :client-name)
+                       {:old old :new new :removing deads
+                        ;;:unsubbing-but-keeping-inactive (cset/intersection (set deads) (set all-sub-flows))
+                        }])]
+     (doall (doseq [n deads]
+              (ut/tracked-dispatch [::http/unsub-to-flow-value n])
+              (when (not (some #(= n %) all-sub-flows)) ;; in other tabs, we dont remove the data, just temp unsub
+                (ut/tracked-dispatch [::conn/declick-parameter
+                                      (vec (map keyword (ut/splitter (ut/replacer (str n) ":" "") #"/")))]))))
+     (assoc db :flow-subs new))))
 
+(re-frame/reg-sub
+ ::get-new-flow-subs
+ (fn [db _]
+   (let [;;flow-refs @(ut/tracked-subscribe [::get-flow-subs])
+         flow-refs @(ut/tracked-sub ::get-flow-subs {})
+         subbed    (get db :flow-subs [])
+         subbed    (filterv #(not (cstr/includes? (str %) "||")) subbed)] ;; dont mess with
+     (vec (cset/difference (set flow-refs) (set subbed))))))
 
-(re-frame/reg-sub ::get-new-flow-subs
-                  (fn [db _]
-                    (let [;;flow-refs @(ut/tracked-subscribe [::get-flow-subs])
-                          flow-refs @(ut/tracked-sub ::get-flow-subs {})
-                          subbed    (get db :flow-subs [])
-                          subbed    (filterv #(not (cstr/includes? (str %) "||")) subbed)] ;; dont mess with
-                      (vec (cset/difference (set flow-refs) (set subbed))))))
+(re-frame/reg-sub 
+ ::new-flow-subs? 
+ (fn [_ _] 
+   (ut/ne? @(ut/tracked-sub ::get-new-flow-subs {}))))
 
-(re-frame/reg-sub ::new-flow-subs? (fn [_ _] (ut/ne? @(ut/tracked-sub ::get-new-flow-subs {}))))
+(re-frame/reg-sub 
+ ::alerts 
+ (fn [db _] (get db :alerts)))
 
-(re-frame/reg-sub ::alerts (fn [db _] (get db :alerts)))
+(re-frame/reg-event-db
+ ::sub-to-flows
+ (fn [db _]
+   (let [;;new @(ut/tracked-subscribe [::get-new-flow-subs])
+         new    @(ut/tracked-sub ::get-new-flow-subs {})
+         old    (get db :flow-subs [])
+         old    (filterv #(not (cstr/includes? (str %) "||")) old)
+         subbed (vec (for [n new] (do (ut/tracked-dispatch [::http/sub-to-flow-value n]) n)))]
+     (assoc db :flow-subs (into subbed old)))))
 
-
-(re-frame/reg-event-db ::sub-to-flows
-                       (fn [db _]
-                         (let [;;new @(ut/tracked-subscribe [::get-new-flow-subs])
-                               new    @(ut/tracked-sub ::get-new-flow-subs {})
-                               old    (get db :flow-subs [])
-                               old    (filterv #(not (cstr/includes? (str %) "||")) old)
-                               subbed (vec (for [n new] (do (ut/tracked-dispatch [::http/sub-to-flow-value n]) n)))]
-                           (assoc db :flow-subs (into subbed old)))))
-
-(re-frame/reg-event-db ::sub-to-flows-all ;; temp debugging
-                       (fn [db _]
-                         (let [;new @(ut/tracked-subscribe [::get-new-flow-subs])
-                               all (get db :flow-subs [])]
-                           (doseq [n all] (ut/tracked-dispatch [::http/sub-to-flow-value n]))
-                           db)))
-
-
+(re-frame/reg-event-db
+ ::sub-to-flows-all ;; temp debugging
+ (fn [db _]
+   (let [;new @(ut/tracked-subscribe [::get-new-flow-subs])
+         all (get db :flow-subs [])]
+     (doseq [n all] (ut/tracked-dispatch [::http/sub-to-flow-value n]))
+     db)))
 
 (re-frame/reg-sub
  ::runstream-running?
@@ -879,28 +896,32 @@
          mode           (get @db/chat-mode kp (if (= "none!" (first kp)) :runstreams :history))]
      (and (get db :buffy?)
           (= mode :runstreams)
-          (true? (some true?
-                       (for [[k v] (get-in db [:click-param :flow-status] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))))
+          ;(true? (some true? ;; remove running for now, req is cheap enough since sampled.
+          ;             (for [[k v] (get-in db [:click-param :flow-status] {}) 
+          ;                   :when (cstr/ends-with? (str k) ">*running?")] v)))
+          ))))
 
-(re-frame/reg-sub ::runstreams-running
-                  (fn [db _]
-                    (count (filter true?
-                                   (for [[k v] (get-in db [:click-param :flow-status] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))
+(re-frame/reg-sub
+ ::runstreams-running
+ (fn [db _]
+   (count (filter true?
+                  (for [[k v] (get-in db [:click-param :flow-status] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))
 
-(re-frame/reg-sub ::runstreams-running-list
-                  (fn [db _]
-                    (for [[k v] (get-in db [:click-param :flow-status] {})
-                          :when (and (true? v) (cstr/ends-with? (str k) ">*running?"))]
-                      (keyword (-> (str k)
-                                   (ut/replacer ">*running?" "")
-                                   (ut/replacer ":" ""))))))
+(re-frame/reg-sub 
+ ::runstreams-running-list
+ (fn [db _]
+   (for [[k v] (get-in db [:click-param :flow-status] {})
+         :when (and (true? v) (cstr/ends-with? (str k) ">*running?"))]
+     (keyword (-> (str k)
+                  (ut/replacer ">*running?" "")
+                  (ut/replacer ":" ""))))))
 
-
-(re-frame/reg-event-db ::runstream-item
-                       (fn [db [_ result]]
-                         (-> db
-                             (assoc-in [:runstreams-lookups (get result :flow-id) :open-inputs] (get result :open-inputs))
-                             (assoc-in [:runstreams-lookups (get result :flow-id) :blocks] (get result :blocks)))))
+(re-frame/reg-event-db
+ ::runstream-item
+ (fn [db [_ result]]
+   (-> db
+       (assoc-in [:runstreams-lookups (get result :flow-id) :open-inputs] (get result :open-inputs))
+       (assoc-in [:runstreams-lookups (get result :flow-id) :blocks] (get result :blocks)))))
 
 (re-frame/reg-event-db
  ::refresh-runstreams
@@ -3021,10 +3042,10 @@
 
 
 
-(defn handle-focus-change [key ref old-state new-state] ;; debug mostly, react can be a sloped roof
-  (tapp>> ["Focus changed from" (str old-state) "to" (str new-state)]))
+;; (defn handle-focus-change [key ref old-state new-state] ;; debug mostly, react can be a sloped roof
+;;   (tapp>> ["Focus changed from" (str old-state) "to" (str new-state)]))
 
-(add-watch db/last-focused :focus-change-watcher handle-focus-change)
+;; (add-watch db/last-focused :focus-change-watcher handle-focus-change)
 
 (add-watch db/value-spy :value-spy-watcher (fn []
                                              ;(reset! db/cm-instance-panel-code-box {})
@@ -8165,20 +8186,21 @@
                     (let [sched (get db :sched {})]
                       (into {} (for [[k v] sched] {(str [:run k]) (- v (get-in db [:re-pollsive.core/polling :counter]))})))))
 
-(re-frame/reg-sub ::keypaths-in-rs-values
-                  (fn [db [_ flow-id bid]]
-                    (try (let [pp           (get-in db [:runstreams-lookups flow-id :open-inputs bid :user-input])
-                               params       (get-in db
-                                                    [:runstreams flow-id :values bid :value] ; try runstream override
-                                                    (get-in db [:runstreams-lookups flow-id :open-inputs bid :user-input])) ; if
-                               params       {bid (or params pp)}
-                               kvpaths      (ut/keypaths params)
-                               kvpaths-vals (into (sorted-map)
-                                                  (for [p kvpaths]
-                                                    {p (let [v (get-in params p)]
-                                                         [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
-                           kvpaths-vals)
-                         (catch :default e (do (ut/tapp>> [:error-in :keypaths-in-rs-values e :passed bid]) {})))))
+(re-frame/reg-sub
+ ::keypaths-in-rs-values
+ (fn [db [_ flow-id bid]]
+   (try (let [pp           (get-in db [:runstreams-lookups flow-id :open-inputs bid :user-input])
+              params       (get-in db
+                                   [:runstreams flow-id :values bid :value] ; try runstream override
+                                   (get-in db [:runstreams-lookups flow-id :open-inputs bid :user-input])) ; if
+              params       {bid (or params pp)}
+              kvpaths      (ut/keypaths params)
+              kvpaths-vals (into (sorted-map)
+                                 (for [p kvpaths]
+                                   {p (let [v (get-in params p)]
+                                        [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
+          kvpaths-vals)
+        (catch :default e (do (ut/tapp>> [:error-in :keypaths-in-rs-values e :passed bid]) {})))))
 
 (re-frame/reg-sub ::keypaths-in-flow
                   (fn [db [_ bid & [single-input?]]]
@@ -8936,9 +8958,16 @@
 (defn sql-explanations-kp [] {[:from 0 0] "table-name" [:from 0 1] "table-alias" [:from] "the table we are selecting from"})
 
 (defn map-value-box
-  [s k-val-type] ;; dupe of a fn inside flows, but w/o dragging - TODO refactor to single fn -
-  ;(ut/tapp>> [s k-val-type]) 
+  [s k-val-type & [ww hww]] ;; dupe of a fn inside flows.cljs, but w/o dragging and a bunch more func, including v-tabling. streamline into one fn TDO
+  ;;(ut/tapp>> [s k-val-type ww hww (- (/ ww 5) hww)]) 
   (let [;render-values? true
+        cols (/ (- ww hww) 9)
+        s (if (and (string? s) (> (count s) cols))
+            (let [half-cols (Math/floor (/ cols 2))
+                  first-half (subs s 0 half-cols)
+                  second-half (subs s (- (count s) half-cols))]
+              (str first-half "..." second-half))
+            s)
         function?      (or (fn? s) (try (fn? s) (catch :default _ false)))]
 
     (cond (ut/hex-color? s)                        [re-com/h-box :gap "3px" :children
@@ -9654,7 +9683,7 @@
                                                            :size "auto"
                                                            :align :end
                                                            :justify :end
-                                                           :child [map-value-box k-val k-val-type]
+                                                           :child [map-value-box k-val k-val-type inner-w2 header-gap]
                                                            :attr {:on-click        #(sel-on-click-fn param-kp k-val)
                                                                   :on-context-menu #(sel-on-context-fn multi-param-kp k-val)}
                                                            :style (merge

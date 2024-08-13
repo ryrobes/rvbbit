@@ -155,10 +155,10 @@
       ;;  :poll-when                [::bricks/panel-code-up?]
       ;;  :dispatch-event-on-start? false}
       
-      {:interval                 2 ;; push sample data to runstream when running ?
-       :event                    [::bricks/refresh-runstreams]
-       :poll-when                [::bricks/runstream-running?]
-       :dispatch-event-on-start? false}
+      ;; {:interval                 2 ;; push sample data to runstream when running ?
+      ;;  :event                    [::bricks/refresh-runstreams]
+      ;;  :poll-when                [::bricks/runstream-running?]
+      ;;  :dispatch-event-on-start? false}
       
       {:interval                 1 ;; subscribe to server data from flows if we see it
        :event                    [::bricks/sub-to-flows]

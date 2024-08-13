@@ -316,13 +316,16 @@
 
 (defn watch-solver-files []
   (let [file-path "./defs/"]
-    (beholder/watch #(when (or (cstr/ends-with? (str (get % :path)) "signals.edn")
-                               (cstr/ends-with? (str (get % :path)) "solvers.edn"))
+    (beholder/watch #(when (and
+                            (or (cstr/ends-with? (str (get % :path)) "signals.edn")
+                                (cstr/ends-with? (str (get % :path)) "solvers.edn"))
+                            (not @wss/shutting-down?))
                        (let [signals? (cstr/ends-with? (str (get % :path)) "signals.edn")
                              destinations (vec (keys @wss/client-queues))
                              map-atom (if signals? wss/signals-atom wss/solvers-atom)
                              _ (reset! map-atom (edn/read-string (slurp (str (get % :path)))))
-                             _ (ut/pp [:solver-file-change! signals? (get % :path)])]
+                             _ (ut/pp [(if signals? :signals :solvers) :file-change! signals? (get % :path)])
+                             _ (if signals? (wss/reload-signals-subs) (wss/reload-solver-subs))]
                          (doseq [d destinations]
                            (wss/alert! d
                                        [:v-box :justify :center :style {:opacity 0.7} :children
@@ -331,8 +334,7 @@
                                          [:box :child (str (get % :path))]]]
                                        13 2
                                        5)
-                           (wss/kick d (if signals? :signals-file :solvers-file) @map-atom 1 :none (str "file updated " (get % :path)))
-                           )))
+                           (wss/kick d (if signals? :signals-file :solvers-file) @map-atom 1 :none (str "file updated " (get % :path))))))
                     file-path)))
 
 
@@ -1350,6 +1352,7 @@
                                               _ (swap! wss/last-times assoc-in [k :end] (System/currentTimeMillis))
                                               human-elapsed   (ut/format-duration start end)
                                               run-id          (str (get-in @flow-db/results-atom [k :run-id]))
+                                              orig-flow-id    (str (get-in @flow-db/results-atom [k :opts-map :orig-flow-id] k))
                                               parent-run-id   (str (get-in @flow-db/results-atom [k :parent-run-id]))
                                               overrides       (get-in @flow-db/subflow-overrides [k run-id])
                                               cname           (get-in @flow-db/results-atom
@@ -1367,6 +1370,7 @@
                                                                          :ended           end ;(get-in @flow-db/results-atom
                                                                          :run_id          run-id
                                                                          :parent-run_id   parent-run-id
+                                                                         :orig_flow_id    orig-flow-id
                                                                          :elapsed         elapsed
                                                                          :overrides       (pr-str overrides)
                                                                          :elapsed_seconds (float (/ elapsed 1000))
@@ -1492,32 +1496,37 @@
     (when (not= new-state old-state)
 
      ; (qp/serial-slot-queue :combined-tracker-watcher-serial :serial-queues
-      (ppy/execute-in-thread-pools :combined-tracker-watcher-side-effects
-                                   (fn []
+      (ppy/execute-in-thread-pools
+       :combined-tracker-watcher-side-effects
+       (fn []
 
-                                     (let [[_ b _] (data/diff old-state new-state)
-                                           kks     (try (keys b) (catch Exception _ nil))]
-                                       (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+         (let [[_ b _] (data/diff old-state new-state)
+               kks     (try (keys b) (catch Exception _ nil))]
+           (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
       ;; Side effects part (originally from tracker-changed2)
-                                         (ppy/execute-in-thread-pools :flow-log-file-writing
-                                                                      (fn []
-                                                                        (ext/create-dirs "./flow-logs/")
-                                                                        (doseq [flow-id kks
-                                                                                :let [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
-                                                                                      fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
-                                                                                      mst        (System/currentTimeMillis)
-                                                                                      _          (swap! wss/watchdog-atom assoc flow-id mst)
-                                                                                      diffy      (get (ut/replace-large-base64 b) flow-id)
-                                                                                      diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
-                                                                                      _          (swap! wss/last-block-written assoc flow-id diffy-keys)
-                                                                                      blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
-                                                                          (let [data        [[(ut/millis-to-date-string mst) blocks]
-                                                                                             {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
-                                                                                              :diff   diffy}]
-                                                                                pretty-data (with-out-str (ppt/pprint data))]
-                                                                            (spit fp (str pretty-data "\n") :append true)))))
-                                         (log-tracker kks)
-                                         (update-stat-atom kks))
+             (ppy/execute-in-thread-pools :flow-log-file-writing
+                                          (fn []
+                                            (ext/create-dirs "./flow-logs/")
+                                            (doseq [flow-id kks
+                                                    :let [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
+                                                          fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
+                                                          mst        (System/currentTimeMillis)
+                                                          _          (swap! wss/watchdog-atom assoc flow-id mst)
+                                                          diffy      (get (ut/replace-large-base64 b) flow-id)
+                                                          diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
+                                                          _          (swap! wss/last-block-written assoc flow-id diffy-keys)
+                                                          blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
+                                              (let [data        [[(ut/millis-to-date-string mst) blocks]
+                                                                 {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
+                                                                  :diff   diffy}]
+                                                    pretty-data (with-out-str (ppt/pprint data))]
+                                                (spit fp (str pretty-data "\n") :append true)))))
+             (log-tracker kks)
+             (ppy/execute-in-thread-pools
+              :runstream-pre-package
+              (fn [] (doseq [k kks] (swap! db/runstream-atom assoc k (wss/get-flow-open-ports k k)))))
+              ;; get-flow-open-ports [flowmap flow-id client-name]
+             (update-stat-atom kks))
 
     ;; Child atom update part (originally from the second watcher)
                                 ;; (let [changes (reduce-kv
@@ -1535,13 +1544,14 @@
                                 ;;                    child-atoms)
                                 ;;                (let [new-child-atom (atom {k v})]
                                 ;;                  (assoc child-atoms k new-child-atom)))))))
-                                       )))))
+           )))))
 
 ;; Add the combined watcher
-  (ppy/add-watch+ flow-db/tracker
-                  :flow-db-tracker
-                  combined-tracker-watcher
-                  :flow-db-tracker)
+  (ppy/add-watch+
+   flow-db/tracker
+   :flow-db-tracker
+   combined-tracker-watcher
+   :flow-db-tracker)
 
   (wss/sub-to-value :rvbbit :time/unix-ms true) ;; importante! 
 

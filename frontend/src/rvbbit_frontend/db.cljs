@@ -9,6 +9,7 @@
 (def solver-view-mode (reagent/atom "return value"))
 (def signals-searcher-atom (reagent/atom nil))
 
+(defonce cm-instance-runstream-code-box (atom {}))
 (defonce search-box (reagent/atom nil))
 (defonce context-modal-pos (reagent/atom [0 0]))
 (defonce editor-mode (reagent/atom :meta))

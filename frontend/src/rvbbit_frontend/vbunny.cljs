@@ -201,8 +201,9 @@
       (fn [{:keys [children style width height id follow?] :as props}]
         (let [{:keys [start end cumulative-heights max-height scroll-top]
                :or {start 0 end 0 scroll-top 0}} (get @scroll-state id)
-              end (if (or (cstr/includes? id "history-v-box")
-                          (cstr/includes? id "parameter-browser"))
+              end (if ;(or (cstr/includes? id "history-v-box")
+                      ;    (cstr/includes? id "parameter-browser"))
+                      true
                     (inc end) end) ;; get an extra block for history...
               visible-children (safe-subvec children start end)
               v-box-style (merge {:overflow-y "auto"

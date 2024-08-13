@@ -4,7 +4,6 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
-
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
@@ -18,7 +17,6 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
-
  :wallpaper-of-the-moment-8k
    {:signal :signal/every-5-minutes
     :type   :clojure

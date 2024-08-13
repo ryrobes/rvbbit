@@ -292,52 +292,69 @@
                  :theme             (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage"
                  }}]]))
 
-(re-frame/reg-event-db ::save-rs-value
-                       (fn [db [_ flow-id kkey source value]]
-                         (-> db
-                             (assoc-in [:runstreams flow-id :values kkey :value] value)
-                             (assoc-in [:runstreams flow-id :values kkey :source] source))))
+(re-frame/reg-event-db 
+ ::save-rs-value
+ (fn [db [_ flow-id kkey source value]]
+   (-> db
+       (assoc-in [:runstreams flow-id :values kkey :value] value)
+       (assoc-in [:runstreams flow-id :values kkey :source] source))))
 
 
-(re-frame/reg-sub ::rs-value
-                  (fn [db {:keys [flow-id kkey]}] ;;; dupe from buffy
-                    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
-                      (if (= src :param)
-                        (let [vvv @(ut/tracked-sub ::resolver/logic-and-params
-                                                   {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
-                              vv  (try (first vvv ;;@(ut/tracked-sub ::resolver/logic-and-params {:m [(get-in db
+(re-frame/reg-sub
+ ::rs-value
+ (fn [db {:keys [flow-id kkey]}] ;;; dupe from buffy
+  ;;  (ut/tapp>> [:rs-value-sub-called flow-id kkey])
+   (let [src (get-in db [:runstreams flow-id :values kkey :source])]
+     (if (= src :param)
+       (let [vvv @(ut/tracked-sub ::resolver/logic-and-params
+                                  {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
+             vv  (try (first vvv ;;@(ut/tracked-sub ::resolver/logic-and-params {:m [(get-in db
                                                   ;;[:runstreams
-                                       )
-                                       (catch :default e (do (ut/tapp>> [:rs-value-fuck-up-buffy vvv flow-id kkey src e]) vvv)))]
-                          vv)
-                        (get-in db [:runstreams flow-id :values kkey :value])))))
+                             )
+                      (catch :default e (do (ut/tapp>> [:rs-value-fuck-up-buffy vvv flow-id kkey src e]) vvv)))]
+         vv)
+       (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (defn code-box-rs-value
   [width-int height-int flow-id kkey value & [param?]]
-  (let [param?     (if (nil? param?) false true)
-        stringify? (and (vector? value) (every? string? value))]
-    [re-com/box :size "auto" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
-     {:font-family   (theme-pull :theme/monospaced-font nil)
-      :font-size     "14px"
-      :overflow      "auto"
-      :border-radius "12px"
-      :font-weight   700} :child
-     [(reagent/adapt-react-class cm/UnControlled)
-      {:value   (if stringify? (str (cstr/join "\n" value)) (ut/format-map (- width-int 24) (str value)))
-       :onBlur  #(when (not param?)
-                   (ut/tracked-dispatch [::save-rs-value flow-id kkey :input
-                                         (try (read-string (cstr/join " " (ut/cm-deep-values %)))
-                                              (catch :default _ (pr-str (cstr/join "\n" (ut/cm-deep-values %)))))])) ;; python?
-       :options {:mode              (when (not stringify?) "clojure") ;(if stringify? "text"
-                 :lineWrapping      true
-                 :lineNumbers       true
-                 :matchBrackets     true
-                 :autoCloseBrackets true
-                 :autofocus         false
-                 :autoScroll        false
-                 :detach            true
-                 :readOnly          param?
-                 :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+  (let [;param?     (if (nil? param?) false true)
+        _ (ut/tapp>> [:code-box-rs-value-called flow-id kkey value param?])
+        stringify? (and (vector? value) (every? string? value))
+        on-focus-fn (fn [_] (reset! db/cm-focused? true))
+        on-change-fn (fn [x] (ut/tapp>> [:change x]))
+        on-blur-fn #(when (not param?)
+                      (ut/tracked-dispatch [::save-rs-value flow-id kkey :input
+                                            (try (read-string (cstr/join " " (ut/cm-deep-values %)))
+                                                 (catch :default _ (pr-str (cstr/join "\n" (ut/cm-deep-values %)))))]))
+        on-before-change-fn (fn [editor _ _] ;; data value]
+                              (swap! db/cm-instance-runstream-code-box assoc 
+                                     [flow-id kkey param?] editor))]
+    ;;^{:key (str flow-id kkey param?)}
+    [re-com/box 
+     :size "auto" 
+     :width (px (- width-int 24)) 
+     :height (px (- height-int 24))
+     :style {:font-family   (theme-pull :theme/monospaced-font nil)
+             :font-size     "14px"
+             :overflow      "auto"
+             :border-radius "12px"
+             :font-weight   700}
+     :child [(reagent/adapt-react-class cm/UnControlled)
+             {:value   (if stringify? (str (cstr/join "\n" value)) (ut/format-map (- width-int 24) (str value)))
+              :onBeforeChange on-before-change-fn
+              :onChange on-change-fn
+              :onBlur  on-blur-fn
+              :onFocus on-focus-fn
+              :options {:mode              (when (not stringify?) "clojure") ;(if stringify? "text"
+                        :lineWrapping      true
+                        :lineNumbers       true
+                        :matchBrackets     true
+                        :autoCloseBrackets true
+                        :autofocus         false
+                        :autoScroll        false
+                        :detach            true
+                        :readOnly          param?
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
 
 
@@ -708,6 +725,7 @@
 (defn runstream-output-boxes
   [flow-id blocks-map panel-width open-outputs? open-inputs]
   (let [open-input-keys (vec (keys open-inputs))]
+    ^{:key (str "runstream-output-boxes" (hash blocks-map))}
     [re-com/v-box :width (px (- panel-width 35)) :children
      [[re-com/h-box :height "30px" :align :center :justify :center :gap "5px" :children
        [[re-com/box :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-outputs flow-id])} :style {:cursor "pointer"}
@@ -728,30 +746,100 @@
                   :let                            [type      (if (cstr/ends-with? (str k) "-vw") "rabbit-code" (gn type))
                                                    view?     (= type "rabbit-code")
                                                    ccolor    (get (theme-pull :theme/data-colors db/data-colors) type)
-                                                   is-input? (true? (some #(= % k) open-input-keys))]]
+                                                   is-input? (true? (some #(= % k) open-input-keys))
+                                                   key-sample (if (> (count (str k)) 30)
+                                                                (try (str (subs (str k) 0 30) "...") (catch :default _ (str k)))
+                                                                (str k))]]
               (bricks/draggable
-                (prepare-output-param-drag k flow-id type)
-                "meta-menu"
-                [re-com/v-box :height "77px" :style
-                 {:cursor           "grab"
-                  :opacity          (if is-input? 0.45 1)
-                  :border           (cond last?     (str "3px solid " ccolor)
-                                          is-input? (str "1px solid #00000000")
-                                          :else     (str "1px solid " ccolor))
-                  :border-radius    "10px"
-                  :background-color (str ccolor (if last? 40 22))} :gap "5px" :padding "4px" :size "auto" :children
-                 [[re-com/h-box :padding "4px" :size "none" :width (px (- (/ panel-width nums) ext)) :justify :between :children
-                   [[re-com/box :style {:font-size "12px" :font-weight (when last? 700) :text-decoration (when last? "underline")}
-                     :child (if (> (count (str k)) 30) (try (str (subs (str k) 0 30) "...") (catch :default _ (str k))) (str k))]
-                    (when (<= (count (str k)) 23)
-                      [re-com/box :style {:font-size "10px" :opacity 0.55} :child (str (if (map? type) (get type :out) type))])]]
-                  (if view?
-                    [re-com/box :size "none" :padding "4px" :height "35px" :align :center :justify :center :style
-                     {:font-size "17px" :overflow "hidden" :opacity 0.55} :width (px (- (/ panel-width nums) ext)) :child
-                     "(renderable view)"]
-                    [re-com/box :size "none" :padding "4px" :height "35px" :style
-                     {:font-size "10px" :overflow "hidden" :opacity 0.55} :width (px (- (/ panel-width nums) ext)) :child
-                     (str sample)])]]))])])]]))
+               (prepare-output-param-drag k flow-id type)
+               "meta-menu"
+                ;; [re-com/v-box
+                ;;  :height "77px"
+                ;;  ;:gap "10px"
+                ;;  :style {:cursor           "grab"
+                ;;          :opacity          (if is-input? 0.45 1)
+                ;;          :border           (cond last?     (str "3px solid " ccolor)
+                ;;                                  is-input? (str "1px solid #00000000")
+                ;;                                  :else     (str "1px solid " ccolor))
+                ;;          :border-radius    "10px"
+                ;;          :background-color (str ccolor (if last? 40 22))} :gap "5px" :padding "4px" :size "auto" :children
+                ;;  [[re-com/v-box
+                ;;    :padding "4px"
+                ;;    ;:gap "10px"
+                ;;    :size "auto"
+                ;;    :width (px (- (/ panel-width nums) ext))
+                ;;    ;:height "55px"
+                ;;    :justify :between
+                ;;    :children
+                ;;    [[re-com/box
+                ;;      ;:width (px (- (/ panel-width nums) ext))
+                ;;      :style {:font-size "12px"
+                ;;              :font-weight (when last? 700)
+                ;;              :overflow "hidden"
+                ;;              :text-decoration (when last? "underline")}
+                ;;      :child (if (> (count (str k)) 30)
+                ;;               (try (str (subs (str k) 0 30) "...") (catch :default _ (str k)))
+                ;;               (str k))]
+
+                ;;     (when (<= (count (str k)) 23)
+                ;;       [re-com/box :style {:font-size "10px" :opacity 0.55} :child (str (if (map? type) (get type :out) type))])]]
+                ;;   (if view?
+                ;;     [re-com/box
+                ;;      :size "none"
+                ;;      :padding "4px"
+                ;;      :height "35px"
+                ;;      :align :center :justify :center
+                ;;      :style {:font-size "14px" :overflow "hidden" :opacity 0.99}
+                ;;      :width (px (- (/ panel-width nums) ext))
+                ;;      :child "(renderable view)"]
+                ;;     [re-com/box :size "none" :padding "4px" :height "35px" :style
+                ;;      {:font-size "10px" :overflow "hidden" :opacity 0.55} :width (px (- (/ panel-width nums) ext)) :child
+                ;;      (str sample)])]]
+
+               ^{:key (str "runstream-output-box" (hash [k blocks-map]))}
+               [re-com/v-box
+                :height "85px"
+                      ;:gap "4px"
+                :justify :between
+                :style {:cursor           "grab"
+                        :overflow "hidden"
+                        :opacity          (cond is-input? 0.4
+                                                last? 1
+                                                :else 0.7)
+                        :border           (cond last?     (str "3px dashed " ccolor)
+                                                is-input? (str "1px solid #00000000")
+                                                :else     (str "1px solid " ccolor))
+                        :border-radius    "10px"
+                        :background-color (str ccolor (if last? 40 22))}
+                :padding "4px"
+                :size "auto"
+                :children [[re-com/box
+                            :width (px (- (/ panel-width nums) ext))
+                            :style {:font-size "12px"
+                                    :font-weight (when last? 700)
+                                          ;:overflow "hidden"
+                                    :text-decoration (when last? "underline")}
+                            :child (str k)]
+
+                                 ;(when (<= (count (str k)) 23)
+                           [re-com/box
+                                  ;:width (px (- (/ panel-width nums) ext))
+                            :align :end
+                            :style {:font-size "10px" :padding-right "6px" :opacity 0.55}
+                            :child (str (if (map? type) (get type :out) type))]
+                                 ;  )
+                           (if view?
+                             [re-com/box
+                              :size "none"
+                              :padding "4px"
+                              :height "35px"
+                              :align :center :justify :center
+                              :style {:font-size "14px" :overflow "hidden" :opacity 0.99}
+                              :width (px (- (/ panel-width nums) ext))
+                              :child "(renderable view)"]
+                             [re-com/box :size "none" :padding "4px" :height "35px" :style
+                              {:font-size "10px" :overflow "hidden" :opacity 0.55} :width (px (- (/ panel-width nums) ext)) :child
+                              (str sample)])]]))])])]]))
 
 (re-frame/reg-sub ::shouts (fn [db [_ flow-id]] (get-in db [:shouts flow-id])))
 
@@ -796,591 +884,634 @@
          flow-parts
          (filter (fn [item] (let [label (get item :label)] (every? (fn [word] (matches-word label word)) words))) flow-parts))))])
 
-(re-frame/reg-sub ::drops (fn [db [_ flow-id]] (get-in db [:runstream-drops flow-id] {})))
+(re-frame/reg-sub 
+ ::drops 
+ (fn [db [_ flow-id]] 
+   (get-in db [:runstream-drops flow-id] {})))
 
-(re-frame/reg-event-db ::add-action
-                       (undoable)
-                       (fn [db [_ flow-id name in out type]]
-                         (if (and (ut/ne? (cstr/trim (str name))) (ut/ne? (cstr/trim (str in))) (ut/ne? (cstr/trim (str out))))
-                           (let [other-names @(ut/tracked-subscribe [::bricks/all-drops-of :*])
-                                 name        (keyword name)
-                                 name        (ut/safe-key name other-names)
-                                 _ (ut/tapp>> [:other-names other-names name])]
-                             (assoc-in db [:runstream-drops flow-id name] {:in in :out out :type (or type (set [:string]))}))
-                           db)))
+(re-frame/reg-event-db
+ ::add-action
+ (undoable)
+ (fn [db [_ flow-id name in out type]]
+   (if (and (ut/ne? (cstr/trim (str name))) (ut/ne? (cstr/trim (str in))) (ut/ne? (cstr/trim (str out))))
+     (let [other-names @(ut/tracked-subscribe [::bricks/all-drops-of :*])
+           name        (keyword name)
+           name        (ut/safe-key name other-names)
+           _ (ut/tapp>> [:other-names other-names name])]
+       (assoc-in db [:runstream-drops flow-id name] {:in in :out out :type (or type (set [:string]))}))
+     db)))
 
-(re-frame/reg-event-db ::remove-action (undoable) (fn [db [_ flow-id name]] (ut/dissoc-in db [:runstream-drops flow-id name])))
+(re-frame/reg-event-db 
+ ::remove-action 
+ (undoable) 
+ (fn [db [_ flow-id name]] 
+   (ut/dissoc-in db [:runstream-drops flow-id name])))
 
 (defn runstream-box
   [panel-height panel-width kp]
   (let [text-box-height    110
         text-box?          false
-        runstreams         @(ut/tracked-subscribe [::bricks/runstreams])
+        runstreams         @(ut/tracked-sub ::bricks/runstreams {})
         runstream-keys     (vec (map :flow-id runstreams))
-        runstreams-lookups @(ut/tracked-subscribe [::bricks/runstreams-lookups])
+        runstreams-lookups @(ut/tracked-sub ::bricks/runstreams-lookups {})
         redrops!           [@bricks/dragging-body @bricks/dragging?]]
-    [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
-                                                                                                                 ;; of
+    ;;^{:key (str "runstream-outer-box" (hash runstreams))}
+    [re-com/box 
+     :padding "5px" 
+     :size "none" 
+     :height (px (- panel-height 12 25 (when text-box? text-box-height))) 
      :width (px (- panel-width 12)) ;; minus size of border left and right and header
-     :attr
-     {:on-drag-over  #(when (and (not @bricks/over-block?) (not @bricks/over-flow?))
-                        (do (reset! bricks/over-flow? true) (reset! bricks/over-block? true)))
-      :on-drag-leave #(do (reset! bricks/over-block? false) (reset! bricks/over-flow? false))} :style
-     {:overflow "auto" :border-radius "16px"} :child
-     [re-com/v-box :gap "9px" :style {:font-size "14px"} :children
-      (conj
-        (vec
-          (for [{:keys [flow-id open? open-outputs? values]} runstreams]
-            (let [open-inputs     (get-in runstreams-lookups [flow-id :open-inputs])
-                  blocks-map      (get-in runstreams-lookups [flow-id :blocks])
-                  no-open-inputs? (true? (empty? open-inputs))
-                  shouts          @(ut/tracked-subscribe [::shouts flow-id])
-                  shouts?         (ut/ne? (cstr/trim (str shouts)))
-                  fire?           @(ut/tracked-subscribe [::fire? flow-id])
-                  drops?          @(ut/tracked-subscribe [::drops? flow-id])
-                  sshout-panel?   (get @shout-panel? flow-id false)
-                  [xx yy]         @detached-coords
-                  override-map    (into {}
-                                        (for [[k {:keys [value source]}] values
-                                              :when                      (not (nil? value))]
-                                          {k (if (= source :input)
-                                               value
-                                               (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])]
-                                                 (if (and (vector? vv) (every? string? vv)) (cstr/join "\n" vv) vv)))}))
-                  overrides-map?  (ut/ne? override-map)
-                  override-map    (if (empty? override-map) nil override-map)
-                  no-data?        (not open-inputs)
-                  input-ports     (vec (keys open-inputs))
-                  output-ports    (vec (cset/difference (set (keys blocks-map)) (set input-ports)))
-                  drops           @(ut/tracked-subscribe [::drops flow-id])]
-              (when no-data? ;; fetch updated port info from server
-                (ut/tracked-dispatch [::get-runstream-ports flow-id]))
-              [re-com/v-box :padding "5px" :style
-               {:border           (when false ;open?
-                                    (str "2px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44)))
-                :border-radius    "11px"
-                :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)} :children
-               [[re-com/h-box :height "45px" :style {:font-size "20px" :padding-bottom "4px"} :justify :between :align :center
-                 :children
-                 [[re-com/h-box :children
-                   [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
-                     #(ut/tracked-dispatch [::bricks/remove-runstream flow-id]) :style
-                     {:color        (str (theme-pull :theme/editor-outer-rim-color nil))
-                      :cursor       "pointer"
-                      :height       "15px"
-                      :margin-top   "3px"
-                      :margin-right "6px"
-                      :font-size    "19px"}]
-                    [re-com/box :style {:cursor "pointer" :user-select "none"} :attr
-                     {:on-click #(ut/tracked-dispatch [::toggle-runstream-item flow-id])} :child (str flow-id)]
-                    (bricks/draggable (let [s-key (str "runstream-chart-" flow-id)
-                                            q-key (ut/safe-key (keyword s-key))]
-                                        (bricks/sql-spawner-chat
-                                          nil
-                                          {:views   {:reech [:> :ResponsiveContainer {:width "100%" :height :panel-height+50}
-                                                             [:> :BarChart
-                                                              {:data q-key :margin {:top 5 :bottom 5 :right 30 :left 20}}
-                                                              [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
-                                                              [:> :Tooltip] [:> :XAxis {:dataKey :started}]
-                                                              [:> :Bar
-                                                               {:dataKey :elapsed
-                                                                :stroke  :theme/editor-outer-rim-color
-                                                                :fill    :theme/editor-outer-rim-color}]]]}
-                                           :queries {q-key {;:select [[[[:sum :elapsed_seconds]] :elapsed] :ts]
-                                                            :select        [[[[:min :elapsed]] :elapsed] :started]
-                                                            :refresh-every 10
-                                                            :cache?        false
-                                                            :connection-id "flows-db"
-                                                            :from          [{:select [:client_name :elapsed :ended :flow_id
-                                                                                      :human_elapsed :in_error :started :ts]
-                                                                             :from   [[:flow_history :mm134]]
-                                                                             :where  [:= :flow_id (str flow-id)]}]
-                                                            :group-by      [:started]}}}
-                                          s-key
-                                          5
-                                          7))
-                                      "meta-menu"
-                                      [re-com/md-icon-button :src (at) :md-icon-name "zmdi-chart" :style
-                                       {:cursor      "grab"
-                                        :color       (str (theme-pull :theme/editor-outer-rim-color nil))
-                                        :height      "15px"
-                                        :margin-left "6px"
-                                        :margin-top  "2px"
-                                        :font-size   "19px"}])
-                    [re-com/md-icon-button :src (at) :md-icon-name "zmdi-hearing" :on-click
-                     #(swap! shout-panel? assoc flow-id (not sshout-panel?)) :style
-                     {:cursor      "pointer"
-                      :color       (str (theme-pull :theme/editor-outer-rim-color nil))
-                      :height      "15px"
-                      :transform   (when sshout-panel? "scaleX(-1)")
-                      :opacity     (if shouts? 1.0 0.33)
-                      :margin-left "6px"
-                      :margin-top  "2px"
-                      :font-size   "19px"}]
-                    (when shouts?
-                      [re-com/box :height "28px" :align :center :justify :start :style
-                       {:font-size "11px" :margin-left "6px" :color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}
-                       :child (str "\"" shouts "...\"")])
-                    [re-com/md-icon-button :src (at) :md-icon-name "zmdi-fire" :on-click
-                     #(ut/tracked-dispatch [::toggle-runstream-fire flow-id]) :style
-                     {:cursor      "pointer"
-                      :color       (if fire?
-                                     (ut/invert-hex-color (str (theme-pull :theme/editor-outer-rim-color nil)))
-                                     (str (theme-pull :theme/editor-outer-rim-color nil)))
-                      :height      "15px"
-                      :opacity     (if fire? 1.0 0.33)
-                      :margin-left "6px"
-                      :margin-top  "2px"
-                      :font-size   "19px"}]
-                    [re-com/h-box :children
-                     [[re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-droplet" :on-click
-                       #(ut/tracked-dispatch [::toggle-runstream-drops flow-id]) :style
-                       {:cursor      "pointer"
-                        :color       (str (theme-pull :theme/editor-outer-rim-color nil))
-                        :height      "15px"
-                        :transform   (when drops? "rotate(-45deg)")
-                        :opacity     0.33
-                        :margin-left (if drops? "5px" "6px")
-                        :margin-top  "2px"
-                        :font-size   "19px"}]
-                      [re-com/box :style
-                       {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "9px" :height "15px"}
-                       :child (str (let [cc (count (keys drops))] (if (= cc 0) "" cc)))]]]
-                    (when no-open-inputs?
-                      [re-com/box :align :center :style {:margin-left "10px" :opacity 0.45 :font-weight 500 :font-size "13px"}
-                       :child "(no open inputs found)"])]]
-                  [re-com/h-box :children
-                   [(when overrides-map?
-                      [re-com/md-icon-button :src (at) :md-icon-name "zmdi-transform" :style
-                       {:color        (str (theme-pull :theme/editor-outer-rim-color nil))
-                        :cursor       "pointer"
-                        :height       "15px"
-                        :margin-top   "11px"
-                        :margin-right "-17px"
-                        :font-size    "19px"}])
-                    (bricks/draggable
-                      {:h 2
-                       :w 7
-                       :drag-meta
-                         {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-                       :views {:flow-play-runstreamed [:box :align :center :justify :center :style
-                                                       {:font-size    "25px"
-                                                        :font-weight  700
-                                                        :padding-top  "6px"
-                                                        :padding-left "14px"
-                                                        :margin-top   "-8px"
-                                                        :color        :theme/editor-outer-rim-color
-                                                        :font-family  :theme/base-font} :child
-                                                       [:run-flow [(str flow-id) (str "run " flow-id) :runstream-overrides]]]}
-                       :name "flow-play-from-runstreams"}
-                      "meta-menu"
-                      [render-honey-comb-fragments
-                       [:box :justify :center :size "none" :width "35px" :height "45px" :style
-                        {:font-size "25px" :padding-top "4px" :margin-left "13px"} :child [:run-flow [flow-id "" override-map]]] 1
-                       1])]]]]
-                (when fire? ;(and fire? (not sshout-panel?))
-                  [re-com/v-box :padding "4px" :height "30px" :width (px (- panel-width 38)) :size "none" ;:height "50px"
-                   :align :center :justify :center :children
-                   [[re-com/box :style {:color (theme-pull :theme/editor-outer-rim-color nil) :font-size "10px"} :child
-                     "(*flow will be triggered when any of it's inputs are changed)"]]])
-                (when sshout-panel?
-                  [re-com/v-box :padding "4px" :width (px (- panel-width 38)) :size "none" ;:height "50px"
-                   :style
-                   {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
-                    :border-radius    "11px"
-                    :padding-bottom   "10px"
-                    :background-color "#00000025"} :align :center :justify :center :children
-                   [;; [re-com/box
-                    [re-com/h-box :gap "10px" :height "40px" :align :center :justify :center :style
-                     {:font-size "16px" :color (str (theme-pull :theme/editor-outer-rim-color nil))} :children
-                     [[re-com/box :child "shouts"]
-                      [re-com/box :style {:font-size "10px"} :child
-                       "(flow will be triggered when it 'hears' a phrase starting with...)"]]]
-                    [re-com/input-text :model (str shouts) :on-change #(ut/tracked-dispatch [::set-shout flow-id (str %)])
-                     :change-on-blur? true :width (px (- panel-width 70)) :style
-                     {:background-color "#00000022"
-                      :font-size        "16px"
-                      :border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
-                      :color            "#ffffff88"}]]])
-                (when drops?
-                  (let [add-row (fn [label placeholder kkey choices]
-                                  [re-com/h-box :align :start :justify :between :height "40px" :children
-                                   [[re-com/box :width "80px" :padding "8px" :align :center :style {:font-size "10px"} :child
-                                     label] [simple-typeahead choices kkey placeholder]
-                                    [re-com/box :padding "8px" :align :center :justify :end :width "260px" :style
-                                     {:font-size "10px" :opacity 0.4 :margin-top "3px"} :child
-                                     (if (= kkey :inputs) "stuf stuf suts inny" "stuf stuf suts outtie")]]])
-                        t-dropdown
-                          (fn [m]
-                            [re-com/tag-dropdown :model (if m m (set (or @add-action-shelf-type [:string]))) :parts
-                             {:main            {:style {:background-color "#00000000" ;(str
-                                                        :color            (theme-pull :theme/editor-font-color nil)
-                                                        :border           (str "0px solid "
-                                                                               (theme-pull :theme/editor-outer-rim-color nil))
-                                                        :outline          "none"}}
-                              :list-group-item {:style {:background-color (str (theme-pull :theme/editor-rim-color nil) "99")
-                                                        :backdrop-filter  "blur(4px)"
-                                                        :border           (str "1px solid "
-                                                                               (theme-pull :theme/editor-outer-rim-color nil)
-                                                                               "44")
-                                                        :color            (theme-pull :theme/editor-font-color nil)}} ;; popover
-                              :list-group      {:style {:margin-top       (px (+ (* -1 yy) -45))
-                                                        :margin-left      (px (+ (* -1 xx) -20))
-                                                        :background-color "#00000000"}}} :abbrev-fn
-                             (fn [m] [re-com/box :child (subs (str (get m :label)) 1 2) :style
-                                      {:font-weight 700 :color (get m :color)}]) :required? true :disabled? (not (nil? m))
-                             :label-fn
-                             (fn [m] [re-com/box :child (str (get m :label)) :style {:font-weight 700 :color (get m :color)}])
-                             :style
-                             {:font-size   "12px"
-                              :font-family (theme-pull :theme/base-font nil)
-                              :color       (theme-pull :theme/editor-font-color nil)} :abbrev-threshold 15 :choices
-                             (vec
-                               (for [[k v] (ut/sort-map-by-key
-                                             (merge {"any" "#c32148" "*table" "#aeaeae" "*view" "#aeaeae" "#field" "#aeaeae"}
-                                                    (theme-pull :theme/data-colors db/data-colors)))]
-                                 {:id (keyword k) :label (str (keyword k)) :color (ut/choose-text-color v) :background-color v}))
-                             :on-change #(reset! add-action-shelf-type %)])]
-                    [re-com/v-box :padding "9px" :width (px (- panel-width 38)) :size "none" ;:height "50px"
-                     :style
-                     {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
-                      :border-radius    "11px"
-                      :background-color "#00000025"
-                      :margin-top       "11px"
-                      :margin-bottom    "11px"} :align :center :justify :center :children
-                     [[re-com/h-box :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) 75)} :align :center
-                       :justify :center :gap "14px" :children
-                       [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
-                         {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"}
-                         :on-click #(swap! add-action-shelf? assoc flow-id (not (get @add-action-shelf? flow-id)))]
-                        [re-com/h-box :height "40px" :gap "10px" :align :center :justify :center :style
-                         {:font-size "16px" :color (str (theme-pull :theme/editor-outer-rim-color nil))} :children
-                         [[re-com/box :child "drops"]
-                          [re-com/box :style {:font-size "10px"} :child
-                           "(functions defined as values 'dropped' on to a flow)"]]]]]
-                      (when (get @add-action-shelf? flow-id)
-                        [re-com/v-box :children
-                         [[re-com/v-box :size "auto" :width "100%" :justify :between :align :center :padding "8px" :children
-                           [[add-row "'drop' into:" " (search for input point)" :inputs input-ports]
-                            [add-row "pick up from:" " (search for output point)" :outputs output-ports]]]
-                          [re-com/h-box :align :center :justify :between :width "100%" :padding "8px" :height "40px" :style
-                           {:font-size "10px"} :children
-                           [;[re-com/box :child "some more stuff down here"]
-                            [re-com/input-text :model add-action-shelf-name ;"tet" ; (get
-                                                                            ;@add-action-shelf
-                             :on-change #(reset! add-action-shelf-name %) :placeholder " (give it a short name)" :validation-regex
-                             #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores,
-                             :width "272px" :style
-                             {:background-color "#00000022"
-                              :z-index          888
-                              :padding          "4px"
-                              :font-size        "13px"
-                              :border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
-                              :padding-left     "0px"
-                              :color            (theme-pull :theme/editor-outer-rim-color nil)}] [t-dropdown]
-                            (let [valid? true]
-                              [re-com/box :style
-                               {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 89))
-                                :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 45)
-                                :cursor           "pointer"
-                                :border-radius    "8px"
-                                :padding-top      "5px"
-                                :padding-bottom   "5px"
-                                :padding-right    "14px"
-                                :padding-left     "14px"} :align :center :justify :center :attr
-                               {:on-click #(do (ut/tracked-dispatch [::add-action flow-id @add-action-shelf-name
-                                                                     @add-action-shelf-inputs @add-action-shelf-outputs
-                                                                     @add-action-shelf-type])
-                                               (reset! add-action-shelf-name nil)
-                                               (reset! add-action-shelf-inputs nil)
-                                               (reset! add-action-shelf-outputs nil)
-                                               (reset! add-action-shelf-type nil)
-                                               (swap! add-action-shelf? assoc flow-id false))} :child "create drop"])]]]])
-                      [re-com/gap :size "10px"]
-                      [re-com/v-box :width (px (- panel-width 60)) :gap "5px" :children
-                       (for [[a {:keys [in out type]}] drops]
-                         [re-com/v-box :padding "8px" :gap "12px" :style
-                          {:border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 66)
-                           :border-radius    "8px"
-                           :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)} :children
-                          [[re-com/h-box :justify :between :align :center :children
-                            [[re-com/box :child (str a)]
-                             [re-com/h-box :gap "12px" :children
-                              [;[re-com/box :child (str type)]
-                               [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
-                                #(ut/tracked-dispatch [::remove-action flow-id a]) :style
-                                {:color     (str (theme-pull :theme/editor-outer-rim-color nil))
-                                 :cursor    "pointer"
-                                 :height    "15px"
-                                 :font-size "19px"}]]]]]
-                           (let [pill-box (fn [x]
-                                            (let [ttype  (get-in blocks-map [x :type] :?)
-                                                  kvord? (fn [x] (try (or (vector? x) (keyword? x)) (catch :default _ false)))
-                                                  ttype  (cond (kvord? ttype)            ttype
-                                                               (kvord? (get ttype :out)) (get ttype :out)
-                                                               (kvord? (get ttype :*))   (get ttype :*)
-                                                               :else                     (or (first (vals (keys ttype))) :?))
-                                                  ccolor (get (theme-pull :theme/data-colors db/data-colors) (gn ttype))]
-                                              [re-com/h-box :justify :between :padding "6px" :width "150px" ;;:justify
-                                                                                                            ;;:center
-                                               :style
-                                               {:border           (str "1px solid " ccolor)
-                                                :font-size        "10px"
-                                                :background-color (str ccolor 22)
-                                                :border-radius    "5px"
-                                                :overflow         "hidden"} :children
-                                               [[re-com/box :style {:font-weight 700} :child (str x)]
-                                                [re-com/box :style {:color ccolor} :child (str ttype)]]]))]
-                             [re-com/h-box :width "100%" :justify :between :align :center :children
-                              [[t-dropdown type]
-                               [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-right-to-bracket" :style
-                                {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "24px"}]
-                               [pill-box in]
-                               [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-timeline" :style
-                                {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "24px"}]
-                               [pill-box out]
-                               [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-right-from-bracket" :style
-                                {:color     (str (theme-pull :theme/editor-outer-rim-color nil))
-                                 :opacity   0.33
-                                 :font-size "24px"}]]])]])]]]))
-                (when open?
-                  [re-com/v-box :children
-                   (let [parted (partition-all 2 (vec (for [[k v] open-inputs] [k v])))]
-                     (for [batch parted]
-                       (let [is-first? (= batch (first parted))
-                             is-last? (= batch (last parted))
-                             is-both? (and is-first? is-last?)
-                             b1 (first batch)
-                             b2 (last batch)
-                             b1-meta (get-in blocks-map [(first b1) :meta :* :scrubber])
-                             b2-meta (get-in blocks-map [(first b2) :meta :* :scrubber])
-                             fix-type (fn [x] (get x :out x)) ;; TODO remove when input fixed
-                             ttype1 (fix-type (get (last b1) :type))
-                             ttype2 (fix-type (get (last b2) :type))
-                             droppable?
-                               (fn [x] ;(ut/tapp>> [:gg (gn x) (get-in @bricks/dragging-body
-                                 (try (or (and @bricks/dragging? ;; all parameters that are valid
-                                               (or (= (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type])) (= x :any))
-                                               (= :param (get-in @bricks/dragging-body [:drag-meta :type])))
-                                          (and @bricks/dragging? ;; all cells that are valid
-                                               (or (= (gn x) (get-in @bricks/dragging-body [:drag-meta :data-type])) (= x :any))
-                                               (>= (get-in @bricks/dragging-body [:drag-meta :row-num]) 0)
-                                               (= :where (get-in @bricks/dragging-body [:drag-meta :type]))))
-                                      (catch :default _ false)))
-                             b1-droppable? (droppable? ttype1)
-                             b2-droppable? (droppable? ttype2)
-                             outcolor1 (try (get (theme-pull :theme/data-colors db/data-colors) (gn ttype1))
-                                            (catch :default _ "orange"))
-                             outcolor2 (try (get (theme-pull :theme/data-colors db/data-colors) (gn ttype2))
-                                            (catch :default _ "orange"))
-                             cell
-                               (fn [cc bbb meta drop?]
-                                 (let [kkey (first bbb)
-                                       override @(ut/tracked-subscribe [::rs-value flow-id kkey])
-                                       defaults (get-in (last bbb) [:defaults kkey])
-                                       ttype (get (last bbb) :type)
-                                       ttype (get (last bbb) :ttype)
-                                       user-input-val (get (last bbb) :user-input defaults)
-                                       overridden? (and (not (nil? override)) (not= user-input-val override))
-                                       curr-val (if overridden? override user-input-val)
-                                       trunc 39
-                                       param? (= (get-in values [kkey :source]) :param)
-                                       param-value (get-in values [kkey :value])
-                                       val-open? (and (get-in values [kkey :open?] false) (not drop?))
-                                       subbed-val (try (str (subs (str curr-val) 0 trunc)
-                                                            (when (> (count (str curr-val)) trunc) "..."))
-                                                       (catch :default _ (str curr-val)))
-                                       param-pill [re-com/box :padding "7px" :min-height "42px" :width
-                                                   (px (- (/ panel-width 2) 30)) :align :center :justify :center :attr
-                                                   {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
-                                                   :style {:opacity 0.8 :overflow "hidden" :cursor "pointer" :font-size "16px"}
-                                                   :child
-                                                   [re-com/box :style
-                                                    {:border           (str "1px solid " cc)
-                                                     :background-color (str cc 55)
-                                                     :padding-top      "3px"
-                                                     :padding-bottom   "3px"
-                                                     :padding-left     "12px"
-                                                     :padding-right    "12px"} :child (str param-value)]]
-                                       the-box
-                                         [re-com/box :height "100%" :style
-                                          {:border-radius    (cond is-both?  "11px"
-                                                                   is-first? "11px 11px 0px 0px"
-                                                                   is-last?  "0px 0px 11px 11px"
-                                                                   :else     "0px")
-                                           :filter           (when drop? "brightness(300%)")
-                                           :border           (if drop? (str "1px solid " cc) (str "1px solid #00000045"))
-                                           :background-color (str cc (if drop? 55 20))} :width (px (- (/ panel-width 2) 18))
-                                          :child
-                                          [re-com/v-box :children
-                                           [[re-com/h-box :size "none" :width (px (- (/ panel-width 2) 30)) :style
-                                             {:margin-left "5px" :cursor "pointer"} :padding "6px" :justify :between :children
-                                             [[re-com/h-box :children
-                                               [(bricks/draggable (prepare-output-param-drag (first bbb) flow-id ttype)
+     :attr {:on-drag-over  #(when (and (not @bricks/over-block?) (not @bricks/over-flow?))
+                              (reset! bricks/over-flow? true)
+                              (reset! bricks/over-block? true))
+            :on-drag-leave #(do (reset! bricks/over-block? false)
+                                (reset! bricks/over-flow? false))}
+     :style {:overflow "auto"
+             :border-radius "16px"}
+     :child
+     ;;^{:key (str "runstream-inner-box" (hash runstreams))}
+     [re-com/v-box
+      :gap "9px"
+      :style {:font-size "14px"}
+      :children (conj
+                 (vec
+                  (for [{:keys [flow-id open? open-outputs? values]} runstreams]
+                    (let [open-inputs     (get-in runstreams-lookups [flow-id :open-inputs])
+                          blocks-map      (get-in runstreams-lookups [flow-id :blocks])
+                          no-open-inputs? (true? (empty? open-inputs))
+                          shouts          @(ut/tracked-subscribe [::shouts flow-id])
+                          shouts?         (ut/ne? (cstr/trim (str shouts)))
+                          fire?           @(ut/tracked-subscribe [::fire? flow-id])
+                          drops?          @(ut/tracked-subscribe [::drops? flow-id])
+                          sshout-panel?   (get @shout-panel? flow-id false)
+                          [xx yy]         @detached-coords
+                          override-map    (into {}
+                                                (for [[k {:keys [value source]}] values
+                                                      :when                      (not (nil? value))]
+                                                  {k (if (= source :input)
+                                                       value
+                                                       (let [vv @(ut/tracked-sub ::rs-value {:flow-id flow-id :kkey k})]
+                                                         (if (and (vector? vv) (every? string? vv)) (cstr/join "\n" vv) vv)))}))
+                          overrides-map?  (ut/ne? override-map)
+                          override-map    (if (empty? override-map) nil override-map)
+                          no-data?        (not open-inputs)
+                          input-ports     (vec (keys open-inputs))
+                          output-ports    (vec (cset/difference (set (keys blocks-map)) (set input-ports)))
+                          drops           @(ut/tracked-subscribe [::drops flow-id])]
+                      
+                      (when no-data? ;; fetch updated port info from server
+                        (ut/tracked-dispatch [::get-runstream-ports flow-id]))
+                      
+                      [re-com/v-box
+                       :padding "5px"
+                       :style {:border           (when false ;open?
+                                                   (str "2px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44)))
+                               :border-radius    "11px"
+                               :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)}
+                       :children [[re-com/h-box
+                                   :height "45px"
+                                   :style {:font-size "20px" :padding-bottom "4px"}
+                                   :justify :between :align :center
+                                   :children [[re-com/h-box :children
+                                               [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
+                                                 #(ut/tracked-dispatch [::bricks/remove-runstream flow-id]) :style
+                                                 {:color        (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                  :cursor       "pointer"
+                                                  :height       "15px"
+                                                  :margin-top   "3px"
+                                                  :margin-right "6px"
+                                                  :font-size    "19px"}]
+                                                [re-com/box
+                                                 :style {:cursor "pointer" :user-select "none"}
+                                                 :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-item flow-id])} 
+                                                 :child (str flow-id)]
+                                                (bricks/draggable (let [s-key (str "runstream-chart-" flow-id)
+                                                                        q-key (ut/safe-key (keyword s-key))]
+                                                                    (bricks/sql-spawner-chat
+                                                                     nil
+                                                                     {:views   {:reech [:> :ResponsiveContainer {:width "100%" :height :panel-height+50}
+                                                                                        [:> :BarChart
+                                                                                         {:data q-key :margin {:top 5 :bottom 5 :right 30 :left 20}}
+                                                                                         [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
+                                                                                         [:> :Tooltip] [:> :XAxis {:dataKey :started}]
+                                                                                         [:> :Bar
+                                                                                          {:dataKey :elapsed
+                                                                                           :stroke  :theme/editor-outer-rim-color
+                                                                                           :fill    :theme/editor-outer-rim-color}]]]}
+                                                                      :queries {q-key {;:select [[[[:sum :elapsed_seconds]] :elapsed] :ts]
+                                                                                       :select        [[[[:min :elapsed]] :elapsed] :started]
+                                                                                       :refresh-every 10
+                                                                                       :cache?        false
+                                                                                       :connection-id "flows-db"
+                                                                                       :from          [{:select [:client_name :elapsed :ended :flow_id
+                                                                                                                 :human_elapsed :in_error :started :ts]
+                                                                                                        :from   [[:flow_history :mm134]]
+                                                                                                        :where  [:= :flow_id (str flow-id)]}]
+                                                                                       :group-by      [:started]}}}
+                                                                     s-key
+                                                                     5
+                                                                     7))
                                                                   "meta-menu"
-                                                                  [re-com/box :attr
-                                                                   {:on-click #(ut/tracked-dispatch [::toggle-runstream-value
-                                                                                                     flow-id kkey])} :style
-                                                                   {:font-size "17px"} :child (str (first bbb))])
-                                                (when overridden?
-                                                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-undo" :on-click
-                                                   #(ut/tracked-dispatch [::save-rs-value flow-id kkey nil nil]) :style
+                                                                  [re-com/md-icon-button
+                                                                   :src (at)
+                                                                   :md-icon-name "zmdi-chart"
+                                                                   :style {:cursor      "grab"
+                                                                           :color       (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                           :height      "15px"
+                                                                           :margin-left "6px"
+                                                                           :margin-top  "2px"
+                                                                           :font-size   "19px"}])
+                                                [re-com/md-icon-button :src (at) :md-icon-name "zmdi-hearing" 
+                                                 :on-click
+                                                 #(swap! shout-panel? assoc flow-id (not sshout-panel?)) 
+                                                 :style
+                                                 {:cursor      "pointer"
+                                                  :color       (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                  :height      "15px"
+                                                  :transform   (when sshout-panel? "scaleX(-1)")
+                                                  :opacity     (if shouts? 1.0 0.33)
+                                                  :margin-left "6px"
+                                                  :margin-top  "2px"
+                                                  :font-size   "19px"}]
+                                                (when shouts?
+                                                  [re-com/box :height "28px" :align :center :justify :start :style
+                                                   {:font-size "11px" :margin-left "6px" :color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}
+                                                   :child (str "\"" shouts "...\"")])
+                                                [re-com/md-icon-button :src (at) :md-icon-name "zmdi-fire" :on-click
+                                                 #(ut/tracked-dispatch [::toggle-runstream-fire flow-id]) :style
+                                                 {:cursor      "pointer"
+                                                  :color       (if fire?
+                                                                 (ut/invert-hex-color (str (theme-pull :theme/editor-outer-rim-color nil)))
+                                                                 (str (theme-pull :theme/editor-outer-rim-color nil)))
+                                                  :height      "15px"
+                                                  :opacity     (if fire? 1.0 0.33)
+                                                  :margin-left "6px"
+                                                  :margin-top  "2px"
+                                                  :font-size   "19px"}]
+                                                [re-com/h-box :children
+                                                 [[re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-droplet" :on-click
+                                                   #(ut/tracked-dispatch [::toggle-runstream-drops flow-id]) :style
                                                    {:cursor      "pointer"
                                                     :color       (str (theme-pull :theme/editor-outer-rim-color nil))
                                                     :height      "15px"
-                                                    :margin-left "4px"
-                                                    :font-size   "19px"}])
-                                                (when (and meta (not val-open?))
-                                                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-more" :on-click
-                                                   #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey]) :style
-                                                   {;:cursor "pointer"
-                                                    :color       (str (theme-pull :theme/editor-outer-rim-color nil))
-                                                    :height      "15px"
-                                                    :margin-left "4px"
-                                                    :font-size   "19px"}])]]
-                                              [re-com/box :style {:color cc :opacity 0.9} :child (str ttype)]]]
-                                            (when (not val-open?)
-                                              (if drop?
-                                                [re-com/box :padding "7px" :height "42px" :align :center :justify :center :style
-                                                 {:cursor "pointer" :font-size "16px"} :child
-                                                 (str "drop parameter here to override")]
-                                                (if param?
-                                                  param-pill
-                                                  [re-com/box :padding "7px" :height "42px" :size "none" :width
-                                                   (px (- (/ panel-width 2) 30)) :attr
-                                                   {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
-                                                   :style
-                                                   {:opacity     0.35
-                                                    :margin-left "7px"
-                                                    :cursor      "pointer"
-                                                    :overflow    "hidden"
-                                                    :font-size   "14px"} :child (str subbed-val)])))
-                                            (when (and val-open? param?) param-pill)
-                                            (when (and val-open? meta (not param?))
-                                              [re-com/box :size "auto" :child
-                                               [bricks/scrubber-panel true
-                                                @(ut/tracked-subscribe [::bricks/keypaths-in-rs-values flow-id (first bbb)])
-                                                [:runstreams flow-id (first bbb)] (first bbb) ;:*
-                                                {:fm true :canvas? true :flow? true :runstreams? true}]])
-                                            (when val-open?
-                                              [re-com/box :size "none" :padding "7px" :style
-                                               {:overflow         "auto"
-                                                :opacity          0.65
-                                                :font-size        "14px"
-                                                :margin           "3px"
-                                                :border-radius    "8px"
-                                                :background-color "#00000065"} :width (px (- (/ panel-width 2) 26)) :child
-                                               [code-box-rs-value (- (/ panel-width 2) 16) nil flow-id kkey
-                                                (if (and (vector? curr-val) (every? string? curr-val)) curr-val (pr-str curr-val)) ;(pr-str
-                                                                                                                                   ;curr-val)
-                                                param?]])]]]]
-                                   (if drop?
-                                     (bricks/droppable-pills
-                                       ["meta-menu"]
-                                       {:clause    :runstream-overrides
-                                        :drop-data {:source (if (= :where (get-in @bricks/dragging-body [:drag-meta :type]))
-                                                              (let [row-num     (get-in @bricks/dragging-body
-                                                                                        [:drag-meta :row-num])
-                                                                    src-table   (get-in @bricks/dragging-body
-                                                                                        [:drag-meta :source-query])
-                                                                    param-field (get-in @bricks/dragging-body
-                                                                                        [:drag-meta :param-field])
-                                                                    param-full  (keyword (str (ut/unkey src-table)
-                                                                                              "/" (ut/unkey param-field)
-                                                                                              "." row-num))]
-                                                                (assoc (get @bricks/dragging-body :drag-meta)
-                                                                  :param-full param-full))
-                                                              (get @bricks/dragging-body :drag-meta))
-                                                    :target {:flow-id flow-id :type ttype :key kkey}}}
-                                       the-box)
-                                     the-box)))]
-                         [re-com/h-box :justify :between :align :start :children
-                          [[cell outcolor1 b1 b1-meta b1-droppable?]
-                           (when (> (count batch) 1) [cell outcolor2 b2 b2-meta b2-droppable?])]])))])
-                (when open? [runstream-output-boxes flow-id blocks-map panel-width open-outputs? open-inputs])]])))
-        [re-com/v-box :align :center :justify :center :size "none" :padding "6px" :width (px (- panel-width 22)) :gap "10px"
-         :children
-         (let [server-flows (map :flow_id @(ut/tracked-subscribe [::conn/sql-data [:flows-sys]]))
-               server-flows (vec (sort (cset/difference (set server-flows) (set runstream-keys))))
-               sql-calls    {:flows-sys {:select        [:flow_id :file_path :last_modified]
-                                         :from          [:flows]
-                                         :connection-id "flows-db"
-                                         :order-by      [[3 :desc]]}}]
-           (dorun (for [[k query] sql-calls]
-                    (let [;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                                                    :transform   (when drops? "rotate(-45deg)")
+                                                    :opacity     0.33
+                                                    :margin-left (if drops? "5px" "6px")
+                                                    :margin-top  "2px"
+                                                    :font-size   "19px"}]
+                                                  [re-com/box :style
+                                                   {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "9px" :height "15px"}
+                                                   :child (str (let [cc (count (keys drops))] (if (= cc 0) "" cc)))]]]
+                                                (when no-open-inputs?
+                                                  [re-com/box :align :center :style {:margin-left "10px" :opacity 0.45 :font-weight 500 :font-size "13px"}
+                                                   :child "(no open inputs found)"])]]
+                                              [re-com/h-box :children
+                                               [(when overrides-map?
+                                                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-transform" :style
+                                                   {:color        (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                    :cursor       "pointer"
+                                                    :height       "15px"
+                                                    :margin-top   "11px"
+                                                    :margin-right "-17px"
+                                                    :font-size    "19px"}])
+                                                (bricks/draggable
+                                                 {:h 2
+                                                  :w 7
+                                                  :drag-meta
+                                                  {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+                                                  :views {:flow-play-runstreamed [:box :align :center :justify :center :style
+                                                                                  {:font-size    "25px"
+                                                                                   :font-weight  700
+                                                                                   :padding-top  "6px"
+                                                                                   :padding-left "14px"
+                                                                                   :margin-top   "-8px"
+                                                                                   :color        :theme/editor-outer-rim-color
+                                                                                   :font-family  :theme/base-font} :child
+                                                                                  [:run-flow [(str flow-id) (str "run " flow-id) :runstream-overrides]]]}
+                                                  :name "flow-play-from-runstreams"}
+                                                 "meta-menu"
+                                                 [render-honey-comb-fragments
+                                                  [:box :justify :center :size "none" :width "35px" :height "45px" :style
+                                                   {:font-size "25px" :padding-top "4px" :margin-left "13px"} :child [:run-flow [flow-id "" override-map]]] 1
+                                                  1])]]]]
+                                  (when fire? ;(and fire? (not sshout-panel?))
+                                    [re-com/v-box :padding "4px" :height "30px" :width (px (- panel-width 38)) :size "none" ;:height "50px"
+                                     :align :center :justify :center :children
+                                     [[re-com/box :style {:color (theme-pull :theme/editor-outer-rim-color nil) :font-size "10px"} :child
+                                       "(*flow will be triggered when any of it's inputs are changed)"]]])
+                                  (when sshout-panel?
+                                    [re-com/v-box :padding "4px" :width (px (- panel-width 38)) :size "none" ;:height "50px"
+                                     :style
+                                     {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
+                                      :border-radius    "11px"
+                                      :padding-bottom   "10px"
+                                      :background-color "#00000025"} :align :center :justify :center :children
+                                     [;; [re-com/box
+                                      [re-com/h-box :gap "10px" :height "40px" :align :center :justify :center :style
+                                       {:font-size "16px" :color (str (theme-pull :theme/editor-outer-rim-color nil))} :children
+                                       [[re-com/box :child "shouts"]
+                                        [re-com/box :style {:font-size "10px"} :child
+                                         "(flow will be triggered when it 'hears' a phrase starting with...)"]]]
+                                      [re-com/input-text :model (str shouts) :on-change #(ut/tracked-dispatch [::set-shout flow-id (str %)])
+                                       :change-on-blur? true :width (px (- panel-width 70)) :style
+                                       {:background-color "#00000022"
+                                        :font-size        "16px"
+                                        :border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
+                                        :color            "#ffffff88"}]]])
+                                  (when drops?
+                                    (let [add-row (fn [label placeholder kkey choices]
+                                                    [re-com/h-box :align :start :justify :between :height "40px" :children
+                                                     [[re-com/box :width "80px" :padding "8px" :align :center :style {:font-size "10px"} :child
+                                                       label] [simple-typeahead choices kkey placeholder]
+                                                      [re-com/box :padding "8px" :align :center :justify :end :width "260px" :style
+                                                       {:font-size "10px" :opacity 0.4 :margin-top "3px"} :child
+                                                       (if (= kkey :inputs) "stuf stuf suts inny" "stuf stuf suts outtie")]]])
+                                          t-dropdown
+                                          (fn [m]
+                                            [re-com/tag-dropdown :model (if m m (set (or @add-action-shelf-type [:string]))) :parts
+                                             {:main            {:style {:background-color "#00000000" ;(str
+                                                                        :color            (theme-pull :theme/editor-font-color nil)
+                                                                        :border           (str "0px solid "
+                                                                                               (theme-pull :theme/editor-outer-rim-color nil))
+                                                                        :outline          "none"}}
+                                              :list-group-item {:style {:background-color (str (theme-pull :theme/editor-rim-color nil) "99")
+                                                                        :backdrop-filter  "blur(4px)"
+                                                                        :border           (str "1px solid "
+                                                                                               (theme-pull :theme/editor-outer-rim-color nil)
+                                                                                               "44")
+                                                                        :color            (theme-pull :theme/editor-font-color nil)}} ;; popover
+                                              :list-group      {:style {:margin-top       (px (+ (* -1 yy) -45))
+                                                                        :margin-left      (px (+ (* -1 xx) -20))
+                                                                        :background-color "#00000000"}}} :abbrev-fn
+                                             (fn [m] [re-com/box :child (subs (str (get m :label)) 1 2) :style
+                                                      {:font-weight 700 :color (get m :color)}]) :required? true :disabled? (not (nil? m))
+                                             :label-fn
+                                             (fn [m] [re-com/box :child (str (get m :label)) :style {:font-weight 700 :color (get m :color)}])
+                                             :style
+                                             {:font-size   "12px"
+                                              :font-family (theme-pull :theme/base-font nil)
+                                              :color       (theme-pull :theme/editor-font-color nil)} :abbrev-threshold 15 :choices
+                                             (vec
+                                              (for [[k v] (ut/sort-map-by-key
+                                                           (merge {"any" "#c32148" "*table" "#aeaeae" "*view" "#aeaeae" "#field" "#aeaeae"}
+                                                                  (theme-pull :theme/data-colors db/data-colors)))]
+                                                {:id (keyword k) :label (str (keyword k)) :color (ut/choose-text-color v) :background-color v}))
+                                             :on-change #(reset! add-action-shelf-type %)])]
+                                      [re-com/v-box :padding "9px" :width (px (- panel-width 38)) :size "none" ;:height "50px"
+                                       :style
+                                       {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
+                                        :border-radius    "11px"
+                                        :background-color "#00000025"
+                                        :margin-top       "11px"
+                                        :margin-bottom    "11px"} :align :center :justify :center :children
+                                       [[re-com/h-box :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) 75)} :align :center
+                                         :justify :center :gap "14px" :children
+                                         [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
+                                           {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"}
+                                           :on-click #(swap! add-action-shelf? assoc flow-id (not (get @add-action-shelf? flow-id)))]
+                                          [re-com/h-box :height "40px" :gap "10px" :align :center :justify :center :style
+                                           {:font-size "16px" :color (str (theme-pull :theme/editor-outer-rim-color nil))} :children
+                                           [[re-com/box :child "drops"]
+                                            [re-com/box :style {:font-size "10px"} :child
+                                             "(functions defined as values 'dropped' on to a flow)"]]]]]
+                                        (when (get @add-action-shelf? flow-id)
+                                          [re-com/v-box :children
+                                           [[re-com/v-box :size "auto" :width "100%" :justify :between :align :center :padding "8px" :children
+                                             [[add-row "'drop' into:" " (search for input point)" :inputs input-ports]
+                                              [add-row "pick up from:" " (search for output point)" :outputs output-ports]]]
+                                            [re-com/h-box :align :center :justify :between :width "100%" :padding "8px" :height "40px" :style
+                                             {:font-size "10px"} :children
+                                             [;[re-com/box :child "some more stuff down here"]
+                                              [re-com/input-text :model add-action-shelf-name ;"tet" ; (get
+                                                                            ;@add-action-shelf
+                                               :on-change #(reset! add-action-shelf-name %) :placeholder " (give it a short name)" :validation-regex
+                                               #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores,
+                                               :width "272px" :style
+                                               {:background-color "#00000022"
+                                                :z-index          888
+                                                :padding          "4px"
+                                                :font-size        "13px"
+                                                :border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44))
+                                                :padding-left     "0px"
+                                                :color            (theme-pull :theme/editor-outer-rim-color nil)}] [t-dropdown]
+                                              (let [valid? true]
+                                                [re-com/box :style
+                                                 {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 89))
+                                                  :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 45)
+                                                  :cursor           "pointer"
+                                                  :border-radius    "8px"
+                                                  :padding-top      "5px"
+                                                  :padding-bottom   "5px"
+                                                  :padding-right    "14px"
+                                                  :padding-left     "14px"} :align :center :justify :center :attr
+                                                 {:on-click #(do (ut/tracked-dispatch [::add-action flow-id @add-action-shelf-name
+                                                                                       @add-action-shelf-inputs @add-action-shelf-outputs
+                                                                                       @add-action-shelf-type])
+                                                                 (reset! add-action-shelf-name nil)
+                                                                 (reset! add-action-shelf-inputs nil)
+                                                                 (reset! add-action-shelf-outputs nil)
+                                                                 (reset! add-action-shelf-type nil)
+                                                                 (swap! add-action-shelf? assoc flow-id false))} :child "create drop"])]]]])
+                                        [re-com/gap :size "10px"]
+                                        [re-com/v-box :width (px (- panel-width 60)) :gap "5px"
+                                         :children (for [[a {:keys [in out type]}] drops]
+                                                     [re-com/v-box :padding "8px" :gap "12px" :style
+                                                      {:border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 66)
+                                                       :border-radius    "8px"
+                                                       :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)} :children
+                                                      [[re-com/h-box :justify :between :align :center :children
+                                                        [[re-com/box :child (str a)]
+                                                         [re-com/h-box :gap "12px" :children
+                                                          [;[re-com/box :child (str type)]
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
+                                                            #(ut/tracked-dispatch [::remove-action flow-id a]) :style
+                                                            {:color     (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                             :cursor    "pointer"
+                                                             :height    "15px"
+                                                             :font-size "19px"}]]]]]
+                                                       (let [pill-box (fn [x]
+                                                                        (let [ttype  (get-in blocks-map [x :type] :?)
+                                                                              kvord? (fn [x] (try (or (vector? x) (keyword? x)) (catch :default _ false)))
+                                                                              ttype  (cond (kvord? ttype)            ttype
+                                                                                           (kvord? (get ttype :out)) (get ttype :out)
+                                                                                           (kvord? (get ttype :*))   (get ttype :*)
+                                                                                           :else                     (or (first (vals (keys ttype))) :?))
+                                                                              ccolor (get (theme-pull :theme/data-colors db/data-colors) (gn ttype))]
+                                                                          [re-com/h-box :justify :between :padding "6px" :width "150px" ;;:justify
+                                                                                                            ;;:center
+                                                                           :style
+                                                                           {:border           (str "1px solid " ccolor)
+                                                                            :font-size        "10px"
+                                                                            :background-color (str ccolor 22)
+                                                                            :border-radius    "5px"
+                                                                            :overflow         "hidden"} :children
+                                                                           [[re-com/box :style {:font-weight 700} :child (str x)]
+                                                                            [re-com/box :style {:color ccolor} :child (str ttype)]]]))]
+                                                         [re-com/h-box :width "100%" :justify :between :align :center :children
+                                                          [[t-dropdown type]
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-right-to-bracket" :style
+                                                            {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "24px"}]
+                                                           [pill-box in]
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-timeline" :style
+                                                            {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "24px"}]
+                                                           [pill-box out]
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-right-from-bracket" :style
+                                                            {:color     (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                             :opacity   0.33
+                                                             :font-size "24px"}]]])]])]]]))
+                                  (when open?
+                                    [re-com/v-box :children
+                                     (let [parted (partition-all 2 (vec (for [[k v] open-inputs] [k v])))]
+                                       (for [batch parted]
+                                         (let [is-first? (= batch (first parted))
+                                               is-last? (= batch (last parted))
+                                               is-both? (and is-first? is-last?)
+                                               b1 (first batch)
+                                               b2 (last batch)
+                                               b1-meta (get-in blocks-map [(first b1) :meta :* :scrubber])
+                                               b2-meta (get-in blocks-map [(first b2) :meta :* :scrubber])
+                                               fix-type (fn [x] (get x :out x)) ;; TODO remove when input fixed
+                                               ttype1 (fix-type (get (last b1) :type))
+                                               ttype2 (fix-type (get (last b2) :type))
+                                               droppable?
+                                               (fn [x] ;(ut/tapp>> [:gg (gn x) (get-in @bricks/dragging-body
+                                                 (try (or (and @bricks/dragging? ;; all parameters that are valid
+                                                               (or (= (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type])) (= x :any))
+                                                               (= :param (get-in @bricks/dragging-body [:drag-meta :type])))
+                                                          (and @bricks/dragging? ;; all cells that are valid
+                                                               (or (= (gn x) (get-in @bricks/dragging-body [:drag-meta :data-type])) (= x :any))
+                                                               (>= (get-in @bricks/dragging-body [:drag-meta :row-num]) 0)
+                                                               (= :where (get-in @bricks/dragging-body [:drag-meta :type]))))
+                                                      (catch :default _ false)))
+                                               b1-droppable? (droppable? ttype1)
+                                               b2-droppable? (droppable? ttype2)
+                                               outcolor1 (try (get (theme-pull :theme/data-colors db/data-colors) (gn ttype1))
+                                                              (catch :default _ "orange"))
+                                               outcolor2 (try (get (theme-pull :theme/data-colors db/data-colors) (gn ttype2))
+                                                              (catch :default _ "orange"))
+                                               cell
+                                               (fn [cc bbb meta drop?]
+                                                 (let [kkey (first bbb)
+                                                       ;;override @(ut/tracked-subscribe [::rs-value flow-id kkey])
+                                                       override @(ut/tracked-sub ::rs-value {:flow-id flow-id :kkey kkey})
+                                                       defaults (get-in (last bbb) [:defaults kkey])
+                                                       ttype (get (last bbb) :type)
+                                                       ;ttype (get (last bbb) :ttype)
+                                                       user-input-val (get (last bbb) :user-input defaults)
+                                                       overridden? (and (not (nil? override)) 
+                                                                        (not= user-input-val override))
+                                                       curr-val (if overridden? override user-input-val)
+                                                       trunc 39
+                                                       param? (= (get-in values [kkey :source]) :param)
+                                                       param-value (get-in values [kkey :value])
+                                                       val-open? (and (get-in values [kkey :open?] false) (not drop?))
+                                                       subbed-val (try (str (subs (str curr-val) 0 trunc)
+                                                                            (when (> (count (str curr-val)) trunc) "..."))
+                                                                       (catch :default _ (str curr-val)))
+                                                       param-pill [re-com/box :padding "7px" :min-height "42px" :width
+                                                                   (px (- (/ panel-width 2) 30)) :align :center :justify :center :attr
+                                                                   {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
+                                                                   :style {:opacity 0.8 :overflow "hidden" :cursor "pointer" :font-size "16px"}
+                                                                   :child
+                                                                   [re-com/box :style
+                                                                    {:border           (str "1px solid " cc)
+                                                                     :background-color (str cc 55)
+                                                                     :padding-top      "3px"
+                                                                     :padding-bottom   "3px"
+                                                                     :padding-left     "12px"
+                                                                     :padding-right    "12px"} 
+                                                                    :child (str param-value)]]
+                                                       the-box
+                                                       [re-com/box :height "100%" :style
+                                                        {:border-radius    (cond is-both?  "11px"
+                                                                                 is-first? "11px 11px 0px 0px"
+                                                                                 is-last?  "0px 0px 11px 11px"
+                                                                                 :else     "0px")
+                                                         :filter           (when drop? "brightness(300%)")
+                                                         :border           (if drop? (str "1px solid " cc) (str "1px solid #00000045"))
+                                                         :background-color (str cc (if drop? 55 20))} 
+                                                        :width (px (- (/ panel-width 2) 18))
+                                                        :child
+                                                        [re-com/v-box :children
+                                                         [[re-com/h-box :size "none" :width (px (- (/ panel-width 2) 30)) :style
+                                                           {:margin-left "5px" :cursor "pointer"} :padding "6px" :justify :between :children
+                                                           [[re-com/h-box :children
+                                                             [(bricks/draggable (prepare-output-param-drag (first bbb) flow-id ttype)
+                                                                                "meta-menu"
+                                                                                [re-com/box :attr
+                                                                                 {:on-click #(ut/tracked-dispatch [::toggle-runstream-value
+                                                                                                                   flow-id kkey])} :style
+                                                                                 {:font-size "17px"} :child (str (first bbb))])
+                                                              (when overridden?
+                                                                [re-com/md-icon-button :src (at) :md-icon-name "zmdi-undo"
+                                                                 :on-click #(ut/tracked-dispatch [::save-rs-value flow-id kkey nil nil]) :style
+                                                                 {:cursor      "pointer"
+                                                                  :color       (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                  :height      "15px"
+                                                                  :margin-left "4px"
+                                                                  :font-size   "19px"}])
+                                                              (when (and meta (not val-open?))
+                                                                [re-com/md-icon-button :src (at) :md-icon-name "zmdi-more" :on-click
+                                                                 #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey]) :style
+                                                                 {;:cursor "pointer"
+                                                                  :color       (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                  :height      "15px"
+                                                                  :margin-left "4px"
+                                                                  :font-size   "19px"}])]]
+                                                            [re-com/box :style {:color cc :opacity 0.9} :child (str ttype)]]]
+                                                          (when (not val-open?)
+                                                            (if drop?
+                                                              [re-com/box :padding "7px" :height "42px" :align :center :justify :center :style
+                                                               {:cursor "pointer" :font-size "16px"} :child
+                                                               (str "drop parameter here to override")]
+                                                              (if param?
+                                                                param-pill
+                                                                [re-com/box 
+                                                                 :padding "7px" 
+                                                                 :height "42px" :size "none" 
+                                                                 :width (px (- (/ panel-width 2) 30))
+                                                                 :attr
+                                                                 {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
+                                                                 :style
+                                                                 {:opacity     0.35
+                                                                  :margin-left "7px"
+                                                                  :cursor      "pointer"
+                                                                  :overflow    "hidden"
+                                                                  :font-size   "14px"} :child (str subbed-val)])))
+                                                          (when (and val-open? param?) param-pill)
+                                                          (when (and val-open? meta (not param?))
+                                                            [re-com/box :size "auto" :child
+                                                             [bricks/scrubber-panel true
+                                                              @(ut/tracked-subscribe [::bricks/keypaths-in-rs-values flow-id (first bbb)])
+                                                              [:runstreams flow-id (first bbb)] (first bbb) ;:*
+                                                              {:fm true :canvas? true :flow? true :runstreams? true}]])
+                                                          (when val-open?
+                                                            [re-com/box :size "none" :padding "7px"
+                                                             :style {:overflow         "auto"
+                                                                     :opacity          0.65
+                                                                     :font-size        "14px"
+                                                                     :margin           "3px"
+                                                                     :border-radius    "8px"
+                                                                     :background-color "#00000065"}
+                                                             :width (px (- (/ panel-width 2) 26))
+                                                             :child
+                                                             ^{:key (str flow-id kkey param?)}
+                                                             [code-box-rs-value (- (/ panel-width 2) 16) nil flow-id kkey
+                                                              (if (and (vector? curr-val) (every? string? curr-val)) curr-val (pr-str curr-val))
+                                                              param?]])]]]]
+                                                   (if drop?
+                                                     (bricks/droppable-pills
+                                                      ["meta-menu"]
+                                                      {:clause    :runstream-overrides
+                                                       :drop-data {:source (if (= :where (get-in @bricks/dragging-body [:drag-meta :type]))
+                                                                             (let [row-num     (get-in @bricks/dragging-body
+                                                                                                       [:drag-meta :row-num])
+                                                                                   src-table   (get-in @bricks/dragging-body
+                                                                                                       [:drag-meta :source-query])
+                                                                                   param-field (get-in @bricks/dragging-body
+                                                                                                       [:drag-meta :param-field])
+                                                                                   param-full  (keyword (str (ut/unkey src-table)
+                                                                                                             "/" (ut/unkey param-field)
+                                                                                                             "." row-num))]
+                                                                               (assoc (get @bricks/dragging-body :drag-meta)
+                                                                                      :param-full param-full))
+                                                                             (get @bricks/dragging-body :drag-meta))
+                                                                   :target {:flow-id flow-id :type ttype :key kkey}}}
+                                                      the-box)
+                                                     the-box)))]
+                                           [re-com/h-box :justify :between :align :start :children
+                                            [[cell outcolor1 b1 b1-meta b1-droppable?]
+                                             (when (> (count batch) 1) [cell outcolor2 b2 b2-meta b2-droppable?])]])))])
+
+                                  (when open? [runstream-output-boxes flow-id blocks-map panel-width open-outputs? open-inputs])]])))
+                 [re-com/v-box :align :center :justify :center :size "none" :padding "6px" :width (px (- panel-width 22)) :gap "10px"
+                  :children
+                  (let [server-flows (map :flow_id @(ut/tracked-subscribe [::conn/sql-data [:flows-sys]]))
+                        server-flows (vec (sort (cset/difference (set server-flows) (set runstream-keys))))
+                        sql-calls    {:flows-sys {:select        [:flow_id :file_path :last_modified]
+                                                  :from          [:flows]
+                                                  :connection-id "flows-db"
+                                                  :order-by      [[3 :desc]]}}]
+                    (dorun (for [[k query] sql-calls]
+                             (let [;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                           ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
-                          data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
-                          unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
-                      (when (or (not data-exists?) unrun-sql?)
-                        (if (get query :connection-id)
-                          (conn/sql-data [k] query (get query :connection-id))
-                          (conn/sql-data [k] query))))))
-           (into
-             [(when (not @add-flow-shelf?)
-                [re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
-                 {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"} :on-click
-                 #(reset! add-flow-shelf? (not @add-flow-shelf?))])]
-             (if @add-flow-shelf?
-               [[re-com/h-box :height "37px" :gap "7px" :align :center :justify :center :children
-                 [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
-                   {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"} :on-click
-                   #(reset! add-flow-shelf? (not @add-flow-shelf?))]
-                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-refresh" :on-click
-                   #(ut/tracked-dispatch [::conn/clear-query-history :flows-sys]) :style
-                   {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"}]
-                  [re-com/typeahead :suggestion-to-string (fn [item] (str (get item :label))) :render-suggestion
-                   (fn [ss _] ;; render in dropdown
-                     [re-com/box :style {:color "#000000"} :child (str (get ss :label))]) :on-change
-                   #(reset! add-flow-shelf (get % :id)) :rigid? true :placeholder "Add which server flow?" :data-source
-                   (fn [x]
-                     (let [flow-parts   (vec (map (fn [n] {:id n :label n}) server-flows))
-                           words        (ut/splitter (cstr/lower-case (cstr/trim x)) #" ")
-                           matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
-                       (if (or (nil? x) (empty? x))
-                         flow-parts
-                         (filter (fn [item] (let [label (get item :label)] (every? (fn [word] (matches-word label word)) words)))
-                           flow-parts))))]
-                  [re-com/box :style
-                   {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 89))
-                    :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 45)
-                    :cursor           "pointer"
-                    :border-radius    "8px"
-                    :padding-top      "5px"
-                    :padding-bottom   "5px"
-                    :padding-right    "14px"
-                    :padding-left     "14px"} :align :center :justify :center :attr
-                   {:on-click #(do (ut/tracked-dispatch [::bricks/add-runstream @add-flow-shelf]) (reset! add-flow-shelf? false))}
-                   :child "add"]]]]
-               [])))])]]))
+                                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
+                               (when (or (not data-exists?) unrun-sql?)
+                                 (if (get query :connection-id)
+                                   (conn/sql-data [k] query (get query :connection-id))
+                                   (conn/sql-data [k] query))))))
+                    (into
+                     [(when (not @add-flow-shelf?)
+                        [re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
+                         {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"} :on-click
+                         #(reset! add-flow-shelf? (not @add-flow-shelf?))])]
+                     (if @add-flow-shelf?
+                       [[re-com/h-box :height "37px" :gap "7px" :align :center :justify :center :children
+                         [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
+                           {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"} :on-click
+                           #(reset! add-flow-shelf? (not @add-flow-shelf?))]
+                          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-refresh" :on-click
+                           #(ut/tracked-dispatch [::conn/clear-query-history :flows-sys]) :style
+                           {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :cursor "pointer" :font-size "26px"}]
+                          [re-com/typeahead :suggestion-to-string (fn [item] (str (get item :label))) :render-suggestion
+                           (fn [ss _] ;; render in dropdown
+                             [re-com/box :style {:color "#000000"} :child (str (get ss :label))]) :on-change
+                           #(reset! add-flow-shelf (get % :id)) :rigid? true :placeholder "Add which server flow?" :data-source
+                           (fn [x]
+                             (let [flow-parts   (vec (map (fn [n] {:id n :label n}) server-flows))
+                                   words        (ut/splitter (cstr/lower-case (cstr/trim x)) #" ")
+                                   matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
+                               (if (or (nil? x) (empty? x))
+                                 flow-parts
+                                 (filter (fn [item] (let [label (get item :label)] (every? (fn [word] (matches-word label word)) words)))
+                                         flow-parts))))]
+                          [re-com/box :style
+                           {:border           (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 89))
+                            :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 45)
+                            :cursor           "pointer"
+                            :border-radius    "8px"
+                            :padding-top      "5px"
+                            :padding-bottom   "5px"
+                            :padding-right    "14px"
+                            :padding-left     "14px"} :align :center :justify :center :attr
+                           {:on-click #(do (ut/tracked-dispatch [::bricks/add-runstream @add-flow-shelf]) (reset! add-flow-shelf? false))}
+                           :child "add"]]]]
+                       [])))])]]))
 
-(re-frame/reg-event-db ::update-item (undoable) (fn [db [_ kp v]] (assoc-in db (cons :panels kp) v)))
+(re-frame/reg-event-db 
+ ::update-item 
+ (undoable) 
+ (fn [db [_ kp v]] 
+   (assoc-in db (cons :panels kp) v)))
 
-(re-frame/reg-event-db ::create-snapshot
-                       (undoable)
-                       (fn [db [_ & [key]]]
-                         (let [snapshot-map      (get-in db [:snapshots :params])
-                               snap-cnt          (+ 1 (count (keys snapshot-map)))
-                               click-param       (get-in db [:click-param])
-                               snap-name         (or key (ut/safe-key "snapshot"))
-                               panels            (get db :panels)
-                               selected-tab      (get db :selected-tab)
-                               block-states      (vec (map #(vec (cons :panels %))
-                                                        (filter #(or (= :w (last %))
-                                                                     (= :h (last %))
-                                                                     (= :z (last %))
-                                                                     (= :hidden? (last %))
-                                                                     (= :ghosted? (last %))
-                                                                     (= :root (last %))
-                                                                     (= :selected-view (last %)))
-                                                          (ut/kvpaths panels))))
-                               block-states-vals (into {} (for [b block-states] {b (get-in db b)}))
-                               snap              {:ts           (str (js/Date.))
-                                                  :menu?        (get-in snapshot-map [key :menu?] false)
-                                                  :extra?       (get-in snapshot-map [key :extra?] false)
-                                                  :selected-tab selected-tab
-                                                  :block-states block-states-vals
-                                                  :params       click-param}]
-                           (assoc-in db [:snapshots :params snap-name] snap))))
+(re-frame/reg-event-db
+ ::create-snapshot
+ (undoable)
+ (fn [db [_ & [key]]]
+   (let [snapshot-map      (get-in db [:snapshots :params])
+         snap-cnt          (+ 1 (count (keys snapshot-map)))
+         click-param       (get-in db [:click-param])
+         snap-name         (or key (ut/safe-key "snapshot"))
+         panels            (get db :panels)
+         selected-tab      (get db :selected-tab)
+         block-states      (vec (map #(vec (cons :panels %))
+                                     (filter #(or (= :w (last %))
+                                                  (= :h (last %))
+                                                  (= :z (last %))
+                                                  (= :hidden? (last %))
+                                                  (= :ghosted? (last %))
+                                                  (= :root (last %))
+                                                  (= :selected-view (last %)))
+                                             (ut/kvpaths panels))))
+         block-states-vals (into {} (for [b block-states] {b (get-in db b)}))
+         snap              {:ts           (str (js/Date.))
+                            :menu?        (get-in snapshot-map [key :menu?] false)
+                            :extra?       (get-in snapshot-map [key :extra?] false)
+                            :selected-tab selected-tab
+                            :block-states block-states-vals
+                            :params       click-param}]
+     (assoc-in db [:snapshots :params snap-name] snap))))
 
 (re-frame/reg-event-db ::rename-snapshot
                        (undoable)
@@ -2084,9 +2215,15 @@
                              [code-box 575 diff-height diff]
                              [re-com/gap :size "10px"]]]]))))}]]))
 
-(re-frame/reg-event-db ::refresh-kits (fn [db [_]] (ut/dissoc-in db [:query-history :kit-results-sys])))
+(re-frame/reg-event-db 
+ ::refresh-kits 
+ (fn [db [_]] 
+   (ut/dissoc-in db [:query-history :kit-results-sys])))
 
-(re-frame/reg-event-db ::refresh-runstreams (fn [db [_]] (dissoc db :runstreams-lookups)))
+(re-frame/reg-event-db
+ ::refresh-runstreams
+ (fn [db [_]]
+   (dissoc db :runstreams-lookups)))
 
 (defn chat-panel
   []
@@ -2147,21 +2284,25 @@
               :cursor     "grab"
               :height     "15px"
               :margin-top "-9px"
-              :font-size  "19px"} :attr {:on-mouse-down mouse-down-handler}]
+              :font-size  "19px"} 
+             :attr {:on-mouse-down mouse-down-handler}]
             [re-com/h-box :children
              [[re-com/h-box :children
-               (cons [re-com/md-icon-button :src (at) :md-icon-name "zmdi-refresh" :style
-                      {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                       :cursor       "pointer"
-                       :color        "inherit"
-                       :margin-right "5px"
-                       :opacity      0.33
-                       :height       "15px"
-                       :margin-top   "3px"
-                       :font-size    "19px"} :attr
-                      {:on-click #(ut/tracked-dispatch (if (and (= kmode :runstreams) (= mode :runstreams))
-                                                         [::refresh-runstreams]
-                                                         [::refresh-kits]))}]
+               (cons [re-com/md-icon-button :src (at)
+                      :md-icon-name "zmdi-refresh"
+                      :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                              :cursor       "pointer"
+                              :color        "inherit"
+                              :margin-right "5px"
+                              :opacity      0.33
+                              :height       "15px"
+                              :margin-top   "3px"
+                              :font-size    "19px"}
+                      :attr {:on-click #(ut/tracked-dispatch (if (and (= kmode :runstreams) 
+                                                                      (= mode :runstreams))
+                                                               ;[::refresh-runstreams]
+                                                               [::bricks/refresh-runstreams]
+                                                               [::refresh-kits]))}]
                      (for [[c v] choices]
                        [re-com/box :child
                         (if (= c :buffy) ;(str v "!")

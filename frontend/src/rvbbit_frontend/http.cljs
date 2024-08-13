@@ -300,30 +300,34 @@
        (assoc-in [:runstreams-lookups (get result :flow-id) :open-inputs] (get result :open-inputs))
        (assoc-in [:runstreams-lookups (get result :flow-id) :blocks] (get result :blocks)))))
 
+;; (re-frame/reg-event-db
+;;   ::refresh-runstreams-sly
+;;   (fn [db _]
+;;     ;(ut/tapp>> [:refresh-runstream-panelF (keys (get db :runstreams))])
+;;     (when (ut/not-empty? (keys (get db :runstreams)))
+;;       (doseq [flow-id (keys (get db :runstreams))]
+;;         (ut/tracked-dispatch
+;;           [::wfx/request :default
+;;            {:message     {:kind :get-flow-open-ports :flow-id flow-id :flowmap flow-id :client-name (get db :client-name)}
+;;             :on-response [::runstream-item]
+;;             :timeout     500000}])))
+;;     db))
+
+;; (re-frame/reg-event-db 
+;;  ::refresh-runstreams 
+;;  (fn [db [_]] 
+;;    (dissoc db :runstreams-lookups)))
+
 (re-frame/reg-event-db
-  ::refresh-runstreams-sly
-  (fn [db _]
-    (ut/tapp>> [:refresh-runstream-panelF (keys (get db :runstreams))])
-    (when (not (empty? (keys (get db :runstreams))))
-      (doseq [flow-id (keys (get db :runstreams))]
-        (ut/tracked-dispatch
-          [::wfx/request :default
-           {:message     {:kind :get-flow-open-ports :flow-id flow-id :flowmap flow-id :client-name (get db :client-name)}
-            :on-response [::runstream-item]
-            :timeout     500000}])))
-    db))
-
-(re-frame/reg-event-db ::refresh-runstreams (fn [db [_]] (dissoc db :runstreams-lookups)))
-
-(re-frame/reg-event-db ::set-flow-results ;; temp from converting from atom to app-db
-                       (fn [db [_ data kkey & [flow-id]]]
-                         (cond kkey (assoc-in db (if (vector? kkey) (vec (into [:flow-results] kkey)) [:flow-results kkey]) data)
-                               (and (= data {:status :started}) flow-id) (-> db
-                                                                             (assoc :flow-results (merge (get db :flow-results)
-                                                                                                         data))
-                                                                             (ut/dissoc-in [:flow-results :return-maps flow-id])
-                                                                             (ut/dissoc-in [:flow-results :tracker flow-id]))
-                               :else (assoc db :flow-results data))))
+ ::set-flow-results ;; temp from converting from atom to app-db
+ (fn [db [_ data kkey & [flow-id]]]
+   (cond kkey (assoc-in db (if (vector? kkey) (vec (into [:flow-results] kkey)) [:flow-results kkey]) data)
+         (and (= data {:status :started}) flow-id) (-> db
+                                                       (assoc :flow-results (merge (get db :flow-results)
+                                                                                   data))
+                                                       (ut/dissoc-in [:flow-results :return-maps flow-id])
+                                                       (ut/dissoc-in [:flow-results :tracker flow-id]))
+         :else (assoc db :flow-results data))))
 
 (re-frame/reg-sub ::flow-results (fn [db _] (get db :flow-results {})))
 
@@ -427,6 +431,8 @@
          (assoc-in tracking-key (vec (distinct (conj (get-in db tracking-key []) data-key))))
          (assoc-in [:data data-key] data)))))
 
+;;  
+
 (re-frame/reg-event-db 
  ::refresh-kits 
  (fn [db [_]] 
@@ -437,6 +443,7 @@
 (re-frame/reg-event-db
   ::simple-response
   (fn [db [_ result & [batched?]]]
+    ;;(ut/tapp>> [:simple-response result])
     (if (vector? result)
       ;; (let [grouped-results (group-by #(let [ui-keypath                  (first (get % :ui-keypath))
       ;;                                        kick?                       (= ui-keypath :kick)
@@ -563,6 +570,9 @@
               server-sub?                 (and kick?
                                                (contains? valid-task-ids (get-in result [:task-id 0]))
                                                (not heartbeat?))
+              runstream-sub?              (and kick? (= (get-in result [:task-id 0]) :runstream) 
+                                               (not (cstr/includes? (str (get-in result [:task-id 1])) ">")) ;; its a base call, not a reactor kp
+                                               (not heartbeat?))
               tracker?                    (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
               flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?))
               settings-update?            (and kick? (= (get-in result [:task-id 0]) :settings) (not heartbeat?))
@@ -573,13 +583,13 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
-          (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ")
+          (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ") ;; gross. 
                                 (cstr/includes? (cstr/lower-case (str result)) "kit ")))
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "prismatic")  
-            (ut/tapp>> [:msg-in tracker? flow-runner-acc-tracker? flow-runner-tracker-blocks? (str (get result :task-id)) (str ui-keypath) 
+          (when (cstr/includes? (str client-name) "narrow")  
+            (ut/tapp>> [:msg-in runstream-sub? task-id (str (get result :task-id)) (str ui-keypath) 
                         ;(str (get-in result [:status :evald-result :value 0]))
                         (get result :status) (str (get result :ui-keypath)) (str result)
                         
@@ -626,7 +636,12 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
-            
+
+            runstream-sub? (let [dd (get result :status)]
+                             (-> db
+                                 (assoc-in [:runstreams-lookups (get dd :flow-id) :open-inputs] (get dd :open-inputs))
+                                 (assoc-in [:runstreams-lookups (get dd :flow-id) :blocks] (get dd :blocks))))
+
             signals-file? (assoc db :signals-map (get result :status))
 
             solvers-file? (assoc db :solvers-map (get result :status))
@@ -899,6 +914,7 @@
                             (ut/dissoc-in [:click-param :solver-status])
                             (ut/dissoc-in [:click-param :solver])
                             (ut/dissoc-in [:click-param :flow-status])
+                            (ut/dissoc-in [:click-param :runstream])
                             (ut/dissoc-in [:click-param :kit-status])
                             (ut/dissoc-in [:click-param :kit])
                             (ut/dissoc-in [:click-param :signal])

@@ -519,6 +519,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    run_id text NULL,
    parent_run_id text NULL,
    client_name text NULL,
+   orig_flow_id text NULL,
    in_error boolean NULL,
    started integer NULL,
    start_ts text NULL,

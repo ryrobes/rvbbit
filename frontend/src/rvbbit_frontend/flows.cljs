@@ -2323,9 +2323,7 @@
                    src-port (ut/replacer (str (get-in rooted-data [:drag-meta :src-pid])) ":" "")
                    check-port-drop (cond port-meta?   (ut/safe-key (keyword (str "<" src-port)) safe-keys-reserved)
                                          get-in-drag? ;; use the get-in keypath to name
-                                           (let [;kp-str (ut/replacer (str (apply (comp merge str)
-                                                 ;kp)) ":" ">")
-                                                 kp-str (cstr/join ">" kp)
+                                           (let [kp-str (cstr/join "=" kp)
                                                  kp-str (-> kp-str
                                                             (ut/replacer ":" "")
                                                             (ut/replacer " " "")
@@ -3156,6 +3154,16 @@
                                :data             :flow-history-calendar-sys*}]}
               vselected? @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
               grid-menu {:select        [:flow_id [[:count [:distinct :run_id]] :runs]]
+                         :connection-id "flows-db"
+                         :col-widths    {:runs 45 :flow_id 210}
+                         :group-by      [1]
+                         :where         [:and (if @flow-search [:like :flow_id (str "%" (str @flow-search) "%")] [:= 1 1])
+                                         (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                                         (if caller [:= :client_name (str caller)] [:= 1 1])
+                                         (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
+                         :order-by      [[1 :asc]]
+                         :from          [[:flow_history :tt336aa]]}
+              grid-menu0 {:select        [:flow_id [[:count [:distinct :flow_id]] :runs]]
                          :connection-id "flows-db"
                          :col-widths    {:runs 45 :flow_id 210}
                          :group-by      [1]

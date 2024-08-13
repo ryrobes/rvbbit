@@ -17,6 +17,7 @@
 (defonce server-atom (ut/thaw-atom {} "./data/atoms/server-atom.edn"))
 (defonce flow-status (atom {}))
 (defonce kit-status (atom {}))
+(defonce runstream-atom (atom {}))
 (defonce params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
 (defonce panels-atom (ut/thaw-atom {} "./data/atoms/panels-atom.edn"))
 (defonce solver-status (atom {}))
@@ -48,6 +49,7 @@
    [:master-screen-watcher  screens-atom  :screen]
    [:master-params-watcher  params-atom  :client]
    [:master-panels-watcher  panels-atom  :panel]
+   [:master-runstream-watcher  runstream-atom  :runstream]
    [:master-flow-watcher flow-db/results-atom  :flow]
    [:master-flow-runner-watcher flow-db/results-atom  :flow-runner] ;; * a copy, but it maintainted separately - pruned, etc.
    [:master-nrepl-instrospection-watcher repl-introspection-atom  :repl-ns]
@@ -70,6 +72,7 @@
          :panel (atom {})
          :flow (atom {})
          :flow-runner (atom {})
+         :runstream (atom {})
          :repl-ns (atom {})
          :solver-status (atom {})
          :signal (atom {})
@@ -114,6 +117,7 @@
            master-type (keyword (first (cstr/split (cstr/replace (str coded-keypath) ":" "") #"/")))
            path (rest parts)
            parsed-path (if (or (= master-type :flow)
+                               (= master-type :runstream)
                                (= master-type :flow-runner)
                                (= master-type :tracker)
                                (= master-type :flow-status))
@@ -286,23 +290,25 @@
 
 (defn client-kp
   [flow-key keypath base-type sub-path client-param-path]
-  (cond (cstr/includes? (str flow-key) "running?")  false
-        (= base-type :time)                         client-param-path
-        (= base-type :signal)                       client-param-path
-        (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :kit)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :repl-ns)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :solver-status)                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :flow-status)                  keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :kit-status)                   (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :signal-history)               (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
-        (= base-type :server)                       client-param-path
-        (= base-type :screen)                       (vec (rest sub-path))
-        (= base-type :client)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        (= base-type :panel)                        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-        :else                                       keypath ;; assume flow
-        ))
+  (let [;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
+        ]
+    (cond (cstr/includes? (str flow-key) "running?")  false
+          (= base-type :time)                         client-param-path
+          (= base-type :signal)                       client-param-path
+          (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :kit)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :repl-ns)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :solver-status)                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :flow-status)                  keypath ;;(vec (rest sub-path)) ;;keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :kit-status)                   (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :signal-history)               (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
+          (= base-type :server)                       client-param-path
+          (= base-type :screen)                       (vec (rest sub-path))
+          (= base-type :client)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :panel)                        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          :else                                       (vec (rest sub-path)) ;;keypath ;;(vec (rest sub-path)) ;;keypath ;; assume flow
+          )))
 
 (defn get-atom-from-keys [base-type sub-type sub-path keypath]
   (let [;base-type (if (and (cstr/includes? (str keypath) ":*") 
@@ -312,7 +318,6 @@
 
 (defn make-watcher
   [keypath flow-key client-name handler-fn & [no-save]]
-
   (fn [kkey atom old-state new-state]
     (let [client-name          :all ;; test, no need for individual cache for clients. kinda
           old-value          (get-in old-state keypath)
@@ -346,6 +351,7 @@
                                          
                                          (swap! client-click-params assoc-in [client-name flow-key] new-value) ;; for diffing later
 
+                                        ;;  (ut/pp [:running-push! flow-key client-name keypath new-value])
                                         ;;   (when (cstr/includes? (str client-name) "-bronze-")  (ut/pp [:running-push! flow-key client-name keypath new-value]))
                                           ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
                                           ;;                               (fn []
@@ -389,6 +395,7 @@
         kit-status?     (= base-type :kit-status)
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)
+        ;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
         ;base-type       (if status? :flow-status base-type)
         ;; base-type       (cond status? :flow-status
         ;;                       tracker? :tracker
@@ -402,7 +409,7 @@
                           solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                          flow-status?    keypath ;;(vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          flow-status?    (vec (rest sub-path)) ;keypath ;;(vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           kit-status?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           time?           (vec (rest keypath))
@@ -410,41 +417,12 @@
                           screen?         (vec (rest sub-path))
                           panel?          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           client?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                          :else           keypath)
+                          :else           (vec (rest sub-path)) ;;keypath ;;(vec (rest sub-path)) ;;keypath
+                          )
         ;;keypath             (if flow? keypath (vec (rest keypath)))
         ;flow-key          (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key) 
         watcher          (make-watcher keypath flow-key :all fn (= sub-type :tracker))
         atom-to-watch    (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))
-        ;; atom-to-watch2       (cond
-        ;;                       ;status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
-        ;;                       status?         (split-2-deep base-type sub-path flow-status-child-atoms flow-status :flow)
-        ;;                       ;tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
-        ;;                       tracker?        (split-2-deep base-type sub-path flow-tracker-child-atoms flow-db/tracker)
-        ;;                       ;signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
-        ;;                       signal?         (split-2-deep base-type sub-path signal-child-atoms last-signals-atom)
-        ;;                       ;solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
-        ;;                       solver?         (split-2-deep base-type sub-path solver-child-atoms last-solvers-atom)
-        ;;                       ;solver-meta?    (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
-        ;;                       solver-meta?    (split-2-deep base-type sub-path solver-meta-child-atoms last-solvers-atom-meta)
-        ;;                       ;repl-ns?        (get-atom-splitter (keyword (second sub-path)) :repl-ns evl/repl-introspection-child-atoms evl/repl-introspection-atom)
-        ;;                       repl-ns?        (split-2-deep base-type sub-path evl/repl-introspection-child-atoms evl/repl-introspection-atom)
-        ;;                       ;solver-status?  (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-status solver-status-child-atoms solver-status)
-        ;;                       solver-status?  (split-2-deep base-type sub-path solver-status-child-atoms solver-status)
-        ;;                       data?           last-solvers-data-atom
-        ;;                       signal-history? (split-2-deep base-type sub-path last-signals-history-child-atoms last-signals-history-atom) ;;last-signals-history-atom
-        ;;                       server?         server-atom
-        ;;                       ;;time?           (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :time time-child-atoms father-time)
-        ;;                       time?           (split-2-deep base-type sub-path time-child-atoms father-time)
-        ;;                       ;panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
-        ;;                       panel?          (split-2-deep base-type sub-path panel-child-atoms panels-atom)
-        ;;                       ;client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
-        ;;                       client?         (split-2-deep base-type sub-path param-child-atoms params-atom)
-        ;;                   ;flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
-        ;;                       flow?           (split-2-deep base-type sub-path flow-child-atoms flow-db/results-atom)
-        ;;                       ;screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
-        ;;                       screen?         (split-2-deep base-type sub-path screen-child-atoms screens-atom)
-        ;;                       ;:else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
-        ;;                       :else           (split-2-deep base-type sub-path flow-child-atoms flow-db/results-atom))
         ]
 
     ;(remove-watch atom-to-watch watch-key) ;; not needed if we're just going to re-add the same atom and watch-key anyways. but good to keep in mind.
@@ -491,6 +469,7 @@
           solver-status?  (= base-type :solver-status)
           signal-history? (= base-type :signal-history)
           server?         (= base-type :server)
+          ;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
           ;; base-type       (cond status? :flow-status
           ;;                       tracker? :tracker
           ;;                       :else base-type)
@@ -511,41 +490,8 @@
                     server?         (vec (rest sub-path))
                     panel?          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     client?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                    :else           keypath)
-          ;keypath (vec (rest keypath))
-          ;;keypath (if flow? keypath (vec (rest keypath)))
-
-          ;; atom-to-watch     (cond
-          ;;                     ;status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
-          ;;                     status?         (split-2-deep base-type sub-path flow-status-child-atoms flow-status :flow)
-          ;;                     ;tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
-          ;;                     tracker?        (split-2-deep base-type sub-path flow-tracker-child-atoms flow-db/tracker)
-          ;;                     ;signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
-          ;;                     signal?         (split-2-deep base-type sub-path signal-child-atoms last-signals-atom)
-          ;;                     ;solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
-          ;;                     solver?         (split-2-deep base-type sub-path solver-child-atoms last-solvers-atom)
-          ;;                     ;solver-meta?    (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
-          ;;                     solver-meta?    (split-2-deep base-type sub-path solver-meta-child-atoms last-solvers-atom-meta)
-          ;;                     ;repl-ns?        (get-atom-splitter (keyword (second sub-path)) :repl-ns evl/repl-introspection-child-atoms evl/repl-introspection-atom)
-          ;;                     repl-ns?        (split-2-deep base-type sub-path evl/repl-introspection-child-atoms evl/repl-introspection-atom)
-          ;;                     ;solver-status?  (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-status solver-status-child-atoms solver-status)
-          ;;                     solver-status?  (split-2-deep base-type sub-path solver-status-child-atoms solver-status)
-          ;;                     data?           last-solvers-data-atom
-          ;;                     signal-history? (split-2-deep base-type sub-path last-signals-history-child-atoms last-signals-history-atom) ;;last-signals-history-atom
-          ;;                     server?         server-atom
-          ;;                     ;;time?           (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :time time-child-atoms father-time)
-          ;;                     time?           (split-2-deep base-type sub-path time-child-atoms father-time)
-          ;;                     ;panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
-          ;;                     panel?          (split-2-deep base-type sub-path panel-child-atoms panels-atom)
-          ;;                     ;client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
-          ;;                     client?         (split-2-deep base-type sub-path param-child-atoms params-atom)
-          ;;                 ;flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
-          ;;                     flow?           (split-2-deep base-type sub-path flow-child-atoms flow-db/results-atom)
-          ;;                     ;screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
-          ;;                     screen?         (split-2-deep base-type sub-path screen-child-atoms screens-atom)
-          ;;                     ;:else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
-          ;;                     :else           (split-2-deep base-type sub-path flow-child-atoms flow-db/results-atom))
-          ;;flow-key           (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key)
+                    :else           (vec (rest sub-path)) ;;keypath
+                    )
           atom-to-watch      (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))
           all-other-watchers (dissoc (into {} (for [[k v] @atoms-and-watchers] {k (vec (for [[_ v] v] (get v :watch-key)))})) client-name)
           ;; all-other-watch-keys (set
@@ -567,6 +513,7 @@
     (catch Throwable e (ut/pp [:remove-watcher-error e]))))
 
 
+
 (defn clover-lookup
   [client-name flow-key & [signal?]]
   (let [flow-key-orig           flow-key
@@ -579,11 +526,15 @@
         flow-key-split          (if vars? flow-key-split-sub flow-key-split)
         [flow-id step-id]       flow-key-split ;(break-up-flow-key flow-key)
         keypath                 [flow-id step-id]
+        ;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
         sub-path                (break-up-flow-key-ext flow-key)
         base-type               (first sub-path)
         flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
-        client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
+        ;; client-param-path       (if (or (= base-type :flow-status)
+        ;;                                  ;;(= base-type :kit-status)
+        ;;                                 (= base-type :flow)) flow-client-param-path other-client-param-path)
+        client-param-path       other-client-param-path
         client-keypath          (client-kp flow-key keypath base-type sub-path client-param-path)
         ssp                     (break-up-flow-key-ext flow-key-orig)
         req-client-kp           (client-kp flow-key-orig
@@ -618,15 +569,13 @@
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :repl-ns)                      (get-in @repl-introspection-atom
-                                                          
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
-      (= base-type :solver-status)                  (get-in @solver-status
+      (= base-type :solver-status)                (get-in @solver-status
                                                             (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                             lv)
-      (= base-type :flow-status)                  (get-in @flow-status
-                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                                                          lv)
+      (= base-type :flow-status)                  (get-in @flow-status (vec (rest sub-path)) lv)
+      (= base-type :runstream)                    (get-in @runstream-atom (vec (rest sub-path)) lv)
       (= base-type :kit-status)                  (get-in @kit-status
                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                          lv)
@@ -641,57 +590,60 @@
       (= base-type :panel)                        (get-in @panels-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
-      :else                                       (get-in @flow-db/results-atom keypath lv) ;; assume
+      :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv) ;; assume flow literal 
       )))
 
 (defn get-starting-value [base-type client-param-path sub-path keypath lv]
-  (cond
+  (let [;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
+        ]
+    (cond
                 ;;(cstr/includes? (str flow-key) "running?")  false
-    (= base-type :time)                         (get @father-time client-param-path)
+      (= base-type :time)                         (get @father-time client-param-path)
                     ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
-    (= base-type :signal)                       (get @last-signals-atom client-param-path)
-    (= base-type :data)                         (get-in @last-solvers-data-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :solver)                       (get-in @last-solvers-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :kit)                          (get-in @kit-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :repl-ns)                      (get-in @repl-introspection-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :solver-status)                  (get-in @solver-status
+      (= base-type :signal)                       (get @last-signals-atom client-param-path)
+      (= base-type :data)                         (get-in @last-solvers-data-atom
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
+      (= base-type :solver)                       (get-in @last-solvers-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :kit)                          (get-in @kit-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :repl-ns)                      (get-in @repl-introspection-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :solver-status)                  (get-in @solver-status
+                                                            (vec (into [(keyword (second sub-path))]
+                                                                       (vec (rest (rest sub-path)))))
+                                                            lv)
     ;;(= base-type :solver-status)                 {} ; nil ;; the old atom is gone anyways, lets clear the client for new values
-    (= base-type :signal-history)               (get-in @last-signals-history-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :server)                       (get @server-atom client-param-path lv)
-    (= base-type :screen)                       (get-in @screens-atom (vec (rest sub-path)) lv)
-    (= base-type :client)                       (get-in @params-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :panel)                        (get-in @panels-atom
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    (= base-type :flow-status)                  (get-in @flow-status keypath lv)
-    (= base-type :kit-status)                   (get-in @kit-status
-                                                        (vec (into [(keyword (second sub-path))]
-                                                                   (vec (rest (rest sub-path)))))
-                                                        lv)
-    :else                                       (get-in @flow-db/results-atom keypath lv)))
+      (= base-type :signal-history)               (get-in @last-signals-history-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :server)                       (get @server-atom client-param-path lv)
+      (= base-type :screen)                       (get-in @screens-atom (vec (rest sub-path)) lv)
+      (= base-type :client)                       (get-in @params-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :panel)                        (get-in @panels-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :flow-status)                  (get-in @flow-status (vec (rest sub-path)) lv)
+      (= base-type :runstream)                    (get-in @runstream-atom (vec (rest sub-path)) lv)
+      (= base-type :kit-status)                   (get-in @kit-status
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv))))
