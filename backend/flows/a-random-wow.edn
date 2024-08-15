@@ -78,6 +78,33 @@
    :ports {:in {}, :out {:out :string}},
    :x 1350,
    :y 575},
+  :unpack-results-map_video=480p
+  {:y 875,
+   :fn (fn [x] (get-in x [:video :480p])),
+   :w 375,
+   :raw-fn (fn [x] (get-in x [:video :480p])),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 275,
+   :x 1350,
+   :view
+   (fn [x] [:iframe
+            {:src x,
+             :style
+             {:border "none", :background-color "#00000000", :width :panel-width+80-px, :height :panel-height+80-px}}]),
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (get-in x [:video :480p])),
+     :name ":open-fn",
+     :raw-fn (fn [x] (get-in x [:video :480p])),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :full-wow-line
   {:y 700,
    :fn (fn [x] x),
@@ -207,106 +234,6 @@
    :ports {:out {:url :string, :* :map}, :in {}},
    :x 1000,
    :y 275},
-  :unpack-results-map_video>480p
-  {:y 900,
-   :fn (fn [x] (get-in x [:video :480p])),
-   :w 225,
-   :raw-fn (fn [x] (get-in x [:video :480p])),
-   :icon "zmdi-functions",
-   :z 0,
-   :ports {:in {:x :any}, :out {:out :any}},
-   :h 185,
-   :x 1375,
-   :data
-   {:flow-item
-    {:category ":rabbit-base",
-     :fn (fn [x] (get-in x [:video :480p])),
-     :name ":open-fn",
-     :raw-fn (fn [x] (get-in x [:video :480p])),
-     :type :open-fn,
-     :icon "zmdi-functions",
-     :types {:x :any, :out :any},
-     :expandable? true,
-     :drag-meta {:type :open-fn}}}},
-  :send-info-to-client-requested
-  {:w 225,
-   :h 85,
-   :x 1125,
-   :y 900,
-   :z 0,
-   :data
-   {:flow-item
-    {:description "Push items to the client UI.",
-     :category ":rabbit-base",
-     :fn
-     (fn [destination ref item-key thread-id message-name thread-desc & args]
-       (rvbbit-backend.websockets/kick destination ref item-key thread-id message-name thread-desc args)),
-     :name ":kick",
-     :type :kick,
-     :icon "images/pink-rabbit-head.png",
-     :defaults
-     {:destination :client-name,
-      :item-key ":base",
-      :thread-id :flow-id,
-      :message-name "Unnamed Message",
-      :thread-desc :flow-id,
-      :ref :flow-id},
-     :types
-     {:destination [:keyword :vector :list :set],
-      :ref :string,
-      :item-key :keyword,
-      :thread-id :string,
-      :message-name :string,
-      :thread-desc :string,
-      :out :any},
-     :pill-name "content",
-     :input_types "[[:keyword :vector :list :set] :string :keyword :string :string :string]",
-     :style {:color "#fc0fc0"},
-     :selected-style {:color "#fc0fc0"},
-     :inputs
-     [:content-8 :ref :item-key :message-name :thread-desc :content-6 :thread-id :content-9 :destination :content-7],
-     :output_types ":any",
-     :expandable? true,
-     :full_map
-     "{:description \"Push items to the client UI.\", :fn (fn [destination ref item-key thread-id message-name thread-desc & args] (rvbbit-backend.websockets/kick destination ref item-key thread-id message-name thread-desc args)), :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :item-key \":base\", :thread-id :flow-id, :message-name \"Unnamed Message\", :thread-desc :flow-id, :ref :flow-id}, :types {:destination [:keyword :vector :list :set], :ref :string, :item-key :keyword, :thread-id :string, :message-name :string, :thread-desc :string, :out :any}, :pill-name \"content\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :ref :item-key :thread-id :message-name :thread-desc], :expandable? true, :required [:destination :ref :item-key :thread-id :message-name :thread-desc]}",
-     :required [:destination :ref :item-key :thread-id :message-name :thread-desc]},
-    :name "drag-from-",
-    :w 5,
-    :source-panel :flow-fn-list*,
-    :root [1150.1770935058594 179.171875],
-    :h 6,
-    :connection-id nil,
-    :queries
-    {:name-drag-10
-     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
-      :from [[:query/flow-fn-sys :ee280]],
-      :where [:= :name ":kick"]}},
-    :drag-meta
-    {:data-type "string",
-     :source-query :flow-fn-sys,
-     :param-full ":kick",
-     :param-field :name,
-     :source-panel-key :flow-fn-list*,
-     :type :kick,
-     :param-table :flow-fn-sys,
-     :source-table :query/flow-fn-sys,
-     :connection-id nil,
-     :target :name,
-     :row-num 7}},
-   :icon "images/pink-rabbit-head.png",
-   :ports
-   {:in
-    {:content-8 :any,
-     :ref :string,
-     :item-key :keyword,
-     :message-name :string,
-     :thread-desc :string,
-     :content-6 :any,
-     :thread-id :string,
-     :content-9 :any,
-     :destination [:keyword :vector :list :set],
-     :content-7 :any},
-    :out {:out :keyword}}},
   :open-fn-5
   {:y 700,
    :fn (fn [x] x),
@@ -458,8 +385,8 @@
      :connection-id nil,
      :target :name,
      :row-num 5}}}},
+ :zoom [-251.86 -320.96 1.225],
  :opts nil,
- :zoom [-326.4 -608.51 1.723],
  :flow-id "a-random-wow",
  :flowmaps-connections
  [[:http-call-1/idx0 :unpack-results-map/value]
@@ -468,10 +395,6 @@
   [:unpack-results-map/character :character/value]
   [:unpack-results-map/movie :movie-name/value]
   [:rando-string :open-fn-5/value]
-  [:movie-name :send-info-to-client-requested/content-6]
-  [:full-wow-line :send-info-to-client-requested/content-7]
-  [:character :send-info-to-client-requested/content-8]
-  [:open-fn-5 :send-info-to-client-requested/content-9]
-  [:send-info-to-client-requested :done]
   [:unpack-results-map :unpack-results-map_poster/x]
-  [:unpack-results-map :unpack-results-map_video>480p/x]]}
+  [:movie-name :done]
+  [:unpack-results-map :unpack-results-map_video=480p/x]]}

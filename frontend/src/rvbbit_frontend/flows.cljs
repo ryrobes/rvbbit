@@ -1972,7 +1972,7 @@
            :z-index          610
            :border-radius    "5px"
            :filter           (if running?
-                               "brightness(145%)"
+                               "brightness(115%)"
                                (when (and (not (nil? selected-bid)) (not running?))
                                  (when (and (not hover-involved?) (not selected?)) "brightness(45%)")))
            :box-shadow       (if (or hover-involved? selected? running?)
@@ -1980,8 +1980,11 @@
                                (str "2px 1px 15px #00000045"))
            :user-select      "none"
            :border           (str "3px " (if selected? "dashed" "solid") " " bcolor (if selected? "" 45))
-           :background-color (cond running? (theme-pull :theme/editor-outer-rim-color nil)
-                                   :else    (str bcolor (if (or hover-involved? selected?) 75 35)))
+          ;;  :background-color (cond running? (theme-pull :theme/editor-outer-rim-color nil)
+          ;;                          :else    (str bcolor (if (or hover-involved? selected?) 75 35)))
+           :background-color (str bcolor (cond (or hover-involved? selected?) 75 
+                                               running?  ""
+                                               :else 35))
            :width            (px w)
            :height           (px h)
            :left             x
@@ -3031,23 +3034,23 @@
         :text-align       "right"
         :background-color "#00000000"}])))
 
-(defn run-history-bar
-  [flow-id flow-select]
-  [re-com/box :style {:margin-left "25px" :margin-top "15px"} :child
-   [buffy/render-honey-comb-fragments
-    {:queries {:runstream-chart-simple-python-exec {:select        [[[[:min :elapsed]] :elapsed] :started]
-                                                    :_ttttt        @trig-atom-test
-                                                    :connection-id "flows-db"
-                                                    :from          [{:select [:client_name :elapsed :ended :flow_id :human_elapsed
-                                                                              :in_error :started :ts]
-                                                                     :from   [[:flow_history :mm134]]
-                                                                     :where  [:= :flow_id flow-id]}]
-                                                    :group-by      [:started]}}
-     :view    [:> :ResponsiveContainer {:width "100%" :height :panel-height+50}
-               [:> :BarChart {:data :runstream-chart-simple-python-exec :margin {:top 5 :bottom 5 :right 30 :left 20}}
-                [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}] [:> :Tooltip] [:> :XAxis {:dataKey :started}]
-                [:> :Bar {:dataKey :elapsed :stroke :theme/editor-outer-rim-color :fill :theme/editor-outer-rim-color}]]]} 5.5
-    11]])
+;; (defn run-history-bar
+;;   [flow-id flow-select]
+;;   [re-com/box :style {:margin-left "25px" :margin-top "15px"} :child
+;;    [buffy/render-honey-comb-fragments
+;;     {:queries {:runstream-chart-simple-python-exec {:select        [[[[:min :elapsed]] :elapsed] :started]
+;;                                                     :_ttttt        @trig-atom-test
+;;                                                     :connection-id "flows-db"
+;;                                                     :from          [{:select [:client_name :elapsed :ended :flow_id :human_elapsed
+;;                                                                               :in_error :started :ts]
+;;                                                                      :from   [[:flow_history :mm134]]
+;;                                                                      :where  [:= :flow_id flow-id]}]
+;;                                                     :group-by      [:started]}}
+;;      :view    [:> :ResponsiveContainer {:width "100%" :height :panel-height+50}
+;;                [:> :BarChart {:data :runstream-chart-simple-python-exec :margin {:top 5 :bottom 5 :right 30 :left 20}}
+;;                 [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}] [:> :Tooltip] [:> :XAxis {:dataKey :started}]
+;;                 [:> :Bar {:dataKey :elapsed :stroke :theme/editor-outer-rim-color :fill :theme/editor-outer-rim-color}]]]} 5.5
+;;     11]])
 
 (defonce last-loaded-run-id (reagent/atom nil))
 (defonce flow-search (reagent/atom nil))
@@ -3488,18 +3491,18 @@
 
 (declare gantt-container)
 
+(def last-loaded-file-path (reagent/atom nil))
 
-
-(defn flow-editor
-  [w h]
-  (let [react-hack [@editor-mode @trig-atom-test @db/flow-editor-system-mode]
+(defn flow-editor [w h]
+  (let [react-hack [@editor-mode @trig-atom-test @db/flow-editor-system-mode @last-loaded-file-path]
         sql-params (into {}
                          (for [k [:flow-fn-categories-sys/category]]
                            {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         flow-id    @(ut/tracked-subscribe [::selected-flow])
         dyn-width  (last @db/flow-editor-system-mode)
         ;;dyn-height ( @db/flow-editor-system-mode)
-        o-modes    [["flows running" 800] ["flow browser" 600] ["flow parts" 600] ["metrics" 990] ["KPIs" 990] ["signals & solvers" 990]
+        selected-file-path @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])
+        o-modes    [["flows running" 800] ["flow browser" 600] ["flow parts" 600] ["metrics & KPIs" 990]  ["signals & solvers" 990]
                     ;;["rules" 990] 
                     ["flow history" 1200]]
         sql-calls  {:flow-fn-categories-sys {:select [:category] :from [:flow_functions] :group-by [1]}
@@ -3524,6 +3527,13 @@
               unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
+    
+       
+    (when (and (not= @last-loaded-file-path selected-file-path) (not (nil? selected-file-path)))
+      (reset! last-loaded-file-path selected-file-path)
+      (ut/tracked-dispatch [::http/load-flow selected-file-path])
+      (ut/tapp>> [:loading-file-path selected-file-path])) 
+
     [re-com/v-box :size "none" :width (px w) :height (px h) :gap "10px" :style
      {;:border-right (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
       :border-top       (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
@@ -3552,7 +3562,8 @@
              :text-decoration  (when selected? "underline")
              :background-color (if selected? (str (theme-pull :theme/editor-outer-rim-color nil) 55) "#00000000")} :child
             (str (first o))])] [re-com/gap :size "10px"]]] [re-com/gap :size "8px"]
-      (cond (= (first @db/flow-editor-system-mode) "flows running") [flow-details-block-container "server flow statuses" :system
+      (cond (= (first @db/flow-editor-system-mode) "flows running") [flow-details-block-container "server flow statuses" 
+                                                                     :system
                                                                      :system
                                                                      [re-com/box :height (px (* h 0.5))
                                                                       :child [server-flows (* h 0.5)]] ;
@@ -3609,8 +3620,8 @@
                                         :isAnimationActive false
                                         :stroke            (str (theme-pull :theme/editor-outer-rim-color nil)) ;;"#8884d8"
                                         :fill              (str (theme-pull :theme/editor-outer-rim-color nil) 55) ;;"#8884d8"
-                                       }]]]}]
-                  
+                                        }]]]}]
+
                   ;; [re-com/h-box :children
                   ;;  [[re-com/v-box :width "50%" :children
                   ;;    [[re-com/box :child "threads" :align :center :justify :center :size "auto" :style {:opacity 0.7}]
@@ -3618,8 +3629,12 @@
                   ;;   [re-com/v-box :width "50%" :children
                   ;;    [[re-com/box :child "memory" :align :center :justify :center :size "auto" :style {:opacity 0.7}]
                   ;;     [re-com/box :child [buffy/render-honey-comb-fragments qq2 (/ dyn-width 50) 2]]]]]]
-                  
-                  (let [rrt! [@db/chunk-chart]]
+
+                  (let [rrt! [@db/chunk-chart]
+                        title "server flow statuses"
+                        full? (not (true? (get-in @flow-details-block-container-atom
+                                                  [:system :system title :open?]
+                                                  (not (cstr/ends-with? (str title) "*")))))]
                     [re-com/v-box
                      :size "auto"
                      :width (px (* dyn-width 1.25))
@@ -3628,12 +3643,12 @@
                      :style {;:border "1px solid pink"
                              :margin-left "30px"
                              :zoom 0.8}
-                     :children [[re-com/h-box 
+                     :children [[re-com/h-box
                                  :width (px dyn-width)
-                                 :size "auto" :justify :between 
+                                 :size "auto" :justify :between
                                  :children (for [m db/chunk-charts ;;[:server/cpu-chart :server/mem-chart :server/thread-chart]
-                                                    :let [selected? (= m @db/chunk-chart)]] 
-                                             [re-com/box 
+                                                 :let [selected? (= m @db/chunk-chart)]]
+                                             [re-com/box
                                               :padding "0px 10px 0px 10px"
                                               :style (merge {:cursor "pointer"
                                                              :font-family (theme-pull :theme/monospaced-font nil)
@@ -3642,12 +3657,15 @@
                                                                              :font-weight 700}))
                                               :attr {:on-click #(reset! db/chunk-chart m)}
                                               :child (str ":" (-> (str m) (cstr/replace ":server/" "") (cstr/replace "-chart" "")))])]
-                                [buffy/render-honey-comb-fragments [:terminal @db/chunk-chart] (/ (* dyn-width 1.25) 50) (/ (* h 0.5) 50)]]])
-                  
+                                [buffy/render-honey-comb-fragments
+                                 [:terminal @db/chunk-chart]
+                                 (/ (* dyn-width 1.25) 50)
+                                 (if full?
+                                   h
+                                   (/ (* h 0.5) 50))]]])
+
                   ;;[:terminal :server/cpu-chart]
                   ;; [buffy/render-honey-comb-fragments [:terminal :server/cpu-chart] (/ dyn-width 50) 2]
-                  
-                  
                   )
                 ;; [re-com/box :style {:padding-left "12px"} :child
                 ;;  (let [qq {:select        [:ts [:thread_count :threads] [:used_memory_mb :used_mb] :sys_load [:ws_peers :clients]]

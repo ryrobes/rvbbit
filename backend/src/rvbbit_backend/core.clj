@@ -893,6 +893,27 @@
   ;; (wss/subscribe-to-session-changes) ;; DISABLE BEHOLDER FOR NOW - mostly for external editing. cpu hog?
 
 
+  (defn reboot-websocket-server-long []
+    (let [destinations (vec (keys @wss/client-queues))]
+      (doseq [d destinations]
+        (wss/alert! d
+                    [:v-box
+                     :justify :center
+                     :style {:opacity 0.7}
+                     :children [[:v-box :style {:color :theme/editor-outer-rim-color :font-weight 700 :font-size "14px"}
+                                 :children [[:box :child (str "Restarting Websocket Server...")]
+                                            [:progress-bar [280 150 (str (rand-int 12345))]]]]]]
+                    10 1
+                    160)))
+    (Thread/sleep 10000)
+    (wss/destroy-websocket-server!)
+    (Thread/sleep 120000)
+    (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
+
+  ;; (qp/cleanup-inactive-queues 1)
+  
+  ;; (reboot-websocket-server-long)
+
   ;(wss/recycle-worker) ;; single blocking
   ;(wss/recycle-worker2) ;; single blocking
   ;(wss/recycle-worker3) ;; single blocking
@@ -1326,7 +1347,7 @@
                                       (for [k     kks ;(keys @flow-db/results-atom)
                                             :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
                     ;(qp/serial-slot-queue :update-stat-atom-serial :serial (fn []
-                                        (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
+                                        (let [
                                               cc              (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf?
                                               blocks          (get-in @flow-db/working-data [k :components-list])
                                               running-blocks  (vec (for [[k v] (get @flow-db/tracker k) :when (nil? (get v :end))] k))
@@ -1334,9 +1355,10 @@
                                               not-started-yet (vec (cset/difference (set blocks) (set (into running-blocks done-blocks))))
                                               running-blocks  (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
                                               res             (get-in @flow-db/results-atom [k :done] :nope)
-                                              running?        (or (= res :nope) (ut/chan? res) (= res :skip))
-                                              done?           (not (= res :nope))
+                                              running?        (ut/ne? running-blocks) ;;(and (or (= res :nope) (ut/chan? res) (= res :skip)) (ut/ne? running-blocks))
+                                              done?           (and (empty? not-started-yet) (empty? running-blocks)) ;;(and (empty? running-blocks) (not (= res :nope)))
                                               error?          (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
+                                              ;;;_ (ut/pp [:flow-status! k :running? running? :done? done?   (get-in @flow-db/tracker [k :done :end])  ])
                                               _ (when error? (swap! wss/temp-error-blocks assoc k not-started-yet))
                                               start           (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
                                                                    (catch Exception _ (System/currentTimeMillis)))
@@ -1526,7 +1548,8 @@
               :runstream-pre-package
               (fn [] (doseq [k kks] (swap! db/runstream-atom assoc k (wss/get-flow-open-ports k k)))))
               ;; get-flow-open-ports [flowmap flow-id client-name]
-             (update-stat-atom kks))
+             (update-stat-atom kks)
+             )
 
     ;; Child atom update part (originally from the second watcher)
                                 ;; (let [changes (reduce-kv

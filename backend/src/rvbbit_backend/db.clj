@@ -348,10 +348,11 @@
                                                                 (System/currentTimeMillis))
                                                       (assoc-in [client-name flow-key :last-push]
                                                                 (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
-                                         
+
                                          (swap! client-click-params assoc-in [client-name flow-key] new-value) ;; for diffing later
 
-                                        ;;  (ut/pp [:running-push! flow-key client-name keypath new-value])
+                                        ;;  (when (cstr/ends-with? (str flow-key) "*running?") (ut/pp [:running-push! flow-key client-name keypath new-value]))
+
                                         ;;   (when (cstr/includes? (str client-name) "-bronze-")  (ut/pp [:running-push! flow-key client-name keypath new-value]))
                                           ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
                                           ;;                               (fn []
@@ -529,7 +530,7 @@
         ;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
         sub-path                (break-up-flow-key-ext flow-key)
         base-type               (first sub-path)
-        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+        ;;flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
         ;; client-param-path       (if (or (= base-type :flow-status)
         ;;                                  ;;(= base-type :kit-status)
@@ -552,7 +553,7 @@
         lv                      (get @last-values keypath)]
     (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath {:sub-path sub-path}])
     (cond
-      (cstr/includes? (str flow-key) "*running?")  false
+      ;;(cstr/includes? (str flow-key) "*running?")  false
       (= base-type :time)                         (get @father-time client-param-path)
       ;;(= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)

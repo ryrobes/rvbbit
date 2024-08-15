@@ -453,15 +453,21 @@
                :children
                [
                 (when solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
-                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-play" :on-click
-                   #(ut/tracked-dispatch [::wfx/request :default
-                                          {:message {:kind         :run-solver
-                                                     :solver-name  name
+                  [re-com/md-icon-button
+                   :src (at)
+                   :md-icon-name "zmdi-play"
+                   :on-click  #(ut/tracked-dispatch [::wfx/request 
+                                                     :default
+                                                     {:message {:kind         :run-solver
+                                                                :solver-name  name
                                                    ;:override-map (get @(ut/tracked-sub ::solvers-map {})
                                                    ;                   selected-warren-item)
-                                                     :client-name  @(ut/tracked-sub ::bricks/client-name {})}
-                                           :timeout 15000000}]) :style
-                   {:font-size "17px" :cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}])
+                                                                :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                                      :timeout 15000000}])
+                   :style {;:font-size "17px"
+                           :transform-origin "18px 17px"
+                           :cursor "pointer"
+                           :color (theme-pull :theme/editor-outer-rim-color nil)}])
                 
                 [re-com/box :child (str (get ext-map :last-processed))]
                 [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])]] :operator sigkw])]]]))
@@ -801,7 +807,7 @@
 
 (defn edn-terminal [ww hh text id & [text?]]
   (let [text (if (vector? text) (cstr/join "\n" text) (pr-str text))
-        text (if text? text (bricks/format-edn ww text 9)) ;; 3rd arg is math of pixels per font char - zprint uses cols, not pixels
+        text (if text? text (ut/format-edn ww text 9)) ;; 3rd arg is math of pixels per font char - zprint uses cols, not pixels
         text (vec (cstr/split text #"\n"))]
     [bricks/reactive-virtualized-console-viewer {:style {:font-weight 700 :font-size "14px"}
                                                  :text text
@@ -850,9 +856,13 @@
      [(when selected-warren-item
         [re-com/v-box :style
          {;:font-family   (theme-pull :theme/monospaced-font nil)
-         } :height (px (* ph 0.7)) :padding "6px" :children
+         } :height (px (* ph 0.7)) :padding "6px" 
+          :children
          [(let [ww (* (- (last @db/flow-editor-system-mode) 70) 0.65)]
-            [re-com/h-box :justify :between :align :center :children
+            [re-com/h-box 
+             :justify :between 
+             :align :center 
+             :children
              [[draggable-viewer 
                [edit-item-name selected-warren-item warren-item-type (* ww 0.9)]
                solver?
@@ -860,23 +870,32 @@
               (cond signal? [re-com/box :align :center :justify :center :style
                              {;:border "1px solid yellow"
                               :font-size   "22px"
-                              :font-weight 700} :height "100%" :width (px (* ww 0.1)) :child
+                              :font-weight 700} 
+                             :height "100%" 
+                             :width (px (* ww 0.1)) 
+                             :child
                              (str @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                    {:keypath [(keyword (str "signal/"
                                                                             (ut/replacer (str selected-warren-item) ":" "")))]}))]
                     solver? [draggable-play
                              [re-com/md-icon-button
                               :src (at)
-                              :md-icon-name (if solver-running? "zmdi-refresh" "zmdi-play")
-                              :class (when solver-running? "rotate linear infinite")
-                              :on-click
-                              #(ut/tracked-dispatch [::wfx/push :default
-                                                     {:kind         :run-solver
-                                                      :solver-name  selected-warren-item
-                                                      :override-map (get @(ut/tracked-sub ::solvers-map {})
-                                                                         selected-warren-item)
-                                                      :client-name  @(ut/tracked-sub ::bricks/client-name {})}])
-                              :style {:font-size "17px" :cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}]
+                              :md-icon-name (if solver-running? 
+                                              "zmdi-refresh" "zmdi-play")
+                              :class (when solver-running? 
+                                       "rotate linear infinite")
+                              :on-click #(ut/tracked-dispatch
+                                          [::wfx/push :default
+                                           {:kind         :run-solver
+                                            :solver-name  selected-warren-item
+                                            :override-map (get @(ut/tracked-sub ::solvers-map {})
+                                                               selected-warren-item)
+                                            :client-name  @(ut/tracked-sub ::bricks/client-name {})}])
+                              :style {:font-size "34px"
+                                      :transform-origin "18px 17px"
+                                      :cursor "pointer"
+                                      ;:margin-top  "-9px"
+                                      :color (theme-pull :theme/editor-outer-rim-color nil)}]
                              selected-warren-item]
                     :else   [re-com/gap :size "10px"] ;; placeholder
                     )]])

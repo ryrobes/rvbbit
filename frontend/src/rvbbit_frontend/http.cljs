@@ -438,7 +438,8 @@
  (fn [db [_]] 
    (ut/dissoc-in db [:query-history :kit-results-sys])))
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client})
+;;(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client})
+;; moved to db/reactor-types
 
 (re-frame/reg-event-db
   ::simple-response
@@ -450,7 +451,7 @@
       ;;                                        task-id                     (get % :task-id)
       ;;                                        heartbeat?                  (= task-id :heartbeat)]
       ;;                                    (and kick?
-      ;;                                         (contains? valid-task-ids (get-in % [:task-id 0]))
+      ;;                                         (contains? db/reactor-types (get-in % [:task-id 0]))
       ;;                                         (not heartbeat?))) result)
       ;;       result-subs (get grouped-results true)
       ;;       result (get grouped-results false)]
@@ -466,7 +467,7 @@
                                              task-id                     (get % :task-id)
                                              heartbeat?                  (= task-id :heartbeat)]
                                          (and kick?
-                                              (contains? valid-task-ids (get-in % [:task-id 0]))
+                                              (contains? db/reactor-types (get-in % [:task-id 0]))
                                               (not heartbeat?))) result)
             result-subs (get grouped-results true)
             result-subs (filterv #(not (nil? (get % :status))) result-subs) ;; no point in nil updates.
@@ -533,8 +534,9 @@
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
                             {} result-subs)]
         
-        ;; (doseq [r result-subs]
-        ;;   (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)]))
+        ;; (when (cstr/includes? (str (get db :client-name)) "beaming")
+        ;;   (doseq [r result-subs]
+        ;;     (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)])))
         
         ;; (ut/tapp>> [;:batch-of-messages (count result) 
         ;;             :grouped-update (count result-subs)
@@ -567,8 +569,8 @@
               signals-file?               (= task-id :signals-file)
               solvers-file?               (= task-id :solvers-file)
               alert?                      (cstr/starts-with? (str task-id) ":alert")
-              server-sub?                 (and kick?
-                                               (contains? valid-task-ids (get-in result [:task-id 0]))
+              server-sub?                 (and kick? ;; likely already batched and applied above, but just in case somehow
+                                               (contains? db/reactor-types (get-in result [:task-id 0]))
                                                (not heartbeat?))
               runstream-sub?              (and kick? (= (get-in result [:task-id 0]) :runstream) 
                                                (not (cstr/includes? (str (get-in result [:task-id 1])) ">")) ;; its a base call, not a reactor kp
@@ -588,13 +590,10 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (cstr/includes? (str client-name) "narrow")  
-            (ut/tapp>> [:msg-in runstream-sub? task-id (str (get result :task-id)) (str ui-keypath) 
-                        ;(str (get-in result [:status :evald-result :value 0]))
-                        (get result :status) (str (get result :ui-keypath)) (str result)
-                        
-                              
-                        ]))
+          ;; (when (and (cstr/includes? (str client-name) "beaming")  (not runstream-sub?))
+          ;;   (ut/tapp>> [:msg-in (str task-id) (get result :status)  (str ui-keypath)
+          ;;               ;(str (get-in result [:status :evald-result :value 0]))
+          ;;               (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -888,44 +887,43 @@
           ;;                        (keys (get db :click-params)))
           ;;flow-subs-child-keys (for [e (get db :flow-subs)] 
           ;;                       (remove nil? (try (keyword (last (cstr/split (str e) #"/"))) (catch :default _ nil))))
-          image       (if true ;(= save-type :skinny)
-                        (-> db ;; dehydrated... as it were
-                            (select-keys base-keys)
-                            (dissoc :query-history)
-                            (dissoc :query-history-condi)
-                            (dissoc :query-history-meta)
-                            (dissoc :flow-results)
-                            (dissoc :webcam-feed)
-                            (dissoc :rules-map)
-                            (dissoc :sessions)
-                            (dissoc :status-data)
-                            (dissoc :solvers-map)
-                            (dissoc :flow-statuses)
-                            (dissoc :flow-subs)
-                            (dissoc :flow-sub-cnts)
-                            (dissoc :signals-map)
-                            (dissoc :repl-output)
-                            (dissoc :solver-fn)
-                            ;(ut/dissoc-in [:solver-fn :runs])
-                            (ut/dissoc-in [:click-param :signal-history])
-                            (ut/dissoc-in [:click-param :solver-meta])
-                            (ut/dissoc-in [:click-param :repl-ns])
-                            (ut/dissoc-in [:click-param :panel-hash])
-                            (ut/dissoc-in [:click-param :solver-status])
-                            (ut/dissoc-in [:click-param :solver])
-                            (ut/dissoc-in [:click-param :flow-status])
-                            (ut/dissoc-in [:click-param :runstream])
-                            (ut/dissoc-in [:click-param :kit-status])
-                            (ut/dissoc-in [:click-param :kit])
-                            (ut/dissoc-in [:click-param :signal])
-                            (dissoc :data)
-                            (dissoc :flows) ;;; mostly ephemeral with the UI....
-                            (dissoc :http-reqs)
-                            (dissoc :sql-str)
-                            (ut/dissoc-in [:server :settings :runners])
-                            (dissoc :file-changed)
-                            (assoc :panels (select-keys (get db :panels) p0)))
-                        db)
+          image       (-> db ;; dehydrated... as it were
+                          (select-keys base-keys)
+                          (dissoc :query-history)
+                          (dissoc :query-history-condi)
+                          (dissoc :query-history-meta)
+                          (dissoc :flow-results)
+                          (dissoc :webcam-feed)
+                          (dissoc :rules-map)
+                          (dissoc :sessions)
+                          (dissoc :status-data)
+                          (dissoc :solvers-map)
+                          (dissoc :flow-statuses)
+                          (dissoc :flow-subs)
+                          (dissoc :flow-sub-cnts)
+                          (dissoc :signals-map)
+                          (dissoc :repl-output)
+                          (dissoc :solver-fn)
+                          ;(ut/dissoc-in [:solver-fn :runs])
+                          ;(ut/dissoc-in [:click-param :signal-history])
+                          ;(ut/dissoc-in [:click-param :solver-meta])
+                          ;(ut/dissoc-in [:click-param :repl-ns])
+                          (ut/dissoc-in [:click-param :panel-hash])
+                          ;(ut/dissoc-in [:click-param :solver-status])
+                          ;(ut/dissoc-in [:click-param :solver])
+                          ;(ut/dissoc-in [:click-param :flow-status])
+                          (ut/dissoc-in [:click-param :runstream])
+                          ;(ut/dissoc-in [:click-param :kit-status])
+                          ;(ut/dissoc-in [:click-param :kit])
+                          ;(ut/dissoc-in [:click-param :signal])
+                          (as-> db' (reduce #(ut/dissoc-in %1 [:click-param %2]) db' db/reactor-types))
+                          (dissoc :data) ;; but NOT clover edn data TODO
+                          (dissoc :flows) ;;; mostly ephemeral with the UI....
+                          (dissoc :http-reqs)
+                          (dissoc :sql-str)
+                          (ut/dissoc-in [:server :settings :runners])
+                          (dissoc :file-changed)
+                          (assoc :panels (select-keys (get db :panels) p0)))
           click-params-running (filter #(cstr/ends-with? (str %) "running?") (keys (get image :click-param)))
           image (assoc image :click-param (apply dissoc (get image :click-param) click-params-running))
           bogus-kw    (vec (find-bogus-keywords image))
@@ -1229,38 +1227,36 @@
                     :on-failure      [::failure-http-load-flow]}})))
 
 
+(re-frame/reg-event-db
+ ::failure-http-load-flow-history
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flow-history])]
+     (assoc-in db
+               [:http-reqs :load-flow-history] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
-
-
-
-(re-frame/reg-event-db ::failure-http-load-flow-history
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :load-flow-history])]
-                           (assoc-in db
-                             [:http-reqs :load-flow-history] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
-
-(re-frame/reg-event-db ::success-http-load-flow-history
-                       (fn [db [_ result]]
-                         (let [old-status           (get-in db [:http-reqs :load-flow-history])
-                               new-db               (get result :image)
-                               flowmaps             (get new-db :flowmaps)
-                               opts                 (get new-db :opts)
-                               flow-id              (get new-db :flow-id)
-                               coords               (get new-db :zoom db/based)
-                               _ (ut/tapp>> coords)
-                               flowmaps-connections (get new-db :flowmaps-connections)]
-                           (reset! db/last-update -1)
-                           (-> db
-                               (assoc-in [:http-reqs :load-flow-history]
-                                         (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
-                               (assoc-in [:flows flow-id :map] flowmaps)
-                               (assoc-in [:flows flow-id :opts] opts)
-                               (assoc-in [:flows flow-id :connections] flowmaps-connections)
-                               (assoc-in [:flow-results :tracker flow-id] (get result :tracker-history)) ;;(get-in
-                               (assoc-in [:flow-results :return-maps]
-                                         (merge (get-in db [:flow-results :return-maps] {}) (get result :return-maps)))
-                               (assoc :selected-flow flow-id)))))
+(re-frame/reg-event-db
+ ::success-http-load-flow-history
+ (fn [db [_ result]]
+   (let [old-status           (get-in db [:http-reqs :load-flow-history])
+         new-db               (get result :image)
+         flowmaps             (get new-db :flowmaps)
+         opts                 (get new-db :opts)
+         flow-id              (get new-db :flow-id)
+         coords               (get new-db :zoom db/based)
+         _ (ut/tapp>> coords)
+         flowmaps-connections (get new-db :flowmaps-connections)]
+     (reset! db/last-update -1)
+     (-> db
+         (assoc-in [:http-reqs :load-flow-history]
+                   (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
+         (assoc-in [:flows flow-id :map] flowmaps)
+         (assoc-in [:flows flow-id :opts] opts)
+         (assoc-in [:flows flow-id :connections] flowmaps-connections)
+         (assoc-in [:flow-results :tracker flow-id] (get result :tracker-history)) ;;(get-in
+         (assoc-in [:flow-results :return-maps]
+                   (merge (get-in db [:flow-results :return-maps] {}) (get result :return-maps)))
+         (assoc :selected-flow flow-id)))))
 
 (re-frame/reg-event-fx
   ::load-flow-history

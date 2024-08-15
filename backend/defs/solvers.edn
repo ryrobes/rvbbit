@@ -25,6 +25,7 @@
                 (let [dir         "/home/ryanr/rvbbit/frontend/resources/public/images/large"
                       rel-dir     "./images/large/"
                       _ (println "8k yo. That's big.")
+                      _ (Thread/sleep 8000)
                       files       (->> (file-seq (clojure.java.io/file dir))
                                        (filter (fn [x] (.isFile x)))
                                        (filter (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))

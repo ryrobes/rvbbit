@@ -1058,13 +1058,14 @@
 
 (def deep-meta-on-deck (atom nil))
 
-(re-frame/reg-event-db ::run-sql-deep-meta-for
-                       (fn [db [_ panel-key query-key honey-sql]]
-                         (let [connection-id (get-in db [:panels panel-key :connection-id])]
-                           (ut/tapp>> [:manual-deep-meta query-key :on connection-id])
-                           (reset! deep-meta-on-deck query-key)
-                           (ut/tracked-dispatch [::clear-query-history query-key])
-                           db)))
+(re-frame/reg-event-db
+ ::run-sql-deep-meta-for
+ (fn [db [_ panel-key query-key honey-sql]]
+   (let [connection-id (get-in db [:panels panel-key :connection-id])]
+     (ut/tapp>> [:manual-deep-meta query-key :on connection-id])
+     (reset! deep-meta-on-deck query-key)
+     (ut/tracked-dispatch [::clear-query-history query-key])
+     db)))
 
 (defn sql-style-meta
   [keypath honey-sql connection-id]
@@ -1156,6 +1157,9 @@
    (let [style-rules   (get honey-sql :style-rules)
          orig-honey-sql honey-sql
          deep-meta?    (true? (= @deep-meta-on-deck (first keypath)))
+        ;;  _             (when deep-meta?
+        ;;                  (ut/tapp>> [:deep-meta! (str keypath)])
+        ;;                  (swap! db/running-deep-meta-on conj (first keypath)))
          sniff?        (= (get @db/sniff-deck (first keypath)) :reco)
          kit-name      (when (and (not sniff?) (keyword? (get @db/sniff-deck (first keypath))))
                          (get @db/sniff-deck (first keypath)))
@@ -1173,7 +1177,7 @@
          honey-sql     (ut/postwalk-replacer {:*client-name client-name
                                               :*client-name* client-name
                                               :*client-name-str (str client-name)} orig-honey-sql)
-         
+
          ;;;;honey-sql     (assoc honey-sql :connection-id connection-id)
          literal-data? (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
          honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
@@ -1186,27 +1190,30 @@
          ]
      (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
-       [::wfx/request :default
-        {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call) 
-                       :ui-keypath    keypath
-                       :panel-key     panel-key
-                       :deep-meta?    deep-meta?
-                       :kit-name      kit-name
-                       :clover-sql    clover-sql
-                       :honey-sql     honey-modded
-                       :connection-id connection-id
-                       :client-cache? (if literal-data? (get honey-sql :cache? true) false)
-                       :page          (get honey-sql :page)
-                       :sniff?        sniff? ;; on used for ext tables
-                       :client-name   client-name}
-         :on-response [::http/socket-response]
-         :on-timeout  [::http/timeout-response [keypath honey-sql]]
-         :timeout     50000}])
-     (when deep-meta? (reset! deep-meta-on-deck nil)))
-   
+      [::wfx/request :default
+       {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call) 
+                      :ui-keypath    keypath
+                      :panel-key     panel-key
+                      :deep-meta?    deep-meta?
+                      :kit-name      kit-name
+                      :clover-sql    clover-sql
+                      :honey-sql     honey-modded
+                      :connection-id connection-id
+                      :client-cache? (if literal-data? (get honey-sql :cache? true) false)
+                      :page          (get honey-sql :page)
+                      :sniff?        sniff? ;; on used for ext tables
+                      :client-name   client-name}
+        :on-response [::http/socket-response]
+        :on-timeout  [::http/timeout-response [keypath honey-sql]]
+        :timeout     50000}])
+
+     (when deep-meta?
+       ;(reset! db/running-deep-meta-on (vec (remove #(= % (first keypath)) @db/running-deep-meta-on)))
+       (reset! deep-meta-on-deck nil)))
+
    (when (not (nil? (get honey-sql :refresh-every)))
      (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
-   
+
    (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))
    
   ([keypath honey-sql connection-id]
@@ -1214,6 +1221,9 @@
      (let [style-rules   (get honey-sql :style-rules)
            orig-honey-sql honey-sql
            deep-meta?    (true? (= @deep-meta-on-deck (first keypath)))
+          ;;  _             (when deep-meta?
+          ;;                  (ut/tapp>> [:deep-metax! (str keypath)])
+          ;;                  (swap! db/running-deep-meta-on conj (first keypath)))
            sniff?        (= (get @db/sniff-deck (first keypath)) :reco)
            kit-name      (when (and (not sniff?) (keyword? (get @db/sniff-deck (first keypath))))
                            (get @db/sniff-deck (first keypath)))
@@ -1262,7 +1272,9 @@
                                   :on-response [::http/socket-response]
                                   :on-timeout  [::http/timeout-response [keypath honey-sql]]
                                   :timeout     50000}])
-           (when deep-meta? (reset! deep-meta-on-deck nil))
+           (when deep-meta?
+             ;(reset! db/running-deep-meta-on (vec (remove #(= % (first keypath)) @db/running-deep-meta-on)))
+             (reset! deep-meta-on-deck nil))
 
            (when (or kit-name ;; clear on deck atom
                      sniff?)

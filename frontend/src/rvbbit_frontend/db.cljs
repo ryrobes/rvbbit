@@ -4,10 +4,13 @@
 
 (def brick-size 50)
 
+(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :panel-hash})
+
 (def click-params-snapshot (atom nil))
 (def param-v-boxes (reagent/atom nil))
 (def solver-view-mode (reagent/atom "return value"))
 (def signals-searcher-atom (reagent/atom nil))
+;; (def running-deep-meta-on (reagent/atom []))
 
 (defonce cm-instance-runstream-code-box (atom {}))
 (defonce search-box (reagent/atom nil))

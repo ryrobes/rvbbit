@@ -1692,16 +1692,48 @@
 ;;     (println "Safe position found:" result)
 ;;     (println "No safe position available")))
 
-
 (def format-map-atom (atom {}))
+
+;; (defn format-edn [w s & [tsplit]]
+;;   ;(tapp>> [:s s])
+;;   (zp/zprint-str s
+;;                  (js/Math.floor (/ w (or tsplit 9)))
+;;                  {:parse-string-all? true ;; was :parse-string-all?
+;;                   :style         [:community :respect-nl :justified-original]
+;;                   :pair          {:force-nl? false}
+;;                   :map {:hang? true :comma? false :sort? false}
+;;                   :pair-fn {:hang? true}
+;;                   :binding       {:force-nl? true}
+;;                   :vector        {:respect-nl? true}
+;;                   ;:color?        true
+;;                   ;;:color-map     {}
+;;                   ;:color-map     {:paren :pink}
+;;                   :parse         {:interpose "\n\n"}}))
+
+(defn format-edn [w s & [tsplit]]
+  (let [cache-key (hash [w s tsplit :edn])
+        cache (get @format-map-atom cache-key)]
+    (if (not (nil? cache))
+      cache
+      (let [o (zp/zprint-str s
+                             (js/Math.floor (/ w (or tsplit 9)))
+                             {:parse-string-all? true
+                              :style         [:community :respect-nl :justified-original]
+                              :pair          {:force-nl? false}
+                              :map           {:hang? true :comma? false :sort? false}
+                              :pair-fn       {:hang? true}
+                              :binding       {:force-nl? true}
+                              :vector        {:respect-nl? true}
+                              :parse         {:interpose "\n\n"}})]
+        (swap! format-map-atom assoc cache-key o)
+        o))))
 
 (defn format-map [w s]
   (let [cache-key (hash [w s])
         cache (get @format-map-atom cache-key)]
     (if (not (nil? cache))
       cache
-      (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
-            type (cond (cstr/includes? s "(")                         [:respect-nl   :justified-original]
+      (let [type (cond (cstr/includes? s "(")                         [:respect-nl   :justified-original]
                        (cstr/starts-with? (cstr/trim-newline s) "[:") [:justified-original :hiccup] ;:community ;[:hiccup :justified-original]
                        :else                                          :justified)
             o    (zp/zprint-str s
@@ -1719,7 +1751,7 @@
                                  ;:map           {:comma? false :sort? false}
                                  :parse         {:interpose "\n\n"}})]
         (swap! format-map-atom assoc cache-key o)
-        o))))
+        o)))) 
 
 (defn remove-keys [m keys] (apply dissoc m keys))
 

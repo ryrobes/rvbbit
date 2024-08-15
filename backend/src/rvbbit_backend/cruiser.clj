@@ -1526,7 +1526,10 @@
              sniff-rows (dissoc sniff-rows :connections)]
          (sql/insert-all-tables sniff-rows (last sql-filter))
          (doseq [k (keys sniff-rows)] (sql-exec dest (to-sql {:delete-from [k]})))
-         (when res? (sql-exec src-conn (to-sql {:drop-table [(last sql-filter)]}))) ;)
+         (when res? (sql-exec src-conn 
+                              ;(to-sql {:drop-table [(last sql-filter)]})
+                              (to-sql {:drop-table (keyword (last sql-filter))})
+                              )) ;)
          nil))))))
 
 

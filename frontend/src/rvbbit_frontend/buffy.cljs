@@ -265,32 +265,30 @@
                            (assoc-in db (cons :click-param keypath) (merge curr value)))))
 
 
-(defn code-box
-  [width-int height-int value]
-  (let [;sql-hint? (cstr/includes? (str value) ":::sql-string")
-       ]
-    [re-com/box
-     :size "none"
-     :width (px (- width-int 24))
-     :height (px (+ height-int 24))
-     :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
-             :font-size     "14px"
-             :overflow      "auto"
-             :border-radius "12px"
-             :font-weight   700} :child
-     [(reagent/adapt-react-class cm/UnControlled)
-      {:value   (ut/format-map 480 (str value))
-       :options {:mode              "clojure"
-                 :lineWrapping      true
-                 :lineNumbers       true
-                 :matchBrackets     true
-                 :autoCloseBrackets true
-                 :autofocus         false
-                 :autoScroll        false
-                 :detach            true
-                 :readOnly          true ;true
-                 :theme             (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage"
-                 }}]]))
+(defn code-box [width-int height-int value & [max-height]]
+  [re-com/box
+   :size "none"
+   :width (px (- width-int 24))
+   :max-height (when max-height (px max-height))
+   :height (when height-int (px (+ height-int 24)))
+   :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+           :font-size     "14px"
+           :overflow      "auto"
+           :border-radius "12px"
+           :font-weight   700} :child
+   [(reagent/adapt-react-class cm/UnControlled)
+    {:value   (ut/format-map 480 (str value))
+     :options {:mode              "clojure"
+               :lineWrapping      true
+               :lineNumbers       true
+               :matchBrackets     true
+               :autoCloseBrackets true
+               :autofocus         false
+               :autoScroll        false
+               :detach            true
+               :readOnly          true ;true
+               :theme             (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage"
+               }}]])
 
 (re-frame/reg-event-db 
  ::save-rs-value
@@ -318,7 +316,7 @@
 (defn code-box-rs-value
   [width-int height-int flow-id kkey value & [param?]]
   (let [;param?     (if (nil? param?) false true)
-        _ (ut/tapp>> [:code-box-rs-value-called flow-id kkey value param?])
+        ;;_ (ut/tapp>> [:code-box-rs-value-called flow-id kkey value param?])
         stringify? (and (vector? value) (every? string? value))
         on-focus-fn (fn [_] (reset! db/cm-focused? true))
         on-change-fn (fn [x] (ut/tapp>> [:change x]))
@@ -661,32 +659,40 @@
         :timeout     50000}])
     db))
 
-(re-frame/reg-event-db ::toggle-runstream-item
-                       (undoable)
-                       (fn [db [_ flow-id]]
-                         (assoc-in db [:runstreams flow-id :open?] (not (get-in db [:runstreams flow-id :open?] false)))))
+(re-frame/reg-event-db
+ ::toggle-runstream-item
+ (undoable)
+ (fn [db [_ flow-id]]
+   (assoc-in db [:runstreams flow-id :open?] 
+             (not (get-in db [:runstreams flow-id :open?] false)))))
 
 (re-frame/reg-event-db
   ::toggle-runstream-outputs
   (undoable)
   (fn [db [_ flow-id]]
-    (assoc-in db [:runstreams flow-id :open-outputs?] (not (get-in db [:runstreams flow-id :open-outputs?] false)))))
+    (assoc-in db [:runstreams flow-id :open-outputs?] 
+              (not (get-in db [:runstreams flow-id :open-outputs?] false)))))
 
 (re-frame/reg-event-db
   ::toggle-runstream-value
   (undoable)
   (fn [db [_ flow-id kkey]]
-    (assoc-in db [:runstreams flow-id :values kkey :open?] (not (get-in db [:runstreams flow-id :values kkey :open?] false)))))
+    (assoc-in db [:runstreams flow-id :values kkey :open?] 
+              (not (get-in db [:runstreams flow-id :values kkey :open?] false)))))
 
-(re-frame/reg-event-db ::toggle-runstream-fire
-                       (undoable)
-                       (fn [db [_ flow-id]]
-                         (assoc-in db [:runstreams flow-id :fire?] (not (get-in db [:runstreams flow-id :fire?] false)))))
+(re-frame/reg-event-db
+ ::toggle-runstream-fire
+ (undoable)
+ (fn [db [_ flow-id]]
+   (assoc-in db [:runstreams flow-id :fire?] 
+             (not (get-in db [:runstreams flow-id :fire?] false)))))
 
-(re-frame/reg-event-db ::toggle-runstream-drops
-                       (undoable)
-                       (fn [db [_ flow-id]]
-                         (assoc-in db [:runstreams flow-id :drops?] (not (get-in db [:runstreams flow-id :drops?] false)))))
+(re-frame/reg-event-db 
+ ::toggle-runstream-drops
+ (undoable)
+ (fn [db [_ flow-id]]
+   (assoc-in db [:runstreams flow-id :drops?] 
+             (not (get-in db [:runstreams flow-id :drops?] false)))))
 
 (defn gn [x] (try (name x) (catch :default _ x)))
 (defn gns [x] (try (namespace x) (catch :default _ x)))
@@ -1048,20 +1054,22 @@
                                                   :margin-left "6px"
                                                   :margin-top  "2px"
                                                   :font-size   "19px"}]
-                                                [re-com/h-box :children
-                                                 [[re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-droplet" :on-click
-                                                   #(ut/tracked-dispatch [::toggle-runstream-drops flow-id]) :style
-                                                   {:cursor      "pointer"
-                                                    :color       (str (theme-pull :theme/editor-outer-rim-color nil))
-                                                    :height      "15px"
-                                                    :transform   (when drops? "rotate(-45deg)")
-                                                    :opacity     0.33
-                                                    :margin-left (if drops? "5px" "6px")
-                                                    :margin-top  "2px"
-                                                    :font-size   "19px"}]
-                                                  [re-com/box :style
-                                                   {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "9px" :height "15px"}
-                                                   :child (str (let [cc (count (keys drops))] (if (= cc 0) "" cc)))]]]
+                                                
+                                                ;; [re-com/h-box :children
+                                                ;;  [[re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-droplet" :on-click
+                                                ;;    #(ut/tracked-dispatch [::toggle-runstream-drops flow-id]) :style
+                                                ;;    {:cursor      "pointer"
+                                                ;;     :color       (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                ;;     :height      "15px"
+                                                ;;     :transform   (when drops? "rotate(-45deg)")
+                                                ;;     :opacity     0.33
+                                                ;;     :margin-left (if drops? "5px" "6px")
+                                                ;;     :margin-top  "2px"
+                                                ;;     :font-size   "19px"}]
+                                                ;;   [re-com/box :style
+                                                ;;    {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "9px" :height "15px"}
+                                                ;;    :child (str (let [cc (count (keys drops))] (if (= cc 0) "" cc)))]]]
+                                                
                                                 (when no-open-inputs?
                                                   [re-com/box :align :center :style {:margin-left "10px" :opacity 0.45 :font-weight 500 :font-size "13px"}
                                                    :child "(no open inputs found)"])]]
@@ -1491,7 +1499,11 @@
  (fn [db [_ & [key]]]
    (let [snapshot-map      (get-in db [:snapshots :params])
          snap-cnt          (+ 1 (count (keys snapshot-map)))
-         click-param       (get-in db [:click-param])
+         ;;click-param       (get-in db [:click-param])
+         click-param       (into {} (reduce dissoc
+                             (get db :click-param)  
+                             db/reactor-types))
+         _ (ut/tapp>> [:click-param (keys click-param)])  
          snap-name         (or key (ut/safe-key "snapshot"))
          panels            (get db :panels)
          selected-tab      (get db :selected-tab)
@@ -1513,27 +1525,39 @@
                             :params       click-param}]
      (assoc-in db [:snapshots :params snap-name] snap))))
 
-(re-frame/reg-event-db ::rename-snapshot
-                       (undoable)
-                       (fn [db [_ old new]]
-                         (let [old-snap (get-in db [:snapshots :params old])]
-                           (-> db
-                               (assoc-in [:snapshots :params new] old-snap)
-                               (ut/dissoc-in [:snapshots :params old])))))
+(re-frame/reg-event-db
+ ::rename-snapshot
+ (undoable)
+ (fn [db [_ old new]]
+   (let [old-snap (get-in db [:snapshots :params old])]
+     (-> db
+         (assoc-in [:snapshots :params new] old-snap)
+         (ut/dissoc-in [:snapshots :params old])))))
 
-(re-frame/reg-event-db ::delete-snapshot (undoable) (fn [db [_ key]] (ut/dissoc-in db [:snapshots :params key])))
+(re-frame/reg-event-db
+ ::delete-snapshot
+ (undoable)
+ (fn [db [_ key]] 
+   (ut/dissoc-in db [:snapshots :params key])))
 
-(re-frame/reg-event-db ::snapshot-menu-toggle
-                       (undoable)
-                       (fn [db [_ key]]
-                         (assoc-in db [:snapshots :params key :menu?] (not (get-in db [:snapshots :params key :menu?])))))
+(re-frame/reg-event-db
+ ::snapshot-menu-toggle
+ (undoable)
+ (fn [db [_ key]]
+   (assoc-in db [:snapshots :params key :menu?] 
+             (not (get-in db [:snapshots :params key :menu?])))))
 
-(re-frame/reg-event-db ::snapshot-extra-toggle
-                       (undoable)
-                       (fn [db [_ key]]
-                         (assoc-in db [:snapshots :params key :extra?] (not (get-in db [:snapshots :params key :extra?])))))
+(re-frame/reg-event-db
+ ::snapshot-extra-toggle
+ (undoable)
+ (fn [db [_ key]]
+   (assoc-in db [:snapshots :params key :extra?]
+             (not (get-in db [:snapshots :params key :extra?])))))
 
-(re-frame/reg-sub ::is-current-params? (fn [db [_ params]] (true? (= params (get db :click-param {})))))
+(re-frame/reg-sub 
+ ::is-current-params? 
+ (fn [db [_ params]]
+   (true? (= params (get db :click-param {})))))
 
 (defn render-honey-comb-fragments
   [c & [w h sys-name]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
@@ -1907,108 +1931,58 @@
   [panel-height panel-width kp]
   (let [text-box-height   110
         text-box?         true
-        reaction-hack     [@hide-diffs? @hide-block-diffs? @title-edit-idx] ;; important to
+        reaction-hack     [@hide-diffs? @hide-block-diffs? @title-edit-idx]
         snapshots         @(re-frame.core/subscribe [::bricks/snapshots])
         ordered-snapshots (vec (sort-by :ts (vec (for [[k v] snapshots] (assoc v :key k)))))
         curr-params       @(re-frame.core/subscribe [::bricks/current-params])]
-    [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size
-                                                                                                                 ;; of
-     :width (px (- panel-width 12)) ;; minus size of border left and right and header
-     :attr {:id "chat-v-box"} :style {:overflow "auto" :border-radius "16px"} :child
+    [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) 
+     :width (px (- panel-width 12))
+     :attr {:id "chat-v-box"} :style {:overflow "auto" :border-radius "16px"} 
+     :child
      [re-com/v-box :padding "4px" :gap "11px" :children
       (for [{:keys [key ts menu? extra? params block-states selected-tab]} ordered-snapshots
-            :let                                                           [valid-state-keys (vec
-                                                                                               (cset/intersection ;; since we
-                                                                                                                  ;; are
-                                                                                                                  ;; diffing,
-                                                                                                                  ;; we only
-                                                                                                                  ;; want
-                                                                                                                  ;; state
-                                                                                                                  ;; keys
-                                                                                                                  ;; that
-                                                                                                 (set (keys block-states))       ;; otherwise
-                                                                                                                                 ;; we
-                                                                                                                                 ;; get
-                                                                                                                                 ;; a
-                                                                                                                                 ;; diff
-                                                                                                                                 ;; for
-                                                                                                                                 ;; every
-                                                                                                                                 ;; key
-                                                                                                                                 ;; -
-                                                                                                 (set (keys (get
-                                                                                                              curr-params
-                                                                                                              :block-states))))) ;; which
-                                                                                                                                 ;; are
-                                                                                                                                 ;; irrelevant
-                                                                                                                                 ;; to
-                                                                                                                                 ;; the
-                                                                                                                                 ;; user
-                                                                            mparams          {:params       params
-                                                                                              :block-states (select-keys
-                                                                                                              block-states
-                                                                                                              valid-state-keys)
-                                                                                              :selected-tab selected-tab}
-                                                                            mparams          (if extra?
-                                                                                               mparams
-                                                                                               (get mparams :params))
-                                                                            curr-params      (if extra?
-                                                                                               (assoc curr-params
-                                                                                                 :block-states
-                                                                                                   (select-keys (get
-                                                                                                                  curr-params
-                                                                                                                  :block-states)
-                                                                                                                valid-state-keys))
-                                                                                               (get curr-params :params))
-                                                                            d1               (first (cdata/diff curr-params
-                                                                                                                mparams))
-                                                                            d2               (first (cdata/diff mparams
-                                                                                                                curr-params))
-                                                                            d1               (if @hide-block-diffs?
-                                                                                               (dissoc d1 :block-states)
-                                                                                               d1)
-                                                                            d2               (if @hide-block-diffs?
-                                                                                               (dissoc d2 :block-states)
-                                                                                               d2)
-                                                                            d1               (if (= (vec (keys d1)) [:params])
-                                                                                               (get d1 :params)
-                                                                                               d1) ;; if there
-                                                                                                   ;; is only
-                                                                                                   ;; params,
-                                                                                                   ;; remove the
-                                                                                                   ;; key. more
-                                                                                                   ;; readable
-                                                                            d2               (if (= (vec (keys d2)) [:params])
-                                                                                               (get d2 :params)
-                                                                                               d2) ;; if there
-                                                                                                   ;; is only
-                                                                                                   ;; params,
-                                                                                                   ;; remove the
-                                                                                                   ;; key. more
-                                                                                                   ;; readable
-                                                                            added            (dissoc (ut/dissoc-in d1
-                                                                                                                   [:params
-                                                                                                                    :user-sys])
-                                                                                               :user-sys)
-                                                                            removed          (dissoc (ut/dissoc-in d2
-                                                                                                                   [:params
-                                                                                                                    :user-sys])
-                                                                                               :user-sys)
-                                                                            added            (if (= added {:params nil})
-                                                                                               nil
-                                                                                               added)
-                                                                            removed          (if (= removed {:params nil})
-                                                                                               nil
-                                                                                               removed)
-                                                                            diffy            (ut/postwalk-replacer
-                                                                                               {:block-states :blocks :panels :_} ;; just
-                                                                                                                                  ;; for
-                                                                                                                                  ;; readability
-                                                                                                                                  ;; again,
-                                                                                                                                  ;; we
-                                                                                                                                  ;; have
-                                                                                                                                  ;; limited
-                                                                                                                                  ;; space
-                                                                                               {:added added :removed removed})]]
+            :let  [valid-state-keys (vec
+                                     (cset/intersection 
+                                      (set (keys block-states))       
+                                      (set (keys (get
+                                                  curr-params
+                                                  :block-states))))) 
+                   mparams          {:params       params
+                                     :block-states (select-keys
+                                                    block-states
+                                                    valid-state-keys)
+                                     :selected-tab selected-tab}
+                   mparams          (if extra? mparams
+                                      (get mparams :params))
+                   curr-params      (if extra?
+                                      (assoc curr-params
+                                             :block-states
+                                             (select-keys (get
+                                                           curr-params
+                                                           :block-states)
+                                                          valid-state-keys))
+                                      (get curr-params :params))
+                   d1               (first (cdata/diff curr-params mparams))
+                   d2               (first (cdata/diff mparams curr-params))
+                   d1               (if @hide-block-diffs?
+                                      (dissoc d1 :block-states)
+                                      d1)
+                   d2               (if @hide-block-diffs?
+                                      (dissoc d2 :block-states)
+                                      d2)
+                   d1               (if (= (vec (keys d1)) [:params])
+                                      (get d1 :params)
+                                      d1) 
+                   d2               (if (= (vec (keys d2)) [:params])
+                                      (get d2 :params)
+                                      d2) 
+                   added            (dissoc (ut/dissoc-in d1 [:params :user-sys]) :user-sys)
+                   removed          (dissoc (ut/dissoc-in d2 [:params :user-sys]) :user-sys)
+                   added            (if (= added {:params nil}) nil added)
+                   removed          (if (= removed {:params nil}) nil removed)
+                   diffy            (ut/postwalk-replacer
+                                     {:block-states :blocks :panels :_}
+                                     {:added added :removed removed})]]
         [re-com/v-box :size "auto" :padding "9px" :style
          {;:border-top (if (= curr-params params) "3px dashed orange" "3px solid #ffffff17")
           :margin-left      "5px"
@@ -2016,73 +1990,80 @@
           :border-radius    (when (= curr-params mparams) "12px")
           :background-color (if (= curr-params mparams) (str (theme-pull :theme/editor-outer-rim-color nil) 15) "inherit")}
          :children
-         [[re-com/v-box :size "auto" :gap "11px" :justify :between :align :center :children
-           [[re-com/h-box :size "none" :height "33px" :width (px (- panel-width 40)) :justify :between :align :center :children
-             [[re-com/box :align :start :justify :start :size "none" :width (px (- panel-width 190)) :style
-               {;:border "1px solid red"
-                :padding-left "10px"
-                :cursor       "pointer"
-                :user-select  "none"} :attr
-               {:on-double-click #(reset! title-edit-idx key) :on-click #(ut/tracked-dispatch [::bricks/swap-snapshot key])}
-               :child ;(str
-                      ;key)
-               (if (= @title-edit-idx key)
-                 [re-com/h-box :children
-                  [[re-com/input-text :model (str key) :on-change
-                    #(do (ut/tapp>> [:changed-snapshot-name (str key) :to (str %)])
-                         (when (and (not (empty? (cstr/trim (str %)))) (not (some (fn [x] (= x %)) (keys snapshots))))
-                           (ut/tracked-dispatch [::rename-snapshot key (str %)]))
-                         (reset! title-edit-idx nil)) :change-on-blur? true :width (px (- panel-width 230)) ;(px (+ 15 (*
-                                                                                                            ;(count (str key))
-                                                                                                            ;11)))
-                    :style
-                    {:background-color "#00000000"
-                     :text-decoration  "underline"
-                     :font-weight      700
-                     :font-size        "16px"
-                     :border           "none"
-                     :padding-left     "0px"
-                     :color            (theme-pull :theme/editor-outer-rim-color nil)}]
-                   [re-com/md-icon-button :src (at) :md-icon-name "zmdi-delete" :style
-                    {;:transform (when @db/show-tabs? "rotate(90deg)")
-                     :color        (theme-pull :theme/editor-outer-rim-color nil)
-                     :padding-left "10px"
-                     :font-size    "14px"
-                     :padding-top  "5px"
-                     :cursor       "pointer"
-                     :width        "10px"
-                     :height       "20px" ;:width (px (+ 0 (* (count (str t)) 11)))
-                    } :attr {:on-click #(ut/tracked-dispatch [::delete-snapshot key])}]]]
-                 [re-com/box :style {:color (theme-pull :theme/editor-outer-rim-color nil) :font-size "16px" :font-weight 700}
-                  :child (str key)])]
-              [re-com/box :align :end :justify :end :size "auto" :attr
-               {:on-click #(ut/tracked-dispatch [::snapshot-extra-toggle key])} :style
-               {:color           (theme-pull :theme/editor-outer-rim-color nil)
-                :opacity         (if extra? 1 0.3)
-                :cursor          "pointer"
-                :padding-right   "10px"
-                :text-decoration (if extra? "inherit" "line-through")} :child "+ extra?"]
-              [re-com/box :align :end :justify :end :size "auto" :attr
-               {:on-click #(ut/tracked-dispatch [::snapshot-menu-toggle key])} :style
-               {:color           (theme-pull :theme/editor-outer-rim-color nil)
-                :opacity         (if menu? 1 0.3)
-                :cursor          "pointer"
-                :padding-right   "10px"
-                :text-decoration (if menu? "inherit" "line-through")} :child "show?"]]]
-            [re-com/box :size "none" :width (px (- panel-width 40)) :align :center :justify :center :style
-             {:opacity 0.4 :font-size "12px" :font-weight 500} :child (str "updated: " ts)]]] [re-com/gap :size "9px"]
-          (when (and (not @hide-diffs?) (not (empty? (get diffy :added))))
-            [re-com/box :padding "6px" :style {:border "2px solid #32de84" :background-color "#32de8409" :margin-bottom "9px"}
+         [[re-com/v-box :size "auto" :gap "11px" :justify :between :align :center
+           :children [[re-com/h-box :size "none" :height "33px" :width (px (- panel-width 40)) :justify :between :align :center
+                       :children [[re-com/box :align :start :justify :start :size "none" :width (px (- panel-width 190)) :style
+                                   {;:border "1px solid red"
+                                    :padding-left "10px"
+                                    :cursor       "pointer"
+                                    :user-select  "none"}
+                                   :attr {:on-double-click #(reset! title-edit-idx key)
+                                          :on-click #(ut/tracked-dispatch [::bricks/swap-snapshot key])}
+                                   :child
+                                   (if (= @title-edit-idx key)
+                                     [re-com/h-box :children
+                                      [[re-com/input-text :model (str key) :on-change
+                                        #(do (ut/tapp>> [:changed-snapshot-name (str key) :to (str %)])
+                                             (when (and (ut/ne? (cstr/trim (str %))) (not (some (fn [x] (= x %)) (keys snapshots))))
+                                               (ut/tracked-dispatch [::rename-snapshot key (str %)]))
+                                             (reset! title-edit-idx nil)) :change-on-blur? true :width (px (- panel-width 230)) 
+                                        :style
+                                        {:background-color "#00000000"
+                                         :text-decoration  "underline"
+                                         :font-weight      700
+                                         :font-size        "16px"
+                                         :border           "none"
+                                         :padding-left     "0px"
+                                         :color            (theme-pull :theme/editor-outer-rim-color nil)}]
+                                       [re-com/md-icon-button :src (at) :md-icon-name "zmdi-delete"
+                                        :style {;:transform (when @db/show-tabs? "rotate(90deg)")
+                                                :color        (theme-pull :theme/editor-outer-rim-color nil)
+                                                :padding-left "10px"
+                                                :font-size    "14px"
+                                                :padding-top  "5px"
+                                                :cursor       "pointer"
+                                                :width        "10px"
+                                                :height       "20px"}
+                                        :attr {:on-click #(ut/tracked-dispatch [::delete-snapshot key])}]]]
+                                     [re-com/box 
+                                      :style {:color (theme-pull :theme/editor-outer-rim-color nil) :font-size "16px" :font-weight 700}
+                                      :child (str key)])]
+                                  [re-com/box :align :end :justify :end :size "auto"
+                                   :attr  {:on-click #(ut/tracked-dispatch [::snapshot-extra-toggle key])}
+                                   :style {:color           (theme-pull :theme/editor-outer-rim-color nil)
+                                           :opacity         (if extra? 1 0.3)
+                                           :cursor          "pointer"
+                                           :padding-right   "10px"
+                                           :text-decoration (if extra? "inherit" "line-through")} :child "+ extra?"]
+                                  [re-com/box :align :end :justify :end :size "auto"
+                                   :attr  {:on-click #(ut/tracked-dispatch [::snapshot-menu-toggle key])}
+                                   :style {:color           (theme-pull :theme/editor-outer-rim-color nil)
+                                           :opacity         (if menu? 1 0.3)
+                                           :cursor          "pointer"
+                                           :padding-right   "10px"
+                                           :text-decoration (if menu? "inherit" "line-through")} :child "show?"]]]
+                      [re-com/box :size "none" :width (px (- panel-width 40)) :align :center :justify :center :style
+                       {:opacity 0.4 :font-size "12px" :font-weight 500} :child (str "updated: " ts)]]] [re-com/gap :size "9px"]
+          (when (and (not @hide-diffs?) (ut/ne? (get diffy :added)))
+            [re-com/box :padding "6px" 
+             :style {:border "2px solid #32de84" :background-color "#32de8409" :margin-bottom "9px"}
              :child [code-box 565 nil (str (get diffy :added))]])
-          (when (and (not @hide-diffs?) (not (empty? (get diffy :removed))))
-            [re-com/box :padding "6px" :style {:border "2px solid #fd5c63" :background-color "#fd5c6309" :margin-bottom "9px"}
+          (when (and (not @hide-diffs?) (ut/ne? (get diffy :removed)))
+            [re-com/box :padding "6px"
+             :style {:border "2px solid #fd5c63" :background-color "#fd5c6309" :margin-bottom "9px"}
              :child [code-box 565 nil (str (get diffy :removed))]])
           [re-com/h-box :gap "7px" :justify :between :align :center :children
-           [[re-com/box :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)} :attr
+           [[re-com/box 
+             :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)} 
+             :attr
              {:on-click #(ut/tracked-dispatch [::create-snapshot key])} :child "overwrite"]
             (when (= curr-params mparams)
-              [re-com/box :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) 22)} :child "(matches current)"])
-            [re-com/box :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)} :attr
+              [re-com/box 
+               :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) 22)} 
+               :child "(matches current)"])
+            [re-com/box 
+             :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)} 
+             :attr
              {:on-click #(ut/tracked-dispatch [::delete-snapshot key])} :child "delete"]]]]])]]))
 
 (defn history-box

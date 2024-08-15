@@ -834,7 +834,7 @@
 
 (def client-batches (atom {}))
 
-(def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :kit  :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
+(def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :kit :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
 (def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status :estimate [:estimate] :tracker :condis [:tracker] :alert :alerts :alert1 :alert2 :alert3}) ;; to not skip old dupes
 
@@ -889,31 +889,32 @@
   ;(enqueue-task-slot2 client-name 
   ;(ppy/execute-in-thread-pools (keyword (str "client/push-to-client." (cstr/replace (str client-name) ":" "")))
                  ;(fn []
-  (try
-    (let [rr                0 ;(rand-int 3)
-          cq                (get client-queue-atoms rr)
-          _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
-          client-queue-atom (get @cq client-name)]
+  (when (keyword? client-name)
+    (try
+      (let [rr                0 ;(rand-int 3)
+            cq                (get client-queue-atoms rr)
+            _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
+            client-queue-atom (get @cq client-name)]
       ;(swap! queue-status assoc-in [client-name task-id ui-keypath] status)
       ;(swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
-      (if client-queue-atom
-        (do (inc-score! client-name :push)
-            (inc-score! client-name :last-push true)
-            (swap! client-queue-atom conj
-                   {:ui-keypath  ui-keypath
-                    :status      status
-                    :elapsed-ms  elapsed-ms
-                    :reco-count  reco-count
-                    :queue-id    queue-id
-                    :task-id     task-id
-                    :data        (when (try (some #(= (first task-id) %) sub-task-ids) (catch Exception _ true)) ;; server sub doenst need :data, just :status (as val)
-                                   [data ;; data is likely needed for :payload and :payload-kp that
-                                    (try (get (first reco-count) :cnt) (catch Exception _ reco-count))])
-                    :client-name client-name}))
-        (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
-          (new-client client-name)
-          (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-    (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
+        (if client-queue-atom
+          (do (inc-score! client-name :push)
+              (inc-score! client-name :last-push true)
+              (swap! client-queue-atom conj
+                     {:ui-keypath  ui-keypath
+                      :status      status
+                      :elapsed-ms  elapsed-ms
+                      :reco-count  reco-count
+                      :queue-id    queue-id
+                      :task-id     task-id
+                      :data        (when (try (some #(= (first task-id) %) sub-task-ids) (catch Exception _ true)) ;; server sub doenst need :data, just :status (as val)
+                                     [data ;; data is likely needed for :payload and :payload-kp that
+                                      (try (get (first reco-count) :cnt) (catch Exception _ reco-count))])
+                      :client-name client-name}))
+          (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
+            (new-client client-name)
+            (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
+      (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data])))));))
 
 (defn react-to-file-changes
   [{:keys [path type]}]
@@ -2157,12 +2158,14 @@
 
 (defn get-flow-open-ports
   [flowmap flow-id & [client-name]] ;; generally a local path, not a map, but hey w/e
-  (ut/pp [:get-flow-open-ports! flowmap flow-id (or client-name  :rvbbit)])
+  ;;(ut/pp [:get-flow-open-ports! flowmap flow-id (or client-name  :rvbbit)])
   (let [raw                 (try (edn/read-string (slurp (if (cstr/ends-with? (cstr/lower-case flowmap) ".edn")
                                                            flowmap ;; file path, use as is
                                                            (str "./flows/" flowmap ".edn"))))
                                  (catch Exception _
-                                   (do (ut/pp [:error-reading-flow-from-disk-raw-open-ports flow-id client-name]) {})))
+                                   (do 
+                                     ;;(ut/pp [:error-reading-flow-from-disk-raw-open-ports flow-id client-name])
+                                     {})))
         [flowmap raw-conns] [(if (string? flowmap) ;; load from disk and run client sync post
                                (let [flowmaps    (process-flow-map (get raw :flowmaps))
                                      connections (get raw :flowmaps-connections)
@@ -3847,9 +3850,10 @@
   [base-type keypath client-name new-value]
   (let [;;_ (ut/pp [:send-reaction-keypath keypath client-name])
         keypath                 (get @db/param-var-mapping [client-name keypath] keypath) ;; get the
-        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+        ;;flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword
-        client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
+        ;;client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
+        client-param-path       other-client-param-path
         signal?                 (= client-name :rvbbit)]
 
     (if (not signal?)
@@ -3983,62 +3987,6 @@
             nil
             nil))))
 
-
-;; (defn sub-to-value
-;;   [client-name flow-key & [signal?]] ;;; IF CHANGED, REMEMBER TO ALSO UPDATE "CLOVER-LOOKUP" -
-;;   (let [flow-key-orig           flow-key
-;;         ;flow-key-orig           (keyword (cstr/replace (str flow-key-orig) ":" "")) ;; normalized the old weird colon inserted clover kws
-;;         flow-key-sub            (db/replace-flow-key-vars flow-key client-name)
-;;         flow-key-split          (db/break-up-flow-key flow-key)
-;;         flow-key-split-sub      (db/break-up-flow-key flow-key-sub)
-;;         vars?                   (not (= flow-key flow-key-sub))
-;;         flow-key                (if vars? flow-key-sub flow-key)
-;;         flow-key-split          (if vars? flow-key-split-sub flow-key-split)
-;;         [flow-id step-id]       flow-key-split ;(break-up-flow-key flow-key)
-;;         signal?                 (true? signal?)
-        
-;;         sub-path                (db/break-up-flow-key-ext flow-key)
-;;         base-type               (first sub-path)
-;;         keypath                 [flow-id step-id] ;;(if (= base-type :flow) [flow-id step-id] (vec (rest sub-path)) )
-;;         ;keypath2                 (vec (rest sub-path))
-        
-;;         flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
-;;         other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
-;;         ;; client-param-path       (if (or (= base-type :flow-status)
-;;         ;;                                 ;;(= base-type :kit-status)
-;;         ;;                                 (= base-type :flow)) 
-;;         ;;                           flow-client-param-path 
-;;         ;;                           other-client-param-path )
-;;         client-param-path       other-client-param-path
-;;         client-keypath          (db/client-kp flow-key keypath base-type sub-path client-param-path)
-;;         ssp                     (db/break-up-flow-key-ext flow-key-orig)
-;;         req-client-kp           (db/client-kp flow-key-orig
-;;                                               (vec (db/break-up-flow-key flow-key-orig))
-;;                                               base-type
-;;                                               ssp
-;;                                               (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" "")))
-;;         ;;_ (ut/pp [:flow-key flow-key vars? flow-key-sub flow-key-split flow-key-split-sub]) ;; this
-;;         _ (when vars? (swap! db/param-var-mapping assoc [client-name client-keypath] req-client-kp))
-;;         _ (when vars? (swap! db/param-var-crosswalk assoc-in [client-name flow-key-orig] [flow-key [client-name client-keypath]]))
-;;         _ (when vars?
-;;             (swap! db/param-var-key-mapping assoc
-;;                    client-name
-;;                    (vec (distinct (conj (get @db/param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
-;;         lv                      (get @db/last-values keypath)]
-;;     ;; (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath
-;;     ;;         ;{:sub-path sub-path} 
-;;     ;;         flow-key])
-;;     ;; (when (get-in @flow-db/results-atom keypath) (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
-;;     (db/add-watcher keypath client-name send-reaction flow-key :param-sub)
-;;     (when (not signal?)
-;;       (kick client-name
-;;             [base-type client-param-path]
-;;             (db/get-starting-value base-type client-param-path sub-path keypath lv)
-;;             nil
-;;             nil
-;;             nil))
-;;     [:client-sub-request flow-id :step-id step-id :client-name client-name]))
-
 (defn sub-to-value
   [client-name flow-key & [signal?]] ;;; IF CHANGED, REMEMBER TO ALSO UPDATE "CLOVER-LOOKUP" -
   (let [flow-key-orig           flow-key
@@ -4054,7 +4002,7 @@
         keypath                 [flow-id step-id]
         sub-path                (db/break-up-flow-key-ext flow-key)
         base-type               (first sub-path)
-        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+        ;;flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
         ;; client-param-path       (if (or (= base-type :flow-status)
         ;;                                 ;;(= base-type :kit-status)
@@ -5095,7 +5043,10 @@
                         result-hash (hash result)]
                      ;(enqueue-task-sql-meta 
 
-                    (when (not= (hash honey-sql) (get-in @sniff-meta-guard [ui-keypath client-name])) ;; sniff & push meta only on new sql construct
+                    (when (or deep-meta?
+                              (and (not (= client-name :rvbbit))
+                                   (not= (hash honey-sql)
+                                         (get-in @sniff-meta-guard [ui-keypath client-name])))) ;; sniff & push meta only on new sql construct
                       (ut/pp [:sniff-meta! ui-keypath client-name])
                       (qp/slot-queue :sql-meta client-name
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?))))
