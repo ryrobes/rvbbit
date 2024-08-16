@@ -63,8 +63,9 @@
    )
   (:import
    [com.github.vertical_blank.sqlformatter SqlFormatter]
+   [org.eclipse.jetty.util.thread QueuedThreadPool]
    [java.nio.file Paths]
-   [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
+   [java.util.concurrent                  ThreadFactory Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
    [java.lang                              ProcessBuilder]
    [java.io                                BufferedReader InputStreamReader]))
 
@@ -6196,7 +6197,7 @@
 (defn pool-tasks-count [] (apply + (for [[_ v] @ppy/pool-exec-times] (count v))))
 
 (defn pools []
-  (vec (for [[k v] (merge {:websocket-thread-pool ppy/websocket-thread-pool ;; could move to organic?
+  (vec (for [[k v] (merge {:websocket-thread-pool @ppy/websocket-thread-pool-atom ;; could move to organic?
                            :general-scheduler-thread-pool ppy/general-scheduler-thread-pool} ;; has to be hardcoded since its a .FixedScheudulePool
                           @ppy/dyn-pools)] [v k])))
 
@@ -6482,7 +6483,8 @@
                 pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
                                                            :let [runs (get-in v [1 :tasks-run] 0)
                                                                  avgs (get-in v [1 :tasks-avg-ms] 0)]
-                                                           :when (> (get-in v [1 :current-pool-size]) 0)]
+                                                           ;:when (> (get-in v [1 :current-pool-size]) 0)
+                                                           ]
                                                        [k (get-in v [1 :current-pool-size])
                                                         {:runs runs
                                                          :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
@@ -6505,7 +6507,36 @@
                    :prev prev
                    :now ttls}))]))
 
+;; (show-pool-sizes-report)
 
+(defn show-reactor-sizes-report []
+  (ut/pp (vec (filter #(cstr/starts-with? (str %) ":time/") (distinct (apply concat (for [[_ v] @db/splitter-stats] (keys v)))))))
+
+  (ut/pp [:reactor (into {} (for [[k v] @db/splitter-stats]
+                              {k (into {} (for [[kk vv] v] {kk (get vv :cnt)}))}))])
+  (ut/pp [:reactor {:counts-by-type (into {}  (for [[k v] @db/splitter-stats] {k (count (keys v))}))}])
+  (ut/pp [:reactor (let [react-counts (apply concat (for [[_ v] @db/splitter-stats] (vals v)))
+                         updates (apply + (map :cnt react-counts))
+                         uptime  (db/reactor-uptime-seconds) ;; (ut/uptime-seconds)
+                         per-sec (ut/rnd (/ updates uptime) 2)]
+                     [:key-watchers-w-reactions (count react-counts)
+                      :watchers (last @watcher-usage)
+                      :updates updates
+                      :uptime-secs uptime
+                      :uptime (ut/format-duration-seconds  uptime)
+                      :per-sec per-sec
+                      :max-key-depth @db/key-depth-limit
+                      :clients (count @wl/sockets)
+                      :avg-cpu (ut/avgf @cpu-usage)])]))
+
+;; (show-reactor-sizes-report)
+
+;;  (show-pool-sizes-report)
+;;  (show-reactor-sizes-report)
+
+;; (ppy/reboot-websocket-thread-pool!)
+
+(println (net/log-pool-stats))
 
 
 ;;;(mapv (fn [x] (cstr/replace (str x) ":" "")) (keys (rvbbit-backend.websockets/stats-keywords)))
@@ -6913,7 +6944,7 @@
 
 
 (defn execute-websocket-task [f]
-  (.execute ppy/websocket-thread-pool f))
+  (.execute @ppy/websocket-thread-pool-atom f))
 
 (defn wrap-websocket-handler [handler]
   (fn [request]
@@ -6936,39 +6967,96 @@
 
 (def websocket-port 3030)
 
-(def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
+;; (def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
+
 ;; net/websocket-handler actually creates it own thread pool w https://github.com/clj-commons/dirigiste
 ;; TODO investigate, this could be where the long-term compute leak is coming from...
 
-(def ring-options
-  {:port                 websocket-port
-   :join?                false
-   :async?               true
-   :input-buffer-size    32768
-   :output-buffer-size   131072
-   ;:idle-timeout         500000  ;; Reduced idle timeout
-   ;:max-idle-time        3000000 ;; Reduced max idle time
-   ;;:max-idle-time        15000
-   :max-message-size     6291456 ;; 6MB
-   :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
-   :allow-null-path-info true})
-
-;; (def ring-options ;; using stock jetty pool (JVM shared, assumably)
+;; (def ring-options
 ;;   {:port                 websocket-port
 ;;    :join?                false
 ;;    :async?               true
-;;    :min-threads          1
-;;    :max-threads          50 ;; Increased max threads
-;;    :idle-timeout         10000
-;;    :max-idle-time        15000
-;;    ;:max-idle-time        15000
-;;    ;:input-buffer-size    131072 ;; default is 8192
-;;    ;:output-buffer-size   131072 ;; default is 32768
+;;    :input-buffer-size    32768
+;;    :output-buffer-size   131072
+;;    ;:idle-timeout         500000  ;; Reduced idle timeout
+;;    ;:max-idle-time        3000000 ;; Reduced max idle time
+;;    ;;:max-idle-time        15000
+;;    :max-message-size     6291456 ;; 6MB
+;;    :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
+;;    :allow-null-path-info true})
+
+(defn create-custom-thread-factory [prefix]
+  (let [thread-number (atom 0)
+        thread-group (Thread/currentThread)]
+    (reify ThreadFactory
+      (newThread [_ r]
+        (let [thread-name (format "%s-%d" prefix (swap! thread-number inc))]
+          (doto (Thread. thread-group r thread-name 0)
+            (.setDaemon true)
+            (.setPriority Thread/NORM_PRIORITY)))))))
+
+(def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
+
+(def ring-options ;; using stock jetty pool (JVM shared, assumably)
+  {:port                 websocket-port
+   :join?                false
+   :async?               true
+   :min-threads          1
+   :max-threads          50 ;; Increased max threads
+   :idle-timeout         30000
+   :thread-idle-timeout  30000 ; 30 seconds
+   :max-idle-time        15000
+   ;:max-idle-time        15000
+   ;:input-buffer-size    131072 ;; default is 8192
+   ;:output-buffer-size   131072 ;; default is 32768
+   :thread-factory       (create-custom-thread-factory "ring-ws")
+   :input-buffer-size    32768
+   :output-buffer-size   131072
+   :max-message-size     6291456 ;; 6MB
+   :websockets           ws-endpoints
+   :allow-null-path-info true})
+
+
+
+;; (defonce websocket-handler-atom (atom nil))
+
+;; (defn create-websocket-handler []
+;;   (net/websocket-handler {:encoding :edn}))
+
+;; (defn initialize-websocket-handler! []
+;;   (reset! websocket-handler-atom (create-websocket-handler)))
+
+;; (initialize-websocket-handler!)
+
+;; (def ws-endpoints {"/ws" @websocket-handler-atom})
+
+;; (defn reboot-websocket-handler! []
+;;   (let [old-handler @websocket-handler-atom
+;;         new-handler (create-websocket-handler)]
+;;     (reset! websocket-handler-atom new-handler)
+
+;;     ;; Close all existing connections
+;;     (when (and old-handler (instance? java.io.Closeable old-handler))
+;;       (.close ^java.io.Closeable old-handler))
+
+;;     ;; Update the ws-endpoints with the new handler
+;;     (alter-var-root #'ws-endpoints assoc "/ws" new-handler)
+
+;;     (println "Websocket handler rebooted")))
+
+;; (def ring-options
+;;   {:port                 websocket-port
+;;    :join?                false
+;;    :async?               true
 ;;    :input-buffer-size    32768
 ;;    :output-buffer-size   131072
 ;;    :max-message-size     6291456 ;; 6MB
-;;    :websockets           ws-endpoints
+;;    :websockets           {"/ws" (fn [request] (@websocket-handler-atom request))}
 ;;    :allow-null-path-info true})
+
+
+
+
 
 (defonce websocket-server (atom nil))
 
@@ -7014,6 +7102,10 @@
 
 (def web-server-port 8888) ;; 8888
 
+(defn create-custom-thread-pool [prefix min-threads max-threads idle-timeout]
+  (doto (QueuedThreadPool. (int max-threads) (int min-threads) (int idle-timeout))
+    (.setName prefix)))
+
 (def service
   {:env                     :prod
    ::http/routes            routes
@@ -7024,22 +7116,29 @@
    ::http/type              :jetty
    ::http/host              "0.0.0.0"
    ::http/port              web-server-port
-   ::http/container-options {:h2c? true :h2? false :ssl? false}})
+   ::http/container-options {:h2c? true :h2? false 
+                             :thread-pool (create-custom-thread-pool "RVBBIT-HTTP" 4 400 10000)
+                             :ssl? false}})
 
 (defonce runnable-service (server/create-server service))
 
 (def web-server (atom nil))
 
-(defn create-web-server!
-  []
+(defn create-web-server! []
   (ut/ppa [:starting-web-server :port web-server-port])
   (reset! web-server (server/start runnable-service)))
 
-(defn stop-web-server!
-  []
+(defn stop-web-server! []
   (ut/ppa [:shutting-down-web-server :port web-server-port])
   (when @web-server (server/stop @web-server) (reset! web-server nil)))
 
+(defn reboot-web-server! []
+  (stop-web-server!)
+  (Thread/sleep 5000)
+  (create-web-server!)) 
+
+
+;; (reboot-web-server!)
 
 
 

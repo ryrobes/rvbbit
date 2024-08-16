@@ -1177,7 +1177,7 @@
   ;;                              (ut/format-duration (get v :started) (System/currentTimeMillis)))))
   ;;                  "Update Solver Statuses")
 
-  ;; (start-scheduler (* 3600 3) ;; 3 hours
+  ;; (start-scheduler (* 3600 4) ;; every 4 hours, after 6 hours
   ;;                  #(do
   ;;                     (let [destinations (vec (keys @wss/client-queues))]
   ;;                       (doseq [d destinations]
@@ -1191,9 +1191,11 @@
   ;;                                     45)))
   ;;                     (Thread/sleep 10000)
   ;;                     (wss/destroy-websocket-server!)
+  ;;                     (wss/reboot-websocket-handler!)
+  ;;                     ;(ppy/reboot-websocket-thread-pool!)
   ;;                     (Thread/sleep 30000)
   ;;                     (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
-  ;;                  "Restart Websocket Server, Test Debug" (* 3600 3))
+  ;;                  "Restart Websocket Server, Test Debug" (* 3600 6))
 
   ;; (start-scheduler 15
   ;;                  #(let [dbs (wss/database-sizes)]

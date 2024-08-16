@@ -14,8 +14,18 @@
 (defonce general-scheduler-thread-pool
   (Executors/newScheduledThreadPool 8))
 
-(defonce websocket-thread-pool
-  (ThreadPoolExecutor. 100 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+;; (defonce websocket-thread-pool
+;;   (ThreadPoolExecutor. 100 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+
+(defonce websocket-thread-pool-atom
+  (atom (ThreadPoolExecutor. 100 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+
+(defn reboot-websocket-thread-pool! []
+  (let [old-pool @websocket-thread-pool-atom
+        new-pool (ThreadPoolExecutor. 100 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))]
+    (.shutdownNow old-pool)  ; Attempt to stop all actively executing tasks
+    (reset! websocket-thread-pool-atom new-pool)
+    (println "Websocket thread pool rebooted")))
 
 ;; (defonce general-scheduler-thread-pool
 ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
