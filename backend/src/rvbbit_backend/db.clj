@@ -6,39 +6,40 @@
    [clojure.set               :as cset]
    [clojure.walk              :as walk]
    [rvbbit-backend.pool-party :as ppy]
+   [rvbbit-backend.freezepop :as fpop]
    [rvbbit-backend.queue-party  :as qp]
    [flowmaps.db               :as flow-db]])
 
 (def key-depth-limit (atom 8)) 
 
-(defonce kit-atom (ut/thaw-atom {} "./data/atoms/kit-atom.edn"))
-(defonce father-time (ut/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
-(defonce screens-atom (atom {})) ;; (ut/thaw-atom {} "./data/atoms/screens-atom.edn"))
-(defonce server-atom (ut/thaw-atom {} "./data/atoms/server-atom.edn"))
+(defonce kit-atom (fpop/thaw-atom {} "./data/atoms/kit-atom.msgpack.transit"))
+(defonce father-time (fpop/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
+(defonce screens-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/screens-atom.edn"))
+(defonce server-atom (fpop/thaw-atom {} "./data/atoms/server-atom.edn"))
 (defonce flow-status (atom {}))
 (defonce kit-status (atom {}))
 (defonce runstream-atom (atom {}))
 (defonce params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
-(defonce panels-atom (ut/thaw-atom {} "./data/atoms/panels-atom.edn"))
+(defonce panels-atom (fpop/thaw-atom {} "./data/atoms/panels-atom.msgpack.transit"))
 (defonce solver-status (atom {}))
-(defonce query-metadata (ut/thaw-atom {} "./data/atoms/query-metadata.edn"))
-(defonce last-signals-history-atom (ut/thaw-atom {} "./data/atoms/last-signals-history-atom.edn"))
-(defonce last-signal-value-atom (ut/thaw-atom {} "./data/atoms/last-signal-value-atom.edn"))
-(defonce last-signals-atom-stamp (ut/thaw-atom {} "./data/atoms/last-signals-atom-stamp.edn"))
-(defonce last-solvers-atom (ut/thaw-atom {} "./data/atoms/last-solvers-atom.edn"))
-(defonce last-solvers-data-atom (ut/thaw-atom {} "./data/atoms/last-solvers-data-atom.edn"))
-(defonce last-solvers-atom-meta (ut/thaw-atom {} "./data/atoms/last-solvers-atom-meta.edn"))
-(defonce last-solvers-history-atom (ut/thaw-atom {} "./data/atoms/last-solvers-history-atom.edn"))
-(defonce last-solvers-history-counts-atom (ut/thaw-atom {} "./data/atoms/last-solvers-history-counts-atom.edn"))
-(defonce last-signals-atom (ut/thaw-atom {} "./data/atoms/last-signals-atom.edn"))
-(defonce repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
+(defonce query-metadata (fpop/thaw-atom {} "./data/atoms/query-metadata.msgpack.transit"))
+(defonce last-signals-history-atom (fpop/thaw-atom {} "./data/atoms/last-signals-history-atom.msgpack.transit"))
+(defonce last-signal-value-atom (fpop/thaw-atom {} "./data/atoms/last-signal-value-atom.msgpack.transit"))
+(defonce last-signals-atom-stamp (fpop/thaw-atom {} "./data/atoms/last-signals-atom-stamp.msgpack.transit"))
+(defonce last-solvers-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-atom.msgpack.transit"))
+(defonce last-solvers-data-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-data-atom.msgpack.transit"))
+(defonce last-solvers-atom-meta (fpop/thaw-atom {} "./data/atoms/last-solvers-atom-meta..msgpack.transit"))
+(defonce last-solvers-history-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-history-atom.msgpack.transit"))
+(defonce last-solvers-history-counts-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-history-counts-atom.msgpack.transit"))
+(defonce last-signals-atom (fpop/thaw-atom {} "./data/atoms/last-signals-atom.msgpack.transit"))
+(defonce repl-introspection-atom (fpop/thaw-atom {} "./data/atoms/repl-introspection-atom.msgpack.transit"))
 (defonce splitter-stats (volatile! {}))
 (defonce atoms-and-watchers (atom {}))
 (defonce watcher-log (atom {}))
 (defonce client-click-params (atom {}))
 
-(defonce last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
-(defonce last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
+(defonce last-values (fpop/thaw-atom {} "./data/atoms/last-values.msgpack.transit"))
+(defonce last-values-per (fpop/thaw-atom {} "./data/atoms/last-values-per.msgpack.transit"))
 
 (defonce param-var-mapping (atom {}))
 (defonce param-var-crosswalk (atom {}))
@@ -188,24 +189,41 @@
       (doseq [flow-key no-longer-needed]
         (unsub-atom-splitter-deep flow-key)))))
 
-(defn reboot-reactor! []
-  (doseq [ckp (vec (apply concat (for [[_ a] @sharded-atoms] (keys @a))))]
-    (unsub-atom-splitter-deep ckp))
-  (doseq [cn (keys @atoms-and-watchers)]
-    (ppy/reset-cached-thread-pools-wildcard (cstr/replace (str cn) ":" "")))
-  (reset! atoms-and-watchers {})
+(defn pool-cleaner! []
   (ppy/reset-cached-thread-pools-wildcard ":subscriptions")
   (ppy/reset-cached-thread-pools-wildcard ":watchers")
   (ppy/reset-cached-thread-pools-wildcard ":nrepl")
+  (ppy/reset-cached-thread-pools-wildcard ":serial-nrepl")
   (ppy/reset-cached-thread-pools-wildcard ":flow")
   (ppy/reset-cached-thread-pools-wildcard ":sql")
   (ppy/reset-cached-thread-pools-wildcard ":param")
   (ppy/reset-cached-thread-pools-wildcard ":client")
   (ppy/reset-cached-thread-pools-wildcard ":query")
   (ppy/reset-cached-thread-pools-wildcard ":signal")
-  (ppy/reset-cached-thread-pools-wildcard ":captured")
+  (ppy/reset-cached-thread-pools-wildcard ":captured"))
+
+;; (pool-cleaner!)
+;; (reboot-reactor!)
+
+(defn reboot-reactor! []
+  (doseq [ckp (vec (apply concat (for [[_ a] @sharded-atoms] (keys @a))))]
+    (unsub-atom-splitter-deep ckp))
+  (doseq [cn (keys @atoms-and-watchers)]
+    (ppy/reset-cached-thread-pools-wildcard (cstr/replace (str cn) ":" "")))
+  (reset! atoms-and-watchers {})
+  (pool-cleaner!)
+  ;; (ppy/reset-cached-thread-pools-wildcard ":subscriptions")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":watchers")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":nrepl")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":flow")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":sql")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":param")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":client")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":query")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":signal")
+  ;; (ppy/reset-cached-thread-pools-wildcard ":captured")
   (reset! reactor-boot-time (System/currentTimeMillis))
-  (qp/cleanup-inactive-queues 10)
+  ;; (qp/cleanup-inactive-queues 10)
   (vreset! splitter-stats  {}))
 
 (defn client-sub-latency []

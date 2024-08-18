@@ -5,8 +5,7 @@
    [clj-time.core :as t]
    [clj-time.format :as f]
    [clj-time.jdbc]
-   [clojure.core.async :as    async
-    :refer [<! <!! >! >!! chan go]]
+   [clojure.core.async :as    async :refer [<! <!! >! >!! chan go]]
    [clojure.core.async :refer [<! timeout]]
    [clojure.data :as data]
    [clojure.edn :as edn]
@@ -33,6 +32,7 @@
    ;[rvbbit-backend.reactor :as rkt]
    [rvbbit-backend.config :as config]
    [rvbbit-backend.db :as db]
+   [rvbbit-backend.freezepop :as fpop]
    [rvbbit-backend.cruiser :as cruiser]
    [rvbbit-backend.embeddings :as em]
    [rvbbit-backend.evaluator :as evl]
@@ -45,6 +45,7 @@
    [rvbbit-backend.util :as    ut
     :refer [ne?]]
    [rvbbit-backend.websockets :as wss]
+   [cognitect.transit :as transit]
    [shutdown.core :as shutdown]
    [taskpool.taskpool :as tp]
    [websocket-layer.core      :as wl]
@@ -53,6 +54,7 @@
   (:import
    [java.util Date]
    ;;[java.util.concurrent Executors TimeUnit]
+   [java.io ByteArrayInputStream ByteArrayOutputStream]
    [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ThreadPoolExecutor$CallerRunsPolicy]
    java.nio.file.Files
    java.nio.file.Paths
@@ -255,7 +257,7 @@
         (do (when poolable? (swap! wss/conn-map assoc conn-name conn))
             (when harvest-on-boot?
               ;(qp/slot-queue :schema-sniff f
-              (ppy/execute-in-thread-pools :conn-schema-sniff
+              (ppy/execute-in-thread-pools :conn-schema-sniff-serial 
                                            (fn []
                                              (cruiser/lets-give-it-a-whirl-no-viz f-path
                                                                                   conn
@@ -265,6 +267,8 @@
                                                                                   cruiser/default-derived-fields
                                                                                   cruiser/default-viz-shapes)))))
         (catch Exception e (do (swap! wss/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))))
+
+;; (update-all-conn-meta)
 
 (defn watch-connections-folder
   []
@@ -338,21 +342,28 @@
                     file-path)))
 
 
-(defn thaw-flow-results
-  []
-  (ut/pp [:thawing-flow-results-atom...])
-  (let [file-path "./data/atoms/flow-db-results-atom.edn"
-        file      (io/file file-path)
-        state     (if (.exists file)
-                    (with-open [rdr (io/reader file)]
-                      (try (edn/read (java.io.PushbackReader. rdr))
-                           (catch Exception e (do (ut/pp [:flow-results-thaw-atom-error!!!! file e]) (System/exit 0)))))
-                    {})]
-    (reset! flow-db/results-atom state)))
+;; (defn thaw-flow-results []
+;;   (ut/pp [:thawing-flow-results-atom...])
+;;   (let [file-path "./data/atoms/flow-db-results-atom.edn"
+;;         file      (io/file file-path)
+;;         state     (if (.exists file)
+;;                     (with-open [rdr (io/reader file)]
+;;                       (try (edn/read (java.io.PushbackReader. rdr))
+;;                            (catch Exception e (do (ut/pp [:flow-results-thaw-atom-error!!!! file e]) (System/exit 0)))))
+;;                     {})]
+;;     (reset! flow-db/results-atom state)))
+
+;; (defn freeze-flow-results []
+;;   (with-open [wtr (io/writer "./data/atoms/flow-db-results-atom.edn")]
+;;     (binding [*out* wtr] (prn @flow-db/results-atom)))) 
 
 
-(defn start-services
-  []
+
+
+
+
+
+(defn start-services []
   (ut/pp [:starting-services...])
   (evl/create-nrepl-server!) ;; needs to start
   (wss/reload-signals-subs) ;; run once on boot
@@ -447,7 +458,7 @@
   [& args]
   (ut/print-ansi-art "rrvbbit.ans")
   (qp/create-slot-queue-system)
-  (thaw-flow-results)
+  (fpop/thaw-flow-results)
   ;(sql/start-worker-sql)
   ;(wss/recycle-workers-sql-meta 5) ;; sql meta cnts
   #_{:clj-kondo/ignore [:inline-def]}
@@ -890,7 +901,7 @@
 
   ;;(tt/start!)
 
-  ;; (wss/subscribe-to-session-changes) ;; DISABLE BEHOLDER FOR NOW - mostly for external editing. cpu hog?
+  (wss/subscribe-to-session-changes) ;; DISABLE BEHOLDER FOR NOW - mostly for external editing. cpu hog?
 
 
   (defn reboot-websocket-server-long []
@@ -1097,6 +1108,20 @@
   ;;                         cruiser/default-viz-shapes))))
   ;;                  "(Re)Sniff Client SQL DBs" 30)
 
+    ;; (start-scheduler 30
+    ;;                #(qp/serial-slot-queue
+    ;;                  :re-sniff-cache-db :single
+    ;;                  (fn []
+    ;;                    (cruiser/lets-give-it-a-whirl-no-viz
+    ;;                     "cache.db"
+    ;;                     wss/cache-db
+    ;;                     system-db
+    ;;                     cruiser/default-sniff-tests
+    ;;                     cruiser/default-field-attributes
+    ;;                     cruiser/default-derived-fields
+    ;;                     cruiser/default-viz-shapes)))
+    ;;                "(Re)Sniff Cache SQL DB" 30)
+
   ;; (start-scheduler 600 ;; sketch for little gain?
   ;;                  db/clean-up-reactor
   ;;                  "Remove unneeded watchers from Reactor" 120)
@@ -1111,13 +1136,13 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler (* 3600 3) ;; 3 hours
-                   reboot-reactor-and-resub
-                   "Reboot Reactor, Subs, Pools" (* 3600 3))
-
-  ;; (start-scheduler (* 3600 8) ;; 8 hours - caused CPU freakout... queue party / sql-meta related? todo
+  ;; (start-scheduler (* 3600 3) ;; 3 hours (causes big cpu jump whne lots of clients present?)
   ;;                  reboot-reactor-and-resub
-  ;;                  "Reboot Atom Reactor & nREPL server" (* 3600 8))
+  ;;                  "Reboot Reactor, Subs, Pools" (* 3600 3))
+
+  ;; (start-scheduler (* 3600 3)
+  ;;                  db/pool-cleaner!
+  ;;                  "Pool Cleaner" (* 3600 3))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
@@ -1322,10 +1347,9 @@
                            (wss/destroy-websocket-server!)))
   (shutdown/add-hook! ::clear-cache
                       #(do (ut/ppa [:freezing-system-atoms])
-                           (ut/freeze-atoms)
+                           (fpop/freeze-atoms)
                            (ut/ppa [:freezing-flow-results-atom])
-                           (with-open [wtr (io/writer "./data/atoms/flow-db-results-atom.edn")]
-                             (binding [*out* wtr] (prn @flow-db/results-atom)))
+                           (fpop/freeze-flow-results)
                            (ut/zprint-file "./defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
                            (ut/zprint-file "./defs/solvers.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
                            ;(ut/ppa [:clearing-cache-db])

@@ -12,6 +12,7 @@
    [rvbbit-backend.util :as ut]
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.pool-party :as ppy]
+   [rvbbit-backend.surveyor :as svy]
    [taskpool.taskpool   :as tp]))
 
 
@@ -59,20 +60,30 @@
 
 
 
-
 (def system-db
   {:datasource
-     @(pool-create
-        {:jdbc-url
-           "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
+   @(pool-create
+     {:jdbc-url
+      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
            ;;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
-         :idle-timeout      600000
-         :maximum-pool-size 20
-         :max-lifetime      1800000
-         :cache             "shared"}
-        "system-db")})
+      :idle-timeout      600000
+      :maximum-pool-size 20
+      :max-lifetime      1800000
+      :cache             "shared"}
+     "system-db")})
+
+;; (def system-db ;; duck test 
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url "jdbc:duckdb:./db/system.duck"
+;;       ;:driver-class-name "org.duckdb.DuckDBDriver"
+;;       :idle-timeout      600000
+;;       :maximum-pool-size 20
+;;       :max-lifetime      1800000}
+;;      "system-db")})
+
 
 (def history-db
   {:datasource
@@ -81,7 +92,7 @@
       ;;;"jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-       "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
+      "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
       :idle-timeout      600000
       :maximum-pool-size 20
       :max-lifetime      1800000
@@ -127,16 +138,16 @@
 
 (def flows-db
   {:datasource
-     @(pool-create
-        {:jdbc-url
+   @(pool-create
+     {:jdbc-url
            ;"jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL"
            ;;&transaction_mode=IMMEDIATE&journal_mode=WAL"
-           "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" ;
-         :idle-timeout 600000
-         :max-lifetime 1800000
-         :auto_vacuum  "FULL"
-         :cache        "shared"}
-        "flows-db")})
+      "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" ;
+      :idle-timeout 600000
+      :max-lifetime 1800000
+      :auto_vacuum  "FULL"
+      :cache        "shared"}
+     "flows-db")})
 
 ;; (def flows-db
 ;;   {:datasource
@@ -163,7 +174,7 @@
 ;;      "flows-db")})
 
 (def ghost-db
-  {:datasource 
+  {:datasource
    @(pool-create
      {:jdbc-url     "jdbc:sqlite:file:./db/ghost.db?cache=shared&journal_mode=WAL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL"
       :idle-timeout 600000
@@ -196,12 +207,14 @@
                   (honey/format {:pretty false :inline true}))]
       (try (jdbc/db-do-commands sdb ins) (catch Exception e (ut/pp {:error-inserting-error e :query query}))))))
 
-(defonce errors (atom [])) ;; (ut/thaw-atom [] "./data/atoms/sql-errors.edn")) ;; no need to persist for now...
+(defonce errors (atom [])) ;; (fpop/thaw-atom [] "./data/atoms/sql-errors.edn")) ;; no need to persist for now...
+
+;; (ut/pp (take 100 (filter #(cstr/includes? (str %) "cache-db-pool") @errors)))
 
 (defn insert-error-row!
   [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
   (swap! errors conj [(str error) (str error-db-conn) query])
-  ;; (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))})
+  (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 400) (catch Throwable _ (str query)))})
   )
 
 
@@ -229,7 +242,7 @@
 (def sql-queries-run (atom 0))
 (def sql-query-log (atom []))
 
-(ut/pp (take 100 @sql-query-log))
+;; (ut/pp (take 100 @sql-query-log))
 ;; (reset! sql-query-log [])
 
 ;; (defn sql-query ;; pre timing... keep 
@@ -259,19 +272,19 @@
               end-time (System/nanoTime) ;; Capture end time
               execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
           (swap! sql-query-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
-                                     (str (try (subs (str query) 0 100)
-                                                             (catch Throwable _ (str query))) "-" (hash query)) execution-time-ms])
+                                     (str (try (subs (str query) 0 300)
+                                               (catch Throwable _ (str query))) "-" (hash query)) execution-time-ms])
           ;;(conj result {:execution_time_ms execution-time-ms})
           result) ;; Return result with execution time
         (catch Exception e
           (let [end-time (System/nanoTime) ;; Capture end time in case of exception
                 execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
             (do ;(ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
-                (insert-error-row! db-spec query e)
-                [{:query_error (str (.getMessage e))} 
-                 {:query_error "(from database connection)"}
-                 {:query_error (subs (str db-spec) 0 50)}
-                 {:execution_time_ms execution-time-ms}])))))))  
+              (insert-error-row! db-spec query e)
+              [{:query_error (str (.getMessage e))}
+               {:query_error "(from database connection)"}
+               {:query_error (subs (str db-spec) 0 150)}
+               {:execution_time_ms execution-time-ms}])))))))
 
 
 
@@ -298,11 +311,11 @@
 (defn sql-exec2-old ;; used for rowset-sql-query, diff use case, not need to run serially
   [db-spec query & [extra]]
   (jdbc/with-db-transaction [t-con db-spec {:isolation :read-uncommitted}]
-                            (try (jdbc/db-do-commands t-con query)
-                                 (catch Exception e
-                                   (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec :query query}
-                                                     (if extra {:ex extra} {})))
-                                       (insert-error-row! db-spec query e))))))
+    (try (jdbc/db-do-commands t-con query)
+         (catch Exception e
+           (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec :query query}
+                             (if extra {:ex extra} {})))
+               (insert-error-row! db-spec query e))))))
 
 
 
@@ -389,22 +402,22 @@
   (let [;queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)
         db-kw (-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)]
      ;(qp/serial-slot-queue :sql-serial :sql
-     (ppy/execute-in-thread-pools-but-deliver :sqlite-serial-writes
+    (ppy/execute-in-thread-pools-but-deliver :sqlite-serial-writes
      ;(keyword (str "sql-serial/" (cstr/replace (str db-kw) ":" ""))) ;; :sql-serial db-kw ;; (str db-spec) ;; queue-name
-     (fn []
-       (swap! sql-exec-run inc)
-       (swap! sql-exec-log conj [db-kw
-                                 (str (try (subs (str query) 0 100)
-                                           (catch Throwable _ (str query))))])
-       (jdbc/with-db-connection [t-con db-spec]
-         (try (jdbc/db-do-commands t-con query)
-              (catch Exception e
-                (do ;(ut/pp (merge {:sql-exec-fn-error e
+                                             (fn []
+                                               (swap! sql-exec-run inc)
+                                               (swap! sql-exec-log conj [db-kw
+                                                                         (str (try (subs (str query) 0 300)
+                                                                                   (catch Throwable _ (str query))))])
+                                               (jdbc/with-db-connection [t-con db-spec]
+                                                 (try (jdbc/db-do-commands t-con query)
+                                                      (catch Exception e
+                                                        (do ;(ut/pp (merge {:sql-exec-fn-error e
                     ;               :db-spec           db-spec
                     ;               :query             (try (subs (str query) 0 1000)
                     ;                                       (catch Throwable _ (str query)))}
                     ;              (if extra {:ex extra} {})))
-                    (insert-error-row! db-spec query e)))))))))
+                                                          (insert-error-row! db-spec query e)))))))))
 
 
 
@@ -414,20 +427,20 @@
   (let [queue-name (str db-spec)]
     ;(qp/serial-slot-queue :sql-serial2 queue-name
     (ppy/execute-in-thread-pools-but-deliver :sqlite-serial-writes ;;:serial-filter-sql-db
-     (fn []
-       (swap! sql-exec-run inc)
-       (swap! sql-exec-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
-                                 (str (try (subs (str query) 0 100)
-                                           (catch Throwable _ (str query))))])
-       (jdbc/with-db-connection [t-con db-spec]
-         (try (jdbc/db-do-commands t-con query)
-              (catch Exception e
-                (do ;(ut/pp (merge {:sql-exec-fn-error e
+                                             (fn []
+                                               (swap! sql-exec-run inc)
+                                               (swap! sql-exec-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
+                                                                         (str (try (subs (str query) 0 300)
+                                                                                   (catch Throwable _ (str query))))])
+                                               (jdbc/with-db-connection [t-con db-spec]
+                                                 (try (jdbc/db-do-commands t-con query)
+                                                      (catch Exception e
+                                                        (do ;(ut/pp (merge {:sql-exec-fn-error e
                     ;               :db-spec           db-spec
                     ;               :query             (try (subs (str query) 0 1000)
                     ;                                       (catch Throwable _ (str query)))}
                     ;              (if extra {:ex extra} {})))
-                    (insert-error-row! db-spec query e)))))))))
+                                                          (insert-error-row! db-spec query e)))))))))
 
 
 
@@ -437,11 +450,11 @@
 (defn sql-exec-no-t ;; older experiment from ducksdb - jdbc driver didnt support db-do-commands
   [db-spec query & [extra]]
   (jdbc/with-db-connection [conn db-spec]
-                           (try (.execute conn query) ; Directly executing the query
-                                (catch Exception e
-                                  (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec :query query}
-                                                    (if extra {:ex extra} {})))
-                                      (insert-error-row! db-spec query e))))))
+    (try (.execute conn query) ; Directly executing the query
+         (catch Exception e
+           (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec :query query}
+                             (if extra {:ex extra} {})))
+               (insert-error-row! db-spec query e))))))
 
 (defn sql-exec-33333
   [db-spec query & [extra]]
@@ -521,34 +534,34 @@
         value-keys (filter #(or (cstr/starts-with? (str %) ":tests/")
                                 (cstr/starts-with? (str %) ":sample/")
                                 (cstr/starts-with? (str %) ":attributes/"))
-                     key-farm)
+                           key-farm)
         value-keys?
-          #_{:clj-kondo/ignore [:not-empty?]}
-          (and (not (empty? value-keys)) (not (nil? key-vector)) (not (nil? system-db)))
+        #_{:clj-kondo/ignore [:not-empty?]}
+        (and (not (empty? value-keys)) (not (nil? key-vector)) (not (nil? system-db)))
         value-mapping (if value-keys? (into {} (for [v value-keys] {v (lookup-value key-vector v system-db)})) {})
         hm (walk/postwalk-replace value-mapping honey-map) ; (walk/postwalk {} honey-map)
         fixed-honey-map
-          (cond (and (= sql-dialect :sqlserver) (get hm :limit)) (let [limit           (get hm :limit)
-                                                                       select-distinct (get hm :select-distinct)
-                                                                       select          (get hm :select)]
-                                                                   (cond select-distinct (dissoc (dissoc
-                                                                                                   (assoc hm
-                                                                                                     :select-distinct-top
+        (cond (and (= sql-dialect :sqlserver) (get hm :limit)) (let [limit           (get hm :limit)
+                                                                     select-distinct (get hm :select-distinct)
+                                                                     select          (get hm :select)]
+                                                                 (cond select-distinct (dissoc (dissoc
+                                                                                                (assoc hm
+                                                                                                       :select-distinct-top
                                                                                                        (vec (cons
-                                                                                                              [limit]
-                                                                                                              select-distinct)))
-                                                                                                   :select-distinct)
-                                                                                           :limit)
-                                                                         select          (dissoc (dissoc (assoc hm
-                                                                                                           :select-top
-                                                                                                             (vec (cons [limit]
-                                                                                                                        select)))
-                                                                                                   :select)
-                                                                                           :limit)
-                                                                         :else           ["sqlserver top issue"]))
-                (and (= sql-dialect :oracle) (get hm :limit))    (let [limit (get hm :limit)]
-                                                                   (dissoc (assoc hm :fetch limit) :limit))
-                :else                                            hm)]
+                                                                                                             [limit]
+                                                                                                             select-distinct)))
+                                                                                                :select-distinct)
+                                                                                               :limit)
+                                                                       select          (dissoc (dissoc (assoc hm
+                                                                                                              :select-top
+                                                                                                              (vec (cons [limit]
+                                                                                                                         select)))
+                                                                                                       :select)
+                                                                                               :limit)
+                                                                       :else           ["sqlserver top issue"]))
+              (and (= sql-dialect :oracle) (get hm :limit))    (let [limit (get hm :limit)]
+                                                                 (dissoc (assoc hm :fetch limit) :limit))
+              :else                                            hm)]
     (try (-> fixed-honey-map
              (honey/format (merge {:pretty true :inline true} (if (nil? sql-dialect) {} {:dialect sql-dialect}))))
          (catch Exception e
@@ -571,7 +584,7 @@
   [db-spec query & [extra]]
   (jdbc/with-db-transaction [t-con db-spec {:isolation :repeatable-read}] ;; {:isolation
                                                                           ;; :read-uncommitted}
-                            (jdbc/db-do-commands t-con query)))
+    (jdbc/db-do-commands t-con query)))
 
 (defn safe-sql-exec-helper
   [db query]

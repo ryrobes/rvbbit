@@ -1430,21 +1430,65 @@
           (insert-error-row! target-db (str (str e) (.toString sw)) {:sql-filter sql-filter})
           )))))
 
+;; (defn insert-rowset
+;;   [rowset table-name db-conn & columns-vec] ;; special version for captured sniff
+;;   (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
+;;                               (and (not (map? (first rowset))) (vector? rowset)) :vectors)
+;;         columns-vec-arg (first columns-vec)
+;;         rowset-fixed    (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec-arg r))) rowset)
+;;         columns         (keys (first rowset-fixed))
+;;         values          (vec (for [r rowset-fixed] (vals r)))
+;;         table-name-str  (ut/unkeyword table-name)
+;;         ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
+;;         insert-sql      (to-sql {:insert-into [table-name] :columns columns :values values})
+;;         extra           [ddl-str columns-vec-arg table-name table-name-str]]
+;;     (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
+;;     (sql-exec db-conn ddl-str extra)
+;;     (sql-exec db-conn insert-sql extra)))
+
 (defn insert-rowset
-  [rowset table-name db-conn & columns-vec] ;; special version for captured sniff
-  (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
-                              (and (not (map? (first rowset))) (vector? rowset)) :vectors)
-        columns-vec-arg (first columns-vec)
-        rowset-fixed    (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec-arg r))) rowset)
-        columns         (keys (first rowset-fixed))
-        values          (vec (for [r rowset-fixed] (vals r)))
-        table-name-str  (ut/unkeyword table-name)
-        ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
-        insert-sql      (to-sql {:insert-into [table-name] :columns columns :values values})
-        extra           [ddl-str columns-vec-arg table-name table-name-str]]
-    (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
-    (sql-exec db-conn ddl-str extra)
-    (sql-exec db-conn insert-sql extra)))
+  [rowset table-name db-conn & columns-vec]
+  ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
+  (if (ut/ne? rowset)
+    (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
+                                     (and (not (map? (first rowset))) (vector? rowset)) :vectors)
+               columns-vec-arg columns-vec
+               ;db-conn         (or db-conn cache-db)
+               db-type         (surveyor/db-typer db-conn)
+               rowset-fixed    (if (= rowset-type :vectors)
+                                 (for [r rowset] (zipmap columns-vec-arg r))
+                                 rowset)
+               columns         (keys (first rowset-fixed))
+               table-name-str  (ut/unkeyword table-name)
+               ;table-name-str  (ut/unkeyword (str client-name "_" table-name))
+               ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed db-type)
+               extra           {;:queue (if (= db-conn cache-db) nil queue-name)
+                                :extras [ddl-str columns-vec-arg table-name table-name-str]}]
+           ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
+           ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
+           ;(write-transit-data rowset-fixed keypath client-name table-name-str)
+           (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
+           (sql-exec db-conn ddl-str extra)
+           (doseq [batch (partition-all 10 rowset-fixed)
+                   :let  [values     (vec (for [r batch] (vals r)))
+                          insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
+             (sql-exec db-conn insert-sql extra))
+
+          ;;  (cruiser/captured-sniff "cache.db"
+          ;;                          db-conn
+          ;;                          db-conn
+          ;;                          cache-db
+          ;;                          (hash rowset-fixed)
+          ;;                          [:= :table-name table-name]
+          ;;                          true
+          ;;                          rowset-fixed
+          ;;                          client-name)
+
+           (ut/pp [:CRUISER-INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
+           {:sql-cache-table table-name :rows (count rowset)})
+         (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
+    (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
+
 
 (def sniff-cache (atom {}))
 
@@ -1452,34 +1496,40 @@
 
 (def tmp-db-src1
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
-                              :cache       "shared"}
+                              ;:auto_vacuum "FULL"
+                              :cache       "shared"
+                              }
                              "tmp-db-src1")})
 (def tmp-db-src2
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
-                              :cache       "shared"}
+                              ;:auto_vacuum "FULL"
+                              :cache       "shared"
+                              }
                              "tmp-db-src2")})
 (def tmp-db-src3
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
-                              :cache       "shared"}
+                              ;:auto_vacuum "FULL"
+                              :cache       "shared"
+                              }
                              "tmp-db-src3")})
 
 (def tmp-db-dest1
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
-                              :cache       "shared"}
+                              ;:auto_vacuum "FULL"
+                              :cache       "shared"
+                              }
                              "tmp-db-dest1")})
 (def tmp-db-dest2
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
-                              :cache       "shared"}
+                              ;:auto_vacuum "FULL"
+                              :cache       "shared"
+                              }
                              "tmp-db-dest2")})
 (def tmp-db-dest3
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
-                              :cache       "shared"}
+                              ;:auto_vacuum "FULL"
+                              :cache       "shared"
+                              }
                              "tmp-db-dest3")})
 
 (create-sqlite-sys-tables-if-needed! tmp-db-dest1)
@@ -1492,9 +1542,10 @@
 ;; (ut/pp @sql/client-db-pools)
 
 (defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
- (ppy/execute-in-thread-pools
-  :captured-sniff ;; (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
-  (fn [] (swap! sniffs inc)
+ ;(ppy/execute-in-thread-pools
+  ;:captured-sniff ;; (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
+  ;(fn [] 
+    (swap! sniffs inc)
     (doall
      (let [res?     (not (nil? resultset))
            cols     (keys (first resultset))
@@ -1530,7 +1581,7 @@
                               ;(to-sql {:drop-table [(last sql-filter)]})
                               (to-sql {:drop-table (keyword (last sql-filter))})
                               )) ;)
-         nil))))))
+         nil))));))
 
 
 

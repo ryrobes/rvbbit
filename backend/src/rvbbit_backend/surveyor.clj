@@ -1,11 +1,10 @@
 (ns rvbbit-backend.surveyor
   (:require
-    [clojure.java.jdbc   :as jdbc]
-    [clojure.string      :as cstr]
-    [java-time.api       :as jt]
-    [rvbbit-backend.util :as ut]
-    ;[tea-time.core       :as tt]
-   ))
+   [clojure.java.jdbc   :as jdbc]
+   [clojure.string      :as cstr]
+   [java-time.api       :as jt]
+   [rvbbit-backend.util :as ut]
+   [clojure.core.memoize :as memo]))
 
 (defn jdbc-conn-good? [conn] true)
 
@@ -93,3 +92,10 @@
                         (:table_name table-map) (:column_name field)]
                          {:column_type (:type_name field) :meta_ddl_gen (jt/instant)}}))))))
 
+(defn db-typer-fn [db-conn]
+  (try 
+    (get (jdbc-connect-meta db-conn "test") :database_name "Unknown")
+    (catch Exception _ "Error")))
+
+(def db-typer
+  (memo/lru db-typer-fn :lru/threshold 100))

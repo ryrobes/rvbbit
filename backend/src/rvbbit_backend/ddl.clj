@@ -622,6 +622,592 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 
 
+
+
+
+
+
+
+;; (def create-status
+;;   "create table if not exists status 
+;;   (client_name text NULL,
+;;    op_name text NULL,
+;;    status text NULL,
+;;    -- ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ts TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')) 
+;;    ) ;")
+
+;; (def create-errors
+;;   "create table if not exists errors 
+;;   (db_conn text NULL,
+;;    sql_stmt text NULL,
+;;    error_str text NULL,
+;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ) ;")
+
+;; (def create-screens
+;;   "create table if not exists screens 
+;;   (file_path text NULL,
+;;    screen_name text NULL,
+;;    blocks integer NULL,
+;;    queries integer NULL,
+;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ) ;")
+
+;; (def create-blocks
+;;   "create table if not exists blocks 
+;;   (file_path text NULL, 
+;;    screen_name text NULL,
+;;    block_key text NULL,
+;;    block_name text NULL,
+;;    views integer NULL,
+;;    queries integer NULL,
+;;    view_names text NULL,
+;;    query_names text NULL, 
+;;    block_data text NULL,
+;;    tab_name text NULL,
+;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ) ;")
+
+;; (def create-boards
+;;   "create table if not exists boards
+;;   (file_path text NULL, 
+;;    screen_name text NULL,
+;;    board_name text NULL,
+;;    board_data text NULL,
+;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ) ;")
+
+;; (def create-tests
+;;   "create table if not exists tests
+;;   (db_type text NULL,
+;;    connection_id text NULL,
+;;    table_type text NULL,
+;;    db_schema text NULL,
+;;    db_catalog text NULL,
+;;    table_name text NULL,
+;;    field_name text NULL, 
+;;    field_type text NULL,
+;;    data_type text NULL, 
+;;    key_hash text NULL,
+;;    context_hash text NULL,
+;;    derived_calc text NULL,
+;;    derived_name text NULL,
+;;    is_sample integer NULL,  
+;;    test_sql text NULL, 
+;;    test_raw_val text NULL,
+;;    test_name text NULL,
+;;    test_val_string text NULL,
+;;    test_val_integer integer NULL,
+;;    test_val_float float NULL,
+;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;    run_id integer NULL) ;")
+
+;; (def create-attributes
+;;   "create table if not exists attributes
+;;   (db_type text NULL,
+;;    connection_id text NULL,
+;;    table_type text NULL,
+;;    db_schema text NULL,
+;;    db_catalog text NULL,
+;;    table_name text NULL,
+;;    field_name text NULL,
+;;    key_hash text NULL,
+;;    context_hash text NULL,
+;;    derived_calc text NULL,
+;;    derived_name text NULL,
+;;    attribute_name text NULL,
+;;    attribute_value boolean NULL,
+;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;    run_id integer NULL
+;;    -- primary key (connection_id, attribute_name)
+;;    -- PK later when we figure out update semantics 
+;;    ) ;")
+
+;; (def create-found-fields
+;;   "create table if not exists found_fields 
+;;   (db_type text NULL,
+;;    connection_id text NULL,
+;;    table_type text NULL,
+;;    db_schema text NULL,
+;;    db_catalog text NULL,
+;;    table_name text NULL,
+;;    field_name text NULL,
+;;    derived_calc text NULL,
+;;    derived_name text NULL,
+;;    context_hash text NULL, 
+;;    key_hash text NULL,
+;;    shape_name text NULL, 
+;;    axes_key text NULL,
+;;    logic_map text NULL, 
+;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;    run_id integer NULL
+;;    -- primary key (connection_id, attribute_name)
+;;    -- PK later when we figure out update semantics 
+;;    ) ;")
+
+;; (def create-connections
+;;   "create table if not exists connections
+;;    (connection_id text, 
+;;     connection_str text, 
+;;     user_name text NULL, 
+;;     database_name text NULL, 
+;;     database_version text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;     original_connection_str text NULL, 
+;;     metadata_filter text NULL,
+;;     run_id integer NULL,
+;;     started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;     ended_at TIMESTAMP NULL --,
+;;     -- primary key (connection_id)
+;;     ) ;")
+
+;; (def create-fields
+;;   "create table if not exists fields
+;;   (db_type text NULL,
+;;    connection_id text NULL,
+;;    table_type text NULL,
+;;    db_schema text NULL,
+;;    db_catalog text NULL,
+;;    table_name text NULL,
+;;    field_name text NULL, 
+;;    field_type text NULL,
+;;    data_type text NULL, 
+;;    context_hash text NULL,
+;;    key_hash text NULL,
+;;    is_group_by boolean NULL,
+;;    derived_calc text NULL, 
+;;    derived_name text NULL,
+;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;    run_id integer NULL --,
+;;    -- primary key (db_type, connection_id, table_type, db_schema, db_catalog, table_name, field_name, derived_calc)
+;;    ) ;")
+
+;; (def create-combos
+;;   "create table if not exists combos
+;;   (context_hash text NULL,
+;;    uuid text NULL,
+;;    combo_hash text NULL,
+;;    connection_id text NULL,                    
+;;    shape_name text NULL,
+;;    table_name text NULL,    
+;;    selected_view text NULL,
+;;    query_map text NULL,
+;;    query_map_str text NULL,
+;;    viz_map text NULL,
+;;    conditionals text NULL,
+;;    key_hashes text NULL,
+;;    key_hashes_hash text NULL,
+;;    h integer NULL,
+;;    w integer NULL,
+;;    score real NULL,
+;;    combo_edn text NULL) ;")
+
+;; (def create-combo-rows
+;;   "create table if not exists combo_rows
+;;   (context_hash text NULL,
+;;    combo_hash text NULL,
+;;    connection_id text NULL,                    
+;;    shape_name text NULL,
+;;    axes text NULL,   
+;;    talias text NULL,                        
+;;    walk1 text NULL,                        
+;;    walk2 text NULL,
+;;    walk3 text NULL,
+;;    walka text NULL,                        
+;;    key_hash text NULL,
+;;    table_type text NULL,                
+;;    field_type text NULL,
+;;    data_type text NULL, 
+;;    db_type text NULL,
+;;    db_schema text NULL,
+;;    db_catalog text NULL,
+;;    table_name text NULL,
+;;    field_name text NULL,
+;;    derived_calc text NULL,
+;;    derived_name text NULL,
+;;    score0 real NULL,
+;;    score1 real NULL,
+;;    score2 real NULL) ;")
+
+;; (def create-rules-table0
+;;   "create table if not exists rule_maps_tests
+;;    (connection_id text NULL,
+;;     run_id integer NULL,
+;;    test_name text NULL, 
+;;     sql_map text NULL, 
+;;     when_logic text NULL, 
+;;     fetch_one text NULL
+;;     ) ;")
+
+;; (def create-rules-table1
+;;   "create table if not exists rule_maps_attributes
+;;    (connection_id text NULL,
+;;     run_id integer NULL,
+;;     attribute_name text NULL, 
+;;     when_logic text NULL
+;;     ) ;")
+
+;; (def create-rules-table2
+;;   " create table if not exists rule_maps_derived_fields
+;;    (connection_id text NULL,
+;;     run_id integer NULL,
+;;    field_name text NULL, 
+;;     when_logic text NULL, 
+;;     calc_logic text NULL
+;;     ) ;")
+
+;; (def create-rules-table3
+;;   " create table if not exists rule_maps_viz_shapes
+;;    (connection_id text NULL,
+;;     run_id integer NULL,
+;;     shape_name text NULL, 
+;;     axes_logic text NULL,    
+;;     sql_maps text NULL, 
+;;     base_score integer NULL,
+;;     selected_view text NULL,
+;;     library_shapes text NULL
+;;     ) ;")
+
+;; (def create-logs
+;;   "create table if not exists logs
+;;    (booted text NULL,
+;;     ts number NULL, 
+;;     hts text NULL, 
+;;     caller text NULL,
+;;     type_key text NULL,              
+;;     log_str text NULL) ;")
+
+;; (def create-tables
+;;   "create table if not exists connections
+;;    (connection_hash text NULL, 
+;;     connection_str text NULL, 
+;;     user_name text NULL, 
+;;     product_name text NULL, 
+;;     product_version text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;     run_id integer NULL) ;")
+
+;; (def create-viz
+;;   "create table if not exists connections
+;;    (connection_hash text NULL, 
+;;     connection_str text NULL, 
+;;     user_name text NULL, 
+;;     product_name text NULL, 
+;;     product_version text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+;;     run_id integer NULL) ;")
+
+;; ;; {:kp (str kp) :client_name (str client-name) :data (pr-str data) :panel-key (str (get kp 0))
+;; ;; :key
+;; ;; (str (get
+;; ;; kp 2)) :type (str (get kp 1))}
+
+;; (def create-panel-history
+;;   "create table if not exists panel_history
+;;    (kp text NULL, 
+;;     client_name text NULL, 
+;;     data text NULL, 
+;;     pre_data text NULL,
+;;     diff text NULL,     
+;;     diff_kp text NULL,                           
+;;     panel_key text NULL, 
+;;     key text NULL,
+;;     type text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-panel-resolved-history
+;;   "create table if not exists panel_resolved_history
+;;    (kp text NULL, 
+;;     client_name text NULL, 
+;;     data text NULL, 
+;;     pre_data text NULL,
+;;     diff text NULL,     
+;;     diff_kp text NULL,                           
+;;     panel_key text NULL, 
+;;     key text NULL,
+;;     type text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-panel-materialized-history
+;;   "create table if not exists panel_materialized_history
+;;    (kp text NULL, 
+;;     client_name text NULL, 
+;;     data text NULL, 
+;;     pre_data text NULL,
+;;     diff text NULL,     
+;;     diff_kp text NULL,                           
+;;     panel_key text NULL, 
+;;     key text NULL,
+;;     type text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+
+
+;; (def create-board-history
+;;   "create table if not exists board_history
+;;    (client_name text NULL, 
+;;     data text NULL, 
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-flow-functions
+;;   "create table if not exists flow_functions
+;;    (connection_id text NULL,
+;;     run_id integer NULL,
+;;     category text NULL, 
+;;     sub_flow text NULL,
+;;     name text NULL, 
+;;     full_map text NULL,
+;;     description text NULL,
+;;     file_path text NULL,
+;;     inputs text NULL,
+;;     icon text NULL,
+;;     input_types text NULL,
+;;     output_types text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-kits
+;;   "create table if not exists kits
+;;    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+;;     item_hash text NULL, 
+;;     item_name text NULL,
+;;     kit_name text NULL,
+;;     item_type text NULL,
+;;     item_key text NULL,
+;;     item_idx integer NULL,   
+;;     item_options text NULL,
+;;     item_data text NULL, 
+;;     client_name text NULL,
+;;     flow_id text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-flow-schedules
+;;   "create table if not exists flow_schedules
+;;    (schedule text NULL,
+;;     flow_id text NULL,
+;;     opts text NULL,
+;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; ;; ^^^ query_hash, type, query_id, kit_name,   key,    idx,  edn_data
+;; ;; (no client-id so we can "reuse" persistent calls if wanted)
+;; ;; use the existing insert-queue?
+
+;; ;; :used_memory_mb :thread_count :sql_cache_size
+;; (def create-client-stats
+;;   "create table if not exists client_stats
+;;    (client_name text NULL,
+;;     ack integer NULL,
+;;     client_latency integer NULL,
+;;     client_subs integer NULL,
+;;     last_seen text NULL,
+;;     memory text NULL,
+;;     push integer NULL,
+;;     queue_size integer NULL,
+;;     server_subs integer NULL,     
+;;     last_seen_seconds integer NULL,
+;;     booted_ts integer NULL,
+;;     queue_distro text NULL,
+;;     uptime_seconds integer NULL,
+;;     uptime text NULL,
+;;     messages_per_second integer NULL,
+;;     recent_messages_per_second integer NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-jvm-stats
+;;   "create table if not exists jvm_stats
+;;    (used_memory_mb integer NULL, 
+;;     thread_count integer NULL, 
+;;     messages integer NULL,
+;;     batches integer NULL,
+;;     recent_batches integer NULL,
+;;     recent_batches_per_second float NULL,
+;;     batches_per_second float NULL,
+;;     unix_ms integer NULL,
+;;     messages_per_second float NULL,
+;;     recent_messages integer NULL,
+;;     recent_messages_per_second float NULL,
+;;     recent_queries_run integer NULL,
+;;     recent_queries_per_second float NULL,
+;;     queries_per_second float NULL,
+;;     sql_cache_size integer NULL, 
+;;     ws_peers integer NULL,
+;;     subscriptions integer NULL,
+;;     open_flow_channels integer NULL,
+;;     uptime_seconds integer NULL,
+;;     seconds_since_last_update integer NULL,
+;;     queries_run integer NULL,
+;;     internal_queries_run integer NULL,
+;;     sniffs_run integer NULL,
+;;     sys_load real NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-flows
+;;   "create table if not exists flows
+;;   (file_path text NULL,
+;;    flow_id text NULL,
+;;    components integer NULL,
+;;    connections integer NULL,
+;;    last_modified text NULL,
+;;    body text NULL,
+;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ) ;")
+
+;; (def create-flow-history
+;;   "create table if not exists flow_history
+;;   (flow_id text NULL,
+;;    run_id text NULL,
+;;    parent_run_id text NULL,
+;;    client_name text NULL,
+;;    orig_flow_id text NULL,
+;;    in_error boolean NULL,
+;;    started integer NULL,
+;;    start_ts text NULL,
+;;    ended integer NULL,
+;;    elapsed real NULL,
+;;    elapsed_seconds real NULL,
+;;    human_elapsed text NULL,
+;;    overrides text NULL,
+;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+;;    ) ;")
+
+;; (def create-flow-results
+;;   "create table if not exists flow_results
+;;    (flow_id text NULL,
+;;     block_key text NULL,
+;;     block_value text NULL,                      
+;;     data_type text NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-live-schedules
+;;   "create table if not exists live_schedules
+;;    (flow_id text NULL,
+;;     override text NULL,
+;;     schedule text NULL,
+;;     channel text NULL,
+;;     next_times text NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-channel-history
+;;   "create table if not exists channel_history
+;;    (flow_id text NULL,
+;;     run_id text NULL,
+;;     base_flow_id text NULL,
+;;     channel text NULL,
+;;     data_type text NULL,                      
+;;     dest text NULL,
+;;     end_ts text NULL,
+;;     start_ts text NULL,
+;;     end number NULL,
+;;     path text NULL,
+;;     start number NULL,
+;;     type text NULL,
+;;     value text NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-fn-history
+;;   "create table if not exists fn_history
+;;    (flow_id text NULL,
+;;     run_id text NULL,
+;;     base_flow_id text NULL,
+;;     channel text NULL,
+;;     block text NULL,                        
+;;     data_type text NULL,         
+;;     end_ts text NULL,
+;;     start_ts text NULL,
+;;     dbgn text NULL,
+;;     elapsed_ms integer NULL,
+;;     from_block text NULL,
+;;     dest text NULL,
+;;     end number NULL,
+;;     path text NULL,
+;;     view text NULL,
+;;     start number NULL,
+;;     type text NULL,
+;;     value text NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-client-items
+;;   "create table if not exists client_items
+;;    (item_key text NULL,
+;;     item_type text NULL,
+;;     item_sub_type text NULL,
+;;     value text NULL,
+;;     is_live boolean NULL,
+;;     sample text NULL,
+;;     display_name text NULL,
+;;     block_meta text NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+;; (def create-client-memory
+;;   "create table if not exists client_memory
+;;    (mem_time text NULL,
+;;     client_name text NULL,
+;;     packets integer NULL,
+;;     batches integer NULL,                           
+;;     mem_limit integer NULL,
+;;     mem_used integer NULL,
+;;     mem_used_mb text NULL, 
+;;     mem_total integer NULL,
+;;     latency integer NULL,
+;;     client_subs integer NULL,
+;;     server_subs integer NULL,
+;;     messages_per_second integer NULL,
+;;     recent_messages_per_second integer NULL,
+;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ;; (def create-reco-vw
 ;;   "create view viz_recos_vw as 
 ;;    select distinct c.context_hash, c.combo_hash, c.connection_id, c.shape_name, c.query_map, c.query_map_str,
@@ -1159,34 +1745,128 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 
 
+;; (defn create-attribute-sample
+;;   [sample-table-name-str rowset & [db-type]]
+;;   (try (let [db-type (or db-type "SQLite")
+;;              field-types (cstr/join ""
+;;                                     (for [[k v] (first rowset)]
+;;                                       (let [type (cond (string? v)                                "varchar"
+;;                                                        (integer? v)                               "integer"
+;;                                                        (float? v)                                 "float"
+;;                                                        (cstr/includes? (str (type v)) "DateTime") "timestamp"
+;;                                                        (cstr/includes? (str (type v)) "Date")     "date"
+;;                                                        :else                                      "varchar")
+;;                                             kk   (ut/unkeyword k)]
+;;                                         (str kk " " type " NULL,"))))]
+;;          (str
+;;           " create table if not exists "
+;;           sample-table-name-str
+;;           "
+;;   ("
+;;           (cstr/join "" (drop-last field-types))
+;;           ")   ;"))
+;;        (catch Exception e
+;;          (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset rowset]))))
+
+(def integer-thresholds
+  {"SQLite"     {:max Long/MAX_VALUE
+                 :types ["INTEGER"]}
+   "DuckDB"     {:max Long/MAX_VALUE
+                 :types ["BIGINT"]} ;; removed INTEGER since was still getting overflows for some reason
+   "MySQL"      {:max 2147483647
+                 :types ["INT" "BIGINT"]}
+   "PostgreSQL" {:max 2147483647
+                 :types ["INTEGER" "BIGINT"]}
+   "SQL Server" {:max 2147483647
+                 :types ["INT" "BIGINT"]}
+   "Oracle"     {:max 2147483647
+                 :types ["NUMBER(10)" "NUMBER(19)"]}
+   "ClickHouse" {:max Long/MAX_VALUE
+                 :types ["Int64"]}})
+
+(defn get-integer-type [db-type value]
+  (let [{:keys [max types]} (get integer-thresholds db-type
+                                 {:max Long/MAX_VALUE :types ["INTEGER"]})
+        [small-int big-int] types]
+    (if (> value max)
+      (or big-int small-int)
+      small-int)))
+
+(defn get-field-type [db-type value]
+  (let [base-types
+        {"SQLite"     {"string" "TEXT", "float" "REAL", "date" "DATE", "datetime" "TIMESTAMP"}
+         "DuckDB"     {"string" "VARCHAR", "float" "DOUBLE", "date" "DATE", "datetime" "TIMESTAMP"}
+         "MySQL"      {"string" "VARCHAR(255)", "float" "DOUBLE", "date" "DATE", "datetime" "DATETIME"}
+         "PostgreSQL" {"string" "TEXT", "float" "DOUBLE PRECISION", "date" "DATE", "datetime" "TIMESTAMP"}
+         "SQL Server" {"string" "NVARCHAR(255)", "float" "FLOAT", "date" "DATE", "datetime" "DATETIME2"}
+         "Oracle"     {"string" "VARCHAR2(255)", "float" "NUMBER", "date" "DATE", "datetime" "TIMESTAMP"}
+         "ClickHouse" {"string" "String", "float" "Float64", "date" "Date", "datetime" "DateTime"}}
+        types (get base-types db-type (base-types "SQLite"))]
+    (cond
+      (nil? value)                                   (get types "string")
+      (string? value)                                (get types "string")
+      (integer? value)                               (get-integer-type db-type value)
+      (float? value)                                 (get types "float")
+      (cstr/includes? (str (type value)) "Date")     (get types "date")
+      (cstr/includes? (str (type value)) "DateTime") (get types "datetime")
+      :else                                          (get types "string"))))
+
+(defn infer-column-type [db-type values]
+  (let [non-nil-values (remove nil? values)
+        type-preferences ["datetime" "date" "float" "integer" "string"]
+        type-checks {"datetime" #(cstr/includes? (str (type %)) "DateTime")
+                     "date"     #(cstr/includes? (str (type %)) "Date")
+                     "float"    float?
+                     "integer"  integer?
+                     "string"   string?}]
+    (if (empty? non-nil-values)
+      (get-field-type db-type nil)
+      (let [inferred-type (first (filter #(some (get type-checks %) non-nil-values) type-preferences))
+            sample-value (first (filter (get type-checks inferred-type) non-nil-values))]
+        (get-field-type db-type sample-value)))))
+
 (defn create-attribute-sample
-  [sample-table-name-str rowset]
-  ;; TODO should rewrite this in honeysql, just to be consistent...
-  ;(ut/ppln [:sample-table-name-str sample-table-name-str :rowset rowset])
-  (try (let [;key-hash sample-table-name-str (cstr/replace key-hash #"-" "_") ;; hashes are often negative. No bueno.
-             field-types (cstr/join ""
-                                    (for [[k v] (first rowset)]
-                                      (let [type (cond (string? v)                                "varchar" ;"text"
-                                                       (integer? v)                               "integer"
-                                                       (float? v)                                 "float"
-                                                       (cstr/includes? (str (type v)) "DateTime") "timestamp"
-                                                       (cstr/includes? (str (type v)) "Date")     "date"
-                                                       :else                                      "varchar" ;"text"
-                                                 )
-                                            kk   (ut/unkeyword k)]
-                                        (str kk " " type " NULL,"))))]
-         ;(ut/pp [:debug field-types (keys (first rowset))])
-         (str  ;; " -- drop table if exists "
-              ;; sample-table-name-str
-              ;; ";
-           " create table if not exists "
-              sample-table-name-str
-              "
-  ("
-              (cstr/join "" (drop-last field-types))
-              ")   ;"))
-       (catch Exception e
-         (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset rowset]))))
+  [sample-table-name-str rowset & [db-type custom-fields extra-ddl-post]]
+  (try
+    (let [db-type (or db-type "SQLite")
+          sample-size 5
+          sampled-rows (take sample-size (shuffle rowset))
+          columns (keys (first rowset))
+          inferred-field-types (into {}
+                                     (for [k columns]
+                                       (let [values (map #(get % k) sampled-rows)
+                                             type (infer-column-type db-type values)]
+                                         [k type])))
+          merged-field-types (merge inferred-field-types custom-fields)
+          field-definitions (for [[k type] merged-field-types]
+                              (let [kk (ut/unkeyword k)]
+                                (if (get custom-fields k)
+                                  (str kk " " type)  ; Custom fields are used as-is
+                                  (str kk " " type " NULL"))))
+          ddl-options (case db-type
+                        "SQLite" ""
+                        "DuckDB" ""
+                        "MySQL" " ENGINE=InnoDB"
+                        "PostgreSQL" ""
+                        "SQL Server" ""
+                        "Oracle" ""
+                        "ClickHouse" " ENGINE=MergeTree() ORDER BY tuple()"
+                        "")]
+      (str
+       "CREATE TABLE IF NOT EXISTS "
+       sample-table-name-str
+       " (" (cstr/join ", " field-definitions) ")"
+       (or extra-ddl-post ddl-options)  
+       ";"))
+    (catch Exception e
+      (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset rowset]))))
+
+
+;; (ut/pp (create-attribute-sample :jvm-stats [{:memory 123124124 :client-name "my client name" :timestamp (java.util.Date.)}] "MySQL" {"updated_at" "timestamp"} " bandna()"))
+
+
+
+
 
 (def sample-kit-output
   

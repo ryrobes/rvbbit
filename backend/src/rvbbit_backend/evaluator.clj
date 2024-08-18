@@ -13,6 +13,7 @@
     :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
    [rvbbit-backend.ddl    :as sqlite-ddl]
+   [rvbbit-backend.freezepop :as fpop]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.pool-party :as ppy]
@@ -34,7 +35,7 @@
 (def nrepls-run (atom 0))
 (def nrepls-intros-run (atom 0))
 
-;; (def repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
+;; (def repl-introspection-atom (fpop/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
 (defonce repl-introspection-child-atoms (atom {}))
 ;(def repl-client-namespaces-map (atom {}))
 

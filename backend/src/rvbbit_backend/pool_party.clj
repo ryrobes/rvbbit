@@ -74,6 +74,9 @@
 
 (defn create-cached-thread-pool [name]
   (let [base-pool (cond
+                    (cstr/includes? (str name) "serial-nrepl")
+                    (ThreadPoolExecutor. 0 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
+
                     (cstr/includes? (str name) "serial")
                     (ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
 
@@ -87,7 +90,7 @@
                         (cstr/includes? (str name) "nrepl-eval/")
                         (cstr/includes? (str name) "query-runstream/")
                         (cstr/includes? (str name) "watchers/"))
-                    (ThreadPoolExecutor. 3 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
+                    (ThreadPoolExecutor. 1 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
 
                     :else (ThreadPoolExecutor. 1 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
         thread-factory (proxy [java.util.concurrent.ThreadFactory] []

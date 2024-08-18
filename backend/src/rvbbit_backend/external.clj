@@ -1,20 +1,65 @@
 (ns rvbbit-backend.external
   (:require
-    [clojure.core.async   :as async]
-    [clojure.data         :as data]
+   [clojure.core.async   :as async]
+   [clojure.data         :as data]
    [clojure.edn          :as edn]
-    [clojure.java.io      :as io]
-    [clojure.set          :as cset]
-    [clojure.string       :as cstr]
-    [rvbbit-backend.util  :as ut]
+   [clojure.java.io      :as io]
+   [clojure.set          :as cset]
+   [clojure.string       :as cstr]
+   [rvbbit-backend.util  :as ut]
    [rvbbit-backend.config  :as cfg]
-    [websocket-layer.core :as wl]))
+   [clojure.pprint :as ppr]
+   [websocket-layer.core :as wl])
+  (:import    [java.security MessageDigest]
+              [java.math BigInteger]))
 
-(defn pretty-spit
-  [file-name collection]
-  (spit (java.io.File. file-name) 
-        (with-out-str (clojure.pprint/write collection 
-                                            :dispatch clojure.pprint/code-dispatch))))
+(defonce file-versions (atom {}))
+
+
+
+;; (ut/pp [:file-versions @file-versions])
+
+
+;; (defn calculate-hash [^String data]
+;;   (let [md (MessageDigest/getInstance "SHA-256")]
+;;     (.update md (.getBytes data "UTF-8"))
+;;     (format "%064x" (BigInteger. 1 (.digest md)))))
+
+(defn calculate-file-hash [file]
+  (hash (slurp file)))
+
+(defn calculate-data-hash [data]
+  (try (hash (pr-str data)) 
+       (catch Exception _ -1)))
+
+(defn update-client-version [file-path data]
+  (let [new-hash (calculate-data-hash data)]
+    (swap! file-versions update file-path
+           (fn [versions]
+             (assoc versions :client new-hash)))))
+
+(defn update-server-version [file-path data]
+  (let [new-hash (calculate-data-hash data)]
+    (swap! file-versions update file-path
+           (fn [versions]
+             (assoc versions :server new-hash)))))
+
+(defn local-edit? [file-path]
+  (let [versions (get @file-versions file-path)
+        current-hash (calculate-file-hash (io/file file-path))]
+    (and (not= current-hash (:client versions))
+         (not= current-hash (:server versions)))))
+
+(defn pretty-spit [file-name collection & [src]]
+  (let [src (or src :server)
+        ;data-hash (calculate-data-hash collection)
+        ]
+    ;;(swap! file-versions assoc-in [file-name src] data-hash)  
+      (spit (java.io.File. file-name)
+        (with-out-str (ppr/write collection
+                                 :dispatch ppr/code-dispatch)))))
+
+
 
 (def client-pushes (atom {}))
 
@@ -177,9 +222,9 @@
                 (create-dirs view-base)
                 (pretty-spit view-file-base vv)))));)
 
-(defn write-panels
-  [client-name panels]
-  (pretty-spit (str "./live/" (fixstr client-name) ".edn") panels) ;; overwrite existing
+(defn write-panels [client-name panels]
+  (ut/pp [:write-panels! client-name (keys panels)])  
+  (pretty-spit (str "./live/" (fixstr client-name) ".edn") panels :client) ;; overwrite existing FULL deck image
   (let [name-mapping-raw (into {} (for [[k v] panels] {k (get v :name)}))
         name-mapping     (ut/generate-unique-names name-mapping-raw)
         ;rev-name-mapping (ut/reverse-map name-mapping)
@@ -218,7 +263,7 @@
       (when (not base-exists?)
         (do ;(ut/pp [:file-unpacker! k :base client-name
           (create-dirs block-dir)
-          (pretty-spit block-file-base naked-incoming-block-data)))
+          (pretty-spit block-file-base naked-incoming-block-data :client)))
 
       (doseq [rr (keys incoming-runners)]
         (process-runner-type (get v rr) block-dir rr (get runners rr) path-history)))

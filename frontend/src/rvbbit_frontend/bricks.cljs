@@ -5142,7 +5142,7 @@
 (re-frame/reg-sub
  ::subq-mapping-alpha
  (fn [db {}]
-   (let [px (hash (ut/remove-underscored (get db :panels)))
+   (let [px (hash (ut/remove-underscored (get db :panels))) 
          cc (get @ut/subq-mapping-alpha px)]
      (if cc
        cc
@@ -5153,19 +5153,25 @@
                                                    (for [[kk vv] (get v :queries)] (when (nil? (find vv :vselect)) {kk vv}))))))
              res               (into {}
                                      (for [[k v] panels]
-                                       {k (merge {:uses (apply concat
-                                                               (for [[_ v1] (merge (get v :queries) (get v :views))]
-                                                                 (for [qq (filter #(or (cstr/includes? (str %) ":query/")
-                                                                                       (some #{%} all-sql-call-keys))
-                                                                                  (flatten (conj (ut/deep-flatten v1)
-                                                                                                 (apply (fn [x] ;; get partial matches
-                                                                                                          (keyword
-                                                                                                           (first (ut/splitter
-                                                                                                                   (str (ut/safe-name x))
-                                                                                                                   #"/"))))
-                                                                                                        (filter #(cstr/includes? (str %) "/")
-                                                                                                                (ut/deep-flatten v1))))))]
-                                                                   (keyword (last (ut/splitter (ut/safe-name qq) "/"))))))}
+                                       {k (merge 
+                                           {:uses (apply concat
+                                                         (for [[_ v1] (merge (get v :queries) (get v :views))
+                                                               :let [ssrc0 (flatten (conj (vec (ut/deep-flatten v1))
+                                                                                          (apply (fn [x] ;; get partial matches
+                                                                                                   (keyword
+                                                                                                    (first (ut/splitter
+                                                                                                            (str (ut/safe-name x))
+                                                                                                            #"/"))))
+                                                                                                 (filter #(cstr/includes? (str %) "/")
+                                                                                                         (vec (ut/deep-flatten v1))))))
+                                                                     ssrc1 (filter #(or (cstr/includes? (str %) ":query/")
+                                                                                        (some #{%} all-sql-call-keys))
+                                                                                   ssrc0)]]
+                                                           (for [qq ssrc1
+                                                                ;;  :let [_ (tapp>> [:v1 (str (ut/deep-flatten v1)) (str all-sql-call-keys) qq
+                                                                ;;                   (keyword (last (ut/splitter (ut/safe-name qq) "/")))])]
+                                                                 ]
+                                                             (keyword (last (ut/splitter (ut/safe-name qq) "/"))))))}
                                                  {:produces (keys (get-in db [:panels k :queries]))})}))]
          (swap! ut/subq-mapping-alpha assoc px res)
          res)))))
@@ -12447,10 +12453,11 @@
 
 (defn draw-lines
   [coords]
+  (tapp>> [:coords coords]) 
   (doall (for [[x1 y1 x2 y2 involved? color z1 z2 same-tab?] coords]
            ^{:key (hash (str x1 y1 x2 y2 "lines"))}
            (let [] ;selected-dash "" ;@(ut/tracked-subscribe [::selected-dash])
-             [:path
+             [:path  
               {:stroke-width (if involved? 16 13)
                :stroke       (if involved? color "#ffffff22") ;(if (or involved? nothing-selected?)
                :fill         "none"
@@ -12509,34 +12516,34 @@
                            {k (hash (ut/remove-underscored-plus-dims v))}))]
      panel-map)))
 
-(re-frame/reg-event-db
- ::send-panel-updates
- (fn [db [_ block-keys]]
-   (if
-    (and (not @dragging?)
-         (not @mouse-dragging-panel?)
-         (not @on-scrubber?))
-     (let [pp (get db :panels)
-           panels-map (select-keys pp block-keys)
-          ;;  resolved-panels-map  (into {} (for [[k v] panels-map] ;; super slow and lags out clients when panels edited
-          ;;                                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)]
-          ;;                                                                  {kk (sql-alias-replace vv)})))}))
-          ;;  materialized-panels-map (into {}  (for [[k v] panels-map] ;; super slow and lags out clients when panels edited
-          ;;                                      {k (materialize-values v)}))
-           ]
-       (tapp>> [:sending-updated-panels  block-keys
-              ;panels-map 
-              ;resolved-panels-map 
-              ;materialized-panels-map
-                ])
-       (ut/tracked-dispatch
-        [::wfx/push :default
-         {:kind :updated-panels
-          :materialized-panels {} ;;materialized-panels-map
-          :panels panels-map
-          :resolved-panels {} ;;resolved-panels-map
-          :client-name (get db :client-name)}]) db)
-     db)))
+;; (re-frame/reg-event-db
+;;  ::send-panel-updates
+;;  (fn [db [_ block-keys]]
+;;    (if
+;;     (and (not @dragging?)
+;;          (not @mouse-dragging-panel?)
+;;          (not @on-scrubber?))
+;;      (let [pp (get db :panels)
+;;            panels-map (select-keys pp block-keys)
+;;           ;;  resolved-panels-map  (into {} (for [[k v] panels-map] ;; super slow and lags out clients when panels edited
+;;           ;;                                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)]
+;;           ;;                                                                  {kk (sql-alias-replace vv)})))}))
+;;           ;;  materialized-panels-map (into {}  (for [[k v] panels-map] ;; super slow and lags out clients when panels edited
+;;           ;;                                      {k (materialize-values v)}))
+;;            ]
+;;        (tapp>> [:sending-updated-panels  block-keys
+;;               ;panels-map 
+;;               ;resolved-panels-map 
+;;               ;materialized-panels-map
+;;                 ])
+;;        (ut/tracked-dispatch
+;;         [::wfx/push :default
+;;          {:kind :updated-panels
+;;           :materialized-panels {} ;;materialized-panels-map
+;;           :panels panels-map
+;;           :resolved-panels {} ;;resolved-panels-map
+;;           :client-name (get db :client-name)}]) db)
+;;      db)))
 
 ;; (ut/tracked-dispatch [::update-panels-hash])
 

@@ -1914,6 +1914,7 @@
 (defn sanitize-name
   [name]   ;; keep updated in server also
   (-> name ;; chars that make file and folder operations annoying
+      str
       (cstr/replace " " "_")
       (cstr/replace "<" "_")
       (cstr/replace ">" "_")

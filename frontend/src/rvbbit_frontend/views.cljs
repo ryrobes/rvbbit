@@ -4165,12 +4165,18 @@
         server-subs @(ut/tracked-subscribe_ [::bricks/all-server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
         coords (if lines? ;; expensive otherwise
-                 (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
+                 (let [_ (ut/tapp>> [:lines!])
+                       subq-mapping @(ut/tracked-sub ::bricks/subq-mapping-alpha {})
+                       _ (ut/tapp>> [:subq-mapping (str subq-mapping)])
                        dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))
                        up-from-here (vec (ut/cached-upstream-search subq-mapping selected-block))
                        involved (vec (distinct (into dwn-from-here up-from-here)))
-                       subq-blocks @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
-                       smap (into {} (for [b (keys subq-mapping)] {b (ut/cached-downstream-search subq-mapping b)}))
+                       subq-blocks @(ut/tracked-sub ::bricks/subq-panels-alpha {:panel-id selected-block})
+                       ;subq-blocks @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
+                       smap (into {} (for [b (keys subq-mapping)] 
+                                       {b (ut/cached-downstream-search subq-mapping b)}))
+                       _ (ut/tapp>> [:smap smap]) 
+                       _ (ut/tapp>> [:subq-mapping subq-mapping])
                        lmap
                          (vec
                            (distinct
@@ -4186,17 +4192,20 @@
                                            dd        (if (not (cstr/starts-with? (str d) ":block"))
                                                        @(ut/tracked-subscribe [::bricks/lookup-panel-key-by-query-key d])
                                                        d)
+                                           
                                            involved? (some #(= % dd) involved)
                                            dest-r    @(ut/tracked-subscribe [::bricks/panel-px-root dd])
                                            dest-h    @(ut/tracked-subscribe [::bricks/panel-px-height dd])
                                            dest-w    @(ut/tracked-subscribe [::bricks/panel-px-width dd])
                                            t1        @(ut/tracked-subscribe [::bricks/what-tab k])
-                                           t2        @(ut/tracked-subscribe [::bricks/what-tab d])
+                                           t2        @(ut/tracked-subscribe [::bricks/what-tab dd])
                                            x1        (+ (first src-r) src-w)
                                            y1        (+ (last src-r) (/ src-h 2))
                                            x2        (first dest-r)
-                                           y2        (+ (last dest-r) (/ dest-h 2))]
-                                       (when (and (not (= src-r dest-r)) (= t1 t2 selected-tab))
+                                           y2        (+ (last dest-r) (/ dest-h 2))
+                                           _ (ut/tapp>> [:k k (str src-r) src-h src-w "->" :d dd (str dest-r) dest-h dest-w])
+                                           ]
+                                       (when (= t1 t2 selected-tab) ;true ;(and (not (= src-r dest-r)) (= t1 t2 selected-tab))
                                          (vec (flatten
                                                 [(if peek? (- x1 (* src-w 0.15)) x1) y1  ;(if peek? (* y1
                                                                                          ;0.7) y1)
@@ -4211,7 +4220,9 @@
                                                          "#7be073" ;; upstream?
                                                        (some #(= % dd) (ut/cached-downstream-search subq-mapping selected-block))
                                                          "#05dfff" ;; downstream?
-                                                       :else "orange") k d nil]))))))))))]
+                                                       :else "orange") 
+                                                 k d nil]))))))))))]
+                   (ut/tapp>> [:lines!   lmap])
                    lmap)
                  [])]
     (bricks/droppable
@@ -4485,6 +4496,7 @@
             {:style {:width          (px ww) ;"6200px" ;; big ass render nothing gets cut off
                      :height         (px hh) ;"6200px"
                      ;:pointer-events "none"
-                     :z-index        8}} (bricks/draw-lines coords)])]]])))
+                     :z-index        8}} 
+            (bricks/draw-lines coords)])]]])))
 
 

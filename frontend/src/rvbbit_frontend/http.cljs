@@ -553,7 +553,7 @@
       (try
         (let [ui-keypath                  (first (get result :ui-keypath))
               client-name                 (get db :client-name)
-              ms                          -1 ;(try (js/Math.ceil (/ (get result :elapsed-ms) 1000)) (catch :default _ nil))
+              ms                          (try (js/Math.ceil (/ (get result :elapsed-ms) 1000)) (catch :default _ nil))
               file-push?                  (= ui-keypath :file-changed)
               external-enabled?           (get db :external? false)
               task-id                     (get result :task-id)
@@ -590,10 +590,12 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          ;; (when (and (cstr/includes? (str client-name) "beaming")  (not runstream-sub?))
-          ;;   (ut/tapp>> [:msg-in (str task-id) (get result :status)  (str ui-keypath)
-          ;;               ;(str (get-in result [:status :evald-result :value 0]))
-          ;;               (str (get result :ui-keypath)) (str result)]))
+          (when (and (cstr/includes? (str client-name) "black")  (not runstream-sub?))
+            (ut/tapp>> [:msg-in
+                        file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?
+                        (str task-id) (get result :status)  (str ui-keypath)
+                        ;(str (get-in result [:status :evald-result :value 0]))
+                        (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -635,6 +637,9 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
+
+            (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
+            (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
 
             runstream-sub? (let [dd (get result :status)]
                              (-> db
@@ -678,8 +683,7 @@
                       (-> db
                           (assoc-in [:post-meta ui-keypath] post-meta-shape)))
 
-            (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
-            (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
+
 
             condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
 
@@ -742,8 +746,6 @@
                                      {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
                            (assoc :flow-subs (get-in result [:status :subs]))
                            (assoc :valid-kits (get-in result [:status :kits])))
-
-
 
             :else (-> db
                       (assoc-in [:status task-id ui-keypath] (get result :status))
