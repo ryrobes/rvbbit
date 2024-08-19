@@ -101,14 +101,14 @@
              (ut/pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
          @managed-atoms)))
 
-;; (defn freeze-atom
-;;   "Freezes a single atom to disk."
-;;   [file-path]
-;;   (let [a (get @managed-atoms file-path)]
-;;     (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
+(defn freeze-atom
+  "Freezes a single atom to disk."
+  [file-path]
+  (let [a (get @managed-atoms file-path)]
+    (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
 
-
-
+;; (freeze-atom "./defs/solvers.edn")
+;; (ut/pp  (keys @managed-atoms))
 
 
 

@@ -1,0 +1,41 @@
+{:measure?               [:and [:or [:= :data-type "number"] [:= :data-type "float"] [:= :data-type "integer"]]
+                          [:not [:and [:= :data-type "integer"] [:like [:lower :field-name] "%month%"]]]
+                          [:not [:and [:= :data-type "integer"] [:like [:lower :field-name] "%year%"]]]
+                          [:not [:like [:lower :field-name] "%id"]]
+                          [:not [:= [:lower :field-name] "sketch"]]
+                          [:not [:like :field-name "styler_%"]] ;; ignore user-space conditional formatting fields
+                          [:not [:like [:lower :field-name] "%_id"]]
+                          [:not [:like [:lower :field-name] "%code%"]]
+                          [:not [:and [:like [:lower :field-name] "lat%"] [:= :data-type "float"]]]
+                          [:not [:and [:like [:lower :field-name] "long%"] [:= :data-type "float"]]]]
+ :dimension?             [:and [:<> :data-type "number"] 
+                          [:not [:= [:lower :field-name] "sketch"]]
+                          [:not [:= :field-name "rows"]] ;; meta field to reco rowcounts (if we group-by it, the sniff queries will fail)
+                          [:not [:like :field-name "%key%"]] 
+                          [:not [:like :field-name "styler_%"]] ;; ignore user-space conditional formatting fields
+                          [:not [:like :field-name "%_id%"]]]
+ :geo-lat?               [:and [:like [:lower :field-name] "lat%"] [:= :data-type "float"]]
+ :geo-long?              [:and [:like [:lower :field-name] "long%"] [:= :data-type "float"]]
+ :fips-state-code?       [:and [:like [:lower :field-name] "%fips_state_code%"] [:= :data-type "integer"]]
+ :fips-county-code?      [:and [:like [:lower :field-name] "%fips_county_code%"] [:= :data-type "integer"]]
+ :zipcode?               [:and [:like [:lower :field-name] "%zip%"] [:= :data-type "integer"]]
+ :very-low-cardinality?  [:<= :distinct-count 8]
+ :low-cardinality?       [:and [:> :distinct-count 8] [:<= :distinct-count 15]]
+ :medium-cardinality?    [:and [:> :distinct-count 15] [:<= :distinct-count 30]]
+ :high-cardinality?      [:>= :distinct-count 31]
+ :is-date?               [:= :data-type "date"]
+ :is-datetime?           [:= :data-type "datetime"]
+ :is-integer?            [:= :data-type "integer"]
+ :is-float?              [:= :data-type "float"]
+ :is-string?             [:= :data-type "string"]
+ :is-sqlite?             [:= :db-type "SQLite"]
+ :is-year?               [:and [:= :data-type "integer"] [:like [:lower :field-name] "%year%"]]
+ :is-month?              [:and [:= :data-type "integer"] [:like [:lower :field-name] "%month%"]]
+ :is-rowcount?           [:and [:= :data-type "integer"] [:= :field-name "rows"]] ;; meta field inserted to generate counts by dim
+ :not-clickhouse?        [:<> :db-type "ClickHouse"]
+ :true?                  [:= 1 1]
+ :looks-like-date?       [:like [:cast :example-value :text] "____-__-__"]
+                          ;[:like [:cast :example-value :text] "%____-__-__%"]
+ :looks-like-datetime?   [:like [:cast :example-value :text] "____-__-__ %"]}
+
+;;; runs on the field level only atm 

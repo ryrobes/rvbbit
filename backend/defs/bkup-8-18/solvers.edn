@@ -17,36 +17,6 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
- :refresh-met-on-tour {:signal :signal/every-5-minutes
-                       :type   :clojure
-                       :cache? false
-                       :data   (do (ns rvbbit-backend.cruiser
-                                     (:require [rvbbit-backend.websockets :as wss]
-                                               [rvbbit-backend.pool-party :as ppy]
-                                               [rvbbit-backend.sql :as sql]))
-                                   (let [conn (get (clojure.core/deref wss/conn-map) "met-on-tour")]
-                                     (lets-give-it-a-whirl-no-viz "connections/met-on-tour.edn"
-                                                                  conn
-                                                                  sql/system-db
-                                                                  default-sniff-tests
-                                                                  default-field-attributes
-                                                                  default-derived-fields
-                                                                  default-viz-shapes)))}
- :refresh-snifftmp1 {:signal :signal/every-5-minutes
-                     :type   :clojure
-                     :cache? false
-                     :data   (do (ns rvbbit-backend.cruiser
-                                   (:require [rvbbit-backend.websockets :as wss]
-                                             [rvbbit-backend.pool-party :as ppy]
-                                             [rvbbit-backend.sql :as sql]))
-                                 (let [conn (get (clojure.core/deref wss/conn-map) "snifftmp1")]
-                                   (lets-give-it-a-whirl-no-viz "connections/snifftmp1.edn"
-                                                                conn
-                                                                sql/system-db
-                                                                default-sniff-tests
-                                                                default-field-attributes
-                                                                default-derived-fields
-                                                                default-viz-shapes)))}
  :wallpaper-of-the-moment-8k
    {:signal :signal/every-5-minutes
     :type   :clojure
@@ -148,21 +118,6 @@
        :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
        :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
  :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
- :refresh-boston-crime {:signal :signal/every-5-minutes
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (clojure.core/deref wss/conn-map) "boston-crime")]
-                                      (lets-give-it-a-whirl-no-viz "connections/boston-crime.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
  :png-wallpaper? {:signal :signal/changed-wallpaper?
                   :type   :clojure
                   :cache? true
@@ -177,21 +132,6 @@
                                    (with-open [in-file  (clojure.java.io/input-stream source-path)
                                                out-file (clojure.java.io/output-stream dest-path)]
                                      (clojure.java.io/copy in-file out-file)))}
- :refresh-filtertmp1 {:signal :signal/every-5-minutes
-                      :type   :clojure
-                      :cache? false
-                      :data   (do (ns rvbbit-backend.cruiser
-                                    (:require [rvbbit-backend.websockets :as wss]
-                                              [rvbbit-backend.pool-party :as ppy]
-                                              [rvbbit-backend.sql :as sql]))
-                                  (let [conn (get (clojure.core/deref wss/conn-map) "filtertmp1")]
-                                    (lets-give-it-a-whirl-no-viz "connections/filtertmp1.edn"
-                                                                 conn
-                                                                 sql/system-db
-                                                                 default-sniff-tests
-                                                                 default-field-attributes
-                                                                 default-derived-fields
-                                                                 default-viz-shapes)))}
  :wallpaper-of-the-moment
    {:signal  :signal/every-5-minutes
     :type    :clojure
@@ -213,49 +153,4 @@
                    (println res)
                    (println "(" (count (deref selected-files-4k)) " files selected previously)")
                    res))}
- :refresh-bigfoot-ufos {:signal :signal/every-5-minutes
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (clojure.core/deref wss/conn-map) "bigfoot-ufos")]
-                                      (lets-give-it-a-whirl-no-viz "connections/bigfoot-ufos.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
- :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}
- :refresh-snifftmp2 {:signal :signal/every-5-minutes
-                     :type   :clojure
-                     :cache? false
-                     :data   (do (ns rvbbit-backend.cruiser
-                                   (:require [rvbbit-backend.websockets :as wss]
-                                             [rvbbit-backend.pool-party :as ppy]
-                                             [rvbbit-backend.sql :as sql]))
-                                 (let [conn (get (clojure.core/deref wss/conn-map) "snifftmp2")]
-                                   (lets-give-it-a-whirl-no-viz "connections/snifftmp2.edn"
-                                                                conn
-                                                                sql/system-db
-                                                                default-sniff-tests
-                                                                default-field-attributes
-                                                                default-derived-fields
-                                                                default-viz-shapes)))}
- :refresh-imported {:signal :signal/every-5-minutes
-                    :type   :clojure
-                    :cache? false
-                    :data   (do (ns rvbbit-backend.cruiser
-                                  (:require [rvbbit-backend.websockets :as wss]
-                                            [rvbbit-backend.pool-party :as ppy]
-                                            [rvbbit-backend.sql :as sql]))
-                                (let [conn (get (clojure.core/deref wss/conn-map) "imported")]
-                                  (lets-give-it-a-whirl-no-viz "connections/imported.edn"
-                                                               conn
-                                                               sql/system-db
-                                                               default-sniff-tests
-                                                               default-field-attributes
-                                                               default-derived-fields
-                                                               default-viz-shapes)))}}
+ :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}}

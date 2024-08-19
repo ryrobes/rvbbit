@@ -1,0 +1,44 @@
+;;
+;;   ____ _    ____ _  _ ____ ____    ___ ____ _  _ ___  _    ____ ___ ____ ____      
+;;   |    |    |  | |  | |___ |__/     |  |___ |\/| |__] |    |__|  |  |___ [__       
+;;   |___ |___ |__|  \/  |___ |  \     |  |___ |  | |    |___ |  |  |  |___ ___]      
+;;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+;;
+;; clover templates are basically just short-codes for front-end views. Anything that is value, works in a clover view, will work.
+;; params get evaluated on the client side before render, just like any other views.
+;; since solvers has a view DSL, you can use this to run server solvers as well. 
+;; Ex See ":color-theft" below. Given an image-path, will return a full color map - and then it is rendered with ":data-viewer" so it can be browsed and pulled from
+;; Note - in config.edn the "default viewers" for various block runners tend to use these to keep the file more concise.
+
+{:color-theft   {:args [:*input]
+                 :body [:data-viewer
+                        [:run-solver
+                         [:get-my-colors
+                          {:input-image-path
+                           :*input}]]]}
+ :pretty-box        {:args [:*input]
+                     :body [:box
+                            :size "auto"
+                            :align :center :justify :center
+                            :style {:color :theme/editor-outer-rim-color
+                                    :font-size [:auto-size-px [:string3 :*input]]}
+                            :child [:string3 :*input]]}
+ :clj            {:args [:code]
+                      :body  [:run-solver
+                              {:signal false
+                               :cache? false
+                               :type :clojure
+                               :input-map {}
+                               :data :code}]}
+ :clj2            {:args [:code]
+                       :body  [:run-solver
+                               {:signal false
+                                :cache? false
+                                :type :clojure2
+                                :input-map {}
+                                :data :code}]}
+ :cheese-burger  {:args [:x]
+                  :body [:box
+                         :style {:color "yellow" :font-size "23px"}
+                         :child [:string3 :x "CHEESEBURGER!"]]}}

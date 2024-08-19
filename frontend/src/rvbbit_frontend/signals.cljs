@@ -411,14 +411,18 @@
                                                  {name vv})))
                                :else   {})]
     [re-com/v-box :children
-     [[re-com/h-box :height "30px" :padding "6px" :align :center :justify :between :style {:font-size "12px"} :children
-       [[re-com/box :style {:cursor "pointer"} :attr {:on-click #(ut/tracked-dispatch [::add-signal warren-type-string])} :child
-         (str "+ new " warren-type-string)]
-        (if (and selected-warren-item (= warren-type-string selected-type))
-          [re-com/box :style {:cursor "pointer"} :attr
-           {:on-click #(ut/tracked-dispatch [::delete-signal selected-warren-item warren-item-type])} :child
-           (str "- delete this " warren-type-string "?")]
-          [re-com/gap :size "5px"])]]
+     [
+      
+      ;; [re-com/h-box :height "30px" :padding "6px" :align :center :justify :between :style {:font-size "12px"} :children
+      ;;  [[re-com/box :style {:cursor "pointer"} :attr {:on-click #(ut/tracked-dispatch [::add-signal warren-type-string])} :child
+      ;;    (str "+ new " warren-type-string)]
+      ;;   (if (and selected-warren-item (= warren-type-string selected-type))
+      ;;     [re-com/box :style {:cursor "pointer"} :attr
+      ;;      {:on-click #(ut/tracked-dispatch [::delete-signal selected-warren-item warren-item-type])} :child
+      ;;      (str "- delete this " warren-type-string "?")]
+      ;;     [re-com/gap :size "5px"])]]
+      
+
       [re-com/v-box :padding "6px" :style
        {;:border "1px solid red"
         :overflow "auto"} :gap "6px" :size "none" :children
@@ -434,7 +438,8 @@
                                                                                             ">extra"))]}))]]
          [draggable-item
           [re-com/v-box :padding "6px" :size "none" :width "100%" :attr
-           {:on-double-click #(ut/tracked-dispatch [::select-signal (if selected? nil name)])} :style
+           {:on-double-click #(ut/tracked-dispatch [::select-signal (if selected? nil name)])} 
+           :style
            {:border           (if selected?
                                 (str "3px dashed " (theme-pull :theme/editor-outer-rim-color nil) 99)
                                 (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) "28"))
@@ -452,7 +457,7 @@
               [re-com/h-box :padding "6px" :justify :between :style {:font-size "13px" :opacity 0.56}
                :children
                [
-                (when solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
+                (when true ;; solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
                   [re-com/md-icon-button
                    :src (at)
                    :md-icon-name "zmdi-play"

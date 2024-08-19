@@ -900,7 +900,8 @@
         options (merge default-options zprint-options)
         formatted-content (zp/zprint-str content options)]
     (spit file-path formatted-content)
-    (pp [:zprinted file-path])))
+    ;;(pp [:zprinted file-path])
+    ))
 
 ;; (zprint-file "./defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
 

@@ -10,7 +10,7 @@
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :default "./screens/looking-glass-redux.edn"
  ;; ^^ if no screen given in URL, load this one. "start page" essentially.
- :harvest-on-boot? false 
+ :harvest-on-boot? true
  ;; ^^ do a full database sniff for each connection on boot (will be staggered and scheduled in the future)
  :modes {:pre       [:pre
                      {:style {:color :theme/editor-outer-rim-color

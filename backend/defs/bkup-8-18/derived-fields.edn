@@ -1,0 +1,46 @@
+{:by-year           {:when [:and
+                            [:not :is-sqlite?]
+                            [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+                     ;:data-type "integer" ;; optional ? or maybe we do a quick test to "taste" the field before we make the vector
+                     :calc  [:year :field]} ;; DERIVED fields def...
+
+ :by-month           {:when [:and
+                             [:not :is-sqlite?]
+                             [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+                      :calc  [:month :field]}
+
+ :by-year-sqlite           {:when [:and
+                                   :is-sqlite?
+                                   [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+                            :calc  [:substr :field 0 5]}
+
+ :by-month-sqlite           {:when [:and
+                                    :is-sqlite?
+                                    [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+                             :calc  [:substr :field 6 2]}
+
+ :day-sqlite           {:when [:and
+                               :is-sqlite?
+                               [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+                        :calc  [:substr :field 0 11]}
+
+;;  :agg-sum            {:when [:or :is-integer? :is-float?]
+;;                       :calc  [:sum :field]}
+
+;;  :cnt1 {:when [:= 1 1]
+;;         :calc [:count 1]}
+
+;;  :plus-one          {:when [:or :is-integer? :is-float?] ;[:and :integer? [:= 1 1]]
+;;                      :calc [[:+ [:field 1]]]}
+
+;;  :range-bucket      {:when ;[:and :integer? [:or :low-cardinality? :medium-cardinality?]]
+;;                      [:or
+;;                       [:and :is-integer? :low-cardinality? :not-clickhouse?]
+;;                       [:and :is-integer? :medium-cardinality? :not-clickhouse?]]
+;;                      :calc [:case
+;;                             [:< :field 10] "small"
+;;                             [:> :field 100] "big"
+;;                             :else "medium"]}
+ }
+
+;;; runs on the field level only atm 

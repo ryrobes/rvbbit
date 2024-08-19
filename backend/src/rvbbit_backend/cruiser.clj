@@ -1392,7 +1392,7 @@
   (doall
     (try
       (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
-            orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db) 
+            orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db)
             connection_id     (get connect-meta :connection_id)
             this-run-id       (get-latest-run-id system-db connect-meta)
             field-vectors-all (create-target-field-vectors target-db connect-meta) ;; this is a
@@ -1421,7 +1421,13 @@
                                  this-run-id
                                  connect-meta
                                  sql-filter)
-        (update-connection-data! system-db this-run-id connection_id))
+        (update-connection-data! system-db this-run-id connection_id)
+        (ut/pp [:lets-give-it-a-whirl-no-viz-success! :fields (count field-vectors)])
+        ;(group-by (fn [v] [(nth v 2) (nth v 5)]) field-vectors)
+        {:connect-meta connect-meta
+         ;;:ff (first field-vectors)
+         :tables (into {} (for [tbl (distinct (map #(get % 5) field-vectors))]
+                            {tbl (vec (distinct (map #(get % 6) field-vectors)))}))})
       (catch Exception e
         (let [sw (java.io.StringWriter.)
               pw (java.io.PrintWriter. sw)]
