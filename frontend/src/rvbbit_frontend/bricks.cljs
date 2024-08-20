@@ -1698,9 +1698,9 @@
 (re-frame/reg-sub
  ::lookup-connection-id-by-query-key
  (fn [db [_ query-key]]
-   (get-in db
-           [:panels (first (remove nil? (for [[k v] (get db :panels)] (when (some #(= query-key %) (keys (get v :queries))) k))))
-            :connection-id])))
+   (let [panel-key (first (remove nil? (for [[k v] (get db :panels)] (when (some #(= query-key %) (keys (get v :queries))) k))))]
+     (get-in db [:panels panel-key :queries query-key :connection-id] 
+             (get-in db [:panels panel-key :connection-id] "cache.db")))))  
 
 (re-frame/reg-event-db
  ::unalias-query
@@ -3625,7 +3625,7 @@
  (fn [db _]
    (let [blocks (ut/deep-remove-keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab ""))
                                                       (get db :panels)))
-                                     [:root :selected-mode :opts :root :selected-view])
+                                     [:root :selected-mode :opts :root :selected-view :icon :icon-view])
          blocks (filterv #(= (count %) 3)
                          (ut/kvpaths blocks))]
      (or blocks []))))
@@ -4011,6 +4011,7 @@
                                         #(and ;; filter out from the top bar toggle first....
                                           (not (= (str (first %)) ":/")) ;; sometimes a garbo
                                                                             ;; param sneaks in
+                                          (not (cstr/starts-with? (str (first %)) ":data/"))
                                           (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
                                           (not (cstr/starts-with? (str (first %)) ":panel-hash/"))
                                           (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
@@ -4765,7 +4766,7 @@
              (not (cstr/includes? (cstr/lower-case (str target-id)) "month"))
              (not (cstr/includes? (cstr/lower-case (str target-id)) "week")))
         sql-name             (keyword sql-name-base)
-        connection-id        (get panel-map :connection-id (get-in panel-map [:queries (first data-keypath) :connection-id]))
+        connection-id        (get-in panel-map [:queries (first data-keypath) :connection-id] (get panel-map :connection-id))
         general-field        {:h             (if agg? 4 5)
                               :w             (if agg? 4 8)
                               :drag-meta     {;:query query-meta
@@ -4828,13 +4829,13 @@
                                                 :param-field      field-name
                                                 :target           field-name
                                                 :row-num          row-num
-                                                :connection-id    (get panel-map :connection-id (get-in panel-map [:queries (first data-keypath) :connection-id]))
+                                                :connection-id    (get-in panel-map [:queries (first data-keypath) :connection-id] (get panel-map :connection-id))
                                                 :data-type        field-data-type
                                                 :source-table     parent-sql-alias
                                                 :source-query     (first data-keypath)
                                                 :source-panel-key source-panel-key})
                               :source-panel  source-panel-key
-                              :connection-id (get panel-map :connection-id (get-in panel-map [:queries (first data-keypath) :connection-id]))
+                              :connection-id (get-in panel-map [:queries (first data-keypath) :connection-id] (get panel-map :connection-id))
                               :name          (str "drag-from-" (get panel-map :name))
                               :queries       {sql-name (merge (when sqlized-hash {:_sqlized-hash sqlized-hash})
                                                               {:select selected-fields ;[:*]
@@ -5811,6 +5812,12 @@
                                                    [:panels panel-key :queries query-key] ;; materialize
                                                                                    ;; and overwrite
                                                    (sql-alias-replace (get-in db [:panels panel-key :queries query-key])))
+       
+       (= clause-conform :materialize-to-cache-db) (let [existing-q   (get-in db [:panels panel-key :queries query-key])
+                                                         connection-id (get-in db [:panels panel-key :connection-id] (get existing-q :connection-id))
+                                                         query (assoc existing-q :page -3)] ;; trigger to materialize that run other side-effects
+                                                     (conn/sql-data [query-key] query connection-id)
+                                                     db)
 
        (= clause-conform :materialize-values) (let [source-tab        (get-in drop-data [:drag-body :source-table])
                                                     block-map         (get-in db [:panels panel-key :views source-tab])
@@ -6014,7 +6021,7 @@
                   (not (cstr/includes? (cstr/lower-case (str target)) "month"))
                   (not (cstr/includes? (cstr/lower-case (str target)) "week")))
         dim? (not agg?)
-        connection-id @(ut/tracked-subscribe [::connection-id panel-key])
+        connection-id @(ut/tracked-sub ::connection-id-alpha2 {:panel-key panel-key :query-key query-key})
         drag-type (get drag-body :type)
         param? (and (or (= drag-type :param) (= drag-type :where)) (not (cstr/includes? (str (get drag-body :param-full)) ".*/"))) ;; ignore
         query? (= drag-type :query)
@@ -6026,6 +6033,7 @@
         block-panel? (true? (or view-drag? query?))
         not-view? (not view-drag?)
         same-db? (= connection-id (get drag-body :connection-id))
+        ;;;_ (tapp>> [:drag-body drag-body])
         same-table? (or (= source-table (first table-source)) (= table-source-k source-table))
         clicked-fields (if view-drag? @(ut/tracked-subscribe [::view-clicked-fields source-panel-key source-table]) [])
         clicked? (ut/ne? clicked-fields)
@@ -6120,6 +6128,7 @@
                           :reference      "#f9b9f9"
                           :delete-query   "#ff3900"
                           :promote-query  "#ffa500" ;;"orange"
+                          :materialize-to-cache-db     "#7eeeee"
                           :materialize-values     "#7eeeee"
                           :delete-view    "#ff3900"
                           :highlight=     "#7eeeee"
@@ -6166,7 +6175,9 @@
                (if (and self? block-panel?)
                  {:block-ops
                   [(if (= drag-type :query)
-                     (if is-child? [:delete-query :promote-query] [:delete-query])
+                     (if is-child?
+                       [:delete-query :promote-query :materialize-to-cache-db]
+                       [:delete-query :materialize-to-cache-db])
                      [:delete-view :materialize-values])]}
                  {}))
               (and (>= w 11) (>= h 6) not-sys?)
@@ -6176,14 +6187,18 @@
                        (if (and (not table?) has-viz-options? big-enough-for-viz?) {:new-viz viz-options} {}))
                      (if (and self? block-panel?)
                        {:block-ops [(if (= drag-type :query)
-                                      (if is-child? [:delete-query :promote-query] [:delete-query])
+                                      (if is-child?
+                                        [:delete-query :promote-query :materialize-to-cache-db]
+                                        [:delete-query :materialize-to-cache-db])
                                       [:delete-view :materialize-values])]}
                        {}))
               not-sys? (merge (if has-sql-options? {selected-view sql-options} {})
                               (if (and (not self?) block-panel?) {:block-ops block-ops} {})
                               (if (and self? block-panel?)
                                 {:block-ops [(if (= drag-type :query)
-                                               (if is-child? [:delete-query :promote-query] [:delete-query])
+                                               (if is-child?
+                                                 [:delete-query :promote-query :materialize-to-cache-db]
+                                                 [:delete-query :materialize-to-cache-db])
                                                [:delete-view :materialize-values])]}
                                 {})))
         option-count (count (flatten (apply concat (vals all-options))))]
@@ -6885,7 +6900,7 @@
  (fn [db _]
    (let [blocks (ut/deep-remove-keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab ""))
                                                       (get db :panels)))
-                                     [:root :selected-mode :opts :root :selected-view])
+                                     [:root :selected-mode :opts :root :selected-view :icon :icon-view])
          blocks (filterv #(= (count %) 3) (ut/kvpaths blocks))
          queries (mapv last (filterv #(= (second %) :queries) blocks))
          waitings    (for [e @(ut/tracked-sub ::http/pending-requests {:socket-id http/socket-id})]
@@ -8554,7 +8569,7 @@
    (doseq [a [honeycomb-context-fns-cache
               ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache ut/map-boxes-cache ut/map-boxes-cache-hits
               ut/clover-walk-singles-map ut/process-key-cache ut/process-key-tracker ut/compound-keys-cache get-all-values-flatten
-              ut/compound-keys-tracker ut/upstream-cache ut/upstream-cache-tracker ut/downstream-cache
+              ut/compound-keys-tracker ut/upstream-cache ut/upstream-cache-tracker ut/downstream-cache ut/deep-template-find-cache
               ut/downstream-cache-tracker ut/split-cache ut/split-cache-data ut/extract-patterns-data
               ut/extract-patterns-cache ut/clean-sql-atom ut/auto-font-atom ut/postwalk-replace-data-cache
               ut/postwalk-replace-cache ut/is-base64-atom ut/is-large-base64-atom ut/safe-name-cache
@@ -12353,6 +12368,12 @@
  (fn [db {:keys [panel-key]}]
    (get-in db [:panels panel-key :connection-id])))
 
+(re-frame/reg-sub
+ ::connection-id-alpha2
+ (fn [db {:keys [panel-key query-key]}]
+   (get-in db [:panels panel-key :queries query-key :connection-id] (get-in db [:panels panel-key :connection-id]))))
+
+
 
 (re-frame/reg-sub ::panel-height (fn [db [_ panel-key]] (get-in db [:panels panel-key :h])))
 (re-frame/reg-sub ::panel-width (fn [db [_ panel-key]] (get-in db [:panels panel-key :w])))
@@ -12453,13 +12474,17 @@
 
 (defn draw-lines
   [coords]
-  (tapp>> [:coords coords]) 
+  ;; (tapp>> [:coords coords]) 
   (doall (for [[x1 y1 x2 y2 involved? color z1 z2 same-tab?] coords]
            ^{:key (hash (str x1 y1 x2 y2 "lines"))}
            (let [] ;selected-dash "" ;@(ut/tracked-subscribe [::selected-dash])
              [:path  
               {:stroke-width (if involved? 16 13)
-               :stroke       (if involved? color "#ffffff22") ;(if (or involved? nothing-selected?)
+               :stroke       (if involved? color 
+                                 "#ffffff22"
+                                 ;(str color 45)
+                                 ;color
+                                 ) ;(if (or involved? nothing-selected?)
                :fill         "none"
                :filter       "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
                :d            (ut/curved-path-h x1 y1 x2 y2)}]))))
@@ -12798,24 +12823,38 @@
                      :width "20px"}]])
     (render-kit-icon "zmdi-pizza")))
 
+
+
 (re-frame/reg-sub
  ::iconized
- (fn [db [_ panel-key]]
+ (fn [db {:keys [panel-key]}]
    (when (get-in db [:panels panel-key :iconized?] false)
      (let [;iconized? (get-in db [:panels panel-key :iconized?] false)
            name             (get-in db [:panels panel-key :name] "")
            icon             (get-in db [:panels panel-key :icon])
+           ;icon-view?       (get-in db [:panels panel-key :icon-view] false)
            default-icon-map {:h    1
                              :w    1
                              :view [:box :align :center :justify :center :width (px (* db/brick-size 1)) :height
                                     (px (* db/brick-size 1)) :padding "5px" :size "auto" :style
                                     {:font-size "10px"
-                                     :border    (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
+                                     ;:border    (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
                                      :filter    (str "drop-shadow(0 0 0.75rem "
                                                      (theme-pull :theme/editor-outer-rim-color nil)
-                                                     ")")} :child (if icon [render-icon icon 1] (str name))]}
+                                                     ")")} 
+                                    :child (if icon [render-icon icon 1] 
+                                               (str name))]}
            icon-view        (get-in db [:panels panel-key :icon-view] default-icon-map)]
        icon-view))))
+
+(re-frame/reg-event-db
+ ::write-iconized-view
+ (fn [db [_ panel-id]]
+   (let [icon-view @(ut/tracked-sub ::iconized {:panel-key panel-id}) ;; materialize defaults to breadcrumb users
+         curr (get-in db [:panels panel-id :icon-view])]
+     (if curr
+       db
+       (assoc-in db [:panels panel-id :icon-view] icon-view)))))
 
 (re-frame/reg-sub ::panel-icon
                   (fn [db [_ panel-key]]
@@ -12964,6 +13003,11 @@
  ::block-in-alert?
  (fn [db [_ panel-key]]
    (cstr/includes? (str (get db :alerts)) (str panel-key))))
+
+(re-frame/reg-sub
+ ::query-mat-pct
+ (fn [db [_ query-key]]
+   (get-in db [:mat-pct query-key])))
 
 (defn grid
   [& [tab]]
@@ -13122,7 +13166,7 @@
                                                                  :else               (theme-pull
                                                                                       :theme/block-tab-selected-font-color
                                                                                       "#ffffff55"))
-              iconization                                  @(ut/tracked-subscribe [::iconized brick-vec-key])
+              iconization                                  @(ut/tracked-sub ::iconized {:panel-key brick-vec-key})
               being-dragged?                               (= brick-vec-key @dragging-block)
               drag-action?                                 (and @mouse-dragging-panel? being-dragged?)
                      ;single-view?                                 false ;;@(ut/tracked-subscribe [::is-single-view? brick-vec-key])
@@ -13176,7 +13220,7 @@
                :justify :center
                :attr {;:on-click #(js/alert (if tab "in container" "not in container"))
                       :on-context-menu #(when (not tab) (ut/tracked-dispatch [::toggle-icon-block brick-vec-key]))
-                             ;;:on-mouse-down   #(mouse-down-handler % brick-vec-key tab-offset true)
+                      ;:on-mouse-down   #(mouse-down-handler % brick-vec-key tab-offset true)
                       :on-mouse-enter   #(do
                                            (reset! over-block brick-vec-key)
                                            (reset! over-block? true))
@@ -13188,8 +13232,9 @@
                       :on-double-click #(do (tag-screen-position %) (ut/tracked-dispatch [::launch-clone brick-vec-key]))}
                :style (merge {:position         "fixed"
                               :user-select      "none"
-                              ;:border           (cond selected? (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
-                              ;                        :else     "2px solid #ffffff05")
+                              :border           (when selected? (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
+                                                      ;;:else     "2px solid #ffffff05"
+                                                      )
                               :color            (theme-pull :theme/block-title-font-color nil)
                               :cursor           "pointer"
                               :z-index          zz
@@ -13362,6 +13407,7 @@
                            ^{:key (str "brick-" brick-vec "-header-icon")}
                            [re-com/md-icon-button :md-icon-name "zmdi-photo-size-select-small" :on-click
                             #(do (ut/tracked-dispatch [::toggle-icon-block brick-vec-key])
+                                 (ut/tracked-dispatch [::write-iconized-view brick-vec-key])
                                  (when selected? (ut/tracked-dispatch [::select-block "none!"]))
                                  (do (reset! over-block? false))) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])
                          (when hovered-on?
@@ -13417,7 +13463,8 @@
                                                  not-view?        (not (some #(= % s) (keys views)))
                                                  reco-count       (when not-view? @(ut/tracked-subscribe [::reco-count s :reco]))
                                                  [_ single-wait?] (if not-view?
-                                                                    @(ut/tracked-subscribe [::query-waitings s]) [0 0])
+                                                                  @(ut/tracked-subscribe [::query-waitings s]) [0 0])
+                                                 mat-pct          (str (Math/ceil @(ut/tracked-subscribe [::query-mat-pct s])) "%")
                                                  reco-ready?      (and not-view? (> reco-count 0))
                                                  runner?          (true? (some #(= s %) (keys runners)))
       
@@ -13514,6 +13561,15 @@
                                                            :margin-left "4px"
                                                            :margin-right "4px"
                                                            :margin-top "-3px"}])
+                                                (when (and 
+                                                       (not= "0%" mat-pct)
+                                                       (not= "100%" mat-pct)) [re-com/box
+                                                               :style {:margin-top "-2px" :padding-left "5px" :padding-right "5px"
+                                                                       :font-size "13px"  :font-weight 700
+                                                                       ;:color (theme-pull :theme/universal-pop-color nil)
+                                                                       :color fcolor
+                                                                       }
+                                                               :child (str mat-pct)])
                                                 (when reco-ready?
                                                   [re-com/box :style {:margin-top "-6px"} :child
                                                    [re-com/md-icon-button :md-icon-name "zmdi-view-dashboard" :on-click
@@ -13528,6 +13584,7 @@
                                                                                  s])))
                                                     :style {:font-size        "14px"
                                                             :cursor           "pointer"
+                                                            :margin-top       "2px"
                                                             :color            (if (not (or block-selected?
                                                                                            viz-reco?
                                                                                            hover-q?

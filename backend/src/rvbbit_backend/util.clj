@@ -883,6 +883,10 @@
         (coll? x) (mapv lists-to-vectors x)
         :else     x))
 
+(def mod-letters
+  ["aa" "bb" "cc" "dd" "ee" "ff" "gg" "hh" "ii" "jj" "kk" "mm" "nn" "oo" "pp" "qq" "rr" "ss" "tt" "uu" "vv" "ww" "xx" "yy" "zz"])
+
+(defn gen-sql-sql-alias [] (let [rid (rand-int 999)] (keyword (str (rand-nth mod-letters) rid))))
 
 (defn extract-map [data keys]
   (let [data (lists-to-vectors data)]

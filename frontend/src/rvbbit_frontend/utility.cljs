@@ -585,7 +585,7 @@
 
 (defn postwalk-replacer
   [walk-map target] ;; param based
-  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :postwalk-replacer-cache?}))
+  (if true ;;cache? ;(true? @(rfa/sub ::param-lookup {:kk :postwalk-replacer-cache?}))
     (postwalk-replacer* walk-map target)
     (walk/postwalk-replace walk-map target)))
 
@@ -1241,19 +1241,31 @@
 
 (defn calculate-atom-sizes [atom-map] (into {} (for [[name a] atom-map] (calculate-atom-size name a))))
 
-(defn template-find
-  [s]
+(defn template-find [s]
   (let [s       (str s)
         pattern (re-pattern "\\{\\{:(\\S+?)\\}\\}")]
     (vec (map keyword (map (fn [match] (second match)) (re-seq pattern s))))))
 
-(defn deep-template-find
-  [data]
-  (letfn [(recurse [item]
-            (cond (string? item) (template-find item)
-                  (coll? item)   (mapcat recurse item)
-                  :else          []))]
-    (vec (set (recurse data)))))
+;; (defn deep-template-find [data]
+;;   (letfn [(recurse [item]
+;;             (cond (string? item) (template-find item)
+;;                   (coll? item)   (mapcat recurse item)
+;;                   :else          []))]
+;;     (vec (set (recurse data)))))
+
+(def deep-template-find-cache (atom {}))
+
+(defn deep-template-find [data]
+  (let [cache-key (hash data)]
+    (if-let [cached-result (get @deep-template-find-cache cache-key)]
+      cached-result
+      (letfn [(recurse [item]
+                (cond (string? item) (template-find item)
+                      (coll? item)   (mapcat recurse item)
+                      :else          []))]
+        (let [result (vec (set (recurse data)))]
+          (swap! deep-template-find-cache assoc cache-key result)
+          result)))))
 
 (defn deep-template-replace
   [replacements data]

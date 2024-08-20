@@ -4,6 +4,14 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
+ :materialize-bigfoot-sightings-drag-41 {:signal    false
+                                         :type      :sql
+                                         :snapshot? false
+                                         :data      {:select [:bfroid :class :county :date :fixed_month :fixed_year
+                                                              :month :nearestroad :nearesttown :run_id :run_time :season
+                                                              :sketch :state :submitted :submitted_date :url :year]
+                                                     :from   [[:bigfoot_sightings :pp256]]
+                                                     :page   -4}}
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
@@ -24,7 +32,7 @@
                                      (:require [rvbbit-backend.websockets :as wss]
                                                [rvbbit-backend.pool-party :as ppy]
                                                [rvbbit-backend.sql :as sql]))
-                                   (let [conn (get (clojure.core/deref wss/conn-map) "met-on-tour")]
+                                   (let [conn (get (deref wss/conn-map) "met-on-tour")]
                                      (lets-give-it-a-whirl-no-viz "connections/met-on-tour.edn"
                                                                   conn
                                                                   sql/system-db
@@ -39,7 +47,7 @@
                                    (:require [rvbbit-backend.websockets :as wss]
                                              [rvbbit-backend.pool-party :as ppy]
                                              [rvbbit-backend.sql :as sql]))
-                                 (let [conn (get (clojure.core/deref wss/conn-map) "snifftmp1")]
+                                 (let [conn (get (deref wss/conn-map) "snifftmp1")]
                                    (lets-give-it-a-whirl-no-viz "connections/snifftmp1.edn"
                                                                 conn
                                                                 sql/system-db
@@ -103,6 +111,16 @@
                                    (with-open [in-file  (clojure.java.io/input-stream source-path)
                                                out-file (clojure.java.io/output-stream dest-path)]
                                      (clojure.java.io/copy in-file out-file)))}
+ :materialize-bigfoot-sightings-drag-23
+   {:signal    false
+    :type      :sql
+    :snapshot? false
+    :data      {:select [:alsonoticed :bfroid :class :county :date :environment :fixed_month :fixed_year
+                         :locationdetails :month :nearestroad :nearesttown :observed :otherstories :otherwitnesses
+                         :run_id :run_time :season :sketch :state :submitted :submitted_date :timeandconditions :title
+                         :url :year]
+                :from   [[:bigfoot_sightings :ff564]]
+                :page   -4}}
  :vibrant-antelope-solver {:signal :signal/cool-raccoon-signal-yo :type :clojure :data (+ 1 2 3 88 (rand-int 1234))}
  :sql-snapshot-solver-1
    {:signal :signal/every-5-minutes
@@ -155,7 +173,7 @@
                                       (:require [rvbbit-backend.websockets :as wss]
                                                 [rvbbit-backend.pool-party :as ppy]
                                                 [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (clojure.core/deref wss/conn-map) "boston-crime")]
+                                    (let [conn (get (deref wss/conn-map) "boston-crime")]
                                       (lets-give-it-a-whirl-no-viz "connections/boston-crime.edn"
                                                                    conn
                                                                    sql/system-db
@@ -167,6 +185,20 @@
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
+ :materialize-offenses-drag-1 {:signal    false
+                               :type      :sql
+                               :snapshot? false
+                               :data      {:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long
+                                                    :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE :OFFENSE_CODE_GROUP
+                                                    :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
+                                                    :YEAR]
+                                           :from   [[:offenses :zz441]]
+                                           :page   -4}}
+ :materialize-setlists-drag-12
+   {:signal    false
+    :type      :sql
+    :snapshot? false
+    :data      {:select [:show_id :song_name :song_order :ts] :from [[:setlists :gg794]] :page -4}}
  :send-to-upscaler-2 {:signal    false
                       :type      :clojure
                       :cache?    false
@@ -184,7 +216,7 @@
                                     (:require [rvbbit-backend.websockets :as wss]
                                               [rvbbit-backend.pool-party :as ppy]
                                               [rvbbit-backend.sql :as sql]))
-                                  (let [conn (get (clojure.core/deref wss/conn-map) "filtertmp1")]
+                                  (let [conn (get (deref wss/conn-map) "filtertmp1")]
                                     (lets-give-it-a-whirl-no-viz "connections/filtertmp1.edn"
                                                                  conn
                                                                  sql/system-db
@@ -192,6 +224,56 @@
                                                                  default-field-attributes
                                                                  default-derived-fields
                                                                  default-viz-shapes)))}
+ :materialize-bigfoot-sightings-locations-drag-21
+   {:signal    false
+    :type      :sql
+    :snapshot? false
+    :data      {:select [:alsonoticed :bfroid :class :county :cty_abbrev :cty_name :date :environment :fips_county_code
+                         :fips_state_code :fixed_month :fixed_year :housing_units :land_area :latitude :locationdetails
+                         :longitude :month :nearestroad :nearesttown :observed :otherstories :otherwitnesses :population
+                         :run_id :run_time :season :state :state_abbrev :state_name :submitted :submitted_date
+                         :timeandconditions :title :url :water_area :year :zip_lat :zip_long :zip_name :zipcode]
+                :from   [[:bigfoot_sightings_locations :oo351]]
+                :page   -4}}
+ :materialize-ufo-sightings-drag-38 {:signal    false
+                                     :type      :sql
+                                     :snapshot? false
+                                     :data      {:select [:city :comments :country :date_posted :datetime
+                                                          :duration_hours :duration_seconds :duration_seconds_int :id
+                                                          :latitude :longitude :shape :state]
+                                                 :from   [[:ufo_sightings :gg696]]
+                                                 :page   -4}}
+ :materialize-offenses-drag-26 {:signal    false
+                                :type      :sql
+                                :snapshot? false
+                                :data      {:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long
+                                                     :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE :OFFENSE_CODE_GROUP
+                                                     :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
+                                                     :YEAR]
+                                            :from   [[:offenses :pp66]]
+                                            :page   -4}}
+ :materialize-class-drag-4
+   {:signal false
+    :type :sql
+    :snapshot? false
+    :data
+      {:select [:class [[:count 1] :rowcnt]]
+       :from
+         [[{:select [:alsonoticed :bfroid :class :county :date :environment :fixed_month :fixed_year :locationdetails
+                     :month :nearestroad :nearesttown :observed :otherstories :otherwitnesses :run_id :run_time :season
+                     :sketch :state :submitted :submitted_date :timeandconditions :title :url :year]
+            :from   [[:bigfoot_sightings :pp256]]} :ff478]]
+       :group-by [:class]
+       :order-by [[:rowcnt :desc]]
+       :page -4}}
+ :materialize-ufo-sightings-drag-39 {:signal    false
+                                     :type      :sql
+                                     :snapshot? false
+                                     :data      {:select [:city :comments :country :date_posted :datetime
+                                                          :duration_hours :duration_seconds :duration_seconds_int :id
+                                                          :latitude :longitude :shape :state]
+                                                 :from   [[:ufo_sightings :oo616]]
+                                                 :page   -4}}
  :wallpaper-of-the-moment
    {:signal  :signal/every-5-minutes
     :type    :clojure
@@ -220,7 +302,7 @@
                                       (:require [rvbbit-backend.websockets :as wss]
                                                 [rvbbit-backend.pool-party :as ppy]
                                                 [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (clojure.core/deref wss/conn-map) "bigfoot-ufos")]
+                                    (let [conn (get (deref wss/conn-map) "bigfoot-ufos")]
                                       (lets-give-it-a-whirl-no-viz "connections/bigfoot-ufos.edn"
                                                                    conn
                                                                    sql/system-db
@@ -236,7 +318,7 @@
                                    (:require [rvbbit-backend.websockets :as wss]
                                              [rvbbit-backend.pool-party :as ppy]
                                              [rvbbit-backend.sql :as sql]))
-                                 (let [conn (get (clojure.core/deref wss/conn-map) "snifftmp2")]
+                                 (let [conn (get (deref wss/conn-map) "snifftmp2")]
                                    (lets-give-it-a-whirl-no-viz "connections/snifftmp2.edn"
                                                                 conn
                                                                 sql/system-db
@@ -251,7 +333,7 @@
                                   (:require [rvbbit-backend.websockets :as wss]
                                             [rvbbit-backend.pool-party :as ppy]
                                             [rvbbit-backend.sql :as sql]))
-                                (let [conn (get (clojure.core/deref wss/conn-map) "imported")]
+                                (let [conn (get (deref wss/conn-map) "imported")]
                                   (lets-give-it-a-whirl-no-viz "connections/imported.edn"
                                                                conn
                                                                sql/system-db

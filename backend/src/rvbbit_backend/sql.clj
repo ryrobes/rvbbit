@@ -64,10 +64,10 @@
   {:datasource
    @(pool-create
      {:jdbc-url
-      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
+      ;;;;;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-           ;;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
+      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
       :idle-timeout      600000
       :maximum-pool-size 20
       :max-lifetime      1800000
@@ -183,7 +183,34 @@
      "ghost-db")})
 
 
+(def import-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url ;;"jdbc:sqlite:db/csv-imports.db"
+      "jdbc:sqlite:file:./db/csv-imports.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+      :cache    "shared"}
+     "imports-db-pool")})
 
+;; (def cache-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url
+;;      ;;  "jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
+;;       "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+;;       :cache    "shared"}
+;;      "cache-db-pool")})
+
+(def default-schema "base")
+(def cache-db ;; duck test 
+  {:datasource
+   @(pool-create
+     {:jdbc-url "jdbc:duckdb:./db/cache.duck"
+      ;:driver-class-name "org.duckdb.DuckDBDriver"
+      :idle-timeout      600000
+      :maximum-pool-size 20
+      ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+      :max-lifetime      1800000}
+     "cache-db-pool")})
 
 
 
@@ -283,7 +310,7 @@
               (insert-error-row! db-spec query e)
               [{:query_error (str (.getMessage e))}
                {:query_error "(from database connection)"}
-               {:query_error (subs (str db-spec) 0 150)}
+               {:query_error (str db-spec)}
                {:execution_time_ms execution-time-ms}])))))))
 
 

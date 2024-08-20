@@ -38,7 +38,7 @@
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.sql :as    sql
-    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db  history-db
+    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db cache-db import-db history-db
             to-sql]]
    [rvbbit-backend.surveyor :as surveyor]
    [rvbbit-backend.transform :as ts]
@@ -247,7 +247,7 @@
                  (:require [rvbbit-backend.websockets :as wss]
                            [rvbbit-backend.pool-party :as ppy]
                            [rvbbit-backend.sql :as sql]))
-               (let [conn (get @wss/conn-map :conn-name)]
+               (let [conn (get (deref wss/conn-map) :conn-name)]
                  ;(ppy/execute-in-thread-pools
                  ; :conn-schema-sniff-serial
                  ; (fn []
@@ -550,7 +550,7 @@
 
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
    "cache.db"
-   wss/cache-db
+   cache-db
    system-db
    cruiser/default-sniff-tests
    cruiser/default-field-attributes

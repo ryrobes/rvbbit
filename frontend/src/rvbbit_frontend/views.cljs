@@ -3947,7 +3947,7 @@
                                                         (into (map first fs)
                                                               ;; [:flow :time :server :flows-sys :client :solver :signal-history :runstream 
                                                               ;;  :data :repl-ns :solver-status :flow-status :kit :kit-status :solver-meta :repl-ns nil]
-                                                              (vec db/reactor-types)
+                                                              (conj (vec db/reactor-types) :selected-block :selected-view)
                                                               ))]
                       (hash pp-without-fs)))) ;; was :param
 
@@ -4220,7 +4220,7 @@
                                                          "#05dfff" ;; downstream?
                                                        :else "orange") 
                                                  k d nil]))))))))))]
-                   (ut/tapp>> [:lines!   lmap])
+                   ;;(ut/tapp>> [:lines!   lmap])
                    lmap)
                  [])]
     (bricks/droppable

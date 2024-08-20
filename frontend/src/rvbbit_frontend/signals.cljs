@@ -38,6 +38,8 @@
     [goog.events EventType]
     [goog.async  Debouncer]))
 
+(def waiting? (reagent/atom {}))
+
 (re-frame/reg-event-db ::edit-signal-drop
                        (undoable)
                        (fn [db [_ content adding]]
@@ -384,12 +386,14 @@
 
 
 
+
 (defn items-list
   [ph signals selected-warren-item warren-type-string]
   (let [;signals @(ut/tracked-subscribe [::signals-map])
-        solver?          (= warren-type-string "solvers")
-        signal?          (= warren-type-string "signals")
-        
+        solver?          (cstr/includes? (str warren-type-string) "solvers")
+        signal?          (cstr/includes? (str warren-type-string) "signals")
+        react!           [@waiting?]
+        client-name      @(ut/tracked-sub ::bricks/client-name {})
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ssr              (ut/replacer (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
         selected-type    (str ssr "s")
@@ -430,6 +434,10 @@
              :let                    [selected? (= name selected-warren-item)
                                       sigkw     (keyword (str "signal/" (ut/replacer (str name) ":" "")))
                                       vv        (when signal? (get results name))
+                                      solver-running?      (when solver?
+                                                             @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                              {:keypath [(keyword (str "solver-status/" (ut/unkeyword client-name) ">"
+                                                                                                       (ut/unkeyword name) ">running?"))]}))
                                       solver-no-signal? (when solver? @(ut/tracked-sub ::solver-no-signal? {:solver-name name}))
                                       ext-map   (when solver?
                                                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
@@ -457,22 +465,53 @@
               [re-com/h-box :padding "6px" :justify :between :style {:font-size "13px" :opacity 0.56}
                :children
                [
-                (when true ;; solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
+                (when solver? ;;true ;; solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
+                  ;; [re-com/md-icon-button
+                  ;;  :src (at)
+                  ;;  :md-icon-name "zmdi-play"
+                  ;;  :on-click  #(ut/tracked-dispatch [::wfx/request 
+                  ;;                                    :default
+                  ;;                                    {:message {:kind         :run-solver
+                  ;;                                               :solver-name  name
+                  ;;                                  ;:override-map (get @(ut/tracked-sub ::solvers-map {})
+                  ;;                                  ;                   selected-warren-item)
+                  ;;                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                  ;;                                     :timeout 15000000}])
+                  ;;  :style {;:font-size "17px"
+                  ;;          :transform-origin "18px 17px"
+                  ;;          :cursor "pointer"
+                  ;;          :color (theme-pull :theme/editor-outer-rim-color nil)}]
+                  
                   [re-com/md-icon-button
-                   :src (at)
-                   :md-icon-name "zmdi-play"
-                   :on-click  #(ut/tracked-dispatch [::wfx/request 
-                                                     :default
-                                                     {:message {:kind         :run-solver
-                                                                :solver-name  name
-                                                   ;:override-map (get @(ut/tracked-sub ::solvers-map {})
-                                                   ;                   selected-warren-item)
-                                                                :client-name  @(ut/tracked-sub ::bricks/client-name {})}
-                                                      :timeout 15000000}])
-                   :style {;:font-size "17px"
+                   :md-icon-name (if (or (get @waiting? name) solver-running?) "zmdi-refresh" "zmdi-play")
+                   :class (cond
+                            solver-running? "rotate linear infinite"
+                            (get @waiting? name) "rotate-reverse linear infinite"
+                            :else "")
+                   :on-click (fn []
+                               (when (not solver-running?)
+                                 (swap! waiting? assoc name true)
+                                 (let [fstr (str "manually running solver - " name)
+                                       w    (/ (count fstr) 4.1)]
+                                   (ut/tracked-dispatch [::wfx/request
+                                                         :default
+                                                         {:message {:kind         :run-solver
+                                                                    :solver-name  name
+                                                                     ;:override-map (get @(ut/tracked-sub ::solvers-map {})
+                                                                     ;                   selected-warren-item)
+                                                                    :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                                          :timeout 15000000}])
+                                   (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                                   (js/setTimeout #(swap! waiting? assoc name false) 5000))))
+                   :style {;:font-size        "inherit"
+                           ;:padding          "5px"
+                           :font-size "34px"
                            :transform-origin "18px 17px"
-                           :cursor "pointer"
-                           :color (theme-pull :theme/editor-outer-rim-color nil)}])
+                           :margin-top       "-6px"
+                           :cursor           "pointer"}]
+                  
+                  
+                  )
                 
                 [re-com/box :child (str (get ext-map :last-processed))]
                 [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])]] :operator sigkw])]]]))
@@ -504,7 +543,9 @@
           :color     (theme-pull :theme/editor-outer-rim-color nil)
           :font-size "14px"}]]]
       (when open?
-        (if (or (= name "solvers") (= name "rules") (= name "signals"))
+        (if (or ;(= name "solvers")
+                (cstr/includes? (str name) "solvers")
+                (= name "rules") (= name "signals"))
           (let [;signals @(ut/tracked-subscribe [::signals-map]) ;; they get passed from the
                 selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
                 ph                   200]
@@ -615,10 +656,16 @@
         ;time-items           @(ut/tracked-sub ::time-items {})
         signals              @(ut/tracked-sub ::signals-map {})
         solvers              @(ut/tracked-sub ::solvers-map {})
+        solver-keys          (keys solvers)
+        solvers-only         (select-keys solvers (filter #(and 
+                                                            (not (cstr/starts-with? (str %) ":materialize"))
+                                                            (not (cstr/starts-with? (str %) ":refresh"))) solver-keys))
+        db-meta-solvers      (select-keys solvers (filter #(cstr/starts-with? (str %) ":materialize") solver-keys))
+        cache-solvers        (select-keys solvers (filter #(cstr/starts-with? (str %) ":refresh") solver-keys))
         ;rules                @(ut/tracked-sub ::rules-map {})
-        selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+        ;selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         ;signal-vec           (get-in signals [selected-warren-item :signal])
-        react!               [@db/selectors-open]
+        react!               [@db/selectors-open @waiting?]
         filter-results       (fn [x y]
                                (if (or (nil? x) (empty? x))
                                  y
@@ -668,7 +715,10 @@
         ;[selector-panel "KPIs" (filter-results @db/signals-searcher-atom time-items) "zmdi-traffic" {} 2] [re-com/gap :size "20px"]
         [selector-panel "signals" (filter-results @db/signals-searcher-atom signals) "zmdi-flash" {} 5]
         ;[selector-panel "rules" (filter-results @db/signals-searcher-atom rules) "zmdi-flash" {} 5]
-        [selector-panel "solvers" (filter-results @db/signals-searcher-atom solvers) "zmdi-flash" {} 5] [re-com/gap :size "10px"]
+        [selector-panel "solvers" (filter-results @db/signals-searcher-atom solvers-only) "zmdi-flash" {} 5] 
+        [selector-panel "*run-db-meta-solvers" (filter-results @db/signals-searcher-atom db-meta-solvers) "zmdi-flash" {} 5]
+        [selector-panel "*run-cache-solvers" (filter-results @db/signals-searcher-atom cache-solvers) "zmdi-flash" {} 5]
+        [re-com/gap :size "10px"]
         ;; [re-com/h-box :size "auto" :gap "8px" :children
         ;;  (for [e ["solver" "rule" "signal"]]
         ;;    [re-com/v-box :padding "4px" :style
@@ -828,6 +878,7 @@
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         warren-item-type     @(ut/tracked-sub ::warren-item-type {})
         solver-vw-mode       @db/solver-view-mode
+        react!               [@waiting?]
         client-name          @(ut/tracked-sub ::bricks/client-name {})
         signal?              (true? (= warren-item-type :signal))
         solver?              (true? (= warren-item-type :solver))
@@ -883,24 +934,53 @@
                                                    {:keypath [(keyword (str "signal/"
                                                                             (ut/replacer (str selected-warren-item) ":" "")))]}))]
                     solver? [draggable-play
+                            ;;  [re-com/md-icon-button
+                            ;;   :src (at)
+                            ;;   :md-icon-name (if solver-running? 
+                            ;;                   "zmdi-refresh" "zmdi-play")
+                            ;;   :class (when solver-running? 
+                            ;;            "rotate linear infinite")
+                            ;;   :on-click #(ut/tracked-dispatch
+                            ;;               [::wfx/push :default
+                            ;;                {:kind         :run-solver
+                            ;;                 :solver-name  selected-warren-item
+                            ;;                 :override-map (get @(ut/tracked-sub ::solvers-map {})
+                            ;;                                    selected-warren-item)
+                            ;;                 :client-name  @(ut/tracked-sub ::bricks/client-name {})}])
+                            ;;   :style {:font-size "34px"
+                            ;;           :transform-origin "18px 17px"
+                            ;;           :cursor "pointer"
+                            ;;           ;:margin-top  "-9px"
+                            ;;           :color (theme-pull :theme/editor-outer-rim-color nil)}]
+                             
                              [re-com/md-icon-button
-                              :src (at)
-                              :md-icon-name (if solver-running? 
-                                              "zmdi-refresh" "zmdi-play")
-                              :class (when solver-running? 
-                                       "rotate linear infinite")
-                              :on-click #(ut/tracked-dispatch
-                                          [::wfx/push :default
-                                           {:kind         :run-solver
-                                            :solver-name  selected-warren-item
-                                            :override-map (get @(ut/tracked-sub ::solvers-map {})
-                                                               selected-warren-item)
-                                            :client-name  @(ut/tracked-sub ::bricks/client-name {})}])
+                              :md-icon-name (if (or (get @waiting? selected-warren-item) solver-running?) "zmdi-refresh" "zmdi-play")
+                              :class (cond
+                                       solver-running? "rotate linear infinite"
+                                       (get @waiting? selected-warren-item) "rotate-reverse linear infinite"
+                                       :else "")
+                              :on-click (fn []
+                                          (when (not solver-running?)
+                                            (swap! waiting? assoc selected-warren-item true)
+                                            (let [fstr (str "manually running solver - " selected-warren-item)
+                                                  w    (/ (count fstr) 4.1)]
+                                              (ut/tracked-dispatch [::wfx/request
+                                                                    :default
+                                                                    {:message {:kind         :run-solver
+                                                                               :solver-name  selected-warren-item
+                                                                               ;:override-map (get @(ut/tracked-sub ::solvers-map {})
+                                                                                ;                   selected-warren-item)
+                                                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                                                     :timeout 15000000}])
+                                              (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                                              (js/setTimeout #(swap! waiting? assoc selected-warren-item false) 5000))))
                               :style {:font-size "34px"
                                       :transform-origin "18px 17px"
-                                      :cursor "pointer"
-                                      ;:margin-top  "-9px"
-                                      :color (theme-pull :theme/editor-outer-rim-color nil)}]
+                                      :margin-top       "-6px"
+                                      :cursor           "pointer"}]
+
+
+
                              selected-warren-item]
                     :else   [re-com/gap :size "10px"] ;; placeholder
                     )]])

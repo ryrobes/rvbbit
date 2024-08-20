@@ -10,9 +10,10 @@
    [rvbbit-backend.db     :as db]
    [clojure.walk          :as walk]
    [rvbbit-backend.sql    :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
+    :refer [sql-exec sql-query sql-query-one system-db cache-db import-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
    [rvbbit-backend.ddl    :as sqlite-ddl]
+   [rvbbit-backend.surveyor :as svy]
    [rvbbit-backend.freezepop :as fpop]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
@@ -206,21 +207,53 @@
 
 (defn strip-ansi-codes [s] (cstr/replace s #"\u001B\[[0-9;]*m" ""))
 
+;; (defn insert-rowset
+;;   [rowset table-name keypath client-name & [columns-vec db-conn queue-name metadata]]
+;;   ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
+;;   (if (ut/ne? rowset)
+;;     (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
+;;                                      (and (not (map? (first rowset))) (vector? rowset)) :vectors)
+;;                columns-vec-arg columns-vec
+;;                ;db-conn         (or db-conn cache-db)
+;;                rowset-fixed    (if (= rowset-type :vectors)
+;;                                  (for [r rowset] (zipmap columns-vec-arg r))
+;;                                  rowset)
+;;                columns         (keys (first rowset-fixed))
+;;                table-name-str  (ut/unkeyword table-name)
+;;                ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
+;;                extra           {:queue queue-name
+;;                                 :extras [ddl-str columns-vec-arg table-name table-name-str]}]
+;;            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
+;;            ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
+;;            ;(write-transit-data rowset-fixed keypath client-name table-name-str)
+;;            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
+;;            (sql-exec db-conn ddl-str extra)
+;;            (doseq [batch (partition-all 10 rowset-fixed)
+;;                    :let  [values     (vec (for [r batch] (vals r)))
+;;                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
+;;              (sql-exec db-conn insert-sql extra))
+;;            (ut/pp [:INSERTED-SUCCESS! :introspected-rowset (count rowset) :into table-name-str  client-name])
+;;            {:sql-cache-table table-name :rows (count rowset)})
+;;          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
+;;     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
+
 (defn insert-rowset
-  [rowset table-name keypath client-name & [columns-vec db-conn queue-name metadata]]
+  [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
   ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
   (if (ut/ne? rowset)
     (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
                                      (and (not (map? (first rowset))) (vector? rowset)) :vectors)
                columns-vec-arg columns-vec
-               ;db-conn         (or db-conn cache-db)
+               db-conn         cache-db ;;(or db-conn cache-db)
+               db-type         (svy/db-typer db-conn)
                rowset-fixed    (if (= rowset-type :vectors)
                                  (for [r rowset] (zipmap columns-vec-arg r))
                                  rowset)
                columns         (keys (first rowset-fixed))
                table-name-str  (ut/unkeyword table-name)
-               ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
-               extra           {:queue queue-name
+               ;table-name-str  (ut/unkeyword (str client-name "_" table-name))
+               ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed db-type)
+               extra           {:queue (if (= db-conn cache-db) nil queue-name)
                                 :extras [ddl-str columns-vec-arg table-name table-name-str]}]
            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
            ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
@@ -231,7 +264,18 @@
                    :let  [values     (vec (for [r batch] (vals r)))
                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
              (sql-exec db-conn insert-sql extra))
-           (ut/pp [:INSERTED-SUCCESS! :introspected-rowset (count rowset) :into table-name-str  client-name])
+
+          ;;  (cruiser/captured-sniff "cache.db"
+          ;;                          db-conn
+          ;;                          db-conn
+          ;;                          cache-db
+          ;;                          (hash rowset-fixed)
+          ;;                          [:= :table-name table-name]
+          ;;                          true
+          ;;                          rowset-fixed
+          ;;                          client-name)
+
+           (ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
@@ -710,7 +754,7 @@
                 (when is-rowset? (let [table-name (ut/keypath-munger [id ui-keypath])
                                        query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
                                    (reset! sqlized [query-name {:select [:*]
-                                                                :connection-id client-name
+                                                                :connection-id "cache.db" ;;client-name
                                                                 :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
                                                                 :_sqlized-by ui-keypath
                                                                 :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
@@ -723,9 +767,11 @@
                                                           nil
                                                           nil
                                                           (keys (first (first merged-values)))
-                                                          (sql/create-or-get-client-db-pool client-name)
+                                                          cache-db ;;(sql/create-or-get-client-db-pool client-name)
                                                           client-name)))
                                    (ut/pp [:sqlized-repl-output! @sqlized])))
+                
+                (swap! db/last-solvers-data-atom assoc (last ui-keypath) (get output :value))
 
                 (merge output (when is-rowset? {:sqlized @sqlized}))))
 

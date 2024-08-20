@@ -4775,7 +4775,7 @@
  (fn [db _]
    (let [blocks (ut/deep-remove-keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab ""))
                                                       (get db :panels)))
-                                     [:root :selected-mode :opts :root :selected-view])
+                                     [:root :selected-mode :opts :root :selected-view :icon :icon-view])
          blocks (filterv #(= (count %) 3) (ut/kvpaths blocks))
          running-solver-keys (mapv #(keyword (str "solver/" (second (cstr/split (str %) ">"))))
                                    (map first
@@ -4799,7 +4799,7 @@
  (fn [db _]
    (let [blocks (ut/deep-remove-keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab ""))
                                                       (get db :panels)))
-                                     [:root :selected-mode :opts :root :selected-view])
+                                     [:root :selected-mode :opts :root :selected-view :icon :icon-view])
          blocks (filterv #(= (count %) 3) (ut/kvpaths blocks))
          running-kit-keys (mapv #(keyword (first (cstr/split (cstr/replace (str %) ":" "") ">")))
                                    (map first

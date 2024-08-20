@@ -16,7 +16,7 @@
     [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party  :as ppy]
     [rvbbit-backend.sql        :as    sql
-                               :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db 
+                               :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db import-db
                                        insert-error-row! to-sql pool-create]]
     [clojure.math.combinatorics :as combo]
     [clj-time.jdbc]) ;; enables joda time returns
@@ -1424,17 +1424,20 @@
         (update-connection-data! system-db this-run-id connection_id)
         (ut/pp [:lets-give-it-a-whirl-no-viz-success! :fields (count field-vectors)])
         ;(group-by (fn [v] [(nth v 2) (nth v 5)]) field-vectors)
-        {:connect-meta connect-meta
-         ;;:ff (first field-vectors)
-         :tables (into {} (for [tbl (distinct (map #(get % 5) field-vectors))]
-                            {tbl (vec (distinct (map #(get % 6) field-vectors)))}))})
+        ;; {:connect-meta connect-meta
+        ;;  ;;:ff (first field-vectors)
+        ;;  :tables (into {} (for [tbl (distinct (map #(get % 5) field-vectors))]
+        ;;                     {tbl (vec (distinct (map #(get % 6) field-vectors)))}))}
+        (merge
+         {:*connect-meta connect-meta}
+         (into {} (for [tbl (distinct (map #(get % 5) field-vectors))]
+                    {tbl (vec (distinct (map #(get % 6) (filter #(= (get % 5) tbl) field-vectors))))}))))
       (catch Exception e
         (let [sw (java.io.StringWriter.)
               pw (java.io.PrintWriter. sw)]
           (.printStackTrace e pw)
           (ut/pp [:error-running-whirl f-path sql-filter target-db (str e) (.toString sw)])
-          (insert-error-row! target-db (str (str e) (.toString sw)) {:sql-filter sql-filter})
-          )))))
+          (insert-error-row! target-db (str (str e) (.toString sw)) {:sql-filter sql-filter}))))))
 
 ;; (defn insert-rowset
 ;;   [rowset table-name db-conn & columns-vec] ;; special version for captured sniff
@@ -1490,7 +1493,7 @@
           ;;                          rowset-fixed
           ;;                          client-name)
 
-           (ut/pp [:CRUISER-INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
+           ;;(ut/pp [:CRUISER-INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))

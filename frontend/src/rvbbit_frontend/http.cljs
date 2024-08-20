@@ -291,7 +291,10 @@
          duration (or duration 30)]
      (if (some #(= % (str content)) (for [[cc _ _ _ _] (get db :alerts [])] (str cc)))
        db ;; no dupes now
-       (assoc db :alerts (vec (conj (get db :alerts []) [content w h (+ ticktock duration) alert-id])))))))
+       (assoc db :alerts (vec (conj (get db :alerts [])
+                                    [[:box
+                                      :style {:font-size "15px"}
+                                      :child content] w h (+ ticktock duration) alert-id])))))))
 
 (re-frame/reg-event-db
  ::runstream-item
@@ -563,11 +566,13 @@
               counts?                     (= task-id :cnts)
               heartbeat?                  (= task-id :heartbeat)
               new-slice?                  (= task-id :new-slice)
+              push-query?                 (= task-id :push-query)
               kit-view?                   (= task-id :kit-view)
               kit-view-opts?              (= task-id :kit-view-opts)
               kit-view-remove?            (= task-id :kit-view-remove)
               signals-file?               (= task-id :signals-file)
               solvers-file?               (= task-id :solvers-file)
+              materialized-pct?            (= task-id :materialized-pct)
               alert?                      (cstr/starts-with? (str task-id) ":alert")
               server-sub?                 (and kick? ;; likely already batched and applied above, but just in case somehow
                                                (contains? db/reactor-types (get-in result [:task-id 0]))
@@ -590,12 +595,12 @@
             (ut/tracked-dispatch [::refresh-kits]))
 
 
-          (when (and (cstr/includes? (str client-name) "black")  (not runstream-sub?))
-            (ut/tapp>> [:msg-in
-                        file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?
-                        (str task-id) (get result :status)  (str ui-keypath)
-                        ;(str (get-in result [:status :evald-result :value 0]))
-                        (str (get result :ui-keypath)) (str result)]))
+          ;; (when (and (cstr/includes? (str client-name) "bronze")  (not runstream-sub?))
+          ;;   (ut/tapp>> [:msg-in
+          ;;               file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?
+          ;;               (str task-id) (get result :status)  (str ui-keypath)
+          ;;               ;(str (get-in result [:status :evald-result :value 0]))
+          ;;               (str (get result :ui-keypath)) (str result)]))
 
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
@@ -637,6 +642,8 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
+            
+            materialized-pct? (assoc-in db [:mat-pct ui-keypath] (get result :status))
 
             (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
             (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
@@ -655,6 +662,13 @@
                                     (get-in result [:status :evald-result :value 0]))
                           (assoc-in [:panels (get-in result [:ui-keypath 1]) :selected-view]
                                     :_kvw1))
+            
+            push-query? (let [panel-key (get-in result [:ui-keypath 1])
+                              q-name (ut/safe-key (get-in result [:ui-keypath 2]))]
+                          (ut/tapp>> [:push-query q-name panel-key (get-in result [:status])])
+                          (-> db
+                              (assoc-in [:panels panel-key :queries q-name] (get-in result [:status]))
+                              (assoc-in [:panels panel-key :selected-view] q-name)))            
 
             new-slice?    (let [kp [:panels (get-in result [:ui-keypath 0]) (get-in result [:status 0]) (get-in result [:status 1])]
                                 query-map (get-in result [:status 2])]
@@ -906,18 +920,18 @@
                           (dissoc :signals-map)
                           (dissoc :repl-output)
                           (dissoc :solver-fn)
-                          ;(ut/dissoc-in [:solver-fn :runs])
-                          ;(ut/dissoc-in [:click-param :signal-history])
-                          ;(ut/dissoc-in [:click-param :solver-meta])
-                          ;(ut/dissoc-in [:click-param :repl-ns])
+                          (ut/dissoc-in [:solver-fn :runs])
+                          (ut/dissoc-in [:click-param :signal-history])
+                          (ut/dissoc-in [:click-param :solver-meta])
+                          (ut/dissoc-in [:click-param :repl-ns])
                           (ut/dissoc-in [:click-param :panel-hash])
-                          ;(ut/dissoc-in [:click-param :solver-status])
-                          ;(ut/dissoc-in [:click-param :solver])
-                          ;(ut/dissoc-in [:click-param :flow-status])
+                          (ut/dissoc-in [:click-param :solver-status])
+                          (ut/dissoc-in [:click-param :solver])
+                          (ut/dissoc-in [:click-param :flow-status])
                           (ut/dissoc-in [:click-param :runstream])
-                          ;(ut/dissoc-in [:click-param :kit-status])
-                          ;(ut/dissoc-in [:click-param :kit])
-                          ;(ut/dissoc-in [:click-param :signal])
+                          (ut/dissoc-in [:click-param :kit-status])
+                          (ut/dissoc-in [:click-param :kit])
+                          (ut/dissoc-in [:click-param :signal])
                           (as-> db' (reduce #(ut/dissoc-in %1 [:click-param %2]) db' db/reactor-types))
                           (dissoc :data) ;; but NOT clover edn data TODO
                           (dissoc :flows) ;;; mostly ephemeral with the UI....

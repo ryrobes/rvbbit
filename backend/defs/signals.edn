@@ -7,6 +7,7 @@
               [:or [:= :time/second 10] [:= :time/second 20] [:= :time/second 45] [:= :time/second 25]]]]}
  :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]}
  :hourly? {:signal [:or [:changed? :time/hour] [:<> :time/minute -1]]}
+ :daily-at-9am {:signal [:= :time/hour 9]}
  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]}
  :every-30-seconds? {:signal [:or [:= :time/second 30] [:= :time/second 0]]}
  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]}
