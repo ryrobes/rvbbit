@@ -1914,7 +1914,7 @@
 
 (defn cycle-mode [current-mode]
   (let [modes           @(ut/tracked-sub ::bricks/hop-bar-runners {})
-        modes           (walk/postwalk-replace {:views :clover} modes)
+        modes           (ut/postwalk-replacer {:views :clover} modes)
         modes           (vec (for [[k m] modes] (merge m {:name k})))
         current-index   (.indexOf modes current-mode)
         next-index      (mod (inc current-index) (count modes))]

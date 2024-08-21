@@ -1233,7 +1233,7 @@
          new (ut/safe-key new)]
      ;;(tapp>> [:change-block-layer? panel-key old new])
      (swap! db/data-browser-query assoc panel-key new)  ;; to select it in the editor 
-     (assoc-in db [:panels panel-key] (walk/postwalk-replace
+     (assoc-in db [:panels panel-key] (ut/postwalk-replacer
                                        {old new}
                                        (get-in db [:panels panel-key]))))))
 
@@ -2215,7 +2215,7 @@
                               ;;             @(ut/tracked-sub ::get-view-data {:panel-key selected-block :runner runner :data-key data-key}))
                               :*client-name client-name})
         valid-body          (if (and as-function? (or clover? clojure?))
-                              (walk/postwalk-replace
+                              (ut/postwalk-replacer
                                (merge
                                 {:clover-body valid-body}
                                 opts-map-star)
@@ -7437,7 +7437,7 @@
                                                                                         {v @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
                                                                                                                    id (get row id) heatmap-styles scheme
                                                                                                                    depth direction])})))]
-                                                  (walk/postwalk-replace logic-kps obody)))
+                                                  (ut/postwalk-replacer logic-kps obody)))
 
                                styles           (apply merge
                                                        (for [s styler-keys]
@@ -8973,19 +8973,29 @@
      (doseq [[k v] all-queries]
        (conn/sql-style-meta [k] (sql-alias-replace v) (get-in db [:panels (lkp k) :connection-id]))))))
 
-(re-frame/reg-event-db ::update-metadata-tabs
-                       (fn [db [_]]
-                         (let [tab-rules (into {}
-                                               (for [[k v] (get db :panels)]
-                                                 (into {} (for [[kk vv] (get v :tab-rules)] {kk {:logic vv :panel-key k}}))))]
-                           (doseq [[[tab-name rule-name] {:keys [logic panel-key]}] tab-rules]
-                             (conn/sql-tab-meta [panel-key] [[tab-name rule-name] (sql-alias-replace logic)] panel-key)))))
+(re-frame/reg-event-db
+ ::update-metadata-tabs
+ (fn [db [_]]
+   (let [tab-rules (into {}
+                         (for [[k v] (get db :panels)]
+                           (into {} (for [[kk vv] (get v :tab-rules)] {kk {:logic vv :panel-key k}}))))]
+     (doseq [[[tab-name rule-name] {:keys [logic panel-key]}] tab-rules]
+       (conn/sql-tab-meta [panel-key] [[tab-name rule-name] (sql-alias-replace logic)] panel-key)))))
 
-(re-frame/reg-event-db ::update-conditionals
-                       (fn [db [_]]
-                         (let [all-condis
-                               (into {} (for [[_ v] (get db :panels)] (into {} (for [[kk vv] (get v :conditionals)] {kk vv}))))]
-                           (doseq [[k v] all-condis] (conn/sql-condi-meta [k] (sql-alias-replace v))))))
+(re-frame/reg-event-db
+ ::update-conditionals
+ (fn [db [_]]
+   (let [all-condis
+         (into {} (for [[_ v] (get db :panels)] (into {} (for [[kk vv] (get v :conditionals)] {kk vv}))))]
+     (doseq [[k v] all-condis] (conn/sql-condi-meta [k] (sql-alias-replace v))))))
+
+(re-frame/reg-sub
+ ::visible-conditionals?
+ (fn [db _]
+   (let [visible-panel-keys @(ut/tracked-sub ::relevant-tab-panels-set {})]
+     (boolean (some (fn [[_ panel]]
+                      (contains? panel :conditionals))
+                    (select-keys (get db :panels) visible-panel-keys))))))
 
 (defn iif [v this that] (if (true? v) this that))
 (defn eql [this that] (= this that))
@@ -10840,7 +10850,7 @@
                         (if (vector? args)
                           (cstr/join "" args) ;;(apply str args))
                           (str args)))
-              :data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box :h-box :_h-box
+              :data-viewer (fn [x] (let [x (ut/postwalk-replacer {:box :_box :icon :_icon :v-box :_v-box :h-box :_h-box
                                                                    :data-viewer :_data-viewer} x)
                                          solver-key (get @db/solver-fn-lookup [:panels panel-key selected-view])
                                                                      ;; _ (tapp>> [:dv solver-key panel-key selected-view @db/solver-fn-lookup])
@@ -10850,7 +10860,7 @@
                                       [map-boxes2 x (or  panel-key solver-key) selected-view []
                                        (if in-editor? [h w] :output)
                                        nil]]))
-              :data-viewer-limit (fn [[x l]] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box
+              :data-viewer-limit (fn [[x l]] (let [x (ut/postwalk-replacer {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box
                                                                              :data-viewer :_data-viewer} x)
                                                    solver-key (get @db/solver-fn-lookup [:panels panel-key selected-view])]
                                                [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
@@ -11293,53 +11303,54 @@
 
 
 
-(defn honeycomb-context-fns [panel-key w h client-name selected-view selected-view-type px-width-int px-height-int]
+(defn honeycomb-context-fns [panel-key w h client-name selected-view selected-view-type px-width-int px-height-int vsql-calls]
   (let [into-walk-map2 (fn [obody]
-                         (let [;obody (walk/postwalk-replace condi-walks orig-body)
+                         (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody)
                                logic-kps (into {} (for [v kps] (let [[_ this that] v] {v (into this that)})))]
-                           (walk/postwalk-replace logic-kps obody)))
+                           (ut/postwalk-replacer logic-kps obody)))
         if-walk-map2 (fn [obody]
-                       (let [;obody (walk/postwalk-replace condi-walks orig-body)
+                       (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                              kps       (ut/extract-patterns obody :if 4) ;(kv-map-fn obody)
                              logic-kps (into {}
                                              (for [v kps]
                                                (let [[_ l this that] v]
                                                  {v (if (if (vector? l) (resolver/logic-and-params l nil) l) this that)})))]
-                         (walk/postwalk-replace logic-kps obody)))
+                         (ut/postwalk-replacer logic-kps obody)))
         when-walk-map2 (fn [obody]
                          (let [kps       (ut/extract-patterns obody :when 3)
                                logic-kps (into {} (for [v kps] (let [[_ l this] v] {v (when l this)})))]
-                           (walk/postwalk-replace logic-kps obody)))
+                           (ut/postwalk-replacer logic-kps obody)))
         =-walk-map2 (fn [obody]
                       (let [kps       (ut/extract-patterns obody := 3)
                             logic-kps (into {} (for [v kps] (let [[_ that this] v] {v (= (str that) (str this))})))]
-                        (walk/postwalk-replace logic-kps obody)))
+                        (ut/postwalk-replacer logic-kps obody)))
         some-walk-map2 (fn [obody]
                          (let [kps       (ut/extract-patterns obody :some 3)
                                logic-kps (into {}
                                                (for [v kps]
                                                  (let [[_ value coll] v]
                                                    {v (boolean (some #(= (str %) (str value)) coll))})))]
-                           (walk/postwalk-replace logic-kps obody)))
+                           (ut/postwalk-replacer logic-kps obody)))
         auto-size-walk-map2 (fn [obody]
                               (let [kps       (ut/extract-patterns obody :auto-size-px 2)
                                     logic-kps (into {} (for [v kps] (let [[_ l] v] {v (ut/auto-font-size-px l h w)})))] ;(=
-                                (walk/postwalk-replace logic-kps obody)))
-              ;; onclick-walk-map2 (fn [obody] ;; vsql version....?
-              ;;                     (let [kps       (ut/extract-patterns obody :set-parameter 3)
-              ;;                           logic-kps (into {}
-              ;;                                           (for [v kps]
-              ;;                                             (let [[_ pkey pval] v
-              ;;                                                   raw-param-key (get-in vsql-calls
-              ;;                                                                         (conj (vec (first (filter #(= (last %) :on-click)
-              ;;                                                                                                   (ut/kvpaths vsql-calls))))
-              ;;                                                                               1)
-              ;;                                                                         pkey)]
-              ;;                                               {v (fn []
-              ;;                                                    (ut/tracked-dispatch [::conn/click-parameter [panel-key]
-              ;;                                                                          {raw-param-key pval}]))})))]
-              ;;                       (walk/postwalk-replace logic-kps obody)))
+                                (ut/postwalk-replacer logic-kps obody)))
+        
+        onclick-vsql-walk-map2 (fn [obody] ;; vsql version....?
+                                 (let [kps       (ut/extract-patterns obody :set-vsql-parameter 3)
+                                       logic-kps (into {}
+                                                       (for [v kps]
+                                                         (let [[_ pkey pval] v
+                                                               raw-param-key (get-in vsql-calls
+                                                                                     (conj (vec (first (filter #(= (last %) :on-click)
+                                                                                                               (ut/kvpaths vsql-calls))))
+                                                                                           1)
+                                                                                     pkey)]
+                                                           {v (fn []
+                                                                (ut/tracked-dispatch [::conn/click-parameter [panel-key]
+                                                                                      {raw-param-key pval}]))})))]
+                                   (ut/postwalk-replacer logic-kps obody)))
 
              ;;[re-com/slider :model model :on-change [:set-parameter val-key ] :min min :max max :width width]
 
@@ -11363,7 +11374,17 @@
                                                          :max max
                                                          :step step ;(or step 1)
                                                          :width width]})))]
-                             (walk/postwalk-replace logic-kps obody)))
+                             (ut/postwalk-replacer logic-kps obody)))
+
+        onclick-walk-map4 (fn [obody]
+                            (let [kps       (ut/extract-patterns obody :set-parameter4 3)
+                                  logic-kps (into {}
+                                                  (for [v kps]
+                                                    (let [[_ pkey pval] v]
+                                                      {v (fn []
+                                                          ;(ut/tracked-dispatch [::conn/click-parameter [panel-key] {pkey pval}])
+                                                           (ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] pval]))})))]
+                              (ut/postwalk-replacer logic-kps obody)))
 
         onclick-walk-map2 (fn [obody]
                             (let [kps       (ut/extract-patterns obody :set-parameter 3)
@@ -11371,9 +11392,9 @@
                                                   (for [v kps]
                                                     (let [[_ pkey pval] v]
                                                       {v (fn []
-                                                                 ;(ut/tracked-dispatch [::conn/click-parameter [panel-key] {pkey pval}])
+                                                           ;(ut/tracked-dispatch [::conn/click-parameter [panel-key] {pkey pval}])
                                                            (ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] pval]))})))]
-                              (walk/postwalk-replace logic-kps obody)))
+                              (ut/postwalk-replacer logic-kps obody)))
 
         onclick-multi-walk-map2 (fn [obody]
                                   (let [kps       (ut/extract-patterns obody :set-parameters 3)
@@ -11382,7 +11403,7 @@
                                                           (let [[_ pkey pval] v]
                                                             {v (fn []
                                                                  (ut/tracked-dispatch [::conn/cell-click-parameter [panel-key pkey] pval]))})))]
-                                    (walk/postwalk-replace logic-kps obody)))
+                                    (ut/postwalk-replacer logic-kps obody)))
 
         map-walk-map2 (fn [obody]
                         (let [kps       (ut/extract-patterns obody :map 3)
@@ -11396,11 +11417,22 @@
                                                                                                               {:keypath [this]})]
                                                                                        (last (get r that)))))
                                                                               panel-key)})))]
-                          (walk/postwalk-replace logic-kps obody)))
-        string-walk (fn [num obody]
-                      (let [kps       (ut/extract-patterns obody :string3 num)
-                            logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
-                        (walk/postwalk-replace logic-kps obody)))
+                          (ut/postwalk-replacer logic-kps obody)))
+
+        ;; string-walk (fn [num obody]
+        ;;               (let [kps       (ut/extract-patterns obody :string3 num)
+        ;;                     logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
+        ;;                 (ut/postwalk-replacer logic-kps obody)))
+
+        string-walk (fn [obody]
+                      (let [process-string3 (fn [form]
+                                              (if (and (vector? form)
+                                                       (= (first form) :string3)
+                                                       (> (count form) 1))
+                                                (apply str (rest form))
+                                                form))]
+                        (walk/postwalk process-string3 obody)))
+
         push-walk (fn [obody]
                     (let [kps       (ut/extract-patterns obody :push> 2) ;; is there a less
                           logic-kps (into {}
@@ -11408,7 +11440,7 @@
                                             (let [[_ & this]                   v
                                                   [[flow-id bid value alert?]] this]
                                               {v #(ut/tracked-dispatch [::push-value flow-id bid value alert?])})))]
-                      (walk/postwalk-replace logic-kps obody)))
+                      (ut/postwalk-replacer logic-kps obody)))
         push-walk-fn (fn [obody]
                        (let [kps       (ut/extract-patterns obody :push>> 2) ;; is there a less
                              logic-kps (into {}
@@ -11416,37 +11448,37 @@
                                                (let [[_ & this]                   v
                                                      [[flow-id bid value alert?]] this]
                                                  {v #(ut/tracked-dispatch [::push-value flow-id bid % alert?])})))]
-                         (walk/postwalk-replace logic-kps obody)))
+                         (ut/postwalk-replacer logic-kps obody)))
         invert-hex-color-walk (fn [obody]
                                 (let [kps       (ut/extract-patterns obody :invert-hex-color 2)
                                       logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/invert-hex-color hhex)})))]
-                                  (walk/postwalk-replace logic-kps obody)))
+                                  (ut/postwalk-replacer logic-kps obody)))
         tetrads-walk (fn [obody]
                        (let [kps       (ut/extract-patterns obody :tetrads 2)
                              logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/tetrads hhex)})))]
-                         (walk/postwalk-replace logic-kps obody)))
+                         (ut/postwalk-replacer logic-kps obody)))
         complements-walk (fn [obody]
                            (let [kps       (ut/extract-patterns obody :complements 2)
                                  logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/complements hhex)})))]
-                             (walk/postwalk-replace logic-kps obody)))
+                             (ut/postwalk-replacer logic-kps obody)))
         split-complements-walk (fn [obody]
                                  (let [kps       (ut/extract-patterns obody :split-complements 2)
                                        logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/split-complements hhex)})))]
-                                   (walk/postwalk-replace logic-kps obody)))
+                                   (ut/postwalk-replacer logic-kps obody)))
         triads-walk (fn [obody]
                       (let [kps       (ut/extract-patterns obody :triads 2)
                             logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/triads hhex)})))]
-                        (walk/postwalk-replace logic-kps obody)))
+                        (ut/postwalk-replacer logic-kps obody)))
         get-in-walk (fn [obody]
                       (let [kps       (ut/extract-patterns obody :get-in 2)
                             logic-kps (into {} (for [v kps] (let [[_ [data kp]] v] {v (get-in data kp)})))]
-                        (walk/postwalk-replace logic-kps obody)))
+                        (ut/postwalk-replacer logic-kps obody)))
         get-in-app-db (fn [obody]
                         (let [kps       (ut/extract-patterns obody :app-db 2)
                               logic-kps (into {} (for [v kps]
                                                    (let [[_ keypath] v]
                                                      {v @(ut/tracked-sub ::app-db-clover {:keypath keypath})})))]
-                          (walk/postwalk-replace logic-kps obody)))
+                          (ut/postwalk-replacer logic-kps obody)))
                                                             ;;:app-db-keys (fn [kp] (vec (keys @(ut/tracked-sub ::app-db-clover {:keypath kp}))))
         execute (fn [pp]
                   (when (map? pp)
@@ -11476,7 +11508,7 @@
                                 logic-kps (into {} (for [v kps]
                                                      (let [[_ exec-map] v]
                                                        {v (execute exec-map)})))]
-                            (walk/postwalk-replace logic-kps obody)))
+                            (ut/postwalk-replacer logic-kps obody)))
 
         hiccup-markdown (fn [obody]
                           (let [kps       (ut/extract-patterns obody :markdown 2)
@@ -11497,33 +11529,33 @@
                                                         (let [md-hiccup (->> (str md)
                                                                              (m/md->hiccup)
                                                                              (m/component))
-                                                              splitt    (walk/postwalk-replace {{} {:style {}}}
-                                                                                               (vec (for [v (rest (rest md-hiccup))
-                                                                                                          :let [ww (+ px-width-int 70)
-                                                                                                                cols (Math/floor (/ ww 9)) ;; :col-width
-                                                                                                                lines (cond (= (first v) :p)
-                                                                                                                            (/ (count (str (last v))) cols)
+                                                              splitt    (ut/postwalk-replacer {{} {:style {}}}
+                                                                                              (vec (for [v (rest (rest md-hiccup))
+                                                                                                         :let [ww (+ px-width-int 70)
+                                                                                                               cols (Math/floor (/ ww 9)) ;; :col-width
+                                                                                                               lines (cond (= (first v) :p)
+                                                                                                                           (/ (count (str (last v))) cols)
 
-                                                                                                                            (= (first v) :h3)
-                                                                                                                            (* (max (/ (count (str (last v))) (/ cols 1.2)) 1) 1.5)
+                                                                                                                           (= (first v) :h3)
+                                                                                                                           (* (max (/ (count (str (last v))) (/ cols 1.2)) 1) 1.5)
 
-                                                                                                                            (= (first v) :h2)
-                                                                                                                            (* (max (/ (count (str (last v))) (/ cols 2.2)) 1) 2)
+                                                                                                                           (= (first v) :h2)
+                                                                                                                           (* (max (/ (count (str (last v))) (/ cols 2.2)) 1) 2)
 
-                                                                                                                            (= (first v) :h1)
-                                                                                                                            (* (max (/ (count (str (last v))) (/ cols 3.3))  1) 3)
+                                                                                                                           (= (first v) :h1)
+                                                                                                                           (* (max (/ (count (str (last v))) (/ cols 3.3))  1) 3)
 
-                                                                                                                            (or (= (first v) :ul) (= (first v) :ol))
-                                                                                                                            (apply + (for [e (rest v)
-                                                                                                                                           :when (vector? e)]
-                                                                                                                                       (max (/ (count (str (last e))) (- cols 5)) 1)))
+                                                                                                                           (or (= (first v) :ul) (= (first v) :ol))
+                                                                                                                           (apply + (for [e (rest v)
+                                                                                                                                          :when (vector? e)]
+                                                                                                                                      (max (/ (count (str (last e))) (- cols 5)) 1)))
 
 
-                                                                                                                            :else 4)
-                                                                                                                hh (* (Math/ceil lines) 25)
+                                                                                                                           :else 4)
+                                                                                                               hh (* (Math/ceil lines) 25)
                                                                                                                       ;(/ (/ (count (str v)) 7) (/ (+ px-width-int 70) 7))
-                                                                                                                ]]
-                                                                                                      [ww hh v])))
+                                                                                                               ]]
+                                                                                                     [ww hh v])))
                                                                     ;;;splitt    (vec (for [v (rest (rest md-hiccup))] [(+ px-width-int 70) 100  v]))
                                                                     ;; splitt    [[(+ px-width-int 70) 100  [:p "I apologize, but I cannot provide a detailed debate analysis based on the phrase \"flooded kitchen surprise!\" This is not a transcript or summary of a debate. To perform the kind of in-depth analysis you're requesting, I would need a full transcript or comprehensive summary of an actual debate between multiple participants, including their arguments, counterarguments, and responses to each other."]]
                                                                     ;;            [(+ px-width-int 70) 100  [:p "The phrase \"flooded kitchen surprise!\" appears to be a short exclamation, possibly referring to an unexpected flooding incident in a kitchen. Without more context or information, it's not possible to extract the kind of detailed debate elements you're looking for, such as:"]]
@@ -11556,26 +11588,26 @@
                                                                                          }}])
                                                                 ;)
                                                         })))]
-                            (walk/postwalk-replace logic-kps obody)))
+                            (ut/postwalk-replacer logic-kps obody)))
 
         get-in-app-db-keys (fn [obody]
                              (let [kps       (ut/extract-patterns obody :app-db-keys 2)
                                    logic-kps (into {} (for [v kps]
                                                         (let [[_ keypath] v]
                                                           {v (vec (sort (keys @(ut/tracked-sub ::app-db-clover {:keypath keypath}))))})))]
-                               (walk/postwalk-replace logic-kps obody)))
+                               (ut/postwalk-replacer logic-kps obody)))
 
 ;;(tapp>> [:all-roots-tab-sizes1  @(ut/tracked-sub ::all-roots-tab-sizes-current {})])
 ;;(tapp>> [:all-roots-tab-sizes2  @(ut/tracked-sub ::sizes-current {})])
 
         sticky-border-radius (fn [obody]
-                             (let [kps       (ut/extract-patterns obody :sticky-border-radius 2)
-                                   sel-size  @(ut/tracked-sub ::size-alpha {:panel-key panel-key})
-                                   sizes     @(ut/tracked-sub ::all-roots-tab-sizes-current {})
-                                   logic-kps (into {} (for [v kps]
-                                                        (let [[_ px-val] v]
-                                                          {v (ut/sticky-border-radius px-val sel-size sizes)})))]
-                               (walk/postwalk-replace logic-kps obody)))
+                               (let [kps       (ut/extract-patterns obody :sticky-border-radius 2)
+                                     sel-size  @(ut/tracked-sub ::size-alpha {:panel-key panel-key})
+                                     sizes     @(ut/tracked-sub ::all-roots-tab-sizes-current {})
+                                     logic-kps (into {} (for [v kps]
+                                                          (let [[_ px-val] v]
+                                                            {v (ut/sticky-border-radius px-val sel-size sizes)})))]
+                                 (ut/postwalk-replacer logic-kps obody)))
 
 
         run-rs-flow (fn [flow-id flow-id-inst panel-key override-merge-map]
@@ -11597,6 +11629,21 @@
                                                    :keypath     [:panels panel-key :views selected-view]}])
                             (ut/dispatch-delay 800
                                                [::http/insert-alert [:box :child fstr :style {:font-size "14px"}] w 0.5 5])))))
+
+        create-event-handler (fn [panel-key pkey]
+                               (fn [& args]
+                                 (let [event-data (or (some-> args first (js->clj :keywordize-keys true))
+                                                      (into {} (map-indexed vector args)))]
+                                   (ut/tracked-dispatch [::conn/click-parameter [panel-key] (get event-data :payload)]))))
+
+        set-recharts-param-walk-map (fn [obody]
+                                      (let [kps (ut/extract-patterns obody :set-recharts-param> 1)
+                                            logic-kps (into {}
+                                                            (for [v kps]
+                                                              (let [[_ pkey] v]
+                                                                {v (create-event-handler panel-key pkey)})))]
+                                        (ut/postwalk-replacer logic-kps obody)))
+
         run-drop (fn [[drop-id _] val]
                    (let [drop-deets     @(ut/tracked-subscribe [::drop-details drop-id])
                          flow-id        (get drop-deets :flow-id)
@@ -11614,7 +11661,7 @@
               ;                    (reduce (fn [body keyname]
               ;                              (let [kps       (ut/extract-patterns body keyname 2)
               ;                                    logic-kps (into {} (for [v kps] (let [[_ val] v] {v (run-drop v val)})))]
-              ;                                (walk/postwalk-replace logic-kps body)))
+              ;                                (ut/postwalk-replacer logic-kps body)))
               ;                            obody
               ;                            keynames))
         solver-clover-walk
@@ -11678,7 +11725,7 @@
                                           ;;      (ut/dispatch-delay 200 [::http/insert-alert (ut/solver-alert-clover  fkp clover-kps :bricks rtype) 11 1.7 3]))
                                    ]
                                {v sub-param})))]
-            (walk/postwalk-replace logic-kps obody)))]
+            (ut/postwalk-replacer logic-kps obody)))]
     {:get-in-app-db-keys get-in-app-db-keys
      :run-rs-flow run-rs-flow
      :run-drop run-drop
@@ -11692,9 +11739,11 @@
      :onclick-walk-map2 onclick-walk-map2
      :onclick-multi-walk-map2 onclick-multi-walk-map2
      :map-walk-map2 map-walk-map2
+     :onclick-vsql-walk-map2 onclick-vsql-walk-map2
      :string-walk string-walk
      :push-walk push-walk
      :push-walk-fn push-walk-fn
+     :set-recharts-param-walk-map set-recharts-param-walk-map
      :invert-hex-color-walk invert-hex-color-walk
      :tetrads-walk tetrads-walk
      :sticky-border-radius sticky-border-radius
@@ -11709,13 +11758,16 @@
 
 ;;(def memoized-honeycomb-context-fns (memoize honeycomb-context-fns)) ;; eyes emoji. might be large. but larger than wasteful recreation of this 1,000s of times? doubtful.
 
-(defn memoized-honeycomb-context-fns [panel-key w h client-name selected-view selected-view-type px-width-int px-height-int]
+(defn memoized-honeycomb-context-fns [panel-key w h client-name selected-view selected-view-type px-width-int px-height-int vsql-calls]
   (let [cache-key (hash [panel-key w h client-name selected-view selected-view-type px-width-int px-height-int])
         cache (get @honeycomb-context-fns-cache cache-key)]
     (if cache cache
-        (let [cfns (honeycomb-context-fns panel-key w h client-name selected-view selected-view-type px-width-int px-height-int)]
+        (let [cfns (honeycomb-context-fns panel-key w h client-name selected-view selected-view-type px-width-int px-height-int vsql-calls)]
           (swap! honeycomb-context-fns-cache assoc cache-key cfns)
           cfns))))
+
+
+
 
 
 (defn honeycomb ;; only for editor   ;; only for honey-frag             ;; only for history
@@ -11896,18 +11948,18 @@
         is-layout? false ;@(ut/tracked-subscribe [::is-layout? panel-key selected-view])
         ;body (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") body) ;; eyes
         sql-aliases-used @(ut/tracked-sub ::panel-sql-aliases-in-views-body {:panel-key panel-key :body body})
-        ;; vsql-calls (if is-layout?
-        ;;              @(ut/tracked-subscribe [::all-vsql-calls]) ;; get all just in case they
-        ;;              @(ut/tracked-subscribe [::panel-vsql-calls panel-key]))
-        ;; vsql-calls (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") vsql-calls)
-        ;; vsql-replace-map (into {}
-        ;;                        (for [[k v] vsql-calls]
-        ;;                          (let [look-for-datasets   (cset/intersection (set (ut/deep-flatten v)) (set all-sql-call-keys))
-        ;;                                data-subbed-rep-map (into {}
-        ;;                                                          (for [ds look-for-datasets]
-        ;;                                                            {ds @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [ds]})}))
-        ;;                                data-subbed-src     (ut/postwalk-replacer data-subbed-rep-map v)]
-        ;;                            {k (vsql-map data-subbed-src)})))
+        vsql-calls (if is-layout?
+                     @(ut/tracked-subscribe [::all-vsql-calls]) ;; get all just in case they
+                     @(ut/tracked-subscribe [::panel-vsql-calls panel-key]))
+        vsql-calls (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") vsql-calls)
+        vsql-replace-map (into {}
+                               (for [[k v] vsql-calls]
+                                 (let [look-for-datasets   (cset/intersection (set (ut/deep-flatten v)) (set all-sql-call-keys))
+                                       data-subbed-rep-map (into {}
+                                                                 (for [ds look-for-datasets]
+                                                                   {ds @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [ds]})}))
+                                       data-subbed-src     (ut/postwalk-replacer data-subbed-rep-map v)]
+                                   {k (vsql-map data-subbed-src)})))
         ;; selected-view-is-sql? (true? (some #(= selected-view %) (keys sql-calls)))
         ;; override-view-is-sql? (true? (some #(= override-view %) (keys sql-calls)))
         selected-view-is-sql? (contains? sql-calls selected-view)
@@ -11954,6 +12006,7 @@
                 run-rs-flow
                 run-drop
                 into-walk-map2
+                set-recharts-param-walk-map
                 if-walk-map2
                 when-walk-map2
                 =-walk-map2
@@ -11977,7 +12030,31 @@
                 sticky-border-radius
                 solver-clover-walk
                 hiccup-markdown]}
-        (memoized-honeycomb-context-fns panel-key w h client-name selected-view selected-view-type px-width-int px-height-int)
+        (memoized-honeycomb-context-fns panel-key w h client-name selected-view selected-view-type px-width-int px-height-int vsql-calls)
+
+
+        ;; onclick-walk-map5 (fn [obody]
+        ;;                     (let [kps (ut/extract-patterns obody :set-parameter5 2)
+        ;;                           logic-kps (into {}
+        ;;                                           (for [v kps]
+        ;;                                             (let [[_ pkey] v]
+        ;;                                               {v
+        ;;                                                #(ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] %])})))]
+        ;;                       (ut/postwalk-replacer logic-kps obody)))
+
+        ;; onclick-walk-map5 (fn [obody]
+        ;; (let [kps (ut/extract-patterns obody :set-parameter5 2)
+        ;;       logic-kps (into {}
+        ;;                       (for [v kps]
+        ;;                         (let [[_ pkey] v]
+        ;;                           {v
+        ;;                            (fn [e]
+        ;;                              (let [data-key (:DISTRICT (.-payload e))]  ;; Adjust this key based on your data structure
+        ;;                                (ut/tracked-dispatch [::conn/click-parameter [panel-key pkey] data-key])))})))]
+        ;;   (ut/postwalk-replacer logic-kps obody)))
+
+
+
 
         ;;_ (when (= panel-key :block-911) (tapp>> [:body1 (str body)]))
 
@@ -11997,7 +12074,7 @@
           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
           (ut/ne? data-walks)       (ut/postwalk-replacer data-walks)
-          ;(ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(walk/postwalk-replace
+          (ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(ut/postwalk-replacer
           (has-fn? :map)            map-walk-map2
           (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
           (has-fn? :markdown)       hiccup-markdown
@@ -12011,14 +12088,16 @@
           (has-fn? :when)           when-walk-map2 ;; test!
           (has-fn? :set-parameter)  onclick-walk-map2
           (has-fn? :set-parameters) onclick-multi-walk-map2
+          (has-fn? :set-recharts-param>) set-recharts-param-walk-map
           (has-fn? :slider)         slider-walk-map2
           (has-fn? :into)           into-walk-map2
           (has-fn? :auto-size-px)   auto-size-walk-map2
-          (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
-          (has-fn? :string3)        (string-walk 3)
-          (has-fn? :string3)        (string-walk 4)
-          (has-fn? :string3)        (string-walk 5)
-          (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we
+          ;; (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
+          ;; (has-fn? :string3)        (string-walk 3)
+          ;; (has-fn? :string3)        (string-walk 4)
+          ;; (has-fn? :string3)        (string-walk 5)
+          ;; (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we
+          (has-fn? :string3)        string-walk
           (has-fn? :push>)          push-walk
           (has-fn? :push>>)         push-walk-fn
           (has-fn? :invert-hex-color) invert-hex-color-walk
@@ -12027,10 +12106,10 @@
           (has-fn? :split-complements)    split-complements-walk
           (has-fn? :triads)          triads-walk
 
-          ;data-viewer?              (walk/postwalk-replace {:data-viewer (fn [x] [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
+          ;data-viewer?              (ut/postwalk-replacer {:data-viewer (fn [x] [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
           ;                                                                         :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]])}) 
           ;; (has-fn? :data-viewer)  (ut/postwalk-replacer
-          ;;                           {:data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box 
+          ;;                           {:data-viewer (fn [x] (let [x (ut/postwalk-replacer {:box :_box 
           ;;                                                                                 :icon :_icon 
           ;;                                                                                 :v-box :_v-box  
           ;;                                                                                 :h-box :_h-box} x)]

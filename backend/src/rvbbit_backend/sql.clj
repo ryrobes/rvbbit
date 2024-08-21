@@ -30,7 +30,8 @@
            (hik/make-datasource bbase))))
 
 (defn close-pool [ds]
-  (try (hik/close-datasource ds) (catch Exception e (ut/pp [:close-pool-error! e]))))
+  (try (hik/close-datasource ds) 
+       (catch Exception e (ut/pp [:close-pool-error! e]))))
 
 (def client-db-pools (atom {}))
 

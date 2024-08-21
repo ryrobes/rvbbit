@@ -81,23 +81,23 @@
 
 (def invalid-to-valid-keywords {":>" ":reagent-gt"})
 (def valid-to-invalid-keywords (zipmap (vals invalid-to-valid-keywords) (keys invalid-to-valid-keywords)))
-(defn convert-to-valid-edn
-  [s]
-  (reduce (fn [s [invalid valid]] (clojure.string/replace s invalid valid)) s invalid-to-valid-keywords))
 
-(defn convert-back-to-original
-  [m]
-  (clojure.walk/postwalk (fn [x] (if (and (keyword? x) (valid-to-invalid-keywords x)) (valid-to-invalid-keywords x) x)) m))
+(defn convert-to-valid-edn [s]
+  (reduce (fn [s [invalid valid]] 
+            (clojure.string/replace s invalid valid)) s invalid-to-valid-keywords))
 
-(defn read-screen
-  [f-path]
+(defn convert-back-to-original [m]
+  (clojure.walk/postwalk 
+   (fn [x] (if (and (keyword? x) (valid-to-invalid-keywords x)) 
+             (valid-to-invalid-keywords x) x)) m))
+
+(defn read-screen [f-path]
   (let [screen-str    (slurp f-path)
         valid-edn-str (convert-to-valid-edn screen-str)
         screen-data   (try (edn/read-string valid-edn-str) (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))]
     (convert-back-to-original screen-data)))
 
-(defn update-screen-meta
-  [f-path]
+(defn update-screen-meta [f-path]
   ;(qp/slot-queue :update-screen-meta f-path
   (ppy/execute-in-thread-pools :update-screen-meta
                                (fn []
@@ -197,8 +197,7 @@
         (wss/create-flowblock f-path)
         (update-flow-meta f-path)))))
 
-(defn refresh-flow-fn
-  [flow-functions-map]
+(defn refresh-flow-fn [flow-functions-map]
   (doseq [{:keys [category name description file-path inputs icon types]} (ut/flatten-map flow-functions-map)]
     ;(wss/enqueue-task3 ;; since out base sqlite db hate concurrency, with a "real" db, this can
     (qp/serial-slot-queue :general-serial :general
@@ -407,16 +406,6 @@
   (let [flows (vec (filter #(not (cstr/includes? (str %) "-solver-flow-")) (keys @flow-db/results-atom)))]
     (reset! flow-db/results-atom (select-keys (ut/replace-large-base64 @flow-db/results-atom) flows))))
 
-(defn delayed-start [ms f] (Thread. #(do (Thread/sleep ms) (f))))
-
-
-(defn delay-execution
-  [ms f]
-  (let [thread (Thread. (fn [] (Thread/sleep ms) (f)))]
-    (.start thread)
-    thread))
-
-
 (defonce scheduled-tasks (atom {}))
 
 (defn start-scheduler [secs f name-str & [delay]]
@@ -466,6 +455,7 @@
   (defonce start-solver-watcher (watch-solver-files))
 
   (shutdown/add-hook! ::heads-up-msg #(ut/ppa "Shutting down now, commander!"))
+
   (sql-exec system-db "drop table if exists jvm_stats;")
   (sql-exec system-db "drop table if exists errors;")
   (sql-exec system-db "drop view  if exists viz_recos_vw;")
@@ -908,7 +898,8 @@
                            (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
-                           (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
+                           ;(shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))
+                           ))
 
   (defn update-stat-atom [kks]
     (qp/serial-slot-queue :update-stat-atom-serial :serial

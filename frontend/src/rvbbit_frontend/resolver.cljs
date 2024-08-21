@@ -90,7 +90,7 @@
                                                               {v (let [sbr (ut/sticky-border-radius px-val sel-size sizes)]
                                                                    ;(ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size) :sbr (str sbr)])
                                                                    sbr)})))]
-                                   (walk/postwalk-replace logic-kps obody)))
+                                   (ut/postwalk-replacer logic-kps obody)))
           ;; sticky-border (fn [obody]
           ;;              (let [kps       (ut/extract-patterns obody :sticky-border 2)
           ;;                    sel-size  @(ut/tracked-sub ::sizes-alpha {:panel-key panel-key})
@@ -102,19 +102,31 @@
           ;;                                           {v (let [sbr (ut/sticky-border px-val sel-size sizes)]
           ;;                                                ;(ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size) :sbr (str sbr)])
           ;;                                                sbr)})))]
-          ;;                (walk/postwalk-replace logic-kps obody)))          
+          ;;                (ut/postwalk-replacer logic-kps obody)))          
           when-walk-map2 (fn [obody]
                            (let [kps       (ut/extract-patterns obody :when 3)
                                  logic-kps (into {} (for [v kps] (let [[_ l this] v] {v (when l this)})))]
                              (ut/postwalk-replacer logic-kps obody)))
+          
           =-walk-map2 (fn [obody]
                         (let [kps       (ut/extract-patterns obody := 3)
                               logic-kps (into {} (for [v kps] (let [[_ that this] v] {v (= (str that) (str this))})))]
                           (ut/postwalk-replacer logic-kps obody)))
-          string-walk (fn [num obody]
-                        (let [kps       (ut/extract-patterns obody :string3 num)
-                              logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
-                          (ut/postwalk-replacer logic-kps obody)))
+          
+          ;; string-walk (fn [num obody]
+          ;;               (let [kps       (ut/extract-patterns obody :string3 num)
+          ;;                     logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
+          ;;                 (ut/postwalk-replacer logic-kps obody)))
+          
+        string-walk (fn [obody]
+                      (let [process-string3 (fn [form]
+                                              (if (and (vector? form)
+                                                       (= (first form) :string3)
+                                                       (> (count form) 1))
+                                                (apply str (rest form))
+                                                form))]
+                        (walk/postwalk process-string3 obody)))
+
           case-walk (fn [obody]
                       (let [kps       (ut/extract-patterns obody :case 2)
                             logic-kps (into {} (for [v kps] (let [[_ l] v] {v (ut/vectorized-case l)})))]
@@ -122,27 +134,27 @@
           get-in-walk (fn [obody]
                         (let [kps       (ut/extract-patterns obody :get-in 2)
                               logic-kps (into {} (for [v kps] (let [[_ [data kp]] v] {v (get-in data kp)})))]
-                          (walk/postwalk-replace logic-kps obody)))
+                          (ut/postwalk-replacer logic-kps obody)))
           invert-hex-color-walk (fn [obody]
                                   (let [kps       (ut/extract-patterns obody :invert-hex-color 2)
                                         logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/invert-hex-color hhex)})))]
-                                    (walk/postwalk-replace logic-kps obody)))
+                                    (ut/postwalk-replacer logic-kps obody)))
           tetrads-walk (fn [obody]
                          (let [kps       (ut/extract-patterns obody :tetrads 2)
                                logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/tetrads hhex)})))]
-                           (walk/postwalk-replace logic-kps obody)))
+                           (ut/postwalk-replacer logic-kps obody)))
           complements-walk (fn [obody]
                              (let [kps       (ut/extract-patterns obody :complements 2)
                                    logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/complements hhex)})))]
-                               (walk/postwalk-replace logic-kps obody)))
+                               (ut/postwalk-replacer logic-kps obody)))
           split-complements-walk (fn [obody]
                                    (let [kps       (ut/extract-patterns obody :split-complements 2)
                                          logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/split-complements hhex)})))]
-                                     (walk/postwalk-replace logic-kps obody)))
+                                     (ut/postwalk-replacer logic-kps obody)))
           triads-walk (fn [obody]
                         (let [kps       (ut/extract-patterns obody :triads 2)
                               logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/triads hhex)})))]
-                          (walk/postwalk-replace logic-kps obody)))
+                          (ut/postwalk-replacer logic-kps obody)))
           singles {:text   str
                    :>>     (fn [[x y]] (true? (> x y)))
                    :<<     (fn [[x y]] (true? (< x y)))
@@ -202,7 +214,7 @@
                                                   (not (some #(= % :time/second) clover-kps)))
                                          (ut/dispatch-delay 100 [::http/insert-alert (ut/solver-alert-clover fkp clover-kps :resolver rtype) 11 1.7 3]))]
                                  {v sub-param})))]
-              (walk/postwalk-replace logic-kps obody)))
+              (ut/postwalk-replacer logic-kps obody)))
           has-fn? (fn [k] (some #(= % k) obody-key-set))
           out-block-map (cond->> block-map
                           true                      (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
@@ -211,11 +223,12 @@
                           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
                           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
                           (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
-                          (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these
-                          (has-fn? :string3)        (string-walk 3)
-                          (has-fn? :string3)        (string-walk 4)
-                          (has-fn? :string3)        (string-walk 5)
-                          (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS
+                          ;; (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these
+                          ;; (has-fn? :string3)        (string-walk 3)
+                          ;; (has-fn? :string3)        (string-walk 4)
+                          ;; (has-fn? :string3)        (string-walk 5)
+                          ;; (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS
+                          (has-fn? :string3)        string-walk
                           (has-fn? :get-in)         get-in-walk
                           (has-fn? :=)              =-walk-map2
                           (has-fn? :sticky-border-radius) sticky-border-radius

@@ -931,6 +931,7 @@
                           (ut/dissoc-in [:click-param :runstream])
                           (ut/dissoc-in [:click-param :kit-status])
                           (ut/dissoc-in [:click-param :kit])
+                          (ut/dissoc-in [:click-param :data])
                           (ut/dissoc-in [:click-param :signal])
                           (as-> db' (reduce #(ut/dissoc-in %1 [:click-param %2]) db' db/reactor-types))
                           (dissoc :data) ;; but NOT clover edn data TODO

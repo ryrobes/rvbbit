@@ -60,14 +60,12 @@
    [clojure.walk              :as walk]
    [clj-time.coerce           :as coerce]
    [rvbbit-backend.config     :as config]
-   [honey.sql                 :as honey]
-   ;[markdown-to-hiccup.core :as m]
-   )
+   [honey.sql                 :as honey])
   (:import
    [com.github.vertical_blank.sqlformatter SqlFormatter]
    [org.eclipse.jetty.util.thread QueuedThreadPool]
-   [java.security MessageDigest]
-   [java.math BigInteger] 
+   ;[java.security MessageDigest]
+   ;[java.math BigInteger] 
    [java.nio.file Paths]
    [java.util.concurrent                  ThreadFactory Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
    [java.lang                              ProcessBuilder]
@@ -4803,7 +4801,7 @@
                      {:select [:*] :from [honey-sql]}
                      honey-sql)
          ;sniff? true
-         ;deep-meta? true
+         deep-meta? true
          honey-sql (ut/deep-remove-keys honey-sql [:post-process-fn]) ;; disregard if we have
          has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql)))
                        (catch Exception _ false))
@@ -5100,9 +5098,9 @@
                         sniff-worthy? (and (not is-meta?)
                                            (not= page -3)
                                            (not has-rql?) ;;; temp since insert will fail dur to not being
-                                           (not (= (ut/dissoc-recursive honey-sql)
-                                                   (ut/dissoc-recursive (get-in @sql/query-history
-                                                                                [cache-table-name :honey-sql])))) 
+                                           ;(not (= (ut/dissoc-recursive honey-sql)
+                                           ;        (ut/dissoc-recursive (get-in @sql/query-history
+                                           ;                                     [cache-table-name :honey-sql])))) 
                                            (ut/ne? (flatten result))
                                            (not (cstr/includes? (str ui-keypath) "-hist-"))
                                            (not query-error?)
@@ -5140,10 +5138,12 @@
                         result-hash (hash result)]
                      ;(enqueue-task-sql-meta 
 
-                    (when (or deep-meta?
-                              (and (not (= client-name :rvbbit))
-                                   (not= (hash honey-sql)
-                                         (get-in @sniff-meta-guard [ui-keypath client-name])))) ;; sniff & push meta only on new sql construct
+                    (when ;;true 
+                     (or deep-meta?
+                        (and (not (= client-name :rvbbit))
+                                 ;;  (not= (hash honey-sql)
+                                 ;;        (get-in @sniff-meta-guard [ui-keypath client-name]))
+                        )) ;; sniff & push meta only on new sql construct
                       (ut/pp [:sniff-meta! ui-keypath client-name])
                       (qp/slot-queue :sql-meta client-name
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?))))
@@ -5205,10 +5205,14 @@
                                                                        (get run-it :elapsed-ms))))))) ;; vertica
                                                  ))))
                       
+                      ;(ut/pp [:sniff-worthy? sniff-worthy?  :ui-keypath ui-keypath :client-name client-name])
+
                       (when sniff-worthy? ;; want details, but not yet the full expensive meta (again, naming is terrible and confusing)
                         ;(enqueue-task
+                        ;(ut/pp [:sniff-worthy? sniff-worthy?  :ui-keypath ui-keypath :client-name client-name])
 
-                        (when (not= (hash honey-sql)
+                        (when 
+                         (not= (hash honey-sql)
                                     (get @quick-sniff-hash [cache-table-name client-name])
                                     ;(not= target-db cache-db)
                                     )

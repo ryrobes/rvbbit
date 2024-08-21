@@ -9,7 +9,7 @@
 
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :default "./screens/looking-glass-redux.edn"
- ;; ^^ if no screen given in URL, load this one. "start page" essentially.
+ ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
  :harvest-on-boot? false 
  ;; ^^ do a full database sniff for each connection on boot (will be staggered and scheduled in the future)
  :modes {:pre       [:pre
@@ -242,7 +242,7 @@
                                                        ;;false ;;true
                                                        )
                                              ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
-                                            :icon "zmdi-pizza"
+                                            :icon "fa-solid fa-circle-exclamation"
                                             ;:clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))
                                             }
 
@@ -268,9 +268,9 @@
                       :icon "images/fbc-logo.gif"}
 
            :shell {:type :nrepl ;; this is the built-in REPL that starts by default
-                   :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
+                   :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default nrepl
                    :modes [:text :data :terminal]
-                   :default "ls -l ; top -n 1  ; pwd" ;; "ls -l"
+                   :default "ls -l ; top -n 1  ; pwd ; whoami" ;; "ls -l"
                    :syntax "shell"
                    :ext ".sh"
                    :hop-function? true

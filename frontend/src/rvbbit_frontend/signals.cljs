@@ -901,7 +901,7 @@
                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                 {:keypath [(keyword (str "solver-status/" (ut/unkeyword client-name) ">"
                                                                          (ut/unkeyword selected-warren-item) ">running?"))]}))
-        signals-history      (when signal? (select-keys (walk/postwalk-replace walk-map signals-history) signal-vec-parts))
+        signals-history      (when signal? (select-keys (ut/postwalk-replacer walk-map signals-history) signal-vec-parts))
         other                (cond (= warren-item-type :solver) (get @(ut/tracked-sub ::solvers-map {}) selected-warren-item)
                                    (= warren-item-type :rule)   (get @(ut/tracked-sub ::rules-map {}) selected-warren-item)
                                    :else                        {})
