@@ -5,6 +5,7 @@
     [re-frame.core           :as re-frame]
     [re-pollsive.core        :as poll]
     [re-pressed.core         :as rp]
+    [reagent.core            :as reagent]
     [reagent.dom             :as rdom]
     [rvbbit-frontend.audio   :as audio]
     [rvbbit-frontend.bricks  :as bricks]
@@ -95,14 +96,13 @@
    (let [{:keys [_ used ttl-heap]} (get db :memory)] (> (/ used ttl-heap) 0.75))))
 
 (defonce root-key 
-  (reagent.core/atom (cljs.core/random-uuid)))
+  (reagent/atom (cljs.core/random-uuid)))
 
 (defn root [] 
   (fn [] [[:div {:key @root-key} 
            [views/main-panel]]]))
 
-(defn clear-cache-and-reload!
-  [] ;;; TEST!
+(defn clear-cache-and-reload! []
   (re-frame/clear-subscription-cache!)
   (swap! root-key (cljs.core/random-uuid))
   (let [root-el (.getElementById js/document "app")]

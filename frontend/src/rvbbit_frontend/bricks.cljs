@@ -1363,13 +1363,19 @@
 
 (re-frame/reg-event-db ::toggle-session-modal (fn [db [_]] (assoc db :session-modal? (not (get db :session-modal? false)))))
 
+(re-frame/reg-event-db ::toggle-doom-modal (fn [db [_]] (assoc db :doom-modal? (not (get db :doom-modal? false)))))
+
 (re-frame/reg-event-db ::toggle-quake-console (fn [db [_]] (assoc db :quake-console? (not (get db :quake-console? false)))))
 
 (re-frame/reg-event-db ::toggle-quake-console-off (fn [db [_]] (assoc db :quake-console? false)))
 
 (re-frame/reg-event-db ::disable-session-modal (fn [db [_]] (assoc db :session-modal? false)))
 
+(re-frame/reg-event-db ::disable-doom-modal (fn [db [_]] (assoc db :doom-modal? false)))
+
 (re-frame/reg-sub ::session-modal? (fn [db] (get db :session-modal? false)))
+
+(re-frame/reg-sub ::doom-modal? (fn [db] (get db :doom-modal? false)))
 
 (re-frame/reg-event-db ::toggle-flow-gantt (fn [db [_]] (assoc-in db [:flow-gantt?] (not (get-in db [:flow-gantt?] false)))))
 
@@ -2003,14 +2009,27 @@
    (reset! db/editor-mode :meta)
    (reset! db/cm-focused? false)
    (ut/tracked-dispatch [::toggle-quake-console-off])
-   (cond (and (not (nil? (get db :selected-flow-block))) (get db :flow?)) (assoc db :selected-flow-block nil)
-         (nil? (get db :selected-cols))                                   (-> db
-                                                                              (assoc :selected-block "none!")
-                                                                              (assoc :col-names nil)
-                                                                              (assoc :selected-cols nil))
-         :else                                                            (-> db
-                                                                              (assoc :selected-cols nil)
-                                                                              (assoc :col-names nil)))))
+
+   (let [all-clear? (and (nil? (get db :selected-flow-block)) 
+                         (or (nil? (get db :selected-block)) (= (get db :selected-block) "none!"))
+                         (nil? (get db :selected-cols)))]
+      (cond
+        all-clear?
+        (assoc db :doom-modal? true)
+
+        (and (not (nil? (get db :selected-flow-block))) (get db :flow?))
+        (assoc db :selected-flow-block nil)
+
+        (nil? (get db :selected-cols))
+        (-> db
+            (assoc :selected-block "none!")
+            (assoc :col-names nil)
+            (assoc :selected-cols nil))
+
+        :else
+        (-> db
+            (assoc :selected-cols nil)
+            (assoc :col-names nil))))))
 
 (re-frame/reg-event-db
  ::next-panel

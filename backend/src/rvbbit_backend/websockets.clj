@@ -6153,6 +6153,9 @@
       \newline
       (conj (vec (cons color-code (vec (figlet/render flf (str text))))) reset-code)))))
 
+
+  ;; (fig-render "RvbbiT" :pink "data/Doom.flf")
+
 (defn split-vector-at-x [v]
   (loop [input v
          current-segment []

@@ -4109,8 +4109,7 @@
                        :margin-bottom "-8px"}]
               [re-com/gap :size "10px"])]]]]))))
 
-(defn session-modal
-  []
+(defn session-modal []
   (let [hh          @(ut/tracked-subscribe [::subs/h])
         ww          @(ut/tracked-subscribe [::subs/w])
         per-page    9
@@ -4136,10 +4135,124 @@
          (for [ss sess :let [s (get ss 0) rowcnt (count sess) t (get ss 1)]] [image-component s t h rowcnt items])])]]))
 
 
+;; (defn doom-modal []
+;;   ;;(ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/hit.mp3" true])
+;;   (let [hh          @(ut/tracked-subscribe [::subs/h])
+;;         ww          @(ut/tracked-subscribe [::subs/w])
+;;         ;per-page    9
+;;         w           (* ww 0.33) ;500
+;;         h           (* hh 0.45) ;500
+;;         audio-playing?       @(ut/tracked-sub ::audio/audio-playing? {})
+;;         client-name @(ut/tracked-subscribe [::bricks/client-name]) ;; reactions
+;;         ;sessions    @(ut/tracked-subscribe [::bricks/sessions])
+;;         left        (- (/ ww 2) (/ w 2))
+;;         top         (- (/ hh 2) (/ h 2))
+;;         ;items       (count sessions)
+;;         ;items       (if (odd? items) items (inc items))
+;;         ;sessions    (take per-page (sort-by last sessions))
+;;         ;sessions    (partition-all 3 sessions)
+;;         ]
+
+   
+
+;;     [re-com/modal-panel :style
+;;      {:z-index 99999 ;; on top of alerts?
+;;       :padding "0px"}
+;;      :frame-style {:background-color "#000000"}
+;;      :parts {:child-container
+;;              {:style {:left left
+;;                       :width w
+;;                       :height h
+;;                       :transform "scale(1.5)" :top top :font-size "8px" :background-color "#000000" :position "fixed"
+;;                       :box-shadow       (let [block-id       :audio
+;;                                               talking-block? true]
+;;                                           (cond (and audio-playing? talking-block?) (str
+;;                                                                                      "1px 1px " (px (* 80
+;;                                                                                                        (+ 0.1 (get @db/audio-data block-id))))
+;;                                                                                      " "        (theme-pull :theme/editor-outer-rim-color nil))
+;;                                                 :else                               "none"))
+;;                       :border "1px solid red"}}}
+;;      :backdrop-opacity 0.75 :backdrop-on-click #(ut/tracked-dispatch [::bricks/disable-doom-modal])
+;;      :child  [re-com/box :child "DOOM!"]]))
 
 
-(defn main-panel
-  []
+;; (def doom-header (str "DOOM!"))
+
+;; (def ansi-text (reagent/atom nil))
+
+;; ;; (defn fetch-ansi-file []
+;; ;;   (-> (js/fetch "images/name.ans")
+;; ;;       (.then #(.arrayBuffer %))
+;; ;;       (.then (fn [buffer]
+;; ;;                (let [decoder (js/TextDecoder. "utf-8")]
+;; ;;                  (reset! ansi-text (.decode decoder buffer)))))
+;; ;;       (.catch #(js/console.error "Error loading ANSI file:" %))))
+
+;; (defn fetch-ansi-file []
+;;   (-> (js/fetch "images/name-smol.ans")
+;;       (.then #(.arrayBuffer %))
+;;       (.then (fn [buffer]
+;;                (let [uint8-array (js/Uint8Array. buffer)
+;;                      text (apply str (map #(js/String.fromCharCode %) (js/Array.from uint8-array)))]
+;;                  (reset! ansi-text text))))
+;;       (.catch #(js/console.error "Error loading ANSI file:" %))))
+
+(defn doom-modal []
+  (reagent/create-class
+   {:component-did-mount
+    (fn [this]
+      (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak 
+                            "/home/ryanr/hit.mp3"
+                            ;"Lets go, baby!"
+                            true]))
+
+    :reagent-render
+    (fn []
+      (let [hh          @(ut/tracked-subscribe [::subs/h])
+            ww          @(ut/tracked-subscribe [::subs/w])
+              ;per-page    9
+            w           (* ww 0.33) ;500
+            h           (* hh 0.45) ;500
+            audio-playing?       @(ut/tracked-sub ::audio/audio-playing? {})
+            client-name @(ut/tracked-subscribe [::bricks/client-name]) ;; reactions
+              ;sessions    @(ut/tracked-subscribe [::bricks/sessions])
+            left        (- (/ ww 2) (/ w 2))
+            top         (- (/ hh 2) (/ h 2))
+              ;items       (count sessions)
+              ;items       (if (odd? items) items (inc items))
+              ;sessions    (take per-page (sort-by last sessions))
+              ;sessions    (partition-all 3 sessions)
+            ]
+      
+        [re-com/modal-panel :style
+         {:z-index 99999 ;; on top of alerts?
+          :padding "0px"}
+         :frame-style {:background-color "#000000" :border-radius "20px"}
+         :parts {:child-container
+                 {:style {:left left
+                          :width w
+                          :height h
+                          ;:transform "scale(1.5)" 
+                          :top top :font-size "8px" :background-color "#000000" :position "fixed"
+                          :box-shadow       (let [block-id       :audio
+                                                  talking-block? true]
+                                              (cond (and audio-playing? talking-block?) (str
+                                                                                         "1px 1px " (px (* 80
+                                                                                                           (+ 0.1 
+                                                                                                              (- (get @db/audio-data2 block-id)
+                                                                                                               (get @db/audio-data block-id))
+                                                                                                              )))
+                                                                                         " "        "cyan")
+                                                    :else                               "none"))
+                         
+                          :border "5px solid cyan"}}}
+         :backdrop-opacity 0.75 :backdrop-on-click #(ut/tracked-dispatch [::bricks/disable-doom-modal])
+         :child [re-com/box :child [:img {:src "images/rvbbit-logo-no-bkgrnd.png"}]]
+         
+         ]))}))
+
+
+(defn main-panel []
   (let [editor? (and @(ut/tracked-subscribe_ [::bricks/editor?]) 
                      (not @bricks/dragging?))
         buffy? @(ut/tracked-subscribe_ [::bricks/buffy?])
@@ -4147,6 +4260,7 @@
         flows? @(ut/tracked-subscribe_ [::bricks/flow?])
         external? @(ut/tracked-subscribe_ [::bricks/external?])
         session? @(ut/tracked-subscribe_ [::bricks/session-modal?])
+        doom? @(ut/tracked-subscribe_ [::bricks/doom-modal?])
         lines? @(ut/tracked-subscribe_ [::bricks/lines?])
         peek? @(ut/tracked-subscribe_ [::bricks/peek?])
         auto-run? @(ut/tracked-subscribe_ [::bricks/auto-run?])
@@ -4294,6 +4408,7 @@
          (when @bricks/dragging-editor?
            [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
          (when session? [session-modal])
+         (when doom? [doom-modal])
          (when (and editor? (not @bricks/mouse-dragging-panel?))
            ;;[bricks/reecatch [editor-panel 33 10]]
            [bricks/reecatch [editor-panel (get @editor-size 0) (get @editor-size 1)]]
