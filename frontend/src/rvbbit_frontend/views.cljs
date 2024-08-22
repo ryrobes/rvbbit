@@ -4201,10 +4201,209 @@
 
 (defonce fanfare? (atom false)) 
 (defonce time-freq (reagent/atom 45))
+(defonce selected-stats-page (reagent/atom :client))
+
+(defn stats-page [w h client-name ttt solver-map]
+  (let [puget-data-color-map {} ;; @(ut/tracked-sub ::conn/puget-data-color-map {})
+        ;;_ (ut/tapp>> [:puget-data-color-map puget-data-color-map])
+        w (- w 45)
+        h (- h 55)]
+    [re-com/v-box
+     :size "none"
+     :height (px h)
+     :width (px w)
+     ;:style {:border "1px dotted pink"}
+     :children [[re-com/h-box
+                 :width (px w)
+                 :height "30px"
+                 :justify :between :align :center
+                 :children
+                 [[re-com/h-box
+                   :children (vec (for [e [:client :system :reactor :pools :queues :clients :sql-sizes :sql]]
+                                    [re-com/box
+                                     :attr {:on-click #(reset! selected-stats-page e)}
+                                     :style {:color (if (= e @selected-stats-page) "cyan" "white")
+                                             :text-shadow (when (= e @selected-stats-page) "2px 1px 3px cyan") 
+                                             :cursor "pointer"}
+                                     :child (str e)]))
+                   :align :center :justify :center
+                   :gap "10px"
+                   :padding "8px"
+                   :style {:font-family "Fixedsys-Excelsior, monospace"
+                           :font-weight 700
+                           :font-size "12px"}]
+                  [re-com/h-box
+                   :children (vec (for [e [15 30 45 90 180 360 600]]
+                                    [re-com/box
+                                     :attr {:on-click #(reset! time-freq e)}
+                                     :style {:color (if (= e @time-freq) "cyan" "white")
+                                             :text-shadow (when (= e @time-freq) "2px 1px 3px cyan")
+                                             :cursor "pointer"}
+                                     :child (str e)]))
+                   :align :center :justify :center
+                   :gap "10px"
+                   :padding "8px"
+                   :style {:font-family "Fixedsys-Excelsior, monospace"
+                           :font-weight 700
+                           :font-size "12px"}]]]
+                [bricks/honeycomb-fragments
+                 (walk/postwalk-replace
+                  {:client-name client-name
+                   :color-map puget-data-color-map
+                   :tt ttt
+                   :freq @time-freq
+                   :ww w}
+                  [:box
+                   :size "none"
+                   ;:style {;:zoom 0.6
+                   ;        :border "3px solid pink"}
+                   :height (px h)
+                   :width (px w)
+                   :child [:terminal-custom
+                           [[:run-solver
+                             solver-map]
+                            (- w 60) ;(* w 1.49) ;(Math/floor (/ w 7))
+                            (- h 75) ;(* (- h 40) 1.49) ;(Math/floor (/ h 1.55))
+                            false
+                            {:id (str "DooM-MenU-" (hash solver-map))
+                             :style {:font-size "11px"
+                                     :line-height "0.9"}
+                             :px-line-height 13}]]])
+                 (/ w 50)
+                 (/ h 50)]]]))
+
+(defn main-stats-page [w h client-name ttt]
+  [stats-page w h client-name ttt
+   (cond (= @selected-stats-page :client)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":client-stats" :bright-cyan)
+                         (draw-client-stats
+                          [:client-name] [:freq]
+                          [:mem-mb :latency :messages-per-second :server-subs]
+                          false
+                          (Math/floor (/ :ww 6.55))
+                          {:force-color :bright-cyan}))))}
+  
+         (= @selected-stats-page :pools)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":pool-party" :bright-cyan)
+                         (draw-stats [:pool-tasks-run+ :pool-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (println "")
+                         (show-pool-sizes-report {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
+  
+         (= @selected-stats-page :sql-sizes)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":sql-sizes" :bright-cyan)
+                         (draw-stats [:sql-queries :sql-exec] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (println "")
+                         (ut/pp (get-table-sizes) {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map})
+                         (ut/pp (database-sizes) {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
+  
+         (= @selected-stats-page :sql)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":sql-stats" :bright-cyan)
+                         (draw-client-stats nil [:freq] nil true 260 {:metrics-atom sql-metrics}))))}
+  
+         (= @selected-stats-page :clients)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":clients" :bright-cyan)
+                         (draw-client-stats nil [:freq] [:mem-mb :latency] false (Math/floor (/ :ww 6.55))))))}
+  
+         (= @selected-stats-page :reactor)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :placeholder-on-running? true
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":reactor" :pink)
+                         (draw-stats [:reactions  :signal-reactions :watchers :subs :subs-client :clover-params] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (println "")
+                         (show-reactor-sizes-report {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
+  
+         (= @selected-stats-page :system)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":system-stats" :bright-cyan) ;; :solvers :nrepl-calls :websockets
+                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls ] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         ;(draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls :websockets :load] [15] false 200 true)
+                         )))}
+  
+         (= @selected-stats-page :queues)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":queue-party" :bright-cyan)
+                           (draw-stats [:workers :queues :queued :queue-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true) 
+                         (println "")
+                         (let [ss (qp/get-queue-stats+)]
+                           (ut/pp [:queue-party-stats+ ss] {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map} )))))}
+  
+         :else {:signal false
+                :cache? false
+                :type :clojure
+                :input-map {}
+                :data '(do (ns rvbbit-backend.websockets)
+                           (let [tt :tt]
+                             (with-out-str
+                               (fig-render ":pool-sizes" :bright-cyan)
+                               (show-pool-sizes-report))))})])
+
+(defn menu-page-item [w h client-name ttt text color]
+  [stats-page w h client-name ttt (walk/postwalk-replace
+                                   {:color (or color :bright-cyan)
+                                    :text (str text)}
+                                   {:signal false
+                                    :cache? false
+                                    :type :clojure
+                                    :input-map {}
+                                    :data '(do (ns rvbbit-backend.websockets)
+                                               (with-out-str
+                                                 (fig-render :text :color)))})])
 
 (defn doom-modal []
-  (let [flipped (reagent/atom false)
-        client-name @(ut/tracked-subscribe_ [::bricks/client-name])]
+  (let [flipped (reagent/atom false)]
     (reagent/create-class
      {:component-did-mount
       (fn [this]
@@ -4212,7 +4411,6 @@
           (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak
                                 "/home/ryanr/hit.mp3"
                                 true]))
-        ;; Set a timeout to flip the image after 5 seconds
         (js/setTimeout #(do (reset! flipped true)
                             (reset! fanfare? true))   
                        (if @fanfare? 1500 5000))) 
@@ -4226,7 +4424,6 @@
               client-name @(ut/tracked-subscribe [::bricks/client-name])
               left (- (/ ww 2) (/ w 2))
               top (- (/ hh 2) (/ h 2))]
-
           [re-com/modal-panel
            :style {:z-index 99999 :padding "0px"}
            :frame-style {:background-color "#000000" :border-radius "20px"}
@@ -4242,114 +4439,56 @@
                                               talking-block? true]
                                           (when (and audio-playing? talking-block?)
                                             (str "1px 1px " (px (* 80
-                                                                      (+ 0.1
-                                                                         (- (get @db/audio-data2 block-id)
-                                                                            (get @db/audio-data block-id)))))
+                                                                   (+ 0.1
+                                                                      (- (get @db/audio-data2 block-id)
+                                                                         (get @db/audio-data block-id)))))
                                                  " cyan")))
                             :border "5px solid cyan"
-                            :transition "transform 0.6s"
-                            :transform (let [block-id :audio
-                                        talking-block? true]
-                                    (when (and audio-playing? talking-block? (not @flipped)) 
-                                      (str "scale(" (max (min 1.1 (+ 0.1
-                                                                     (- (get @db/audio-data2 block-id)
-                                                                        (get @db/audio-data block-id)))) 1.6) ")")))
+                            :transition "box-shadow 0.2s"
+                            ;; :transform (let [block-id :audio
+                            ;;             talking-block? true]
+                            ;;         (when (and audio-playing? talking-block? (not @flipped)) 
+                            ;;           (str "scale(" (max (min 1.1 (+ 0.1
+                            ;;                                          (- (get @db/audio-data2 block-id)
+                            ;;                                             (get @db/audio-data block-id)))) 1.6) ")")))
                             :perspective "1000px"  ; Add perspective for 3D effect
                             }}}
            :backdrop-opacity 0.75
            :backdrop-on-click #(ut/tracked-dispatch [::bricks/disable-doom-modal])
-           :child [:div {:style {:width "100%"
-                                 :height "100%"
-                                 :position "relative"
-                                 :transition "transform 0.6s"
-                                 :transform-origin "top center"
-                                 :transform-style "preserve-3d"
-                                 ;:border (when @flipped "1px solid cyan")
-                                 :transform (if @flipped "rotateY(180deg)" "rotateY(0deg)")
-                                 }}
-                   [:div {:style {:position "absolute"
-                                  :width "100%"
-                                  :height "100%"
-                                  :backface-visibility "hidden"}}
-                    [:img {:src "images/rvbbit-logo-no-bkgrnd.png"
-                           :style {:width "100%"
-                                   :height "100%"
-                                   :object-fit "contain"
-                                   :object-position "center"
-                                   :max-width "100%"
-                                   :max-height "100%"}}]]
-                   [:div {:style {:position "absolute"
-                                  :width "100%"
-                                  :height "100%"
-                                  :backface-visibility "hidden"
-                                  :transform "rotateY(180deg)"
-                                  ;:background-color "cyan"
-                                  ;:border (when @flipped "1px solid cyan")
-                                  :display "flex"
-                                  ;:justify-content "center"
-                                  ;:align-items "center"
-                                  ;:color "black"
-                                  :font-size "24px"}}
-                    ;;"(insert DooM menu here)"
-                    (let [ttt @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:time/minute]})
-                          ;ttt @(ut/tracked-subscribe [::conn/clicked-parameter [:time :minute]])
-                          
-                          react! [@time-freq]]
-                    ;;(ut/tapp>> [:ttt ttt])
-                      [re-com/v-box 
-                       :width (px w)
+           :child  [re-com/v-box
+                    :style {:width w
+                            :height h
+                            :position "relative"
+                            :transition "transform 0.3s"
+                            :transform-origin "top center"
+                            :transform-style "preserve-3d"
+                             ;:border (when @flipped "1px solid cyan")
+                            :transform (if @flipped "rotateY(180deg)" "rotateY(0deg)")}
+                    :children [[:div {:style {:position "absolute"
+                                              :width w
+                                              :height h
+                                              :backface-visibility "hidden"}}
+                                [:img {:src "images/rvbbit-logo-no-bkgrnd.png"
+                                       :style {:width w
+                                               :height h
+                                               :object-fit "contain"
+                                               :object-position "center"
+                                               :max-width "100%"
+                                               :max-height "100%"}}]]
+                               [re-com/box
+                                :style {:width w
+                                        :height h
+                                         ;:border "1px solid lime"
+                                        :backface-visibility "hidden"
+                                        :transform "rotateY(180deg)"
+                                        :font-size "24px"}
+                                :child (let [ttt @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:time/minute]})
+                                             react! [@time-freq]]
+                                         [main-stats-page w h client-name ttt]
+                                         ;[menu-page w h client-name ttt]
 
-                       :children [[re-com/h-box 
-                                   :children (vec (for [e [15 30 45 90 180 360 600]]
-                                               [re-com/box 
-                                                :attr {:on-click #(reset! time-freq e)}
-                                                :style {:color (if (= e @time-freq) "cyan" "white") 
-                                                        :cursor "pointer"}
-                                                :child (str e)]))
-                                   :align :center :justify :center
-                                   :gap "20px"
-                                   :width (px (- w 45))
-                                   ;:size "auto"
-                                   :height "30px"  
-                                   :padding "8px"
-                                   :style {:font-family "Fixedsys-Excelsior, monospace" 
-                                           :font-size "12px"
-                                           ;:border "1px solid cyan"
-                                           }]
-                                  [bricks/honeycomb-fragments
-                       (walk/postwalk-replace
-                        {:client-name client-name
-                         :tt ttt
-                         :freq @time-freq
-                         :ww (* w 1.236)}
-                        [:box
-                         :size "none"
-                         :style {:zoom 0.6}
-                         :height (px hh)
-                         :child [:terminal-custom
-                                 [[:run-solver
-                                   {:signal false
-                                    :cache? false
-                                    :type :clojure
-                                    :input-map {}
-                                    :data '(do (ns rvbbit-backend.websockets)
-                                               (let [tt :tt]
-                                                 (with-out-str 
-                                                   (fig-render ":client-stats" :bright-cyan)
-                                                   (draw-client-stats
-                                                                [:client-name] [:freq]
-                                                                [:mem-mb :latency :messages-per-second :server-subs]
-                                                                false
-                                                                (Math/floor (/ :ww 7))
-                                                                {:force-color :bright-cyan}
-                                                                ))))}]
-                                  (* w 1.49) ;(Math/floor (/ w 7))
-                                  (* (- h 40) 1.49) ;(Math/floor (/ h 1.55))
-
-                                  false]]])
-                       (Math/floor (/ w 7)) ;;15
-                       (Math/floor (/ h 7))]]])
-                    ]]]))})))
+                                          ;[re-com/box :child " fart fax " :style {:width w :height h :border "1px solid lime"}]
+                                         )]]]]))})))
 
 
 

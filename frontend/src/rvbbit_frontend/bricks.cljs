@@ -10625,7 +10625,7 @@
                    {:__html html-content}}]]))
 
 
-(defn reactive-virtualized-console-viewer [{:keys [text style width height] :as props}]
+(defn reactive-virtualized-console-viewer [{:keys [text style width height px-line-height] :as props}]
   (let [is-vec?      (vector? text)
         text         (if is-vec?
                        (map str text)
@@ -10642,9 +10642,10 @@
                         :white-space "pre"
                         :text-shadow "#00000088 1px 0 10px"} style)
         text-boxes (vec (for [t decoded-lines]
-                          [width 20 [:div {:style console-style
-                                           :dangerouslySetInnerHTML
-                                           {:__html t}}]]))
+                          [width (or px-line-height 20)
+                           [:div {:style console-style
+                                  :dangerouslySetInnerHTML
+                                  {:__html t}}]]))
         props (-> props (assoc :children text-boxes) (dissoc :text))]
     [vbunny/virtual-v-box props]))
 
@@ -10860,13 +10861,16 @@
                                   :width (+ px-width-int 70)
                                   :height (+ px-height-int 55)}])
 
-              :terminal-custom (fn [[x w h follow?]] [reactive-virtualized-console-viewer
-                                                      {:style {}
+              :terminal-custom (fn [[x w h follow? & [{:keys [style px-line-height] :as opts-map}]]] 
+                                 [reactive-virtualized-console-viewer
+                                                      (merge 
+                                                       {:style {}
                                                        :text x
                                                        :follow? follow?
                                                        :id (str panel-key "-" selected-view "-" output-type)
                                                        :width (+ w 70)
-                                                       :height (+ h 55)}])
+                                                       :height (+ h 55)}
+                                                       opts-map)])
 
               :panel-code-box-single panel-code-box-single
               :code-box-single panel-code-box-single

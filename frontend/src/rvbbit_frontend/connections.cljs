@@ -1026,9 +1026,11 @@
         fallback0           (if theme-key? (get resolved-base-theme t2) fallback)]
     (if (not (nil? v)) v fallback0)))
 
-(re-frame/reg-sub ::data-colors (fn [_] (theme-pull :theme/data-colors db/data-colors)))
+(re-frame/reg-sub 
+ ::data-colors 
+ (fn [_] (theme-pull :theme/data-colors db/data-colors)))
 
-(def data-colors @(re-frame.alpha/sub ::data-colors)) ;; kinda weird usage
+(def data-colors @(ut/tracked-sub ::data-colors {})) ;; kinda weird usage
 
 (re-frame/reg-sub ::sql-source (fn [db {:keys [kkey]}] (get-in db [:sql-source kkey] {})))
 
@@ -1042,8 +1044,29 @@
    (swap! format-puget-atom assoc cache-key res)
    db))
 
+(re-frame/reg-sub
+ ::puget-data-color-map
+ (fn [_] (let [data-colors (theme-pull :theme/data-colors db/data-colors)
+               data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color nil))
+               data-colors (walk/keywordize-keys data-colors)
+               color-map (assoc (walk/postwalk-replace
+                                 {:integer :number
+                                  :universal-pop-color :delimiter
+                                  :rabbit-code :function-symbol}
+                                 (into {} (for [[k v] data-colors]
+                                            {k (if (or (= k :universal-pop-color)
+                                                       (= k :keyword)
+                                                       (= k :nil))
+                                              ; [:bold v]
+                                                 [v]
+                                                 [v])})))
+                                :tag [(get data-colors :universal-pop-color)])]
+           color-map)))
+
 (defn format-edn-puget [w s & [tsplit]]
   (let [cache-key (hash [w s tsplit :puget])
+        data-colors @(ut/tracked-sub ::data-colors {})
+       ;; _ (ut/tapp>> [:cc data-colors :dd (theme-pull :theme/data-colors nil)])
         react! [@format-puget-atom]
         w (Math/floor (/ w 9))
         cache (get @format-puget-atom cache-key)]

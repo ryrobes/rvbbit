@@ -4,6 +4,7 @@
             [clojure.string :as cstr]
             [clojure.pprint :as pprint]
             [rvbbit-backend.util :as ut]
+            [rvbbit-backend.pool-party :as ppy]
             [flowmaps.db :as flow-db]
             [cognitect.transit :as transit])
   (:import [java.io ByteArrayInputStream ByteArrayOutputStream]
@@ -99,13 +100,16 @@
                  size-in-mb         (/ size-in-bytes 1048576.0)
                  size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
              (ut/pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
-         @managed-atoms)))
+         (dissoc @managed-atoms "./defs/solvers.edn" "./defs/signals.edn") ;; dont freeze these, since we manage them manually
+         )))
 
 (defn freeze-atom
   "Freezes a single atom to disk."
   [file-path]
-  (let [a (get @managed-atoms file-path)]
-    (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
+  (ppy/execute-in-thread-pools
+   :freeze-atom-serial
+   (fn [] (let [a (get @managed-atoms file-path)]
+            (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))))
 
 ;; (freeze-atom "./defs/solvers.edn")
 ;; (ut/pp  (keys @managed-atoms))

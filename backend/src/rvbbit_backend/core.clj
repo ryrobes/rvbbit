@@ -272,7 +272,7 @@
                   solver-name (keyword (str "refresh-" conn-name))
                   solver-edn-fp "./defs/solvers.edn"
                   solver-exist? (get @wss/solvers-atom solver-name)
-                  _ (when true ;(not solver-exist?) 
+                  _ (when (not solver-exist?) 
                       (ut/pp [:refresh-metadata-schedule-being-created-for conn-name :as solver-name])
                       (swap! wss/solvers-atom assoc solver-name (db-sniff-solver-default f-path conn-name))
                       (fpop/freeze-atom solver-edn-fp)
@@ -351,25 +351,27 @@
 
 (defn watch-solver-files []
   (let [file-path "./defs/"]
-    (beholder/watch #(when (and
-                            (or (cstr/ends-with? (str (get % :path)) "signals.edn")
-                                (cstr/ends-with? (str (get % :path)) "solvers.edn"))
-                            (not @wss/shutting-down?))
-                       (let [signals? (cstr/ends-with? (str (get % :path)) "signals.edn")
-                             destinations (vec (keys @wss/client-queues))
-                             map-atom (if signals? wss/signals-atom wss/solvers-atom)
-                             _ (reset! map-atom (edn/read-string (slurp (str (get % :path)))))
-                             _ (ut/pp [(if signals? :signals :solvers) :file-change! signals? (get % :path)])
-                             _ (if signals? (wss/reload-signals-subs) (wss/reload-solver-subs))]
-                         (doseq [d destinations]
-                           (wss/alert! d
-                                       [:v-box :justify :center :style {:opacity 0.7} :children
-                                        [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                          :child (str "Note: Server " (if signals? "signals" "solvers") " have been updated & received")]
-                                         [:box :child (str (get % :path))]]]
-                                       13 2
-                                       5)
-                           (wss/kick d (if signals? :signals-file :solvers-file) @map-atom 1 :none (str "file updated " (get % :path))))))
+    (beholder/watch #(ppy/execute-in-thread-pools
+                     :watch-solver-files-serial
+                     (fn [] (when (and
+                                   (or (cstr/ends-with? (str (get % :path)) "signals.edn")
+                                       (cstr/ends-with? (str (get % :path)) "solvers.edn"))
+                                   (not @wss/shutting-down?))
+                              (let [signals? (cstr/ends-with? (str (get % :path)) "signals.edn")
+                                    destinations (vec (keys @wss/client-queues))
+                                    map-atom (if signals? wss/signals-atom wss/solvers-atom)
+                                    _ (reset! map-atom (edn/read-string (slurp (str (get % :path)))))
+                                    _ (ut/pp [(if signals? :signals :solvers) :file-change! signals? (get % :path)])
+                                    _ (if signals? (wss/reload-signals-subs) (wss/reload-solver-subs))]
+                                (doseq [d destinations]
+                                  (wss/alert! d
+                                              [:v-box :justify :center :style {:opacity 0.7} :children
+                                               [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                                 :child (str "Note: Server " (if signals? "signals" "solvers") " have been updated & received")]
+                                                [:box :child (str (get % :path))]]]
+                                              13 2
+                                              5)
+                                  (wss/kick d (if signals? :signals-file :solvers-file) @map-atom 1 :none (str "file updated " (get % :path))))))))
                     file-path)))
 
 
@@ -693,6 +695,8 @@
   (start-scheduler 1
                    #(do (swap! wss/peer-usage conj (count @wl/sockets))
                         (swap! wss/push-usage conj @wss/all-pushes)
+                        (swap! wss/reaction-usage conj @wss/sent-reactions)
+                        (swap! wss/signal-reaction-usage conj @wss/sent-signal-reactions)
                         (swap! wss/solver-usage conj @wss/solvers-run)
                         (swap! wss/queue-tasks conj @qp/queue-tasks-run)
                         (swap! wss/nrepl-intros-usage conj @evl/nrepls-intros-run)
@@ -761,14 +765,14 @@
   ;;                     (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
   ;;                  "Restart Websocket Server, Test Debug" (* 3600 6))
 
-  ;; (start-scheduler 15
-  ;;                  #(let [dbs (wss/database-sizes)]
-  ;;                     (qp/update-queue-stats-history) ;; has it's own timestamp key
-  ;;                     (doseq [[db dbv] dbs]
-  ;;                       (swap! wss/sql-metrics assoc db
-  ;;                              (conj (get @wss/sql-metrics db [])
-  ;;                                    dbv))))
-  ;;                  "Simple SQLite Db Stats" 60)
+  (start-scheduler 15
+                   #(let [dbs (wss/database-sizes)]
+                      (qp/update-queue-stats-history) ;; has it's own timestamp key
+                      (doseq [[db dbv] dbs]
+                        (swap! wss/sql-metrics assoc db
+                               (conj (get @wss/sql-metrics db [])
+                                     dbv))))
+                   "Simple SQLite Db Stats" 60)
 
 
   (start-scheduler 15

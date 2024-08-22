@@ -1,0 +1,441 @@
+;;
+;;   ____ _  _ ___  ___  _ ___    ___  ____ ____ ____    ____ ____ _  _ ____ _ ____
+;;   |__/ |  | |__] |__] |  |     |__] |__| [__  |___    |    |  | |\ | |___ | | __
+;;   |  \  \/  |__] |__] |  |     |__] |  | ___] |___    |___ |__| | \| |    | |__]
+;;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+;;
+;; docs coming soon, doc!
+
+{:debug-level 1 ;; for console output. somewhat deprecated.
+ :default "./screens/looking-glass-redux.edn"
+ ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
+ :harvest-on-boot? false 
+ ;; ^^ do a full database sniff for each connection on boot (will be staggered and scheduled in the future)
+ :modes {:pre       [:pre
+                     {:style {:color :theme/editor-outer-rim-color
+                              :background-color "#00000000"
+                              :border "none"
+                              :text-shadow "4px 4px 4px #00000088"
+                              :font-size "17px"
+                              :font-family :theme/monospaced-font}}
+                     [:string3 :*data]]
+         :edn       [:edn :*data]
+         :text      [:console :*data]
+         :terminal  [:terminal :*data]
+         :markdown  [:markdown :*data]
+         :data      [:data-viewer :*data]
+         :pretty    [:pretty-box :*data]
+         :rowset    [:honeycomb {:select [:*] :from {:data :*data}} 11 9] ;; this is slow and funky. revisit?
+         :clover    [:box :child :*data]}
+  ;; ^^ see clover-templates.edn, for the full clover defs mentioned here
+ :runners {:queries {:default {}
+                     :modes [:rowset]
+                     :hop-bar? false
+                     :ext ".edn"
+                     :icon "images/sql.png"} ;; basic clover-sql query runner
+
+           :views   {:default []
+                     :modes [:clover :edn]
+                     :ext ".edn"
+                     :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
+                     :icon "🍀"} ;; basic clover render
+
+           ;; ^ these 2 are built in a required and mostly not configurable for now
+           :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default  
+                           :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
+                           :modes [:clover :text :data  :terminal]
+                           :hop-function? true
+                           :ext ".clj"
+                           :default (do
+                                      (ns hoppy.chuck-norris
+                                        (:require [clojure.data.json :as json]
+                                                  [clojure.java.io :as io]))
+
+                                      (def url (java.net.URL. "https://api.chucknorris.io/jokes/random"))
+
+                                      (defn fetch-chuck-norris-joke []
+                                        (let [conn (.openConnection url)]
+                                          (with-open [reader (io/reader (.getInputStream conn))]
+                                            (json/read (java.io.PushbackReader. reader) :key-fn keyword))))
+
+                                      (defn joke-to-hiccup [joke]
+                                        [:v-box
+                                         :size "auto" :align :center :justify :center
+                                         :gap "4px"
+                                         :style {:color :theme/editor-outer-rim-color}
+                                         :children [[:h2 "Chuck's Wisdom of the Day"]
+                                                    [:p (:value joke)]
+                                                    [:img {:src "https://placekitten.com/200/200"
+                                                           :width "200px" :height "200px" :style {:border-radius "15px"}
+                                                           :alt "A cute bunny (actually a kitten)"}]]])
+
+                                      (def joke (fetch-chuck-norris-joke))
+
+                                      (def inputs (pr-str :clover-body))
+
+                                      (def hiccup (joke-to-hiccup joke))
+
+                                      (println "Console joke output:" (pr-str (get joke :value)))
+                                      hiccup)
+                           :syntax "clojure"
+                           :placeholder-clover [:v-box
+                                                :children [[:img {:src "images/running.gif"}]]
+                                                :size "auto"
+                                                :style {:color :theme/universal-pop-color
+                                                        :font-size "14px"}
+                                                :height :panel-height+50-px
+                                                :align :center :justify :center]
+                           :clover-fn [:run-solver
+                                       {:signal false
+                                        :cache? false
+                                        :type :clojure
+                                        :input-map {}
+                                        :data :clover-body}]
+                           :description "Demo: Fetch a random Chuck Norris joke from the chucknorris.io API and display it with a cute kitten image."
+                           :icon "images/chuck.png"}
+
+           :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
+                     :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
+                     :modes [:text :edn :clover :data  :terminal]
+                     :ext ".clj"
+                     :default (let [clojure-version (clojure-version)
+                                    jvm-version (System/getProperty
+                                                 "java.version")]
+                                (str
+                                 "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+                                 clojure-version
+                                 " on " jvm-version " JVM tech"
+                                 " 🥕🐇"))
+                     :syntax "clojure"
+                     :placeholder-clover [:v-box
+                                          :children [;[:box :child [:string3 :*solver-name* " running..."]]
+                                                     [:img {:src "images/running.gif"
+                                                            ;:width "70px" 
+                                                            ;:height "70px"
+                                                            }]]
+                                          :size "auto"
+                                          :style {:color :theme/universal-pop-color
+                                                  ;:border "1px solid white"
+                                                  :font-size "14px"}
+                                          ;:width  :panel-width-px
+                                          :height :panel-height+50-px
+                                          :align :center :justify :center]
+                     :clover-fn [:run-solver
+                                 {:signal false
+                                  :cache? false
+                                  :type :clojure
+                                  :input-map {}
+                                  :data :clover-body}]
+                     :description "Run a Clojure expression and return the result. Uses the internal RVBBIT nREPL, has access to all rvbbit-backend.* namespaces."
+                     :pattern-hint "This is a standard Clojure REPL block. It executes Clojure code and returns the result in an arbitrary nREPL server of the users choosing. 
+                                    Since this system is EDN based, all code has to be wrapped in a (do ..) form in order to be evaluated as a single expression. If a user-provided do block already exists, just use it, do not double wrap it - a single parent (do ...) form is all that is needed.
+                                    Being saved in EDN also means that it cannot use Clojure artifacts that are invalid EDN - so, do not use the shorthand for anon functions (#(this %)), or shorthand atom derefs (@atom), or shortcode sets (#{}) always use the full for version for these things - instead w/o the special characters (deref, set, (fn[x]...))."
+                     :icon "images/clojure-alt.svg"}
+
+           :fabric {:type :nrepl
+                    :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+                    :modes [:text :markdown :clover :data :terminal]
+                    :default "funny tweet about rabbits and clojure"
+                    :syntax "text"
+                    :ext ".txt"
+                    :hop-function? true
+                    :slice-bar? false
+                    :placeholder-on-running? true
+                    :clover-fn [:run-solver
+                                {:signal false
+                                 :cache? true
+                                 :type :clojure
+                                 :input-map {}
+                                 :data (rvbbit-backend.websockets/fabric-run
+                                        {:input (str :clover-body "")
+                                         :client-name :*client-name
+                                         :id :*id
+                                         :context :*context
+                                         :runner :*runner
+                                         :pattern (or :*pattern "tweet")
+                                         :model (or :*model "gpt-3.5-turbo")})}]
+                    :description "AI framework: Uses the Fabric command line tool to access various local and remote LLM models with pre-defined 'patterns', + special context-aware RVBBIT patterns."
+                    :icon "images/fbc-logo.gif"}
+
+           :outliers {:type :nrepl
+                      :runner {:port 45999 :host "127.0.0.1"} 
+                      :modes [:text :clover :data :terminal]
+                      :hop-bar? false ;; only used for the kit runner menu on query slice panels 
+                      :slice-bar? false
+                      :default (let [clojure-version (clojure-version)
+                                     jvm-version (System/getProperty
+                                                  "java.version")]
+                                 (str ;; default, never going to see this code, just a placeholder since this is a kit runner REPL only :hop-bar? false :slice-bar? false
+                                  "🐇🥕 Outliers nREPL Library. Clojure "
+                                  clojure-version
+                                  " on " jvm-version " JVM "
+                                  " 🥕🐇"))
+                      :syntax "clojure"
+                      :ext ".clj"
+                      :kits {:get-outliers {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                                       (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
+                                                                                :when (get v :queries)]
+                                                                            (for  [kk (keys (get v :queries))]
+                                                                              [k :queries kk])))))
+                                            :output :kit-map
+                                            :kit-view-opts {:max-combos 4 ;; will be applied, client-side when view starts up
+                                                            :dimensions-to-scan []}
+                                            :kit-view-exprs [(let [panel-key :panel-key  ;; function "view" runs in the host nrepl
+                                                                   max-combos (keyword (str (cstr/replace (str panel-key) ":" "") "/max-combos"))
+                                                                   query-meta :query-metadata
+                                                                   dimensions (vec (for [[k {:keys [:group-by?]}]
+                                                                                         (get query-meta :fields)
+                                                                                         :when group-by?] k))
+                                                                   dimensions-to-scan (keyword (str (cstr/replace (str panel-key) ":" "") "/dimensions-to-scan"))]
+                                                               [:v-box 
+                                                                :size "auto"
+                                                                :align :center
+                                                                :padding "6px"
+                                                                :gap "10px"
+                                                                :children
+                                                                [[:box :child "dimensional outliers options" 
+                                                                  :style {:font-weight 700
+                                                                          :font-size "45px"
+                                                                          :color "orange"
+                                                                          :font-family "Homemade Apple"}]
+                                                                 [:box :child "group-by dimensions to include"]
+                                                                 [:h-box
+                                                                  :gap "8px"
+                                                                  :size "auto"
+                                                                  :children (for [dd dimensions]
+                                                                              [:box
+                                                                               :size "auto"
+                                                                               :padding "6px"
+                                                                               :child (str dd)
+                                                                               :style {:border "1px solid #ffffff33"
+                                                                                       :background-color [:when [:some dd dimensions-to-scan] "orange"]
+                                                                                       :color [:when [:some dd dimensions-to-scan] "black"]
+                                                                                       :font-size "18px" :cursor "pointer"}
+                                                                               :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])]
+                                                                 [:box :child "max dimension combos to run"]
+                                                                 [:h-box 
+                                                                  :gap "10px"
+                                                                  :children [[:slider :max-combos 2 10 1 200 max-combos]
+                                                                                    [:box :child [:string3 max-combos]]]]
+                                                                 [:h-box
+                                                                  ;:justify :between
+                                                                  :style {:font-size "33px"
+                                                                          :font-weight 700}
+                                                                  :gap "50px"
+                                                                  :children [[:box
+                                                                              :style {;:border "1px solid green"
+                                                                                      :cursor "pointer"}
+                                                                              :child "GO?"
+                                                                              :attr {:on-click [:set-parameter :go! :go!]}]
+                                                                             [:box
+                                                                              :style {;:border "1px solid red" 
+                                                                                      :cursor "pointer"}
+                                                                              :child "CANCEL"
+                                                                              :attr {:on-click [:set-parameter :go! :cancel!]}]]]]])]
+                                            :kit-expr (rabbit-kit-outliers.core/get-outliers  ;; runs in the host nrepl
+                                                       :data-key
+                                                       :panel-key
+                                                       :transit-rowset
+                                                       :transit-rowset-meta
+                                                       :opts-map
+                                                       ;;false ;;true
+                                                       )
+                                             ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
+                                            :icon "fa-solid fa-circle-exclamation"
+                                            ;:clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))
+                                            }
+
+                            ;;  :get-outliers-maps {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                            ;;                                 (vec (apply concat (for [[k v] client-data]
+                            ;;                                                 (apply concat (for [[kk vv] v]
+                            ;;                                                                 (for [[k3 v3] vv
+                            ;;                                                                       :when (map? v3)]
+                            ;;                                                                   [k kk k3])))))))
+                            ;;                      :kit-expr (fn [client-panels client-data panel-key view-key]
+                            ;;                                (fn [] (println (clojure-version) "Outliers Kit Runner called." (keys client-panels)))) ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
+                            ;;                      :icon "zmdi-map"
+                            ;;                      :clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))}
+                             }
+                      :placeholder-on-running? true
+                      :clover-fn [:run-solver
+                                  {:signal false
+                                   :cache? false
+                                   :type :clojure
+                                   :input-map {}
+                                   :data :clover-body}]
+                      :description "Clojure REPL only used for the Outliers Kit Runner."
+                      :icon "images/fbc-logo.gif"}
+
+           :shell {:type :nrepl ;; this is the built-in REPL that starts by default
+                   :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default nrepl
+                   :modes [:text :data :terminal]
+                   :default "ls -l ; top -n 1  ; pwd ; whoami" ;; "ls -l"
+                   :syntax "shell"
+                   :ext ".sh"
+                   :hop-function? true
+                   :placeholder-on-running? true
+                   :clover-fn [:run-solver
+                               {:signal false
+                                :cache? false
+                                :type :clojure
+                                :input-map {}
+                                :data (let [command (str :clover-body)
+                                            process-builder (ProcessBuilder. (into-array ["sh" "-c" command]))
+                                            _ (.redirectErrorStream process-builder true)  ; Merge stderr into stdout
+                                            process (.start process-builder)
+                                            reader (java.io.BufferedReader.
+                                                    (java.io.InputStreamReader.
+                                                     (.getInputStream process)))
+                                            output (StringBuilder.)]
+
+                                        (loop []
+                                          (when-let [line (.readLine reader)]
+                                            (.append output line)
+                                            (.append output "\n")
+                                            (recur)))
+
+                                        (.waitFor process)
+
+                                        (let [result (str output)]
+                                          (if (empty? result)
+                                            "Command executed, but produced no output."
+                                            result)))}]
+                   :description "Run a shell (in your default shell) command (from the ./shell-root/ dir) & return the output. Warning: executes with permissions of RVBBIT server user."
+                   :icon "images/snail-shell.svg"}
+           :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
+                      :runner {:port 37851 :host "127.0.0.1"}
+                      :modes [:text :edn :clover :data   :terminal]
+                      :ext ".clj"
+                      :default (let [clojure-version (clojure-version)
+                                     jvm-version (System/getProperty
+                                                  "java.version")]
+                                 (str
+                                  "👻 Whoa. Spooky external nREPL! 👀 Clojure "
+                                  clojure-version
+                                  " on JVM tech " jvm-version
+                                  " 👻"))
+                      :syntax "clojure"
+                      :clover-fn  [:run-solver
+                                   {:signal false
+                                    :type :clojure2
+                                    :input-map {}
+                                    :data :clover-body}]
+                      :description "Run a Clojure expression and return the result. Uses an external nREPL server."
+                      :icon "images/clojure_2.svg"}
+           :create-image {:runner {}
+                          :modes [:clover :data :text]
+                          :type :flow
+                          :syntax "text"
+                          :ext ".txt"
+                          :description "Create an image with OpenAI's DALLE-3 HTTP endpoint. Uses the 'openai-image-gen-ladder3' flowmap, and returns the :hiccup-image-box-w-png step value."
+                          :placeholder-on-running? true
+                          :clover-fn [:run-solver
+                                      {:signal false
+                                       :cache? false
+                                       :type :flow
+                                       :data
+                                       {:flowmap "openai-image-gen-ladder3"
+                                        :opts
+                                        {:timeout 120000
+                                         :overrides
+                                         {:prompt
+                                          :clover-body}}
+                                        :return :hiccup-image-box-w-png}}]
+                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer."
+                          :icon ["images/openai.png" "images/dalle3.png"]}
+           :python3 {:runner {}
+                     :modes [:text :data  :clover :terminal]
+                     :type :flow
+                     :syntax "python"
+                     :ext ".py"
+                     :placeholder-on-running? true
+                     :clover-fn [:run-solver
+                                 {:signal false
+                                  :cache? false
+                                  :type :flow
+                                  :data
+                                  {:flowmap "simple-python-exec" ;; "python-test-1"
+                                   :opts
+                                   {:timeout 120000
+                                    :overrides
+                                    {:python-code-string ;;:open-input-1
+                                     :clover-body}}
+                                   :return :output-only}}]
+                     :default ["import platform"
+                               ""
+                               "def main():"
+                               "    # Print Hello, World!"
+                               "    print(\"Hello, World!\")"
+                               "    "
+                               "    # Print Python version"
+                               "    print(f\"Python version: {platform.python_version()}\")"
+                               "    "
+                               "    # Print detailed Python version info"
+                               "    print(f\"Python version info: {platform.python_version_tuple()}\")"
+                               "    "
+                               "    # Print system information"
+                               "    print(f\"System: {platform.system()}\")"
+                               "    print(f\"Node: {platform.node()}\")"
+                               "    print(f\"Release: {platform.release()}\")"
+                               "    print(f\"Version: {platform.version()}\")"
+                               "    print(f\"Machine: {platform.machine()}\")"
+                               "    print(f\"Processor: {platform.processor()}\")"
+                               ""
+                               "if __name__ == \"__main__\":"
+                               "    main()"]
+                     :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Experimental!"
+                     :icon "images/python.svg"}}
+ :eleven-labs-api-key nil
+ ;:eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
+ ;:eleven-labs-default-voice-name "Alicia Speaks-Unique and Pleasant"
+ ;:eleven-labs-default-voice-name "Sofia-AI-frye"
+ :eleven-labs-default-voice-name "Not OG Buffy"
+ :new-block-rand  ["Why, sometimes I've believed as many as six impossible things before breakfast."
+                   "Imagination is the only weapon in the war against reality."
+                   "It's no use going back to yesterday, because I was a different person then."
+                   "Who in the world am I? Ah, that's the great puzzle."
+                   "Curiouser and curiouser!"
+                   "If you don't know where you are going any road can take you there."
+                   "We're all mad here."
+                   "I can't go back to yesterday because I was a different person then."
+                   "It's always tea-time."
+                   "Begin at the beginning and go on till you come to the end; then stop."
+                   "I knew who I was this morning, but I've changed a few times since then."
+                   "How long is forever? Sometimes, just one second."
+                   "If everybody minded their own business, the world would go around a great deal faster than it does."
+                   "I don't think... then you shouldn't talk, said the Hatter."
+                   "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+                   "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+                   "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+                   "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+                   "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+                   "Well, I never heard it before, but it sounds uncommon nonsense."
+                   ;; end Alice in Wonderland quotes, start various cyberpunk 
+                   "Why, sometimes I've believed as many as six impossible things before breakfast."
+                   "Imagination is the only weapon in the war against reality."
+                   "Who in the world am I? Ah, that's the great puzzle."
+                   "We're all mad here."
+                   "How long is forever? Sometimes, just one second."
+                   "The world is full of obvious things which nobody by any chance ever observes."
+                   "Reality is that which, when you stop believing in it, doesn't go away."
+                   "The sky above the port was the color of television, tuned to a dead channel."
+                   "Information wants to be free."
+                   "The future is already here – it's just not evenly distributed."
+                   "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+                   "The 'Net is a waste of time, and that's exactly what's right about it."
+                   "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+                   "The street finds its own uses for things."
+                   "Accelerated world. Accelerated nervous system to go with it."
+                   "The future has arrived — it's just not evenly distributed yet."
+                   "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+                   "When you want to know how things really work, study them when they're coming apart."
+                   "The human sensory system is a lot more complex and weird than most people realize."
+                   "Time moves in one direction, memory in another."
+                   "The only thing that keeps you sane is to think that it's all a bad dream."
+                   "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+                   "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+                   "Secrets are not the same as surprises."
+                   "Neuromancer. The lane to the land of the dead."
+                   ]}
+

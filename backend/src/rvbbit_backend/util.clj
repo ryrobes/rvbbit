@@ -1158,13 +1158,22 @@
 (defn hash-group [key num-groups]
   (mod (hash key) num-groups))
 
-(defn delay-execution [ms f] (future (do (Thread/sleep ms) (f))))
+(defn delay-execution [ms f] 
+  (future (do (Thread/sleep ms) (f))))
 
-(defn safe-cprint [x] (locking console-lock (puget/with-options {:width (get-terminal-width)} (puget/cprint x))))
+(defn safe-cprint [x & [opts-map]]
+  (locking console-lock
+    (puget/with-options (merge
+                         {:width (get-terminal-width)}
+                         opts-map) (puget/cprint x))))
 
-(defn ppln [x] (if (>= debug-level 2) (safe-cprint x) ((fn [& _]) x)))
+(defn ppln [x] 
+  (if (>= debug-level 2) 
+    (safe-cprint x) ((fn [& _]) x)))
 
-(defn pp [x] (if (>= debug-level 1) (safe-cprint x) ((fn [& _]) x)))
+(defn pp [x & [opts-map]] 
+  (if (>= debug-level 1) 
+    (safe-cprint x opts-map) ((fn [& _]) x)))
 
 (defn ppa
   [x] ;; always print

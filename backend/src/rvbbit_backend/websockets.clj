@@ -88,7 +88,13 @@
 (defonce nrepl-usage (atom []))
 (defonce nrepl-intros-usage (atom []))
 
-(defonce client-metrics (fpop/thaw-atom {} "./data/atoms/client-metrics-atom.msgpack.transit")) ;;(atom {}))
+(defonce sent-reactions (atom 0))
+(defonce sent-signal-reactions (atom 0))
+
+(defonce reaction-usage (atom []))
+(defonce signal-reaction-usage (atom []))
+
+(defonce client-metrics (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-metrics-atom.msgpack.transit")) ;;(atom {}))
 (defonce sql-metrics (atom {}))
 
 (defonce sys-load (atom []))
@@ -2813,20 +2819,20 @@
         history (select-keys (get @db/last-signals-history-atom signal-name {}) ccw)]
     history))
 
-(defmethod wl/handle-request :save-signals-map
-  [{:keys [client-name data-map]}]
-  (ut/pp [:saving-signals-map client-name])
-  (let [bm {}] (reset! signals-atom data-map)))
+;; (defmethod wl/handle-request :save-signals-map
+;;   [{:keys [client-name data-map]}]
+;;   (ut/pp [:saving-signals-map client-name])
+;;   (let [bm {}] (reset! signals-atom data-map)))
 
-(defmethod wl/handle-request :save-rules-map
-  [{:keys [client-name data-map]}]
-  (ut/pp [:saving-rules-map client-name])
-  (let [bm {}] (reset! rules-atom data-map)))
+;; (defmethod wl/handle-request :save-rules-map
+;;   [{:keys [client-name data-map]}]
+;;   (ut/pp [:saving-rules-map client-name])
+;;   (let [bm {}] (reset! rules-atom data-map)))
 
-(defmethod wl/handle-request :save-solvers-map
-  [{:keys [client-name data-map]}]
-  (ut/pp [:saving-solvers-map client-name])
-  (let [bm {}] (reset! solvers-atom data-map)))
+;; (defmethod wl/handle-request :save-solvers-map
+;;   [{:keys [client-name data-map]}]
+;;   (ut/pp [:saving-solvers-map client-name])
+;;   (let [bm {}] (reset! solvers-atom data-map)))
 
 (defmethod wl/handle-request :save-custom-flow-block
   [{:keys [client-name name block-map]}]
@@ -3884,6 +3890,8 @@
   (let [_             (swap! rvbbit-client-sub-values assoc-in keypath new-value)
         re-con-key    (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
         valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))]
+    (swap! sent-signal-reactions inc)
+
     (doseq [signal valid-signals
             :let   [solver-deps    (vec (distinct (for [[_ v] @solvers-atom]
                                                     (keyword (-> (get v :signal)
@@ -3895,12 +3903,12 @@
 
 (declare process-solver)
 
-(defn process-solvers-reaction
-  [base-type keypath new-value client-param-path]
-  (let [re-con-key    (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
-        valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))]
-    (doseq [signal valid-signals] ;; run in parallel later perhaps
-      (process-solver signal))))
+;; (defn process-solvers-reaction ;; mostly uneeded. reg reactions are used here now 
+;;   [base-type keypath new-value client-param-path]
+;;   (let [re-con-key    (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
+;;         valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))]
+;;     (doseq [signal valid-signals] ;; run in parallel later perhaps
+;;       (process-solver signal))))
 
 
 (defn send-reaction
@@ -3912,6 +3920,7 @@
         ;;client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
         client-param-path       other-client-param-path
         signal?                 (= client-name :rvbbit)]
+    (swap! sent-reactions inc)
 
     (if (not signal?)
       (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
@@ -4418,6 +4427,64 @@
         (boolean? v)                                                                 "boolean"
         :else                                                                        "unknown"))
 
+(defn sql-like-min [coll]
+  (when (seq coll)
+    (reduce (fn [a b]
+              (if (neg? (compare (str a) (str b))) a b))
+            coll)))
+
+(defn sql-like-max [coll]
+  (when (seq coll)
+    (reduce (fn [a b]
+              (if (pos? (compare (str a) (str b))) a b))
+            coll)))
+
+(defn safe-median [coll]
+  (when (seq coll)
+    (let [sorted (sort-by str coll)
+          cnt (count sorted)
+          halfway (quot cnt 2)]
+      (if (odd? cnt)
+        (nth sorted halfway)
+        (let [bottom (nth sorted (dec halfway))
+              top (nth sorted halfway)]
+          (if (every? number? [bottom top])
+            (/ (+ bottom top) 2)
+            (str bottom)))))))
+
+(defn safe-avg [coll]
+  (when (seq coll)
+    (if (every? number? coll)
+      (/ (apply + coll) (count coll))
+      (let [cnt (count coll)]
+        (if (pos? cnt)
+          (str (first coll) " (non-numeric average)")
+          nil)))))
+
+(defn safe-stats [fsamples]
+  (try
+    (cond
+      (every? number? fsamples)
+      {:min (apply min fsamples)
+       :max (apply max fsamples)
+       :median (safe-median fsamples)
+       :avg (safe-avg fsamples)}
+
+      (every? string? fsamples)
+      {:min (sql-like-min fsamples)
+       :max (sql-like-max fsamples)
+       :median (safe-median fsamples)
+       :avg (safe-avg fsamples)}
+
+      :else
+      (let [str-samples (map str fsamples)]
+        {:min (sql-like-min str-samples)
+         :max (sql-like-max str-samples)
+         :median (safe-median str-samples)
+         :avg (safe-avg str-samples)}))
+    (catch Exception _
+      {:min nil, :max nil, :median nil, :avg nil})))
+
 (defn get-query-metadata
   [rowset query]
   (let [sample                rowset ;(repeatedly 100 (fn [] (rand-nth rowset)))
@@ -4438,6 +4505,28 @@
                                            (vector? g)  (get selects-non-aliased g)
                                            :else        g)))
         fields                (keys (first sample))
+        ;; field-data            (into {}
+        ;;                             (for [f fields]
+        ;;                               {f (let [fsamples         (map f sample)
+        ;;                                        distinct-samples (count (distinct fsamples))
+        ;;                                        commons          (into {} (take 3 (reverse (sort-by last (frequencies fsamples)))))
+        ;;                                        data-type        (get-in (vec (reverse (sort-by last
+        ;;                                                                                        (frequencies (map data-type-value
+        ;;                                                                                                          fsamples)))))
+        ;;                                                                 [0 0])]
+        ;;                                    {:data-type   data-type
+        ;;                                     :distinct    distinct-samples
+        ;;                                     :min (try (apply min fsamples) (catch Exception _ nil))
+        ;;                                     :max (try (apply max fsamples) (catch Exception _ nil))
+        ;;                                     :avg (try (ut/avg fsamples) (catch Exception _ nil))
+        ;;                                     :group-by?   (if (not no-group-by?)
+        ;;                                                    (true? (try (some #(= f %) materialize-group-bys)
+        ;;                                                                (catch Exception _ false)))
+        ;;                                                    true)
+        ;;                                     :commons     (if (cstr/includes? data-type "date")
+        ;;                                                    (into {} (for [[k v] commons] {(str k) v}))
+        ;;                                                    commons)
+        ;;                                     :cardinality (int (* 100 (float (/ distinct-samples sample-size))))})}))]
         field-data            (into {}
                                     (for [f fields]
                                       {f (let [fsamples         (map f sample)
@@ -4446,9 +4535,14 @@
                                                data-type        (get-in (vec (reverse (sort-by last
                                                                                                (frequencies (map data-type-value
                                                                                                                  fsamples)))))
-                                                                        [0 0])]
+                                                                        [0 0])
+                                               {:keys [min max median avg]} (safe-stats fsamples)]
                                            {:data-type   data-type
                                             :distinct    distinct-samples
+                                            :min         min
+                                            :max         max
+                                            :median      median
+                                            :avg         avg
                                             :group-by?   (if (not no-group-by?)
                                                            (true? (try (some #(= f %) materialize-group-bys)
                                                                        (catch Exception _ false)))
@@ -4525,14 +4619,19 @@
                                                                   (for [field (keys fields)]
                                                                     {[:distinct field] {:select [[[:count [:distinct field]]
                                                                                                   :distinct-values]]
-                                                                                        :from   [[honey-sql :subq]]}}))))]
+                                                                                        :from   [[honey-sql :subq]]}
+                                                                    ;;  [:avg field] {:select [[[:avg field] :avgvalue]]
+                                                                    ;;                :from   [[honey-sql :subq]]}
+                                                                    ;;  [:min field] {:select [[[:min field] :minvalue]]
+                                                                    ;;                :from   [[honey-sql :subq]]}
+                                                                    ;;  [:max field] {:select [[[:max field] :maxvalue]]
+                                                                    ;;                :from   [[honey-sql :subq]]}
+                                                                     }
+                                                                    ))))]
                                (let [str-sql    (to-sql hsql)
                                      sql-result (first (vals (first (sql-query target-db str-sql [ui-keypath :post-meta]))))
                                      res        {f sql-result}]
-                                 (when (not (string? sql-result)) res))))] ;; smaller for websocket
-                                                                           ;; js memory read-string
-                                                                           ;; issues (distinct or
-                                                                           ;; rowcount is
+                                 (when (not (string? sql-result)) res))))] 
         ;;  (ut/pp [:running-meta-cnts ui-keypath client-name cnts])
          (swap! sniff-meta-guard assoc-in [ui-keypath client-name] (hash ohoney-sql))
          (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts cnts))
@@ -6165,19 +6264,19 @@
 
 (def flf1 (figlet/load-flf "data/ansi-regular.flf"))
 
-(defn stacktrace-element->map [^StackTraceElement element]
-  {:class-name (.getClassName element)
-   :file-name (.getFileName element)
-   :line-number (.getLineNumber element)
-   :method-name (.getMethodName element)
-   :native? (.isNativeMethod element)})
+;; (defn stacktrace-element->map [^StackTraceElement element]
+;;   {:class-name (.getClassName element)
+;;    :file-name (.getFileName element)
+;;    :line-number (.getLineNumber element)
+;;    :method-name (.getMethodName element)
+;;    :native? (.isNativeMethod element)})
 
-(defn stacktrace->map [^Throwable thrown-error]
-  (let [cause (.getCause thrown-error)]
-    {:type (class thrown-error)
-     :message (.getMessage thrown-error)
-     :stacktrace (mapv stacktrace-element->map (.getStackTrace thrown-error))
-     :cause (when cause (stacktrace->map cause))}))
+;; (defn stacktrace->map [^Throwable thrown-error]
+;;   (let [cause (.getCause thrown-error)]
+;;     {:type (class thrown-error)
+;;      :message (.getMessage thrown-error)
+;;      :stacktrace (mapv stacktrace-element->map (.getStackTrace thrown-error))
+;;      :cause (when cause (stacktrace->map cause))}))
 
 (defn fig-render
   [text & [color flf]]
@@ -6509,6 +6608,8 @@
 
 ;;(ut/pp [:test])
 
+;; (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls :websockets :load] [15] false 200 true)
+
 ;; (ut/pp @sql-metrics)
 
 ;; (ut/pp @client-metrics)
@@ -6582,6 +6683,8 @@
                   :solvers [(ut/cumulative-to-delta @solver-usage) "solvers running" "solvers"]
                   :pool-tasks-run [(ut/cumulative-to-delta @pool-task-usage) "pool tasks run" "tasks run"]
                   :msgs [(ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes"]
+                  :reactions [(ut/cumulative-to-delta @reaction-usage) "reactions/sec" "reactions"]
+                  :signal-reactions [(ut/cumulative-to-delta @signal-reaction-usage) "signal reactions/sec" "signal reactions"]
                   :pool-tasks [(ut/cumulative-to-delta @pool-tasks) "pool tasks" "tasks run"]
                   :websockets [(get-in @pool-stats-atom ["websocket-thread-pool" :current-pool-size]) "threads" "threads"]
                   :queues [(get @qp/queue-stats-history :total-queues) "queues" "queues"]
@@ -6663,13 +6766,15 @@
 
 ;; (draw-stats :cpu)
 ;; (draw-stats)
+;; (draw-stats [:workers] [15] false nil true) 
+;; (draw-stats [:reactions+ :signal-reactions] [15] false nil true) 
 
 ;; (time (draw-stats [:cpu ] [15] false nil true))
  ;;  (time (draw-stats [:cpu ] [15] false nil false))
 
 (defonce pool-ttls-last (atom {}))
 
-(defn show-pool-sizes-report []
+(defn show-pool-sizes-report [ & [opts-map]]
   (ut/pp [:pool-sizes
           (let [pool-sizes (query-pool-sizes)
                 pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
@@ -6697,16 +6802,16 @@
                    :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
                    :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
                    :prev prev
-                   :now ttls}))]))
+                   :now ttls}))] opts-map))
 
-;; (show-pool-sizes-report)
+;; (show-pool-sizes-report {:width 10})
 
-(defn show-reactor-sizes-report []
-  (ut/pp (vec (filter #(cstr/starts-with? (str %) ":time/") (distinct (apply concat (for [[_ v] @db/splitter-stats] (keys v)))))))
+(defn show-reactor-sizes-report [& [opts-map]]
+  (ut/pp (vec (filter #(cstr/starts-with? (str %) ":time/") (distinct (apply concat (for [[_ v] @db/splitter-stats] (keys v)))))) opts-map)
 
   (ut/pp [:reactor (into {} (for [[k v] @db/splitter-stats]
-                              {k (into {} (for [[kk vv] v] {kk (get vv :cnt)}))}))])
-  (ut/pp [:reactor {:counts-by-type (into {}  (for [[k v] @db/splitter-stats] {k (count (keys v))}))}])
+                              {k (into {} (for [[kk vv] v] {kk (get vv :cnt)}))}))] opts-map)
+  (ut/pp [:reactor {:counts-by-type (into {}  (for [[k v] @db/splitter-stats] {k (count (keys v))}))}] opts-map)
   (ut/pp [:reactor (let [react-counts (apply concat (for [[_ v] @db/splitter-stats] (vals v)))
                          updates (apply + (map :cnt react-counts))
                          uptime  (db/reactor-uptime-seconds) ;; (ut/uptime-seconds)
@@ -6719,7 +6824,7 @@
                       :per-sec per-sec
                       :max-key-depth @db/key-depth-limit
                       :clients (count @wl/sockets)
-                      :avg-cpu (ut/avgf @cpu-usage)])]))
+                      :avg-cpu (ut/avgf @cpu-usage)])]  opts-map))
 
 ;; (show-reactor-sizes-report)
 
