@@ -3076,6 +3076,32 @@
                         :readOnly          true
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
+(defn meta-edn-box [width-int height-int value]
+  (let [syntax      "clojure"
+        code-width  (- width-int 24)]
+    [re-com/box
+     :size "auto"
+     :padding "8px"
+     :height (px (- height-int 14))
+     :style {:font-family      (if (= syntax "text")
+                                 (theme-pull :theme/base-font nil)
+                                 (theme-pull :theme/monospaced-font nil))
+             :font-size        "12px"
+             :overflow         "auto"
+             :background-color "#00000000"
+             :font-weight      700}
+     :child [(reagent/adapt-react-class cm/UnControlled)
+             {:value (try (ut/format-map code-width (str value)) (catch :default _ value))
+              :options {:mode              syntax
+                        :lineWrapping      true
+                        :lineNumbers       false ;true
+                        :matchBrackets     true
+                        :autoCloseBrackets true
+                        :autofocus         false
+                        :autoScroll        false
+                        :detach            true
+                        :readOnly          true
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
 
 
@@ -3958,6 +3984,31 @@
                       :align :center :justify :center
                       :child "no params found"])]])]])))
 
+(declare reactive-virtualized-console-viewer)
+
+(defn query-meta-browser [data-key width-int height-int]
+  (let [x @(ut/tracked-subscribe [::meta-from-query-name data-key])
+        x (get x :fields {})
+        text (if (vector? x) (cstr/join "\n" x) (pr-str x))
+        ww (- width-int 33)
+        hh (+ height-int 55)
+        ;text (ut/format-edn ww text 9) ;; 3rd arg is math of pixels per font char - zprint uses cols, not pixels
+        text (conn/format-edn-puget ww text 7)
+        text (vec (cstr/split text #"\n"))] 
+    [re-com/box
+     :size "auto"
+     :width (px ww)
+     :height (px hh)
+     ;:style {:border "1px solid cyan"}
+     :child
+     ;;(pr-str query-meta)
+     ;[meta-edn-box (+ width-int 70) (+ height-int 55) query-meta]
+     [reactive-virtualized-console-viewer {:style {:font-weight 700 
+                                                   :font-size "14px"}
+                                           :text text
+                                           :id (str "query-meta-" data-key)
+                                           :width ww
+                                           :height hh}]]))
 
 (defn click-param-browser ;; has a very annoying scrolling problem. I've wasted too much time on this bullshit.
   [click-params width-int height-int]
@@ -8589,7 +8640,7 @@
               ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache ut/map-boxes-cache ut/map-boxes-cache-hits
               ut/clover-walk-singles-map ut/process-key-cache ut/process-key-tracker ut/compound-keys-cache get-all-values-flatten
               ut/compound-keys-tracker ut/upstream-cache ut/upstream-cache-tracker ut/downstream-cache ut/deep-template-find-cache
-              ut/downstream-cache-tracker ut/split-cache ut/split-cache-data ut/extract-patterns-data
+              ut/downstream-cache-tracker ut/split-cache ut/split-cache-data ut/extract-patterns-data conn/format-puget-atom 
               ut/extract-patterns-cache ut/clean-sql-atom ut/auto-font-atom ut/postwalk-replace-data-cache
               ut/postwalk-replace-cache ut/is-base64-atom ut/is-large-base64-atom ut/safe-name-cache
               ut/format-map-atom ut/body-set-atom ut/data-typer-atom ut/coord-cache]]
@@ -10583,7 +10634,7 @@
                         :font-size "15px"
                         :line-height "1.1"
                         :padding "15px"
-                        :color "inherit"
+                        ;:color "inherit"
                           ;:color (theme-pull :theme/editor-font-color nil)
                         :white-space "pre"
                         :text-shadow "#00000088 1px 0 10px"} style)
@@ -10704,14 +10755,14 @@
 
 (declare grid)
 
-(def waiting? (reagent/atom {}))
+(def waiting? (reagent/atom {})) 
 
 (defn clover-walk-singles
   [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type]
   (let [kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type])
         in-editor? (not (nil? override-view))
         cc (get @ut/clover-walk-singles-map kk)]
-    (if cc ;(ut/ne? cc)
+    (if false ;;cc ;(ut/ne? cc)
       cc
       (let [in-editor? (not (nil? override-view))
             walk-map
@@ -10729,7 +10780,8 @@
                              (if (= viewer :virtualized)
                                (let [text (if (vector? x) (cstr/join "\n" x) (pr-str x))
                                      ww (+ px-width-int 70)
-                                     text (ut/format-edn ww text 9) ;; 3rd arg is math of pixels per font char - zprint uses cols, not pixels
+                                     ;text (ut/format-edn ww text 9) ;; 3rd arg is math of pixels per font char - zprint uses cols, not pixels
+                                     text (conn/format-edn-puget ww text 9)
                                      text (vec (cstr/split text #"\n"))]
                                  [reactive-virtualized-console-viewer {:style {:font-weight 700 :font-size "18px"}
                                                                        :text text
@@ -10738,7 +10790,7 @@
                                                                        :height (+ px-height-int 55)}])
                                [edn-box (+ px-width-int 70) (+ px-height-int 55) x] ;; else just use codemirror since it looks nicer
                                )))
-              
+
               :panel-code-box panel-code-box
               :code-box panel-code-box
               :editor (fn [[block-id runner-key data-key]]
@@ -10870,7 +10922,7 @@
                           (cstr/join "" args) ;;(apply str args))
                           (str args)))
               :data-viewer (fn [x] (let [x (ut/postwalk-replacer {:box :_box :icon :_icon :v-box :_v-box :h-box :_h-box
-                                                                   :data-viewer :_data-viewer} x)
+                                                                  :data-viewer :_data-viewer} x)
                                          solver-key (get @db/solver-fn-lookup [:panels panel-key selected-view])
                                                                      ;; _ (tapp>> [:dv solver-key panel-key selected-view @db/solver-fn-lookup])
                                          ]
@@ -10880,7 +10932,7 @@
                                        (if in-editor? [h w] :output)
                                        nil]]))
               :data-viewer-limit (fn [[x l]] (let [x (ut/postwalk-replacer {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box
-                                                                             :data-viewer :_data-viewer} x)
+                                                                            :data-viewer :_data-viewer} x)
                                                    solver-key (get @db/solver-fn-lookup [:panels panel-key selected-view])]
                                                [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
                                                 :style {:overflow "auto"} :child
@@ -10979,24 +11031,41 @@
                             (let []
                               [re-com/v-box :size "auto" :children
                                [[re-com/box :child (str text)]
-                                [re-com/h-box :size "auto" :justify :between :height "10px" :style {} ;:border
-                                                                                                                                      ;"1px
-                                                                                                                                      ;solid
-                                                                                                                                      ;white"
+                                [re-com/h-box :size "auto" :justify :between :height "10px" :style {}
                                  :children
                                  [[re-com/md-icon-button :md-icon-name "zmdi-play" :on-click
                                    (fn []
                                      (when (not (some (fn [x] (= x text)) @db/speech-log))
                                        (do (ut/tracked-dispatch [::audio/text-to-speech11 panel-key :speak (str text) true]))))
                                    :style {:font-size "15px" :opacity 0.25 :cursor "pointer"}] [re-com/box :child ""]]]]]))
+              :play-click-custom (fn [[text display-text]]
+                                   (let []
+                                     [re-com/v-box :size "auto" :children
+                                      [[re-com/box :child (pr-str display-text)]
+                                       [re-com/h-box 
+                                        :size "auto" 
+                                        ;:justify :between 
+                                        :gap "4px"
+                                        :height "10px" 
+                                        :style {}
+                                        :children
+                                        [[re-com/md-icon-button
+                                          :md-icon-name "zmdi-play"
+                                          :on-click (fn []
+                                                      (when (not (some (fn [x] (= x text)) @db/speech-log))
+                                                        (do (ut/tracked-dispatch 
+                                                             [::audio/text-to-speech11 panel-key :speak (str text) true])))) 
+                                          :style {:font-size "15px" :opacity 0.25 :cursor "pointer"}]
+                                         [re-com/md-icon-button
+                                          :md-icon-name "zmdi-stop"
+                                          :on-click #(audio/stop-audio)
+                                          :style {:font-size "15px" :opacity 0.25 :cursor "pointer"}]
+                                         [re-com/box :child ""]]]]]))
               :play-click-target (fn [[text panel-key]]
                                    (let []
                                      [re-com/v-box :size "auto" :children
                                       [[re-com/box :child (str text)]
-                                       [re-com/h-box :size "auto" :justify :between :height "10px" :style {} ;:border
-                                                                                                                                             ;"1px
-                                                                                                                                             ;solid
-                                                                                                                                             ;white"
+                                       [re-com/h-box :size "auto" :justify :between :height "10px" :style {}
                                         :children
                                         [[re-com/md-icon-button :md-icon-name "zmdi-play" :on-click
                                           (fn []
@@ -11009,10 +11078,7 @@
                                      (catch :default _ nil))]
                         [re-com/v-box :size "auto" :children
                          [[re-com/box :child (if view view (str [flow-id bid value]))]
-                          [re-com/h-box :size "auto" :justify :between :height "10px" :style {} ;:border
-                                                                                                                                ;"1px
-                                                                                                                                ;solid
-                                                                                                                                ;white"
+                          [re-com/h-box :size "auto" :justify :between :height "10px" :style {}
                            :children
                            [[re-com/md-icon-button :md-icon-name "fa-solid fa-location-crosshairs" ;; <i class=
                              :on-click (fn [] (when bid (ut/tracked-dispatch [::push-value flow-id bid value]))) :style
@@ -13377,19 +13443,41 @@
                               (if (or (and hidden? (not selected?)) minimized? (cstr/starts-with? (str brick-vec-key) ":query-preview"))
                                 "none"
                                 "inherit")
-                              :transform (when peek?
+                              ;; :transform (if peek?
+                              ;;              (if selected?
+                              ;;                "scale(0.7)"
+                              ;;                "scale(0.7)")
+                              ;;              (when (and audio-playing? (= brick-vec-key @db/speaking))
+                              ;;                (str "scale(" (max (min 0.95 (+ 0.0
+                              ;;                                               (- (get @db/audio-data2 brick-vec-key)
+                              ;;                                                  (get @db/audio-data brick-vec-key)))) 1.14) ")")))
+                              :transform (if peek?
                                            (if selected?
-                                             "scale(0.7)" ; nil ;"scale(0.85)"
-                                             "scale(0.7)"))
+                                             "scale(0.7)"
+                                             "scale(0.7)")
+                                           (when (and audio-playing? (= brick-vec-key @db/speaking))
+                                             (let [audio-diff (- (get @db/audio-data2 brick-vec-key)
+                                                                 (get @db/audio-data brick-vec-key))
+                                                   jiggle-x (* audio-diff 1.6)  ; Adjust multiplier for more/less horizontal movement
+                                                   jiggle-y (* audio-diff 1.1)  ; Adjust multiplier for more/less vertical movement
+                                                   rotation (* audio-diff 5)]  ; Adjust multiplier for more/less rotation
+                                               (str "translate(" jiggle-x "px, " jiggle-y "px) "
+                                                    "rotate(" rotation "deg)"))))
                               :transform-style "preserve-3d" ;; important for tab embedding!
-                              :box-shadow
-                              (when (= brick-vec-key @db/speaking)
-                                (let [block-id       brick-vec-key ;:audio
-                                      talking-block? true]
-                                  (cond (and audio-playing? talking-block?) (str
-                                                                             "1px 1px " (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
-                                                                             " "        (theme-pull :theme/editor-outer-rim-color nil))
-                                        :else                               "none")))
+                              :box-shadow (when (= brick-vec-key @db/speaking)
+                                            (let [block-id       brick-vec-key ;:audio
+                                                  talking-block? true]
+                                              (cond (and audio-playing? talking-block?)
+                                                    ;; (str
+                                                    ;;  "1px 1px " (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
+                                                    ;;  " "        (theme-pull :theme/editor-outer-rim-color nil))
+                                                    (str "1px 1px " (px (* 90
+                                                                           (+ 0.1
+                                                                              (- (get @db/audio-data2 block-id)
+                                                                                 (get @db/audio-data block-id)))))
+                                                      " "  (theme-pull :theme/universal-pop-color nil))
+
+                                                    :else                               "none")))
                               :transition "border 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out"
                               :border-top dyn-border
                               :border-bottom dyn-border

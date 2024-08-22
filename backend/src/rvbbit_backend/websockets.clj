@@ -39,6 +39,7 @@
    [rvbbit-backend.surveyor :as svy]
    [rvbbit-backend.queue-party  :as qp]
    [rvbbit-backend.transform  :as ts]
+   [puget.printer           :as puget]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
     :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db cache-db import-db ghost-db flows-db insert-error-row! to-sql
@@ -64,12 +65,10 @@
   (:import
    [com.github.vertical_blank.sqlformatter SqlFormatter]
    [org.eclipse.jetty.util.thread QueuedThreadPool]
-   ;[java.security MessageDigest]
-   ;[java.math BigInteger] 
    [java.nio.file Paths]
    [java.util.concurrent                  ThreadFactory Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
    [java.lang                              ProcessBuilder]
-   [java.io                                BufferedReader InputStreamReader]))
+   [java.io                                BufferedReader InputStreamReader StringWriter]))
 
 
 (defonce cpu-usage (atom []))
@@ -757,7 +756,47 @@
 
 (defmethod wl/handle-request :ack2 [{:keys [client-name body]}] (inc-score! client-name :last-ack true) {})
 
+;; (defmethod wl/handle-request :puget-document [{:keys [text data-colors width opts-map]}] 
+;;   (let [color-map
+;;         (assoc (walk/postwalk-replace
+;;                 {:integer :number
+;;                  :universal-pop-color :delimiter
+;;                  :rabbit-code :function-symbol}
+;;                 (into {} (for [[k v] data-colors]
+;;                            {k (if (or (= k :universal-pop-color)
+;;                                       (= k :keyword)
+;;                                       (= k :nil))
+;;                                 [:bold v]
+;;                                 [v])}))) :tag [(get data-colors :universal-pop-color)])
+;;         text (edn/read-string text)]
+;;     (puget/with-options
+;;       (merge {:width width
+;;               :color-scheme color-map} opts-map)
+;;       (puget/cprint text))))
 
+(defmethod wl/handle-request :puget-document [{:keys [text data-colors width opts-map]}]
+  (let [data-colors (walk/keywordize-keys data-colors)
+        color-map (assoc (walk/postwalk-replace
+                {:integer :number
+                 :universal-pop-color :delimiter
+                 :rabbit-code :function-symbol}
+                (into {} (for [[k v] data-colors]
+                           {k (if (or (= k :universal-pop-color)
+                                      (= k :keyword)
+                                      (= k :nil))
+                               ; [:bold v]
+                                [v]
+                                [v])}))) 
+                         :tag [(get data-colors :universal-pop-color)])
+        _ (ut/pp [:color-map color-map])
+        text (edn/read-string text)
+        output (with-out-str
+                 (puget/with-options
+                   (merge {:width width
+                           :color-scheme color-map} opts-map)
+                   (puget/cprint text)))] 
+    (println output)
+    output))
 
 (defonce client-queues (atom {}))
 (defonce client-queues-2 (atom {}))
@@ -6154,7 +6193,7 @@
       (conj (vec (cons color-code (vec (figlet/render flf (str text))))) reset-code)))))
 
 
-  ;; (fig-render "RvbbiT" :pink "data/Doom.flf")
+  ;; (fig-render "DooM" :pink "data/Doom.flf")
 
 (defn split-vector-at-x [v]
   (loop [input v

@@ -17,7 +17,8 @@
                        [org.clojure/java.jdbc "0.7.12"]
                        [clj-taskpool "0.1.0"] ;; https://github.com/WickedShell/clj-taskpool
                        [tea-time "1.0.1"] ;; https://github.com/aphyr/tea-time - task scheduler
-                       [mvxcvi/puget "1.3.2"] ;; https://github.com/greglook/puget
+                       ;;[mvxcvi/puget "1.3.2"] ;; https://github.com/greglook/puget
+                       [com.ryrobes/puget "1.3.5-SNAPSHOT"]
                        [clojure.java-time "1.1.0"] ;; https://github.com/dm3/clojure.java-time
                        ;;[com.nextjournal/beholder "1.0.0"]
                        [com.nextjournal/beholder "1.0.2"]

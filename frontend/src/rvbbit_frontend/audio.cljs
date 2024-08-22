@@ -306,16 +306,49 @@
                     (js/requestAnimationFrame frame))))]
       (frame))))
 
+;; (defn play-audio-blob
+;;   [audio-data block-id]
+;;   (reset! playing? true)
+;;   (ut/tracked-dispatch [::audio-started])
+;;   (reset! db/speaking block-id)
+;;   (let [audio-context (js/AudioContext.)
+;;         url           (js/URL.createObjectURL audio-data)
+;;         audio-element (js/document.createElement "audio")
+;;         source-node   (.createMediaElementSource audio-context audio-element)
+;;         analyser      (.createAnalyser audio-context)]
+;;     (set! (.-src audio-element) url)
+;;     (.addEventListener audio-element
+;;                        "ended"
+;;                        (fn [e]
+;;                          (do (ut/tracked-dispatch [::audio-ended])
+;;                              (swap! db/audio-data dissoc block-id)
+;;                              (swap! db/audio-data2 dissoc block-id)
+;;                              (reset! playing? false))))
+;;     (set! (.-fftSize analyser) 2048)
+;;     (.connect source-node analyser)
+;;     (.connect analyser (.-destination audio-context))
+;;     (.play audio-element)
+;;     (draw analyser block-id)))
+
+(def current-audio-context (atom nil))
+(def current-audio-element (atom nil))
+
 (defn play-audio-blob
   [audio-data block-id]
   (reset! playing? true)
   (ut/tracked-dispatch [::audio-started])
   (reset! db/speaking block-id)
+  (when @current-audio-context
+    (.close @current-audio-context))
+  (when @current-audio-element
+    (.pause @current-audio-element))
   (let [audio-context (js/AudioContext.)
         url           (js/URL.createObjectURL audio-data)
         audio-element (js/document.createElement "audio")
         source-node   (.createMediaElementSource audio-context audio-element)
         analyser      (.createAnalyser audio-context)]
+    (reset! current-audio-context audio-context)
+    (reset! current-audio-element audio-element)
     (set! (.-src audio-element) url)
     (.addEventListener audio-element
                        "ended"
@@ -329,6 +362,20 @@
     (.connect analyser (.-destination audio-context))
     (.play audio-element)
     (draw analyser block-id)))
+
+(defn stop-audio []
+  (when @current-audio-element
+    (.pause @current-audio-element)
+    (set! (.-currentTime @current-audio-element) 0))
+  (when @current-audio-context
+    (.close @current-audio-context))
+  (reset! current-audio-element nil)
+  (reset! current-audio-context nil)
+  (reset! playing? false)
+  (ut/tracked-dispatch [::audio-ended])
+  (swap! db/audio-data empty)
+  (swap! db/audio-data2 empty)
+  (reset! db/speaking nil))
 
 (re-frame/reg-event-db ::save-recording-data (fn [db [_ audio-map]] (assoc db :audio-data-recorded audio-map)))
 

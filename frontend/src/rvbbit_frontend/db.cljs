@@ -10,6 +10,7 @@
 (def param-v-boxes (reagent/atom nil))
 (def solver-view-mode (reagent/atom "return value"))
 (def signals-searcher-atom (reagent/atom nil))
+(def params-or-meta-atom (reagent/atom :params)) 
 ;; (def running-deep-meta-on (reagent/atom []))
 
 (defonce cm-instance-runstream-code-box (atom {}))

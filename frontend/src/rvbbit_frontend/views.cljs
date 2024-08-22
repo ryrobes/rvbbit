@@ -2953,6 +2953,7 @@
                                                :let [mode (get modes mode-idx)
                                                      is-last? (= mode-idx (dec (count modes)))
                                                      is-first? (= mode-idx 0)
+                                                     only? (and is-last? is-first?)
                                                      bkgrd (str (theme-pull :theme/editor-outer-rim-color nil))
                                                      selected? (= mode current-view-mode)
                                                      bkgrd (if (> (count bkgrd) 7) (subs bkgrd 0 7)  bkgrd)]]
@@ -2965,9 +2966,11 @@
                                                     :padding-left "3px"
                                                     :padding-right "3px"
                                                     ;:margin-top "2px"
-                                                    :border-radius (cond is-last? "0px 7px 7px 0px"
-                                                                         is-first? "7px 0px 0px 7px"
-                                                                         :else "0px")
+                                                    :border-radius (cond
+                                                                     only? "7px"
+                                                                     is-last? "0px 7px 7px 0px"
+                                                                     is-first? "7px 0px 0px 7px"
+                                                                     :else "0px")
                                                     :font-size "12px"}])]]
                    :style
                    {:font-weight 500
@@ -3435,47 +3438,69 @@
                                       :size "auto"
                                       ;:style {:border "1px solid green"}
                                       :height (px (- single-height 20))
-                                      :children [[re-com/v-box
-                                                  :size "none"
-                                                  :width (px (* single-width 0.6))
-                                                  :children [[re-com/box :style
-                                                              {:font-weight    500
-                                                               :color          (theme-pull :theme/editor-font-color nil)
-                                                               :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
-                                                               :padding-top    "4px"
-                                                               :padding-bottom "4px"}
-                                                              :child [re-com/h-box
-                                                                      :width (px (* single-width 0.538))
-                                                                      :justify :between :children
-                                                                      [[re-com/h-box
-                                                                        :gap "1px"
-                                                                        :align :center
-                                                                        :justify :center
-                                                                        :children [[re-com/box
-                                                                                    :style {:padding-left (when vertical? "5px")}
-                                                                                    :child "parameters"]
-                                                                                   [re-com/md-icon-button
-                                                                                    :attr {:on-click #(reset! hide-panel-3? true)}
-                                                                                    :md-icon-name "zmdi-chevron-left"
-                                                                                    :style {:font-size "17px"
-                                                                                  ;:margin-top "-2px"
-                                                                                            :opacity 0.88}]]]
-                                                                       [re-com/h-box
-                                                                        :gap "3px"
-                                                                        :style {:font-size "11px" :margin-top "3px"}
-                                                                        :align :center
-                                                                        :justify :center
-                                                                        :children
-                                                                        (vec (for [f (keys @db/param-filter)]
-                                                                               [re-com/box :child (ut/safe-name f) :attr
-                                                                                {:on-click #(swap! db/param-filter assoc f (not (get @db/param-filter f false)))} :style
-                                                                                {:text-decoration (if (get @db/param-filter f true) "none" "line-through")
-                                                                                 :opacity         (if (get @db/param-filter f true) 1 0.4)
-                                                                                 :cursor          "pointer"
-                                                                                 :user-select     "none"
-                                                                                 :padding-left    "4px"
-                                                                                 :padding-right   "4px"}]))]]]]
-                                                             [bricks/click-param-browser click-params (* single-width 0.6) (- single-height 1.3)]]]
+                                      :children [
+                                                 (let [query? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
+                                                                   (some #(= % data-key) (keys sql-calls)))
+                                                        react! [@db/params-or-meta-atom]]
+                                                   [re-com/v-box
+                                                    :size "none"
+                                                    :width (px (* single-width 0.6))
+                                                    :children [[re-com/box :style
+                                                                {:font-weight    500
+                                                                 :color          (theme-pull :theme/editor-font-color nil)
+                                                                 :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
+                                                                 :padding-top    "4px"
+                                                                 :padding-bottom "4px"}
+                                                                :child [re-com/h-box
+                                                                        :width (px (* single-width 0.538))
+                                                                        :justify :between :children
+                                                                        [[re-com/h-box
+                                                                          :gap "1px"
+                                                                          :align :center
+                                                                          :justify :center
+                                                                          :children [[re-com/h-box
+                                                                                      :size "auto"
+                                                                                      :style {:padding-left (when vertical? "5px")
+                                                                                              :font-size "13px"}
+                                                                                      :justify :between 
+                                                                                      :gap "10px" 
+                                                                                      :align :center
+                                                                                      :children (if query?
+                                                                                                  [[re-com/box
+                                                                                                    :style {:cursor "pointer"
+                                                                                                            :opacity (if (= @db/params-or-meta-atom :params) 1 0.5)}
+                                                                                                    :attr {:on-click #(reset! db/params-or-meta-atom :params)}
+                                                                                                    :child "params"]
+                                                                                                   [re-com/box
+                                                                                                    :style {:cursor "pointer"
+                                                                                                            :opacity (if (= @db/params-or-meta-atom :meta) 1 0.5)}
+                                                                                                    :attr {:on-click #(reset! db/params-or-meta-atom :meta)}
+                                                                                                    :child "meta"]]
+                                                                                                  [[re-com/box :child "parameters"]])]
+                                                                                     [re-com/md-icon-button
+                                                                                      :attr {:on-click #(reset! hide-panel-3? true)}
+                                                                                      :md-icon-name "zmdi-chevron-left"
+                                                                                      :style {:font-size "17px"
+                                                                                              ;:margin-top "-2px"
+                                                                                              :opacity 0.88}]]]
+                                                                         [re-com/h-box
+                                                                          :gap "3px"
+                                                                          :style {:font-size "11px" :margin-top "3px"}
+                                                                          :align :center
+                                                                          :justify :center
+                                                                          :children
+                                                                          (vec (for [f (keys @db/param-filter)]
+                                                                                 [re-com/box :child (ut/safe-name f) :attr
+                                                                                  {:on-click #(swap! db/param-filter assoc f (not (get @db/param-filter f false)))} :style
+                                                                                  {:text-decoration (if (get @db/param-filter f true) "none" "line-through")
+                                                                                   :opacity         (if (get @db/param-filter f true) 1 0.4)
+                                                                                   :cursor          "pointer"
+                                                                                   :user-select     "none"
+                                                                                   :padding-left    "4px"
+                                                                                   :padding-right   "4px"}]))]]]]
+                                                               (if (and query? (= @db/params-or-meta-atom :meta))  
+                                                                 [bricks/query-meta-browser data-key (* single-width 0.6)  (- single-height 1.3)]
+                                                                 [bricks/click-param-browser click-params (* single-width 0.6) (- single-height 1.3)])]])
 
                                                  (let [data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
                                                        view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
@@ -4134,7 +4159,6 @@
         [re-com/h-box :size "auto" :gap "4px" :children
          (for [ss sess :let [s (get ss 0) rowcnt (count sess) t (get ss 1)]] [image-component s t h rowcnt items])])]]))
 
-
 ;; (defn doom-modal []
 ;;   ;;(ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/hit.mp3" true])
 ;;   (let [hh          @(ut/tracked-subscribe [::subs/h])
@@ -4153,8 +4177,7 @@
 ;;         ;sessions    (partition-all 3 sessions)
 ;;         ]
 
-   
-
+  
 ;;     [re-com/modal-panel :style
 ;;      {:z-index 99999 ;; on top of alerts?
 ;;       :padding "0px"}
@@ -4176,80 +4199,97 @@
 ;;      :child  [re-com/box :child "DOOM!"]]))
 
 
-;; (def doom-header (str "DOOM!"))
-
-;; (def ansi-text (reagent/atom nil))
-
-;; ;; (defn fetch-ansi-file []
-;; ;;   (-> (js/fetch "images/name.ans")
-;; ;;       (.then #(.arrayBuffer %))
-;; ;;       (.then (fn [buffer]
-;; ;;                (let [decoder (js/TextDecoder. "utf-8")]
-;; ;;                  (reset! ansi-text (.decode decoder buffer)))))
-;; ;;       (.catch #(js/console.error "Error loading ANSI file:" %))))
-
-;; (defn fetch-ansi-file []
-;;   (-> (js/fetch "images/name-smol.ans")
-;;       (.then #(.arrayBuffer %))
-;;       (.then (fn [buffer]
-;;                (let [uint8-array (js/Uint8Array. buffer)
-;;                      text (apply str (map #(js/String.fromCharCode %) (js/Array.from uint8-array)))]
-;;                  (reset! ansi-text text))))
-;;       (.catch #(js/console.error "Error loading ANSI file:" %))))
+(def fanfare? (atom false)) 
 
 (defn doom-modal []
-  (reagent/create-class
-   {:component-did-mount
-    (fn [this]
-      (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak 
-                            "/home/ryanr/hit.mp3"
-                            ;"Lets go, baby!"
-                            true]))
+  (let [flipped (reagent/atom false)]
+    (reagent/create-class
+     {:component-did-mount
+      (fn [this]
+        (when (not @fanfare?)
+          (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak
+                                "/home/ryanr/hit.mp3"
+                                true]))
+        ;; Set a timeout to flip the image after 5 seconds
+        (js/setTimeout #(do (reset! flipped true)
+                            (reset! fanfare? true))   
+                       (if @fanfare? 1500 5000))) 
+      :reagent-render
+      (fn []
+        (let [hh @(ut/tracked-subscribe [::subs/h])
+              ww @(ut/tracked-subscribe [::subs/w])
+              w (* ww 0.33)
+              h (* hh 0.45)
+              audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
+              client-name @(ut/tracked-subscribe [::bricks/client-name])
+              left (- (/ ww 2) (/ w 2))
+              top (- (/ hh 2) (/ h 2))]
 
-    :reagent-render
-    (fn []
-      (let [hh          @(ut/tracked-subscribe [::subs/h])
-            ww          @(ut/tracked-subscribe [::subs/w])
-              ;per-page    9
-            w           (* ww 0.33) ;500
-            h           (* hh 0.45) ;500
-            audio-playing?       @(ut/tracked-sub ::audio/audio-playing? {})
-            client-name @(ut/tracked-subscribe [::bricks/client-name]) ;; reactions
-              ;sessions    @(ut/tracked-subscribe [::bricks/sessions])
-            left        (- (/ ww 2) (/ w 2))
-            top         (- (/ hh 2) (/ h 2))
-              ;items       (count sessions)
-              ;items       (if (odd? items) items (inc items))
-              ;sessions    (take per-page (sort-by last sessions))
-              ;sessions    (partition-all 3 sessions)
-            ]
-      
-        [re-com/modal-panel :style
-         {:z-index 99999 ;; on top of alerts?
-          :padding "0px"}
-         :frame-style {:background-color "#000000" :border-radius "20px"}
-         :parts {:child-container
-                 {:style {:left left
-                          :width w
-                          :height h
-                          ;:transform "scale(1.5)" 
-                          :top top :font-size "8px" :background-color "#000000" :position "fixed"
-                          :box-shadow       (let [block-id       :audio
-                                                  talking-block? true]
-                                              (cond (and audio-playing? talking-block?) (str
-                                                                                         "1px 1px " (px (* 80
-                                                                                                           (+ 0.1 
-                                                                                                              (- (get @db/audio-data2 block-id)
-                                                                                                               (get @db/audio-data block-id))
-                                                                                                              )))
-                                                                                         " "        "cyan")
-                                                    :else                               "none"))
-                         
-                          :border "5px solid cyan"}}}
-         :backdrop-opacity 0.75 :backdrop-on-click #(ut/tracked-dispatch [::bricks/disable-doom-modal])
-         :child [re-com/box :child [:img {:src "images/rvbbit-logo-no-bkgrnd.png"}]]
-         
-         ]))}))
+          [re-com/modal-panel
+           :style {:z-index 99999 :padding "0px"}
+           :frame-style {:background-color "#000000" :border-radius "20px"}
+           :parts {:child-container
+                   {:style {:left left
+                            :width w
+                            :height h
+                            :top top
+                            :font-size "8px"
+                            :background-color "#000000"
+                            :position "fixed"
+                            :box-shadow (let [block-id :audio
+                                              talking-block? true]
+                                          (when (and audio-playing? talking-block?)
+                                            (str "1px 1px " (px (* 80
+                                                                      (+ 0.1
+                                                                         (- (get @db/audio-data2 block-id)
+                                                                            (get @db/audio-data block-id)))))
+                                                 " cyan")))
+                            :border "5px solid cyan"
+                            :transition "transform 0.6s"
+                            :transform (let [block-id :audio
+                                        talking-block? true]
+                                    (when (and audio-playing? talking-block? (not @flipped)) 
+                                      (str "scale(" (max (min 1.1 (+ 0.1
+                                                                     (- (get @db/audio-data2 block-id)
+                                                                        (get @db/audio-data block-id)))) 1.6) ")")))
+                            :perspective "1000px"  ; Add perspective for 3D effect
+                            }}}
+           :backdrop-opacity 0.75
+           :backdrop-on-click #(ut/tracked-dispatch [::bricks/disable-doom-modal])
+           :child [:div {:style {:width "100%"
+                                 :height "100%"
+                                 :position "relative"
+                                 :transition "transform 0.6s"
+                                 :transform-origin "top center"
+                                 :transform-style "preserve-3d"
+                                 :border (when @flipped "1px solid cyan")
+                                 :transform (if @flipped "rotateY(180deg)" "rotateY(0deg)")
+                                 }}
+                   [:div {:style {:position "absolute"
+                                  :width "100%"
+                                  :height "100%"
+                                  :backface-visibility "hidden"}}
+                    [:img {:src "images/rvbbit-logo-no-bkgrnd.png"
+                           :style {:width "100%"
+                                   :height "100%"
+                                   :object-fit "contain"
+                                   :object-position "center"
+                                   :max-width "100%"
+                                   :max-height "100%"}}]]
+                   [:div {:style {:position "absolute"
+                                  :width "100%"
+                                  :height "100%"
+                                  :backface-visibility "hidden"
+                                  :transform "rotateY(180deg)"
+                                  ;:background-color "cyan"
+                                  ;:border (when @flipped "1px solid cyan")
+                                  :display "flex"
+                                  :justify-content "center"
+                                  :align-items "center"
+                                  ;:color "black"
+                                  :font-size "24px"}}
+                    "(insert DooM menu here)"]]]))})))
+
 
 
 (defn main-panel []
@@ -4514,7 +4554,11 @@
            :background-color "#00000022"
            :color            "white"}]
          (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
-           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-speaker" :style
+           [re-com/md-icon-button 
+            :src (at) 
+            :md-icon-name "zmdi-speaker" 
+            :on-click #(audio/stop-audio)
+            :style
             {;:margin-top "4px"
              :position  "fixed"
              :left      138

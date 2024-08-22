@@ -22,6 +22,7 @@
    [talltale.core     :as tales]
    [zprint.core       :as zp]
    [goog.string       :as gstring]
+   [websocket-fx.core :as wfx]
    [goog.string.format :as gformat])
   (:import
    [goog.i18n              NumberFormat]
@@ -575,13 +576,12 @@
 
 (defn postwalk-replacer*
   [walk-map target]
-  (let [hash-key (pr-str [walk-map target])] ;; switching from hash keys to pr-str due to
+  (let [hash-key (hash [walk-map target])] 
     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
     (or (@postwalk-replace-data-cache hash-key)
         (let [result (walk/postwalk-replace walk-map target)]
           (swap! postwalk-replace-data-cache assoc hash-key result)
           result))))
-
 
 (defn postwalk-replacer
   [walk-map target] ;; param based
@@ -621,7 +621,7 @@
 (defn cached-upstream-search
   [subq-map panel-id] ;; this actually IS noticably faster when cached
   (if true ;cache?
-    (let [args (pr-str [subq-map panel-id])]
+    (let [args (hash [subq-map panel-id])]
       (if-let [result (@upstream-cache args)]
         (do (swap! upstream-cache-tracker update args (fnil inc 0)) result)
         (let [result (upstream-search subq-map panel-id)]
@@ -636,7 +636,7 @@
 (defn cached-downstream-search
   [subq-map panel-id] ;; this actually IS noticably faster when cached
   (if true ;cache?
-    (let [args (pr-str [subq-map panel-id])]
+    (let [args (hash [subq-map panel-id])]
       (if-let [result (@downstream-cache args)]
         (do (swap! downstream-cache-tracker update args (fnil inc 0)) result)
         (let [result (downstream-search subq-map panel-id)]
@@ -1739,6 +1739,8 @@
                               :parse         {:interpose "\n\n"}})]
         (swap! format-map-atom assoc cache-key o)
         o))))
+
+
 
 (defn format-map [w s]
   (let [cache-key (hash [w s])

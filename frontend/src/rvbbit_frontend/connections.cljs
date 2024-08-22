@@ -5,6 +5,7 @@
     [rvbbit-frontend.http    :as http]
     [rvbbit-frontend.db      :as db]
     [rvbbit-frontend.utility :as ut]
+    [reagent.core            :as reagent]
     [clojure.walk            :as walk]
     [clojure.edn             :as edn]
     [re-com.core             :as    re-com
@@ -1025,12 +1026,39 @@
         fallback0           (if theme-key? (get resolved-base-theme t2) fallback)]
     (if (not (nil? v)) v fallback0)))
 
-
 (re-frame/reg-sub ::data-colors (fn [_] (theme-pull :theme/data-colors db/data-colors)))
 
 (def data-colors @(re-frame.alpha/sub ::data-colors)) ;; kinda weird usage
 
 (re-frame/reg-sub ::sql-source (fn [db {:keys [kkey]}] (get-in db [:sql-source kkey] {})))
+
+
+(def format-puget-atom (reagent/atom {}))
+
+(re-frame/reg-event-db
+ ::save-puget
+ (fn [db [_ cache-key res ]]
+   (ut/tapp>> [:save-puget res cache-key])
+   (swap! format-puget-atom assoc cache-key res)
+   db))
+
+(defn format-edn-puget [w s & [tsplit]]
+  (let [cache-key (hash [w s tsplit :puget])
+        react! [@format-puget-atom]
+        w (Math/floor (/ w 9))
+        cache (get @format-puget-atom cache-key)]
+    (ut/tapp>> [:format-edn-puget w  cache-key])
+    (if (not (nil? cache))
+      cache
+      (do (ut/tracked-dispatch
+           [::wfx/request :default
+            {:message {:kind :puget-document
+                       :text s :data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color nil)) 
+                       :width w :opts-map {:map-coll-separator :line
+                                           ;:map-delimiter :line
+                                           }}
+             :on-response [::save-puget cache-key] :timeout 15000}])
+          (str (get @format-puget-atom cache-key))))))
 
 (defn sql-deep-meta
   [keypath honey-sql connection-id & [deeps?]]
