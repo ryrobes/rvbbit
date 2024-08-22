@@ -585,7 +585,7 @@
 
 (defn postwalk-replacer
   [walk-map target] ;; param based
-  (if true ;;cache? ;(true? @(rfa/sub ::param-lookup {:kk :postwalk-replacer-cache?}))
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :postwalk-replacer-cache?}))
     (postwalk-replacer* walk-map target)
     (walk/postwalk-replace walk-map target)))
 

@@ -646,6 +646,7 @@
         ;;                                 (keyword (str "repl-ns/" nms ">introspected"))))
 
          editor?                 (get db :editor?)
+         doom?                   (get db :doom-modal?)
          flow?                   (get db :flow?)
          selected-tab            (get db :selected-tab)
          panels-map              (get db :panels)
@@ -806,12 +807,13 @@
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))
          subs-vec (vec (distinct
-                        (concat flow-runners clover-solver-outputs chunk-charts @temp-extra-subs
+                        (remove nil? (concat flow-runners clover-solver-outputs chunk-charts @temp-extra-subs
+                                (when doom? [:time/minute])
                                      ;;client-namespaces-refs 
                                      ;;client-namespace-intros 
                                 client-ns-intro-map
                                 signal-subs clover-solvers
-                                clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))]
+                                clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs))))]
      subs-vec
       ;; (tapp>> [:clover-solvers
       ;;          @db/solver-fn-lookup
@@ -4004,6 +4006,7 @@
      ;;(pr-str query-meta)
      ;[meta-edn-box (+ width-int 70) (+ height-int 55) query-meta]
      [reactive-virtualized-console-viewer {:style {:font-weight 700 
+                                                   :font-family (theme-pull :theme/monospaced-font nil) 
                                                    :font-size "14px"}
                                            :text text
                                            :id (str "query-meta-" data-key)
@@ -10605,7 +10608,7 @@
                        (map str text)
                        (vec (cstr/split text "\n")))
         html-content (cstr/join "\n" (map #(.toHtml ansi-converter %) text))
-        console-style {:font-family "monospace" ;;(theme-pull :theme/monospaced-font nil)
+        console-style {:font-family "Fixedsys-Excelsior, monospace"  ;;(theme-pull :theme/monospaced-font nil)
                        :font-size "15px"
                        :line-height "1.1"
                        :padding "15px"
@@ -10630,9 +10633,9 @@
         ;html-content (cstr/join "\n" (map #(.toHtml ansi-converter %) text))
         decoded-lines (mapv #(.toHtml ansi-converter %) text)
         console-style (merge
-                       {:font-family "monospace" ;;(theme-pull :theme/monospaced-font nil)
+                       {:font-family "Fixedsys-Excelsior, monospace" ;;(theme-pull :theme/monospaced-font nil)
                         :font-size "15px"
-                        :line-height "1.1"
+                        :line-height "0.95"
                         :padding "15px"
                         ;:color "inherit"
                           ;:color (theme-pull :theme/editor-font-color nil)
@@ -11011,7 +11014,7 @@
                                       :child
                                       (let [;[kp width-int height-int syntax] args
                                             {:keys [kp width-int height-int style syntax]} args
-                                                             ;;vv     @(ut/tracked-sub ::conn/clicked-parameter-alpha {:keypath kp})
+                                            ;;vv     @(ut/tracked-sub ::conn/clicked-parameter-alpha {:keypath kp})
                                             vv     @(ut/tracked-subscribe [::conn/clicked-parameter kp])
                                             vv     (if (string? vv) (pr-str vv) vv)]
                                         [open-input-code-box kp width-int height-int vv syntax style])])

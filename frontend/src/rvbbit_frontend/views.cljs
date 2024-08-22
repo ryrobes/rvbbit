@@ -4199,10 +4199,12 @@
 ;;      :child  [re-com/box :child "DOOM!"]]))
 
 
-(def fanfare? (atom false)) 
+(defonce fanfare? (atom false)) 
+(defonce time-freq (reagent/atom 45))
 
 (defn doom-modal []
-  (let [flipped (reagent/atom false)]
+  (let [flipped (reagent/atom false)
+        client-name @(ut/tracked-subscribe_ [::bricks/client-name])]
     (reagent/create-class
      {:component-did-mount
       (fn [this]
@@ -4218,8 +4220,8 @@
       (fn []
         (let [hh @(ut/tracked-subscribe [::subs/h])
               ww @(ut/tracked-subscribe [::subs/w])
-              w (* ww 0.33)
-              h (* hh 0.45)
+              w (* ww 0.45)
+              h (* hh 0.7)
               audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
               client-name @(ut/tracked-subscribe [::bricks/client-name])
               left (- (/ ww 2) (/ w 2))
@@ -4262,7 +4264,7 @@
                                  :transition "transform 0.6s"
                                  :transform-origin "top center"
                                  :transform-style "preserve-3d"
-                                 :border (when @flipped "1px solid cyan")
+                                 ;:border (when @flipped "1px solid cyan")
                                  :transform (if @flipped "rotateY(180deg)" "rotateY(0deg)")
                                  }}
                    [:div {:style {:position "absolute"
@@ -4284,11 +4286,72 @@
                                   ;:background-color "cyan"
                                   ;:border (when @flipped "1px solid cyan")
                                   :display "flex"
-                                  :justify-content "center"
-                                  :align-items "center"
+                                  ;:justify-content "center"
+                                  ;:align-items "center"
                                   ;:color "black"
                                   :font-size "24px"}}
-                    "(insert DooM menu here)"]]]))})))
+                    ;;"(insert DooM menu here)"
+                    (let [ttt @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:time/minute]})
+                          ;ttt @(ut/tracked-subscribe [::conn/clicked-parameter [:time :minute]])
+                          
+                          react! [@time-freq]]
+                    ;;(ut/tapp>> [:ttt ttt])
+                      [re-com/v-box 
+                       :width (px w)
+
+                       :children [[re-com/h-box 
+                                   :children (vec (for [e [15 30 45 90 180 360 600]]
+                                               [re-com/box 
+                                                :attr {:on-click #(reset! time-freq e)}
+                                                :style {:color (if (= e @time-freq) "cyan" "white") 
+                                                        :cursor "pointer"}
+                                                :child (str e)]))
+                                   :align :center :justify :center
+                                   :gap "20px"
+                                   :width (px (- w 45))
+                                   ;:size "auto"
+                                   :height "30px"  
+                                   :padding "8px"
+                                   :style {:font-family "Fixedsys-Excelsior, monospace" 
+                                           :font-size "12px"
+                                           ;:border "1px solid cyan"
+                                           }]
+                                  [bricks/honeycomb-fragments
+                       (walk/postwalk-replace
+                        {:client-name client-name
+                         :tt ttt
+                         :freq @time-freq
+                         :ww (* w 1.236)}
+                        [:box
+                         :size "none"
+                         :style {:zoom 0.6}
+                         :height (px hh)
+                         :child [:terminal-custom
+                                 [[:run-solver
+                                   {:signal false
+                                    :cache? false
+                                    :type :clojure
+                                    :input-map {}
+                                    :data '(do (ns rvbbit-backend.websockets)
+                                               (let [tt :tt]
+                                                 (with-out-str 
+                                                   (fig-render ":client-stats" :bright-cyan)
+                                                   (draw-client-stats
+                                                                [:client-name] [:freq]
+                                                                [:mem-mb :latency :messages-per-second :server-subs]
+                                                                false
+                                                                (Math/floor (/ :ww 7))
+                                                                {:force-color :bright-cyan}
+                                                                ))))}]
+                                  (* w 1.49) ;(Math/floor (/ w 7))
+                                  (* (- h 40) 1.49) ;(Math/floor (/ h 1.55))
+
+                                  false]]])
+                       (Math/floor (/ w 7)) ;;15
+                       (Math/floor (/ h 7))]]])
+                    ]]]))})))
+
+
 
 
 

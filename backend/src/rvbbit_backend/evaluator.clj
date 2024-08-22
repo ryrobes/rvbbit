@@ -22,8 +22,8 @@
   (:import [java.util.concurrent TimeoutException TimeUnit]))
 
 (def ^:private initial-max-items 200)
-(def ^:private max-wire-size (* 50 1024)) ; 50KB, as per your example
-(def ^:private max-string-length 1000)
+(def ^:private max-wire-size (* 150 1024)) ; 150KB, as per your example
+(def ^:private max-string-length 5000)
 (defonce eval-cache (atom {}))
 (def rabbit-config (config/settings)) ;; legacy
 (def debug? true)

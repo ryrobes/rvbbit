@@ -6444,7 +6444,7 @@
   )
 
 
-(defn draw-client-stats [& [kks freqs stats label? width {:keys [metrics-atom] :or {metrics-atom client-metrics}}]]
+(defn draw-client-stats [& [kks freqs stats label? width {:keys [metrics-atom force-color] :or {metrics-atom client-metrics}}]]
   (try
     (let [width (or width (ut/get-terminal-width))
           sample-size (* width 1.5)]
@@ -6469,7 +6469,7 @@
                             freqs)
                     colors (vec (keys ansi-colors))
                     color-index (mod (hash pp) (count colors))
-                    color (nth colors color-index)]]
+                    color (or force-color(nth colors color-index))]]
 
         (doseq [s stats]
           (doseq [ff freqs]
