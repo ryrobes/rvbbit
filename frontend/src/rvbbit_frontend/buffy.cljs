@@ -62,7 +62,9 @@
 
 (defn mouse-up-handler
   [on-move]
-  (fn me [evt] (reset! bricks/dragging-editor? false) (do (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
+  (fn me [evt] 
+    (reset! bricks/dragging-editor? false) 
+    (do (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
 
 (defn mouse-down-handler
   [e]
@@ -2206,22 +2208,26 @@
  (fn [db [_]]
    (dissoc db :runstreams-lookups)))
 
-(defn chat-panel
-  []
+(defn chat-panel []
   (let [x-px            (px (first @detached-coords)) ;(px (* x db/brick-size))
         y-px            (px (last @detached-coords)) ;(px (* y db/brick-size))
         panel-width     600
         text-box-height 110
         selected-block  @(ut/tracked-subscribe [::bricks/selected-block])
         selected-view   @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
+        client-name     @(ut/tracked-sub ::bricks/client-name {})
         kp              (vec (flatten [selected-block selected-view]))
-        chats-vec       @(ut/tracked-subscribe [::chats kp])
+        ;chats-vec       @(ut/tracked-subscribe [::chats kp])
         audio-playing?  @(ut/tracked-subscribe [::audio/audio-playing?])
         hh              @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when
         ww              @(ut/tracked-subscribe [::subs/w])
+        kick-slices      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (str "kit/kicks>" (cstr/replace (str client-name) #":" "")))]})
         panel-height    (* (.-innerHeight js/window) 0.9)
-        mode            (get @db/chat-mode kp (if (= "none!" (first kp)) :runstreams :history))
-        kmode           (get @db/kit-mode kp)
+        mode            (get @db/chat-mode kp 
+                             (if (= "none!" (first kp)) :runstreams :history))
+        kmode           (get @db/kit-mode kp 
+                             (if (= "none!" (first kp)) :runstreams :history))
+        ;; _ (ut/tapp>> [:chat-panel mode kmode selected-view kick-slices])
         text-box?       (or (= mode :snapshots) (= mode :buffy) (= mode :narratives) (= mode :kick))
         valid-kits      @(ut/tracked-subscribe [::valid-kits])
         narrative-mode? (some #(= % (last kp)) (keys valid-kits))
@@ -2231,9 +2237,12 @@
                               (vec (remove nil?
                                      [;;[:buffy :ai/calliope]
                                       (when (= "none!" (first kp)) [:runstreams :runstreams])
-                                      (if (= "none!" (first kp)) ; (nil? (second kp))
+                                      (if 
+                                       (= "none!" (first kp)) ; (nil? (second kp))
                                         [:snapshots :snapshots]
-                                        [:history :history]) [:kick :kick]])))]
+                                        [:history :history]) 
+                                      (when (some #{(last selected-view)} kick-slices) [:kick :kick])
+                                      ])))]
     [bricks/reecatch
      [re-com/box :size "none" :width (px panel-width) :height (px panel-height) :attr
       {:on-mouse-enter #(reset! bricks/over-block? true) :on-mouse-leave #(reset! bricks/over-block? false)} :style
@@ -2251,72 +2260,99 @@
        :box-shadow       (let [block-id       :audio
                                talking-block? true]
                            (cond (and audio-playing? talking-block?) (str
-                                                                       "1px 1px " (px (* 80
-                                                                                         (+ 0.1 (get @db/audio-data block-id))))
-                                                                       " "        (theme-pull :theme/editor-outer-rim-color nil))
-                                 :else                               "none"))} :child
-      (if false ;@bricks/dragging-editor?
-        [re-com/box :child "paused"]
-        [re-com/v-box :width "575px" :children
-         [[re-com/h-box :justify :between :align :center :padding "6px" :children
-           [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-arrows" :style
-             {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-              :color      (theme-pull :theme/editor-font-color nil)
-              :cursor     "grab"
-              :height     "15px"
-              :margin-top "-9px"
-              :font-size  "19px"} 
-             :attr {:on-mouse-down mouse-down-handler}]
-            [re-com/h-box :children
-             [[re-com/h-box :children
-               (cons [re-com/md-icon-button :src (at)
-                      :md-icon-name "zmdi-refresh"
-                      :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                              :cursor       "pointer"
-                              :color        "inherit"
-                              :margin-right "5px"
-                              :opacity      0.33
-                              :height       "15px"
-                              :margin-top   "3px"
-                              :font-size    "19px"}
-                      :attr {:on-click #(ut/tracked-dispatch (if (and (= kmode :runstreams) 
-                                                                      (= mode :runstreams))
+                                                                      "1px 1px " (px (* 80
+                                                                                        (+ 0.1 (get @db/audio-data block-id))))
+                                                                      " "        (theme-pull :theme/editor-outer-rim-color nil))
+                                 :else                               "none"))}
+      :child (if @bricks/dragging-editor?
+               [re-com/box
+                :size "auto"
+                :align :center :justify :center
+                :child "paused"
+                :style (let [cc (theme-pull :theme/editor-outer-rim-color nil)
+                             ccc (count cc)
+                             cc (str (if (> ccc 7) (subs cc 0 7) cc) 45)]
+                         {:user-select "none"
+                          :color (theme-pull :theme/editor-outer-rim-color nil)
+                          :font-size "18px"
+                          :background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent
+                                             "linear-gradient(0deg, "
+                                             cc
+                                             " 2px, transparent 8px), linear-gradient(90deg, "
+                                             cc
+                                             " 2px, transparent 8px)"
+                                                                                 ;(when (get custom-map :background-image) ", ")
+                                                                                 ;(get custom-map :background-image)
+                                             )
+                          :background-size  (str "50px 50px, 50px 50px"
+                                                                                     ;(when (get custom-map :background-size) ", ")
+                                                                                     ;(get custom-map :background-size)
+                                                 )})]
+               [re-com/v-box :width "575px" :children
+                [[re-com/h-box :justify :between :align :center :padding "6px" :children
+                  [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-arrows" :style
+                    {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                     :color      (theme-pull :theme/editor-font-color nil)
+                     :cursor     "grab"
+                     :height     "15px"
+                     :margin-top "-9px"
+                     :font-size  "19px"}
+                    :attr {:on-mouse-down mouse-down-handler}]
+                   [re-com/h-box :children
+                    [[re-com/h-box :children
+                      (cons [re-com/md-icon-button :src (at)
+                             :md-icon-name "zmdi-refresh"
+                             :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                                     :cursor       "pointer"
+                                     :color        "inherit"
+                                     :margin-right "5px"
+                                     :opacity      0.33
+                                     :height       "15px"
+                                     :margin-top   "3px"
+                                     :font-size    "19px"}
+                             :attr {:on-click #(ut/tracked-dispatch (if (and (= kmode :runstreams)
+                                                                             (= mode :runstreams))
                                                                ;[::refresh-runstreams]
-                                                               [::bricks/refresh-runstreams]
-                                                               [::refresh-kits]))}]
-                     (for [[c v] choices]
-                       [re-com/box :child
-                        (if (= c :buffy) ;(str v "!")
-                          [re-com/h-box :children
-                           [[re-com/box :child " :ai-worker/ " :style {}]
-                            [re-com/box :child " Calliope" ; " Buffy"
-                             :style {:font-family "Homemade Apple" :color "orange" :margin-top "2px"}]]]
-                          (str v)) :attr {:on-click #(do (swap! db/chat-mode assoc kp c) (swap! db/kit-mode assoc kp v))} :style
-                        (if (and (= mode c) (= kmode v)) {:text-decoration "underline"} {:cursor "pointer" :opacity 0.6}) :padding
-                        "4px"]))]
-              [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click #(ut/tracked-dispatch [::bricks/toggle-buffy])
-               :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}]]]] :size "none" :width "588px" :height "25px" :style
-           {;:background-color (theme-pull :theme/editor-rim-color nil)
-            :background    (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
-            :border-radius "10px 10px 0px 0px"
-            :color         (theme-pull :theme/editor-outer-rim-color nil)}]
-          (cond ;(= mode :buffy2)     [chat-box panel-height panel-width chats-vec kp]
-            (= mode :runstreams)                [runstream-box panel-height panel-width kp]
-            (= mode :buffy)                     [narrative-box panel-height panel-width kp]
-            (= mode :snapshots)                 [snapshot-box panel-height panel-width kp]
-            narrative-mode?                     [narrative-box panel-height panel-width kp]
-            (= mode :narratives)                [narrative-box panel-height panel-width kp]
-            (or (= mode :kick) (= mode :buffy)) [narrative-box panel-height panel-width kp]
-            :else                               [history-box panel-height panel-width kp])
-          (when text-box?
-            [re-com/v-box :children
-             [[option-buttons kp mode]
-              (when (and (not (some #(= % kp) @audio/waiting-for-response))
-                         (not (= mode :narratives))
-                         (not (or (= mode :kick) (= mode :buffy)))
-                         (not (= mode :snapshots)))
-                [re-com/input-textarea :width (px (- panel-width 20)) :model "" :rows 2 :placeholder "_" :style
-                 {:border "1px solid #00000000" :background-color "inherit" :font-size "16px" :font-weight 700} :on-change
-                 #(ut/tracked-dispatch [::audio/add-chat % kp])])] :padding "5px" :height (px text-box-height) :width
-             (px (- panel-width 12)) :style
-             {:border-top (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil))}])]])]]))
+                                                                      [::bricks/refresh-runstreams]
+                                                                      [::refresh-kits]))}]
+                            (for [[c v] choices]
+                              [re-com/box :child
+                               (if (= c :buffy) ;(str v "!")
+                                 [re-com/h-box :children
+                                  [[re-com/box :child " :ai-worker/ " :style {}]
+                                   [re-com/box :child " Calliope" ; " Buffy"
+                                    :style {:font-family "Homemade Apple" :color "orange" :margin-top "2px"}]]]
+                                 (str v))
+                               :attr {:on-click #(do (swap! db/chat-mode assoc kp c) 
+                                                     (swap! db/kit-mode assoc kp v))}
+                               :style (if (and (= mode c) (= kmode v)) {:text-decoration "underline"} {:cursor "pointer" :opacity 0.6})
+                               :padding "4px"]))]
+                     [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click #(ut/tracked-dispatch [::bricks/toggle-buffy])
+                      :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}]]]]
+                  :size "none"
+                  :width "588px"
+                  :height "25px"
+                  :style {;:background-color (theme-pull :theme/editor-rim-color nil)
+                          :background    (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
+                          :border-radius "10px 10px 0px 0px"
+                          :color         (theme-pull :theme/editor-outer-rim-color nil)}]
+                 (cond ;(= mode :buffy2)     [chat-box panel-height panel-width chats-vec kp]
+                   (= mode :runstreams)                [runstream-box panel-height panel-width kp]
+                   (= mode :buffy)                     [narrative-box panel-height panel-width kp]
+                   (= mode :snapshots)                 [snapshot-box panel-height panel-width kp]
+                   narrative-mode?                     [narrative-box panel-height panel-width kp]
+                   (= mode :narratives)                [narrative-box panel-height panel-width kp]
+                   (or (= mode :kick) (= mode :buffy)) [narrative-box panel-height panel-width kp]
+                   :else                               [history-box panel-height panel-width kp])
+                 (when text-box?
+                   [re-com/v-box :children
+                    [[option-buttons kp mode]
+                     (when (and (not (some #(= % kp) @audio/waiting-for-response))
+                                (not (= mode :narratives))
+                                (not (or (= mode :kick) (= mode :buffy)))
+                                (not (= mode :snapshots)))
+                       [re-com/input-textarea :width (px (- panel-width 20)) :model "" :rows 2 :placeholder "_" :style
+                        {:border "1px solid #00000000" :background-color "inherit" :font-size "16px" :font-weight 700} :on-change
+                        #(ut/tracked-dispatch [::audio/add-chat % kp])])] :padding "5px" :height (px text-box-height) :width
+                    (px (- panel-width 12)) :style
+                    {:border-top (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil))}])]])]]))

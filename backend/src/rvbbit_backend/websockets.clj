@@ -93,6 +93,7 @@
 
 (defonce reaction-usage (atom []))
 (defonce signal-reaction-usage (atom []))
+(defonce kit-client-maps (atom {}))
 
 (defonce client-metrics (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-metrics-atom.msgpack.transit")) ;;(atom {}))
 (defonce sql-metrics (atom {}))
@@ -2352,7 +2353,9 @@
 (defmethod wl/handle-push :run-kit
   [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]
   (try
-    (let [kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
+    (let [_ (swap! db/kit-atom assoc-in [:kicks client-name] ;; so the UI has the :kicks :buffy option to watch before completeted
+                   (vec (distinct (conj (get-in @db/kit-atom [:kicks client-name] []) data-key))))
+          kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
           kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
           times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
           [kit-runner
@@ -5538,15 +5541,21 @@
                                                                                                    :item_idx     idx
                                                                                                    :client_name  (str client-name)
                                                                                                    :flow_id      (str flow-id)
-                                                                                                   :item_options (pr-str (select-keys
-                                                                                                                          v
+                                                                                                   :item_options (pr-str (select-keys v
                                                                                                                           [:options :parameters :mutates
                                                                                                                            :description]))
                                                                                                    :item_data    (pr-str i)}]]
                                                                                 row-map))]]
                                                            rowset)))]
 
-                            (when true ;;(not (= kkit-name ":kick")) ;; let kick "messages" pile up, dont swap out like a
+                            (when (ut/ne? output-rows) ;; give the client a hint through a kick sub that we have data for X
+                              (swap! db/kit-atom assoc-in [:kicks client-name]
+                                     (vec (distinct (conj (get-in @db/kit-atom [:kicks client-name] [])
+                                                          (if (vector? ui-keypath)
+                                                            (first ui-keypath)
+                                                            ui-keypath))))))
+                            
+                            (when true ;;(not (= kkit-name ":kick")) ;; clear older kick data for this item name - TODO what about multiple kits on the same card?
                               (sql-exec system-db
                                         (to-sql {:delete-from [:kits]
                                                  :where       [:and [:= :kit_name kkit-name]

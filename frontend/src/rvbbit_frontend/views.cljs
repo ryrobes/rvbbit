@@ -4199,7 +4199,7 @@
 ;;      :child  [re-com/box :child "DOOM!"]]))
 
 
-(defonce fanfare? (atom false)) 
+(defonce fanfare? (atom true)) 
 (defonce time-freq (reagent/atom 45))
 (defonce selected-stats-page (reagent/atom :client))
 
@@ -4216,7 +4216,8 @@
      :children [[re-com/h-box
                  :width (px w)
                  :height "30px"
-                 :justify :between :align :center
+                 :justify :between 
+                 :align :center
                  :children
                  [[re-com/h-box
                    :children (vec (for [e [:client :system :reactor :pools :queues :clients :sql-sizes :sql]]
@@ -4326,7 +4327,7 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":sql-stats" :bright-cyan)
-                         (draw-client-stats nil [:freq] nil true 260 {:metrics-atom sql-metrics}))))}
+                         (draw-client-stats nil [:freq] nil true (Math/floor (/ :ww 6.55)) {:metrics-atom sql-metrics}))))}
   
          (= @selected-stats-page :clients)
          {:signal false
@@ -4375,7 +4376,7 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":queue-party" :bright-cyan)
-                           (draw-stats [:workers :queues :queued :queue-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true) 
+                           (draw-stats [:workers :queues :queue-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true) 
                          (println "")
                          (let [ss (qp/get-queue-stats+)]
                            (ut/pp [:queue-party-stats+ ss] {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map} )))))}
@@ -4402,6 +4403,8 @@
                                                (with-out-str
                                                  (fig-render :text :color)))})])
 
+(defonce hover-text (reagent/atom nil))
+
 (defn doom-modal []
   (let [flipped (reagent/atom false)]
     (reagent/create-class
@@ -4420,6 +4423,7 @@
               ww @(ut/tracked-subscribe [::subs/w])
               w (* ww 0.45)
               h (* hh 0.7)
+              react! [@hover-text]
               audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
               client-name @(ut/tracked-subscribe [::bricks/client-name])
               left (- (/ ww 2) (/ w 2))
@@ -4475,20 +4479,370 @@
                                                :object-position "center"
                                                :max-width "100%"
                                                :max-height "100%"}}]]
-                               [re-com/box
+                               [re-com/v-box
+                                :justify :between
                                 :style {:width w
                                         :height h
                                          ;:border "1px solid lime"
                                         :backface-visibility "hidden"
                                         :transform "rotateY(180deg)"
                                         :font-size "24px"}
-                                :child (let [ttt @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:time/minute]})
-                                             react! [@time-freq]]
-                                         [main-stats-page w h client-name ttt]
-                                         ;[menu-page w h client-name ttt]
+                                :children [(let [ttt @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:time/minute]})
+                                                 react! [@time-freq]]
+                                             [main-stats-page w h client-name ttt])
+                                           [re-com/h-box
+                                            :width (px (- w 40))
+                                            :height "20px"
+                                            :justify :between
+                                            :align :center
+                                            :style {:font-size "18px"
+                                                    ;:border "1px solid lime"
+                                                    :font-family "Fixedsys-Excelsior, monospace"}
+                                            :children [(if @hover-text
+                                                         [re-com/box
+                                                          :style {:margin-top "4px"
+                                                                  :text-shadow "2px 3px 5px #00000099"
+                                                                  :color "darkcyan"}
+                                                          :child (str @hover-text)]
+                                                         [re-com/h-box
+                                                          :gap "10px"
+                                                          :style {:margin-top "4px"
+                                                                  :text-shadow "2px 3px 5px #00000099"
+                                                                  :color "darkcyan"}
+                                                          :children [[re-com/box :child "RVBBIT"]
+                                                                     [re-com/box :child (str db/version)]
+                                                                     [re-com/box :child (str db/version-date)]]])
+                                                       ;[re-com/gap :size "16px"]
+                                                       [re-com/h-box
+                                                        :gap "10px"
+                                                        :style {:font-weight 700
+                                                                :text-shadow "2px 3px 5px #00000099"
+                                                                :color "brightcyan"
+                                                                :margin-top "4px"}
+                                                        :children [[re-com/box
+                                                                    :attr {:on-mouse-over #(reset! hover-text "https://twitter.com/ryrobes")
+                                                                           :on-mouse-out #(reset! hover-text nil)}
+                                                                    :child [:a {:href "https://twitter.com/ryrobes"
+                                                                                :target "_blank"
+                                                                                :rel "noopener noreferrer"
+                                                                                :style {:color "cyan"
+                                                                                        :text-decoration "none"}}
+                                                                            "@ryrobes"]]
+                                                                   [re-com/box
+                                                                    :child [:a {:href "https://github.com/ryrobes/rvbbit"
+                                                                                :target "_blank"
+                                                                                :rel "noopener noreferrer"
+                                                                                :style {:color "darkcyan"
+                                                                                        :text-decoration "none"}}
+                                                                            [re-com/md-icon-button :src (at)
+                                                                             :md-icon-name "zmdi-github-alt"
+                                                                             :attr {:on-mouse-over #(reset! hover-text "https://github.com/ryrobes/rvbbit")
+                                                                                    :on-mouse-out #(reset! hover-text nil)}
+                                                                             :style {:color        "darkcyan"
+                                                                                     :z-index      99999
+                                                                                     :cursor       "pointer"
+                                                                                     :margin-top   "-3px"
+                                                                                     :font-size    "15px"}]]]
+                                                                   [re-com/box
+                                                                    :child [:a {:href "https://youtube.com/ryrobes"
+                                                                                :target "_blank"
+                                                                                :rel "noopener noreferrer"
+                                                                                :style {:color "darkcyan"
+                                                                                        :text-decoration "none"}}
+                                                                            [re-com/md-icon-button :src (at)
+                                                                             :md-icon-name "zmdi-youtube-play"
+                                                                             :attr {:on-mouse-over #(reset! hover-text "https://youtube.com/ryrobes")
+                                                                                    :on-mouse-out #(reset! hover-text nil)}
+                                                                             :style {:color        "darkcyan"
+                                                                                     :z-index      99999
+                                                                                     :cursor       "pointer"
+                                                                                     :margin-top   "-3px"
+                                                                                     :font-size    "15px"}]]]
+                                                                   [re-com/box
+                                                                    :attr {:on-mouse-over #(reset! hover-text "https://rvbbit.com")
+                                                                           :on-mouse-out #(reset! hover-text nil)}
+                                                                    :child [:a {:href "https://rvbbit.com"
+                                                                                :target "_blank"
+                                                                                :rel "noopener noreferrer"
+                                                                                :style {:color "cyan"
+                                                                                        :text-decoration "none"}}
+                                                                            "rvbbit.com"]]
+                                                                   [re-com/box
+                                                                    :style {:cursor "crosshair"}
+                                                                    :attr {:on-mouse-over #(reset! hover-text "(proudly built in Florida, USA)")
+                                                                           :on-mouse-out #(reset! hover-text nil)}
+                                                                    :child "🐊🇺🇸"]]]]]]]]]]))})))
 
-                                          ;[re-com/box :child " fart fax " :style {:width w :height h :border "1px solid lime"}]
-                                         )]]]]))})))
+(def bar-hover-text (reagent/atom nil))
+
+(defn custom-icon-button [{:keys [icon-name tooltip on-click active? color]}]
+  (let [hovered? (reagent/atom false)]
+    (fn [{:keys [icon-name tooltip on-click active? color]}]
+      [re-com/md-icon-button
+       :src (at)
+       :md-icon-name icon-name
+       :on-click (fn [e]
+                   (on-click e)
+                   (reset! hovered? false))  ; Reset hover state after click
+       :style {:color (if @hovered?
+                        (theme-pull :theme/editor-outer-rim-color nil)
+                        (or color "#ffffff"))
+               :width "35px"
+               :height "28px"
+               :cursor "pointer"
+               ;:border-radius (when (= icon-name "zmdi-labels") "20px 0px 0px 0px") 
+               :text-shadow "2px 1px 3px #000000"
+               :filter "drop-shadow(2px 1px 3px #000000)"
+               :opacity (if active? 1.0 (if @hovered? 0.8 0.45))
+               :padding-top (when (not @hovered?) "4px")
+               :padding-left "2px"
+               :font-size (if @hovered? "33px" "18px")
+               :transition "all 0.3s ease"}
+       :attr {:on-mouse-over (fn []
+                               (reset! hovered? true)
+                               (reset! bar-hover-text tooltip))
+              :on-mouse-out (fn []
+                              (reset! hovered? false)
+                              (reset! bar-hover-text nil))}])))
+
+(defn custom-text-display [{:keys [text tooltip color on-click]}]
+  (let [hovered? (reagent/atom false)]
+    (fn [{:keys [text tooltip color on-click]}]
+      [re-com/box
+       :attr {:on-mouse-over (fn []
+                               (reset! hovered? true)
+                               (reset! bar-hover-text tooltip))
+              :on-mouse-out (fn []
+                              (reset! hovered? false)
+                              (reset! bar-hover-text nil))
+              :on-click (when on-click
+                          (fn [e]
+                            (on-click e)
+                            (reset! hovered? false)))}
+       :style {:color (if @hovered?
+                        (theme-pull :theme/editor-outer-rim-color nil)
+                        (or color "#ffffff99"))
+               :cursor (if on-click "pointer" "default")
+               :min-width "35px"
+               :height "28px"
+               :font-weight 700
+               ;:display "inline-flex"
+               ;:align-items "center"
+               ;:justify-content "center"
+               :text-shadow "2px 1px 3px #00000099"
+               :filter "drop-shadow(2px 1px 3px #00000099)"
+               :opacity (if @hovered? 1.0 0.8)
+               ;:padding-top (when (not @hovered?) "4px")
+               :margin-top (if (not @hovered?) "-2px" "-9px")
+               :font-size (if @hovered? "30px" "18px")
+               :transition "all 0.3s ease"
+               :padding "5px"}
+       :child [:span text]])))
+
+
+
+
+
+(defn button-panels [editor? lines? peek? auto-run? external? selected-block? online?
+                     websocket-status server-subs things-running flow-watcher-subs-grouped
+                     client-name screen-name]
+  (let [left [re-com/h-box
+              :style {:position "fixed"
+                      :z-index 98
+                      :bottom 0
+                      :left 0
+                      :background-color (when @bar-hover-text 
+                                          ;;"#00000099"
+                                          (theme-pull :theme/base-block-color "#00000099")
+                                          )
+                      :backdrop-filter (when @bar-hover-text "blur(4px) brightness(0.35)")
+                     ; :background-color "#00000022"
+                      :color "white"}
+              ;:gap "5px"
+              :height "28px"
+              :children [
+                         [custom-icon-button
+                          {:icon-name (if lines? "zmdi-layers" "zmdi-layers-off")
+                           :tooltip "show lineage / sub-query lines? (L)"
+                           :on-click #(ut/tracked-dispatch [::bricks/toggle-lines])
+                           :active? lines?}]
+
+                         [custom-icon-button
+                          {:icon-name (if peek? "zmdi-eye" "zmdi-eye-off")
+                           :tooltip "toggle peek mode (P)"
+                           :on-click #(ut/tracked-dispatch [::bricks/toggle-peek])
+                           :active? peek?}]
+
+                         [custom-icon-button
+                          {:icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off")
+                           :tooltip "toggle auto-refresh (O)"
+                           :on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])
+                           :active? auto-run?}]
+
+                         [custom-icon-button
+                          {:icon-name "zmdi-developer-board"
+                           :tooltip "toggle external editing"
+                           :on-click #(ut/tracked-dispatch [::bricks/toggle-external])
+                           :active? external?
+                           :color (if external? "red" "#ffffff")}]
+
+                         (when selected-block?
+                           [custom-icon-button
+                            {:icon-name "zmdi-close"
+                             :tooltip "un-select block (ESC)"
+                             :on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])
+                             :active? selected-block?}])
+
+                         [custom-text-display
+                          {:text (str (get websocket-status :waiting -1))
+                           :tooltip "websocket requests waiting (sql queries, etc)"}]
+
+                         [custom-text-display
+                          {:text (ut/nf (count server-subs))
+                           :tooltip "active reactor subscriptions"}]
+
+                         [custom-text-display
+                          {:text (ut/nf (count things-running))
+                           :tooltip "active running (solvers, flows, etc)"}]
+
+                         (when (not online?)
+                           [custom-text-display
+                            {:text "RVBBIT server is offline"
+                             :tooltip "RVBBIT server is offline"}])
+
+                         (when (ut/ne? flow-watcher-subs-grouped)
+                           [re-com/h-box
+                            :style {:padding-left "10px" :font-size "16px" :font-weight 700}
+                            :gap "8px"
+                            :children (for [[kk cnt] flow-watcher-subs-grouped]
+                                        [re-com/h-box :style
+                                         {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                          :padding-left     "6px"
+                                          :border-radius    "5px 5px 0px 0px"
+                                          :padding-right    "6px"
+                                          :color            (theme-pull :theme/editor-background-color nil)}
+                                         :gap "5px"
+                                         :children [[re-com/box :child (str kk)]
+                                                    [re-com/box :style {:opacity 0.5} :child (str cnt)]
+                                                    [re-com/md-icon-button
+                                                     :md-icon-name "zmdi-close"
+                                                     :style {:cursor "pointer"
+                                                             :color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                             :font-size "18px"
+                                                             ;:height "10px" 
+                                                             ;:margin-top "-3px"
+                                                             } :on-click
+                                                     #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
+                                                          (ut/tracked-dispatch [::wfx/request :default
+                                                                                {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
+                                                                                 :timeout 50000}]))]]])])
+
+                         (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
+                           [custom-icon-button
+                            {:icon-name "zmdi-speaker"
+                             :tooltip "stop currently playing audio"
+                             :on-click #(audio/stop-audio)
+                             :active? true
+                             :color "red"}])
+
+                         (when @(ut/tracked-subscribe_ [::audio/recording?])
+                           [custom-icon-button
+                            {:icon-name "zmdi-mic"
+                             :tooltip "recording audio in progress"
+                             :on-click nil
+                             :active? true
+                             :color "red"}])]]
+
+        memory (let [mem @(ut/tracked-subscribe_ [::bricks/memory])]
+                 (when (> (get mem 1) 0) ;; firefox, etc doesn't support this, so not point to render 0MB
+                   (str (ut/bytes-to-mb (get mem 1)))))
+
+        right [re-com/h-box
+               :height "28px"
+               :style {:position "fixed"
+                       :z-index 98
+                       :bottom 0
+                       :right 0
+                       :border-radius "15px 0px 0px 0px"
+                       :background-color (when @bar-hover-text 
+                                           ;;"#00000099"
+                                           (theme-pull :theme/base-block-color "#00000099")
+                                           )
+                       :backdrop-filter (when @bar-hover-text "blur(4px) brightness(0.35)")
+                       :color "white"}
+               :children [[custom-icon-button
+                           (let [alert-mute? @(ut/tracked-sub ::bricks/alert-mute? {})]
+                             {:icon-name (if alert-mute? "zmdi-notifications-none" "zmdi-notifications")
+                              :tooltip "mute alert pop-ups / status notifications (M)"
+                              :on-click #(ut/tracked-dispatch [::bricks/toggle-alert-mute])
+                              :active? alert-mute?})]
+
+                          [custom-icon-button
+                           {:icon-name "zmdi-labels"
+                            :tooltip "toggle display mode (reduced ui for presenting)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-no-ui])
+                            :active? @(ut/tracked-sub ::bricks/full-no-ui? {})}]
+
+                          [custom-icon-button
+                           {:icon-name "zmdi-refresh"
+                            :tooltip "refresh all visible SQL queries"
+                            :on-click #(ut/tracked-dispatch [::bricks/refresh-all])}]
+
+                          [custom-icon-button
+                           {:icon-name "zmdi-save"
+                            :tooltip "save board (Ctrl-S)"
+                            :on-click #(ut/tracked-dispatch [::http/save :skinny screen-name])}]
+
+
+                          ;; [re-com/md-icon-button :src (at) :md-icon-name "zmdi-labels" :tooltip "toggle display mode" :on-click
+                          ;;  #(ut/tracked-dispatch [::bricks/toggle-no-ui]) :style
+                          ;;  {:color        "#ffffff"
+                          ;;   :cursor       "pointer"
+                          ;;   :opacity      (if @(ut/tracked-sub ::bricks/full-no-ui? {}) 1.0 0.3)
+                          ;;   :margin-top   "-2px"
+                          ;;   :padding-left "2px"
+                          ;;   :font-size    "15px"}]
+
+                          ;; [re-com/md-icon-button
+                          ;;  :src (at)
+                          ;;  :md-icon-name "zmdi-refresh"
+                          ;;  :tooltip "refresh all"
+                          ;;  :on-click #(do (ut/tracked-dispatch [::bricks/refresh-all]))
+                          ;;  :style {:color "#ffffff"
+                          ;;          :cursor "pointer"
+                          ;;          :margin-top "-2px"
+                          ;;          :padding-left "2px"
+                          ;;          :font-size "15px"}]
+
+                          ;; [re-com/md-icon-button :src (at) :md-icon-name "zmdi-save" :tooltip "save board (Ctrl-S)" :on-click
+                          ;;  #(do (ut/tracked-dispatch [::http/save :skinny screen-name])) :style
+                          ;;  {:color "#ffffff" :cursor "pointer" :margin-top "-2px" :padding-left "2px" :font-size "15px"}]
+                          ]
+                           
+                           ]]
+
+    [re-com/v-box
+     :children [left
+                [re-com/box
+                 :size "none"
+                 :style {:position "fixed"
+                         :padding (if @bar-hover-text "10px 10px 10px 20px" "5px")
+                         :border-radius "0px 20px 20px 0px"
+                         :left 0
+                         :bottom 28
+                         :font-weight 700
+                         :background-color (when @bar-hover-text 
+                                             ;;"#00000099"
+                                             (theme-pull :theme/base-block-color "#00000099")
+                                             )
+                         :backdrop-filter (when @bar-hover-text "blur(4px) brightness(0.35)")
+                         :font-size (when @bar-hover-text "27px")
+                         :transition "all 0.3s ease"
+                         :text-shadow "2px 1px 3px #000000"
+                         :color "#ffffff99"}
+                 :child (if @bar-hover-text 
+                          @bar-hover-text memory)]
+                right]]))
 
 
 
@@ -4497,6 +4851,7 @@
 (defn main-panel []
   (let [editor? (and @(ut/tracked-subscribe_ [::bricks/editor?]) 
                      (not @bricks/dragging?))
+        alert-mute? @(ut/tracked-sub ::bricks/alert-mute? {})
         buffy? @(ut/tracked-subscribe_ [::bricks/buffy?])
         console? @(ut/tracked-subscribe_ [::bricks/quake-console?])
         flows? @(ut/tracked-subscribe_ [::bricks/flow?])
@@ -4506,7 +4861,7 @@
         lines? @(ut/tracked-subscribe_ [::bricks/lines?])
         peek? @(ut/tracked-subscribe_ [::bricks/peek?])
         auto-run? @(ut/tracked-subscribe_ [::bricks/auto-run?])
-        rekt [@db/kick-alert @editor-size]
+        rekt [@db/kick-alert @editor-size] ;; a top binding kick for atom reactions 
         wssk @(ut/tracked-subscribe_ [::http/websocket-status])
         websocket-status (select-keys wssk [:status :datasets :panels :waiting])
         online? (true? (= (get websocket-status :status) :connected))
@@ -4520,7 +4875,7 @@
         flow-watcher-subs-grouped @(ut/tracked-subscribe_ [::bricks/flow-watcher-subs-grouped])
         server-subs @(ut/tracked-subscribe_ [::bricks/all-server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
-        coords (if lines? ;; expensive otherwise
+        coords (if lines? ;; wicked expensive otherwise
                  (let [;;_ (ut/tapp>> [:lines!])
                        subq-mapping @(ut/tracked-sub ::bricks/subq-mapping-alpha {})
                        ;;_ (ut/tapp>> [:subq-mapping (str subq-mapping)])
@@ -4548,7 +4903,6 @@
                                            dd        (if (not (cstr/starts-with? (str d) ":block"))
                                                        @(ut/tracked-subscribe [::bricks/lookup-panel-key-by-query-key d])
                                                        d)
-
                                            involved? (some #(= % dd) involved)
                                            dest-r    @(ut/tracked-subscribe [::bricks/panel-px-root dd])
                                            dest-h    @(ut/tracked-subscribe [::bricks/panel-px-height dd])
@@ -4583,279 +4937,120 @@
       (if @rvbbit-frontend.flows/dragging-port? ["meta-menu" :flow-port] ["meta-menu" ]) ;; eyes
       [(js/Math.floor (/ (ifnil (first @db/context-modal-pos) 0) db/brick-size))
        (js/Math.floor (/ (ifnil (last @db/context-modal-pos) 0) db/brick-size))]
-      [re-com/box :style {:background-color "black"} :attr
-       {:id              "base-canvas"
-        :on-drag-over    #(bricks/tag-screen-position %)
-        :on-context-menu (re-com/handler-fn #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                            (bricks/tag-screen-position event) ;; event is magic in handler-fn
-                                            (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
-                                              (bricks/insert-new-block
-                                                [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
-                                                 (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
-                                                5
-                                                4))
-                                            #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                            (.preventDefault event))
-        :on-mouse-down   #(when (= (.-button %) 1) ;; middle click
-                            (do #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                (bricks/tag-screen-position %) ;; event is magic in handler-fn
-                                (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
-                                  (let [x  (keyword (ut/replacer (str (talltale.core/quality-color-animal)) " " "-"))
-                                        x  (ut/safe-key x)
-                                        kp [:param x]]
-                                    (bricks/insert-new-block [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
-                                                              (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
-                                                             5
-                                                             4
-                                                             {:drag-meta     {:type :open-input}
-                                                              :w             6
-                                                              :selected-view x
-                                                              :h             2
-                                                              :views         {x [:open-input
-                                                                                 {:kp         kp ;[:param
+      [re-com/box
+       :style {:background-color "black"}
+       :attr {:id              "base-canvas"
+              :on-drag-over    #(bricks/tag-screen-position %)
+              :on-context-menu (re-com/handler-fn #_{:clj-kondo/ignore [:unresolved-symbol]}
+                                (bricks/tag-screen-position event) ;; event is magic in handler-fn
+                                                  (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
+                                                    (bricks/insert-new-block
+                                                     [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
+                                                      (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
+                                                     5
+                                                     4))
+                                                  #_{:clj-kondo/ignore [:unresolved-symbol]}
+                                                  (.preventDefault event))
+              :on-mouse-down   #(when (= (.-button %) 1) ;; middle click
+                                  (do #_{:clj-kondo/ignore [:unresolved-symbol]}
+                                   (bricks/tag-screen-position %) ;; event is magic in handler-fn
+                                      (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
+                                        (let [x  (keyword (ut/replacer (str (talltale.core/quality-color-animal)) " " "-"))
+                                              x  (ut/safe-key x)
+                                              kp [:param x]]
+                                          (bricks/insert-new-block [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
+                                                                    (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
+                                                                   5
+                                                                   4
+                                                                   {:drag-meta     {:type :open-input}
+                                                                    :w             6
+                                                                    :selected-view x
+                                                                    :h             2
+                                                                    :views         {x [:open-input
+                                                                                       {:kp         kp ;[:param
                                                                                                  ;:remarkable-blush-louse]
-                                                                                  :width-int  :panel-width+100
-                                                                                  :height-int :panel-height+80
-                                                                                  :syntax     "clojure"}]}})
-                                    (let [default "new parameter value!" ;(if (nil? default) "new parameter
-                                          vv      @(ut/tracked-subscribe [::conn/clicked-parameter kp])
-                                          exists? (not (nil? vv))
-                                          _ (when (not exists?) (ut/tracked-dispatch [::conn/click-parameter kp default]))])))
-                                #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                (.preventDefault %)))} :size "1" :width (px ww) :height (px hh) :child
-       [re-com/v-box :size "1" :style
-        (let [custom-map (theme-pull :theme/canvas-background-css nil)
-              custom-map (when (map? custom-map) custom-map)
-              cc         (str ;(ut/invert-hex-color
-                           (theme-pull :theme/editor-outer-rim-color nil)
-                           87)]
-          (merge custom-map
-                 {:font-family (theme-pull :theme/base-font nil)
-                  :transition  "filter 4s ease-in-out"
-                  :filter      (when (not online?) "grayscale(100%)")}
-                 (when (or @bricks/dragging? @bricks/mouse-dragging-panel?) ;; editor? ;;(not
-                   {:background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent
-                                        "linear-gradient(0deg, "
-                                        cc
-                                        " 2px, transparent 8px), linear-gradient(90deg, "
-                                        cc
-                                        " 2px, transparent 8px)"
-                                        (when (get custom-map :background-image) ", ")
-                                        (get custom-map :background-image))
-                    :background-size  (str "50px 50px, 50px 50px"
-                                           (when (get custom-map :background-size) ", ")
-                                           (get custom-map :background-size))}))) :children
-        [[bricks/reecatch [tab-menu]]
-         [bricks/reecatch [snapshot-menu]]
-         (when @bricks/dragging-editor?
-           [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
-         (when session? [session-modal])
-         (when doom? [doom-modal])
-         (when (and editor? (not @bricks/mouse-dragging-panel?))
-           ;;[bricks/reecatch [editor-panel 33 10]]
-           [bricks/reecatch [editor-panel (get @editor-size 0) (get @editor-size 1)]]
-           ;;[bricks/reecatch [editor-panel 46 22]]
-           )
-         (when (or (and @bricks/dragging? (not @bricks/on-block?) (not @bricks/over-flow?)) @bricks/swap-layers?)
-           [re-com/box :child " " :style
-            {:background-color (str (theme-pull :theme/editor-background-color nil) 22) ;; "#00000022"
-             :filter           "drop-shadow(16px 16px 20px red) invert(75%)"
-             :position         "fixed"
-             :left             (* (js/Math.floor (/ (first @db/context-modal-pos) db/brick-size)) db/brick-size)
-             :top              (* (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size)) db/brick-size)} :width
-            (px (* (get @bricks/dragging-body :w) db/brick-size)) :height
-            (px (* (get @bricks/dragging-body :h) db/brick-size))])
-         (when (and buffy? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [buffy/chat-panel]])
-         
-         (when flows? ;(and flows? (not @bricks/mouse-dragging-panel?))
-           [bricks/reecatch [flows/flow-panel]]) [bricks/reecatch [bricks/grid]]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-pizza" :tooltip "  toggle floating editor panel (SPACE)" :style
-           {:color        "#ffffff"
-            :cursor       "pointer"
-            :opacity      (if editor? 1.0 0.3)
-            :transform    (if editor? "rotate(-90deg)" "")
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"} :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-editor])}] :width "20px" :height "20px"
-          :style {:position "fixed" :z-index 98 :bottom 0 :left 0 :background-color "#00000022" :color "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name (if lines? "zmdi-layers" "zmdi-layers-off") :tooltip
-           "show lineage / sub-query lines? (L)" :style
-           {:color        "#ffffff"
-            :cursor       "pointer"
-            :opacity      (if lines? 1.0 0.3)
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"} :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-lines])}] :width "20px" :height "20px"
-          :style
-          {:position         "fixed"
-           :z-index          98
-           :border-radius    "0px 7px 0px 0px"
-           :bottom           0
-           :left             23
-           :background-color "#00000022"
-           :color            "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name (if peek? "zmdi-eye" "zmdi-eye-off") :tooltip "toggle peek mode (P)"
-           :style
-           {:color        "#ffffff"
-            :cursor       "pointer"
-            :opacity      (if peek? 1.0 0.3)
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"} :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-peek])}] :width "20px" :height "20px"
-          :style
-          {:position         "fixed"
-           :z-index          98
-           :border-radius    "0px 7px 0px 0px"
-           :bottom           0
-           :left             46
-           :background-color "#00000022"
-           :color            "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off") :tooltip
-           "toggle auto-refresh (O)" :style
-           {:color        "#ffffff"
-            :cursor       "pointer"
-            :opacity      (if auto-run? 1.0 0.3)
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"} :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])}] :width "20px" :height
-          "20px" :style
-          {:position         "fixed"
-           :z-index          98
-           :border-radius    "0px 7px 0px 0px"
-           :bottom           0
-           :left             69
-           :background-color "#00000022"
-           :color            "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-developer-board" :tooltip "  toggle external editing" :style
-           {:color        (if external? "red" "#ffffff")
-            :cursor       "pointer"
-            :opacity      (if external? 1.0 0.3)
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"} :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-external])}] :width "20px" :height
-          "20px" :style {:position "fixed" :z-index 98 :bottom 0 :left 92 :background-color "#00000022" :color "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :tooltip "un-select block (ESC)" :style
-           {:color        "#ffffff"
-            :cursor       "pointer"
-            :opacity      (if selected-block? 1.0 0.3)
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"} :attr {:on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])}] :width "20px" :height
-          "20px" :style
-          {:position         "fixed"
-           :z-index          98
-           :border-radius    "0px 7px 0px 0px"
-           :bottom           0
-           :left             115
-           :background-color "#00000022"
-           :color            "white"}]
-         (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
-           [re-com/md-icon-button 
-            :src (at) 
-            :md-icon-name "zmdi-speaker" 
-            :on-click #(audio/stop-audio)
-            :style
-            {;:margin-top "4px"
-             :position  "fixed"
-             :left      138
-             :bottom    0
-             :color     "red"
-             :font-size "22px"}])
-         (when @(ut/tracked-subscribe_ [::audio/recording?])
-           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-mic" :style
-            {;:margin-top "-0px"
-             :position  "fixed"
-             :left      161
-             :bottom    0
-             :color     "red"
-             :font-size "22px"}])
-         [re-com/h-box :size "none" :gap "8px" :style
-          {:position    "fixed"
-           :left        138
-           :bottom      0
-           :z-index 99999999999
-           ;:background-color "#000000"
-           :font-weight 700
-           :color       (if (not online?) "#ffffff" "#ffffff77")
-           :font-family (theme-pull :theme/monospaced-font nil)} :children
-          [[re-com/box
-            :size "none"
-            ;; :style {:z-index 99999999999
-            ;;         :background-color "#000000"}
-            :child (str (get websocket-status :waiting -1)
-                        (str ", " (ut/nf (count server-subs)))
-                        (str ", " (ut/nf (count things-running)))
-                        (when (not online?) " (RVBBIT server is offline)"))]
-           (when (ut/ne? flow-watcher-subs-grouped)
-             [re-com/h-box :style {:padding-left "10px" :font-size "12px"} :gap "8px" :children
-              (for [[kk cnt] flow-watcher-subs-grouped]
-                [re-com/h-box :style
-                 {:background-color (theme-pull :theme/editor-outer-rim-color nil)
-                  :padding-left     "6px"
-                  :border-radius    "5px 5px 0px 0px"
-                  :padding-right    "6px"
-                  :color            (theme-pull :theme/editor-background-color nil)} :gap "5px" :children
-                 [[re-com/box :child (str kk)] [re-com/box :style {:opacity 0.5} :child (str cnt)]
-                  [re-com/md-icon-button :md-icon-name "zmdi-close" :style
-                   {:cursor "pointer" :color "white" :font-size "15px" :height "10px" :margin-top "-3px"} :on-click
-                   #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
-                        (ut/tracked-dispatch [::wfx/request :default
-                                              {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
-                                               :timeout 50000}]))]]])])]]
-         (let [mem @(ut/tracked-subscribe_ [::bricks/memory])]
-           [re-com/box :size "none" :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"} :child
-            (str (ut/bytes-to-mb (get mem 1))
-                 ;;(str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")")
-                 )])
-         [bricks/reecatch [task-bar]]
-         (when console? [bricks/reecatch [quake-console ww]])
-         [bricks/reecatch [flows/alert-box]]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-labels" :tooltip "toggle display mode" :on-click
-           #(ut/tracked-dispatch [::bricks/toggle-no-ui]) :style
-           {:color        "#ffffff"
-            :cursor       "pointer"
-            :opacity      (if @(ut/tracked-sub ::bricks/full-no-ui? {}) 1.0 0.3)
-            :margin-top   "-2px"
-            :padding-left "2px"
-            :font-size    "15px"}] :width "20px" :height "20px" :style
-          {:position "fixed" :z-index 98 :bottom 0 :right 49 :background-color "#00000022" :color "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button
-           :src (at)
-           :md-icon-name "zmdi-refresh"
-           :tooltip "refresh all"
-           :on-click #(do (ut/tracked-dispatch [::bricks/refresh-all]))
-           :style {:color "#ffffff" 
-                   :cursor "pointer" 
-                   :margin-top "-2px" 
-                   :padding-left "2px" 
-                   :font-size "15px"}] 
-          :width "20px" 
-          :height "20px" 
-          :style {:position "fixed" 
-                  :z-index 98 
-                  :bottom 0 
-                  :right 26 
-                  :background-color "#00000022" 
-                  :color "white"}]
-         [re-com/box :child
-          [re-com/md-icon-button :src (at) :md-icon-name "zmdi-save" :tooltip "save board (Ctrl-S)" :on-click
-           #(do (ut/tracked-dispatch [::http/save :skinny screen-name])) :style
-           {:color "#ffffff" :cursor "pointer" :margin-top "-2px" :padding-left "2px" :font-size "15px"}] :width "20px" :height
-          "20px" :style {:position "fixed" :z-index 98 :bottom 0 :right 3 :background-color "#00000022" :color "white"}]
-         (when (ut/ne? coords)
-           [:svg
-            {:style {:width          (px ww) ;"6200px" ;; big ass render nothing gets cut off
-                     :height         (px hh) ;"6200px"
+                                                                                        :width-int  :panel-width+100
+                                                                                        :height-int :panel-height+80
+                                                                                        :syntax     "clojure"}]}})
+                                          (let [default "new parameter value!" ;(if (nil? default) "new parameter
+                                                vv      @(ut/tracked-subscribe [::conn/clicked-parameter kp])
+                                                exists? (not (nil? vv))
+                                                _ (when (not exists?) (ut/tracked-dispatch [::conn/click-parameter kp default]))])))
+                                      #_{:clj-kondo/ignore [:unresolved-symbol]}
+                                      (.preventDefault %)))}
+       :size "1"
+       :width (px ww)
+       :height (px hh)
+       :child [re-com/v-box
+               :size "1"
+               :style (let [custom-map (theme-pull :theme/canvas-background-css nil)
+                            custom-map (when (map? custom-map) custom-map)
+                            cc         (str ;(ut/invert-hex-color
+                                        (theme-pull :theme/editor-outer-rim-color nil)
+                                        87)]
+                        (merge custom-map
+                               {:font-family (theme-pull :theme/base-font nil)
+                                :transition  "filter 4s ease-in-out"
+                                :filter      (when (not online?) "grayscale(100%)")}
+                               (when (or @bricks/dragging? @bricks/mouse-dragging-panel?) ;; editor? ;;(not
+                                 {:background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent
+                                                     "linear-gradient(0deg, "
+                                                     cc
+                                                     " 2px, transparent 8px), linear-gradient(90deg, "
+                                                     cc
+                                                     " 2px, transparent 8px)"
+                                                     (when (get custom-map :background-image) ", ")
+                                                     (get custom-map :background-image))
+                                  :background-size  (str "50px 50px, 50px 50px"
+                                                         (when (get custom-map :background-size) ", ")
+                                                         (get custom-map :background-size))})))
+               :children [[bricks/reecatch [tab-menu]]
+
+                          [bricks/reecatch [snapshot-menu]]
+
+                          (when @bricks/dragging-editor?
+                            [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
+
+                          (when session? [session-modal])
+
+                          (when doom? [doom-modal])
+
+                          (when (and editor? (not @bricks/mouse-dragging-panel?))
+                            [bricks/reecatch [editor-panel (get @editor-size 0) (get @editor-size 1)]])
+
+                          (when (or (and @bricks/dragging? (not @bricks/on-block?) (not @bricks/over-flow?)) @bricks/swap-layers?)
+                            [re-com/box :child " " :style
+                             {:background-color (str (theme-pull :theme/editor-background-color nil) 22) ;; "#00000022"
+                              :filter           "drop-shadow(16px 16px 20px red) invert(75%)"
+                              :position         "fixed"
+                              :left             (* (js/Math.floor (/ (first @db/context-modal-pos) db/brick-size)) db/brick-size)
+                              :top              (* (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size)) db/brick-size)} :width
+                             (px (* (get @bricks/dragging-body :w) db/brick-size)) :height
+                             (px (* (get @bricks/dragging-body :h) db/brick-size))])
+
+                          (when (and buffy? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [buffy/chat-panel]])
+
+                          (when flows? ;(and flows? (not @bricks/mouse-dragging-panel?))
+                            [bricks/reecatch [flows/flow-panel]])
+
+                          [bricks/reecatch [bricks/grid]]
+
+                          [bricks/reecatch [button-panels editor? lines? peek? auto-run? external? selected-block? online?
+                                            websocket-status server-subs things-running flow-watcher-subs-grouped
+                                            client-name screen-name]]
+
+                          [bricks/reecatch [task-bar]]
+
+                          (when console? [bricks/reecatch [quake-console ww]])
+
+                          (when (not alert-mute?) [bricks/reecatch [flows/alert-box]])
+
+                          (when (ut/ne? coords)
+                            [:svg
+                             {:style {:width          (px ww) ;"6200px" ;; big ass render nothing gets cut off
+                                      :height         (px hh) ;"6200px"
                      ;:pointer-events "none"
-                     :z-index        8}} 
-            (bricks/draw-lines coords)])]]])))
+                                      :z-index        8}}
+                             (bricks/draw-lines coords)])]]])))
 
 

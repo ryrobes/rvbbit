@@ -1101,37 +1101,41 @@
                       :on-success      [::success-http-save-csv]
                       :on-failure      [::failure-http-save-csv]}}))))
 
-(re-frame/reg-event-db ::failure-http-load-flowset
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :load-flowset])]
-                           (assoc-in db
-                             [:http-reqs :load-flowset] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+(re-frame/reg-event-db
+ ::failure-http-load-flowset
+ (undoable)
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flowset])]
+     (assoc-in db
+               [:http-reqs :load-flowset] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-http-load-flowset
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :load-flowset])
-                               new-db     (dissoc (get result :image) :resolved-queries)]
-                           (-> db
-                               (assoc-in [:http-reqs :load-flowset]
-                                         (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
-                               (assoc :query-history (get new-db :query-history))
-                               (ut/dissoc-in [:query-history :blocks-sys])
-                               (ut/dissoc-in [:query-history :fields-sys])
-                               (ut/dissoc-in [:query-history :tables-sys])
-                               (ut/dissoc-in [:query-history :files-sys])
-                               (ut/dissoc-in [:query-history :connections-sys])
-                               (assoc :runstreams (get new-db :runstreams))
-                               (assoc :runstream-drops (get new-db :runstream-drops))
-                               (assoc :panels (get new-db :panels))
-                               (assoc :tabs (get new-db :tabs))
-                               (assoc :snapshots (get new-db :snapshots))
-                               (assoc :selected-tab (get new-db :selected-tab))
-                               (assoc :selected-block "none!")
-                               (assoc :meta (get new-db :meta))
-                               (assoc :screen-name (get new-db :screen-name))
-                               (assoc :data (get new-db :data))
-                               (assoc :click-param (get new-db :click-param))))))
+(re-frame/reg-event-db
+ ::success-http-load-flowset
+ (undoable)
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flowset])
+         new-db     (dissoc (get result :image) :resolved-queries)]
+     (-> db
+         (assoc-in [:http-reqs :load-flowset]
+                   (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
+         (assoc :query-history (get new-db :query-history))
+         (ut/dissoc-in [:query-history :blocks-sys])
+         (ut/dissoc-in [:query-history :fields-sys])
+         (ut/dissoc-in [:query-history :tables-sys])
+         (ut/dissoc-in [:query-history :files-sys])
+         (ut/dissoc-in [:query-history :connections-sys])
+         (assoc :runstreams (get new-db :runstreams))
+         (assoc :runstream-drops (get new-db :runstream-drops))
+         (assoc :panels (get new-db :panels))
+         (assoc :tabs (get new-db :tabs))
+         (assoc :snapshots (get new-db :snapshots))
+         (assoc :selected-tab (get new-db :selected-tab))
+         (assoc :selected-block "none!")
+         (assoc :meta (get new-db :meta))
+         (assoc :screen-name (get new-db :screen-name))
+         (assoc :data (get new-db :data))
+         (assoc :click-param (get new-db :click-param))))))
 
 (re-frame/reg-event-fx
   ::load
@@ -1151,12 +1155,13 @@
                     :on-success      [::success-http-load-flowset]
                     :on-failure      [::failure-http-load-flowset]}})))
 
-(re-frame/reg-event-db ::failure-http-load-session
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :load-session])]
-                           (assoc-in db
-                             [:http-reqs :load-session] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+(re-frame/reg-event-db
+ ::failure-http-load-session
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-session])]
+     (assoc-in db
+               [:http-reqs :load-session] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
 (re-frame/reg-event-db
   ::success-http-load-session
@@ -1201,31 +1206,33 @@
 
 
 
-(re-frame/reg-event-db ::failure-http-load-flow
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :load-flow])]
-                           (assoc-in db
-                             [:http-reqs :load-flow] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+(re-frame/reg-event-db
+ ::failure-http-load-flow
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flow])]
+     (assoc-in db
+               [:http-reqs :load-flow] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-http-load-flow
-                       (fn [db [_ result]]
-                         (let [old-status           (get-in db [:http-reqs :load-flow])
-                               new-db               (get result :image)
-                               flowmaps             (get new-db :flowmaps)
-                               opts                 (get new-db :opts)
-                               flow-id              (get new-db :flow-id)
-                               coords               (get new-db :zoom db/based)
-                               _ (ut/tapp>> coords)
-                               flowmaps-connections (get new-db :flowmaps-connections)]
-                           (-> db
-                               (assoc :zoom-start coords)
-                               (assoc-in [:http-reqs :load-flow]
-                                         (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
-                               (assoc-in [:flows flow-id :map] flowmaps)
-                               (assoc-in [:flows flow-id :opts] opts)
-                               (assoc-in [:flows flow-id :connections] flowmaps-connections)
-                               (assoc :selected-flow flow-id)))))
+(re-frame/reg-event-db
+ ::success-http-load-flow
+ (fn [db [_ result]]
+   (let [old-status           (get-in db [:http-reqs :load-flow])
+         new-db               (get result :image)
+         flowmaps             (get new-db :flowmaps)
+         opts                 (get new-db :opts)
+         flow-id              (get new-db :flow-id)
+         coords               (get new-db :zoom db/based)
+         _ (ut/tapp>> coords)
+         flowmaps-connections (get new-db :flowmaps-connections)]
+     (-> db
+         (assoc :zoom-start coords)
+         (assoc-in [:http-reqs :load-flow]
+                   (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
+         (assoc-in [:flows flow-id :map] flowmaps)
+         (assoc-in [:flows flow-id :opts] opts)
+         (assoc-in [:flows flow-id :connections] flowmaps-connections)
+         (assoc :selected-flow flow-id)))))
 
 (re-frame/reg-event-fx
   ::load-flow
@@ -1296,26 +1303,28 @@
 
 
 
-(re-frame/reg-event-db ::failure-http-load-flow-alias
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :load-flow-alias])]
-                           (assoc-in db
-                             [:http-reqs :load-flow-alias] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+(re-frame/reg-event-db
+ ::failure-http-load-flow-alias
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flow-alias])]
+     (assoc-in db
+               [:http-reqs :load-flow-alias] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-http-load-flow-alias
-                       (fn [db [_ alias result]]
-                         (let [old-status           (get-in db [:http-reqs :load-flow-alias])
-                               new-db               (get result :image)
-                               flowmaps             (get new-db :flowmaps)
-                               flow-id              alias ;(get new-db :flow-id)
-                               flowmaps-connections (get new-db :flowmaps-connections)]
-                           (-> db
-                               (assoc-in [:http-reqs :load-flow-alias]
-                                         (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
-                               (assoc-in [:flows flow-id :map] flowmaps)
-                               (assoc-in [:flows flow-id :connections] flowmaps-connections)
-                               (assoc :selected-flow flow-id)))))
+(re-frame/reg-event-db
+ ::success-http-load-flow-alias
+ (fn [db [_ alias result]]
+   (let [old-status           (get-in db [:http-reqs :load-flow-alias])
+         new-db               (get result :image)
+         flowmaps             (get new-db :flowmaps)
+         flow-id              alias ;(get new-db :flow-id)
+         flowmaps-connections (get new-db :flowmaps-connections)]
+     (-> db
+         (assoc-in [:http-reqs :load-flow-alias]
+                   (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
+         (assoc-in [:flows flow-id :map] flowmaps)
+         (assoc-in [:flows flow-id :connections] flowmaps-connections)
+         (assoc :selected-flow flow-id)))))
 
 (re-frame/reg-event-fx
   ::load-flow-w-alias
@@ -1333,27 +1342,29 @@
                     :on-success      [::success-http-load-flow-alias alias]
                     :on-failure      [::failure-http-load-flow-alias]}})))
 
-(re-frame/reg-event-db ::failure-http-load-sub-flow
-                       (fn [db [_ file-path result]]
-                         (let [old-status (get-in db [:http-reqs :load-sub-flow])]
-                           (assoc-in db
-                             [:http-reqs :load-flowset] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+(re-frame/reg-event-db
+ ::failure-http-load-sub-flow
+ (fn [db [_ file-path result]]
+   (let [old-status (get-in db [:http-reqs :load-sub-flow])]
+     (assoc-in db
+               [:http-reqs :load-flowset] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-http-load-sub-flow
-                       (fn [db [_ file-path result]]
-                         (let [old-status           (get-in db [:http-reqs :load-sub-flow])
-                               new-db               (get result :image)
-                               flowmaps             (get new-db :flowmaps)
-                               flow-id              (get new-db :flow-id)
-                               flowmaps-connections (get new-db :flowmaps-connections)]
-                           (-> db
-                               (assoc-in [:http-reqs :load-sub-flow]
-                                         (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
-                               (assoc-in [:sub-flow-incoming :flow-id] flow-id)
-                               (assoc-in [:sub-flow-incoming :file-path] file-path)
-                               (assoc-in [:sub-flow-incoming :map] flowmaps)
-                               (assoc-in [:sub-flow-incoming :connections] flowmaps-connections)))))
+(re-frame/reg-event-db
+ ::success-http-load-sub-flow
+ (fn [db [_ file-path result]]
+   (let [old-status           (get-in db [:http-reqs :load-sub-flow])
+         new-db               (get result :image)
+         flowmaps             (get new-db :flowmaps)
+         flow-id              (get new-db :flow-id)
+         flowmaps-connections (get new-db :flowmaps-connections)]
+     (-> db
+         (assoc-in [:http-reqs :load-sub-flow]
+                   (merge old-status {:result result :ended-unix (.getTime (js/Date.)) :status "success"}))
+         (assoc-in [:sub-flow-incoming :flow-id] flow-id)
+         (assoc-in [:sub-flow-incoming :file-path] file-path)
+         (assoc-in [:sub-flow-incoming :map] flowmaps)
+         (assoc-in [:sub-flow-incoming :connections] flowmaps-connections)))))
 
 (re-frame/reg-event-fx
   ::load-sub-flow

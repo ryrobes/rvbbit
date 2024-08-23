@@ -615,6 +615,8 @@
  (fn [db {:keys [all?]}]
    (let [client-name             @(ut/tracked-sub ::client-name {})
          client-name-str         (cstr/replace (str client-name) ":" "")
+         base-subs               [(keyword (str "kit/kicks>" client-name-str)) ;; easy way to determine kick data per card slice
+                                  ]
          create-runner-listeners (fn [obody]
                                    (let [kps       (ut/extract-patterns obody :run-flow 2)
                                          logic-kps (into {}
@@ -808,7 +810,7 @@
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))
          subs-vec (vec (distinct
                         (remove nil? (concat flow-runners clover-solver-outputs chunk-charts @temp-extra-subs
-                                (when doom? [:time/minute])
+                                (when doom? [:time/minute]) base-subs 
                                      ;;client-namespaces-refs 
                                      ;;client-namespace-intros 
                                 client-ns-intro-map
@@ -1406,6 +1408,8 @@
 (re-frame/reg-event-db ::toggle-auto-run (fn [db [_]] (assoc-in db [:auto-run?] (not (get-in db [:auto-run?] false)))))
 
 (re-frame/reg-event-db ::toggle-no-ui (fn [db [_]] (assoc-in db [:no-ui?] (not (get-in db [:no-ui?] false)))))
+
+(re-frame/reg-event-db ::toggle-alert-mute (fn [db [_]] (assoc-in db [:alert-mute?] (not (get-in db [:alert-mute?] false)))))
 
 (re-frame/reg-event-db ::overwrite-theme
                        (undoable)
@@ -2012,10 +2016,13 @@
    (reset! db/cm-focused? false)
    (ut/tracked-dispatch [::toggle-quake-console-off])
 
-   (let [all-clear? (and (nil? (get db :selected-flow-block)) 
+   (let [all-clear? (and (nil? (get db :selected-flow-block))
                          (or (nil? (get db :selected-block)) (= (get db :selected-block) "none!"))
                          (nil? (get db :selected-cols)))]
       (cond
+        (get db :doom-modal? false) 
+        (assoc db :doom-modal? false)
+
         all-clear?
         (assoc db :doom-modal? true)
 
@@ -12525,9 +12532,10 @@
 
 (re-frame/reg-sub ::panel-px-height (fn [db [_ panel-key]] (* db/brick-size (get-in db [:panels panel-key :h]))))
 
-(re-frame/reg-sub ::panel-px-root
-                  (fn [db [_ panel-key]]
-                    (let [r (get-in db [:panels panel-key :root]) x (* db/brick-size (first r)) y (* db/brick-size (last r))] [x y])))
+(re-frame/reg-sub
+ ::panel-px-root
+ (fn [db [_ panel-key]]
+   (let [r (get-in db [:panels panel-key :root]) x (* db/brick-size (first r)) y (* db/brick-size (last r))] [x y])))
 
 (re-frame/reg-sub
  ::connection-id
@@ -12544,37 +12552,50 @@
  (fn [db {:keys [panel-key query-key]}]
    (get-in db [:panels panel-key :queries query-key :connection-id] (get-in db [:panels panel-key :connection-id]))))
 
-
-
 (re-frame/reg-sub ::panel-height (fn [db [_ panel-key]] (get-in db [:panels panel-key :h])))
 (re-frame/reg-sub ::panel-width (fn [db [_ panel-key]] (get-in db [:panels panel-key :w])))
-
 (re-frame/reg-sub ::panel-depth (fn [db [_ panel-key]] (get-in db [:panels panel-key :z] 0)))
 
-(re-frame/reg-event-db ::panel-depth-up
-                       (fn [db [_]]
-                         (let [panel-key (get db :selected-block)
-                               old-z     (get-in db [:panels panel-key :z] 0)]
-                           (assoc-in db [:panels panel-key :z] (+ old-z 1)))))
+(re-frame/reg-event-db
+ ::panel-depth-up
+ (fn [db [_]]
+   (let [panel-key (get db :selected-block)
+         old-z     (get-in db [:panels panel-key :z] 0)]
+     (assoc-in db [:panels panel-key :z] (+ old-z 1)))))
 
-(re-frame/reg-event-db ::panel-depth-down
-                       (fn [db [_]]
-                         (let [panel-key (get db :selected-block)
-                               old-z     (get-in db [:panels panel-key :z] 0)]
-                           (if (> old-z 0) (assoc-in db [:panels panel-key :z] (- old-z 1)) db))))
+(re-frame/reg-event-db
+ ::panel-depth-down
+ (fn [db [_]]
+   (let [panel-key (get db :selected-block)
+         old-z     (get-in db [:panels panel-key :z] 0)]
+     (if (> old-z 0) (assoc-in db [:panels panel-key :z] (- old-z 1)) db))))
 
-(re-frame/reg-sub ::panel-name (fn [db [_ panel-key]] (get-in db [:panels panel-key :name])))
+(re-frame/reg-sub 
+ ::panel-name 
+ (fn [db [_ panel-key]] 
+   (get-in db [:panels panel-key :name])))
 
-(re-frame/reg-sub ::ghosted? (fn [db [_ panel-key]] (if (get db :peek?) false (get-in db [:panels panel-key :ghosted?] false))))
+(re-frame/reg-sub 
+ ::ghosted? 
+ (fn [db [_ panel-key]] 
+   (if (get db :peek?) false 
+       (get-in db [:panels panel-key :ghosted?] false))))
 
-(re-frame/reg-sub ::un-fired-cross-breed?
-                  (fn [db [_ panel-key]]
-                    (true? (and (ut/ne? (get-in db [:panels panel-key :cross-breed]))
-                                (empty? (get-in db [:panels panel-key :cross-breed :children]))))))
+(re-frame/reg-sub
+ ::un-fired-cross-breed?
+ (fn [db [_ panel-key]]
+   (true? (and (ut/ne? (get-in db [:panels panel-key :cross-breed]))
+               (empty? (get-in db [:panels panel-key :cross-breed :children]))))))
 
-(re-frame/reg-sub ::no-ui?
-                  (fn [db [_ panel-key]]
-                    (if (get db :peek?) false (or (get db :no-ui? false) (get-in db [:panels panel-key :no-ui?] false)))))
+(re-frame/reg-sub
+ ::alert-mute?
+ (fn [db _]
+   (get db :alert-mute? false)))
+
+(re-frame/reg-sub
+ ::no-ui?
+ (fn [db [_ panel-key]]
+   (if (get db :peek?) false (or (get db :no-ui? false) (get-in db [:panels panel-key :no-ui?] false)))))
 
 (re-frame/reg-sub ::panel-style (fn [db [_ panel-key]] (if (get db :peek?) {} (get-in db [:panels panel-key :style] {}))))
 
@@ -12596,7 +12617,6 @@
                                              (if (= u kk)
                                                (downstream-map k kk subq-map (+ 1 idx) (conj final {:d idx :p k}))
                                                (conj final {:d idx :p k})))))))))))
-
 
 (def warp-hole (reagent/atom false))
 
@@ -13462,27 +13482,30 @@
                                            (if selected?
                                              "scale(0.7)"
                                              "scale(0.7)")
-                                           (when (and audio-playing? (= brick-vec-key @db/speaking))
-                                             (let [audio-diff (- (get @db/audio-data2 brick-vec-key)
-                                                                 (get @db/audio-data brick-vec-key))
-                                                   jiggle-x (* audio-diff 1.6)  ; Adjust multiplier for more/less horizontal movement
-                                                   jiggle-y (* audio-diff 1.1)  ; Adjust multiplier for more/less vertical movement
-                                                   rotation (* audio-diff 5)]  ; Adjust multiplier for more/less rotation
-                                               (str "translate(" jiggle-x "px, " jiggle-y "px) "
-                                                    "rotate(" rotation "deg)"))))
+                                          ;;  (when (and audio-playing? (= brick-vec-key @db/speaking))
+                                          ;;    (let [audio-diff (- (get @db/audio-data2 brick-vec-key)
+                                          ;;                        (get @db/audio-data brick-vec-key))
+                                          ;;          jiggle-x (* audio-diff 1.6)  ; Adjust multiplier for more/less horizontal movement
+                                          ;;          jiggle-y (* audio-diff 1.1)  ; Adjust multiplier for more/less vertical movement
+                                          ;;          rotation (* audio-diff 5)]  ; Adjust multiplier for more/less rotation
+                                          ;;      (str "translate(" jiggle-x "px, " jiggle-y "px) "
+                                          ;;           "rotate(" rotation "deg)")))
+                                           )
                               :transform-style "preserve-3d" ;; important for tab embedding!
                               :box-shadow (when (= brick-vec-key @db/speaking)
                                             (let [block-id       brick-vec-key ;:audio
                                                   talking-block? true]
                                               (cond (and audio-playing? talking-block?)
-                                                    ;; (str
-                                                    ;;  "1px 1px " (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
-                                                    ;;  " "        (theme-pull :theme/editor-outer-rim-color nil))
-                                                    (str "1px 1px " (px (* 90
-                                                                           (+ 0.1
-                                                                              (- (get @db/audio-data2 block-id)
-                                                                                 (get @db/audio-data block-id)))))
-                                                      " "  (theme-pull :theme/universal-pop-color nil))
+                                                    (str
+                                                     "1px 1px " 
+                                                     ;"1px " (px (* 10 (+ 0.1 (get @db/audio-data block-id)))) " " 
+                                                     (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
+                                                     " "        (theme-pull :theme/editor-outer-rim-color nil))
+                                                    ;; (str "1px 1px " (px (* 70
+                                                    ;;                        (+ 0.1
+                                                    ;;                           (- (get @db/audio-data2 block-id)
+                                                    ;;                              (get @db/audio-data block-id)))))
+                                                    ;;   " "  (theme-pull :theme/universal-pop-color nil))
 
                                                     :else                               "none")))
                               :transition "border 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out"

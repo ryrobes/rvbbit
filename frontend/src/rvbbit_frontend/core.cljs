@@ -58,6 +58,7 @@
                              [[::bricks/toggle-flow] [{:keyCode 32 :shiftKey false :ctrlKey true}]] ; space
                              [[::bricks/next-panel] [{:keyCode 9}]] ; tab
                              [[::bricks/toggle-kick-alert] [{:keyCode 75}]] ; k
+                             [[::bricks/toggle-alert-mute] [{:keyCode 77}]] ; m
                              [[::bricks/toggle-peek] [{:keyCode 80}]] ; p
                              [[::bricks/toggle-lines] [{:keyCode 76}]] ; l
                              [[::bricks/toggle-auto-run] [{:keyCode 79}]] ; O
@@ -195,18 +196,17 @@
       ;;  :event [::bricks/update-reco-previews]
       ;;  :dispatch-event-on-start? false}
 
-      {:interval 1 
-       :event [::bricks/update-conditionals] 
-       :poll-when [::bricks/visible-conditionals?]
-       :dispatch-event-on-start? false}
+      ;; {:interval 1 
+      ;;  :event [::bricks/update-conditionals] 
+      ;;  :poll-when [::bricks/visible-conditionals?]
+      ;;  :dispatch-event-on-start? false}
       
       {:interval                 4
        :event                    [::bricks/refresh-status]
        :poll-when                [::bricks/bg-status?] ;; @db/editor-mode
        :dispatch-event-on-start? false}]]))
 
-(defn ^:dev/after-load mount-root
-  []
+(defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
   (let [root-el (.getElementById js/document "app")]
     (rdom/unmount-component-at-node root-el)
@@ -226,15 +226,15 @@
                          :on-timeout  [::http/timeout-response [:boot :get-settings]]
                          :timeout     15000}])
   (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :signals-map :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                        {:message     {:kind :signals-map :client-name client-name}
                          :on-response [::signals/signals-map-response]
                          :timeout     15000000}])
   (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :rules-map :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                        {:message     {:kind :rules-map :client-name client-name}
                          :on-response [::signals/rules-map-response]
                          :timeout     15000000}])
   (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :solvers-map :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                        {:message     {:kind :solvers-map :client-name client-name}
                          :on-response [::signals/solvers-map-response]
                          :timeout     15000000}])
   (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
@@ -247,8 +247,11 @@
   ;;   (.addEventListener js/window "keydown" press-fn)
   ;;   (.addEventListener js/window "keyup" release-fn))
   (ut/tracked-dispatch
-    [::wfx/request :default
-     {:message {:kind :session-snaps :client-name client-name} :on-response [::bricks/save-sessions] :timeout 15000}])
+   [::wfx/request :default
+    {:message {:kind :session-snaps
+               :client-name client-name}
+     :on-response [::bricks/save-sessions]
+     :timeout 15000}])
   (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
         base-dir "./screens/"]
     (if (>= (count url-vec) 1) ;; if we have a url with a flowset, load that, oitherwise load
@@ -257,7 +260,7 @@
                             {:message     {:kind :get-settings :client-name client-name}
                              :on-response [::http/simple-response-boot]
                              :on-timeout  [::http/timeout-response [:boot :get-settings]]
-                             :timeout     15000}])))
+                             :timeout     25000}])))
   (http/start-listening-to-url-changes)
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])

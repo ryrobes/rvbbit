@@ -765,15 +765,14 @@
   ;;                     (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
   ;;                  "Restart Websocket Server, Test Debug" (* 3600 6))
 
-  (start-scheduler 15
-                   #(let [dbs (wss/database-sizes)]
-                      (qp/update-queue-stats-history) ;; has it's own timestamp key
-                      (doseq [[db dbv] dbs]
-                        (swap! wss/sql-metrics assoc db
-                               (conj (get @wss/sql-metrics db [])
-                                     dbv))))
-                   "Simple SQLite Db Stats" 60)
-
+  ;; (start-scheduler 15
+  ;;                  #(let [dbs (wss/database-sizes)]
+  ;;                     (qp/update-queue-stats-history) ;; has it's own timestamp key
+  ;;                     (doseq [[db dbv] dbs]
+  ;;                       (swap! wss/sql-metrics assoc db
+  ;;                              (conj (get @wss/sql-metrics db [])
+  ;;                                    dbv))))
+  ;;                  "Simple SQLite Db Stats" 60)
 
   (start-scheduler 15
                    #(let [pst (wss/query-pool-sizes)]
