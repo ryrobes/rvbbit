@@ -197,18 +197,18 @@
                                             :output :kit-map
                                             :icon-location :card ;; :card, :canvas 
                                             :tooltip "Lundberg me."
-                                            :kit-expr (let [kit-map {:push-alerts {:body [:box 
-                                                                                         :style {:font-size "33px" :color "orange"}
-                                                                                         :child "Yeaaahhhhh... about that."] 
+                                            :kit-expr (let [kit-map {:push-alerts {:body [:box
+                                                                                          :style {:font-size "33px" :color "orange"}
+                                                                                          :child "Yeaaahhhhh... about that."]
                                                                                    :w 15
                                                                                    :seconds 60}
                                                                      :push-assocs {[:panels :panel-key :views :data-key]
-                                                                                  [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
-                                                                                         :style {:width "100%"
-                                                                                                 :padding "5px"
-                                                                                                 :border-radius "20px"
-                                                                                                 :height "100%"
-                                                                                                 :object-fit "cover"}}]}
+                                                                                   [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
+                                                                                          :style {:width "100%"
+                                                                                                  :padding "5px"
+                                                                                                  :border-radius "20px"
+                                                                                                  :height "100%"
+                                                                                                  :object-fit "cover"}}]}
                                                                      :view-lundberg {:description "please get to work..."
                                                                                      :options {:pages? true :search? false :actions? false}
                                                                                      :parameters {}
@@ -216,7 +216,41 @@
                                                                                      :data []}}]
                                                         kit-map)
                                             ;:icon "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6aKuMo6Dao0FOSWXYczr9-cWeMw3APvo2yw&s"
-                                            :icon "zmdi-pizza"}}}
+                                            :icon "zmdi-pizza"}
+                            :gen-ev {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                                (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
+                                                                         :when (get v :queries)]
+                                                                     (for  [kk (keys (get v :queries))]
+                                                                       [k :queries kk])))))
+                                     :output :kit-map
+                                     :icon-location :card ;; :card, :canvas 
+                                     :tooltip "generate some shit."
+                                     :kit-expr (let [fabric-data (rvbbit-backend.websockets/fabric-run
+                                                                  {:input "Create me a new and interesting dashboard with the given SQL metadata and the dashboard examples to learn the dashboard DSL and present it in the necessary way"
+                                                                   :client-name :*client-name
+                                                                   :id :*id
+                                                                   :context ""
+                                                                   :runner :*runner
+                                                                   :pattern "clover-canvas"
+                                                                   :model "claude-3-5-sonnet-20240620"
+                                                                   ;:model "gpt-4o"
+                                                                   })
+                                                     _ (rvbbit-backend.util/pp fabric-data)
+                                                     ;;fabric-data2 (rvbbit-backend.websockets/parse-text-and-code fabric-data)
+                                                     clover-map (clojure.edn/read-string (clojure.string/join "\n" (flatten fabric-data))) 
+                                                     kit-map {:push-alerts {:body [:box
+                                                                                   :child [:speak "dashboard time!"]]
+                                                                            :seconds 10}
+                                                              :push-assocs clover-map
+                                                              :gen-ev {:description "please get to work..."
+                                                                              :options {:pages? true :search? false :actions? false}
+                                                                              :parameters {}
+                                                                              :mutates {}
+                                                                              :data []}}]
+                                                 (rvbbit-backend.util/pp clover-map)
+                                                 kit-map)
+                                            ;:icon "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6aKuMo6Dao0FOSWXYczr9-cWeMw3APvo2yw&s"
+                                     :icon "zmdi-car"}}}
 
            :fabric {:type :nrepl
                     :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 

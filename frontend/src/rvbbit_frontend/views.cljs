@@ -4889,8 +4889,8 @@
                          :transition "all 0.3s ease"
                          :text-shadow "2px 1px 3px #000000"
                          :color "#ffffff99"}
-                 :child (if @db/bar-hover-text 
-                          @db/bar-hover-text memory)]
+                 :child (str (if @db/bar-hover-text 
+                          @db/bar-hover-text memory))]
                 right]]))
 
 
