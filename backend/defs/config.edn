@@ -131,7 +131,92 @@
                      :pattern-hint "This is a standard Clojure REPL block. It executes Clojure code and returns the result in an arbitrary nREPL server of the users choosing. 
                                     Since this system is EDN based, all code has to be wrapped in a (do ..) form in order to be evaluated as a single expression. If a user-provided do block already exists, just use it, do not double wrap it - a single parent (do ...) form is all that is needed.
                                     Being saved in EDN also means that it cannot use Clojure artifacts that are invalid EDN - so, do not use the shorthand for anon functions (#(this %)), or shorthand atom derefs (@atom), or shortcode sets (#{}) always use the full for version for these things - instead w/o the special characters (deref, set, (fn[x]...))."
-                     :icon "images/clojure-alt.svg"}
+                     :icon "images/clojure-alt.svg"
+                     :kits {:export-to-csv {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                                       (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
+                                                                                :when (get v :queries)]
+                                                                            (for  [kk (keys (get v :queries))]
+                                                                              [k :queries kk])))))
+                                            :output :kit-map
+                                            :icon-location :card ;; :card, :canvas 
+                                            :tooltip "Export a rowset to CSV"
+                                            :kit-expr (do
+                                                        (require '[cognitect.transit :as transit]
+                                                                 '[clojure.data.csv :as csv]
+                                                                 '[clojure.java.io :as io])
+
+                                                        (let [transit-file :transit-rowset
+                                                              data-key :data-key
+                                                              panel-key :panel-key
+                                                              output-file (-> (str "/tmp/" data-key "_" panel-key ".csv")
+                                                                              (cstr/replace ":" ""))
+                                                              [finished-output-file
+                                                               rowcount] (let [transit-data (with-open [in (io/input-stream transit-file)]
+                                                                                              (let [reader (transit/reader in :msgpack)]
+                                                                                                (transit/read reader)))]
+                                                                                    ;; Convert to CSV
+                                                                           (when (seq transit-data)
+                                                                             (let [headers (keys (first transit-data))
+                                                                                   rows (map (fn [x] (map x headers)) transit-data)]
+                                                                                        ;; Write CSV file
+                                                                               (with-open [writer (io/writer output-file)]
+                                                                                 (csv/write-csv writer (cons headers rows)))))
+                                                                                    ;; Return the path of the created file
+                                                                           [output-file (count transit-data)])
+                                                              kit-map {:alert-push {:body (str output-file) :seconds 60}
+                                                                       :export-to-csv {:description "export to csv output"
+                                                                                       :options {:pages? true :search? false :actions? false}
+                                                                                       :parameters {}
+                                                                                       :mutates {}
+                                                                                       :data [{:name (str "csv export of " data-key " in " panel-key)
+                                                                                               :parameters {}
+                                                                                               :step-mutates {}
+                                                                                               :ask-mutates {}
+                                                                                               :content [[:v-box
+                                                                                                          :size "auto"
+                                                                                                          :width "490px"
+                                                                                                          :style {:border [:string3 "3px solid " :theme/editor-outer-rim-color]
+                                                                                                                  :border-radius "14px"}
+                                                                                                          :padding "10px"
+                                                                                                          :gap "5px"
+                                                                                                          :children [(str finished-output-file)
+                                                                                                                     (str rowcount " rows exported")
+                                                                                                                     [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
+                                                                                                                            :style {:width "100%"
+                                                                                                                                    :padding "5px"
+                                                                                                                                    :border-radius "14px"
+                                                                                                                                    :height "100%"
+                                                                                                                                    :object-fit "cover"}}]]]]}]}}]
+                                                          kit-map))
+                                            :icon "fa-solid fa-file-export"}
+                            :view-lundberg {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                                       (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
+                                                                                :when (get v :views)]
+                                                                            (for  [kk (keys (get v :views))]
+                                                                              [k :views kk])))))
+                                            :output :kit-map
+                                            :icon-location :card ;; :card, :canvas 
+                                            :tooltip "Lundberg me."
+                                            :kit-expr (let [kit-map {:push-alerts {:body [:box 
+                                                                                         :style {:font-size "33px" :color "orange"}
+                                                                                         :child "Yeaaahhhhh... about that."] 
+                                                                                   :w 15
+                                                                                   :seconds 60}
+                                                                     :push-assocs {[:panels :panel-key :views :data-key]
+                                                                                  [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
+                                                                                         :style {:width "100%"
+                                                                                                 :padding "5px"
+                                                                                                 :border-radius "20px"
+                                                                                                 :height "100%"
+                                                                                                 :object-fit "cover"}}]}
+                                                                     :view-lundberg {:description "please get to work..."
+                                                                                     :options {:pages? true :search? false :actions? false}
+                                                                                     :parameters {}
+                                                                                     :mutates {}
+                                                                                     :data []}}]
+                                                        kit-map)
+                                            ;:icon "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6aKuMo6Dao0FOSWXYczr9-cWeMw3APvo2yw&s"
+                                            :icon "zmdi-pizza"}}}
 
            :fabric {:type :nrepl
                     :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
@@ -159,7 +244,7 @@
                     :icon "images/fbc-logo.gif"}
 
            :outliers {:type :nrepl
-                      :runner {:port 45999 :host "127.0.0.1"} 
+                      :runner {:port 45999 :host "127.0.0.1"}
                       :modes [:text :clover :data :terminal]
                       :hop-bar? false ;; only used for the kit runner menu on query slice panels 
                       :slice-bar? false
@@ -179,6 +264,8 @@
                                                                             (for  [kk (keys (get v :queries))]
                                                                               [k :queries kk])))))
                                             :output :kit-map
+                                            :icon-location :query ;; :card, :canvas 
+                                            :tooltip "Run a dimensional outlier analysis on a SQL rowset (offline, NOT on the db host)"
                                             :kit-view-opts {:max-combos 4 ;; will be applied, client-side when view starts up
                                                             :dimensions-to-scan []}
                                             :kit-view-exprs [(let [panel-key :panel-key  ;; function "view" runs in the host nrepl
@@ -188,13 +275,13 @@
                                                                                          (get query-meta :fields)
                                                                                          :when group-by?] k))
                                                                    dimensions-to-scan (keyword (str (cstr/replace (str panel-key) ":" "") "/dimensions-to-scan"))]
-                                                               [:v-box 
+                                                               [:v-box
                                                                 :size "auto"
                                                                 :align :center
                                                                 :padding "6px"
                                                                 :gap "10px"
                                                                 :children
-                                                                [[:box :child "dimensional outliers options" 
+                                                                [[:box :child "dimensional outliers options"
                                                                   :style {:font-weight 700
                                                                           :font-size "45px"
                                                                           :color "orange"
@@ -214,10 +301,10 @@
                                                                                        :font-size "18px" :cursor "pointer"}
                                                                                :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])]
                                                                  [:box :child "max dimension combos to run"]
-                                                                 [:h-box 
+                                                                 [:h-box
                                                                   :gap "10px"
                                                                   :children [[:slider :max-combos 2 10 1 200 max-combos]
-                                                                                    [:box :child [:string3 max-combos]]]]
+                                                                             [:box :child [:string3 max-combos]]]]
                                                                  [:h-box
                                                                   ;:justify :between
                                                                   :style {:font-size "33px"

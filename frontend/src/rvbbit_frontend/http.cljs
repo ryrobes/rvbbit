@@ -268,15 +268,25 @@
   (when (and ;(= (first (get result :ui-keypath)) :reeco-status)
           (= task-id :reco)
           (= (get result :status) :done))
-    (swap! db/context-box assoc
-      (last (get result :ui-keypath))
-      (str "shapes: found " (ut/nf reco-count) " viz suggestions in ~" ms " secs")))
+    
+    ;; (swap! db/context-box assoc
+    ;;   (last (get result :ui-keypath))
+    ;;   (str "shapes: found " (ut/nf reco-count) " viz suggestions in ~" ms " secs"))
+    (ut/tracked-dispatch [::insert-alert [:box 
+                                          :style {:font-size "20px"}
+                                          :child (str "viz shapes: found " (ut/nf reco-count) " viz suggestions in ~" ms " secs")] 12 nil 5])
+    
+    )
   
   (when (and (= task-id :outliers) ;;(not (= task-id :reco))
              (= (get result :status) :done))
-    (swap! db/context-box assoc
-      (last (get result :ui-keypath))
-      (str task-id " - " (ut/nf reco-count) " results in ~" ms " secs"))))
+    
+    ;; (swap! db/context-box assoc
+    ;;   (last (get result :ui-keypath))
+    ;;   (str task-id " - " (ut/nf reco-count) " results in ~" ms " secs"))
+    (ut/tracked-dispatch [::insert-alert (str task-id " - " (ut/nf reco-count) " results in ~" ms " secs") 10 nil 5])
+    
+    ))
 
 (re-frame/reg-event-db ::refresh-kits (fn [db [_]] (ut/dissoc-in db [:query-history :kit-results-sys])))
 
@@ -572,7 +582,8 @@
               kit-view-remove?            (= task-id :kit-view-remove)
               signals-file?               (= task-id :signals-file)
               solvers-file?               (= task-id :solvers-file)
-              materialized-pct?            (= task-id :materialized-pct)
+              push-assocs?                (= task-id :push-assocs)
+              materialized-pct?           (= task-id :materialized-pct)
               alert?                      (cstr/starts-with? (str task-id) ":alert")
               server-sub?                 (and kick? ;; likely already batched and applied above, but just in case somehow
                                                (contains? db/reactor-types (get-in result [:task-id 0]))
@@ -642,7 +653,14 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
-            
+
+            push-assocs? (let [kp-value-map (get result :status)]
+                           (reduce-kv
+                            (fn [db keypath value]
+                              (assoc-in db keypath value))
+                            db
+                            kp-value-map))
+
             materialized-pct? (assoc-in db [:mat-pct ui-keypath] (get result :status))
 
             (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
@@ -662,13 +680,13 @@
                                     (get-in result [:status :evald-result :value 0]))
                           (assoc-in [:panels (get-in result [:ui-keypath 1]) :selected-view]
                                     :_kvw1))
-            
+
             push-query? (let [panel-key (get-in result [:ui-keypath 1])
                               q-name (ut/safe-key (get-in result [:ui-keypath 2]))]
                           (ut/tapp>> [:push-query q-name panel-key (get-in result [:status])])
                           (-> db
                               (assoc-in [:panels panel-key :queries q-name] (get-in result [:status]))
-                              (assoc-in [:panels panel-key :selected-view] q-name)))            
+                              (assoc-in [:panels panel-key :selected-view] q-name)))
 
             new-slice?    (let [kp [:panels (get-in result [:ui-keypath 0]) (get-in result [:status 0]) (get-in result [:status 1])]
                                 query-map (get-in result [:status 2])]

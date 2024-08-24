@@ -4573,14 +4573,15 @@
                                                                            :on-mouse-out #(reset! hover-text nil)}
                                                                     :child "🐊🇺🇸"]]]]]]]]]]))})))
 
-(def bar-hover-text (reagent/atom nil))
 
-(defn custom-icon-button [{:keys [icon-name tooltip on-click active? color]}]
+
+(defn custom-icon-button [{:keys [icon-name tooltip on-click active? color class]}]
   (let [hovered? (reagent/atom false)]
-    (fn [{:keys [icon-name tooltip on-click active? color]}]
+    (fn [{:keys [icon-name tooltip on-click active? class color]}]
       [re-com/md-icon-button
        :src (at)
        :md-icon-name icon-name
+       :class class
        :on-click (fn [e]
                    (on-click e)
                    (reset! hovered? false))  ; Reset hover state after click
@@ -4590,6 +4591,7 @@
                :width "35px"
                :height "28px"
                :cursor "pointer"
+               :z-index (when @db/bar-hover-text 99999999)
                ;:border-radius (when (= icon-name "zmdi-labels") "20px 0px 0px 0px") 
                :text-shadow "2px 1px 3px #000000"
                :filter "drop-shadow(2px 1px 3px #000000)"
@@ -4600,10 +4602,10 @@
                :transition "all 0.3s ease"}
        :attr {:on-mouse-over (fn []
                                (reset! hovered? true)
-                               (reset! bar-hover-text tooltip))
+                               (reset! db/bar-hover-text tooltip))
               :on-mouse-out (fn []
                               (reset! hovered? false)
-                              (reset! bar-hover-text nil))}])))
+                              (reset! db/bar-hover-text nil))}])))
 
 (defn custom-text-display [{:keys [text tooltip color on-click]}]
   (let [hovered? (reagent/atom false)]
@@ -4611,10 +4613,10 @@
       [re-com/box
        :attr {:on-mouse-over (fn []
                                (reset! hovered? true)
-                               (reset! bar-hover-text tooltip))
+                               (reset! db/bar-hover-text tooltip))
               :on-mouse-out (fn []
                               (reset! hovered? false)
-                              (reset! bar-hover-text nil))
+                              (reset! db/bar-hover-text nil))
               :on-click (when on-click
                           (fn [e]
                             (on-click e)
@@ -4626,6 +4628,7 @@
                :min-width "35px"
                :height "28px"
                :font-weight 700
+               :z-index (when @db/bar-hover-text 99999999)
                ;:display "inline-flex"
                ;:align-items "center"
                ;:justify-content "center"
@@ -4640,7 +4643,50 @@
        :child [:span text]])))
 
 
-
+(defn kit-canvas-icons [panel-key query-key]
+  (let [valid-kits  @(ut/tracked-subscribe [::bricks/valid-kits-for {:panel-key panel-key :data-key query-key}])
+        ;;_ (tapp>>  [:valid-kits valid-kits])
+        block-runners  @(ut/tracked-sub ::bricks/block-runners {})
+        client-name    @(ut/tracked-sub ::bricks/client-name {})]
+    (vec (for [e valid-kits
+               :let [icon (get-in block-runners [(first e) :kits (last e) :icon])
+                     tooltip (str (get-in block-runners [(first e) :kits (last e) :tooltip] "(missing tooltip)"))
+                     kit-runner-key (str "kit-runner" (hash (str client-name panel-key query-key (first e) (last e))))
+                     running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
+                     output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
+                     running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                     trig!        [@bricks/waiting?]
+                     class        (cond
+                                    running? "rotate linear infinite"
+                                    (get @bricks/waiting? kit-runner-key) "rotate-reverse linear infinite"
+                                    :else "")]]
+           [custom-icon-button
+            {:icon-name icon ;;(if lines? "zmdi-layers" "zmdi-layers-off")
+             :tooltip tooltip
+             :class class
+             :on-click (fn []
+                         (when (not running?)
+                           (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
+                           (swap! bricks/waiting? assoc kit-runner-key true)
+                           (swap! bricks/temp-extra-subs conj running-key)
+                           (swap! bricks/temp-extra-subs conj output-key)
+                           (swap! db/kit-fn-lookup assoc [panel-key query-key] running-key)
+                           (let [fstr (str "kit-runner " kit-runner-key)
+                                 w    (/ (count fstr) 4.1)]
+                             (ut/tracked-dispatch
+                              [::wfx/push   :default
+                               {:kind       :run-kit
+                                :kit-keypath e
+                                :kit-runner-key kit-runner-key
+                                :panel-key   panel-key
+                                :data-key    query-key
+                                :runner      :queries
+                                :client-name client-name
+                                :ui-keypath     [:panels panel-key :queries query-key]}])
+                             (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                             (ut/tapp>> [:clicked-kit running-key])
+                             (js/setTimeout #(swap! bricks/waiting? assoc kit-runner-key false) 5000))))
+             :active? false}]))))
 
 
 (defn button-panels [editor? lines? peek? auto-run? external? selected-block? online?
@@ -4651,107 +4697,109 @@
                       :z-index 98
                       :bottom 0
                       :left 0
-                      :background-color (when @bar-hover-text 
+                      :background-color (when @db/bar-hover-text 
                                           ;;"#00000099"
                                           (theme-pull :theme/base-block-color "#00000099")
                                           )
-                      :backdrop-filter (when @bar-hover-text "blur(4px) brightness(0.35)")
+                      :backdrop-filter (when @db/bar-hover-text "blur(4px) brightness(0.35)")
                      ; :background-color "#00000022"
                       :color "white"}
               ;:gap "5px"
               :height "28px"
-              :children [
-                         [custom-icon-button
-                          {:icon-name (if lines? "zmdi-layers" "zmdi-layers-off")
-                           :tooltip "show lineage / sub-query lines? (L)"
-                           :on-click #(ut/tracked-dispatch [::bricks/toggle-lines])
-                           :active? lines?}]
+              :children (into
+                         [[custom-icon-button
+                           {:icon-name (if lines? "zmdi-layers" "zmdi-layers-off")
+                            :tooltip "show lineage / sub-query lines? (L)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-lines])
+                            :active? lines?}]
 
-                         [custom-icon-button
-                          {:icon-name (if peek? "zmdi-eye" "zmdi-eye-off")
-                           :tooltip "toggle peek mode (P)"
-                           :on-click #(ut/tracked-dispatch [::bricks/toggle-peek])
-                           :active? peek?}]
+                          [custom-icon-button
+                           {:icon-name (if peek? "zmdi-eye" "zmdi-eye-off")
+                            :tooltip "toggle peek mode (P)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-peek])
+                            :active? peek?}]
 
-                         [custom-icon-button
-                          {:icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off")
-                           :tooltip "toggle auto-refresh (O)"
-                           :on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])
-                           :active? auto-run?}]
+                          [custom-icon-button
+                           {:icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off")
+                            :tooltip "toggle auto-refresh (O)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])
+                            :active? auto-run?}]
 
-                         [custom-icon-button
-                          {:icon-name "zmdi-developer-board"
-                           :tooltip "toggle external editing"
-                           :on-click #(ut/tracked-dispatch [::bricks/toggle-external])
-                           :active? external?
-                           :color (if external? "red" "#ffffff")}]
+                          [custom-icon-button
+                           {:icon-name "zmdi-developer-board"
+                            :tooltip "toggle external editing"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-external])
+                            :active? external?
+                            :color (if external? "red" "#ffffff")}]
 
-                         (when selected-block?
-                           [custom-icon-button
-                            {:icon-name "zmdi-close"
-                             :tooltip "un-select block (ESC)"
-                             :on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])
-                             :active? selected-block?}])
+                          (when selected-block?
+                            [custom-icon-button
+                             {:icon-name "zmdi-close"
+                              :tooltip "un-select block (ESC)"
+                              :on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])
+                              :active? selected-block?}])
 
-                         [custom-text-display
-                          {:text (str (get websocket-status :waiting -1))
-                           :tooltip "websocket requests waiting (sql queries, etc)"}]
+                          [custom-text-display
+                           {:text (str (get websocket-status :waiting -1))
+                            :tooltip "websocket requests waiting (sql queries, etc)"}]
 
-                         [custom-text-display
-                          {:text (ut/nf (count server-subs))
-                           :tooltip "active reactor subscriptions"}]
+                          [custom-text-display
+                           {:text (ut/nf (count server-subs))
+                            :tooltip "active reactor subscriptions"}]
 
-                         [custom-text-display
-                          {:text (ut/nf (count things-running))
-                           :tooltip "active running (solvers, flows, etc)"}]
+                          [custom-text-display
+                           {:text (ut/nf (count things-running))
+                            :tooltip "active running (solvers, flows, etc)"}]
 
-                         (when (not online?)
-                           [custom-text-display
-                            {:text "RVBBIT server is offline"
-                             :tooltip "RVBBIT server is offline"}])
+                          (when (not online?)
+                            [custom-text-display
+                             {:text "RVBBIT server is offline"
+                              :tooltip "RVBBIT server is offline"}])
 
-                         (when (ut/ne? flow-watcher-subs-grouped)
-                           [re-com/h-box
-                            :style {:padding-left "10px" :font-size "16px" :font-weight 700}
-                            :gap "8px"
-                            :children (for [[kk cnt] flow-watcher-subs-grouped]
-                                        [re-com/h-box :style
-                                         {:background-color (theme-pull :theme/editor-outer-rim-color nil)
-                                          :padding-left     "6px"
-                                          :border-radius    "5px 5px 0px 0px"
-                                          :padding-right    "6px"
-                                          :color            (theme-pull :theme/editor-background-color nil)}
-                                         :gap "5px"
-                                         :children [[re-com/box :child (str kk)]
-                                                    [re-com/box :style {:opacity 0.5} :child (str cnt)]
-                                                    [re-com/md-icon-button
-                                                     :md-icon-name "zmdi-close"
-                                                     :style {:cursor "pointer"
-                                                             :color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
-                                                             :font-size "18px"
+                          (when (ut/ne? flow-watcher-subs-grouped)
+                            [re-com/h-box
+                             :style {:padding-left "10px" :font-size "16px" :font-weight 700}
+                             :gap "8px"
+                             :children (for [[kk cnt] flow-watcher-subs-grouped]
+                                         [re-com/h-box :style
+                                          {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                           :padding-left     "6px"
+                                           :border-radius    "5px 5px 0px 0px"
+                                           :padding-right    "6px"
+                                           :color            (theme-pull :theme/editor-background-color nil)}
+                                          :gap "5px"
+                                          :children [[re-com/box :child (str kk)]
+                                                     [re-com/box :style {:opacity 0.5} :child (str cnt)]
+                                                     [re-com/md-icon-button
+                                                      :md-icon-name "zmdi-close"
+                                                      :style {:cursor "pointer"
+                                                              :color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                              :font-size "18px"
                                                              ;:height "10px" 
                                                              ;:margin-top "-3px"
-                                                             } :on-click
-                                                     #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
-                                                          (ut/tracked-dispatch [::wfx/request :default
-                                                                                {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
-                                                                                 :timeout 50000}]))]]])])
+                                                              }:on-click
+                                                      #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
+                                                           (ut/tracked-dispatch [::wfx/request :default
+                                                                                 {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
+                                                                                  :timeout 50000}]))]]])])
 
-                         (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
-                           [custom-icon-button
-                            {:icon-name "zmdi-speaker"
-                             :tooltip "stop currently playing audio"
-                             :on-click #(audio/stop-audio)
-                             :active? true
-                             :color "red"}])
+                          (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
+                            [custom-icon-button
+                             {:icon-name "zmdi-speaker"
+                              :tooltip "stop currently playing audio"
+                              :on-click #(audio/stop-audio)
+                              :active? true
+                              :color "red"}])
 
-                         (when @(ut/tracked-subscribe_ [::audio/recording?])
-                           [custom-icon-button
-                            {:icon-name "zmdi-mic"
-                             :tooltip "recording audio in progress"
-                             :on-click nil
-                             :active? true
-                             :color "red"}])]]
+                          (when @(ut/tracked-subscribe_ [::audio/recording?])
+                            [custom-icon-button
+                             {:icon-name "zmdi-mic"
+                              :tooltip "recording audio in progress"
+                              :on-click nil
+                              :active? true
+                              :color "red"}])]
+
+                         (kit-canvas-icons :block-3570 :album-name-drag-12))]
 
         memory (let [mem @(ut/tracked-subscribe_ [::bricks/memory])]
                  (when (> (get mem 1) 0) ;; firefox, etc doesn't support this, so not point to render 0MB
@@ -4764,11 +4812,11 @@
                        :bottom 0
                        :right 0
                        :border-radius "15px 0px 0px 0px"
-                       :background-color (when @bar-hover-text 
+                       :background-color (when @db/bar-hover-text 
                                            ;;"#00000099"
                                            (theme-pull :theme/base-block-color "#00000099")
                                            )
-                       :backdrop-filter (when @bar-hover-text "blur(4px) brightness(0.35)")
+                       :backdrop-filter (when @db/bar-hover-text "blur(4px) brightness(0.35)")
                        :color "white"}
                :children [[custom-icon-button
                            (let [alert-mute? @(ut/tracked-sub ::bricks/alert-mute? {})]
@@ -4826,22 +4874,23 @@
                 [re-com/box
                  :size "none"
                  :style {:position "fixed"
-                         :padding (if @bar-hover-text "10px 10px 10px 20px" "5px")
+                         :padding (if @db/bar-hover-text "10px 10px 10px 20px" "5px")
                          :border-radius "0px 20px 20px 0px"
                          :left 0
                          :bottom 28
                          :font-weight 700
-                         :background-color (when @bar-hover-text 
+                         :z-index (when @db/bar-hover-text 99999999)
+                         :background-color (when @db/bar-hover-text 
                                              ;;"#00000099"
                                              (theme-pull :theme/base-block-color "#00000099")
                                              )
-                         :backdrop-filter (when @bar-hover-text "blur(4px) brightness(0.35)")
-                         :font-size (when @bar-hover-text "27px")
+                         :backdrop-filter (when @db/bar-hover-text "blur(4px) brightness(0.35)")
+                         :font-size (when @db/bar-hover-text "27px")
                          :transition "all 0.3s ease"
                          :text-shadow "2px 1px 3px #000000"
                          :color "#ffffff99"}
-                 :child (if @bar-hover-text 
-                          @bar-hover-text memory)]
+                 :child (if @db/bar-hover-text 
+                          @db/bar-hover-text memory)]
                 right]]))
 
 

@@ -8,6 +8,8 @@
 
 (def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :panel-hash})
 
+(def bar-hover-text (reagent/atom nil))
+
 (def click-params-snapshot (atom nil))
 (def param-v-boxes (reagent/atom nil))
 (def solver-view-mode (reagent/atom "return value"))

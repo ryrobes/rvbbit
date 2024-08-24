@@ -2424,6 +2424,9 @@
                                                                                  :size "auto"
                                                                                  :child [:string3 "error: " view-fn-error]]
                                                                                 (get rendered-views :result))))
+                    _ (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+                             (create-ansi-box
+                              (str "waiting for user input... " (ut/millis-to-date-string (System/currentTimeMillis)) "\n ")))
                     user-response (loop []
                                     (let [current-value (get-in @db/params-atom response-path)
                                           elapsed-time (- (System/currentTimeMillis) start-time)]
@@ -2438,14 +2441,14 @@
                         (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
                         (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
                                (create-ansi-box
-                                (str "kit run cancelled by user \n" 
+                                (str "kit run cancelled by user \n"
                                      (ut/millis-to-date-string (System/currentTimeMillis)) "\n ")))
                         (throw (ex-info "User cancelled the operation" {:type :user-cancel})))
                     _ (when (= user-response :timeout)
                         (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
                         (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
                                (create-ansi-box
-                                (str "kit run timeout waiting for user response \n" 
+                                (str "kit run timeout waiting for user response \n"
                                      (ut/millis-to-date-string (System/currentTimeMillis)) "\n ")))
                         (throw (ex-info "Operation timed out waiting for user response" {:type :timeout})))]
                 (Thread/sleep 2000)))
@@ -2475,7 +2478,7 @@
                        [[:box :child (str "pull *full* query rows for analysis...")]
                         [:box :style {:font-size "11px" :opacity 0.7}
                          :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-                      18
+                      nil ;9
                       nil
                       6)
               ;; (ut/pp (get-in @client-panels-resolved [client-name host-runner data-key :connection-id]
@@ -2508,7 +2511,7 @@
                        [[:box :child (str "data pulled, running analysis...")]
                         [:box :style {:font-size "11px" :opacity 0.7}
                          :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-                      18
+                      nil ;9
                       nil
                       6))
 
@@ -2538,7 +2541,7 @@
                                         (fn []
                                           (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
           error?   (cstr/includes? (cstr/lower-case (str result)) " error ")  ;; lame , get codes later 
-          output   (get-in result [:evald-result :value])
+          output   (get-in result [:evald-result :value 0])
           ;console (get-in result [:evald-result :out])
           ]
 
@@ -2546,13 +2549,31 @@
 
       ;;(ut/pp  [:result result])
       (when (and (= output-type :kit-map)
-                 ;(and (vector? output)
-                 ;     (map? (first output)))
-                 )
-        (ut/pp [:inserting-into-kit-results-table.. (count output)])
-        (doseq [kk output]
-          (insert-kit-data kk
-                           (hash kk)
+                 (ut/ne? output)
+                 (map? output))
+        (ut/pp [:inserting-into-kit-results-table.. (count output) (vec (keys output))])
+
+        (let [push-assocs (get output :push-assocs)
+              push-alerts (get output :push-alerts)
+              output (dissoc output :push-assocs :push-alerts)]
+
+          (when (and (ut/ne? push-assocs)
+                     (map? push-assocs))
+            (push-to-client ui-keypath [] client-name 1 :push-assocs push-assocs))
+
+          (when (and ;; send any push alerts
+                 (ut/ne? push-alerts)
+                 (or (vector? push-alerts)
+                     (map? push-alerts)))
+            (if (vector? push-alerts)
+              (doseq [alert push-alerts
+                      :let [{:keys [body seconds w h]} alert]]
+                (alert! client-name body w h (or seconds 45)))
+              (let [{:keys [body seconds w h]} push-alerts]
+                (alert! client-name body w h (or seconds 45)))))
+          ;; send the rest of the kit data for the client's UI to render
+          (insert-kit-data output
+                           (hash output)
                            data-key ;(last ui-keypath)
                            "query-log" ;;kit-expr-push"
                            :kick
@@ -2578,7 +2599,7 @@
                 ;;    :child [:terminal-custom [console (* 17 50) 250]]])
                 [:box :style {:font-size "11px" :opacity 0.7}
                  :child (str (ut/millis-to-date-string (System/currentTimeMillis)))]]]
-              18
+              nil
               nil
               5)
       (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
@@ -5290,7 +5311,7 @@
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?))))
 
                     (if (and 
-                         (not (some #(= % filtered-req-hash) @deep-run-list))
+                         ;(not (some #(= % filtered-req-hash) @deep-run-list))
                          sniffable?) ;; aka reco check. need to rename since it's hella confusing with all the sniffing.
                       (doall
                        (do
@@ -5416,7 +5437,7 @@
                                                           (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
                                                           (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
                                                           (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result))
-                                                          (swap! db/last-solvers-data-atom assoc (first ui-keypath) (get output :result))
+                                                          ;(swap! db/last-solvers-data-atom assoc (first ui-keypath) (get output :result)) ;;  :data/ ... TBD
                                                           ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                                                           (when (= page -3)
                                                               ;;; insert a new solver job if not exists :materialize-query-name
@@ -5527,7 +5548,13 @@
                                                   (apply (if (= kit-keys 1) flatten into)
                                                          (for [[k v] output
                                                                :let  [;descr (pr-str (get v :description))
-                                                                      rows   (get v :data)
+                                                                      rows (get v :data [])
+                                                                      rows (if (empty? rows) [{:name "no content sent from kit"
+                                                                                               :parameters {}
+                                                                                               :step-mutates {}
+                                                                                               :ask-mutates {}
+                                                                                               :content [[:box :child "Kit executed successfully, but no data sent. Perhaps by design."]]}]
+                                                                               rows)
                                                                       rowset (vec
                                                                               (for [idx  (range (count rows))
                                                                                     :let [i       (get rows idx)
@@ -5542,8 +5569,8 @@
                                                                                                    :client_name  (str client-name)
                                                                                                    :flow_id      (str flow-id)
                                                                                                    :item_options (pr-str (select-keys v
-                                                                                                                          [:options :parameters :mutates
-                                                                                                                           :description]))
+                                                                                                                                      [:options :parameters :mutates
+                                                                                                                                       :description]))
                                                                                                    :item_data    (pr-str i)}]]
                                                                                 row-map))]]
                                                            rowset)))]
@@ -5558,9 +5585,10 @@
                             (when true ;;(not (= kkit-name ":kick")) ;; clear older kick data for this item name - TODO what about multiple kits on the same card?
                               (sql-exec system-db
                                         (to-sql {:delete-from [:kits]
-                                                 :where       [:and [:= :kit_name kkit-name]
-                                                               [:= :item_name
-                                                                (if (vector? ui-keypath) (str (first ui-keypath)) (str ui-keypath))]]})))
+                                                 :where       [:and 
+                                                               [:in :item_key (mapv :item_key output-rows)]
+                                                               [:= :kit_name kkit-name]
+                                                               [:= :item_name (if (vector? ui-keypath) (str (first ui-keypath)) (str ui-keypath))]]})))
                             (swap! kit-client-mapped assoc-in [client-name kkit-name] (kit-rows-to-map output-rows)) ;; *very* weird client row munging moved to server... TODO Aug'24
                             (sql-exec system-db (to-sql {:insert-into [:kits] :values output-rows}))))))
 
@@ -7561,17 +7589,33 @@
       (cstr/replace "\n" "'\n'")   ; Handle newlines
       (->> (format "'%s'"))))      ; Wrap in single quotes
 
-(defn get-fabric-models []
-  (let [output (run-shell-command "fabric --listmodels")]
-    (if (= (get output :error-code 0) 0)
-      (models-list-to-map (get output :output)) ;; check for malformed first?
-      (get output :exception))))
+;; (defn get-fabric-models []
+;;   (let [output (run-shell-command "fabric --listmodels")]
+;;     (if (= (get output :error-code 0) 0)
+;;       (models-list-to-map (get output :output)) ;; check for malformed first?
+;;       (get output :exception))))
 
-(defn get-fabric-patterns []
-  (let [output (run-shell-command "fabric --list")]
-    (if (= (get output :error-code 0) 0)
-      (get output :output)
-      (get output :exception))))
+;; (defn get-fabric-patterns []
+;;   (let [output (run-shell-command "fabric --list")]
+;;     (if (= (get output :error-code 0) 0)
+;;       (get output :output)
+;;       (get output :exception))))
+
+(def get-fabric-models
+  (memoize
+   (fn []
+     (let [output (run-shell-command "fabric --listmodels")]
+       (if (= (get output :error-code 0) 0)
+         (models-list-to-map (get output :output)) ;; check for malformed first?
+         (get output :exception))))))
+
+(def get-fabric-patterns
+  (memoize
+   (fn []
+     (let [output (run-shell-command "fabric --list")]
+       (if (= (get output :error-code 0) 0)
+         (get output :output)
+         (get output :exception))))))
 
 (defn fabric
   "Wrapper for the fabric CLI application.
