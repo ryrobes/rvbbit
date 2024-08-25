@@ -196,10 +196,10 @@
       ;;  :event [::bricks/update-reco-previews]
       ;;  :dispatch-event-on-start? false}
 
-      ;; {:interval 1 
-      ;;  :event [::bricks/update-conditionals] 
-      ;;  :poll-when [::bricks/visible-conditionals?]
-      ;;  :dispatch-event-on-start? false}
+      {:interval 1 
+       :event [::bricks/update-conditionals] 
+       :poll-when [::bricks/visible-conditionals?]
+       :dispatch-event-on-start? false}
       
       {:interval                 4
        :event                    [::bricks/refresh-status]

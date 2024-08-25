@@ -198,7 +198,8 @@
                                             :icon-location :card ;; :card, :canvas 
                                             :tooltip "Lundberg me."
                                             :kit-expr (let [kit-map {:push-alerts {:body [:box
-                                                                                          :style {:font-size "33px" :color "orange"}
+                                                                                          :style {:font-size "33px" 
+                                                                                                  :color "orange"}
                                                                                           :child "Yeaaahhhhh... about that."]
                                                                                    :w 15
                                                                                    :seconds 60}
@@ -225,28 +226,83 @@
                                      :output :kit-map
                                      :icon-location :card ;; :card, :canvas 
                                      :tooltip "generate some shit."
-                                     :kit-expr (let [fabric-data (rvbbit-backend.websockets/fabric-run
-                                                                  {:input "Create me a new and interesting dashboard with the given SQL metadata and the dashboard examples to learn the dashboard DSL and present it in the necessary way"
-                                                                   :client-name :*client-name
-                                                                   :id :*id
-                                                                   :context ""
-                                                                   :runner :*runner
-                                                                   :pattern "clover-canvas"
-                                                                   :model "claude-3-5-sonnet-20240620"
-                                                                   ;:model "gpt-4o"
-                                                                   })
-                                                     _ (rvbbit-backend.util/pp fabric-data)
+                                     :kit-expr (let [canvas-coords (or :*canvas-coords [])
+                                                     canvas-size (or :*canvas-size [])
+                                                     orig-input (or :*input "")
+                                                     input (str orig-input "\n\n"
+                                                                (when (not (empty? :*metadata))
+                                                                  (str "\n\n ##QUERY/TABLE METADATA: \n"
+                                                                       (pr-str :*metadata)))
+                                                                (when (not (empty? canvas-coords))
+                                                                  (str "\n\n ##CANVAS-COORDS-USED: \n"
+                                                                       (pr-str canvas-coords)))
+                                                                (when (not (empty? canvas-size))
+                                                                  (str "\n\n ##CANVAS-SIZE: \n"
+                                                                       (pr-str canvas-size))))
+                                                     model :*model
+                                                     req-map {:input input
+                                                              :client-name :*client-name
+                                                              :id :*id
+                                                              :context :*context
+                                                              :runner :*runner
+                                                              :pattern :*pattern ;;"clover-canvas"
+                                                              :model model}
+                                                     _ (rvbbit-backend.util/pp [:req-map req-map])
+                                                     fabric-data (rvbbit-backend.websockets/fabric-run req-map)
+                                                     fabric-data-str (-> (clojure.string/join "\n" (flatten fabric-data))
+                                                                         (clojure.string/replace "```clojurescript" "")
+                                                                         (clojure.string/replace "```clojure" "")
+                                                                         (clojure.string/replace "```edn" "")
+                                                                         (clojure.string/replace "```" ""))
+                                                     _ (rvbbit-backend.util/pp [:output fabric-data-str])
                                                      ;;fabric-data2 (rvbbit-backend.websockets/parse-text-and-code fabric-data)
-                                                     clover-map (clojure.edn/read-string (clojure.string/join "\n" (flatten fabric-data))) 
-                                                     kit-map {:push-alerts {:body [:box
-                                                                                   :child [:speak "dashboard time!"]]
-                                                                            :seconds 10}
+                                                     clover-map (try (clojure.edn/read-string fabric-data-str)
+                                                                     (catch Exception e
+                                                                       (let [_ (println "error parsing fabric-data, attempting to fix..." e)
+                                                                             fixed (rvbbit-backend.websockets/fabric-run
+                                                                                    {:input fabric-data-str ;(str "The " (rand-int 1234567) " Error was: " (str e) "\n\n" fabric-data-str)
+                                                                                     :client-name :*client-name
+                                                                                     :id :*id
+                                                                                     :context ""
+                                                                                     :runner :*runner
+                                                                                     :pattern "clojure-edn-balance"
+                                                                                     :model :*model ;"claude-3-5-sonnet-20240620"
+                                                                                     ;:model "gpt-4"
+                                                                                     })
+                                                                             fabric-data-str2 (clojure.string/join "\n" (flatten fixed))]
+                                                                         (try
+                                                                           (clojure.edn/read-string fabric-data-str2)
+                                                                           (catch Exception e
+                                                                             (let [_ (println "error parsing fabric-data, attempting to fix AGAIN..." e)
+                                                                                   fixed (rvbbit-backend.websockets/fabric-run
+                                                                                          {:input fabric-data-str ;(str "The " (rand-int 1234544) " Error was: " (str e) "\n\n" fabric-data-str)
+                                                                                           :client-name :*client-name
+                                                                                           :id :*id
+                                                                                           :context ""
+                                                                                           :runner :*runner
+                                                                                           :pattern "clojure-edn-balance"
+                                                                                           :model :*model ;"claude-3-5-sonnet-20240620"
+                                                                                           ;:model "gpt-4"
+                                                                                           })
+                                                                                   fabric-data-str2 (clojure.string/join "\n" (flatten fixed))]
+                                                                               (try
+                                                                                 (clojure.edn/read-string fabric-data-str2)
+                                                                                 (catch Exception e (do (println "error parsing fabric-data AGAIN AGAIN... we cooked." e) {})))))))))
+                                                     kit-map {:push-alerts (let [change-cnt (count (keys clover-map))]
+                                                                             {:body [:box
+                                                                                     :child [:speak (str model " has returned with " change-cnt " change" (when (= change-cnt 1) "s"))]]
+                                                                              :seconds 10})
                                                               :push-assocs clover-map
-                                                              :gen-ev {:description "please get to work..."
-                                                                              :options {:pages? true :search? false :actions? false}
-                                                                              :parameters {}
-                                                                              :mutates {}
-                                                                              :data []}}]
+                                                              :gen-ev {:description "please get to work...?"
+                                                                       :options {:pages? true :search? false :actions? false}
+                                                                       :parameters {}
+                                                                       :mutates {}
+                                                                       :data [{:name (str orig-input)
+                                                                               :content [[:box
+                                                                                          :size "auto"
+                                                                                          :style {:border "1px solid #ffffff33"
+                                                                                                  :border-radius "15px"}
+                                                                                          :child [:edn (str clover-map)]]]}]}}]
                                                  (rvbbit-backend.util/pp clover-map)
                                                  kit-map)
                                             ;:icon "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6aKuMo6Dao0FOSWXYczr9-cWeMw3APvo2yw&s"
@@ -363,7 +419,7 @@
                                                        ;;false ;;true
                                                        )
                                              ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
-                                            :icon "fa-solid fa-circle-exclamation"
+                                            :icon "ri-advertisement-line" ;; "fa-solid fa-circle-exclamation"
                                             ;:clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))
                                             }
 

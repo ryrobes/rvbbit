@@ -2351,10 +2351,12 @@
 ;; (reset! times-atom {})
 
 (defmethod wl/handle-push :run-kit
-  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key]}]
+  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key opts-map]}]
   (try
     (let [_ (swap! db/kit-atom assoc-in [:kicks client-name] ;; so the UI has the :kicks :buffy option to watch before completeted
                    (vec (distinct (conj (get-in @db/kit-atom [:kicks client-name] []) data-key))))
+          opts-map (when opts-map (into {} (for [[k v] opts-map] {(keyword (str "*" (cstr/replace (str k) ":" ""))) v}))) ;; mostly got fabric pre-loaded reqs
+          _ (ut/pp [:kit-pre-opts-map opts-map])
           kit-runner-key  (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)
           kit-runner-key-str (cstr/replace (str kit-runner-key) ":" "")
           times-key       kit-keypath ;;(into [:kit-run] kit-keypath) ;;(into kit-keypath ui-keypath)
@@ -2454,7 +2456,7 @@
                 (Thread/sleep 2000)))
            ;;kit-opts (when kit-view? )
 
-          opts-map (dissoc (get-in @db/params-atom [client-name panel-key]) :go!)
+          opts-map (merge (dissoc (get-in @db/params-atom [client-name panel-key]) :go!) opts-map)
           added-postwalk-map (merge limited-postwalk-map ;; add in view opts if any 
                                     opts-map)
 
@@ -3198,9 +3200,10 @@
 
 (defn fabric-post-process [client-name fabric-opts-map output elapsed-ms ui-keypath is-history?]
   (let [{:keys [pattern id input model context]} fabric-opts-map
-        code-proc? (and (=  pattern "clover")
-                        (cstr/includes? (str output) "```"))
-        kit-content (when code-proc? (parse-text-and-code output))
+        ;; code-proc? (and (=  pattern "clover-canvas")
+        ;;                 (cstr/includes? (str output) "```"))
+        code-proc?  (=  pattern "clover-canvas")
+        kit-content (try (edn/read-string (cstr/join "/n" (flatten output))) (catch Exception e {:error (str e)}))
         kit-out {(keyword model) {:data [{:name (str client-name " request")
                                           :content [[:v-box :size "auto"
                                                      :children [[:box :size "auto"
@@ -3238,10 +3241,14 @@
                               ;;               (cstr/join "\n" output)
                               ;;               output))
                               ;;:child [:speak (cstr/join " " (filter string? (parse-text-and-code output)))]
-                              :child (cstr/join " " (filter string? (parse-text-and-code output)))]
-                             (try
-                               (when code-proc? [:execute (into {} (for [[k v] (apply merge (filter map? kit-content))] {k (edn/read-string v)}))])
-                               (catch Exception _ nil))]]]]]
+                              :child (cstr/join " " (filter string? (parse-text-and-code output)))
+                              ;:child (str (keys kit-content) " modded")
+                              ]
+                            ;;  (try
+                            ;;    ;;(when code-proc? [:execute (into {} (for [[k v] (apply merge (filter map? kit-content))] {k (edn/read-string v)}))])
+                            ;;    (when (and (not (get kit-content :error)) code-proc?) [:execute kit-content])
+                            ;;    (catch Exception _ nil))
+                             ]]]]]
               16
               nil
               20 :fabric-response)
@@ -3261,8 +3268,9 @@
                                                    :step-mutates (into {} (for [[kp v] context] {kp (edn/read-string v)})) ;; was stringified on the FE to protect from transfer issues, but now we need it back as a struct
                                                    :content (into ["(context during req)"] (vec (vals context)))}
                                                   {:name (str model " response")
-                                                   :step-mutates step-maps
-                                                   :content (into (filterv string? kit-content) (vec (vals step-maps)))}]}}]
+                                                   ;;:step-mutates step-maps
+                                                   :step-mutates (when (and (not (get kit-content :error)) code-proc?) [:execute kit-content])
+                                                   :content [:edn (str (keys kit-content) " modded")]}]}}]
           (ut/pp [:kit-response step-maps target context kit-out])
           (insert-kit-data kit-out
                            (hash kit-out)
@@ -5446,7 +5454,9 @@
                                                                      {:signal false ;;:signal/every-5-minutes
                                                                       :type :sql
                                                                       :snapshot? false
-                                                                      :data (assoc orig-honey-sql :page -4)})
+                                                                      :data (-> orig-honey-sql 
+                                                                                (assoc :page -4) 
+                                                                                (assoc :connection-id connection-id))})
                                                               ;; add new query to client 
                                                               (reload-solver-subs)
                                                               ;; (push-to-client [ui-keypath panel-key cli-cache-table-name] [] client-name 1 :push-query
@@ -7668,16 +7678,18 @@
    (let [_ (ut/pp [:fabric-run opts-map])
          ;context (get opts-map :context)
          ;pattern (get opts-map :pattern)
-         {:keys [context pattern model client-name runner id]} opts-map
+         {:keys [context pattern model client-name metadata runner id]} opts-map
           ;view-name (when context (last (ffirst context)))
          opts-map (cond ;(and context (= pattern "clover"))
                          ;(assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n "))
 
-                    (and context (= pattern "clover"))
+                    (and context (= pattern "clover-canvas"))
                     (let [runner-hint (get-in (config/settings) [:runners runner :pattern-hint])]
                       (assoc opts-map :input (str (get opts-map :input) "\n\n ```" (pr-str context) "``` \n\n "
                                                   (when runner-hint
-                                                    (str "##SPECIAL BLOCK TYPE INSTRUCTIONS:  \n" (str runner-hint))))))
+                                                    (str "##SPECIAL BLOCK TYPE INSTRUCTIONS:  \n" (str runner-hint)))
+                                                  (when (ut/ne? metadata) 
+                                                    (str "##QUERY/TABLE METADATA: \n" (pr-str metadata))))))
 
                     :else opts-map)
 

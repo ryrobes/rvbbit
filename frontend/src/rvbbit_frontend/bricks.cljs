@@ -1207,19 +1207,20 @@
 
 (re-frame/reg-sub
  ::selected-tab
- (fn [db] (get db :selected-tab (first (get db :tabs)))))
+ (fn [db] (get db :selected-tab (first @(ut/tracked-sub ::tabs {})))))
 
 (re-frame/reg-event-db
  ::delete-tab
  (undoable)
  (fn [db [_ tab-name]]
-   (let [tabs     (get db :tabs)
+   (let [tabs     @(ut/tracked-sub ::tabs {}) ;;(get db :tabs)
          curr-idx (.indexOf tabs tab-name)
-         new-tabs (vec (remove #(= % tab-name) (get db :tabs)))
-         new-curr (nth (cycle new-tabs) curr-idx)]
+         new-tabs (vec (remove #(= % tab-name) tabs))
+         new-curr (try (nth (cycle new-tabs) curr-idx) (catch :default _ (first new-tabs)))]
      (ut/tapp>> [:boo curr-idx new-curr])
      (-> db
-         (assoc :tabs (vec (remove #(= % tab-name) (get db :tabs))))
+         (assoc :tabs (vec (remove #(= % tab-name) tabs)))
+         (assoc :selected-tab new-curr)
          (assoc :panels (into {} (filter #(not (= tab-name (get (val %) :tab))) (get db :panels))))))))
 
 (re-frame/reg-event-db
@@ -2201,6 +2202,11 @@
  ::get-view-data
  (fn [db {:keys [panel-key runner data-key]}]
    (get-in db [:panels panel-key runner data-key])))
+
+(re-frame/reg-sub
+ ::get-block-data
+ (fn [db {:keys [panel-key]}]
+   (get-in db [:panels panel-key])))
 
 (defn is-float?
   [n] ;; cljs uses js "number" so core "float?" cant tell between int and float
@@ -6667,7 +6673,7 @@
                  ffromv        (-> (get-in incomingv [1 :data :values])
                                    (ut/replacer "_" "-")
                                    (ut/replacer "query/" ""))
-                 original-conn @(ut/tracked-subscribe [::lookup-connection-id-by-query-key (keyword ffromv)])
+                 original-conn @(ut/tracked-subscribe [::lookup-by-query-key (keyword ffromv)])
                  view          (-> incomingv
                                    (assoc-in [1 :data :values] :query-preview)
                                    (assoc-in [1 :config] :theme/vega-defaults)
@@ -7791,7 +7797,7 @@
                            [re-com/gap :size "6px"]]
 
                           (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key panel-key :data-key query-key}])
-                                _ (tapp>>  [:valid-kits valid-kits])
+                                ;;_ (tapp>>  [:valid-kits valid-kits])
                                 block-runners  @(ut/tracked-sub ::block-runners {})
                                 client-name    @(ut/tracked-sub ::client-name {})]
                             (vec (for [e valid-kits
@@ -8554,6 +8560,10 @@
      :panel-height             (cond (and lay? vega-lite?) "container"
                                      vega-lite?            (- px-height-int 20)
                                      :else                 px-height-int) ;px-height-int
+     :card-width               (+ 70 px-width-int) ;; moving terminology - Aug 2024
+     :card-height              (+ 50 px-height-int) ;; moving terminology - Aug 2024
+     :card-width-px            (px (+ 70 px-width-int)) ;; moving terminology - Aug 2024
+     :card-height-px           (px (+ 50 px-height-int)) ;; moving terminology - Aug 2024
      :panel-height+10          (+ 10 px-height-int)
      :panel-height+20          (+ 20 px-height-int)
      :panel-height+30          (+ 30 px-height-int)
@@ -10866,7 +10876,7 @@
   (let [kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type])
         in-editor? (not (nil? override-view))
         cc (get @ut/clover-walk-singles-map kk)]
-    (if false ;;cc ;(ut/ne? cc)
+    (if cc ;(ut/ne? cc)
       cc
       (let [in-editor? (not (nil? override-view))
             walk-map
@@ -10961,16 +10971,16 @@
                                   :width (+ px-width-int 70)
                                   :height (+ px-height-int 55)}])
 
-              :terminal-custom (fn [[x w h follow? & [{:keys [style px-line-height] :as opts-map}]]] 
+              :terminal-custom (fn [[x w h follow? & [{:keys [style px-line-height] :as opts-map}]]]
                                  [reactive-virtualized-console-viewer
-                                                      (merge 
-                                                       {:style {}
-                                                       :text x
-                                                       :follow? follow?
-                                                       :id (str panel-key "-" selected-view "-" output-type)
-                                                       :width (+ w 70)
-                                                       :height (+ h 55)}
-                                                       opts-map)])
+                                  (merge
+                                   {:style {}
+                                    :text x
+                                    :follow? follow?
+                                    :id (str panel-key "-" selected-view "-" output-type)
+                                    :width (+ w 70)
+                                    :height (+ h 55)}
+                                   opts-map)])
 
               :panel-code-box-single panel-code-box-single
               :code-box-single panel-code-box-single
@@ -11149,19 +11159,19 @@
                                    (let []
                                      [re-com/v-box :size "auto" :children
                                       [[re-com/box :child (pr-str display-text)]
-                                       [re-com/h-box 
-                                        :size "auto" 
+                                       [re-com/h-box
+                                        :size "auto"
                                         ;:justify :between 
                                         :gap "4px"
-                                        :height "10px" 
+                                        :height "10px"
                                         :style {}
                                         :children
                                         [[re-com/md-icon-button
                                           :md-icon-name "zmdi-play"
                                           :on-click (fn []
                                                       (when (not (some (fn [x] (= x text)) @db/speech-log))
-                                                        (do (ut/tracked-dispatch 
-                                                             [::audio/text-to-speech11 panel-key :speak (str text) true])))) 
+                                                        (do (ut/tracked-dispatch
+                                                             [::audio/text-to-speech11 panel-key :speak (str text) true]))))
                                           :style {:font-size "15px" :opacity 0.25 :cursor "pointer"}]
                                          [re-com/md-icon-button
                                           :md-icon-name "zmdi-stop"
@@ -11190,17 +11200,17 @@
                            [[re-com/md-icon-button :md-icon-name "fa-solid fa-location-crosshairs" ;; <i class=
                              :on-click (fn [] (when bid (ut/tracked-dispatch [::push-value flow-id bid value]))) :style
                              {:font-size "15px" :opacity 0.25 :cursor "pointer"}] [re-com/box :child ""]]]]]))
-              :dialog-push
-              (fn [[flow-id bid value & [view]]]
-                (let [bid      (try (if (cstr/starts-with? bid ":") (edn/read-string bid) (edn/read-string (str ":" bid)))
-                                    (catch :default _ nil))
-                      alert-id @(ut/tracked-subscribe [::lookup-alert-id :dialog-push flow-id bid value])]
-                  [re-com/box :style {:cursor "pointer"} :attr
-                   {:on-click (fn []
-                                (when bid
-                                  (ut/tracked-dispatch [::push-value flow-id bid value])
-                                  (ut/dispatch-delay 800 [::prune-alert alert-id])))} :size "auto" :child
-                   (if view view (str "push " value " to " flow-id "/" bid))]))
+
+              :dialog-push (fn [[flow-id bid value & [view]]]
+                             (let [bid      (try (if (cstr/starts-with? bid ":") (edn/read-string bid) (edn/read-string (str ":" bid)))
+                                                 (catch :default _ nil))
+                                   alert-id @(ut/tracked-subscribe [::lookup-alert-id :dialog-push flow-id bid value])]
+                               [re-com/box :style {:cursor "pointer"} :attr
+                                {:on-click (fn []
+                                             (when bid
+                                               (ut/tracked-dispatch [::push-value flow-id bid value])
+                                               (ut/dispatch-delay 800 [::prune-alert alert-id])))} :size "auto" :child
+                                (if view view (str "push " value " to " flow-id "/" bid))]))
               :web-cam #(let [video-ref     (reagent/atom nil)
                               running?      @(ut/tracked-subscribe [::webcam?])
                               webcam-stream @(ut/tracked-subscribe [::webcam-feed])]
@@ -11383,6 +11393,7 @@
               :number (fn [x] (str (nf x)))
               :percent (fn [x] (str (nf x) "%"))
               :v-box re-com/v-box}
+             
              (walk-map-sizes (/ px-width-int db/brick-size) (/ px-height-int db/brick-size) nil nil nil nil)
                                              ;; {:box re-com/box
                                              ;;  :layout (fn [x] [layout panel-key (or override-view selected-view) x w h])
@@ -13092,7 +13103,9 @@
 (defn render-kit-icon [icon & [class]]
   (if (and (ut/ne? icon) (not (nil? icon)))
     (if (or (cstr/starts-with? icon "zmdi-")
+            (cstr/starts-with? icon "ri-")
             (cstr/starts-with? icon "fa-"))
+      
       [re-com/md-icon-button
        :src (at)
        :class class

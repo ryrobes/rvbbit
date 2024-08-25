@@ -1815,7 +1815,8 @@
         [runner-src data-key] @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
         selected-block    @(ut/tracked-sub ::bricks/selected-block {})
         no-selected?      (or (nil? selected-block) (= selected-block "none!"))
-        context-body      (pr-str @(ut/tracked-sub ::bricks/get-view-data {:panel-key selected-block :runner runner-src :data-key data-key}))
+        ;;context-body      (pr-str @(ut/tracked-sub ::bricks/get-view-data {:panel-key selected-block :runner runner-src :data-key data-key}))
+        context-body      (pr-str @(ut/tracked-sub ::bricks/get-block-data {:panel-key selected-block}))
         ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
         ;; is-rf-event? (and (or (= runner :views) (= runner :clover))
         ;;                   (cstr/starts-with? (cstr/trim command) "[:dispatch"))
@@ -1832,25 +1833,71 @@
                   command ;; the "implied string"
                   (ensure-quoted-string (cstr/replace command "\"" "\\\"")))
         opts-map (if (= runner :fabric)
-                   {:model (get @fbc-selected-model runner)
-                    :client-name client-name
-                    :runner (or runner-src :views)
-                    :context {[:panels selected-block runner-src data-key] context-body}
-                    :pattern (if (not no-selected?) "clover" (get @fbc-selected-pattern runner "tweet"))} 
+                   (let [curr-tab @(ut/tracked-sub ::bricks/selected-tab {})
+                         coords @(ut/tracked-sub ::bricks/all-roots-tab-sizes {:tab curr-tab})
+                         hh @(ut/tracked-subscribe_ [::subs/h])
+                         ww @(ut/tracked-subscribe_ [::subs/w])
+                         canvas-w (/ ww db/brick-size)
+                         canvas-h (/ hh db/brick-size)]
+                     {:model (get @fbc-selected-model runner)
+                      :client-name client-name
+                    ;:runner (if no-selected? :clojure (or runner-src :views))
+                      :metadata (if (= runner-src :queries)
+                                  {:connection-id @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key data-key])
+                                   :fields (get @(ut/tracked-sub ::conn/sql-metadata-alpha {:keypath [data-key]}) :fields)} {})
+                      :canvas-coords coords
+                      :canvas-size [canvas-w canvas-h]
+                      :input (str command)
+                    ;:id          (cstr/replace (str client-name "++" selected-block "++" runner "++" data-key) ":" "")
+                      :id       (cstr/replace (str client-name "++" selected-block "++" runner-src "++" data-key) ":" "")
+                    ;;:context {[:panels selected-block runner-src data-key] context-body}
+                      :context {[:panels selected-block] context-body}
+                      :pattern (if (not no-selected?) "clover-canvas"
+                                   (get @fbc-selected-pattern runner "tweet"))}) 
                    {})]
+    
     (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
 
-    (let [resp (insert-response-block 8 5 command runner syntax opts-map no-selected?)
-          ee (str command "(" resp ")")]
+    (if (not (and (not no-selected?) (= runner :fabric)))
+      (let [resp (insert-response-block 8 5 command runner syntax opts-map no-selected?)
+            ee (str command "(" resp ")")]
           ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
           ;(re-frame/dispatch [::bricks/toggle-quake-console])
-      ;(ut/tracked-dispatch [::bricks/toggle-quake-console-off])
-      (ut/dispatch-delay 200 [::http/insert-alert
-                              [:v-box :children [;[:box :child (str resp)]
-                                                 [:box :child (str "running " command)
-                                                  :style {:font-size "12px"}]]] 6 1.5 5])
-      (swap! console-responses assoc command ee))))
+        ;(ut/tracked-dispatch [::bricks/toggle-quake-console-off])
+        (ut/dispatch-delay 200 [::http/insert-alert
+                                [:v-box :children [;[:box :child (str resp)]
+                                                   [:box :child (str "running " command)
+                                                    :style {:font-size "12px"}]]] 6 1.5 5])
+        (swap! console-responses assoc command ee))
+      
+      (let [kit-runner-key (str "kit-runner" (hash (str client-name selected-block data-key :clojure :gen-ev)))
+            kit-keypath [:clojure :gen-ev]
+            running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
+            output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
+            ;;running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+            fstr (str "kit-runner " kit-runner-key)
+            w    (/ (count fstr) 4.1)]
+        (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
+        (swap! bricks/waiting? assoc kit-runner-key true)
+        (swap! bricks/temp-extra-subs conj running-key)
+        (swap! bricks/temp-extra-subs conj output-key)
+        (swap! db/kit-fn-lookup assoc [selected-block data-key] running-key)
+        (ut/tracked-dispatch
+         [::wfx/push   :default
+          {:kind       :run-kit
+           :kit-keypath kit-keypath
+           :kit-runner-key kit-runner-key
+           :panel-key   selected-block
+           :data-key    data-key
+           :opts-map    opts-map
+           :runner      :clojure
+           :client-name client-name
+           :ui-keypath  [:panels selected-block :queries data-key]}])
+        (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+        (ut/tapp>> [:clicked-kit running-key])
+        (js/setTimeout #(swap! bricks/waiting? assoc kit-runner-key false) 5000))
+      )))
 
 
 
@@ -4520,6 +4567,16 @@
                                                                 :color "brightcyan"
                                                                 :margin-top "4px"}
                                                         :children [[re-com/box
+                                                                    :attr {:on-mouse-over #(reset! hover-text "https://rvbbit.com")
+                                                                           :on-mouse-out #(reset! hover-text nil)}
+                                                                    :child [:a {:href "https://rvbbit.com"
+                                                                                :target "_blank"
+                                                                                :rel "noopener noreferrer"
+                                                                                :style {:color "cyan"
+                                                                                        :text-decoration "none"}}
+                                                                            "rvbbit.com"]]
+                                                                   
+                                                                   [re-com/box
                                                                     :attr {:on-mouse-over #(reset! hover-text "https://twitter.com/ryrobes")
                                                                            :on-mouse-out #(reset! hover-text nil)}
                                                                     :child [:a {:href "https://twitter.com/ryrobes"
@@ -4528,6 +4585,7 @@
                                                                                 :style {:color "cyan"
                                                                                         :text-decoration "none"}}
                                                                             "@ryrobes"]]
+                                                                   
                                                                    [re-com/box
                                                                     :child [:a {:href "https://github.com/ryrobes/rvbbit"
                                                                                 :target "_blank"
@@ -4559,19 +4617,37 @@
                                                                                      :margin-top   "-3px"
                                                                                      :font-size    "15px"}]]]
                                                                    [re-com/box
-                                                                    :attr {:on-mouse-over #(reset! hover-text "https://rvbbit.com")
+                                                                    :child [:a {:href "mailto:ryan.robitaille@gmail.com"
+                                                                                :target "_blank"
+                                                                                :rel "noopener noreferrer"
+                                                                                :style {:color "darkcyan"
+                                                                                        :text-decoration "none"}}
+                                                                            [re-com/md-icon-button :src (at)
+                                                                             :md-icon-name "zmdi-email"
+                                                                             :attr {:on-mouse-over #(reset! hover-text "ryan.robitaille@gmail.com")
+                                                                                    :on-mouse-out #(reset! hover-text nil)}
+                                                                             :style {:color        "darkcyan"
+                                                                                     :z-index      99999
+                                                                                     :cursor       "pointer"
+                                                                                     :margin-top   "-3px"
+                                                                                     :font-size    "15px"}]]]
+                                                                   
+                                                                   
+                                                                   [re-com/box
+                                                                    :attr {:on-mouse-over #(reset! hover-text "https://ryrob.es")
                                                                            :on-mouse-out #(reset! hover-text nil)}
-                                                                    :child [:a {:href "https://rvbbit.com"
+                                                                    :child [:a {:href "https://ryrob.es"
                                                                                 :target "_blank"
                                                                                 :rel "noopener noreferrer"
                                                                                 :style {:color "cyan"
                                                                                         :text-decoration "none"}}
-                                                                            "rvbbit.com"]]
+                                                                            "ryrob.es"]]
+
                                                                    [re-com/box
                                                                     :style {:cursor "crosshair"}
                                                                     :attr {:on-mouse-over #(reset! hover-text "(proudly built in Florida, USA)")
                                                                            :on-mouse-out #(reset! hover-text nil)}
-                                                                    :child "🐊🇺🇸"]]]]]]]]]]))})))
+                                                                    :child "🇺🇸🐊"]]]]]]]]]]))})))
 
 
 

@@ -235,7 +235,7 @@
                     file-path)))
 
 (defn db-sniff-solver-default [f-path conn-name]
-  {:signal :signal/every-5-minutes
+  {:signal :signal/daily-at-9am
    :type   :clojure
    :cache? false
    :data   (walk/postwalk-replace
