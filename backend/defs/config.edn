@@ -240,10 +240,11 @@
                                                                   (str "\n\n ##CANVAS-SIZE: \n"
                                                                        (pr-str canvas-size))))
                                                      model :*model
+                                                     context :*context
                                                      req-map {:input input
                                                               :client-name :*client-name
                                                               :id :*id
-                                                              :context :*context
+                                                              :context context
                                                               :runner :*runner
                                                               :pattern :*pattern ;;"clover-canvas"
                                                               :model model}
@@ -266,9 +267,7 @@
                                                                                      :context ""
                                                                                      :runner :*runner
                                                                                      :pattern "clojure-edn-balance"
-                                                                                     :model :*model ;"claude-3-5-sonnet-20240620"
-                                                                                     ;:model "gpt-4"
-                                                                                     })
+                                                                                     :model :*model})
                                                                              fabric-data-str2 (clojure.string/join "\n" (flatten fixed))]
                                                                          (try
                                                                            (clojure.edn/read-string fabric-data-str2)
@@ -281,23 +280,29 @@
                                                                                            :context ""
                                                                                            :runner :*runner
                                                                                            :pattern "clojure-edn-balance"
-                                                                                           :model :*model ;"claude-3-5-sonnet-20240620"
-                                                                                           ;:model "gpt-4"
-                                                                                           })
+                                                                                           :model :*model})
                                                                                    fabric-data-str2 (clojure.string/join "\n" (flatten fixed))]
                                                                                (try
                                                                                  (clojure.edn/read-string fabric-data-str2)
-                                                                                 (catch Exception e (do (println "error parsing fabric-data AGAIN AGAIN... we cooked." e) {})))))))))
+                                                                                 (catch Exception e (do (println "error parsing fabric-data AGAIN AGAIN... we cooked." e) {:error (pr-str e)})))))))))
                                                      kit-map {:push-alerts (let [change-cnt (count (keys clover-map))]
                                                                              {:body [:box
                                                                                      :child [:speak (str model " has returned with " change-cnt " change" (when (= change-cnt 1) "s"))]]
                                                                               :seconds 10})
                                                               :push-assocs clover-map
                                                               :gen-ev {:description "please get to work...?"
-                                                                       :options {:pages? true :search? false :actions? false}
+                                                                       :options {:pages? false :search? false :actions? false}
                                                                        :parameters {}
                                                                        :mutates {}
-                                                                       :data [{:name (str orig-input)
+                                                                       :data [{:name "previous"
+                                                                               ;:step-mutates context
+                                                                               :content [[:box
+                                                                                          :size "auto"
+                                                                                          :style {:border "1px solid #ffffff33"
+                                                                                                  :border-radius "15px"}
+                                                                                          :child "(n/a)"]]}
+                                                                              {:name (str orig-input)
+                                                                               ;:step-mutates clover-map
                                                                                :content [[:box
                                                                                           :size "auto"
                                                                                           :style {:border "1px solid #ffffff33"
