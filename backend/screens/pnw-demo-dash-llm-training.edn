@@ -3,27 +3,16 @@
   [:block_key :block_name :queries :views :block_data :view_names :query_names],
   :fields-sys [:field_name :field_type :data_type],
   :gen-viz-211 [:Electric_Range :Make],
-  :SHOOTING-drag-296 [:SHOOTING :rowcnt],
-  :season-drag-828 [:season :rowcnt],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
   :gen-viz-401 [:rows :Model_Year :State],
-  :STREET-drag-106 [:STREET :rowcnt],
   :Electric-Range-drag-990 [:Electric_Range_Avg],
   :Make-drag-801 [:Make :rowcnt],
-  :Electric-Range-drag-685 [:Electric_Range_Avg],
   :query-385 [:rowcnt],
-  :OFFENSE-CODE-GROUP-drag-327 [:OFFENSE_CODE_GROUP :rowcnt],
-  :offenses-drag-DISTRICT-260 [:DISTRICT :rowcnt],
-  :gen-viz-49 [:Lat :Long :DISTRICT],
+  :raw_custom_override_1989323045__block_86_clojure_new_clojure_ (:query_error),
   :files-sys [:file_path :screen_name :blocks :queries :ts],
-  :albums (:query_error),
-  :albums-drag-289 [:album_name :img_300 :img_640 :popularity :release_date],
   :State-drag-734 [:State :rowcnt :County],
-  :offenses-drag-OFFENSE-CODE-GROUP-885 [:OFFENSE_CODE_GROUP :rowcnt],
-  :query-11564 [:rowcnt],
-  :gen-viz-710 [:HOUR :day_sqlite_OCCURRED_ON_DATE :DAY_OF_WEEK],
-  :gen-viz-821 [:rows :tour_name],
+  :new-clojure-sqlized [:ffilename],
   :Electric-Vehicle-Population-Data-drag-580
   [:Base_MSRP
    :City
@@ -42,107 +31,8 @@
    :Vehicle_Location
    :_2020_Census_Tract
    :zipcode],
-  :bigfoot-sightings-locations-drag-305
-  [:alsonoticed
-   :bfroid
-   :class
-   :county
-   :cty_abbrev
-   :cty_name
-   :date
-   :environment
-   :fips_county_code
-   :fips_state_code
-   :fixed_month
-   :fixed_year
-   :housing_units
-   :land_area
-   :latitude
-   :locationdetails
-   :longitude
-   :month
-   :nearestroad
-   :nearesttown
-   :observed
-   :otherstories
-   :otherwitnesses
-   :population
-   :run_id
-   :run_time
-   :season
-   :state
-   :state_abbrev
-   :state_name
-   :submitted
-   :submitted_date
-   :timeandconditions
-   :title
-   :url
-   :water_area
-   :year
-   :zip_lat
-   :zip_long
-   :zip_name
-   :zipcode],
-  :gen-viz-1198 [:value :day],
-  :fixed-year-drag-818 [:fixed_year :rowcnt],
-  :shows (:query_error),
-  :offenses-drag-377
-  [:DAY_OF_WEEK
-   :DISTRICT
-   :HOUR
-   :INCIDENT_NUMBER
-   :Lat
-   :Location
-   :Long
-   :MONTH
-   :OCCURRED_ON_DATE
-   :OFFENSE_CODE
-   :OFFENSE_CODE_GROUP
-   :OFFENSE_DESCRIPTION
-   :REPORTING_AREA
-   :SHOOTING
-   :STREET
-   :UCR_PART
-   :YEAR],
-  :gen-viz-987 [:rows :YEAR],
   :Electric_Vehicle_Population_Data (:query_error),
-  :gen-viz-502 [:REPORTING_AREA :day_sqlite_OCCURRED_ON_DATE],
-  :gen-viz-1217
-  [:min_long :max_long :min_lat :max_lat :a_lat :a_long :long_diff :lat_diff],
-  :offenses-drag-761
-  [:DAY_OF_WEEK
-   :DISTRICT
-   :HOUR
-   :INCIDENT_NUMBER
-   :Lat
-   :Location
-   :Long
-   :MONTH
-   :OCCURRED_ON_DATE
-   :OFFENSE_CODE
-   :OFFENSE_CODE_GROUP
-   :OFFENSE_DESCRIPTION
-   :REPORTING_AREA
-   :SHOOTING
-   :STREET
-   :UCR_PART
-   :YEAR],
-  :bigfoot-sightings-locations-drag-class-428 [:class :rowcnt],
-  :tour-name-drag-420 [:tour_name :rowcnt],
-  :bigfoot_sightings_locations (:query_error),
-  :offenses (:query_error),
-  :connections-sys [:database_name :connection_id :styler_highlight_8717ssa],
-  :OFFENSE-CODE-GROUP-drag-732 [:OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :rowcnt],
-  :gen-viz-363 [:fips_state_code :rows],
-  :shows-drag-525 [:location :show_date :show_id :show_name :title :tour_name],
-  :gen-viz-413
-  [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-  :gen-viz-413-clone-633
-  [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-  :gen-viz-1126 [:rows :day_sqlite_OCCURRED_ON_DATE :DISTRICT],
-  :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941
-  [:Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility :rowcnt]},
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ssa]},
  :reco-preview "2006850921",
  :sql-source
  {:gen-viz-211
@@ -168,82 +58,6 @@
       :zipcode],
      :from [[:Electric_Vehicle_Population_Data :aa583]]}],
    :group-by [:Make]},
-  :SHOOTING-drag-296
-  {:select [:SHOOTING [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :yy713]],
-      :where [:= :DISTRICT "B3"]}
-     :ww329]],
-   :group-by [:SHOOTING],
-   :order-by [[:rowcnt :desc]]},
-  :season-drag-828
-  {:select [:season [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:alsonoticed
-       :bfroid
-       :class
-       :county
-       :cty_abbrev
-       :cty_name
-       :date
-       :environment
-       :fips_county_code
-       :fips_state_code
-       :fixed_month
-       :fixed_year
-       :housing_units
-       :land_area
-       :latitude
-       :locationdetails
-       :longitude
-       :month
-       :nearestroad
-       :nearesttown
-       :observed
-       :otherstories
-       :otherwitnesses
-       :population
-       :run_id
-       :run_time
-       :season
-       :state
-       :state_abbrev
-       :state_name
-       :submitted
-       :submitted_date
-       :timeandconditions
-       :title
-       :url
-       :water_area
-       :year
-       :zip_lat
-       :zip_long
-       :zip_name
-       :zipcode],
-      :from [[:bigfoot_sightings_locations :kk67]],
-      :where [:= :class "Class A"]}
-     :dd830]],
-   :group-by [:season],
-   :order-by [[:rowcnt :desc]]},
   :gen-viz-401
   {:select [[[:count 1] :rows] :Model_Year :State],
    :from
@@ -267,32 +81,6 @@
       :zipcode],
      :from [[:Electric_Vehicle_Population_Data :aa583]]}],
    :group-by [:Model_Year :State]},
-  :STREET-drag-106
-  {:select [:STREET [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :yy713]],
-      :where [:= :DISTRICT "B3"]}
-     :ii852]],
-   :group-by [:STREET],
-   :order-by [[:rowcnt :desc]]},
   :Electric-Range-drag-990
   {:select [[[:avg :Electric_Range] :Electric_Range_Avg]],
    :from
@@ -341,39 +129,6 @@
      :dd691]],
    :group-by [:Make],
    :order-by [[:rowcnt :desc]]},
-  :Electric-Range-drag-685
-  {:select [[[:avg :Electric_Range] :Electric_Range_Avg]],
-   :from
-   [[{:select
-      [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-      :from
-      [[{:select
-         [[[[:avg :Electric_Range]] :Electric_Range]
-          :Make
-          :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-         :from
-         [{:select
-           [:Base_MSRP
-            :City
-            :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-            :County
-            :DOL_Vehicle_ID
-            :Electric_Range
-            :Electric_Utility
-            :Electric_Vehicle_Type
-            :Legislative_District
-            :Make
-            :Model
-            :Model_Year
-            :State
-            :VIN_1_10
-            :Vehicle_Location
-            :_2020_Census_Tract
-            :zipcode],
-           :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-         :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}
-        :cc758]]}
-     :cc649]]},
   :query-385
   {:select [[[:count 1] :rowcnt]],
    :from
@@ -397,64 +152,11 @@
        :zipcode],
       :from [[:Electric_Vehicle_Population_Data :aa583]]}
      :jj797]]},
-  :OFFENSE-CODE-GROUP-drag-327
-  {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :yy713]],
-      :where [:= :DISTRICT "B3"]}
-     :qq486]],
-   :group-by [:OFFENSE_CODE_GROUP],
-   :order-by [[:rowcnt :desc]]},
-  :offenses-drag-DISTRICT-260
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from [[:offenses :hh24]],
-   :group-by [:DISTRICT],
-   :order-by [[:rowcnt :desc]]},
-  :gen-viz-49
-  {:select-distinct [:Lat :Long :DISTRICT],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :yy713]],
-     :where [:= :DISTRICT "B3"]}]},
-  :albums {:select [:*], :connection-id "system-db", :from [:albums], :limit 111},
-  :albums-drag-289
-  {:select [:album_name :img_300 :img_640 :popularity :release_date],
-   :from [[:albums :gg872]]},
+  :raw_custom_override_1989323045__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_],
+   :limit 111},
   :State-drag-734
   {:select [:State [[:count 1] :rowcnt] :County],
    :from
@@ -480,92 +182,13 @@
      :dd661]],
    :group-by [:State :County],
    :order-by [[:rowcnt :desc]]},
-  :offenses-drag-OFFENSE-CODE-GROUP-885
-  {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
-   :from [[:offenses :mm685]],
-   :group-by [:OFFENSE_CODE_GROUP],
-   :order-by [[:rowcnt :desc]]},
-  :query-11564
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:alsonoticed
-       :bfroid
-       :class
-       :county
-       :cty_abbrev
-       :cty_name
-       :date
-       :environment
-       :fips_county_code
-       :fips_state_code
-       :fixed_month
-       :fixed_year
-       :housing_units
-       :land_area
-       :latitude
-       :locationdetails
-       :longitude
-       :month
-       :nearestroad
-       :nearesttown
-       :observed
-       :otherstories
-       :otherwitnesses
-       :population
-       :run_id
-       :run_time
-       :season
-       :state
-       :state_abbrev
-       :state_name
-       :submitted
-       :submitted_date
-       :timeandconditions
-       :title
-       :url
-       :water_area
-       :year
-       :zip_lat
-       :zip_long
-       :zip_name
-       :zipcode],
-      :from [[:bigfoot_sightings_locations :kk67]],
-      :where [:= :class "Class A"]}
-     :qq678]]},
-  :gen-viz-710
-  {:select
-   [[[[:sum :HOUR]] :HOUR]
-    [[:substr :OCCURRED_ON_DATE 0 11] :day_sqlite_OCCURRED_ON_DATE]
-    :DAY_OF_WEEK],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :cc804]],
-     :where [:= :OFFENSE_CODE_GROUP "Harassment"]}],
-   :group-by [[:substr :OCCURRED_ON_DATE 0 11] :DAY_OF_WEEK]},
-  :gen-viz-821
-  {:select [[[:count 1] :rows] :tour_name],
-   :from
-   [{:select [:location :show_date :show_id :show_name :title :tour_name],
-     :from [[:shows :cc542]]}],
-   :group-by [:tour_name]},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-25 21:33:25",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1851117399,
+   :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_]},
   :Electric-Vehicle-Population-Data-drag-580
   {:select
    [:Base_MSRP
@@ -586,474 +209,22 @@
     :_2020_Census_Tract
     :zipcode],
    :from [[:Electric_Vehicle_Population_Data :aa583]]},
-  :bigfoot-sightings-locations-drag-305
-  {:select
-   [:alsonoticed
-    :bfroid
-    :class
-    :county
-    :cty_abbrev
-    :cty_name
-    :date
-    :environment
-    :fips_county_code
-    :fips_state_code
-    :fixed_month
-    :fixed_year
-    :housing_units
-    :land_area
-    :latitude
-    :locationdetails
-    :longitude
-    :month
-    :nearestroad
-    :nearesttown
-    :observed
-    :otherstories
-    :otherwitnesses
-    :population
-    :run_id
-    :run_time
-    :season
-    :state
-    :state_abbrev
-    :state_name
-    :submitted
-    :submitted_date
-    :timeandconditions
-    :title
-    :url
-    :water_area
-    :year
-    :zip_lat
-    :zip_long
-    :zip_name
-    :zipcode],
-   :from [[:bigfoot_sightings_locations :kk67]],
-   :where [:= :class "Class A"]},
-  :gen-viz-1198
-  {:select [[[[:count 1]] :value] [[:substr :OCCURRED_ON_DATE 0 11] :day]],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :cc804]],
-     :where [:= :OFFENSE_CODE_GROUP "Harassment"]}],
-   :group-by [[:substr :OCCURRED_ON_DATE 0 11]]},
-  :fixed-year-drag-818
-  {:select [:fixed_year [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:alsonoticed
-       :bfroid
-       :class
-       :county
-       :cty_abbrev
-       :cty_name
-       :date
-       :environment
-       :fips_county_code
-       :fips_state_code
-       :fixed_month
-       :fixed_year
-       :housing_units
-       :land_area
-       :latitude
-       :locationdetails
-       :longitude
-       :month
-       :nearestroad
-       :nearesttown
-       :observed
-       :otherstories
-       :otherwitnesses
-       :population
-       :run_id
-       :run_time
-       :season
-       :state
-       :state_abbrev
-       :state_name
-       :submitted
-       :submitted_date
-       :timeandconditions
-       :title
-       :url
-       :water_area
-       :year
-       :zip_lat
-       :zip_long
-       :zip_name
-       :zipcode],
-      :from [[:bigfoot_sightings_locations :kk67]],
-      :where [:= :class "Class A"]}
-     :rr597]],
-   :group-by [:fixed_year],
-   :order-by [[:rowcnt :desc]]},
-  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
-  :offenses-drag-377
-  {:select
-   [:DAY_OF_WEEK
-    :DISTRICT
-    :HOUR
-    :INCIDENT_NUMBER
-    :Lat
-    :Location
-    :Long
-    :MONTH
-    :OCCURRED_ON_DATE
-    :OFFENSE_CODE
-    :OFFENSE_CODE_GROUP
-    :OFFENSE_DESCRIPTION
-    :REPORTING_AREA
-    :SHOOTING
-    :STREET
-    :UCR_PART
-    :YEAR],
-   :from [[:offenses :cc804]],
-   :where [:= :OFFENSE_CODE_GROUP "Harassment"]},
-  :gen-viz-987
-  {:select [[[:count 1] :rows] :YEAR],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :yy713]],
-     :where [:= :DISTRICT "B3"]}],
-   :group-by [:YEAR]},
   :Electric_Vehicle_Population_Data
   {:select [:*],
    :connection-id "system-db",
    :from [:Electric_Vehicle_Population_Data],
-   :limit 111},
-  :gen-viz-502
-  {:select
-   [[[[:sum :REPORTING_AREA]] :REPORTING_AREA]
-    [[:substr :OCCURRED_ON_DATE 0 8] :day_sqlite_OCCURRED_ON_DATE]],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :cc804]],
-     :where [:= :OFFENSE_CODE_GROUP "Harassment"]}],
-   :group-by [[:substr :OCCURRED_ON_DATE 0 8]]},
-  :gen-viz-1217
-  {:select
-   [[[:min :Long] :min-long]
-    [[:max :Long] :max-long]
-    [[:min :Lat] :min-lat]
-    [[:max :Lat] :max-lat]
-    [[:avg :Lat] :a-lat]
-    [[:avg :Long] :a-long]
-    [[:round [:raw ["(" [:max :Long] " - " [:min :Long] ") * 55"]] 2] :long_diff]
-    [[:round [:raw ["(" [:max :Lat] " - " [:min :Lat] ") * 55"]] 2] :lat_diff]],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :yy713]],
-     :where [:= :DISTRICT "B3"]}],
-   :where [:and [:<> :Lat -1] [:<> :Lat nil] [:<> :Long -1] [:<> :Long nil]]},
-  :offenses-drag-761
-  {:select
-   [:DAY_OF_WEEK
-    :DISTRICT
-    :HOUR
-    :INCIDENT_NUMBER
-    :Lat
-    :Location
-    :Long
-    :MONTH
-    :OCCURRED_ON_DATE
-    :OFFENSE_CODE
-    :OFFENSE_CODE_GROUP
-    :OFFENSE_DESCRIPTION
-    :REPORTING_AREA
-    :SHOOTING
-    :STREET
-    :UCR_PART
-    :YEAR],
-   :from [[:offenses :yy713]],
-   :where [:= :DISTRICT "B3"]},
-  :bigfoot-sightings-locations-drag-class-428
-  {:select [:class [[:count 1] :rowcnt]],
-   :from [[:bigfoot_sightings_locations :ff215]],
-   :group-by [:class],
-   :order-by [[:rowcnt :desc]]},
-  :tour-name-drag-420
-  {:select [:tour_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:location :show_date :show_id :show_name :title :tour_name],
-      :from [[:shows :cc542]]}
-     :pp438]],
-   :group-by [:tour_name],
-   :order-by [[:rowcnt :desc]]},
-  :bigfoot_sightings_locations
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:bigfoot_sightings_locations],
-   :limit 111},
-  :offenses
-  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
-  :OFFENSE-CODE-GROUP-drag-732
-  {:select [:OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :yy713]],
-      :where [:= :DISTRICT "B3"]}
-     :yy891]],
-   :group-by [:OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION],
-   :order-by [[:rowcnt :desc]]},
-  :gen-viz-363
-  {:select [:fips_state_code [[:count 1] :rows]],
-   :from
-   [{:select
-     [:alsonoticed
-      :bfroid
-      :class
-      :county
-      :cty_abbrev
-      :cty_name
-      :date
-      :environment
-      :fips_county_code
-      :fips_state_code
-      :fixed_month
-      :fixed_year
-      :housing_units
-      :land_area
-      :latitude
-      :locationdetails
-      :longitude
-      :month
-      :nearestroad
-      :nearesttown
-      :observed
-      :otherstories
-      :otherwitnesses
-      :population
-      :run_id
-      :run_time
-      :season
-      :state
-      :state_abbrev
-      :state_name
-      :submitted
-      :submitted_date
-      :timeandconditions
-      :title
-      :url
-      :water_area
-      :year
-      :zip_lat
-      :zip_long
-      :zip_name
-      :zipcode],
-     :from [[:bigfoot_sightings_locations :kk67]],
-     :where [:= :class "Class A"]}],
-   :group-by [:fips_state_code]},
-  :shows-drag-525
-  {:select [:location :show_date :show_id :show_name :title :tour_name],
-   :from [[:shows :cc542]]},
-  :gen-viz-413
-  {:select
-   [[[[:avg :Electric_Range]] :Electric_Range]
-    :Make
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]},
-  :gen-viz-413-clone-633
-  {:select [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :from
-   [[{:select
-      [[[[:avg :Electric_Range]] :Electric_Range]
-       :Make
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-      :from
-      [{:select
-        [:Base_MSRP
-         :City
-         :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-         :County
-         :DOL_Vehicle_ID
-         :Electric_Range
-         :Electric_Utility
-         :Electric_Vehicle_Type
-         :Legislative_District
-         :Make
-         :Model
-         :Model_Year
-         :State
-         :VIN_1_10
-         :Vehicle_Location
-         :_2020_Census_Tract
-         :zipcode],
-        :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-      :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}
-     :cc758]]},
-  :gen-viz-1126
-  {:select
-   [[[[:count 1]] :rows]
-    [[:substr :OCCURRED_ON_DATE 0 8] :day_sqlite_OCCURRED_ON_DATE]
-    :DISTRICT],
-   :page -1,
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :cc804]],
-     :where [:= :OFFENSE_CODE_GROUP "Harassment"]}],
-   :group-by [[:substr :OCCURRED_ON_DATE 0 8] :DISTRICT]},
-  :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941
-  {:select [:Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-      :from
-      [[{:select
-         [[[[:avg :Electric_Range]] :Electric_Range]
-          :Make
-          :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-         :from
-         [{:select
-           [:Base_MSRP
-            :City
-            :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-            :County
-            :DOL_Vehicle_ID
-            :Electric_Range
-            :Electric_Utility
-            :Electric_Vehicle_Type
-            :Legislative_District
-            :Make
-            :Model
-            :Model_Year
-            :State
-            :VIN_1_10
-            :Vehicle_Location
-            :_2020_Census_Tract
-            :zipcode],
-           :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-         :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}
-        :cc758]]}
-     :xx436]],
-   :group-by [:Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :order-by [[:rowcnt :desc]],
-   :col-widths {:rowcnt 95, :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility 515}}},
- :doom-modal? false,
+   :limit 111}},
  :meta
- {:query-preview112960637
+ {nil
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :query-preview112960637
   {:fields
    {:rows
     {:data-type "integer", :distinct 2, :commons {1 499, 2 1}, :cardinality 0},
@@ -1088,90 +259,89 @@
   :blocks-sys
   {:fields
    {:block_key
-    {:min ":*theme*",
+    {:min "",
      :data-type "string",
-     :commons {":block-3889" 1, ":block-757" 1, ":block-8119" 1},
-     :distinct 42,
+     :commons {":block-3392" 1, ":block-5844" 1, ":block-3777" 1},
+     :distinct 70,
      :group-by? true,
-     :median ":block-6751",
-     :max "strategic grill locations",
-     :avg ":*theme* (non-numeric average)",
+     :median ":block-4932",
+     :max "through the rabbit hole and out the other side",
+     :avg ":viz-shapes0-list* (non-numeric average)",
      :cardinality 100},
     :block_name
-    {:min "(meta: this screen's theme, who ya gonna call? )",
+    {:min "",
      :data-type "string",
      :commons
-     {"drag-from-clone-gen-viz-413633" 2,
-      "point_map_colors - DISTRICT, Lat, Long - 26" 1,
-      "select-all-deniro" 1},
-     :distinct 41,
+     {"drag-from-select-all-ufo_sightings" 4,
+      "select-all-offenses" 3,
+      "drag-from-select-all-offenses" 3},
+     :distinct 61,
      :group-by? true,
-     :median "board: strategic grill locations",
-     :max "us_states_fips_map_dim - fips_state_code, rows - 1230",
-     :avg "(meta: this screen's theme, who ya gonna call? ) (non-numeric average)",
-     :cardinality 97},
+     :median "block-9369",
+     :max "views-block-4932",
+     :avg " (non-numeric average)",
+     :cardinality 87},
     :queries
     {:min 0,
      :data-type "integer",
-     :commons {1 22, 0 19, 2 1},
+     :commons {0 44, 1 24, 2 2},
      :distinct 3,
      :group-by? true,
-     :median 1,
+     :median 0,
      :max 2,
-     :avg 0.5714285714285714,
-     :cardinality 7},
+     :avg 0.4,
+     :cardinality 4},
     :views
     {:min 0,
      :data-type "integer",
-     :commons {0 23, 1 16, 2 2},
+     :commons {1 34, 0 29, 2 6},
      :distinct 4,
      :group-by? true,
-     :median 0,
-     :max 24,
-     :avg 1.0476190476190477,
-     :cardinality 9},
+     :median 1,
+     :max 28,
+     :avg 1.0571428571428572,
+     :cardinality 5},
     :block_data
     {:min
-     "{:h 10, :w 13, :connection-id \"imported\", :name \"clone-gen-viz-413633\", :queries {:gen-viz-413-clone-633 {:select [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility], :from [[:query/gen-viz-413 :cc758]]}}, :root [20 2], :tab \"rectangular hippopotamus\"}",
+     "{:clojure {:large-bg (do (let [dir \"/home/ryanr/rvbbit/frontend/resources/public/images/large\" rel-dir \"./images/large/\" files (->> (file-seq (clojure.java.io/file dir)) (filter (fn [x] (.isFile x))) (filter (fn [x] (not (clojure.string/includes? (str (.getName x)) \"8k\")))) (map (fn [x] (.getName x))))] (println (count files)) (vec (for [f files] {:ffilename (str f)}))))}, :name \"block-2361\", :w 7, :selected-mode {:large-bg :rowset}, :selected-view :large-bgss, :root [38 2], :h 14, :connection-id :*client-name*, :queries {:large-bg-sqlized {:select [:*], :connection-id :restored-star-shaped-moose-41, :_sqlized-at \"2024-08-10 16:24:05\", :_sqlized-by [:block-2361 :clojure :large-bg], :_sqlized-hash 1851117399, :from [:raw_custom_override346250891__block_2361_clojure_large_bg_]}}, :tab \"azure oyster\", :views {}}",
      :data-type "string",
      :commons
-     {"{:h 7, :w 30, :connection-id \"imported\", :name \"select-all-Electric_Vehicle_Population_Data\", :queries {:Electric-Vehicle-Population-Data-drag-580 {:select [:Base_MSRP :City :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility :County :DOL_Vehicle_ID :Electric_Range :Electric_Utility :Electric_Vehicle_Type :Legislative_District :Make :Model :Model_Year :State :VIN_1_10 :Vehicle_Location :_2020_Census_Tract :zipcode], :from [[:Electric_Vehicle_Population_Data :aa583]]}}, :root [1 1], :tab \"pnw ev data.csv\"}"
+     {"{:name \"views-block-10898\", :w 9, :selected-mode {:clover-hop-1 :edn}, :selected-view :clover-hop-1, :root [20 18], :h 6, :opts {:clover-hop-1 {}}, :queries {}, :tab \"sapphire ape\", :minimized? false, :views {:clover-hop-1 [:app-db [:click-param :param]]}}"
       1,
-      "{:h 11, :w 19, :root [12 8], :name \"basic_h_bar_color - Model_Year, State, rows - 99\", :connection-id \"imported\", :views {:oz [:vega-lite {:layer [{:encoding {:x {:field :Model_Year, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :field :State, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-401}, :config :theme/vega-defaults, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]}, :queries {:gen-viz-401 {:select [[[:count 1] :rows] :Model_Year :State], :from [:query/Electric-Vehicle-Population-Data-drag-580], :group-by [:Model_Year :State]}}, :tab \"pnw ev data.csv\"}"
+      "{:h 4, :w 6, :tab \"fat hawk\", :root [17 2], :name \"block-11696\", :views {:pulled-val [:box :size \"auto\" :align :center :justify :center :style {:font-size [:auto-size-px :param/generated-colors>second-darkest]} :child [:string :param/generated-colors>second-darkest]]}, :queries {}}"
       1,
-      "{:h 7, :w 7, :views {:view-clone [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"} :child [:img {:src :albums-drag-289/img_640.10, :width \"100%\"}]]}, :name \"clone-view-clone809\", :root [15 8], :tab \"poor touring me\"}"
+      "{:h 3, :w 5, :root [5 5], :tab \"azure oyster\", :selected-view :hare-vw-4, :name \"block-7935\", :views {:hare-vw-4 [:box :align :center :justify :center :style {:font-size \"21px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"How long is forever? Sometimes, just one second.\"]}, :queries {}}"
       1},
-     :distinct 42,
+     :distinct 70,
      :group-by? true,
      :median
-     "{:h 7, :w 7, :tab \"poor touring me\", :root [19 1], :name \"block-7979\", :views {:param [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"} :child [:img {:src :albums-drag-289/img_640, :width \"100%\"}]]}, :queries {}}",
+     "{:h 7, :w 27, :connection-id \"system-db\", :name \"select-all-kits\", :queries {:kits-drag-39 {:select [:client_name :id :item_data :item_hash :item_key :item_name :item_options :item_type :updated], :from [[:kits :uu908]]}}, :root [2 9], :tab \"amber hog\"}",
      :max
-     "{:theme-name \"who ya gonna call?\", :codemirror-theme \"ayu-mirage\", :editor-param-background-color \"#0b1122\", :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#0b031b\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b1122\", :editor-rim-color \"#0b1122\", :vega-default-color-scheme {:scheme \"accent\"}, :editor-grid-selected-font-color \"#ffffff\", :monospaced-font \"IBM Plex Mono\", :editor-grid-selected-background-color \"#FFA50087\", :editor-outer-rim-color \"#33ffb7\", :grid-selected-font-color \"#ffffff\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#8879bc\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/fake-brick5.png)\", :background-color \"#47555e\", :background-repeat \"repeat\"}, :editor-font-color \"#ffffff\", :base-font \"Oxygen Mono\", :block-tab-selected-font-color \"#FFA500\", :editor-background-color \"#000000\", :editor-grid-font-color \"#ffffff\"}",
+     "{:queries {:viz-shapes0-sys->-shape {:select [:*], :from nil, :where [:*when {} [:*all= {} []]]}}, :selected-view :viz-shapes0-sys->-shape}",
      :avg
-     "{:theme-name \"who ya gonna call?\", :codemirror-theme \"ayu-mirage\", :editor-param-background-color \"#0b1122\", :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#0b031b\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b1122\", :editor-rim-color \"#0b1122\", :vega-default-color-scheme {:scheme \"accent\"}, :editor-grid-selected-font-color \"#ffffff\", :monospaced-font \"IBM Plex Mono\", :editor-grid-selected-background-color \"#FFA50087\", :editor-outer-rim-color \"#33ffb7\", :grid-selected-font-color \"#ffffff\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#8879bc\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/fake-brick5.png)\", :background-color \"#47555e\", :background-repeat \"repeat\"}, :editor-font-color \"#ffffff\", :base-font \"Oxygen Mono\", :block-tab-selected-font-color \"#FFA500\", :editor-background-color \"#000000\", :editor-grid-font-color \"#ffffff\"} (non-numeric average)",
+     "{:queries {:viz-shapes0-sys->-shape {:select [:*], :from nil, :where [:*when {} [:*all= {} []]]}}, :selected-view :viz-shapes0-sys->-shape} (non-numeric average)",
      :cardinality 100},
     :view_names
     {:min "",
      :data-type "string",
-     :commons {"" 23, ":oz" 7, ":param" 4},
-     :distinct 8,
+     :commons {"" 29, ":hi :stack" 6, ":param-val" 6},
+     :distinct 23,
      :group-by? true,
-     :median "",
-     :max ":view-clone",
-     :avg
-     ":theme-name :codemirror-theme :editor-param-background-color :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :vega-default-color-scheme :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color (non-numeric average)",
-     :cardinality 19},
+     :median ":hare-vw",
+     :max "console-out",
+     :avg " (non-numeric average)",
+     :cardinality 32},
     :query_names
     {:min "",
      :data-type "string",
-     :commons {"" 19, ":shows-drag-525" 1, ":deniro-drag-796" 1},
-     :distinct 24,
+     :commons {"" 44, ":setlists-drag-2" 1, ":tour-name-drag-11" 1},
+     :distinct 27,
      :group-by? true,
-     :median ":Electric-Range-drag-685",
-     :max ":tour-name-drag-420",
-     :avg " (non-numeric average)",
-     :cardinality 57}},
-   :rowcount 42},
+     :median "",
+     :max ":viz-shapes0-sys->-shape",
+     :avg ":viz-shapes0-sys->-shape (non-numeric average)",
+     :cardinality 38}},
+   :rowcount 70},
   :fields-sys
   {:fields
    {:field_name
@@ -2020,6 +1190,25 @@
      :commons {1 37, 2 16, 3 9},
      :cardinality 32}},
    :rowcount 177},
+  :raw_custom_override_1989323045__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5701d51c \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5701d51c \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_1989323045__block_86_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :rowcount 4},
   :gen-viz-848
   {:fields
    {:fips_state_code
@@ -2085,55 +1274,59 @@
      {"./screens/weave-test122.edn" 1,
       "./screens/nightcity-cape-cod.edn" 1,
       "./screens/duality-of-lepus.edn" 1},
-     :distinct 186,
+     :distinct 189,
      :group-by? true,
-     :median "./screens/looking-glass-redux.edn",
-     :max "/home/ryanr/rvbbit/backend/./screens/server-stats2.edn",
+     :median "./screens/looking-glass-redux23a.edn",
+     :max
+     "/home/ryanr/rvbbit/backend/./screens/tweet-demo-thing-bigfoot-is-blurry.edn",
      :avg
      "./screens/GGGeat-ochre-mole-exiled-from-abyssal-plain.edn (non-numeric average)",
      :cardinality 100},
     :screen_name
     {:min "GGGeat-ochre-mole-exiled-from-abyssal-plain",
      :data-type "string",
-     :commons {"unnamed-screen!" 8, "tallica-param-test2" 2, "server-stats2" 2},
-     :distinct 177,
+     :commons
+     {"unnamed-screen!" 8,
+      "tweet-demo-thing-bigfoot-is-blurry" 2,
+      "tallica-param-test2" 2},
+     :distinct 179,
      :group-by? true,
-     :median "looking-glass-redux23b",
+     :median "looking-glass-redux2aa",
      :max "wow-board",
      :avg "GGGeat-ochre-mole-exiled-from-abyssal-plain (non-numeric average)",
-     :cardinality 95},
+     :cardinality 94},
     :blocks
     {:min 0,
      :data-type "integer",
      :commons {3 45, 12 6, 6 6},
-     :distinct 63,
+     :distinct 64,
      :group-by? true,
      :median 3,
      :max 220,
-     :avg 24.419354838709676,
+     :avg 24.597883597883598,
      :cardinality 33},
     :queries
     {:min 0,
      :data-type "integer",
      :commons {0 54, 5 13, 11 13},
-     :distinct 38,
+     :distinct 40,
      :group-by? true,
      :median 14,
      :max 203,
-     :avg 12.209677419354838,
-     :cardinality 20},
+     :avg 12.328042328042327,
+     :cardinality 21},
     :ts
     {:min "2024-08-23 03:12:38",
      :data-type "string",
      :commons
      {"2024-08-23 03:12:44" 29, "2024-08-23 03:12:47" 23, "2024-08-23 03:12:41" 22},
-     :distinct 14,
+     :distinct 17,
      :group-by? true,
      :median "2024-08-23 03:12:44",
-     :max "2024-08-23 15:27:38",
+     :max "2024-08-25 21:18:16",
      :avg "2024-08-23 03:12:41 (non-numeric average)",
-     :cardinality 7}},
-   :rowcount 186},
+     :cardinality 8}},
+   :rowcount 189},
   :albums
   {:fields
    {:query_error
@@ -2369,6 +1562,22 @@
      {"2010-09-22 Christchurch, New Zealand" 1,
       "2013-12-08 South Shetland Islands, Antarctica" 1,
       "2017-07-14 Quebec City, QC, Canada" 1},
+     :cardinality 100}},
+   :rowcount 500},
+  :new-clojure-sqlized
+  {:fields
+   {:ffilename
+    {:min "Screenshot_20240519_025447aa-4k.webp",
+     :data-type "string",
+     :commons
+     {"b64-image5-57853-95564-4k.webp" 1,
+      "b64-image3-65849-64925-4k.webp" 1,
+      "b64-image-83886-74618-4k.webp" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "b64-image-94454-75088-4k.webp",
+     :max "yvette56-localup2.png",
+     :avg "b64-image-53204-84575-4k.webp (non-numeric average)",
      :cardinality 100}},
    :rowcount 500},
   :query-preview-1342662105-2
@@ -3396,6 +2605,15 @@
      :cardinality 100},
     :rowcnt {:data-type "integer", :distinct 1, :commons {1 44}, :cardinality 2}},
    :rowcount 44},
+  :new-clojure
+  {:fields
+   {:ffilename
+    {:data-type "string",
+     :distinct 1041,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1041},
   :query-preview875293601
   {:fields
    {:Lat
@@ -5063,39 +4281,19 @@
      :cardinality 55}},
    :rowcount 9}},
  :default-col-widths
- {:block-5567 {:season-drag-828 180},
-  :block-6751 {:gen-viz-413-clone-633 203},
-  :block-8873 {:bigfoot-sightings-locations-drag-305 100},
-  :block-5404 {:tour-name-drag-420 205},
-  :block-8119 {:Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941 305},
-  :block-10226 {:STREET-drag-106 180},
-  :block-7822 {:offenses-drag-761 100},
-  :block-6186 {:fixed-year-drag-818 105},
-  :block-5706 {:Electric-Range-drag-685 261},
+ {:block-86 {:new-clojure-sqlized 361},
   :block-1832 {:Make-drag-801 105},
-  :block-989 {:gen-viz-401 170},
-  :block-10210 {:offenses-drag-OFFENSE-CODE-GROUP-885 280},
   :block-5365 {:Electric-Range-drag-990 211},
-  :block-7210 {:OFFENSE-CODE-GROUP-drag-327 180},
   :system-connections-list* {:connections-sys 126},
-  :block-7226 {:offenses-drag-DISTRICT-260 105},
   :system-fields-list* {:fields-sys 170},
-  :block-5922 {:albums-drag-289 172},
-  :block-8661 {:query-11564 211},
   :files-list* {:files-sys 170},
-  :block-167 {:gen-viz-211 255},
-  :block-8414 {:SHOOTING-drag-296 130},
   :block-3352 {:State-drag-734 103},
   :block-10336 {:Electric-Vehicle-Population-Data-drag-580 103},
-  :block-739 {:OFFENSE-CODE-GROUP-drag-732 170},
-  :block-1922 {:shows-drag-525 110},
-  :block-11046 {:bigfoot-sightings-locations-drag-class-428 180},
   :blocks-list* {:blocks-sys 127},
   :block-5215 {:query-385 211},
-  :block-7920 {:offenses-drag-377 100},
   :system-tables-list* {:tables-sys 133}},
  :runstream-drops nil,
- :tabs ["pnw ev data.csv"],
+ :tabs ["pnw ev data.csv" "marvelous ape"],
  :selected-cols nil,
  :server
  {:settings
@@ -5313,6 +4511,7 @@
     "my-goodness"
     "my-goodness-the-sequel"
     "neverwinter-amy"
+    "new-age-hacking"
     "night-city-never-sleeps"
     "nightcity-cape-cod"
     "nivo-getting-better!"
@@ -5329,6 +4528,7 @@
     "pink-and-green-elk"
     "pink-dusk-falls"
     "pinup-rabbit-fields"
+    "pnw-demo-dash-llm-training"
     "pomp-girl1"
     "pomp-girl2"
     "poor-touring-me"
@@ -5391,143 +4591,26 @@
  :buffy? false,
  :valid-kits
  {[:clojure :export-to-csv]
-  [[nil :queries nil]
-   [:reco-preview :queries :query-preview]
-   [:block-356 :queries :gen-viz-821]
-   [:block-5567 :queries :season-drag-828]
-   [:block-6751 :queries :gen-viz-413-clone-633]
-   [:block-757 :queries :gen-viz-49]
-   [:block-757 :queries :gen-viz-1217]
-   [:block-8873 :queries :bigfoot-sightings-locations-drag-305]
-   [:block-5404 :queries :tour-name-drag-420]
-   [:block-8119 :queries :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941]
-   [:block-10226 :queries :STREET-drag-106]
-   [:block-7822 :queries :offenses-drag-761]
-   [:block-6186 :queries :fixed-year-drag-818]
-   [:block-5706 :queries :Electric-Range-drag-685]
-   [:block-1832 :queries :Make-drag-801]
-   [:block-989 :queries :gen-viz-401]
-   [:block-107 :queries :gen-viz-413]
-   [:block-5365 :queries :Electric-Range-drag-990]
-   [:block-7210 :queries :OFFENSE-CODE-GROUP-drag-327]
-   [:block-7226 :queries :offenses-drag-DISTRICT-260]
-   [:block-5922 :queries :albums-drag-289]
-   [:block-8661 :queries :query-11564]
-   [:block-743 :queries :gen-viz-987]
-   [:block-167 :queries :gen-viz-211]
-   [:block-8414 :queries :SHOOTING-drag-296]
-   [:block-3352 :queries :State-drag-734]
-   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
-   [:block-739 :queries :OFFENSE-CODE-GROUP-drag-732]
-   [:block-91 :queries :gen-viz-363]
-   [:block-1922 :queries :shows-drag-525]
-   [:block-11046 :queries :bigfoot-sightings-locations-drag-class-428]
-   [:block-5215 :queries :query-385]],
+  [[:reco-preview :queries :query-preview]
+   [:block-86 :queries :new-clojure-sqlized]],
   [:clojure :view-lundberg]
-  [[:reco-preview :views :oz]
-   [:block-356 :views :oz]
-   [:block-8804 :views :param]
-   [:block-757 :views :oz]
-   [:block-3889 :views :hi]
-   [:block-5015 :views :hi]
-   [:block-5015 :views :oz]
-   [:block-8189 :views :clover-hop]
-   [:block-7979 :views :param]
-   [:block-989 :views :oz]
-   [:block-9849 :views :param]
-   [:block-107 :views :oz]
-   [:hello-there-brother :views :heya!]
-   [:block-1183 :views :view-clone]
-   [:block-8661 :views :hi]
-   [:block-2932 :views :hi]
-   [:block-7550 :views :view-clone]
-   [:block-743 :views :oz]
-   [:block-2811 :views :hi]
-   [:block-2811 :views :oz]
-   [:block-9092 :views :param]
-   [:block-167 :views :oz]
-   [:block-91 :views :oz]
-   [:block-11429 :views :param]
-   [:block-5215 :views :hi]],
+  [[:reco-preview :views :oz] [:block-86 :views :hare-vw]],
+  [:clojure :gen-ev]
+  [[:reco-preview :queries :query-preview]
+   [:block-86 :queries :new-clojure-sqlized]],
   [:outliers :get-outliers]
-  [[nil :queries nil]
-   [:reco-preview :queries :query-preview]
-   [:block-356 :queries :gen-viz-821]
-   [:block-5567 :queries :season-drag-828]
-   [:block-6751 :queries :gen-viz-413-clone-633]
-   [:block-757 :queries :gen-viz-49]
-   [:block-757 :queries :gen-viz-1217]
-   [:block-8873 :queries :bigfoot-sightings-locations-drag-305]
-   [:block-5404 :queries :tour-name-drag-420]
-   [:block-8119 :queries :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941]
-   [:block-10226 :queries :STREET-drag-106]
-   [:block-7822 :queries :offenses-drag-761]
-   [:block-6186 :queries :fixed-year-drag-818]
-   [:block-5706 :queries :Electric-Range-drag-685]
-   [:block-1832 :queries :Make-drag-801]
-   [:block-989 :queries :gen-viz-401]
-   [:block-107 :queries :gen-viz-413]
-   [:block-5365 :queries :Electric-Range-drag-990]
-   [:block-7210 :queries :OFFENSE-CODE-GROUP-drag-327]
-   [:block-7226 :queries :offenses-drag-DISTRICT-260]
-   [:block-5922 :queries :albums-drag-289]
-   [:block-8661 :queries :query-11564]
-   [:block-743 :queries :gen-viz-987]
-   [:block-167 :queries :gen-viz-211]
-   [:block-8414 :queries :SHOOTING-drag-296]
-   [:block-3352 :queries :State-drag-734]
-   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
-   [:block-739 :queries :OFFENSE-CODE-GROUP-drag-732]
-   [:block-91 :queries :gen-viz-363]
-   [:block-1922 :queries :shows-drag-525]
-   [:block-11046 :queries :bigfoot-sightings-locations-drag-class-428]
-   [:block-5215 :queries :query-385]]},
- :memory [301327642 219198642 4294705152],
- :client-name :worthy-teal-clam-32,
+  [[:reco-preview :queries :query-preview]
+   [:block-86 :queries :new-clojure-sqlized]]},
+ :memory [169585953 142782465 4294705152],
+ :client-name :transforming-Persian-blue-moose-23,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2203, :h 1112},
+ :window {:w 1978, :h 1081},
  :quake-console? false,
+ :implicit-rowsets {:solver [nil :new-clojure]},
  :post-meta
- {:blocks-sys
-  {:* {:rowcount 50},
-   :block_key {:distinct 50},
-   :block_name {:distinct 43},
-   :queries {:distinct 3},
-   :views {:distinct 4},
-   :block_data {:distinct 50},
-   :view_names {:distinct 8},
-   :query_names {:distinct 30}},
-  :fields-sys
-  {:* {:rowcount 41},
-   :field_name {:distinct 41},
-   :field_type {:distinct 4},
-   :data_type {:distinct 4}},
-  :SHOOTING-drag-296
-  {:* {:rowcount 2}, :SHOOTING {:distinct 1}, :rowcnt {:distinct 2}},
-  :Make-drag-801 {:* {:rowcount 34}, :Make {:distinct 34}, :rowcnt {:distinct 33}},
-  :Electric-Range-drag-685 {:* {:rowcount 1}, :Electric_Range_Avg {:distinct 1}},
-  :offenses-drag-DISTRICT-260
-  {:* {:rowcount 13}, :DISTRICT {:distinct 12}, :rowcnt {:distinct 13}},
-  :files-sys
-  {:* {:rowcount 186},
-   :file_path {:distinct 186},
-   :screen_name {:distinct 177},
-   :blocks {:distinct 63},
-   :queries {:distinct 38},
-   :ts {:distinct 14}},
-  :State-drag-734
-  {:* {:rowcount 179},
-   :State {:distinct 43},
-   :rowcnt {:distinct 48},
-   :County {:distinct 164}},
-  :offenses-drag-OFFENSE-CODE-GROUP-885
-  {:* {:rowcount 67}, :OFFENSE_CODE_GROUP {:distinct 67}, :rowcnt {:distinct 64}},
-  :gen-viz-710
-  {:* {:rowcount 1094},
-   :HOUR {:distinct 139},
-   :day_sqlite_OCCURRED_ON_DATE {:distinct 1094},
-   :DAY_OF_WEEK {:distinct 7}},
+ {:Make-drag-801 {:* {:rowcount 34}, :Make {:distinct 34}, :rowcnt {:distinct 33}},
+  :query-385 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
   :Electric-Vehicle-Population-Data-drag-580
   {:VIN_1_10 {:distinct 7803},
    :Vehicle_Location {:distinct 762},
@@ -5547,142 +4630,66 @@
    :State {:distinct 43},
    :Electric_Range {:distinct 101},
    :Legislative_District {:distinct 50}},
-  :bigfoot-sightings-locations-drag-305
-  {:nearestroad {:distinct 1930},
-   :water_area {:distinct 928},
-   :housing_units {:distinct 924},
-   :date {:distinct 599},
-   :* {:rowcount 2486},
-   :locationdetails {:distinct 2082},
-   :submitted_date {:distinct 2004},
-   :bfroid {:distinct 2486},
-   :cty_abbrev {:distinct 50},
-   :otherwitnesses {:distinct 1813},
-   :run_id {:distinct 1},
-   :fips_county_code {:distinct 153},
-   :cty_name {:distinct 689},
-   :nearesttown {:distinct 2035},
-   :timeandconditions {:distinct 2181},
-   :month {:distinct 12},
-   :county {:distinct 821},
-   :land_area {:distinct 930},
-   :longitude {:distinct 2197},
-   :state {:distinct 49},
-   :zipcode {:distinct 1428},
-   :fixed_month {:distinct 12},
-   :submitted {:distinct 2004},
-   :fips_state_code {:distinct 50},
-   :state_abbrev {:distinct 50},
-   :title {:distinct 2484},
-   :otherstories {:distinct 1412},
-   :year {:distinct 260},
-   :season {:distinct 5},
-   :state_name {:distinct 50},
-   :class {:distinct 1},
-   :population {:distinct 928},
-   :zip_long {:distinct 1428},
-   :alsonoticed {:distinct 1429},
-   :zip_lat {:distinct 1428},
-   :url {:distinct 2486},
-   :latitude {:distinct 2197},
-   :observed {:distinct 2460},
-   :environment {:distinct 2302},
-   :fixed_year {:distinct 103},
-   :run_time {:distinct 1613},
-   :zip_name {:distinct 1266}},
-  :offenses-drag-377
-  {:SHOOTING {:distinct 0},
-   :DISTRICT {:distinct 12},
-   :* {:rowcount 4007},
-   :INCIDENT_NUMBER {:distinct 4007},
-   :OFFENSE_DESCRIPTION {:distinct 1},
-   :DAY_OF_WEEK {:distinct 7},
-   :MONTH {:distinct 12},
-   :YEAR {:distinct 4},
-   :HOUR {:distinct 24},
-   :STREET {:distinct 1278},
-   :OFFENSE_CODE_GROUP {:distinct 1},
-   :UCR_PART {:distinct 1},
-   :Long {:distinct 2443},
-   :REPORTING_AREA {:distinct 750},
-   :Location {:distinct 2445},
-   :OFFENSE_CODE {:distinct 1},
-   :Lat {:distinct 2444},
-   :OCCURRED_ON_DATE {:distinct 3957}},
-  :bigfoot_sightings_locations {},
-  :offenses {},
-  :shows-drag-525
-  {:* {:rowcount 2214},
-   :location {:distinct 553},
-   :show_date {:distinct 2194},
-   :show_id {:distinct 2214},
-   :show_name {:distinct 1196},
-   :title {:distinct 2212},
-   :tour_name {:distinct 31}},
-  :gen-viz-413
-  {:* {:rowcount 63},
-   :Electric_Range {:distinct 44},
-   :Make {:distinct 34},
-   :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility {:distinct 3}}},
+  :gen-viz-401
+  {:* {:rowcount 166},
+   :rows {:distinct 27},
+   :Model_Year {:distinct 20},
+   :State {:distinct 43}},
+  :connections-sys
+  {:* {:rowcount 9},
+   :database_name {:distinct 3},
+   :connection_id {:distinct 9},
+   :styler_highlight_8717ssa {:distinct 1}},
+  :blocks-sys
+  {:* {:rowcount 70},
+   :block_key {:distinct 70},
+   :block_name {:distinct 61},
+   :queries {:distinct 3},
+   :views {:distinct 4},
+   :block_data {:distinct 70},
+   :view_names {:distinct 23},
+   :query_names {:distinct 27}},
+  :raw_custom_override_1989323045__block_86_clojure_new_clojure_ {},
+  :new-clojure-sqlized {:* {:rowcount 1041}, :ffilename {:distinct 1041}}},
  :flow-estimates
  {:blocks-sys {:times 0.002, :run-id :blocks-sys},
   :fields-sys {:times 0.001, :run-id :fields-sys},
-  :gen-viz-211 {:times 0.069, :run-id :gen-viz-211},
-  :SHOOTING-drag-296 {:times 0.055, :run-id :SHOOTING-drag-296},
-  :season-drag-828 {:times 0.006, :run-id :season-drag-828},
+  :gen-viz-211 {:times 0.065, :run-id :gen-viz-211},
   :tables-sys {:times 0.001, :run-id :tables-sys},
-  :gen-viz-401 {:times 0.067, :run-id :gen-viz-401},
-  :STREET-drag-106 {:times 0.069, :run-id :STREET-drag-106},
-  :Electric-Range-drag-990 {:times 0.019, :run-id :Electric-Range-drag-990},
-  :Make-drag-801 {:times 0.059, :run-id :Make-drag-801},
-  :Electric-Range-drag-685 {:times 0.113, :run-id :Electric-Range-drag-685},
-  :raw-custom-override-1422475689
-  {:times 0.237, :run-id :raw-custom-override-1422475689},
+  :gen-viz-401 {:times 0.074, :run-id :gen-viz-401},
+  :Electric-Range-drag-990 {:times 0.02, :run-id :Electric-Range-drag-990},
+  :Make-drag-801 {:times 0.06, :run-id :Make-drag-801},
   :query-385 {:times 0.011, :run-id :query-385},
-  :OFFENSE-CODE-GROUP-drag-327 {:times 0.06, :run-id :OFFENSE-CODE-GROUP-drag-327},
-  :offenses-drag-DISTRICT-260 {:times 0.219, :run-id :offenses-drag-DISTRICT-260},
-  :gen-viz-49 {:times 0.006, :run-id :gen-viz-49},
+  "get-my-colors-1147791155-solver-flow-"
+  {:times 1, :run-id "81d7a4d6-fc97-4bd4-9e90-412caeadd30e"},
   :files-sys {:times 0.005, :run-id :files-sys},
-  :albums-drag-289 {:times 0.001, :run-id :albums-drag-289},
-  :offenses-drag-OFFENSE-CODE-GROUP-885
-  {:times 0.194, :run-id :offenses-drag-OFFENSE-CODE-GROUP-885},
-  :query-11564 {:times 0.008, :run-id :query-11564},
-  :gen-viz-710 {:times 0.048, :run-id :gen-viz-710},
-  :gen-viz-821 {:times 0.002, :run-id :gen-viz-821},
+  :State-drag-734 {:times 0.105, :run-id :State-drag-734},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
+  :raw-custom-override-1989323045
+  {:times 0.013, :run-id :raw-custom-override-1989323045},
   :Electric-Vehicle-Population-Data-drag-580
-  {:times 0.016, :run-id :Electric-Vehicle-Population-Data-drag-580},
-  :bigfoot-sightings-locations-drag-305
-  {:times 0.049, :run-id :bigfoot-sightings-locations-drag-305},
-  :gen-viz-1198 {:times 0.038, :run-id :gen-viz-1198},
-  :fixed-year-drag-818 {:times 0.006, :run-id :fixed-year-drag-818},
-  :offenses-drag-377 {:times 0.023, :run-id :offenses-drag-377},
-  :gen-viz-987 {:times 0.051, :run-id :gen-viz-987},
-  :gen-viz-502 {:times 0.048, :run-id :gen-viz-502},
-  :gen-viz-1217 {:times 0.051, :run-id :gen-viz-1217},
-  :offenses-drag-761 {:times 0.021, :run-id :offenses-drag-761},
-  :bigfoot-sightings-locations-drag-class-428
-  {:times 0.009, :run-id :bigfoot-sightings-locations-drag-class-428},
-  :tour-name-drag-420 {:times 0.002, :run-id :tour-name-drag-420},
+  {:times 0.017, :run-id :Electric-Vehicle-Population-Data-drag-580},
   :connections-sys {:times 0.001, :run-id :connections-sys},
-  :OFFENSE-CODE-GROUP-drag-732 {:times 0.074, :run-id :OFFENSE-CODE-GROUP-drag-732},
-  :gen-viz-363 {:times 0.009, :run-id :gen-viz-363},
-  :shows-drag-525 {:times 0.008, :run-id :shows-drag-525},
-  :gen-viz-413 {:times 0.092, :run-id :gen-viz-413},
-  :gen-viz-413-clone-633 {:times 0.074, :run-id :gen-viz-413-clone-633},
-  :gen-viz-1126 {:times 0.045, :run-id :gen-viz-1126},
-  :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941
-  {:times 0.072,
-   :run-id :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941}},
+  "get-my-colors1947372390-solver-flow-"
+  {:times 1, :run-id "bf358c91-0fef-462f-9a48-fa198c2e7e9f"}},
  :status
  {:heartbeat
   {:kick
-   [:flow-status/live-scratch-flow>*running?
-    :kit/kicks>worthy-teal-clam-32
-    :solver/raw-custom-override-1422475689
-    :solver-status/worthy-teal-clam-32>raw-custom-override-1422475689>running?]}},
+   [:solver-status/transforming-Persian-blue-moose-23>raw-custom-override-1989323045>running?
+    :solver-status/transforming-Persian-blue-moose-23>get-my-colors1947372390>running?
+    :kit/kicks>transforming-Persian-blue-moose-23
+    :solver-meta/raw-custom-override-1989323045>output>evald-result>value-hash
+    :flow-status/live-scratch-flow>*running?
+    :solver/raw-custom-override-1989323045
+    :solver/get-my-colors-1147791155
+    :solver/get-my-colors1947372390
+    :solver-status/transforming-Persian-blue-moose-23>get-my-colors-1147791155>running?]},
+  :alert2 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
+  :alert1 {:alerts :alert2}},
  :screen-name "pnw-demo-dash-llm-training",
  :recos-page2 0,
- :selected-tab "pnw ev data.csv",
+ :selected-tab "marvelous ape",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -5698,21 +4705,20 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   279
+   343
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
- {:offenses -505802446,
-  :albums 1594413685,
-  :shows 89957543,
-  :Electric_Vehicle_Population_Data 1659044548,
-  :bigfoot_sightings_locations -435790458},
+ {:Electric_Vehicle_Population_Data 1659044548,
+  :raw_custom_override_1989323045__block_86_clojure_new_clojure_ -1914793508},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -929539562,
+ :user-params-hash -2122954728,
  :grid-recos? true,
+ :preview-keys2 [],
+ :session-hash 1400267690,
  :resolved-queries
- {nil {:_last-run "00:25:53"},
+ {nil {:_last-run "21:33:42"},
   :gen-viz-211
   {:select [[[[:avg :Electric_Range]] :Electric_Range] :Make],
    :from
@@ -5855,6 +4861,13 @@
      :dd661]],
    :group-by [:State :County],
    :order-by [[:rowcnt :desc]]},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-25 21:33:25",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1851117399,
+   :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_]},
   :Electric-Vehicle-Population-Data-drag-580
   {:select
    [:Base_MSRP
@@ -5902,7 +4915,54 @@
      :from [[:Electric_Vehicle_Population_Data :aa583]]}],
    :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}},
  :panels
- {nil {:queries {nil {:_last-run "00:25:53"}}},
+ {nil {:queries {nil {:_last-run "21:33:42"}}},
+  :block-86
+  {:clojure
+   {:new-clojure
+    (do
+      (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+            rel-dir "./images/large/"
+            files (->>
+                    (file-seq (clojure.java.io/file dir))
+                    (filter (fn [x] (.isFile x)))
+                    (filter
+                      (fn [x]
+                        (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                    (map (fn [x] (.getName x))))]
+        (println (count files))
+        (vec (for [f files] {:ffilename (str f)}))))},
+   :name "block-86",
+   :w 8,
+   :selected-view :new-clojure-sqlized,
+   :root [1 2],
+   :h 15,
+   :queries
+   {:new-clojure-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-25 21:33:25",
+     :_sqlized-by [:block-86 :clojure :new-clojure],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override-1989323045>output>evald-result>value-hash,
+     :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_]}},
+   :tab "marvelous ape",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Secrets are not the same as surprises."]}},
   :block-1832
   {:h 5,
    :w 5,
@@ -6070,21 +5130,19 @@
      "hi!"]}}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#2c728e",
-  "boolean" "#f386bf",
-  "map" "#00FFFF",
-  "list" "#c32148",
-  "string" "#5dc963",
-  "any" "#ffffff",
-  "vector" "#008080",
-  "keyword" "#add8e6",
-  "rabbit-code" "#FC0FC0",
-  "datetime" "#472d7b",
-  "integer" "#d6e367",
-  "unknown" "#c7005d",
-  "date" "#3b528b",
-  "rabbitsql" "#FC0FC0",
-  "nil" "#ff2147"},
+ {"float" "#fdfcfc",
+  "boolean" "#d3c2ba",
+  "map" "#d8b4b4",
+  "list" "#9e469b",
+  "string" "#ffffff",
+  "any" "#4f52ba",
+  "vector" "#9ad3a5",
+  "keyword" "#ffffff",
+  "rabbit-code" "#6bc8a6",
+  "datetime" "#448392",
+  "integer" "#e9acdf",
+  "unknown" "#72336e",
+  "date" "#2b2e48"},
  :solver-fn nil,
  :click-param
  {:recos-sys
@@ -6099,13 +5157,13 @@
    :condis ""},
   :blocks-sys
   {:block_key ":*theme*",
-   :block_name "(meta: this screen's theme, who ya gonna call? )",
+   :block_name "(meta: this screen's theme)",
    :queries 0,
-   :views 24,
+   :views 28,
    :block_data
-   "{:theme-name \"who ya gonna call?\", :codemirror-theme \"ayu-mirage\", :editor-param-background-color \"#0b1122\", :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#0b031b\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b1122\", :editor-rim-color \"#0b1122\", :vega-default-color-scheme {:scheme \"accent\"}, :editor-grid-selected-font-color \"#ffffff\", :monospaced-font \"IBM Plex Mono\", :editor-grid-selected-background-color \"#FFA50087\", :editor-outer-rim-color \"#33ffb7\", :grid-selected-font-color \"#ffffff\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#8879bc\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/fake-brick5.png)\", :background-color \"#47555e\", :background-repeat \"repeat\"}, :editor-font-color \"#ffffff\", :base-font \"Oxygen Mono\", :block-tab-selected-font-color \"#FFA500\", :editor-background-color \"#000000\", :editor-grid-font-color \"#ffffff\"}",
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style :param/glass-fish-style, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected :param/generated-colors>second-darkest, :block-title-font-color \"#ffffff\", :universal-pop-color :param/tetradss>0, :base-block-color \"#04041e82\", :editor-rim-color :param/generated-colors>colors>4, :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :param/generated-colors>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :param/generated-colors>dominant, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:string3 \"url(\" :param/rel-image-path \")\"], :transition \"all 1.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#00000088\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
    :view_names
-   ":theme-name :codemirror-theme :editor-param-background-color :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :vega-default-color-scheme :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :universal-pop-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
    :query_names ""},
   :fields-sys {:field_name "class", :field_type "VARCHAR(7)", :data_type "string"},
   :viz-shapes-sys {:combo_edn nil},
@@ -6118,11 +5176,11 @@
    :fields 42},
   :offenses-drag-DISTRICT-260 {:DISTRICT "B3", :rowcnt 35442},
   :files-sys
-  {:file_path "./screens/tweet-demo-thing-bigfoot-is-blurry.edn",
-   :screen_name "tweet-demo-thing-bigfoot-is-blurry",
-   :blocks 35,
-   :queries 24,
-   :ts "2023-09-26 00:02:49"},
+  {:file_path "./screens/duality-of-lepus33aa.edn",
+   :screen_name "duality-of-lepus33aa",
+   :blocks 70,
+   :queries 28,
+   :ts "2024-08-23 03:12:39"},
   :albums-drag-289
   {:album_name "St. Anger",
    :img_300 "https://i.scdn.co/image/ab67616d00001e022fe08610316f3e5ebaa06d68",
@@ -6130,6 +5188,7 @@
    :popularity 53,
    :release_date "2003-06-05"},
   :user-dropdown-sys {:req-field nil},
+  :new-clojure-sqlized {:ffilename "b64-image3-30849-74975-4k.webp"},
   :viz-tables-sys {:table_name "bigfoot_sightings_locations_drag_305"},
   :bigfoot-sightings-locations-drag-305
   {:nearestroad "Federal Street",
@@ -6180,14 +5239,27 @@
    :run_time "2022-05-20 16:27:43.000000",
    :zip_name "BELCHERTOWN"},
   :param
-  {:selected-block :block-8189,
+  {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
+   :keper "b64-image3-30849-74975-4k.webp",
+   :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
+   :selected-view-data {:root [-1 nil]},
    :selected-view nil,
-   :selected-view-data {:root [-1 nil]}},
+   :generated-colors
+   [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
+   :rel-image-path [:string3 "images/large/" :new-clojure-sqlized/ffilename],
+   :tetradss [:tetrads :param/generated-colors>dominant],
+   :selected-block :block-86,
+   :glass-fish-style
+   {:background-color [:string3 :param/generated-colors>darkest 73],
+    :border-radius [:sticky-border-radius "33px"],
+    :box-shadow "10px 5px 5px #00000034",
+    :backdrop-filter "blur(4px) brightness(40%)",
+    :filter nil}},
   :viz-shapes0-sys {:shape nil, :recos 266},
   :theme
-  {:theme-name "who ya gonna call?",
-   :codemirror-theme "ayu-mirage",
-   :editor-param-background-color "#0b1122",
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :base-block-style :param/glass-fish-style,
    :vega-defaults
    {:view {:stroke "transparent"},
     :axis
@@ -6219,30 +5291,66 @@
      :titleColor "#ffffff99"}},
    :grid-selected-column-css
    {:background-color "#00000088", :filter "brightness(200%)"},
-   :base-block-color-selected "#0b031b",
+   :base-block-color-selected :param/generated-colors>second-darkest,
    :block-title-font-color "#ffffff",
-   :base-block-color "#0b1122",
-   :editor-rim-color "#0b1122",
-   :vega-default-color-scheme {:scheme "accent"},
-   :editor-grid-selected-font-color "#ffffff",
-   :monospaced-font "IBM Plex Mono",
-   :editor-grid-selected-background-color "#FFA50087",
-   :editor-outer-rim-color "#33ffb7",
-   :grid-selected-font-color "#ffffff",
+   :universal-pop-color :param/tetradss>0,
+   :base-block-color "#04041e82",
+   :editor-rim-color :param/generated-colors>colors>4,
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors :param/generated-colors>data-colors,
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color :param/generated-colors>dominant,
+   :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
-   :grid-selected-background-color "#8879bc",
+   :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/fake-brick5.png)",
-    :background-color "#47555e",
-    :background-repeat "repeat"},
+   {:background-image [:string3 "url(" :param/rel-image-path ")"],
+    :transition "all 1.8s ease-in-out",
+    :background-blend-mode "overlay",
+    :background-size "cover",
+    :background-color "#00000088"},
    :editor-font-color "#ffffff",
-   :base-font "Oxygen Mono",
-   :block-tab-selected-font-color "#FFA500",
-   :editor-background-color "#000000",
+   :base-font "Poppins",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :bigfoot-sightings-locations-drag-class-428 {:class "Class A", :rowcnt 2486},
   :class-drag-987 nil,
   :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
-  :sys {:selected-tab "pnw ev data.csv", :selected-tab-idx 0}},
- :selected-flow "live-scratch-flow"}
+  :sys {:selected-tab "marvelous ape", :selected-tab-idx 1}},
+ :selected-flow "live-scratch-flow",
+ :current-url "#/pnw-demo-dash-llm-training"}

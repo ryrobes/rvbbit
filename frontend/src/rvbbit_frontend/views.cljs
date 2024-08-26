@@ -913,8 +913,7 @@
 (defonce param-scrubber? (reagent/atom {}))
 (defonce param-search (reagent/atom {}))
 
-(defn editor-panel-metadata-params
-  [single-width single-height key-type]
+(defn editor-panel-metadata-params [single-width single-height key-type]
   (let [;theme-scrubber? false key-type :param
         {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         param-map @(ut/tracked-subscribe [::bricks/user-parameters key-type])]
@@ -969,8 +968,7 @@
       
       ]]))
 
-(defn editor-panel-metadata-ext-files
-  []
+(defn editor-panel-metadata-ext-files []
   (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         sql-params (into {}
                          (for [k [:files-sys/file_path]]
@@ -996,8 +994,7 @@
           bricks-tall ;10
           [:screen_name :ts :block_data :view_names :query_names]]]]]]]))
 
-(defn editor-panel-metadata-ext
-  []
+(defn editor-panel-metadata-ext []
   (let [{:keys [single-width-bricks single-height-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         sql-params (into {}
                          (for [k [:connections-sys/connection_id :tables-sys/table_name]]
@@ -1036,8 +1033,7 @@
 
 
 
-(defn editor-panel-metadata-viz
-  []
+(defn editor-panel-metadata-viz []
   (let [{:keys [single-width-bricks single-height-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         sql-params    (into {}
                             (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn]]
@@ -1065,8 +1061,7 @@
           [(when shape-picked? :shape_name) :query_map_str :table_name :context_hash :connection_id :h :w :condis :viz_map
            (when combo-picked? :combo_edn)]]]]]]]))
 
-(defn editor-panel-metadata-status
-  []
+(defn editor-panel-metadata-status []
   (let [pending     @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
         client-name @(ut/tracked-subscribe [::bricks/client-name])
         pending     (remove #(cstr/ends-with? (str (get-in % [:message :ui-keypath 0])) "-sys") pending)]
@@ -1092,8 +1087,7 @@
 
 
 
-(defn ui-debugger
-  []
+(defn ui-debugger []
   (let [;bw 33 bh 11
         sched      @(ut/tracked-subscribe [::bricks/query-schedule])
         params     (merge sched
@@ -1794,7 +1788,7 @@
 (def searcher-atom (reagent/atom nil))
 
 (defn insert-response-block [w h data runner syntax opts-map no-selected?]
-  (let [root (ut/find-safe-position h w)]
+  (let [root (or (ut/find-safe-position h w) [5 5])]
     (bricks/insert-new-block-raw root w h data runner syntax opts-map no-selected?)))
 
 (defn ensure-quoted-string
@@ -1837,6 +1831,7 @@
                          coords @(ut/tracked-sub ::bricks/all-roots-tab-sizes {:tab curr-tab})
                          hh @(ut/tracked-subscribe_ [::subs/h])
                          ww @(ut/tracked-subscribe_ [::subs/w])
+                         mdata @(ut/tracked-sub ::conn/sql-metadata-alpha {:keypath [data-key]})
                          canvas-w (/ ww db/brick-size)
                          canvas-h (/ hh db/brick-size)]
                      {:model (get @fbc-selected-model runner)
@@ -1844,7 +1839,8 @@
                     ;:runner (if no-selected? :clojure (or runner-src :views))
                       :metadata (if (= runner-src :queries)
                                   {:connection-id @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key data-key])
-                                   :fields (get @(ut/tracked-sub ::conn/sql-metadata-alpha {:keypath [data-key]}) :fields)} {})
+                                   :database-type (get mdata :database-type "")
+                                   :fields (get mdata :fields)} {})
                       :canvas-coords coords
                       :canvas-size [canvas-w canvas-h]
                       :input (str command)
@@ -1859,9 +1855,12 @@
     (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
 
-    (if (not (and (not no-selected?) (= runner :fabric)))
+    (if (not (and (not no-selected?) 
+                  (= runner :fabric)))
       (let [resp (insert-response-block 8 5 command runner syntax opts-map no-selected?)
-            ee (str command "(" resp ")")]
+            ee (str command "(" resp ")")
+            _ (ut/tapp>> (str "insert-response-block: " command " " resp))]
+
           ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
           ;(re-frame/dispatch [::bricks/toggle-quake-console])
         ;(ut/tracked-dispatch [::bricks/toggle-quake-console-off])
@@ -1877,6 +1876,8 @@
             output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
             ;;running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
             fstr (str "kit-runner " kit-runner-key)
+            fstr2 [:v-box :children [[:box :child (str "You asked: \"" command "\" to " (get opts-map :model))]
+                                     [:box :child (str "under the context of " selected-block " on " data-key)]]]
             w    (/ (count fstr) 4.1)]
         (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
         (swap! bricks/waiting? assoc kit-runner-key true)
@@ -1894,6 +1895,7 @@
            :runner      :clojure
            :client-name client-name
            :ui-keypath  [:panels selected-block :queries data-key]}])
+        (ut/tracked-dispatch [::http/insert-alert fstr2 w 2 15])
         (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
         (ut/tapp>> [:clicked-kit running-key])
         (js/setTimeout #(swap! bricks/waiting? assoc kit-runner-key false) 5000))
@@ -1904,7 +1906,7 @@
 (defn console-text-box [width-int height-int value]
   (let [history-index (reagent/atom -1)
         ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
-        react! [@hop-bar-tooltip]]
+        react! [@hop-bar-tooltip @db/console-voice-text]]
     (fn [width-int height-int value]
       [re-com/box
        :size "auto"
@@ -1919,7 +1921,7 @@
         :font-weight   700}
        :child
        [(reagent/adapt-react-class cm/UnControlled)
-        {:value   (or value " ")
+        {:value   (or @db/console-voice-text value " ")
          :onBeforeChange (fn [editor _ _] ;; data value]
                            (reset! cm-instance editor))
          :onBlur #(when (and (not @over-hop-bar) 
@@ -1984,6 +1986,19 @@
                      :size "auto" 
                      :align :center 
                      :justify :center])))
+
+(declare custom-icon-button)
+
+(defn recording-button []
+  [custom-icon-button
+   (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
+     {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
+      :tooltip "transcribe voice to :param/voice"
+      :on-click (if audio-recording?
+                  #(ut/tracked-dispatch [::audio/stop-recording])
+                  #(ut/tracked-dispatch [::audio/start-recording]))
+      :active? audio-recording?
+      :color (if audio-recording? "red" "#ffffff")})])
 
 (defn quake-console [ww]
   (let [hh                  (* 2  db/brick-size)
@@ -2243,13 +2258,20 @@
                              ;:style {:border "1px solid green"}
                              :align :center
                              :justify :between
+                             :attr {:on-click #(when @cm-instance  (.focus @cm-instance))}  
                              :children [[console-text-box nil nil " "] 
+                                        
                                         (when (and is-fabric? (keyword? selected-block))
                                           [re-com/box
                                            :style {;:border "1px solid pink" 
                                                    :font-size "14px"
                                                    :padding-right "12px"}
-                                           :child (str selected-block " "  runner " " data-key)])
+                                           ;:child (str selected-block " "  runner " " data-key)
+                                           :child (str selected-block " " data-key)
+                                           ])
+                                        [re-com/gap :size "6px"]
+                                        [recording-button]
+                                        [re-com/gap :size "6px"]
                                         ]]]]]]))
 
 
@@ -4858,6 +4880,16 @@
                                                            (ut/tracked-dispatch [::wfx/request :default
                                                                                  {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
                                                                                   :timeout 50000}]))]]])])
+                          
+                          [custom-icon-button
+                           (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
+                             {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
+                              :tooltip "transcribe voice to :param/voice"
+                              :on-click (if audio-recording?
+                                          #(ut/tracked-dispatch [::audio/stop-recording])
+                                          #(ut/tracked-dispatch [::audio/start-recording]))
+                              :active? audio-recording?
+                              :color (if audio-recording? "red" "#ffffff")})]
 
                           (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
                             [custom-icon-button
@@ -4867,13 +4899,14 @@
                               :active? true
                               :color "red"}])
 
-                          (when @(ut/tracked-subscribe_ [::audio/recording?])
-                            [custom-icon-button
-                             {:icon-name "zmdi-mic"
-                              :tooltip "recording audio in progress"
-                              :on-click nil
-                              :active? true
-                              :color "red"}])]
+                          ;; (when @(ut/tracked-subscribe_ [::audio/recording?])
+                          ;;   [custom-icon-button
+                          ;;    {:icon-name "zmdi-mic"
+                          ;;     :tooltip "recording audio in progress"
+                          ;;     :on-click nil
+                          ;;     :active? true
+                          ;;     :color "red"}])
+                          ]
 
                          (kit-canvas-icons :block-3570 :album-name-drag-12))]
 

@@ -35,11 +35,12 @@
    [io.pedestal.http.route    :as route]
    [hikari-cp.core            :as hik]
    [clojure.string            :as cstr]
-   [rvbbit-backend.freezepop :as fpop]
-   [rvbbit-backend.surveyor :as svy]
-   [rvbbit-backend.queue-party  :as qp]
+   [rvbbit-backend.surveyor   :as surveyor]
+   [rvbbit-backend.freezepop  :as fpop]
+   [rvbbit-backend.surveyor   :as svy]
+   [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.transform  :as ts]
-   [puget.printer           :as puget]
+   [puget.printer             :as puget]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
     :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db cache-db import-db ghost-db flows-db insert-error-row! to-sql
@@ -4517,8 +4518,7 @@
     (catch Exception _
       {:min nil, :max nil, :median nil, :avg nil})))
 
-(defn get-query-metadata
-  [rowset query]
+(defn get-query-metadata [rowset query dbtype]
   (let [sample                rowset ;(repeatedly 100 (fn [] (rand-nth rowset)))
         sample-size           (count sample)
         selects               (get query :select)
@@ -4583,7 +4583,9 @@
                                                            (into {} (for [[k v] commons] {(str k) v}))
                                                            commons)
                                             :cardinality (int (* 100 (float (/ distinct-samples sample-size))))})}))]
-    {:fields field-data :rowcount (count sample)}))
+    {:fields field-data 
+     :database-type (str dbtype)
+     :rowcount (count sample)}))
 
 
 
@@ -4609,7 +4611,7 @@
                 honey-sql     (if page-num (assoc (dissoc honey-sql :page) :offset (* page-num per-page-limit)) honey-sql)
                 honey-sql-str (to-sql honey-sql)
                 honey-result  (sql-query system-db honey-sql-str ui-keypath)
-                honey-meta    (get-query-metadata honey-result honey-sql)
+                honey-meta    (get-query-metadata honey-result honey-sql (surveyor/db-typer system-db))
                 fields        (get honey-meta :fields)
                 dates         (remove nil? (for [[k v] fields] (when (cstr/includes? (get v :data-type) "date") k)))
                 result        (if (empty? dates)
@@ -5191,7 +5193,7 @@
                         query-ms (get honey-result :elapsed-ms)
                         honey-result (get honey-result :result)
                         query-error? (get (first honey-result) :query_error)
-                        honey-meta (get-query-metadata honey-result honey-sql)
+                        honey-meta (get-query-metadata honey-result honey-sql (surveyor/db-typer target-db))
                         fields (get honey-meta :fields)
                         dates (remove nil? (for [[k v] fields] (when (cstr/includes? (get v :data-type) "date") k)))
                         is-meta? (= 3 (count ui-keypath))
@@ -5262,7 +5264,7 @@
                                            has-rql? ;query-error?
                                            post-process-fn
                                            (get orig-honey-sql :data)) ;; TODO< this is ugly
-                                     (get-query-metadata result honey-sql) ;; get new meta on
+                                     (get-query-metadata result honey-sql (surveyor/db-typer target-db)) ;; get new meta on
                                      honey-meta)
                         fields (get honey-meta :fields) ;; lol, refactor, this is cheesy (will
                         sniff-worthy? (and (not is-meta?)

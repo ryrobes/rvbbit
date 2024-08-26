@@ -285,9 +285,12 @@
                                                                                (try
                                                                                  (clojure.edn/read-string fabric-data-str2)
                                                                                  (catch Exception e (do (println "error parsing fabric-data AGAIN AGAIN... we cooked." e) {:error (pr-str e)})))))))))
+                                                     comment (get clover-map [:comment]) ;; keypath as a key.
+                                                     clover-map (-> clover-map (dissoc :comment) (rvbbit-backend.util/dissoc-in [:comment]))
                                                      kit-map {:push-alerts (let [change-cnt (count (keys clover-map))]
                                                                              {:body [:box
-                                                                                     :child [:speak (str model " has returned with " change-cnt " change" (when (= change-cnt 1) "s"))]]
+                                                                                     :child [:speak (if comment (str comment) 
+                                                                                                        (str model " has returned with " change-cnt " change" (when (> change-cnt 1) "s")))]]
                                                                               :seconds 10})
                                                               :push-assocs clover-map
                                                               :gen-ev {:description "please get to work...?"

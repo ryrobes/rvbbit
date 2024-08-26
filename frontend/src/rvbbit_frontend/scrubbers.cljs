@@ -242,6 +242,241 @@
     (true? (some true? (for [kpc keypath-contains] (ordered-keys-in-kp-multi? kpc kp))))
     (ordered-keys-in-kp? keypath-contains kp)))
 
+;; (defn custom-slider-style [track-color thumb-color]
+;;   {:appearance "none"
+;;    :height "10px"
+;;    :background track-color
+;;    :outline "none"
+;;    :border-radius "8px"
+;;    :opacity "0.7"
+;;    :transition "opacity .2s"
+;;    :-webkit-appearance "none"
+;;    :cursor "pointer"
+
+;;    ;; Webkit (Chrome, Safari, newer versions of Opera)
+;;    "--webkit-slider-thumb" {:-webkit-appearance "none"
+;;                              :appearance "none"
+;;                              :width "20px"
+;;                              :height "20px"
+;;                              :background thumb-color
+;;                              :cursor "pointer"
+;;                              :border-radius "50%"}
+
+;;    ;; Mozilla Firefox
+;;    "--moz-range-thumb" {:width "20px"
+;;                          :height "20px"
+;;                          :background thumb-color
+;;                          :cursor "pointer"
+;;                          :border-radius "50%"
+;;                          :border "none"}
+
+;;    ;; Microsoft Edge and IE
+;;    "--ms-thumb" {:width "20px"
+;;                   :height "20px"
+;;                   :background thumb-color
+;;                   :cursor "pointer"
+;;                   :border-radius "50%"}
+
+;;    "--moz-range-track" {:background track-color}
+;;    "--ms-track" {:background "transparent"
+;;                   :border-color "transparent"
+;;                   :color "transparent"}})
+
+
+;; (defn custom-slider-style [track-color thumb-color]
+;;   {:appearance "none"
+;;    :-webkit-appearance "none"
+;;    :-moz-appearance "none"
+;;    ;:width "100%"
+;;    :height "10px"
+;;    :background track-color
+;;    ;:background "transparent" ;;track-color
+;;    :border (str "1px solid " thumb-color)
+;;    :border-radius "5px"
+;;    :outline "none"
+;;    :opacity "0.7"
+;;    :transition "opacity .2s"
+;;    :cursor "pointer"
+
+;;    ;; Webkit (Chrome, Safari, newer versions of Opera)
+;;    "::-webkit-slider-runnable-track" {:width "100%"
+;;                                       :height "10px"
+;;                                       :background track-color
+;;                                       :border-radius "5px"
+;;                                       :border "none"}
+;;    "::-webkit-slider-thumb" {:-webkit-appearance "none"
+;;                              :appearance "none"
+;;                              :width "20px"
+;;                              :height "20px"
+;;                              :background thumb-color
+;;                              :cursor "pointer"
+;;                              :border "none"
+;;                              :border-radius "50%"
+;;                              :margin-top "-5px"}
+
+;;    ;; Mozilla Firefox
+;;    "::-moz-range-track" {:width "100%"
+;;                          :height "10px"
+;;                          :background track-color
+;;                          :border-radius "5px"
+;;                          :border "none"}
+;;    "::-moz-range-thumb" {:width "20px"
+;;                          :height "20px"
+;;                          :background thumb-color
+;;                          :cursor "pointer"
+;;                          :border-radius "50%"
+;;                          :border "none"}
+
+;;    ;; Microsoft Edge and IE
+;;    "::-ms-track" {:width "100%"
+;;                   :height "10px"
+;;                   :background "transparent"
+;;                   :border-color "transparent"
+;;                   :color "transparent"}
+;;    "::-ms-fill-lower" {:background track-color
+;;                        :border-radius "5px"}
+;;    "::-ms-fill-upper" {:background track-color
+;;                        :border-radius "5px"}
+;;    "::-ms-thumb" {:width "20px"
+;;                   :height "20px"
+;;                   :background thumb-color
+;;                   :cursor "pointer"
+;;                   :border-radius "50%"
+;;                   :border "none"
+;;                   :margin-top "0px"}})
+
+(defn inject-slider-styles [track-color thumb-color]
+  (let [style (str "input[type='range']::-webkit-slider-runnable-track {"
+                   "width: 100%;"
+                   "height: 10px;"
+                   "background: " track-color ";"
+                   "border-radius: 5px;"
+                   ;"opacity: 0.7;"
+                   ;"border: 1px solid " thumb-color ";"
+                   "border: none;"
+                   "}"
+                   "input[type='range']::-webkit-slider-thumb {"
+                   "-webkit-appearance: none;"
+                   "appearance: none;"
+                   "width: 20px;"
+                   "height: 20px;"
+                   "background: " thumb-color ";"
+                   "cursor: pointer;"
+                   "border: none;"
+                   "border-radius: 10%;"
+                   "margin-top: -5px;"
+                   "}"
+                   "input[type='range']::-moz-range-track {"
+                   "width: 100%;"
+                   "height: 10px;"
+                   "background: " track-color ";"
+                   "border-radius: 5px;"
+                   "border: none;"
+                   "}"
+                   "input[type='range']::-moz-range-thumb {"
+                   "width: 20px;"
+                   "height: 20px;"
+                   "background: " thumb-color ";"
+                   "cursor: pointer;"
+                   "border-radius: 10%;"
+                   "border: none;"
+                   "}"
+                   "input[type='range']::-ms-track {"
+                   "width: 100%;"
+                   "height: 10px;"
+                   "background: transparent;"
+                   "border-color: transparent;"
+                   "color: transparent;"
+                   "}"
+                   "input[type='range']::-ms-fill-lower {"
+                   "background: " track-color ";"
+                   "border-radius: 5px;"
+                   "}"
+                   "input[type='range']::-ms-fill-upper {"
+                   "background: " track-color ";"
+                   "border-radius: 5px;"
+                   "}"
+                   "input[type='range']::-ms-thumb {"
+                   "width: 20px;"
+                   "height: 20px;"
+                   "background: " thumb-color ";"
+                   "cursor: pointer;"
+                   "border-radius: 10%;"
+                   "border: none;"
+                   "margin-top: 0px;"
+                   "}")]
+    (js/document.head.appendChild (let [style-el (.createElement js/document "style")]
+                                    (set! (.-type style-el) "text/css")
+                                    (set! (.-innerHTML style-el) style)
+                                    style-el))))
+
+;; (inject-slider-styles "#ffffff" (theme-pull :theme/editor-outer-rim-color nil))
+
+
+;; Call `apply-custom-slider-style` wherever your themes are set or updated
+
+
+(defn custom-slider-style [track-color thumb-color]
+  {:appearance "none"
+   :-webkit-appearance "none"
+   :-moz-appearance "none"
+   :height "10px"
+   :background track-color
+   :border (str "1px solid " thumb-color)
+   :border-radius "5px"
+   :outline "none"
+   :opacity "0.7"
+   :transition "opacity .2s"
+   :cursor "pointer"
+
+   ;; Webkit (Chrome, Safari, newer versions of Opera)
+   "input[type='range']::-webkit-slider-runnable-track" {:width "100%"
+                                                         :height "10px"
+                                                         :background track-color
+                                                         :border-radius "5px"
+                                                         :border "none"}
+   "input[type='range']::-webkit-slider-thumb" {:-webkit-appearance "none"
+                                                :appearance "none"
+                                                :width "20px"
+                                                :height "20px"
+                                                :background thumb-color
+                                                :cursor "pointer"
+                                                :border "none"
+                                                :border-radius "50%"
+                                                :margin-top "-5px"}
+
+   ;; Mozilla Firefox
+   "input[type='range']::-moz-range-track" {:width "100%"
+                                            :height "10px"
+                                            :background track-color
+                                            :border-radius "5px"
+                                            :border "none"}
+   "input[type='range']::-moz-range-thumb" {:width "20px"
+                                            :height "20px"
+                                            :background thumb-color
+                                            :cursor "pointer"
+                                            :border-radius "50%"
+                                            :border "none"}
+
+   ;; Microsoft Edge and IE
+   "input[type='range']::-ms-track" {:width "100%"
+                                     :height "10px"
+                                     :background "transparent"
+                                     :border-color "transparent"
+                                     :color "transparent"}
+   "input[type='range']::-ms-fill-lower" {:background track-color
+                                          :border-radius "5px"}
+   "input[type='range']::-ms-fill-upper" {:background track-color
+                                          :border-radius "5px"}
+   "input[type='range']::-ms-thumb" {:width "20px"
+                                     :height "20px"
+                                     :background thumb-color
+                                     :cursor "pointer"
+                                     :border-radius "50%"
+                                     :border "none"
+                                     :margin-top "0px"}})
+
+
 (defn int-slider
   [kp v view-key type-key & [[ext]]]
   [re-com/box :src (at) :child
@@ -256,14 +491,21 @@
      [re-com/h-box :src (at) :size "auto" :justify :between ;:size "1"
       :children
       [[re-com/md-icon-button :md-icon-name "zmdi-caret-left" :on-click
-        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (- v 1) "px") (- v 1)) view-key type-key]) :style
-        {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" :padding "0px" :margin-top "-9px"}]
-       [re-com/slider :src (at) :model v :min min-val :step step-val :max max-val :width
-        (when (try (= (first view-key) :runstreams) (catch :default _ false)) "210px") :on-change
+        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (- v 1) "px") (- v 1)) view-key type-key]) 
+        :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" 
+                :padding "0px" :margin-top "-11px"}]
+       
+       [re-com/slider :src (at) :model v :min min-val :step step-val :max max-val 
+        :style (custom-slider-style "#ffffff" "#ffffff")
+        :width (when (try (= (first view-key) :runstreams) (catch :default _ false)) "210px") :on-change
         #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str % "px") %) view-key type-key]) :disabled? false]
+       
        [re-com/md-icon-button :md-icon-name "zmdi-caret-right" :on-click
-        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (+ v 1) "px") (+ v 1)) view-key type-key]) :style
-        {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" :padding "0px" :margin-top "-9px"}]]])])
+        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (+ v 1) "px") (+ v 1)) view-key type-key]) 
+        :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" 
+                :padding "0px" :margin-top "-11px"
+                }]]])])
+
 
 (defn options-col
   [colors curr-color kp view-key type-key label]

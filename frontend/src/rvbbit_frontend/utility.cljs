@@ -1628,11 +1628,12 @@
 (re-frame/reg-sub ::w (fn [db] (get-in db [:window :w])))
 (re-frame/reg-sub ::h (fn [db] (get-in db [:window :h])))
 
-(re-frame/reg-sub ::all-roots-tab-sizes
-                  (fn [db _]
-                    (let [tab (get db :selected-tab)]
-                      (vec (for [[_ v] (into {} (filter #(= tab (get (val %) :tab "")) (get db :panels)))]
-                             (vec (into (get v :root) [(get v :h) (get v :w)])))))))
+(re-frame/reg-sub
+ ::all-roots-tab-sizes
+ (fn [db _]
+   (let [tab (get db :selected-tab)]
+     (vec (for [[_ v] (into {} (filter #(= tab (get (val %) :tab "")) (get db :panels)))]
+            (vec (into (get v :root) [(get v :h) (get v :w)])))))))
 
 (defn find-safe-position [block-height block-width]
   (let [hh @(tracked-sub ::h {})
@@ -1766,6 +1767,19 @@
                                  :parse         {:interpose "\n\n"}})]
         (swap! format-map-atom assoc cache-key o)
         o)))) 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 (defn remove-keys [m keys] (apply dissoc m keys))
 

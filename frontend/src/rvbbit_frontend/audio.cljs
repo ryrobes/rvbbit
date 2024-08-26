@@ -193,6 +193,7 @@
           lines              (get-in result [:text])
           sshouts            (get db :shouts)
           shouts             (invert-map sshouts)
+          quake-open?        (get db :quake-console? false)
           shout-flows-to-run (vec (flatten (for [k     (keys shouts)
                                                  :let  [k     (ut/remove-punctuation (cstr/lower-case k))
                                                         lines (ut/remove-punctuation (cstr/lower-case lines))]
@@ -207,6 +208,7 @@
           (ut/dispatch-delay 400 [::http/insert-alert [:box :child txt] cnt 1 6])))
       (ut/tracked-dispatch [::wfx/request :default
                             {:message {:kind :voice-trigger :client-name client-name :voice-text lines} :timeout 500000}])
+      (when quake-open? (reset! db/console-voice-text lines))
       (-> db
           (assoc-in [:incoming-voice] lines)
           (assoc-in [:click-param :param :voice] lines)
@@ -244,15 +246,15 @@
                     :on-success      [::success-speech-to-text]
                     :on-failure      [::failure-speech-to-text]}})))
 
-(defn get-audio-stream
-  []
+(defn get-audio-stream []
   (-> (.-mediaDevices js/navigator)
       (.getUserMedia #js {:audio true})))
 
-(defn create-media-recorder [stream] (js/MediaRecorder. stream))
+(defn create-media-recorder [stream] 
+  (js/MediaRecorder. stream))
 
-(defn start-recording [recorder] (ut/tapp>> ["start-recording-fn - state:" (.-state recorder)]) (.start recorder))
-
+(defn start-recording [recorder] 
+  (ut/tapp>> ["start-recording-fn - state:" (.-state recorder)]) (.start recorder))
 
 (defn stop-recording
   [recorder]

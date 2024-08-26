@@ -455,6 +455,17 @@
 ;; moved to db/reactor-types
 
 (re-frame/reg-event-db
+ ::assoc-push-undoable
+ (undoable)
+ (fn [db [_ clover-map]]
+   (let [kp-value-map clover-map]
+     (reduce-kv
+      (fn [db keypath value]
+        (assoc-in db keypath value))
+      db
+      kp-value-map))))
+
+(re-frame/reg-event-db
   ::simple-response
   (fn [db [_ result & [batched?]]]
     ;;(ut/tapp>> [:simple-response result])
@@ -654,12 +665,16 @@
 
           (cond
 
-            push-assocs? (let [kp-value-map (get result :status)]
-                           (reduce-kv
-                            (fn [db keypath value]
-                              (assoc-in db keypath value))
-                            db
-                            kp-value-map))
+            ;; push-assocs? (let [kp-value-map (get result :status)]
+            ;;                (reduce-kv
+            ;;                 (fn [db keypath value]
+            ;;                   (assoc-in db keypath value))
+            ;;                 db
+            ;;                 kp-value-map))
+
+            push-assocs? (do ;; using sep event because we want it to be specifically undoable, but NOT other streams here. hack.
+                           (ut/tracked-dispatch [::assoc-push-undoable (get result :status)])
+                           db)
 
             materialized-pct? (assoc-in db [:mat-pct ui-keypath] (get result :status))
 

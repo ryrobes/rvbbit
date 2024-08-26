@@ -1371,7 +1371,11 @@
 
 (re-frame/reg-event-db ::toggle-doom-modal (fn [db [_]] (assoc db :doom-modal? (not (get db :doom-modal? false)))))
 
-(re-frame/reg-event-db ::toggle-quake-console (fn [db [_]] (assoc db :quake-console? (not (get db :quake-console? false)))))
+(re-frame/reg-event-db 
+ ::toggle-quake-console 
+ (fn [db [_]] 
+   (reset! db/console-voice-text nil)
+   (assoc db :quake-console? (not (get db :quake-console? false)))))
 
 (re-frame/reg-event-db ::toggle-quake-console-off (fn [db [_]] (assoc db :quake-console? false)))
 
@@ -3389,8 +3393,9 @@
          (if (not value-spy?)
            (highlight-codes-only codes selected-block data-key editor?
                                  {:color            (ut/choose-text-color
-                                                     ;;inv-backgrd-color
-                                                     (get (theme-pull :theme/data-colors nil) "keyword")) ;;inv-color
+                                                     inv-backgrd-color
+                                                     ;(get (theme-pull :theme/data-colors nil) "keyword")
+                                                     ) ;;inv-color
                                   :background-color inv-backgrd-color
                                   :text-shadow      "none"
                                   :filter           "invert(1.2)"
@@ -3404,8 +3409,9 @@
                                                                           ]})}))
                                    selected-block data-key editor?
                                    {:color            (ut/choose-text-color
-                                                       ;;inv-backgrd-color
-                                                       (get (theme-pull :theme/data-colors nil) "keyword")) ;; inv-color
+                                                       inv-backgrd-color
+                                                       ;(get (theme-pull :theme/data-colors nil) "keyword")
+                                                       ) ;; inv-color
                                     :background-color inv-backgrd-color
                                     :text-shadow      "none"
                                     :filter           "invert(1.2)"
@@ -5334,6 +5340,8 @@
          canvas? (get full-map :canvas? false)
          flow? (get full-map :flow? false)
          opts? (get full-map :opts? false)
+         dcolors (theme-pull :theme/data-colors nil)
+         dcolor (fn [x] (get dcolors (ut/data-typer x)))
          runstreams? (get full-map :runstreams? false)
          panel-key @(ut/tracked-subscribe [::selected-block])
          block-map @(ut/tracked-subscribe [::selected-block-map])
@@ -5372,15 +5380,19 @@
                       :on-mouse-leave #(do ;(ut/tapp>> [:exit-scrub-area
                                          (reset! on-scrubber? false))} :style
                      (if canvas?
-                       {:margin-top "-12px"}
+                       {} ;{:margin-top "-12px"}
                        {:border-top (if (or (= kp [:select]) (= kp [:from]) (= kp [:where]) (= kp [:group-by]))
                                       "0px solid #ffffff18"
-                                      "1px solid #ffffff18")}) :children
+                                      "1px solid #ffffff18")}) 
+                     :children
                      [;[re-com/box :child (str kp " :: " v)]
                       [re-com/h-box :justify :between :children
                        [(when (not flow?)
                           [re-com/box :src (at) :child display-kp :style
-                           {:color (if system-param? "#f386bf" "#ae81ff") :font-weight 700}])
+                           {:color (if system-param? 
+                                     "#f386bf" 
+                                      (get dcolors "keyword")
+                                       ) :font-weight 700}])
                         (when (not flow?)
                           [re-com/h-box :gap "5px" :style {:font-size "11px" :padding-top "3px"} :children
                            [(when message [re-com/box :child (str message)])
@@ -5393,12 +5405,14 @@
                           (when (and (not flow?) (not (vector? v)))
                             [re-com/box :src (at) :child (if (string? v) (str "\"" v "\"") (str v)) :style
                              {:font-weight 700
-                              :color       (cond (string? v)  "#b9e47d"
-                                                 (integer? v) "#f2c263"
-                                                 (float? v)   "#f2c263"
-                                                 (keyword? v) "#ae81ff"
-                                                 (boolean? v) "#ae81ff"
-                                                 :else        "#b9e47d")}])]]]]
+                              ;; :color       (cond (string? v)  "#b9e47d"
+                              ;;                    (integer? v) "#f2c263"
+                              ;;                    (float? v)   "#f2c263"
+                              ;;                    (keyword? v) "#ae81ff"
+                              ;;                    (boolean? v) "#ae81ff"
+                              ;;                    :else        "#b9e47d")
+                              :color       (dcolor v)
+                              }])]]]]
                       [reecatch
                        (if ffnx
                          [re-com/box :src (at) :child [ffn kp v view-key type-key ffnx]]
@@ -8452,7 +8466,7 @@
 
 (re-frame/reg-sub ::keypaths-in-params
                   (fn [db {:keys [key-type]}]
-                    (try (let [params       (get-in db [:click-param key-type])
+                    (try (let [params       (dissoc (get-in db [:click-param key-type]) :selected-view :selected-view-data :selected-block) 
                                kvpaths      (ut/keypaths params)
                                kvpaths-vals (into (sorted-map)
                                                   (for [p kvpaths]
@@ -11370,7 +11384,8 @@
 
               :case (fn [x] (ut/vectorized-case x))
               :scrubber (fn [[kk pm & [opts]]] [scrubber-panel true @(ut/tracked-sub ::keypaths-in-params {:key-type :param}) kk pm
-                                                (if opts {:fm true :canvas? true :opts opts} {:fm true :canvas? true})])
+                                                (if opts {:fm true :canvas? true :opts opts} 
+                                                    {:fm true :canvas? true})])
               :Map Map
               :Source Source
               :Layer Layer
@@ -12107,7 +12122,9 @@
                                                                               {:clover-body v}
                                                                               opts-map-star) wrapper)
 
-                                                     v (ut/postwalk-replacer {:col-width (Math/floor (/ (* main-w db/brick-size) 9.5))} v)
+                                                     v (ut/postwalk-replacer (merge
+                                                                              {:col-width (Math/floor (/ (* main-w db/brick-size) 9.5))}
+                                                                              (select-keys walk-map [:card-width :card-height])) v)
                                                      v (if (not (nil? v))
                                                          (ut/postwalk-replacer {:*data v} clover-fn) v)]
                                                  (if runner-type
