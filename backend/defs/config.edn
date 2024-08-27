@@ -138,7 +138,7 @@
                                                                             (for  [kk (keys (get v :queries))]
                                                                               [k :queries kk])))))
                                             :output :kit-map
-                                            :icon-location :card ;; :card, :canvas 
+                                            :icon-location :query
                                             :tooltip "Export a rowset to CSV"
                                             :kit-expr (do
                                                         (require '[cognitect.transit :as transit]
@@ -158,12 +158,13 @@
                                                                            (when (seq transit-data)
                                                                              (let [headers (keys (first transit-data))
                                                                                    rows (map (fn [x] (map x headers)) transit-data)]
-                                                                                        ;; Write CSV file
+                                                                                    ;; Write CSV file
                                                                                (with-open [writer (io/writer output-file)]
                                                                                  (csv/write-csv writer (cons headers rows)))))
                                                                                     ;; Return the path of the created file
                                                                            [output-file (count transit-data)])
-                                                              kit-map {:alert-push {:body (str output-file) :seconds 60}
+                                                              kit-map {:push-alerts {:body [:v-box :children [[:box :child "File saved locally to:"]
+                                                                                                              [:box :child (str output-file)]]] :seconds 60}
                                                                        :export-to-csv {:description "export to csv output"
                                                                                        :options {:pages? true :search? false :actions? false}
                                                                                        :parameters {}
@@ -179,7 +180,7 @@
                                                                                                                   :border-radius "14px"}
                                                                                                           :padding "10px"
                                                                                                           :gap "5px"
-                                                                                                          :children [(str finished-output-file)
+                                                                                                          :children [[:box :child (str "File saved locally to: " finished-output-file)]
                                                                                                                      (str rowcount " rows exported")
                                                                                                                      [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
                                                                                                                             :style {:width "100%"
@@ -187,8 +188,86 @@
                                                                                                                                     :border-radius "14px"
                                                                                                                                     :height "100%"
                                                                                                                                     :object-fit "cover"}}]]]]}]}}]
+                                                          (println "kit-map: " kit-map)
                                                           kit-map))
-                                            :icon "fa-solid fa-file-export"}
+                                            :icon "ri-export-fill"}
+                            :count-map-keys {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                                        (vec (apply concat (for [[k v] (dissoc client-data nil)
+                                                                                 :when (seq v)]
+                                                                             (apply concat (for [[kk vv] v
+                                                                                                 :when (seq vv)]
+                                                                                             (try
+                                                                                               (for [kp (filter (fn [x] (coll? x)) vv)
+                                                                                                     :let [[k3 v3] kp]
+                                                                                                     :when (map? v3)]
+                                                                                                 [k kk k3])
+                                                                                               (catch Exception _ nil))))))))
+                                             :output :kit-map
+                                             :icon-location :card
+                                             :kit-expr (do
+                                                         (require '[clojure.java.io :as io]
+                                                                  '[rvbbit-backend.util :as ut]
+                                                                  '[cognitect.transit  :as transit])
+                                                         (try
+                                                           (let [transit-file :transit-file
+                                                                 panel-key :panel-key
+                                                                 data-key :data-key
+                                                                 host-runner :host-runner
+                                                                 _ (println "transit-file: " transit-file)
+                                                                 client-data (with-open [in (io/input-stream transit-file)] ;; getting client data, since we might be on a diff repl
+                                                                               (transit/read (transit/reader in :msgpack)))
+                                                                 _ (println "keypath: " [:client-panels-data panel-key host-runner data-key])
+                                                                 panel-data (get-in client-data [:client-panels-data panel-key host-runner data-key])
+                                                                 kit-map {:push-alerts {:body [:box
+                                                                                               :style {:font-size "22px"
+                                                                                                       :color "orange"}
+                                                                                               :child (str "This map has " (count (keys panel-data)) " base level keys.")]
+                                                                                        :w 9
+                                                                                        :seconds 60}
+                                                                          :count-map-keys {:description "map has been analyzed. you're welcome."
+                                                                                           :options {:pages? true :search? false :actions? false}
+                                                                                           :parameters {}
+                                                                                           :mutates {}
+                                                                                           :data []}}]
+                                                             (ut/pp [:kit-map kit-map])
+                                                             kit-map)
+                                                           (catch Exception e (println "error: " e))))
+                                             :icon "zmdi-map"
+                                             :tooltip "Simple example kit that looks for an output map to act on and then sends an alert with the key count"}
+                            :new-lundberg {:when-fn (fn [_ _] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                                      [[:* :* :*]]) ;;; since this is a canvas level kit, we don't need to filter by panel or view. just say everything and make sure :icon-location is :canvas
+                                           :output :kit-map
+                                           :icon-location :canvas
+                                           :tooltip "Spawn a new view of Lundberg."
+                                           :kit-expr (let [tab-name :tab-name
+                                                           panel-key-name (keyword (str "lundberg-" (rand-int 777777)))
+                                                           kit-map {:push-alerts {:body [:box
+                                                                                         :style {:font-size "33px"
+                                                                                                 :color "orange"}
+                                                                                         :child "Yeaaahhhhh... that'd be great."]
+                                                                                  :w 15
+                                                                                  :seconds 60}
+                                                                    :push-assocs {[:panels panel-key-name]
+                                                                                  {:name          "a wild lundberg appears!"
+                                                                                   :w             8
+                                                                                   :selected-view :yeaaahhhhh
+                                                                                   :root          [10 10]
+                                                                                   :h             5
+                                                                                   :tab           tab-name
+                                                                                   :minimized?    false
+                                                                                   :views         {:yeaaahhhhh [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
+                                                                                                                      :style {:width "100%"
+                                                                                                                              :padding "5px"
+                                                                                                                              :border-radius "20px"
+                                                                                                                              :height "100%"
+                                                                                                                              :object-fit "cover"}}]}}}
+                                                                    :new-lundberg {:description "please get to work..."
+                                                                                   :options {:pages? true :search? false :actions? false}
+                                                                                   :parameters {}
+                                                                                   :mutates {}
+                                                                                   :data []}}]
+                                                       kit-map)
+                                           :icon "ri-cup-fill"}
                             :view-lundberg {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
                                                        (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
                                                                                 :when (get v :views)]
@@ -196,11 +275,11 @@
                                                                               [k :views kk])))))
                                             :output :kit-map
                                             :icon-location :card ;; :card, :canvas 
-                                            :tooltip "Lundberg me."
+                                            :tooltip "Will take your view & replace it with a Lundberg."
                                             :kit-expr (let [kit-map {:push-alerts {:body [:box
-                                                                                          :style {:font-size "33px" 
+                                                                                          :style {:font-size "33px"
                                                                                                   :color "orange"}
-                                                                                          :child "Yeaaahhhhh... about that."]
+                                                                                          :child "Yeaaahhhhh... that'd be great."]
                                                                                    :w 15
                                                                                    :seconds 60}
                                                                      :push-assocs {[:panels :panel-key :views :data-key]
@@ -216,13 +295,10 @@
                                                                                      :mutates {}
                                                                                      :data []}}]
                                                         kit-map)
-                                            ;:icon "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6aKuMo6Dao0FOSWXYczr9-cWeMw3APvo2yw&s"
-                                            :icon "zmdi-pizza"}
+                                                                        ;:icon "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6aKuMo6Dao0FOSWXYczr9-cWeMw3APvo2yw&s"
+                                            :icon "ri-cup-line"}
                             :gen-ev {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
-                                                (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
-                                                                         :when (get v :queries)]
-                                                                     (for  [kk (keys (get v :queries))]
-                                                                       [k :queries kk])))))
+                                                []) ;; this kit is called in a different way, so it doesn't need an icon or to be validated to the users screen data
                                      :output :kit-map
                                      :icon-location :card ;; :card, :canvas 
                                      :tooltip "generate some shit."
@@ -256,7 +332,6 @@
                                                                          (clojure.string/replace "```edn" "")
                                                                          (clojure.string/replace "```" ""))
                                                      _ (rvbbit-backend.util/pp [:output fabric-data-str])
-                                                     ;;fabric-data2 (rvbbit-backend.websockets/parse-text-and-code fabric-data)
                                                      clover-map (try (clojure.edn/read-string fabric-data-str)
                                                                      (catch Exception e
                                                                        (let [_ (println "error parsing fabric-data, attempting to fix..." e)
@@ -289,7 +364,7 @@
                                                      clover-map (-> clover-map (dissoc :comment) (rvbbit-backend.util/dissoc-in [:comment]))
                                                      kit-map {:push-alerts (let [change-cnt (count (keys clover-map))]
                                                                              {:body [:box
-                                                                                     :child [:speak (if comment (str comment) 
+                                                                                     :child [:speak (if comment (str comment)
                                                                                                         (str model " has returned with " change-cnt " change" (when (> change-cnt 1) "s")))]]
                                                                               :seconds 10})
                                                               :push-assocs clover-map
@@ -318,6 +393,10 @@
 
            :fabric {:type :nrepl
                     :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+                    :when-expr (do (require '[clojure.java.shell :as shell])
+                                   (try
+                                     (zero? (:exit (shell/sh "which" "fabric")))
+                                   (catch Exception _ false)))
                     :modes [:text :markdown :clover :data :terminal]
                     :default "funny tweet about rabbits and clojure"
                     :syntax "text"
@@ -343,6 +422,15 @@
 
            :outliers {:type :nrepl
                       :runner {:port 45999 :host "127.0.0.1"}
+                      :when-expr (do
+                                   (require '[nrepl.core :as nrepl])
+                                   (try
+                                     (do
+                                       (with-open [conn (nrepl/connect :port 45999 :host "127.0.0.1")]
+                                         (-> (nrepl/client conn 1000)
+                                             (nrepl/message {:op "eval" :code "(+ 1 1)"})))
+                                       true)
+                                     (catch Exception _ false))) ;; connection refused will throw
                       :modes [:text :clover :data :terminal]
                       :hop-bar? false ;; only used for the kit runner menu on query slice panels 
                       :slice-bar? false
@@ -423,25 +511,9 @@
                                                        :panel-key
                                                        :transit-rowset
                                                        :transit-rowset-meta
-                                                       :opts-map
-                                                       ;;false ;;true
-                                                       )
+                                                       :opts-map)
                                              ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
-                                            :icon "ri-advertisement-line" ;; "fa-solid fa-circle-exclamation"
-                                            ;:clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))
-                                            }
-
-                            ;;  :get-outliers-maps {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
-                            ;;                                 (vec (apply concat (for [[k v] client-data]
-                            ;;                                                 (apply concat (for [[kk vv] v]
-                            ;;                                                                 (for [[k3 v3] vv
-                            ;;                                                                       :when (map? v3)]
-                            ;;                                                                   [k kk k3])))))))
-                            ;;                      :kit-expr (fn [client-panels client-data panel-key view-key]
-                            ;;                                (fn [] (println (clojure-version) "Outliers Kit Runner called." (keys client-panels)))) ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
-                            ;;                      :icon "zmdi-map"
-                            ;;                      :clover-body (fn [context-map] (str "(:get-outliers " (pr-str context-map) ")"))}
-                             }
+                                            :icon "ri-book-shelf-fill"}}
                       :placeholder-on-running? true
                       :clover-fn [:run-solver
                                   {:signal false
@@ -454,8 +526,13 @@
 
            :shell {:type :nrepl ;; this is the built-in REPL that starts by default
                    :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default nrepl
+                   :when-expr (do
+                                (require '[clojure.java.shell :as shell])
+                                (try
+                                  (zero? (:exit (shell/sh "uname")))
+                                  (catch Exception _ false)))
                    :modes [:text :data :terminal]
-                   :default "ls -l ; top -n 1  ; pwd ; whoami" ;; "ls -l"
+                   :default "ls -l ; top -n 1  ; pwd ; whoami "
                    :syntax "shell"
                    :ext ".sh"
                    :hop-function? true
@@ -490,8 +567,51 @@
                    :icon "images/snail-shell.svg"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
+                      :when-expr (do
+                                   (require '[nrepl.core :as nrepl])
+                                   (try
+                                     (do
+                                       (with-open [conn (nrepl/connect :port 37851 :host "127.0.0.1")]
+                                         (-> (nrepl/client conn 1000)
+                                             (nrepl/message {:op "eval" :code "(+ 1 1)"})))
+                                       true)
+                                     (catch Exception _ false))) ;; connection refused will throw
                       :modes [:text :edn :clover :data   :terminal]
                       :ext ".clj"
+                ;;       :kits {:new-lundberg2 {:when-fn (fn [_ _] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                ;;                                         [[:* :* :*]]) ;;; since this is a canvas level kit, we don't need to filter by panel or view. just say everything and make sure :icon-location is :canvas
+                ;;                              :output :kit-map
+                ;;                              :icon-location :canvas
+                ;;                              :tooltip "Spawn a new view of Lundberg2."
+                ;;                              :kit-expr (let [tab-name :tab-name
+                ;;                                              panel-key-name (keyword (str "lundberg-" (rand-int 777777)))
+                ;;                                              kit-map {:push-alerts {:body [:box
+                ;;                                                                            :style {:font-size "33px"
+                ;;                                                                                    :color "orange"}
+                ;;                                                                            :child "Yeaaahhhhh... that'd be great."]
+                ;;                                                                     :w 15
+                ;;                                                                     :seconds 60}
+                ;;                                                       :push-assocs {[:panels panel-key-name]
+                ;;                                                                     {:name          "a wild lundberg appears!"
+                ;;                                                                      :w             8
+                ;;                                                                      :selected-view :yeaaahhhhh
+                ;;                                                                      :root          [10 10]
+                ;;                                                                      :h             5
+                ;;                                                                      :tab           tab-name
+                ;;                                                                      :minimized?    false
+                ;;                                                                      :views         {:yeaaahhhhh [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
+                ;;                                                                                                         :style {:width "100%"
+                ;;                                                                                                                 :padding "5px"
+                ;;                                                                                                                 :border-radius "20px"
+                ;;                                                                                                                 :height "100%"
+                ;;                                                                                                                 :object-fit "cover"}}]}}}
+                ;;                                                       :new-lundberg {:description "please get to work..."
+                ;;                                                                      :options {:pages? true :search? false :actions? false}
+                ;;                                                                      :parameters {}
+                ;;                                                                      :mutates {}
+                ;;                                                                      :data []}}]
+                ;;                                          kit-map)
+                ;;                              :icon "ri-database-2-fill"}}
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
@@ -527,50 +647,53 @@
                                          {:prompt
                                           :clover-body}}
                                         :return :hiccup-image-box-w-png}}]
-                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer."
+                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk & vaporwave colors. 
+                                    A retro future. Many rabbits eye the scene. 
+                                    There is a beautiful woman standing in the field, she looks upon you with kind eyes. In the style of a 1970s sci-fi movie poster."
                           :icon ["images/openai.png" "images/dalle3.png"]}
-           :python3 {:runner {}
-                     :modes [:text :data  :clover :terminal]
-                     :type :flow
-                     :syntax "python"
-                     :ext ".py"
-                     :placeholder-on-running? true
-                     :clover-fn [:run-solver
-                                 {:signal false
-                                  :cache? false
-                                  :type :flow
-                                  :data
-                                  {:flowmap "simple-python-exec" ;; "python-test-1"
-                                   :opts
-                                   {:timeout 120000
-                                    :overrides
-                                    {:python-code-string ;;:open-input-1
-                                     :clover-body}}
-                                   :return :output-only}}]
-                     :default ["import platform"
-                               ""
-                               "def main():"
-                               "    # Print Hello, World!"
-                               "    print(\"Hello, World!\")"
-                               "    "
-                               "    # Print Python version"
-                               "    print(f\"Python version: {platform.python_version()}\")"
-                               "    "
-                               "    # Print detailed Python version info"
-                               "    print(f\"Python version info: {platform.python_version_tuple()}\")"
-                               "    "
-                               "    # Print system information"
-                               "    print(f\"System: {platform.system()}\")"
-                               "    print(f\"Node: {platform.node()}\")"
-                               "    print(f\"Release: {platform.release()}\")"
-                               "    print(f\"Version: {platform.version()}\")"
-                               "    print(f\"Machine: {platform.machine()}\")"
-                               "    print(f\"Processor: {platform.processor()}\")"
-                               ""
-                               "if __name__ == \"__main__\":"
-                               "    main()"]
-                     :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Experimental!"
-                     :icon "images/python.svg"}}
+        ;;    :python3 {:runner {}
+        ;;              :modes [:text :data  :clover :terminal]
+        ;;              :type :flow
+        ;;              :syntax "python"
+        ;;              :ext ".py"
+        ;;              :placeholder-on-running? true
+        ;;              :clover-fn [:run-solver
+        ;;                          {:signal false
+        ;;                           :cache? false
+        ;;                           :type :flow
+        ;;                           :data
+        ;;                           {:flowmap "simple-python-exec" ;; "python-test-1"
+        ;;                            :opts
+        ;;                            {:timeout 120000
+        ;;                             :overrides
+        ;;                             {:python-code-string ;;:open-input-1
+        ;;                              :clover-body}}
+        ;;                            :return :output-only}}]
+        ;;              :default ["import platform"
+        ;;                        ""
+        ;;                        "def main():"
+        ;;                        "    # Print Hello, World!"
+        ;;                        "    print(\"Hello, World!\")"
+        ;;                        "    "
+        ;;                        "    # Print Python version"
+        ;;                        "    print(f\"Python version: {platform.python_version()}\")"
+        ;;                        "    "
+        ;;                        "    # Print detailed Python version info"
+        ;;                        "    print(f\"Python version info: {platform.python_version_tuple()}\")"
+        ;;                        "    "
+        ;;                        "    # Print system information"
+        ;;                        "    print(f\"System: {platform.system()}\")"
+        ;;                        "    print(f\"Node: {platform.node()}\")"
+        ;;                        "    print(f\"Release: {platform.release()}\")"
+        ;;                        "    print(f\"Version: {platform.version()}\")"
+        ;;                        "    print(f\"Machine: {platform.machine()}\")"
+        ;;                        "    print(f\"Processor: {platform.processor()}\")"
+        ;;                        ""
+        ;;                        "if __name__ == \"__main__\":"
+        ;;                        "    main()"]
+        ;;              :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Super Experimental! (not really useful ATM)"
+        ;;              :icon "images/python.svg"}
+                     }
  :eleven-labs-api-key nil
  ;:eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
  ;:eleven-labs-default-voice-name "Alicia Speaks-Unique and Pleasant"
@@ -621,6 +744,5 @@
                    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
                    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
                    "Secrets are not the same as surprises."
-                   "Neuromancer. The lane to the land of the dead."
-                   ]}
+                   "Neuromancer. The lane to the land of the dead."]}
 

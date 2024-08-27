@@ -1874,6 +1874,7 @@
             kit-keypath [:clojure :gen-ev]
             running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
             output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
+            curr-tab       @(ut/tracked-sub ::bricks/selected-tab {})
             ;;running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
             fstr (str "kit-runner " kit-runner-key)
             fstr2 [:v-box :children [[:box :child (str "You asked: \"" command "\" to " (get opts-map :model))]
@@ -1891,6 +1892,7 @@
            :kit-runner-key kit-runner-key
            :panel-key   selected-block
            :data-key    data-key
+           :tab-name    curr-tab
            :opts-map    opts-map
            :runner      :clojure
            :client-name client-name
@@ -4742,7 +4744,7 @@
 
 
 (defn kit-canvas-icons [panel-key query-key]
-  (let [valid-kits  @(ut/tracked-subscribe [::bricks/valid-kits-for {:panel-key panel-key :data-key query-key}])
+  (let [valid-kits  @(ut/tracked-subscribe [::bricks/valid-kits-for {:panel-key panel-key :data-key query-key :location :canvas}])
         ;;_ (tapp>>  [:valid-kits valid-kits])
         block-runners  @(ut/tracked-sub ::bricks/block-runners {})
         client-name    @(ut/tracked-sub ::bricks/client-name {})]
@@ -4753,6 +4755,7 @@
                      running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
                      output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
                      running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                     curr-tab      @(ut/tracked-sub ::bricks/selected-tab {})
                      trig!        [@bricks/waiting?]
                      class        (cond
                                     running? "rotate linear infinite"
@@ -4778,7 +4781,8 @@
                                 :kit-runner-key kit-runner-key
                                 :panel-key   panel-key
                                 :data-key    query-key
-                                :runner      :queries
+                                :tab-name    curr-tab
+                                :runner      :*
                                 :client-name client-name
                                 :ui-keypath     [:panels panel-key :queries query-key]}])
                              (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
@@ -4790,7 +4794,8 @@
 (defn button-panels [editor? lines? peek? auto-run? external? selected-block? online?
                      websocket-status server-subs things-running flow-watcher-subs-grouped
                      client-name screen-name]
-  (let [left [re-com/h-box
+  (let [things-running (vec (distinct (filter #(cstr/includes? (str %) ">running?") things-running)))
+        left [re-com/h-box
               :style {:position "fixed"
                       :z-index 98
                       :bottom 0
@@ -4847,7 +4852,15 @@
 
                           [custom-text-display
                            {:text (ut/nf (count things-running))
-                            :tooltip "active running (solvers, flows, etc)"}]
+                            :tooltip (str "active running (solvers, flows, etc), " (ut/nf (count things-running)))}]
+
+                          (when (> (count things-running) 0)
+                            [custom-icon-button
+                             {:icon-name "zmdi-refresh"
+                              :tooltip (str "running: " things-running)
+                              :active? false
+                              :class "rotate linear infinite"
+                              :color (theme-pull :theme/editor-outer-rim-color nil)}])
 
                           (when (not online?)
                             [custom-text-display
@@ -4880,7 +4893,7 @@
                                                            (ut/tracked-dispatch [::wfx/request :default
                                                                                  {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
                                                                                   :timeout 50000}]))]]])])
-                          
+
                           [custom-icon-button
                            (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
                              {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
@@ -4908,7 +4921,7 @@
                           ;;     :color "red"}])
                           ]
 
-                         (kit-canvas-icons :block-3570 :album-name-drag-12))]
+                         (kit-canvas-icons :* :*))]
 
         memory (let [mem @(ut/tracked-subscribe_ [::bricks/memory])]
                  (when (> (get mem 1) 0) ;; firefox, etc doesn't support this, so not point to render 0MB

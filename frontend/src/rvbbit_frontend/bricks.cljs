@@ -884,7 +884,7 @@
 
 (re-frame/reg-sub 
  ::alerts 
- (fn [db _] (get db :alerts)))
+ (fn [db _] (vec (distinct (get db :alerts)))))
 
 (re-frame/reg-event-db
  ::sub-to-flows
@@ -7050,11 +7050,21 @@
 
 (re-frame/reg-sub
  ::valid-kits-for
- (fn [db [_ {:keys [panel-key data-key]}]]
-   (let [valid-kits (get db :valid-kits)]
+ (fn [db [_ {:keys [panel-key data-key location]}]]
+   (let [valid-kits (get db :valid-kits)
+         ;location :card
+         possible-kits (vec (apply concat
+                                   (for [[k v] (get-in db [:server :settings :runners])]
+                                     (for [vv (keys (get v :kits))
+                                           :let [icon-location (get-in db [:server :settings :runners k :kits vv :icon-location])]
+                                           :when (or (nil? icon-location)
+                                                     (= location icon-location))]
+                                       [k vv]))))
+         valid-kits (if location (select-keys valid-kits possible-kits) valid-kits)]
      (for [[k v] valid-kits
-           :when (some #(and (= (first %) panel-key)
-                             (= (last %) data-key)) v)] k))))
+           :when (or (= panel-key :*)
+                     (some #(and (= (first %) panel-key)
+                                 (= (last %) data-key)) v))] k))))
 
 (re-frame/reg-sub
  ::installed-kits
@@ -7082,6 +7092,7 @@
 (defn render-kit-icon-query [icon & [class]]
   (if (and (ut/ne? icon) (not (nil? icon)))
     (if (or (cstr/starts-with? icon "zmdi-")
+            (cstr/starts-with? icon "ri-")
             (cstr/starts-with? icon "fa-"))
       [re-com/md-icon-button
        :src (at)
@@ -7116,7 +7127,6 @@
                        (try [(edn/read-string (ut/replacer (first data-keypath) "::" ":"))] (catch :default _ nil))
                        data-keypath) ;; unpack the viewer string
         panel-map @(ut/tracked-subscribe [::workspace [panel-key]])
-
         implied-rowset? @(ut/tracked-sub ::is-implied-rowset? {:data-keypath data-keypath})
         draggable (if implied-rowset? draggable-stub draggable)
         query-key (first data-keypath)
@@ -7808,10 +7818,12 @@
                                       :padding          "0px"
                                       :margin-top       "-3px"}])
 
-                           [re-com/gap :size "6px"]]
+                           ;[re-com/gap :size "2px"]
+                           ]
 
-                          (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key panel-key :data-key query-key}])
+                          (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key panel-key :data-key query-key :location :query}])
                                 ;;_ (tapp>>  [:valid-kits valid-kits])
+                                curr-tab       @(ut/tracked-sub ::selected-tab {})
                                 block-runners  @(ut/tracked-sub ::block-runners {})
                                 client-name    @(ut/tracked-sub ::client-name {})]
                             (vec (for [e valid-kits
@@ -7845,6 +7857,7 @@
                                                               :kit-runner-key kit-runner-key
                                                               :panel-key   panel-key
                                                               :data-key    query-key
+                                                              :tab-name    curr-tab
                                                               :runner      :queries
                                                               :client-name client-name
                                                               :ui-keypath     [:panels panel-key :queries query-key]}])
@@ -13774,11 +13787,7 @@
                                   [honeycomb brick-vec-key selected-view]
                                   [honeycomb brick-vec-key])]))]
                  (if (or (and (not ghosted?) (not no-ui?)) selected?)
-                   (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view}])
-                                ;; _ (tapp>> [:valid-kits! valid-kits brick-vec-key selected-view @(ut/tracked-sub ::valid-kits {}) 
-                                ;;            @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view}])
-                                ;;            ])
-                         ]
+                   (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view :location :card}])]
                      ^{:key (str "brick-" brick-vec "-footer")}
                      [re-com/box :size "none" :width (px (- block-width 4)) :height "15px" :style
                       {:overflow "hidden" :z-index (if selected? (+ zz 10) zz)} :child
@@ -13961,6 +13970,7 @@
                                                                    running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
                                                                    output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
                                                                    running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                                                                   curr-tab     @(ut/tracked-sub ::selected-tab {})
                                                                    trig!        [@waiting?]
                                                                    class        (cond
                                                                                   running? "rotate linear infinite"
@@ -13985,6 +13995,7 @@
                                                                                     :kit-runner-key kit-runner-key
                                                                                     :panel-key   brick-vec-key
                                                                                     :data-key    selected-view
+                                                                                    :tab-name    curr-tab
                                                                                     :runner      selected-view-type
                                                                                     :client-name client-name
                                                                                     :ui-keypath     [:panels brick-vec-key selected-view-type selected-view]}])

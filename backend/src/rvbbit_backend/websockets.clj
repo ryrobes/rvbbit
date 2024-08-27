@@ -1392,8 +1392,21 @@
           (ring-resp/content-type "audio/mpeg"))
       (ring-resp/not-found "File not found"))))
 
-(defn package-settings-for-client []
-  (let [settings (merge (ut/deep-remove-keys (config/settings) [:when-fn :kit-expr])
+(defn package-settings-for-client [& [client-name]]
+  (let [settings (config/settings)
+        valid-runners-map (ppy/execute-in-thread-pools-but-deliver
+                       :serial-runner-when-expr-checks
+                       (fn [] (into {}
+                                    (for [[k v] (get settings :runners)
+                                          :let [oo (evl/repl-eval (get v :when-expr true)
+                                                                  "127.0.0.1" 8181
+                                                                  :rvbbit (keyword (str "config-when-runner" (cstr/replace (str k) ":" ""))) [])]]
+                                      {k (get-in oo [:evald-result :value 0] (get-in oo [:evald-result :out]))}))))
+        valid-runners (vec (keys (filter #(last %) valid-runners-map)))
+        ;; _ (when true ;(= client-name :rvbbit)
+        ;;     (ut/pp [valid-runners-map valid-runners]))
+        settings (assoc settings :runners (select-keys (get settings :runners) valid-runners))
+        settings (merge (ut/deep-remove-keys settings [:when-fn :kit-expr :when-expr])
                         {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
                          :kits    {} ;;config/kit-fns
                          :screens (vec (map :screen_name
@@ -1412,9 +1425,7 @@
 (defmethod wl/handle-request :get-settings
   [{:keys [client-name]}]
   (ut/pp [:client client-name :just-booted])
-  (package-settings-for-client))
-
-
+  (package-settings-for-client client-name))
 
 (defmethod wl/handle-request :autocomplete
   [{:keys [client-name surrounding panel-key view]}]
@@ -2352,7 +2363,8 @@
 ;; (reset! times-atom {})
 
 (defmethod wl/handle-push :run-kit
-  [{:keys [client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key opts-map]}]
+  [{:keys [client-name ui-keypath data-key panel-key tab-name runner kit-keypath kit-runner-key opts-map]}]
+  (ut/pp [:run-kit-pre client-name ui-keypath data-key panel-key tab-name runner kit-keypath kit-runner-key opts-map])
   (try
     (let [_ (swap! db/kit-atom assoc-in [:kicks client-name] ;; so the UI has the :kicks :buffy option to watch before completeted
                    (vec (distinct (conj (get-in @db/kit-atom [:kicks client-name] []) data-key))))
@@ -2385,16 +2397,18 @@
                             :client-panels-data (get @client-panels-data client-name)
                             :client-panels-metadata (get @client-panels-metadata client-name)
                             :query-metadata (get-in @db/query-metadata [client-name data-key])
-                            :height-int (* (get-in @client-panels [client-name panel-key :h]) 50)
-                            :width-int (* (get-in @client-panels [client-name panel-key :w]) 50)
+                            :height-int (* (get-in @client-panels [client-name panel-key :h] 0) 50)
+                            :width-int (* (get-in @client-panels [client-name panel-key :w] 0) 50)
                             :panel-key panel-key
                             :data-key data-key
+                            :tab-name tab-name
+                            :host-runner host-runner
                             :ui-keypath [:panels panel-key host-runner data-key]})
           transit-file    (write-transit-data context-data kit-runner-key-str client-name kit-runner-key-str)
           limited-postwalk-map (merge
                                 {:transit-file transit-file}
                                 clover-lookup-map
-                                (select-keys context-data [:panel-key :data-key :ui-keypath :query-metadata :height-int :width-int]))
+                                (select-keys context-data [:panel-key :data-key :ui-keypath :query-metadata :height-int :width-int :tab-name :host-runner]))
                                 ;; ^^ only the smaller strucs will we allow to be postwalked, else they need to be loaded from the transit file(s)
 
           ;; big blocking step for shipping kit fn view UI, but times out after a minute and cancels
@@ -2534,15 +2548,16 @@
                                       {:transit-rowset (get-in @transit-file-mapping [client-name data-key :file])
                                        :transit-rowset-meta (get-in @transit-file-mapping [client-name data-key :meta-file])}
                                       limited-postwalk-map)
-          _ (ut/pp [:debug-kit runner kit-keypath (str kit-runner-fn) repl-host repl-port transit-file])
+          _ (ut/pp [:debug-kit runner kit-keypath kit-runner-fn repl-host repl-port transit-file])
           loaded-kit-runner-fn (walk/postwalk-replace limited-postwalk-map
                                                       kit-runner-fn)
-          _ (ut/pp [:debug-kit2 runner kit-keypath (str loaded-kit-runner-fn) repl-host repl-port transit-file])
+          _ (ut/pp [:debug-kit2 runner kit-keypath loaded-kit-runner-fn repl-host repl-port transit-file])
           {:keys [result elapsed-ms]} (ut/timed-exec
                                        (ppy/execute-in-thread-pools-but-deliver
                                         (keyword (str "serial-kit-instance/" kit-runner-key-str))
                                         (fn []
                                           (evl/repl-eval loaded-kit-runner-fn repl-host repl-port client-name kit-runner-key ui-keypath))))
+          _ (ut/pp [:debug-kit3 runner kit-keypath result elapsed-ms])
           error?   (cstr/includes? (cstr/lower-case (str result)) " error ")  ;; lame , get codes later 
           output   (get-in result [:evald-result :value 0])
           ;console (get-in result [:evald-result :out])
@@ -2551,9 +2566,10 @@
       ;;(ut/pp [:kit-runner-output result {:elapsed-ms? elapsed-ms}])
 
       ;;(ut/pp  [:result result])
-      (when (and (= output-type :kit-map)
+      (when (and ;(= output-type :kit-map)
                  (ut/ne? output)
                  (map? output))
+        
         (ut/pp [:inserting-into-kit-results-table.. (count output) (vec (keys output))])
 
         (let [push-assocs (get output :push-assocs)
@@ -2609,7 +2625,27 @@
       (when true ;; (not error?) 
         (swap! times-atom assoc times-key (conj (get @times-atom times-key []) elapsed-ms)))
       (ut/pp [:finished-kit-from client-name ui-keypath]))
-    (catch Exception e (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key e]))))
+    (catch Exception e 
+      (let [kit-runner-key (if (string? kit-runner-key) (keyword kit-runner-key) kit-runner-key)]
+        (ut/pp [:kit-runner-fn-error client-name ui-keypath data-key panel-key runner kit-keypath kit-runner-key (str e)])
+        (swap! db/kit-status assoc-in [kit-runner-key :running?] false)
+        (alert! client-name
+                [:v-box
+                 :padding "5px"
+                 :gap "10px"
+                 :children
+                 [[:box :child (str "kit runner fn error...")]
+                  [:box :style {:font-size "11px" :opacity 0.7}
+                   :child (str e)]]]
+                nil
+                nil
+                240)
+        (swap! db/kit-atom assoc-in [kit-runner-key :incremental]
+               (create-ansi-box
+                (str "kit run error \n"
+                     (ut/millis-to-date-string (System/currentTimeMillis)) "\n " e "\n")))
+        (throw (ex-info "kit run error" {:type :error})))
+      )))
 
 ;; (ut/pp @flow-status)
 
@@ -5586,6 +5622,7 @@
                                                                                                    :item_data    (pr-str i)}]]
                                                                                 row-map))]]
                                                            rowset)))]
+                            (ut/pp [:inserting-kit-data output-rows])
 
                             (when (ut/ne? output-rows) ;; give the client a hint through a kick sub that we have data for X
                               (swap! db/kit-atom assoc-in [:kicks client-name]

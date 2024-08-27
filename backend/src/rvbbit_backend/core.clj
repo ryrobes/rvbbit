@@ -346,7 +346,7 @@
                                          [:box :child (str (get % :path))]]]
                                        13 2
                                        5)
-                           (wss/kick d [:settings] (wss/package-settings-for-client) 1 :none (str "file updated " (get % :path))))))
+                           (wss/kick d [:settings] (wss/package-settings-for-client :rvbbit) 1 :none (str "file updated " (get % :path))))))
                     file-path)))
 
 (defn watch-solver-files []
