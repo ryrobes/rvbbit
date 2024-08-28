@@ -35,7 +35,7 @@
                      :icon "images/sql.png"} ;; basic clover-sql query runner
 
            :views   {:default []
-                     :modes [:clover :edn]
+                     :modes [:clover :edn :data]
                      :ext ".edn"
                      :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
                      :icon "🍀"} ;; basic clover render
@@ -91,7 +91,7 @@
                                         :type :clojure
                                         :input-map {}
                                         :data :clover-body}]
-                           :description "Demo: Fetch a random Chuck Norris joke from the chucknorris.io API and display it with a cute kitten image."
+                           :description "Demo - Fetch a random Chuck Norris joke from the chucknorris.io API and display it with a cute kitten image."
                            :icon "images/chuck.png"}
 
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
@@ -133,38 +133,48 @@
                      :icon "images/clojure-alt.svg"
                      :kits {:export-to-csv {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
                                                        (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
-                                                                                :when (get v :queries)]
+                                                                                :when (get v :queries)] ;; only things eligble are query results
                                                                             (for  [kk (keys (get v :queries))]
                                                                               [k :queries kk])))))
                                             :output :kit-map
                                             :icon-location :query
                                             :tooltip "Export a rowset to CSV"
+                                            :icon "ri-export-fill"
                                             :kit-expr (do
                                                         (require '[cognitect.transit :as transit]
                                                                  '[clojure.data.csv :as csv]
+                                                                 '[rvbbit-backend.external :as ext]
+                                                                 '[rvbbit-backend.util :as ut]
+                                                                 '[clojure.string :as cstr]
                                                                  '[clojure.java.io :as io])
-
-                                                        (let [transit-file :transit-rowset
-                                                              data-key :data-key
-                                                              panel-key :panel-key
-                                                              output-file (-> (str "/tmp/" data-key "_" panel-key ".csv")
+                                                        (let [dest-dir "user-content/data-exports"
+                                                              _ (ext/create-dirs dest-dir) ;; if not exists, create it
+                                                              transit-file :transit-rowset
+                                                              data-key     :data-key
+                                                              panel-key    :panel-key
+                                                              output-file  (-> (str dest-dir "/" data-key "_" panel-key ".csv")
                                                                               (cstr/replace ":" ""))
                                                               [finished-output-file
                                                                rowcount] (let [transit-data (with-open [in (io/input-stream transit-file)]
                                                                                               (let [reader (transit/reader in :msgpack)]
                                                                                                 (transit/read reader)))]
-                                                                                    ;; Convert to CSV
+                                                                           ;; Convert to CSV
                                                                            (when (seq transit-data)
                                                                              (let [headers (keys (first transit-data))
+                                                                                   headers-str (map (fn [x] (cstr/replace (str x) ":" "")) headers)
                                                                                    rows (map (fn [x] (map x headers)) transit-data)]
-                                                                                    ;; Write CSV file
+                                                                               ;; Write CSV file
                                                                                (with-open [writer (io/writer output-file)]
-                                                                                 (csv/write-csv writer (cons headers rows)))))
+                                                                                 (csv/write-csv writer (cons headers-str rows)))))
                                                                                     ;; Return the path of the created file
                                                                            [output-file (count transit-data)])
-                                                              kit-map {:push-alerts {:body [:v-box :children [[:box :child "File saved locally to:"]
-                                                                                                              [:box :child (str output-file)]]] :seconds 60}
-                                                                       :export-to-csv {:description "export to csv output"
+                                                              kit-map {:push-alerts {:body [:v-box
+                                                                                            :style {:font-size "17px"}
+                                                                                            :children [[:box :child "File saved locally to:"]
+                                                                                                       [:box :child (str output-file)]]] 
+                                                                                     :w 13 :h 3
+                                                                                     :seconds 60}
+                                                                       :export-to-csv {:description "export to csv"
                                                                                        :options {:pages? true :search? false :actions? false}
                                                                                        :parameters {}
                                                                                        :mutates {}
@@ -173,23 +183,30 @@
                                                                                                :step-mutates {}
                                                                                                :ask-mutates {}
                                                                                                :content [[:v-box
-                                                                                                          :size "auto"
+                                                                                                          :size "auto" :align :center :justify :center
                                                                                                           :width "490px"
                                                                                                           :style {:border [:string3 "3px solid " :theme/editor-outer-rim-color]
                                                                                                                   :border-radius "14px"}
                                                                                                           :padding "10px"
                                                                                                           :gap "5px"
-                                                                                                          :children [[:box :child (str "File saved locally to: " finished-output-file)]
-                                                                                                                     (str rowcount " rows exported")
+                                                                                                          :children [[:box :child (str "Success. File saved locally to: ")]
+                                                                                                                     [:box
+                                                                                                                      :style {:font-size "17px"}
+                                                                                                                      :child (str finished-output-file)]
+                                                                                                                     [:box
+                                                                                                                      :style {:font-size "17px"}
+                                                                                                                      :child (str (ut/nf rowcount) " rows exported")]
                                                                                                                      [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
                                                                                                                             :style {:width "100%"
                                                                                                                                     :padding "5px"
                                                                                                                                     :border-radius "14px"
                                                                                                                                     :height "100%"
-                                                                                                                                    :object-fit "cover"}}]]]]}]}}]
+                                                                                                                                    :object-fit "cover"}}]
+                                                                                                                     [:box :child (str "..if you could... print this out for me... that'd be great...")]]]]}]}}]
                                                           (println "kit-map: " kit-map)
                                                           kit-map))
-                                            :icon "ri-export-fill"}
+                                            }
+                            ;; example of a kit that looks at the card's DATA to decide if it's eligible
                             :count-map-keys {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
                                                         (vec (apply concat (for [[k v] (dissoc client-data nil)
                                                                                  :when (seq v)]
@@ -472,19 +489,22 @@
                                                                           :color "orange"
                                                                           :font-family "Homemade Apple"}]
                                                                  [:box :child "group-by dimensions to include"]
-                                                                 [:h-box
-                                                                  :gap "8px"
-                                                                  :size "auto"
-                                                                  :children (for [dd dimensions]
-                                                                              [:box
-                                                                               :size "auto"
-                                                                               :padding "6px"
-                                                                               :child (str dd)
-                                                                               :style {:border "1px solid #ffffff33"
-                                                                                       :background-color [:when [:some dd dimensions-to-scan] "orange"]
-                                                                                       :color [:when [:some dd dimensions-to-scan] "black"]
-                                                                                       :font-size "18px" :cursor "pointer"}
-                                                                               :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])]
+                                                                 [:v-box 
+                                                                  :children 
+                                                                  (for [dimensions-chunk (partition-all 5 dimensions)]
+                                                                    [:h-box
+                                                                     :gap "8px"
+                                                                     :size "auto"
+                                                                     :children (for [dd dimensions-chunk]
+                                                                                 [:box
+                                                                                  :size "auto"
+                                                                                  :padding "6px"
+                                                                                  :child (str dd)
+                                                                                  :style {:border "1px solid #ffffff33"
+                                                                                          :background-color [:when [:some dd dimensions-to-scan] "orange"]
+                                                                                          :color [:when [:some dd dimensions-to-scan] "black"]
+                                                                                          :font-size "18px" :cursor "pointer"}
+                                                                                  :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])])]
                                                                  [:box :child "max dimension combos to run"]
                                                                  [:h-box
                                                                   :gap "10px"

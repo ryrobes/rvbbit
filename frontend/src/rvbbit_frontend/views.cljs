@@ -3730,7 +3730,8 @@
                                        ;(get custom-map :background-size)
                                           )})))]]))
 
-(dnd2/subscribe! (js/document.querySelector "div")
+(dnd2/subscribe! ;;;(js/document.getElementById "base-canvas")
+                 (js/document.querySelector "div") ;; "base-canvas"
                  :canvas02
                  {:drop (fn [_ files]
                           (when (not (= ""

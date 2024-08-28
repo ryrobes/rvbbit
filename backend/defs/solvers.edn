@@ -40,31 +40,6 @@
                                                                   default-field-attributes
                                                                   default-derived-fields
                                                                   default-viz-shapes)))}
- :random-karl-casey
-   {:signal :signal/changed-wallpaper?
-    :type :clojure
-    :cache? false
-    :data
-      (do
-        (ns mp3-finder.core
-          (:require [clojure.java.io :as io]))
-        (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
-        (defn is-mp3? "Checks if the given file object is an MP3 file." [file] (.endsWith (.getName file) ".mp3"))
-        (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
-        (defn get-file-name "Gets the name of a file object." [file] (.getName file))
-        (defn find-random-mp3
-          "Given a starting directory, finds all *.mp3 files recursively
-                                       and returns a vector containing:
-                                       [full-path file-name]
-                                       for a random MP3 file."
-          [start-dir]
-          (let [mp3-files (->> (file-seq (io/file start-dir))
-                               (filter is-file?)
-                               (filter is-mp3?)
-                               (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
-                               (into []))]
-            (if (seq mp3-files) (rand-nth mp3-files) nil)))
-        [:play-click-custom (find-random-mp3 "/home/ryanr/Music")])}
  :refresh-snifftmp1 {:signal :signal/daily-at-9am
                      :type   :clojure
                      :cache? false
@@ -104,6 +79,20 @@
                   (println "(" (count (deref selected-files)) " files selected previously)")
                   res))}
  :count-sql-solver-1 {:signal :solver/sql-solver-1 :type :clojure :data (count :data/sql-solver-1)}
+ :materialize-state-abbrev-drag-13
+   {:signal false
+    :type :sql
+    :snapshot? false
+    :data
+      {:select [:state_abbrev [[:count 1] :rowcnt] [[:sum :population] :population_sum_49]]
+       :from
+         [[{:select [:fips_county_code :fips_state_code :housing_units :land_area :latitude :longitude :name :population
+                     :state_abbrev :water_area]
+            :from   [[:us_counties :mm7]]} :aa860]]
+       :group-by [:state_abbrev]
+       :order-by [[:rowcnt :desc]]
+       :page -4
+       :connection-id "bigfoot-ufos"}}
  :send-to-upscaler-3 {:signal    false
                       :type      :clojure
                       :cache?    false
@@ -336,6 +325,15 @@
                                                                    default-derived-fields
                                                                    default-viz-shapes)))}
  :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}
+ :materialize-us-counties-drag-15 {:signal    false
+                                   :type      :sql
+                                   :snapshot? false
+                                   :data      {:select        [:fips_county_code :fips_state_code :housing_units
+                                                               :land_area :latitude :longitude :name :population
+                                                               :state_abbrev :water_area]
+                                               :from          [[:us_counties :mm7]]
+                                               :page          -4
+                                               :connection-id "bigfoot-ufos"}}
  :refresh-snifftmp2 {:signal :signal/daily-at-9am
                      :type   :clojure
                      :cache? false
@@ -365,4 +363,26 @@
                                                                default-sniff-tests
                                                                default-field-attributes
                                                                default-derived-fields
-                                                               default-viz-shapes)))}}
+                                                               default-viz-shapes)))}
+ :random-karl-casey
+   {:signal :signal/changed-wallpaper?
+    :type :clojure
+    :cache? false
+    :data
+      (do
+        (ns mp3-finder.core
+          (:require [clojure.java.io :as io]))
+        (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
+        (defn is-mp3? "Checks if the given file object is an MP3 file." [file] (.endsWith (.getName file) ".mp3"))
+        (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
+        (defn get-file-name "Gets the name of a file object." [file] (.getName file))
+        (defn find-random-mp3
+          "Given a starting directory, finds all *.mp3 files recursively\n                                       and returns a vector containing:\n                                       [full-path file-name]\n                                       for a random MP3 file."
+          [start-dir]
+          (let [mp3-files (->> (file-seq (io/file start-dir))
+                               (filter is-file?)
+                               (filter is-mp3?)
+                               (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
+                               (into []))]
+            (if (seq mp3-files) (rand-nth mp3-files) nil)))
+        [:play-click-custom (find-random-mp3 "/home/ryanr/Music")])}}

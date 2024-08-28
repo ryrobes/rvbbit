@@ -272,7 +272,8 @@
                       (fpop/freeze-atom solver-edn-fp)
                       (ut/zprint-file solver-edn-fp {:style [:justified-original] :parse-string? true
                                                      :comment {:count? nil :wrap? nil} :width 120
-                                                     :map {:comma? false :sort? false}}))
+                                                     :map {:comma? false :sort? false}})
+                      (wss/reload-solver-subs))
                   conn      (edn/read-string (slurp f-path))
                   poolable? (try (and (map? conn) (find conn :jdbc-url)) (catch Exception _ false))
                   conn      (if poolable?

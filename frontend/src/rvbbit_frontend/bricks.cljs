@@ -745,12 +745,18 @@
                                                            (cstr/includes? (cstr/lower-case (str v)) (cstr/lower-case x))))
                                                      y))
                                        (vec (filter #(cstr/includes? (cstr/lower-case (str %)) (cstr/lower-case x)) y)))))
-         all-solvers             (ss-filter-results @db/signals-searcher-atom (get db :solvers-map))
-         all-signals             (ss-filter-results @db/signals-searcher-atom (get db :signals-map))
-         solvers                 (if (and solver-open? (some #(= % "solvers") @db/selectors-open))
-                                   (vec (for [ss (keys all-solvers)]
+        ;;  all-solvers             (ss-filter-results @db/signals-searcher-atom (get db :solvers-map))
+        ;;  solvers                 (if (and solver-open? (some #(= % "solvers") @db/selectors-open))
+        ;;                            (vec (for [ss (keys all-solvers)]
+        ;;                                   (keyword (str "solver-meta/" (ut/replacer (str ss) ":" "") ">extra"))))
+        ;;                            [])
+         all-solvers             (vec (flatten (for [[_ v] (select-keys @db/selectors-items @db/selectors-open)] v)))
+         solvers                 (if (and solver-open? (ut/ne? all-solvers))
+                                   (vec (for [ss all-solvers]
                                           (keyword (str "solver-meta/" (ut/replacer (str ss) ":" "") ">extra"))))
                                    [])
+         ;;_ (tapp>> [:selectors-open solvers all-solvers @db/selectors-open @db/selectors-items])
+         all-signals             (ss-filter-results @db/signals-searcher-atom (get db :signals-map))
          signals-mode?           (and (= (get @db/flow-editor-system-mode 0) "signals & solvers") ;; signals
                                       (get db :flow?))
          signals-box-open?       (some #(= % "signals") @db/selectors-open)
@@ -811,12 +817,12 @@
                                                         (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))
          subs-vec (vec (distinct
                         (remove nil? (concat flow-runners clover-solver-outputs chunk-charts @temp-extra-subs
-                                (when doom? [:time/minute]) base-subs 
+                                             (when doom? [:time/minute]) base-subs
                                      ;;client-namespaces-refs 
                                      ;;client-namespace-intros 
-                                client-ns-intro-map
-                                signal-subs clover-solvers
-                                clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs))))]
+                                             client-ns-intro-map
+                                             signal-subs clover-solvers
+                                             clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs))))]
      subs-vec
       ;; (tapp>> [:clover-solvers
       ;;          @db/solver-fn-lookup
@@ -4101,6 +4107,7 @@
                                           (not (= (str (first %)) ":/")) ;; sometimes a garbo "param" sneaks in
                                           (not (cstr/starts-with? (str (first %)) ":data/"))
                                           (not (cstr/starts-with? (str (first %)) ":kit/"))
+                                          (not (cstr/starts-with? (str (first %)) ":kit-status/"))
                                           (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
                                           (not (cstr/starts-with? (str (first %)) ":panel-hash/"))
                                           (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
@@ -4117,7 +4124,8 @@
                                           (not (nil? (last %))) ;; no nil val params 
                                           (not (cstr/starts-with? (str (first %)) ":conn-list/"))
                                           (not (cstr/starts-with? (str (first %)) ":time/"))
-                                          (not (cstr/starts-with? (str (first %)) ":sys/"))
+                                          (not (cstr/includes? (str (first %)) "sys/"))
+                                          (not (cstr/includes? (str (first %)) "sys2/"))
                                           (not (cstr/starts-with? (str (first %)) ":client/"))
                                           (not (cstr/starts-with? (str (first %)) (if (get pf :theme) ":theme/***" ":theme/")))
                                           (not (cstr/starts-with? (str (first %)) (if (get pf :user) ":param/***" ":param/")))
@@ -5761,10 +5769,11 @@
                                               new             (if exist? [:and where-exist stmt] stmt)
                                               kpath           (vec (conj (vec (drop-last kpath)) :where))]
                                           (assoc-in db kpath new))
-       (or (cstr/starts-with? (str clause-conform) ":pivot-on/") (cstr/starts-with? (str clause-conform) ":🌶️pivot-on/"))
+       (or (cstr/starts-with? (str clause-conform) ":pivot-on/") 
+           (cstr/starts-with? (str clause-conform) ":🌶️pivot-on/"))
        (let [pivot-field  (keyword (last (ut/splitter (str clause-conform) #"/")))
              agg-field    (get-in drop-data [:drag-body :target])
-             spicy?       (cstr/starts-with? (str clause-conform) ":🌶️pivot-on/")
+             ;spicy?       (cstr/starts-with? (str clause-conform) ":🌶️pivot-on/")
              existing-q   (get-in db [:panels panel-key :queries query-key])
              aggy         (if (= agg-field :rowcnt) :count [:sum agg-field]) ;; rowcnt is not
              pivot-by-map {pivot-field [aggy
@@ -5774,8 +5783,8 @@
                               (assoc :pivot-by pivot-by-map)
                               (assoc :select (ut/remove-key (get existing-q :select) pivot-field))
                               (assoc :group-by (ut/remove-key (get existing-q :group-by) pivot-field)))
-             new-query    (if spicy?
-                            (-> new-query)
+             new-query    (if (empty? (get new-query :group-by)) ;; if no group by, remove it - single dim, measure pivots
+                            (dissoc new-query :group-by)
                             new-query)]
          (ut/tapp>> [:pivot pivot-field existing-q drop-data new-query])
          (assoc-in db [:panels panel-key :queries query-key] new-query))
@@ -5887,6 +5896,7 @@
                                            (assoc-in [:panels panel-key :connection-id]
                                                      (get-in drop-data [:drag-body :connection-id]))
                                            (assoc-in [:panels panel-key :selected-view] new-q-key)))
+       
        (= clause-conform :remove)
        (let [fname      (get-in drop-data [:drag-body :target])
              select     (get-in db [:panels panel-key :queries query-key :select] [])
@@ -5901,15 +5911,15 @@
              (assoc-in [:panels panel-key :queries query-key :order-by] new-order)
              (assoc-in [:panels panel-key :queries query-key :group-by] new-group)
              (ut/dissoc-in [:panels panel-key :queries query-key (if (empty? new-order) :order-by :nevermind!)]) ;; dirty
-                                                                                                                    ;; hack
              (ut/dissoc-in [:panels panel-key :queries query-key (if (empty? new-group) :group-by :nevermind!)]))) ;; dirty
-                                                                                                                      ;; hack
+       
        (= clause-conform :promote-query) (assoc-in db
                                                    [:panels panel-key :queries query-key] ;; materialize
                                                                                    ;; and overwrite
                                                    (sql-alias-replace (get-in db [:panels panel-key :queries query-key])))
        
        (= clause-conform :materialize-to-cache-db) (let [existing-q    (sql-alias-replace (get-in db [:panels panel-key :queries query-key]))
+                                                         ;; ^^ need to sliently "promote" it first so it is materialized properly
                                                          connection-id (get-in db [:panels panel-key :connection-id] (get existing-q :connection-id))
                                                          query (assoc existing-q :page -3)] ;; trigger to materialize that run other side-effects
                                                      (conn/sql-data [query-key] query connection-id)
@@ -7237,7 +7247,7 @@
         has-pages? (and (>= full-rowcount rows-per-page) (or (> page-num 0) (nil? page-num)) (not (= page-num -1)))
         last-page? (and has-pages? (= page-num (js/Math.ceil (/ full-rowcount rows-per-page))))
         first-page? (and has-pages? (or (nil? page-num) (= page-num 1)))
-        _ (tapp>> [:has-pages? has-pages? page-num last-page? first-page?])
+        ;; _ (tapp>> [:has-pages? has-pages? page-num last-page? first-page?])
         [waits? single-wait?] @(ut/tracked-subscribe [::query-waitings query-key])
         ;;deep-meta-running?  (some #(= % query-key) @db/running-deep-meta-on)  
         default-col-widths @(ut/tracked-sub ::column-default-widths {:panel-key panel-key :query-key query-key})
@@ -9465,7 +9475,7 @@
                                                                     ;(string? k-val) 36
                                                                   (or (vector? k-val)
                                                                       (map? k-val))
-                                                                  (+ 10 (apply + (map (fn [[k v]]
+                                                                  (+ 30 (apply + (map (fn [[k v]]
                                                                                         (if (or (seq? v) (map? v))
                                                                                           65 ;(try (* (count v) 65) (catch :default _ 65))
                                                                                           35))
@@ -9475,7 +9485,7 @@
                                                                   ;;                                      ;(> (count v) 1) 
                                                                   ;;                                                (or (seq? v) (map? v)))
                                                                   ;;                                         65 35)) k-val)))
-                                                                  :else 35)
+                                                                  :else 45)
                                                                 (catch :default _ 0)))
                                                       ;open-height (sizes k-val)
                                                       open-kps (when open? ;;(and open? (not single-val?))
@@ -9525,7 +9535,7 @@
                                                                         (map? k-val)))
                                                             ;(max (* (count k-val) 35) child-open-sizes)
                                                             ;child-open-sizes
-                                                            (max (sizes k-val) child-open-sizes 35)
+                                                            (max (sizes k-val) child-open-sizes 45)
 
 
                                                             ;(and open? (empty? open-kps) (seq? k-val)) (* (count k-val) 25)
@@ -9537,7 +9547,7 @@
                                                             (vector? k-val) 65
                                                               ;single-val? 65
 
-                                                            :else 35)
+                                                            :else 45)
 
                                                       hhh (+ hhh (get-in @opened-boxes-long [block-id keypath-in kki] 0))]
 
@@ -11570,25 +11580,19 @@
                               (let [kps       (ut/extract-patterns obody :auto-size-px 2)
                                     logic-kps (into {} (for [v kps] (let [[_ l] v] {v (ut/auto-font-size-px l h w)})))] ;(=
                                 (ut/postwalk-replacer logic-kps obody)))
-        
-        onclick-vsql-walk-map2 (fn [obody] ;; vsql version....?
-                                 (let [kps       (ut/extract-patterns obody :set-vsql-parameter 3)
-                                       logic-kps (into {}
-                                                       (for [v kps]
-                                                         (let [[_ pkey pval] v
-                                                               raw-param-key (get-in vsql-calls
-                                                                                     (conj (vec (first (filter #(= (last %) :on-click)
-                                                                                                               (ut/kvpaths vsql-calls))))
-                                                                                           1)
-                                                                                     pkey)]
-                                                           {v (fn []
-                                                                (ut/tracked-dispatch [::conn/click-parameter [panel-key]
-                                                                                      {raw-param-key pval}]))})))]
-                                   (ut/postwalk-replacer logic-kps obody)))
 
-             ;;[re-com/slider :model model :on-change [:set-parameter val-key ] :min min :max max :width width]
+        onclick-vsql-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-vsql-parameter 3)
+                                                      logic-kps (into {} (for [v kps]
+                                                                           (let [[_ pkey pval] v
+                                                                                 raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
+                                                                                                                                            (ut/kvpaths vsql-calls)))) 1) pkey)]
+                                                                                ;;;(tap> [:on-click-hack panel-key v raw-param-key])
+                                                                             {v 
+                                                                              (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))
+                                                                              })))]
+                                                     ;(tap> [:set-param/logic-kps logic-kps kps])
+                                                  (walk/postwalk-replace logic-kps obody)))
 
-              ;; [:slider :my-slider-param 0 100 1 200 50]
         slider-walk-map2 (fn [obody]
                            (let [kps (ut/extract-patterns obody :slider 7)
                                  logic-kps (into {}
@@ -12196,6 +12200,7 @@
                                                                    {ds @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [ds]})}))
                                        data-subbed-src     (ut/postwalk-replacer data-subbed-rep-map v)]
                                    {k (vsql-map data-subbed-src)})))
+        ;;_ (tapp>> [:vsql-replace-map (str vsql-replace-map) (str body)])
         ;; selected-view-is-sql? (true? (some #(= selected-view %) (keys sql-calls)))
         ;; override-view-is-sql? (true? (some #(= override-view %) (keys sql-calls)))
         selected-view-is-sql? (contains? sql-calls selected-view)
@@ -12251,6 +12256,7 @@
                 slider-walk-map2
                 onclick-walk-map2
                 onclick-multi-walk-map2
+                onclick-vsql-walk-map2
                 map-walk-map2
                 string-walk
                 push-walk
@@ -12266,7 +12272,7 @@
                 sticky-border-radius
                 solver-clover-walk
                 hiccup-markdown]}
-        (memoized-honeycomb-context-fns panel-key w h client-name selected-view selected-view-type px-width-int px-height-int vsql-calls)
+        (honeycomb-context-fns panel-key w h client-name selected-view selected-view-type px-width-int px-height-int vsql-calls)
 
 
         ;; onclick-walk-map5 (fn [obody]
@@ -12293,7 +12299,8 @@
 
 
         ;;_ (when (= panel-key :block-911) (tapp>> [:body1 (str body)]))
-
+        body (if (ut/ne? vsql-replace-map) 
+               (ut/postwalk-replacer vsql-replace-map body) body)
         obody-key-set (ut/deep-flatten body) ;; valid-clover-template-keys ;; (ut/deep-flatten body) ;; cant reuse since body gets mutated between
         has-fn? (fn [k] (contains? obody-key-set k)) ;; faster than some on a set since it will
         ;;has-drops? (boolean (some obody-key-set all-drops)) ;; faster?
@@ -12307,12 +12314,18 @@
             ;;(has-fn? :run-solver)     (ut/postwalk-replacer solver-clover-fn-walk-map) ;; has to run first since
             ;;it'll contain a clover sub param
           (has-fn? :run-solver)     solver-clover-walk ;;(conn/solver-clover-walk client-name panel-key)
+
           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
           (ut/ne? data-walks)       (ut/postwalk-replacer data-walks)
-          (ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(ut/postwalk-replacer
+
+          ;(ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map)
+
           (has-fn? :map)            map-walk-map2
+          ;(has-fn? :set-vsql-parameter) onclick-vsql-walk-map2
+
           (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
+
           (has-fn? :markdown)       hiccup-markdown
           (has-fn? :app-db)         get-in-app-db
           (has-fn? :app-db-keys)    get-in-app-db-keys
@@ -12324,15 +12337,11 @@
           (has-fn? :when)           when-walk-map2 ;; test!
           (has-fn? :set-parameter)  onclick-walk-map2
           (has-fn? :set-parameters) onclick-multi-walk-map2
+          (has-fn? :set-vsql-parameter) onclick-vsql-walk-map2
           (has-fn? :set-recharts-param>) set-recharts-param-walk-map
           (has-fn? :slider)         slider-walk-map2
           (has-fn? :into)           into-walk-map2
           (has-fn? :auto-size-px)   auto-size-walk-map2
-          ;; (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
-          ;; (has-fn? :string3)        (string-walk 3)
-          ;; (has-fn? :string3)        (string-walk 4)
-          ;; (has-fn? :string3)        (string-walk 5)
-          ;; (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we
           (has-fn? :string3)        string-walk
           (has-fn? :push>)          push-walk
           (has-fn? :push>>)         push-walk-fn

@@ -392,45 +392,38 @@
   (let [;signals @(ut/tracked-subscribe [::signals-map])
         solver?          (cstr/includes? (str warren-type-string) "solvers")
         signal?          (cstr/includes? (str warren-type-string) "signals")
-        react!           [@waiting?]
+        react!           [@waiting? @db/selectors-items @db/selectors-open]
         client-name      @(ut/tracked-sub ::bricks/client-name {})
-        warren-item-type @(ut/tracked-sub ::warren-item-type {})
-        ssr              (ut/replacer (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
-        selected-type    (str ssr "s")
+        ;warren-item-type @(ut/tracked-sub ::warren-item-type {})
+        ;ssr              (ut/replacer (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
+        ;selected-type    (str ssr "s")
         results          (cond signal? (into {}
                                              (for [[name _] signals]
                                                (let [sigkw (keyword (str "signal/" (ut/replacer (str name) ":" "")))
-                                                     vv    (if (= warren-type-string "signals")
-                                                             @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                              {:keypath [sigkw]})
-                                                             "")]
+                                                     vv    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                            {:keypath [sigkw]})]
                                                  {name vv})))
                                solver? (into {}
                                              (for [[name _] signals]
                                                (let [sigkw (keyword (str "solver-meta/" (ut/replacer (str name) ":" "") ">extra"))
-                                                     vv    (if (= warren-type-string "solvers")
-                                                             @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                              {:keypath [sigkw]})
-                                                             "")]
+                                                     vv    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                            {:keypath [sigkw]})]
                                                  {name vv})))
                                :else   {})]
     [re-com/v-box :children
-     [
-      
-      ;; [re-com/h-box :height "30px" :padding "6px" :align :center :justify :between :style {:font-size "12px"} :children
-      ;;  [[re-com/box :style {:cursor "pointer"} :attr {:on-click #(ut/tracked-dispatch [::add-signal warren-type-string])} :child
-      ;;    (str "+ new " warren-type-string)]
-      ;;   (if (and selected-warren-item (= warren-type-string selected-type))
-      ;;     [re-com/box :style {:cursor "pointer"} :attr
-      ;;      {:on-click #(ut/tracked-dispatch [::delete-signal selected-warren-item warren-item-type])} :child
-      ;;      (str "- delete this " warren-type-string "?")]
-      ;;     [re-com/gap :size "5px"])]]
-      
-
+     [;; [re-com/h-box :height "30px" :padding "6px" :align :center :justify :between :style {:font-size "12px"} :children
+        ;;  [[re-com/box :style {:cursor "pointer"} :attr {:on-click #(ut/tracked-dispatch [::add-signal warren-type-string])} :child
+        ;;    (str "+ new " warren-type-string)]
+        ;;   (if (and selected-warren-item (= warren-type-string selected-type))
+        ;;     [re-com/box :style {:cursor "pointer"} :attr
+        ;;      {:on-click #(ut/tracked-dispatch [::delete-signal selected-warren-item warren-item-type])} :child
+        ;;      (str "- delete this " warren-type-string "?")]
+        ;;     [re-com/gap :size "5px"])]]
+  
       [re-com/v-box :padding "6px" :style
        {;:border "1px solid red"
         :overflow "auto"} :gap "6px" :size "none" :children
-       (for [[name {:keys [signal]}] (sort signals)
+       (for [[name _] (sort signals)
              :let                    [selected? (= name selected-warren-item)
                                       sigkw     (keyword (str "signal/" (ut/replacer (str name) ":" "")))
                                       vv        (when signal? (get results name))
@@ -438,7 +431,7 @@
                                                              @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                               {:keypath [(keyword (str "solver-status/" (ut/unkeyword client-name) ">"
                                                                                                        (ut/unkeyword name) ">running?"))]}))
-                                      solver-no-signal? (when solver? @(ut/tracked-sub ::solver-no-signal? {:solver-name name}))
+                                      ;solver-no-signal? (when solver? @(ut/tracked-sub ::solver-no-signal? {:solver-name name}))
                                       ext-map   (when solver?
                                                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                    {:keypath [(keyword (str "solver-meta/"
@@ -446,13 +439,13 @@
                                                                                             ">extra"))]}))]]
          [draggable-item
           [re-com/v-box :padding "6px" :size "none" :width "100%" :attr
-           {:on-double-click #(ut/tracked-dispatch [::select-signal (if selected? nil name)])} 
+           {:on-double-click #(ut/tracked-dispatch [::select-signal (if selected? nil name)])}
            :style
            {:border           (if selected?
                                 (str "3px dashed " (theme-pull :theme/editor-outer-rim-color nil) 99)
                                 (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) "28"))
             :background-color (cond selected? ;;(or selected? (true? vv))
-                                      (str (theme-pull :theme/editor-outer-rim-color nil) 65)          ;; "rgba(0,
+                                    (str (theme-pull :theme/editor-outer-rim-color nil) 65)          ;; "rgba(0,
                                     (true? vv) (str (theme-pull :theme/editor-outer-rim-color nil) 30) ;; "rgba(0,
                                     :else      "rgba(0, 0, 0, 0.1)")
             :cursor           "pointer"} :children
@@ -464,24 +457,23 @@
             (when solver?
               [re-com/h-box :padding "6px" :justify :between :style {:font-size "13px" :opacity 0.56}
                :children
-               [
-                (when solver? ;;true ;; solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
-                  ;; [re-com/md-icon-button
-                  ;;  :src (at)
-                  ;;  :md-icon-name "zmdi-play"
-                  ;;  :on-click  #(ut/tracked-dispatch [::wfx/request 
-                  ;;                                    :default
-                  ;;                                    {:message {:kind         :run-solver
-                  ;;                                               :solver-name  name
-                  ;;                                  ;:override-map (get @(ut/tracked-sub ::solvers-map {})
-                  ;;                                  ;                   selected-warren-item)
-                  ;;                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
-                  ;;                                     :timeout 15000000}])
-                  ;;  :style {;:font-size "17px"
-                  ;;          :transform-origin "18px 17px"
-                  ;;          :cursor "pointer"
-                  ;;          :color (theme-pull :theme/editor-outer-rim-color nil)}]
-                  
+               [(when solver? ;;true ;; solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
+                    ;; [re-com/md-icon-button
+                    ;;  :src (at)
+                    ;;  :md-icon-name "zmdi-play"
+                    ;;  :on-click  #(ut/tracked-dispatch [::wfx/request 
+                    ;;                                    :default
+                    ;;                                    {:message {:kind         :run-solver
+                    ;;                                               :solver-name  name
+                    ;;                                  ;:override-map (get @(ut/tracked-sub ::solvers-map {})
+                    ;;                                  ;                   selected-warren-item)
+                    ;;                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                    ;;                                     :timeout 15000000}])
+                    ;;  :style {;:font-size "17px"
+                    ;;          :transform-origin "18px 17px"
+                    ;;          :cursor "pointer"
+                    ;;          :color (theme-pull :theme/editor-outer-rim-color nil)}]
+  
                   [re-com/md-icon-button
                    :md-icon-name (if (or (get @waiting? name) solver-running?) "zmdi-refresh" "zmdi-play")
                    :class (cond
@@ -497,22 +489,19 @@
                                                          :default
                                                          {:message {:kind         :run-solver
                                                                     :solver-name  name
-                                                                     ;:override-map (get @(ut/tracked-sub ::solvers-map {})
-                                                                     ;                   selected-warren-item)
+                                                                       ;:override-map (get @(ut/tracked-sub ::solvers-map {})
+                                                                       ;                   selected-warren-item)
                                                                     :client-name  @(ut/tracked-sub ::bricks/client-name {})}
                                                           :timeout 15000000}])
                                    (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
                                    (js/setTimeout #(swap! waiting? assoc name false) 5000))))
                    :style {;:font-size        "inherit"
-                           ;:padding          "5px"
+                             ;:padding          "5px"
                            :font-size "34px"
                            :transform-origin "18px 17px"
                            :margin-top       "-6px"
-                           :cursor           "pointer"}]
-                  
-                  
-                  )
-                
+                           :cursor           "pointer"}])
+  
                 [re-com/box :child (str (get ext-map :last-processed))]
                 [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])]] :operator sigkw])]]]))
 
@@ -527,6 +516,7 @@
   [name items icon & [style wide?]]
   (let [open?       (some #(= name %) @db/selectors-open)
         items-count (count items)
+        react!      [@db/selectors-items @db/selectors-open]
         partition?  (integer? wide?)]
     [re-com/v-box :padding "6px" :style
      (merge {:border (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 55) :border-radius "4px"} style) :children
@@ -534,22 +524,42 @@
        {:cursor "pointer" :user-select "none" :color (theme-pull :theme/editor-outer-rim-color nil)} :justify :between :align
        :center :attr
        {:on-click #(if open?
-                     (reset! db/selectors-open (remove (fn [x] (= x name)) @db/selectors-open))
-                     (swap! db/selectors-open conj name))} :children
-       [[re-com/h-box :style {:font-size "22px"} :gap "8px" :align :center :justify :center :children
-         [[re-com/box :child name] [re-com/box :style {:opacity 0.55 :font-size "15px"} :child (str "(" items-count ")")]]]
-        [re-com/md-icon-button :src (at) :md-icon-name icon :style
-         {;:color (if open?
-          :color     (theme-pull :theme/editor-outer-rim-color nil)
-          :font-size "14px"}]]]
+                     (do (reset! db/selectors-open (remove (fn [x] (= x name)) @db/selectors-open))
+                         (swap! db/selectors-items dissoc name))
+                     (do (swap! db/selectors-open conj name)
+                         (swap! db/selectors-items assoc name (vec (keys items)))))}
+       :children [[re-com/h-box :style {:font-size "22px"} :gap "8px" :align :center :justify :center :children
+                   [[re-com/box :child name] [re-com/box :style {:opacity 0.55 :font-size "15px"} :child (str "(" items-count ")")]]]
+                  [re-com/md-icon-button :src (at) :md-icon-name icon :style
+                   {;:color (if open?
+                    :color     (theme-pull :theme/editor-outer-rim-color nil)
+                    :font-size "14px"}]]]
       (when open?
         (if (or ;(= name "solvers")
-                (cstr/includes? (str name) "solvers")
-                (= name "rules") (= name "signals"))
+             (cstr/includes? (str name) "solvers")
+             (= name "rules") 
+             (= name "signals"))
           (let [;signals @(ut/tracked-subscribe [::signals-map]) ;; they get passed from the
+                solver? (cstr/includes? (str name) "solvers")
                 selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+                ;; itmz (cond (not solver?)
+                ;;            (into {}
+                ;;                  (for [[name _] items]
+                ;;                    (let [sigkw (keyword (str "signal/" (ut/replacer (str name) ":" "")))
+                ;;                          vv    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                ;;                                                 {:keypath [sigkw]})]
+                ;;                      {name vv})))
+                ;;            solver? (into {}
+                ;;                          (for [[name _] items]
+                ;;                            (let [sigkw (keyword (str "solver-meta/" (ut/replacer (str name) ":" "") ">extra"))
+                ;;                                  vv    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                ;;                                                         {:keypath [sigkw]})]
+                ;;                              {name vv})))
+                ;;            :else   {})
+                ;;_ (ut/tapp>> [:itmz itmz])
                 ph                   200]
-            [items-list (if selected-warren-item (* ph 0.3) ph) items selected-warren-item name])
+            [items-list (if selected-warren-item (* ph 0.3) ph) 
+             items selected-warren-item name])
           (if partition?
             [re-com/v-box :style {:margin-top "6px"} :children
              (for [seg (partition-all wide? items)]
@@ -563,7 +573,8 @@
                     {:border           "1px solid purple"
                      :background-color "#DA70D624"
                      :font-family      (theme-pull :theme/monospaced-font nil)} :child (str item)] :operator item])])]
-            [(if wide? re-com/h-box re-com/v-box) :children
+            [(if wide? re-com/h-box re-com/v-box)
+             :children
              (for [item items]
                [draggable-item
                 [re-com/box :padding "6px" :style

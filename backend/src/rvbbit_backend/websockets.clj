@@ -512,6 +512,8 @@
 (defonce literal-data-map (atom {}))
 (defonce literal-data-output (atom {}))
 
+(declare alert!)
+
 (defn insert-rowset-csv ;; [rowset query & columns-vec]
   "takes a 'rowset' (vector of uniform maps) or a vector with a vector of column names
    - inserts it into an in memory SQL db, executes a SQL query on it (via a honey-sql map) and returns it"
@@ -519,21 +521,23 @@
   (ut/pp [:importing-csv-to-sql table-name])
   (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
                               (and (not (map? (first rowset))) (vector? rowset)) :vectors)
+        table-name-str  (-> table-name str (cstr/replace "-" "_") (cstr/replace ":" ""))
         columns-vec-arg (first columns-vec)
         batch-size      100
         rowset-fixed    (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec-arg r))) rowset)
         columns         (keys (first rowset-fixed))
         values          (vec (for [r rowset-fixed] (vals r)))
-        ddl-str         (ddl/create-attribute-sample table-name rowset-fixed)
+        ddl-str         (ddl/create-attribute-sample table-name-str rowset-fixed "SQLite")
         extra           [ddl-str columns-vec-arg table-name table-name]]
-    (sql-exec system-db
-              (to-sql {:insert-into [:status]
-                       :columns     [:client_name :op_name :status]
-                       :values      [[client-name op-name (str "inserting " (ut/nf (count rowset-fixed)) " rows... ")]]}))
-    (sql-exec import-db (str "drop table if exists " table-name " ; ") extra)
+    ;; (sql-exec system-db
+    ;;           (to-sql {:insert-into [:status]
+    ;;                    :columns     [:client_name :op_name :status]
+    ;;                    :values      [[client-name op-name (str "inserting " (ut/nf (count rowset-fixed)) " rows... ")]]}))
+
+    (sql-exec import-db (str "drop table if exists " table-name-str " ; ") extra)
     (sql-exec import-db ddl-str extra)
     (doseq [batch (partition-all batch-size values)] ; (cp/pdoseq pool
-      (dorun (sql-exec import-db (to-sql {:insert-into [(keyword table-name)] :columns columns :values batch}) extra)))
+      (dorun (sql-exec import-db (to-sql {:insert-into [(keyword table-name-str)] :columns columns :values batch}) extra)))
     (ut/pp {:sql-csv-table table-name :rows (count rowset)})))
 
 ;; (defn insert-rowset-old ;; [rowset query & columns-vec]
@@ -5463,6 +5467,7 @@
                                                         (let [modded-meta (-> (get output :result-meta)
                                                                               (assoc :original-honey (get output :original-honey))
                                                                               (assoc :connection-id (get output :connection-id)))
+                                                              solver-edn-fp "./defs/solvers.edn"
                                                               materialize-solver-name (keyword (str "materialize-" (cstr/replace (str (first ui-keypath)) ":" "")))
                                                               cli-cache-table-name (keyword (cstr/replace (str "cached-" (ut/unkeyword cache-table-name)) "_" "-"))  
                                                               resultv (vec (for [r result] (assoc r :rows 1)))]
@@ -5475,40 +5480,45 @@
                                                           ;(swap! db/last-solvers-data-atom assoc (first ui-keypath) (get output :result)) ;;  :data/ ... TBD
                                                           ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                                                           (when (= page -3)
-                                                              ;;; insert a new solver job if not exists :materialize-query-name
-                                                            (when true ;(not (get @solvers-atom materialize-solver-name))
-                                                              (swap! solvers-atom assoc materialize-solver-name
-                                                                     {:signal false ;;:signal/every-5-minutes
-                                                                      :type :sql
-                                                                      :snapshot? false
-                                                                      :data (-> orig-honey-sql 
-                                                                                (assoc :page -4) 
-                                                                                (assoc :connection-id connection-id))})
-                                                              ;; add new query to client 
-                                                              (reload-solver-subs)
+                                                            ;;; insert a new solver job if not exists :materialize-query-name
+                                                            ;(when true ;(not (get @solvers-atom materialize-solver-name))
+                                                            (swap! solvers-atom assoc materialize-solver-name
+                                                                   {:signal false ;;:signal/every-5-minutes
+                                                                    :type :sql
+                                                                    :snapshot? false
+                                                                    :data (-> orig-honey-sql
+                                                                              (assoc :page -4)
+                                                                              (assoc :connection-id connection-id))})
+                                                            (Thread/sleep 300)
+                                                            (fpop/freeze-atom solver-edn-fp)
+                                                              ;; (ut/zprint-file solver-edn-fp {:style [:justified-original] :parse-string? true
+                                                              ;;                                :comment {:count? nil :wrap? nil} :width 120
+                                                              ;;                                :map {:comma? false :sort? false}})
+
                                                               ;; (push-to-client [ui-keypath panel-key cli-cache-table-name] [] client-name 1 :push-query
                                                               ;;                 {:select (vec (remove #{:rows} (keys (first resultv))))
                                                               ;;                  :connection-id "cache.db"
                                                               ;;                  :from [[(keyword cache-table-name)
                                                               ;;                          (ut/gen-sql-sql-alias)]]})
-                                                              (future ;; wait a bit so the first refresh of the new table isn't a missing table error
-                                                                (Thread/sleep 3000) ; Delay for 3 seconds
-                                                                (push-to-client [ui-keypath panel-key cli-cache-table-name] [] client-name 1 :push-query
-                                                                                {:select (vec (remove #{:rows} (keys (first resultv))))
-                                                                                 :connection-id "cache.db"
-                                                                                 :from [[(keyword cache-table-name)
-                                                                                         (ut/gen-sql-sql-alias)]]}))
-                                                              (ppy/execute-in-thread-pools
-                                                               :materialize-insert-counter
-                                                               (fn [] (wait-for-value (count resultv)
-                                                                                      (fn [] (get-in (try
-                                                                                                       (sql-query cache-db (str "select count(*) as tt from " cache-table-name))
-                                                                                                       (catch Exception _ 0)) [0 :tt] 0))
-                                                                                      [cli-cache-table-name] ;;ui-keypath
-                                                                                      client-name)))
-                                                              (ut/zprint-file "./defs/solvers.edn" {:style [:justified-original] :parse-string? true
-                                                                                                    :comment {:count? nil :wrap? nil} :width 120
-                                                                                                    :map {:comma? false :sort? false}}))
+                                                            (future ;; wait a bit so the first refresh of the new table isn't a missing table error
+                                                              (Thread/sleep 3000) ; Delay for 3 seconds
+                                                              (push-to-client [ui-keypath panel-key cli-cache-table-name] [] client-name 1 :push-query
+                                                                              {:select (vec (remove #{:rows} (keys (first resultv))))
+                                                                               :connection-id "cache.db"
+                                                                               :from [[(keyword cache-table-name)
+                                                                                       (ut/gen-sql-sql-alias)]]}))
+                                                            (ppy/execute-in-thread-pools
+                                                             :materialize-insert-counter
+                                                             (fn [] (wait-for-value (count resultv)
+                                                                                    (fn [] (get-in (try
+                                                                                                     (sql-query cache-db (str "select count(*) as tt from " cache-table-name))
+                                                                                                     (catch Exception _ 0)) [0 :tt] 0))
+                                                                                    [cli-cache-table-name] ;;ui-keypath
+                                                                                    client-name)))
+                                                            (reload-solver-subs)
+                                                            (ut/zprint-file solver-edn-fp {:style [:justified-original] :parse-string? true
+                                                                                           :comment {:count? nil :wrap? nil} :width 120
+                                                                                           :map {:comma? false :sort? false}});)
                                                               ;;; do the inserts
                                                             (insert-rowset resultv ;; insert into client cache sql db for potential cross-joins 
                                                                            cache-table-name ;; ^^ (TODO make optional and add option for full row cache, but regular UI SQL behavior)
@@ -5516,9 +5526,7 @@
                                                                            client-name
                                                                            (keys (first resultv))
                                                                            cache-db ;;(sql/create-or-get-client-db-pool client-name)
-                                                                           client-name)
-
-                                                            )
+                                                                           client-name))
                                                           )))
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
 
@@ -5741,13 +5749,19 @@
 (defn process-csv
   [request & [local-file]]
   (ut/pp [:incoming-file (if local-file local-file (get-in request [:edn-params :fname]))])
-  (time
+  ;(time
+  (doall
    (let [seed-id        (rand-int 123124) ;; for status table
          file-name      (if local-file local-file (get-in request [:edn-params :fname]))
          client-name    (if local-file "system" (str (get-in request [:edn-params :client-name])))
          fdata          (if local-file (slurp local-file) (get-in request [:edn-params :image]))
          file-base-name (first (cstr/split (last (cstr/split file-name #"/")) #"\."))
          file-path      (str "./data/" file-name)
+         _   (alert! client-name
+                     [:box :child (str "inserting " file-name ".csv into import db...")]
+                     10
+                     2.1
+                     13)
          fdata-map      (doall (ut/csv-data->maps (csv/read-csv fdata)))
          ftypes         (into {} (for [f (keys (first fdata-map))] {f (flatten (take 5 (map (juxt f) fdata-map)))}))
          ftypes-coerce  (into {}
@@ -5782,10 +5796,11 @@
                                           cruiser/default-field-attributes
                                           cruiser/default-derived-fields
                                           cruiser/default-viz-shapes)
-     (ut/pp [:saved-csv file-path file-base-name (first fdata-map) ftypes ftypes-coerce (first fdata-map-mod)]))))
+     (ut/pp [:saved-csv file-path file-base-name (first fdata-map) ftypes ftypes-coerce (first fdata-map-mod)])))) ;)
 
 (defn save-csv [request]
-  (time (process-csv request))
+  (push-to-client [:alerts] [[:box :child (str "inserting "  ".csv into import db...")] 10 3 15] (get-in request [:edn-params :client-name]) -1 (rand-nth [:alert1 :alert2 :alert3]) (or type :alert2))
+  (process-csv request)
   (send-edn-success {:status "saved-csv"
                      :screen (first (get request :edn-params))}))
 
@@ -7378,12 +7393,16 @@
 (def common-interceptors [(body-params/body-params) http/html-body])
 
 (def routes
-  #{["/" :get (conj common-interceptors `static-root)] ["/save" :post (conj common-interceptors `save)]
+  #{["/" :get (conj common-interceptors `static-root)] 
+    ["/save" :post (conj common-interceptors `save)]
     ["/assets/*" :get (conj common-interceptors `serve-user-asset)]
-    ["/save-flow" :post (conj common-interceptors `save-flow)] ["/save-snap" :post (conj common-interceptors `save-snap)]
+    ["/save-flow" :post (conj common-interceptors `save-flow)] 
+    ["/save-snap" :post (conj common-interceptors `save-snap)]
     ["/save-screen-snap" :post (conj common-interceptors `save-screen-snap)]
-    ["/save-csv" :post (conj common-interceptors `save-csv)] ["/load" :get (conj common-interceptors `load-screen)]
-    ["/audio" :post (conj common-interceptors `get-audio)] ["/load-flow" :get (conj common-interceptors `load-flow)]
+    ["/save-csv" :post (conj common-interceptors `save-csv)] 
+    ["/load" :get (conj common-interceptors `load-screen)]
+    ["/audio" :post (conj common-interceptors `get-audio)] 
+    ["/load-flow" :get (conj common-interceptors `load-flow)]
     ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]})
 
 (def web-server-port 8888)

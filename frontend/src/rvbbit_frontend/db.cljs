@@ -81,6 +81,7 @@
 (def bad-form-msg-signals (reagent/atom nil))
 
 (defonce selectors-open (reagent/atom []))
+(defonce selectors-items (reagent/atom {}))
 
 (defonce kick-alert (reagent/atom false))
 
