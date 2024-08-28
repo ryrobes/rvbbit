@@ -2308,7 +2308,7 @@
 (defn image-or-alternative [clicked-screen]
   (let [image-loaded? (reagent/atom false)
         clicked-screen (ut/sanitize-name clicked-screen)  
-        image-url (str "screen-snaps/" clicked-screen ".jpg")]
+        image-url (str "assets/screen-snaps/" clicked-screen ".jpg")]
     (image-exists? image-url #(reset! image-loaded? %))
     (fn []
       (if @image-loaded?
@@ -4105,6 +4105,8 @@
   (try
     (let [min-panels              @(ut/tracked-sub ::bricks/all-panels-minimized {})
           user-param-hash2        @(ut/tracked-sub ::watch-user-params {})
+          selected-block          @(ut/tracked-sub ::bricks/selected-block {})
+          selected-block?         (not (or (= selected-block "none!") (nil? selected-block)))
           selected-view           @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
           sselected-view          @(ut/tracked-sub ::conn/clicked-parameter-alpha {:keypath [:param :selected-view]})
           editor?                 @(ut/tracked-sub ::bricks/editor? {})
@@ -4149,6 +4151,9 @@
                                       (-> (str nn)
                                           (ut/replacer ":" "")
                                           (ut/replacer "?" ""))
+                                      nn)
+                         nn         (if (= nn "buffy")
+                                      (if selected-block? "history" "runstreams")
                                       nn)
                          icon       (if sys-panel? "zmdi-developer-board" @(ut/tracked-subscribe [::bricks/panel-icon e]))]]
            [re-com/h-box :align :center :justify :center :height "30px" :gap "6px" :attr
@@ -4291,7 +4296,7 @@
                  :align :center
                  :children
                  [[re-com/h-box
-                   :children (vec (for [e [:client :system :reactor :pools :queues :clients :sql-sizes :sql]]
+                   :children (vec (for [e [:help :client :system :reactor :pools :clients :sql-sizes]]
                                     [re-com/box
                                      :attr {:on-click #(reset! selected-stats-page e)}
                                      :style {:color (if (= e @selected-stats-page) "cyan" "white")
@@ -4361,7 +4366,7 @@
                           false
                           (Math/floor (/ :ww 6.55))
                           {:force-color :bright-cyan}))))}
-  
+
          (= @selected-stats-page :pools)
          {:signal false
           :cache? false
@@ -4374,7 +4379,7 @@
                          (draw-stats [:pool-tasks-run+ :pool-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true)
                          (println "")
                          (show-pool-sizes-report {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
-  
+
          (= @selected-stats-page :sql-sizes)
          {:signal false
           :cache? false
@@ -4388,7 +4393,7 @@
                          (println "")
                          (ut/pp (get-table-sizes) {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map})
                          (ut/pp (database-sizes) {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
-  
+
          (= @selected-stats-page :sql)
          {:signal false
           :cache? false
@@ -4399,7 +4404,7 @@
                        (with-out-str
                          (fig-render ":sql-stats" :bright-cyan)
                          (draw-client-stats nil [:freq] nil true (Math/floor (/ :ww 6.55)) {:metrics-atom sql-metrics}))))}
-  
+
          (= @selected-stats-page :clients)
          {:signal false
           :cache? false
@@ -4410,7 +4415,40 @@
                        (with-out-str
                          (fig-render ":clients" :bright-cyan)
                          (draw-client-stats nil [:freq] [:mem-mb :latency] false (Math/floor (/ :ww 6.55))))))}
-  
+
+         (= @selected-stats-page :help)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :placeholder-on-running? true
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":keybindings" :pink)
+                         
+                         (rvbbit-backend.util/pp {:SPACEBAR "toggle floating editor"
+                                                  :SHIFT-SPACEBAR "toggle sidepanel / history / kits / snapshots"
+                                                  :TILDE "toggle 'hop bar' for quick commands to spawn runners / configured kits, etc"
+                                                  :ESC "un-selects selected card - or opens this panel if nothing selected"
+                                                  :W-A-S-D "move selected card block by block around the canvas"
+                                                  :SHIFT-W-A-S-D "resize selected card block by block"
+                                                  :TAB "cycle through next card on canvas"
+                                                  :Q-E "cycle through each TAB on the canvas"
+                                                  :CTRL-Z "undo"
+                                                  :SHIFT-CTRL-Z "redo"
+                                                  :L "toggle sub-query lineage lines"
+                                                  :CTRL-S "save the current screen or flow (if flow panel is up)"
+                                                  :P "peek at all cards by minimizing them some, allowing the lines to stand out"
+                                                  :SHIFT-R-F "move a card one layer up or down, z-index for overlapping cards"
+                                                  :CTRL-SPACEBAR "toggle flow panel / solver / signal / system panel"} {:width 90})
+                         
+                         (println " ")
+                         (rvbbit-backend.util/pp "latest docs will be on the GitHub page - linked below...")
+                         
+                         (println "")
+                         )))}
+
          (= @selected-stats-page :reactor)
          {:signal false
           :cache? false
@@ -4424,7 +4462,7 @@
                          (draw-stats [:reactions  :signal-reactions :watchers :subs :subs-client :clover-params] [:freq] false (Math/floor (/ :ww 6.55)) true)
                          (println "")
                          (show-reactor-sizes-report {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
-  
+
          (= @selected-stats-page :system)
          {:signal false
           :cache? false
@@ -4434,10 +4472,10 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":system-stats" :bright-cyan) ;; :solvers :nrepl-calls :websockets
-                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls ] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 6.55)) true)
                          ;(draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls :websockets :load] [15] false 200 true)
                          )))}
-  
+
          (= @selected-stats-page :queues)
          {:signal false
           :cache? false
@@ -4447,11 +4485,11 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":queue-party" :bright-cyan)
-                           (draw-stats [:workers :queues :queue-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true) 
+                         (draw-stats [:workers :queues :queue-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true)
                          (println "")
                          (let [ss (qp/get-queue-stats+)]
-                           (ut/pp [:queue-party-stats+ ss] {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map} )))))}
-  
+                           (ut/pp [:queue-party-stats+ ss] {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map})))))}
+
          :else {:signal false
                 :cache? false
                 :type :clojure
@@ -4830,7 +4868,7 @@
 
                           [custom-icon-button
                            {:icon-name "zmdi-developer-board"
-                            :tooltip "toggle external editing"
+                            :tooltip "toggle external editing from ./live/* (experimental! 💀)"
                             :on-click #(ut/tracked-dispatch [::bricks/toggle-external])
                             :active? external?
                             :color (if external? "red" "#ffffff")}]

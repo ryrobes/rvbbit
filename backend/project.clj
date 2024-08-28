@@ -45,13 +45,12 @@
                        [cheshire "5.11.0"]
                        [clj-figlet "0.1.1"]
                        [org.clojure/core.cache "1.0.207"]
-                       ;;[talltale "0.5.8"]
                        [talltale "0.5.14"] 
                        [clucie "0.4.2"]
                        [zprint "1.2.3"]
                        [jline "2.14.6"] ;; to detect console width
                        [clj-commons/clj-ssh "0.5.15"]
-                       [com.ryrobes/flowmaps "0.31-SNAPSHOT"]
+                       [com.ryrobes/flowmaps "0.45-SNAPSHOT"]
                        ;;[nrepl "0.9.0"]
                        [nrepl "1.3.0"]
                        ;;[org.mentat/emmy "0.32.0"]
@@ -73,7 +72,7 @@
                        ]
   :jvm-opts           ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
                        ;;"-Xmx32g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
-                       "-Xmx82g" ;; testing with 64g on my main dev machine
+                       ;;"-Xmx82g" ;; testing with 64g on my main dev machine
                        ;;"-Xms32g" ;; testing
                        "-XX:+UseG1GC"
                        "-XX:MaxGCPauseMillis=200"
@@ -84,5 +83,5 @@
   :source-paths       ["src" "../shared"]
   :repl-options       {:init-ns rvbbit-backend.core}
   :warn-on-reflection false
-  :main               ^{:skip-aot true} rvbbit-backend.core ;; not for library use?
+  :main               ^{:skip-aot false} rvbbit-backend.core
 )

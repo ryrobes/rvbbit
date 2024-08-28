@@ -2061,7 +2061,7 @@
              {:on-click #(ut/tracked-dispatch [::create-snapshot key])} :child "overwrite"]
             (when (= curr-params mparams)
               [re-com/box 
-               :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) 22)} 
+               :style {:color (str (theme-pull :theme/editor-outer-rim-colr nil) 22)} 
                :child "(matches current)"])
             [re-com/box 
              :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)} 
@@ -2125,7 +2125,7 @@
                               kp_d           (if (some #(or (= % :viz-gen) (= % :*) (= % :base)) kp_d)
                                                [(first kp_d)] ;(vec (ut/postwalk-replacer {:* :base :viz-gen
                                                kp_d)
-                              diff-height    (min (* diff-lines 18.5) 400)
+                              diff-height    (min (* diff-lines 25) 400)
                               hist-block-h   (+ 405 diff-height) ;; dynamic later
                               block-runners  (vec (keys (dissoc @(ut/tracked-sub ::bricks/block-runners {}) :views :queries)))
                               has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
@@ -2164,11 +2164,12 @@
                                           :child (str updated)]]]
                              [re-com/box :style {;:zoom 0.6 
                                                  :transform "translate(0)"} :child
-                              (cond has-flow-drop?      ""
+                              (cond ;has-flow-drop?      ""
                                     (= type ":views")
-                                    (let [view {key data_d}] [bricks/honeycomb panel_key key 11 8 view nil])
+                                    (let [view {key data_d}] 
+                                      [bricks/honeycomb panel_key key 11 8 view nil])
 
-                            ;(= type ":clojure")
+                                    ;(= type ":clojure")
                                     (some #(= % typek) block-runners)
                                     (let [view {:virtual-view data_d}
                                           curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key panel_key :data-key key})
@@ -2180,7 +2181,8 @@
                                     (= type ":queries") (let [query {temp-key (-> data_d ;(get data_d :queries)
                                                                                   (dissoc :cache?)
                                                                                   (dissoc :refresh-every))}]
-                                                          [bricks/honeycomb panel_key temp-key 11 8 nil query])
+                                                          [bricks/honeycomb panel_key temp-key 8 11 nil query]
+                                                          )
                                     (= type ":base")    (let [queries (get data_d :queries)
                                                               views   (get data_d :views)
                                                               qkeys   (into {}

@@ -110,8 +110,6 @@
     (rdom/unmount-component-at-node root-el)
     (rdom/render [root] root-el)))
 
-
-
 (re-frame/reg-event-db
  ::purge-sub-cache!
  (fn [db]
@@ -124,7 +122,6 @@
        (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
        (clear-cache-and-reload!)
        db))))
-
 
 (defn dispatch-poller-rules []
   (ut/tracked-dispatch
@@ -266,7 +263,8 @@
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])
   (ut/tracked-dispatch-sync [::poll/init])
   (ut/tracked-dispatch [::subs/window-fx-watcher])
-  (ut/tracked-dispatch [::audio/text-to-speech11 :audio :elevenlabs nil]) ;; get voices if avail
+  (ut/dispatch-delay 7000 [::audio/text-to-speech11 :audio :elevenlabs nil]) 
+  ;; ^^ get voices if avail, but wait to make sure we have the api key from the server first
   (dispatch-poller-rules)
   (dispatch-keyup-rules)
   (dispatch-keydown-rules)

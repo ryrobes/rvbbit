@@ -9,8 +9,6 @@
    [cognitect.transit         :as transit]
    [nextjournal.beholder      :as beholder]
    [io.pedestal.http          :as http]
-   ;[rvbbit-backend.surveyor   :as surveyor]
-   ;;[rvbbit-backend.fabric     :as fbc]
    [clojure.java.shell        :as shell]
    [rvbbit-backend.assistants :as assistants]
    [flowmaps.db               :as flow-db]
@@ -92,7 +90,7 @@
 
 (defonce reaction-usage (atom []))
 (defonce signal-reaction-usage (atom []))
-(defonce kit-client-maps (atom {}))
+;(defonce kit-client-maps (atom {}))
 
 (defonce client-metrics (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-metrics-atom.msgpack.transit")) ;;(atom {}))
 (defonce sql-metrics (atom {}))
@@ -110,17 +108,17 @@
 
 (defonce timekeeper-failovers (atom {}))
 
-(def client-panels (fpop/thaw-atom {} "./data/atoms/client-panels-atom.msgpack.transit"))
+(def client-panels (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-panels-atom.msgpack.transit"))
 (def client-panels-resolved (atom {}))
 (def client-panels-materialized (atom {}))
-(def client-panels-data (fpop/thaw-atom {} "./data/atoms/client-panels-data-atom.msgpack.transit")) ;; TEMP
-(def client-panels-metadata (fpop/thaw-atom {} "./data/atoms/client-panels-metadata-atom.msgpack.transit"))
+(def client-panels-data (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-panels-data-atom.msgpack.transit")) ;; TEMP
+(def client-panels-metadata (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-panels-metadata-atom.msgpack.transit"))
 
 (def client-panels-history (atom {}))
 ;;(def client-panels-history (fpop/thaw-atom {} "./data/atoms/client-panel-history-atom.edn"))
 
 (defonce quick-sniff-hash (atom {}))
-(defonce honey-echo (fpop/thaw-atom {} "./data/atoms/honey-echo-atom.msgpack.transit"))
+(defonce honey-echo (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/honey-echo-atom.msgpack.transit"))
 
 (def heartbeat-seconds 15)
 
@@ -133,9 +131,7 @@
 (def restart-map (atom {}))
 (def orig-caller (atom {}))
 (def sub-flow-blocks (atom {}))
-(def custom-flow-blocks (fpop/thaw-atom {} "./data/atoms/custom-flow-blocks-atom.msgpack.transit"))
-
-
+(def custom-flow-blocks (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/custom-flow-blocks-atom.msgpack.transit"))
 
 (defonce watchdog-atom (atom {}))
 (defonce last-block-written (atom {})) ;; kind of wasteful, but it's a small atom and is clean.
@@ -145,11 +141,6 @@
 (defonce acc-trackers (atom {}))
 (defonce temp-error-blocks (atom {}))
 (defonce tracker-history (atom {}))
-
-
-
-
-
 
 (def ack-scoreboard (atom {}))
 (def ping-ts (atom {}))
@@ -1999,7 +1990,7 @@
                                      :out out)}]
     (async/thread ;; really expensive logging below. temp
       (let [fp (str "./flow-blocks/" fid ".edn")]
-        (ext/create-dirs "./flow-blocks/")
+        ;(ext/create-dirs "./flow-blocks/")
         (ut/pretty-spit fp block 225)))
     (swap! sub-flow-blocks assoc flow-id block)
     {flow-id block}))
@@ -2102,7 +2093,7 @@
                                                                              (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
                                                      _ (ship-est client-name)
                                                      image-map        (assoc file-image :opts (merge (get file-image :opts) (select-keys orig-opts [:overrides])))
-                                                     _ (do (ext/create-dirs "./flow-history") ;; just in case
+                                                     _ (do ;(ext/create-dirs "./flow-history") ;; just in case
                                                            (spit ;; a partial flow-history map so if someone wants to "jump into" a
                                                             (str "./flow-history/" flow-id ".edn")
                                                             {:image       image-map ;; a partial flow-history map so if someone wants to
@@ -2166,7 +2157,7 @@
                                                      (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
                                                            (swap! latest-run-id assoc flow-id run-id)
                                                            (ut/pp [:saving-flow-exec-for flow-id result-code run-id])
-                                                           (do (ext/create-dirs "./flow-history") ;; just in case
+                                                           (do ;(ext/create-dirs "./flow-history") ;; just in case
                                                                (spit ;; ut/pretty-spit
                                                                 (str "./flow-history/" run-id ".edn")
                                                                 (ut/replace-large-base64 (merge output
@@ -5835,22 +5826,20 @@
                   (catch Throwable e
                     (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
                         (spit file-path (get-in request [:edn-params :image])))))
-             (save-alert-notification client-name screen-name fpath false)
-             ))
+             (save-alert-notification client-name screen-name fpath false)))
        (catch Exception e
-         (do 
+         (do
            (ut/pp [:error-saving-screen-outer (get-in request [:edn-params :screen-name])
-                 (get-in request [:edn-params :client-name] "unknown") e])
+                   (get-in request [:edn-params :client-name] "unknown") e])
            (alert! (get-in request [:edn-params :client-name] "unknown")
-                   [:v-box :justify :center :style
-                    {;:margin-top "-6px"
-                     :opacity 0.6} ;:color (if error? "red" "inherit")}
-                    :children [[:box :style {:font-weight 700 :font-size "13px"} :child (str "error saving " (get-in request [:edn-params :screen-name]) "...")]
-                               [:box :style {:font-weight 700 :font-size "13px"} :child (str e)]]]
+                   [:v-box :justify :center :style {:opacity 0.6}
+                    :children [[:box :style {:font-weight 700 :font-size "13px"} 
+                                :child (str "error saving " (get-in request [:edn-params :screen-name]) "...")]
+                               [:box :style {:font-weight 700 :font-size "13px"} 
+                                :child (str e)]]]
                    10
                    0.6
-                   8)
-           )))
+                   8))))
   (send-edn-success {:status "saved" :screen (first (get request :edn-params))}))
 
 
@@ -5859,22 +5848,25 @@
              session     (get-in request [:edn-params :session])
              client-name (get-in request [:edn-params :client-name] "unknown")
              client-name (cstr/replace (str client-name) ":" "")
-             file-path   (str "./snaps/" client-name ".jpg")
-             ifile-path  (str "/home/ryanr/rvbbit/frontend/resources/public/snaps/" client-name ".jpg")
-             sess-path   (str "./snaps/" client-name ".edn")]
+             file-path   (str "./user-content/snaps/" client-name ".jpg")
+             ;ifile-path  (str "./assets/snaps/" client-name ".jpg")
+             sess-path   (str "./user-content/snaps/" client-name ".edn")]
          (spit sess-path session)
          (ut/save-base64-to-jpeg image file-path)
-         (ut/save-base64-to-jpeg image ifile-path)) ;)
+         ;(ut/save-base64-to-jpeg image ifile-path)
+         ) ;)
        (catch Exception e (ut/pp [:save-snap-error e])))
   (send-edn-success {:status "snap-saved" :flow (first (get request :edn-params))}))
 
 (defn save-screen-snap [request]
   (try (let [image       (get-in request [:edn-params :image])
              screen-name (get-in request [:edn-params :screen-name] "unknown")
-             file-path   (str "./screen-snaps/" screen-name ".jpg")
-             ifile-path  (str "/home/ryanr/rvbbit/frontend/resources/public/screen-snaps/" screen-name ".jpg")]
+             file-path   (str "./user-content/screen-snaps/" screen-name ".jpg")
+             ;ifile-path  (str "./assets/screen-snaps/" screen-name ".jpg")
+             ]
          (ut/save-base64-to-jpeg image file-path)
-         (ut/save-base64-to-jpeg image ifile-path)) ;)
+         ;(ut/save-base64-to-jpeg image ifile-path)
+         ) ;)
        (catch Exception e (ut/pp [:save-snap-error e])))
   (send-edn-success {:status "screen-snap-saved" :flow (first (get request :edn-params))}))
 
@@ -7217,18 +7209,16 @@
         ;;                     :clients (count @wl/sockets)
         ;;                     :avg-cpu (ut/avgf @cpu-usage)])])
 
-
         ;;(get @atoms-and-watchers :okay-short-crow-1)
 
-
-        (let [ss (qp/get-queue-stats+)]
-          (ut/pp [:queue-party-stats+ ss]))
+        ;; (let [ss (qp/get-queue-stats+)]
+        ;;   (ut/pp [:queue-party-stats+ ss]))
 
         ;; (ut/pp [:freeze-pop? @(get-atom-splitter-deep :time/now father-time)
         ;;         (get @father-time :now)
         ;;         :rvbbit-sub-ms-diff (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))])
 
-        (ut/pp [:clients-with-tardy-subs? (count (db/client-subs-late-delivery 30000))])
+        ;; (ut/pp [:clients-with-tardy-subs? (count (db/client-subs-late-delivery 30000))])
 
         ;; (ut/pp (ut/pp @rvbbit-client-sub-values))
 
@@ -7286,54 +7276,6 @@
 
 
 
-
-
-
-
-
-
-
-;; (def ring-options-old
-;;   {:port websocket-port :join? false :async? true :max-idle-time 5000 :websockets ws-endpoints :allow-null-path-info true})
-
-
-;; (defn web-handler
-;;   [request]
-;;   {:status  200
-;;    :headers {"Content-Type" "text/html"}
-;;    :body    "<html><head></head><body>youre never going to see this, bro</body></html>"})
-
-;; (def websocket-port 3030)
-
-;; (def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
-
-;; (def ring-options
-;;   {:port                 websocket-port
-;;    :join?                false
-;;    :async?               true
-;;    ;:min-threads          300
-;;    ;:max-threads          1000 ;; Increased max threads
-;;    ;:idle-timeout         500000 ;; Reduced idle timeout
-;;    ;:max-idle-time        3000000 ;; Reduced max idle time
-;;    ;:max-idle-time        15000
-;;    ;:input-buffer-size    131072 ;; default is 8192
-;;    ;:output-buffer-size   131072 ;; default is 32768
-;;    :input-buffer-size    32768
-;;    :output-buffer-size   131072
-;;    :max-message-size     6291456 ;;2097152  ;; Increased max message size
-;;    :websockets           ws-endpoints
-;;    :allow-null-path-info true})
-
-;; (defonce websocket-server (atom nil))
-
-;;;;;;;;;(reset! websocket-server (jetty/run-jetty #'web-handler ring-options))
-
-
-
-
-
-
-
 (defn execute-websocket-task [f]
   (.execute @ppy/websocket-thread-pool-atom f))
 
@@ -7357,24 +7299,6 @@
    :body    "<html><head></head><body>youre never going to see this, bro</body></html>"})
 
 (def websocket-port 3030)
-
-;; (def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
-
-;; net/websocket-handler actually creates it own thread pool w https://github.com/clj-commons/dirigiste
-;; TODO investigate, this could be where the long-term compute leak is coming from...
-
-;; (def ring-options
-;;   {:port                 websocket-port
-;;    :join?                false
-;;    :async?               true
-;;    :input-buffer-size    32768
-;;    :output-buffer-size   131072
-;;    ;:idle-timeout         500000  ;; Reduced idle timeout
-;;    ;:max-idle-time        3000000 ;; Reduced max idle time
-;;    ;;:max-idle-time        15000
-;;    :max-message-size     6291456 ;; 6MB
-;;    :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
-;;    :allow-null-path-info true})
 
 (defn create-custom-thread-factory [prefix]
   (let [thread-number (atom 0)
@@ -7407,48 +7331,6 @@
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
-
-
-;; (defonce websocket-handler-atom (atom nil))
-
-;; (defn create-websocket-handler []
-;;   (net/websocket-handler {:encoding :edn}))
-
-;; (defn initialize-websocket-handler! []
-;;   (reset! websocket-handler-atom (create-websocket-handler)))
-
-;; (initialize-websocket-handler!)
-
-;; (def ws-endpoints {"/ws" @websocket-handler-atom})
-
-;; (defn reboot-websocket-handler! []
-;;   (let [old-handler @websocket-handler-atom
-;;         new-handler (create-websocket-handler)]
-;;     (reset! websocket-handler-atom new-handler)
-
-;;     ;; Close all existing connections
-;;     (when (and old-handler (instance? java.io.Closeable old-handler))
-;;       (.close ^java.io.Closeable old-handler))
-
-;;     ;; Update the ws-endpoints with the new handler
-;;     (alter-var-root #'ws-endpoints assoc "/ws" new-handler)
-
-;;     (println "Websocket handler rebooted")))
-
-;; (def ring-options
-;;   {:port                 websocket-port
-;;    :join?                false
-;;    :async?               true
-;;    :input-buffer-size    32768
-;;    :output-buffer-size   131072
-;;    :max-message-size     6291456 ;; 6MB
-;;    :websockets           {"/ws" (fn [request] (@websocket-handler-atom request))}
-;;    :allow-null-path-info true})
-
-
-
-
-
 (defonce websocket-server (atom nil))
 
 ;; (reset! websocket-server (jetty/run-jetty #'web-handler ring-options)) ;;; to start 
@@ -7457,7 +7339,6 @@
   (when-let [server @websocket-server]
     (.stop server)
     (reset! websocket-server nil)))
-
 
 (defn destroy-websocket-server! []
   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
@@ -7531,16 +7412,13 @@
 
 (defn init-user-space! []
   (when-let [dir (resolve-user-space-dir)]
+    (println "User space directory configured at:" dir)
     (alter-var-root #'user-space-dir (constantly dir))))
 
 (defn create-web-server! []
   (ut/ppa [:starting-web-server :port web-server-port])
   (init-user-space!)
   (reset! web-server (server/start runnable-service)))
-
-;; (defn create-web-server! []
-;;   (ut/ppa [:starting-web-server :port web-server-port])
-;;   (reset! web-server (server/start runnable-service)))
 
 (defn stop-web-server! []
   (ut/ppa [:shutting-down-web-server :port web-server-port])
@@ -7551,8 +7429,6 @@
   (Thread/sleep 5000)
   (create-web-server!)) 
 
-
-;; (reboot-web-server!)
 
 
 
@@ -7589,10 +7465,6 @@
      :seconds    timing-data
      :exit-code  exit-code
      :command    (str command)}))
-
-
-
-;; (spit fp (str pretty-data "\n") :append true)
 
 (defn models-list-to-map [models-list]
   (let [is-header? #(cstr/ends-with? % ":")]
@@ -7704,10 +7576,6 @@
 
     ;; Return the command
     command))
-
-(ext/create-dirs "./fabric-sessions") ;; from base rvbbit folder
-;(ext/create-dirs "./fabric-outputs")
-;(ext/create-dirs "./fabric-inputs") 
 
 (defn fabric-run [opts-map]
   (doall

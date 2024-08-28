@@ -221,8 +221,8 @@
   ::speech-to-text
   (fn [{:keys [db]} _]
     (let [url               "https://api.openai.com/v1/audio/transcriptions"
-          openapi-key       (get db :openai-api-key)
-          openapi-org-id    (get db :openai-org-id)
+          openapi-key       (get-in db [:server :settings :openai-api-key])
+          openapi-org-id    (get-in db [:server :settings :openai-org-id])
           headers           (merge {"Authorization" (str "Bearer " openapi-key)}
                                    (if (not (nil? openapi-org-id)) {"OpenAI-Organization" openapi-org-id} {}))
           blob              (get-in db [:audio-data-recorded :blob])
@@ -490,7 +490,7 @@
   ::text-to-speech11
   (fn [{:keys [db]} [_ block-id block-type text-to-speak & [audio-file?]]]
     (let [voices?    (nil? text-to-speak)
-          xi-api-key (get db :elevenlabs-api-key)
+          xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
           method     (if voices? :GET :POST)
           voice-key  (get-in db [:server :settings :eleven-labs-default-voice-name] "Not OG Buffy") ;; "Not
           vname      (get-in db [:blocks block-id :req :voice_name] voice-key)
@@ -561,7 +561,7 @@
           url        (if new?
                        (str "https://api.elevenlabs.io/v1/voices/add")
                        (str "https://api.elevenlabs.io/v1/voices/" vid "/edit"))
-          xi-api-key (get db :elevenlabs-api-key)
+          xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
           method     :POST
           header     {"xi-api-key" xi-api-key}
           blob       (get-in db [:audio-data-recorded :blob])

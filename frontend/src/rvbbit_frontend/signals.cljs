@@ -657,11 +657,11 @@
         signals              @(ut/tracked-sub ::signals-map {})
         solvers              @(ut/tracked-sub ::solvers-map {})
         solver-keys          (keys solvers)
-        solvers-only         (select-keys solvers (filter #(and 
+        solvers-only         (select-keys solvers (filter #(and
                                                             (not (cstr/starts-with? (str %) ":materialize"))
                                                             (not (cstr/starts-with? (str %) ":refresh"))) solver-keys))
-        db-meta-solvers      (select-keys solvers (filter #(cstr/starts-with? (str %) ":materialize") solver-keys))
-        cache-solvers        (select-keys solvers (filter #(cstr/starts-with? (str %) ":refresh") solver-keys))
+        cache-solvers        (select-keys solvers (filter #(cstr/starts-with? (str %) ":materialize") solver-keys))
+        db-meta-solvers      (select-keys solvers (filter #(cstr/starts-with? (str %) ":refresh") solver-keys))
         ;rules                @(ut/tracked-sub ::rules-map {})
         ;selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         ;signal-vec           (get-in signals [selected-warren-item :signal])
@@ -674,7 +674,7 @@
                                          (filter (fn [[k v]]
                                                    (or (cstr/includes? (cstr/lower-case (str k)) (cstr/lower-case x))
                                                        (cstr/includes? (cstr/lower-case (str v)) (cstr/lower-case x))))
-                                           y))
+                                                 y))
                                    (vec (filter #(cstr/includes? (cstr/lower-case (str %)) (cstr/lower-case x)) y)))))
         flow-box-hh          148]
     [re-com/v-box :gap "6px" :width "35%" :children

@@ -9,17 +9,19 @@ fi
 
 # If we're here, we're safe-ish.
 
-clear
+# clear
+export LEIN_SNAPSHOTS_IN_RELEASE=true ## for now, until we have a better build process. besides, most of the snapshot deps are mine.
 cd frontend
 ./clean-me.sh
 npm install
-rm -rf frontend/.shadow-cljs
+rm -rf .shadow-cljs
 npx shadow-cljs release app
 echo "UI compiled. copying to server resources"
-cd backend
+cd ..
 rm -rf backend/resources/public/
-lein clean
 cp -r frontend/resources/public backend/resources/public
+rm -rf backend/resources/public/images/gen/
+rm -rf backend/resources/public/images/large/
 echo "UI copied. compiling uberjar."
 cd backend
 mkdir target

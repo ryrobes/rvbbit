@@ -4,14 +4,13 @@
 ;;   |  \  \/  |__] |__] |  |     |__] |  | ___] |___    |___ |__| | \| |    | |__]
 ;;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-;;
 ;; docs coming soon, doc!
 
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :default "./screens/looking-glass-redux.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
- :harvest-on-boot? false 
- ;; ^^ do a full database sniff for each connection on boot (will be staggered and scheduled in the future)
+ :harvest-on-boot? false
+ ;; ^^ do a full database sniff for each connection on boot? (generally not needed)
  :modes {:pre       [:pre
                      {:style {:color :theme/editor-outer-rim-color
                               :background-color "#00000000"
@@ -396,7 +395,7 @@
                     :when-expr (do (require '[clojure.java.shell :as shell])
                                    (try
                                      (zero? (:exit (shell/sh "which" "fabric")))
-                                   (catch Exception _ false)))
+                                     (catch Exception _ false)))
                     :modes [:text :markdown :clover :data :terminal]
                     :default "funny tweet about rabbits and clojure"
                     :syntax "text"
@@ -693,16 +692,15 @@
         ;;                        "    main()"]
         ;;              :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Super Experimental! (not really useful ATM)"
         ;;              :icon "images/python.svg"}
-                     }
- :eleven-labs-api-key nil
- ;:eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
- ;:eleven-labs-default-voice-name "Alicia Speaks-Unique and Pleasant"
- ;:eleven-labs-default-voice-name "Sofia-AI-frye"
+           }
+ :openai-api-key     "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"
+ :openai-org-id      "org-YLngjih2M4oju0tnnZtKCAYg"
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6"
  :eleven-labs-default-voice-name "Not OG Buffy"
  :new-block-rand  ["Why, sometimes I've believed as many as six impossible things before breakfast."
                    "Imagination is the only weapon in the war against reality."
                    "It's no use going back to yesterday, because I was a different person then."
-                   "Who in the world am I? Ah, that's the great puzzle."
+                   "Who in the world am I? Ah, that's the great puzzle..."
                    "Curiouser and curiouser!"
                    "If you don't know where you are going any road can take you there."
                    "We're all mad here."

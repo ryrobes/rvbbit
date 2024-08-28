@@ -26,7 +26,7 @@
 (defonce auto-refresh? (reagent/atom false))
 (defonce param-filter
   (reagent/atom {;:clicked true
-                 :this-tab? false
+                 :this-tab? true ;false
                  :user      true
                  :theme     false
                  :condis    false}))
@@ -135,7 +135,6 @@
                       topper (* hh 0.06)
                       lefty  (* ww 0.06)]
                   [lefty topper])))
-
 
 (def data-colors
   {"string"      "#5dc963" ; "#abdc32" ; "#feb733"
@@ -290,10 +289,7 @@
    :buffy?             false
    :flow-editor?       true
    :grid-recos?        true
-   :openai-api-key     "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"
-   :openai-org-id      "org-YLngjih2M4oju0tnnZtKCAYg"
-   :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6"
-   :selected-flow      "live-scratch-flow"
+   :selected-flow      (str "my-new-flow" (rand-int 7564))
    :selected-cols      {}
    :recos-page         0
    :recos-page2        0

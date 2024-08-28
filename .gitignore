@@ -46,5 +46,4 @@ fabric-inputs/
 fabric-outputs/
 fabric-sessions/
 checkouts/
-
-backend/checkouts/flowmaps
+backend/resources/public

@@ -281,15 +281,6 @@
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
 
 
-(defn logger [name edn]
-  (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")
-        _           (ext/create-dirs dir)
-        fp          (str dir name ".log.edn")
-        mst         (System/currentTimeMillis)
-        data        [(ut/millis-to-date-string mst) edn]
-        pretty-data (with-out-str (ppt/pprint data))]
-    (spit fp (str pretty-data "\n") :append false)))
-
 (defn introspect-namespace [conn namespace-name client-name]
   (try
     (let [_ (swap! nrepls-intros-run inc)

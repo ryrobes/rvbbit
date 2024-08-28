@@ -1499,51 +1499,37 @@
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
 
 
-(def sniff-cache (atom {}))
-
-
-
 (def tmp-db-src1
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               ;:auto_vacuum "FULL"
-                              :cache       "shared"
-                              }
+                              :cache       "shared"}
                              "tmp-db-src1")})
 (def tmp-db-src2
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               ;:auto_vacuum "FULL"
-                              :cache       "shared"
-                              }
+                              :cache       "shared"}
                              "tmp-db-src2")})
 (def tmp-db-src3
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               ;:auto_vacuum "FULL"
-                              :cache       "shared"
-                              }
+                              :cache       "shared"}
                              "tmp-db-src3")})
 
 (def tmp-db-dest1
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               ;:auto_vacuum "FULL"
-                              :cache       "shared"
-                              }
+                              :cache       "shared"}
                              "tmp-db-dest1")})
 (def tmp-db-dest2
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               ;:auto_vacuum "FULL"
-                              :cache       "shared"
-                              }
+                              :cache       "shared"}
                              "tmp-db-dest2")})
 (def tmp-db-dest3
   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               ;:auto_vacuum "FULL"
-                              :cache       "shared"
-                              }
+                              :cache       "shared"}
                              "tmp-db-dest3")})
-
-(create-sqlite-sys-tables-if-needed! tmp-db-dest1)
-(create-sqlite-sys-tables-if-needed! tmp-db-dest2)
-(create-sqlite-sys-tables-if-needed! tmp-db-dest3)
 
 (def sniffs (atom 0))
 
