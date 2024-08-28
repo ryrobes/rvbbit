@@ -43,17 +43,15 @@
    [puget.printer             :as puget]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db cache-db import-db ghost-db flows-db insert-error-row! to-sql
-            pool-create]]
+    :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db
+            cache-db import-db ghost-db flows-db insert-error-row! to-sql pool-create]]
    [clojure.data.csv          :as csv]
    [csv-map.core              :as ccsv]
    [clojure.core.cache        :as cache]
    [clojure.java.io           :as io]
-   [rvbbit-backend.clickhouse-ddl :as clickhouse-ddl]
    [rvbbit-backend.ddl        :as ddl]
    [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset filter fn
    [rvbbit-backend.cruiser    :as cruiser]
-    ;;[tea-time.core             :as tt]
    [com.climate.claypoole     :as cp]
    [clj-figlet.core           :as figlet]
    [clj-http.client           :as client]
@@ -1355,13 +1353,14 @@
             }))))
 
 (defn write-local-file
-  [full-path file-data]
+  "write local file with given data (forked fabric version)"
+  [full-path file-data & [append?]]
   (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
         output    (run-shell-command "pwd")
-        pwd       (first (get-in output [:output :output] []))
+        pwd       (first (get-in output [:output] []))
         full-path (if fqd? full-path (str pwd "/" full-path))]
     (ut/pp [:writing-file full-path])
-    (do (try (spit full-path file-data)
+    (do (try (spit full-path file-data :append (true? append?))
              (catch Exception e
                (do (println "err")
                    {;:file-data file-data
@@ -1369,7 +1368,6 @@
                     :file-path full-path
                     :error     (str "caught exception: " (.getMessage e))})))
         {:status :ok :file-path full-path})))
-
 
 (declare get-fabric-patterns)
 (declare get-fabric-models)
@@ -5814,17 +5812,18 @@
           1.6
           8))
 
-(defn save-alert-notification-pre [client-name name fpath flow?]
+(defn save-alert-notification-pre [client-name nname fpath flow?]
   (alert! client-name
           [:v-box :justify :center :style
            {;:margin-top "-6px"
             :opacity 0.6} ;:color (if error? "red" "inherit")}
-           :children [[:box :style {:font-weight 700 :font-size "13px"} :child (str "saving " name "...")]]]
+           :children [[:box :style {:font-weight 700 :font-size "13px"} :child (str "saving " nname "...")]]]
           10
           0.6
           8))
 
 (defn save [request]
+  (ut/pp [:save-coming-in])
   (try (let [screen-name    (get-in request [:edn-params :screen-name])
              client-name    (get-in request [:edn-params :client-name] "unknown")
              file-base-name (ut/sanitize-name (str screen-name))
@@ -5839,8 +5838,19 @@
              (save-alert-notification client-name screen-name fpath false)
              ))
        (catch Exception e
-         (ut/pp [:error-saving-screen-outer (get-in request [:edn-params :screen-name])
-                 (get-in request [:edn-params :client-name] "unknown") e])))
+         (do 
+           (ut/pp [:error-saving-screen-outer (get-in request [:edn-params :screen-name])
+                 (get-in request [:edn-params :client-name] "unknown") e])
+           (alert! (get-in request [:edn-params :client-name] "unknown")
+                   [:v-box :justify :center :style
+                    {;:margin-top "-6px"
+                     :opacity 0.6} ;:color (if error? "red" "inherit")}
+                    :children [[:box :style {:font-weight 700 :font-size "13px"} :child (str "error saving " (get-in request [:edn-params :screen-name]) "...")]
+                               [:box :style {:font-weight 700 :font-size "13px"} :child (str e)]]]
+                   10
+                   0.6
+                   8)
+           )))
   (send-edn-success {:status "saved" :screen (first (get request :edn-params))}))
 
 
@@ -7466,22 +7476,36 @@
 
 
 
+(defn resolve-user-space-dir []
+  (let [working-dir (System/getProperty "user.dir")
+        user-space (io/file working-dir "user-content")]
+    (when (.exists user-space)
+      (.getCanonicalPath user-space))))
 
+(def user-space-dir (resolve-user-space-dir))
 
+(defn serve-user-asset [request]
+  (if user-space-dir
+    (let [asset-path (subs (:uri request) (count "/assets/"))
+          file (io/file user-space-dir asset-path)]
+      (if (.exists file)
+        (ring-resp/file-response (.getPath file))
+        (ring-resp/not-found "Asset not found")))
+    (ring-resp/not-found "User space directory not configured")))
 
-(defn home-page [request] (ring-resp/response "Hello World! Home!"))
 (defn static-root [request] (ring-resp/content-type (ring-resp/resource-response "index.html" {:root "public"}) "text/html"))
 (def common-interceptors [(body-params/body-params) http/html-body])
 
 (def routes
   #{["/" :get (conj common-interceptors `static-root)] ["/save" :post (conj common-interceptors `save)]
+    ["/assets/*" :get (conj common-interceptors `serve-user-asset)]
     ["/save-flow" :post (conj common-interceptors `save-flow)] ["/save-snap" :post (conj common-interceptors `save-snap)]
     ["/save-screen-snap" :post (conj common-interceptors `save-screen-snap)]
     ["/save-csv" :post (conj common-interceptors `save-csv)] ["/load" :get (conj common-interceptors `load-screen)]
     ["/audio" :post (conj common-interceptors `get-audio)] ["/load-flow" :get (conj common-interceptors `load-flow)]
     ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]})
 
-(def web-server-port 8888) ;; 8888
+(def web-server-port 8888)
 
 (defn create-custom-thread-pool [prefix min-threads max-threads idle-timeout]
   (doto (QueuedThreadPool. (int max-threads) (int min-threads) (int idle-timeout))
@@ -7505,9 +7529,18 @@
 
 (def web-server (atom nil))
 
+(defn init-user-space! []
+  (when-let [dir (resolve-user-space-dir)]
+    (alter-var-root #'user-space-dir (constantly dir))))
+
 (defn create-web-server! []
   (ut/ppa [:starting-web-server :port web-server-port])
+  (init-user-space!)
   (reset! web-server (server/start runnable-service)))
+
+;; (defn create-web-server! []
+;;   (ut/ppa [:starting-web-server :port web-server-port])
+;;   (reset! web-server (server/start runnable-service)))
 
 (defn stop-web-server! []
   (ut/ppa [:shutting-down-web-server :port web-server-port])
@@ -7557,36 +7590,7 @@
      :exit-code  exit-code
      :command    (str command)}))
 
-(defn read-local-file
-  "read local file and return its content as a string (forked fabric version)"
-  [full-path]
-  (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
-        output    (run-shell-command "pwd")
-        pwd       (first (get-in output [:output :output] []))
-        full-path (if fqd? full-path (str pwd "/" full-path))]
-    (ut/pp [:reading-file full-path])
-    (try {:file-data (str (slurp full-path)) :error nil}
-         (catch Exception e
-           {:file-data (str "\n" (str (.getMessage e)) "\n")
-            :error     nil ;(str "read-local-file, caught exception: " (.getMessage e))
-            }))))
 
-(defn write-local-file
-  "write local file with given data (forked fabric version)"
-  [full-path file-data & [append?]]
-  (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
-        output    (run-shell-command "pwd")
-        pwd       (first (get-in output [:output] []))
-        full-path (if fqd? full-path (str pwd "/" full-path))]
-    (ut/pp [:writing-file full-path])
-    (do (try (spit full-path file-data :append (true? append?))
-             (catch Exception e
-               (do (println "err")
-                   {;:file-data file-data
-                    :status    :error
-                    :file-path full-path
-                    :error     (str "caught exception: " (.getMessage e))})))
-        {:status :ok :file-path full-path})))
 
 ;; (spit fp (str pretty-data "\n") :append true)
 
@@ -7620,13 +7624,6 @@
       (cstr/replace #"_" "-")
       (cstr/replace #":" "")
       cstr/lower-case))
-
-;; (defn- shell-escape
-;;   "Escape a string for safe use in shell commands"
-;;   [s]
-;;   (-> s
-;;       (cstr/replace #"'" "'\\''")  ; Replace ' with '\''
-;;       (->> (format "'%s'"))))    ; Wrap the entire string in single quotes
 
 (defn shell-escape [s]
   (-> s

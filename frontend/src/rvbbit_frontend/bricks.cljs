@@ -3918,7 +3918,7 @@
                                           :height       "15px"}
                                   :on-click #(ut/tracked-dispatch [::conn/copy-to-clipboard (str k)])]
                                  [re-com/md-icon-button
-                                  :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close"
+                                  :md-icon-name "ri-delete-bin-6-line" ;; "zmdi-close"
                                   :style {:color        dcolor
                                           :padding      "0px"
                                           :margin-top   "-2px"
@@ -4257,7 +4257,7 @@
                                                          :height       "15px"}
                                                  :on-click #(ut/tracked-dispatch [::conn/copy-to-clipboard (str k)])]
                                                 [re-com/md-icon-button
-                                                 :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close"
+                                                 :md-icon-name "ri-delete-bin-6-line" ;; "zmdi-close"
                                                  :style {:color        dcolor
                                                          :padding      "0px"
                                                          :margin-top   "-2px"
@@ -4499,7 +4499,7 @@
                                        :height       "15px"}
                                :on-click #(ut/tracked-dispatch [::conn/copy-to-clipboard (str k)])]
                               [re-com/md-icon-button
-                               :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close"
+                               :md-icon-name "ri-delete-bin-6-line" ;; "zmdi-close"
                                :style {:color        dcolor
                                        :padding      "0px"
                                        :margin-top   "-2px"
@@ -10969,7 +10969,7 @@
                                                :justify :center
                                                :child [re-com/md-icon-button
                                                        :md-icon-name (if (= bb "spy")
-                                                                       "fa-solid fa-user-secret"
+                                                                       "ri-spy-fill"
                                                                        "zmdi-close")
                                                        :on-click on-click-fn
                                                        :style {:color (if value-spy? (theme-pull :theme/universal-pop-color nil) "grey")
@@ -11224,7 +11224,7 @@
                          [[re-com/box :child (if view view (str [flow-id bid value]))]
                           [re-com/h-box :size "auto" :justify :between :height "10px" :style {}
                            :children
-                           [[re-com/md-icon-button :md-icon-name "fa-solid fa-location-crosshairs" ;; <i class=
+                           [[re-com/md-icon-button :md-icon-name "ri-crosshair-2-line" ;; <i class=
                              :on-click (fn [] (when bid (ut/tracked-dispatch [::push-value flow-id bid value]))) :style
                              {:font-size "15px" :opacity 0.25 :cursor "pointer"}] [re-com/box :child ""]]]]]))
 

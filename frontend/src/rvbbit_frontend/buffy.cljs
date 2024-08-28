@@ -506,7 +506,7 @@
                  :attr {:on-click #(swap! console-or-kit-mode? assoc kp (not (get @console-or-kit-mode? kp false)))}
                  :child [re-com/md-icon-button
                          :src (at)
-                         :md-icon-name (if console-mode? "fa-solid fa-sliders" "fa-solid fa-file-lines")
+                         :md-icon-name (if console-mode? "ri-table-alt-line" "ri-terminal-box-fill")
                          :style {:color (theme-pull :theme/editor-outer-rim-color nil)}]
                      ;:style {:color (theme-pull :theme/editor-outer-rim-color nil)} 
                  :width "20px"]]]]
@@ -1058,7 +1058,7 @@
                                                   :font-size   "19px"}]
                                                 
                                                 ;; [re-com/h-box :children
-                                                ;;  [[re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-droplet" :on-click
+                                                ;;  [[re-com/md-icon-button :src (at) :md-icon-name "ri-contrast-drop-2-fill" :on-click
                                                 ;;    #(ut/tracked-dispatch [::toggle-runstream-drops flow-id]) :style
                                                 ;;    {:cursor      "pointer"
                                                 ;;     :color       (str (theme-pull :theme/editor-outer-rim-color nil))
@@ -1259,13 +1259,13 @@
                                                                             [re-com/box :style {:color ccolor} :child (str ttype)]]]))]
                                                          [re-com/h-box :width "100%" :justify :between :align :center :children
                                                           [[t-dropdown type]
-                                                           [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-right-to-bracket" :style
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-pizza" :style
                                                             {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "24px"}]
                                                            [pill-box in]
-                                                           [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-timeline" :style
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-pizza" :style
                                                             {:color (str (theme-pull :theme/editor-outer-rim-color nil)) :opacity 0.33 :font-size "24px"}]
                                                            [pill-box out]
-                                                           [re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-right-from-bracket" :style
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-pizza" :style
                                                             {:color     (str (theme-pull :theme/editor-outer-rim-color nil))
                                                              :opacity   0.33
                                                              :font-size "24px"}]]])]])]]]))

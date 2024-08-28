@@ -191,7 +191,6 @@
        :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
        :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
  :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
-
  :refresh-boston-crime {:signal :signal/daily-at-9am
                         :type   :clojure
                         :cache? false
@@ -211,7 +210,6 @@
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
- 
  :materialize-offenses-drag-1 {:signal    false
                                :type      :sql
                                :snapshot? false
@@ -226,7 +224,6 @@
     :type      :sql
     :snapshot? false
     :data      {:select [:show_id :song_name :song_order :ts] :from [[:setlists :gg794]] :page -4}}
- 
  :send-to-upscaler-2 {:signal    false
                       :type      :clojure
                       :cache?    false
@@ -237,7 +234,6 @@
                                    (with-open [in-file  (clojure.java.io/input-stream source-path)
                                                out-file (clojure.java.io/output-stream dest-path)]
                                      (clojure.java.io/copy in-file out-file)))}
- 
  :refresh-filtertmp1 {:signal :signal/daily-at-9am
                       :type   :clojure
                       :cache? false

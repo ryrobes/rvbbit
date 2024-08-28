@@ -1,211 +1,19 @@
 {:orders
- {:gen-viz-211 [:Electric_Range :Make],
-  :gen-viz-401 [:rows :Model_Year :State],
-  :Electric-Range-drag-990 [:Electric_Range_Avg],
-  :Make-drag-801 [:Make :rowcnt],
-  :query-385 [:rowcnt],
-  :raw_custom_override_1989323045__block_86_clojure_new_clojure_ (:query_error),
-  :State-drag-734 [:State :rowcnt :County],
-  :new-clojure-sqlized [:ffilename],
-  :Electric-Vehicle-Population-Data-drag-580
-  [:Base_MSRP
-   :City
-   :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-   :County
-   :DOL_Vehicle_ID
-   :Electric_Range
-   :Electric_Utility
-   :Electric_Vehicle_Type
-   :Legislative_District
-   :Make
-   :Model
-   :Model_Year
-   :State
-   :VIN_1_10
-   :Vehicle_Location
-   :_2020_Census_Tract
-   :zipcode],
-  :Electric_Vehicle_Population_Data (:query_error)},
+ {:raw_custom_override_1989323045__block_86_clojure_new_clojure_ (:query_error),
+  :new-clojure-sqlized [:ffilename]},
  :reco-preview nil,
  :sql-source
- {:gen-viz-211
-  {:select [[[[:avg :Electric_Range]] :Electric_Range] :Make],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Make]},
-  :gen-viz-401
-  {:select [[[:count 1] :rows] :Model_Year :State],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Model_Year :State]},
-  :Electric-Range-drag-990
-  {:select [[[:avg :Electric_Range] :Electric_Range_Avg]],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :gg224]]},
-  :Make-drag-801
-  {:select [:Make [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :dd691]],
-   :group-by [:Make],
-   :order-by [[:rowcnt :desc]]},
-  :query-385
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :jj797]]},
-  :raw_custom_override_1989323045__block_86_clojure_new_clojure_
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_],
-   :limit 111},
-  :State-drag-734
-  {:select [:State [[:count 1] :rowcnt] :County],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :dd661]],
-   :group-by [:State :County],
-   :order-by [[:rowcnt :desc]]},
-  :new-clojure-sqlized
+ {:new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
    :_sqlized-at "2024-08-25 21:33:25",
    :_sqlized-by [:block-86 :clojure :new-clojure],
    :_sqlized-hash 1851117399,
    :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_]},
-  :Electric-Vehicle-Population-Data-drag-580
-  {:select
-   [:Base_MSRP
-    :City
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-    :County
-    :DOL_Vehicle_ID
-    :Electric_Range
-    :Electric_Utility
-    :Electric_Vehicle_Type
-    :Legislative_District
-    :Make
-    :Model
-    :Model_Year
-    :State
-    :VIN_1_10
-    :Vehicle_Location
-    :_2020_Census_Tract
-    :zipcode],
-   :from [[:Electric_Vehicle_Population_Data :aa583]]},
-  :Electric_Vehicle_Population_Data
+  :raw_custom_override_1989323045__block_86_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
-   :from [:Electric_Vehicle_Population_Data],
+   :from [:raw_custom_override_1989323045__block_86_clojure_new_clojure_],
    :limit 111}},
  :meta
  {nil
@@ -4273,15 +4081,9 @@
      :commons {"Part Two" 2, "Part Three" 2, "Part One" 2},
      :cardinality 55}},
    :rowcount 9}},
- :default-col-widths
- {:block-86 {:new-clojure-sqlized 361},
-  :block-1832 {:Make-drag-801 105},
-  :block-5365 {:Electric-Range-drag-990 211},
-  :block-3352 {:State-drag-734 103},
-  :block-10336 {:Electric-Vehicle-Population-Data-drag-580 103},
-  :block-5215 {:query-385 211}},
+ :default-col-widths {:block-86 {:new-clojure-sqlized 361}},
  :runstream-drops nil,
- :tabs ["pnw ev data.csv" "marvelous ape"],
+ :tabs ["pnw ev data.csv" "marvelous ape" "turquoise hornet"],
  :selected-cols {},
  :server
  {:settings
@@ -4517,6 +4319,7 @@
     "pink-dusk-falls"
     "pinup-rabbit-fields"
     "pnw-demo-dash-llm-training"
+    "pnw-demo-dash-llm-training11"
     "pomp-girl1"
     "pomp-girl2"
     "poor-touring-me"
@@ -4579,73 +4382,142 @@
  :editor? false,
  :buffy? false,
  :valid-kits
- {[:clojure :export-to-csv] [],
+ {[:clojure :export-to-csv]
+  [[nil :queries nil]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-1832 :queries :Make-drag-801]
+   [:block-989 :queries :gen-viz-401]
+   [:block-5365 :queries :Electric-Range-drag-990]
+   [:block-167 :queries :gen-viz-211]
+   [:block-3352 :queries :State-drag-734]
+   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
+   [:block-5215 :queries :query-385]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
-  [:clojure :view-lundberg] [],
+  [:clojure :view-lundberg]
+  [[:block-86 :views :hare-vw]
+   [:block-989 :views :oz]
+   [:block-167 :views :oz]
+   [:block-5215 :views :hi]],
   [:clojure :gen-ev] [],
-  [:outliers :get-outliers] []},
- :memory [398422281 378167265 4294705152],
- :client-name :stirring-violet-turtle-26,
+  [:outliers :get-outliers]
+  [[nil :queries nil]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-1832 :queries :Make-drag-801]
+   [:block-989 :queries :gen-viz-401]
+   [:block-5365 :queries :Electric-Range-drag-990]
+   [:block-167 :queries :gen-viz-211]
+   [:block-3352 :queries :State-drag-734]
+   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
+   [:block-5215 :queries :query-385]]},
+ :memory [621722287 543226495 4294705152],
+ :client-name :robust-copper-cheetah-13,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 1978, :h 1081},
+ :window {:w 2473, :h 1351},
  :post-meta
- {:new-clojure-sqlized {:* {:rowcount 1041}, :ffilename {:distinct 1041}},
-  :gen-viz-401
-  {:* {:rowcount 166},
-   :rows {:distinct 27},
-   :Model_Year {:distinct 20},
-   :State {:distinct 43}},
-  :Make-drag-801 {:* {:rowcount 34}, :Make {:distinct 34}, :rowcnt {:distinct 33}},
-  :Electric-Vehicle-Population-Data-drag-580
-  {:VIN_1_10 {:distinct 7803},
-   :Vehicle_Location {:distinct 762},
-   :* {:rowcount 114600},
-   :City {:distinct 639},
-   :Electric_Vehicle_Type {:distinct 2},
-   :Make {:distinct 34},
-   :County {:distinct 164},
-   :zipcode {:distinct 775},
-   :_2020_Census_Tract {:distinct 2025},
-   :Base_MSRP {:distinct 30},
-   :Model {:distinct 116},
-   :Electric_Utility {:distinct 74},
-   :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility {:distinct 3},
-   :Model_Year {:distinct 20},
-   :DOL_Vehicle_ID {:distinct 114600},
-   :State {:distinct 43},
-   :Electric_Range {:distinct 101},
-   :Legislative_District {:distinct 50}}},
+ {:new-clojure-sqlized {:* {:rowcount 1041}, :ffilename {:distinct 1041}}},
  :flow-estimates
- {:new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
-  :Electric-Range-drag-990 {:times 0.02, :run-id :Electric-Range-drag-990},
-  :gen-viz-401 {:times 0.074, :run-id :gen-viz-401},
-  :Make-drag-801 {:times 0.06, :run-id :Make-drag-801},
-  :gen-viz-211 {:times 0.065, :run-id :gen-viz-211},
-  :State-drag-734 {:times 0.105, :run-id :State-drag-734},
-  :Electric-Vehicle-Population-Data-drag-580
-  {:times 0.017, :run-id :Electric-Vehicle-Population-Data-drag-580},
-  :query-385 {:times 0.011, :run-id :query-385}},
+ {:new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized}},
  :status
- {:alert1 {:alerts :alert2},
-  :alert2 {:alerts :alert2},
-  :heartbeat
+ {:heartbeat
   {:kick
-   [:flow-status/live-scratch-flow>*running?
-    :kit/kicks>stirring-violet-turtle-26
-    :solver/get-my-colors1322964051
-    :solver/get-my-colors-1450830101
-    :solver-status/stirring-violet-turtle-26>get-my-colors1322964051>running?
-    :solver-status/stirring-violet-turtle-26>get-my-colors-1450830101>running?
+   [:kit/kicks>robust-copper-cheetah-13
+    :solver/get-my-colors1840149709
+    :solver-status/robust-copper-cheetah-13>get-my-colors1840149709>running?
+    :flow-status/live-scratch-flow>*running?
     :solver-meta/raw-custom-override-1989323045>output>evald-result>value-hash]}},
- :screen-name "pnw-demo-dash-llm-training",
+ :screen-name "pnw-demo-dash-llm-training11",
  :recos-page2 0,
- :selected-tab "marvelous ape",
+ :selected-tab "turquoise hornet",
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
  [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box :child "sub to :solver/get-my-colors-192068792"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   24
+   2057604884]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box
+       :child
+       "sub to :solver-status/robust-copper-cheetah-13>get-my-colors-192068792>running?"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   24
+   -900334539]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box :child "sub to :solver/get-my-colors-192068792"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   25
+   2057604884]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box
+       :child
+       "sub to :solver-status/robust-copper-cheetah-13>get-my-colors-192068792>running?"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   25
+   -900334539]
+  [[:box
     :style
     {:font-size "15px"}
     :child
@@ -4656,18 +4528,17 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   31
+   28
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
- {:raw_custom_override_1989323045__block_86_clojure_new_clojure_ -1914793508,
-  :Electric_Vehicle_Population_Data 1659044548},
+ {:raw_custom_override_1989323045__block_86_clojure_new_clojure_ -1914793508},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -2122954728,
+ :user-params-hash 1975749319,
  :grid-recos? true,
  :resolved-queries
- {nil {:_last-run "21:33:42"},
+ {nil {:_last-run "21:02:58"},
   :gen-viz-211
   {:select [[[[:avg :Electric_Range]] :Electric_Range] :Make],
    :from
@@ -4838,7 +4709,7 @@
     :zipcode],
    :from [[:Electric_Vehicle_Population_Data :aa583]]}},
  :panels
- {nil {:queries {nil {:_last-run "21:33:42"}}},
+ {nil {:queries {nil {:_last-run "21:02:58"}}},
   :block-86
   {:clojure
    {:new-clojure
@@ -4944,6 +4815,31 @@
    :root [32 11],
    :tab "pnw ev data.csv"},
   "none!" {:root [-1 nil]},
+  :block-6688
+  {:h 4,
+   :w 5,
+   :root [12 9],
+   :tab "turquoise hornet",
+   :selected-view :hare-vw-1,
+   :name "block-6688",
+   :views
+   {:hare-vw-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Why, sometimes I've believed as many as six impossible things before breakfast."]},
+   :queries {}},
   :block-167
   {:name "basic_v_bar_avg - Electric_Range, Make - 956",
    :w 11,
@@ -5274,6 +5170,5 @@
   :bigfoot-sightings-locations-drag-class-428 {:class "Class A", :rowcnt 2486},
   :class-drag-987 nil,
   :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
-  :sys {:selected-tab "marvelous ape", :selected-tab-idx 1}},
- :selected-flow "live-scratch-flow",
- :current-url "#/pnw-demo-dash-llm-training"}
+  :sys {:selected-tab "turquoise hornet", :selected-tab-idx 2}},
+ :selected-flow "live-scratch-flow"}

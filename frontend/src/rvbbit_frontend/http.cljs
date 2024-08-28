@@ -229,8 +229,9 @@
      :gap "10px"
      :children [[:md-icon
                         :style {:font-size "12px"}
-                        :md-icon-name (if un? "fa-solid fa-skull"
-                                          "fa-solid fa-handshake")]
+                        :md-icon-name (if un?
+                                        "ri-skull-fill"
+                                        "ri-shake-hands-fill")]
                        [:box :child (str key)]]
      :style {:font-size "12px"
              :opacity (when un? 0.6)
@@ -925,7 +926,8 @@
           pl          (keys (get db :panels))
           client-name (get db :client-name)
           p0          (cset/difference (set pl) (set pp))
-          base-keys   (filter (comp not namespace) (keys db))
+          base-keys   (filter (comp not namespace) (remove nil? (keys db)))
+          _ (ut/tapp>> [:is? base-keys])
           ;; temp-sub-click-params (filter 
           ;;                        #(or
           ;;                          (not (cstr/starts-with? (str %) ":solver-meta/"))
@@ -979,7 +981,10 @@
           bogus-kw    (vec (find-bogus-keywords image))
           image       (apply dissoc image (map first bogus-kw))
           request     {:image (assoc image :resolved-queries resolved-queries) :client-name client-name :screen-name screen-name}
-          _ (ut/tapp>> [:saving screen-name "!" request :removed-bogus-keywords bogus-kw])]
+          _ (ut/tapp>> [:saving screen-name "!" request :removed-bogus-keywords bogus-kw])
+          ;clean-db (assoc-in db [:http-reqs :save-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
+          ;;is-valid-edn? (ut/is-valid-edn? request) ;; TODO, invalid EDN will prevent saving... 
+          ]
       {:db         (assoc-in db [:http-reqs :save-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
        :http-xhrio {:method          method
                     :uri             url

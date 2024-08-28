@@ -2629,7 +2629,7 @@
                                                                                                    ;"-3px"
               :attr {:on-click #(swap! flow-details-block-container-atom assoc-in [flow-id bid :push-paths :open?] (not open?))}
               :children
-              [[re-com/md-icon-button :md-icon-name "fa-solid fa-carrot" :style {:font-size "17px" :cursor "pointer"}]
+              [[re-com/md-icon-button :md-icon-name "ri-game-line" :style {:font-size "17px" :cursor "pointer"}]
                [re-com/box :child (str "push paths (" cnt ")")]]]
              [re-com/md-icon-button :on-click #(ut/tracked-dispatch [::add-push-port bid]) :md-icon-name "zmdi-plus" :style
               {:font-size "22px" :cursor "pointer"}]]] (when (and open? (> cnt 0)) [re-com/gap :size "8px"])
@@ -4043,10 +4043,7 @@
                                                                                                     ;"-3px"
                :attr {:on-click #(swap! flow-details-block-container-atom assoc-in [flow-id bid :condi-paths :open?] (not open?))}
                :children
-               [[re-com/md-icon-button :src (at) :md-icon-name "fa-solid fa-tree" ;; <i class=
-                                                                                  ;; "fa-solid
-                                                                                  ;; fa-bezier-curve"
-                                                                                  ;; ></i>
+               [[re-com/md-icon-button :src (at) :md-icon-name "ri-tree-line" 
                  :style
                  {;:color (theme-pull :theme/editor-outer-rim-color nil)
                   :font-size "17px"
@@ -4122,10 +4119,10 @@
        {;:border "1px solid white"
         :color (str (theme-pull :theme/editor-outer-rim-color nil) 88)} :size "auto" :padding "4px" :align :center :justify
        :center :gap "10px" :children
-       [[re-com/md-icon-button :md-icon-name "fa-solid fa-radiation" :style
+       [[re-com/md-icon-button :md-icon-name "ri-alert-line" :style
          {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}]
         [re-com/box :child "(use to push a value downstream manually - ATTN: be careful. lol)"]
-        [re-com/md-icon-button :md-icon-name "fa-solid fa-radiation" :style
+        [re-com/md-icon-button :md-icon-name "ri-alert-line" :style
          {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}]]]
       [re-com/box :width "570px" :style
        {:border (str "3px dashed " (theme-pull :theme/editor-outer-rim-color nil) 66) :border-radius "12px"} :child
@@ -4139,7 +4136,7 @@
        [re-com/h-box :gap "10px" :attr {:on-click #(ut/tracked-dispatch [::bricks/push-value flow-id flow-select val true])}
         :style {:color (theme-pull :theme/editor-outer-rim-color nil) :cursor "pointer"} :padding "6px" :children
         [[re-com/box :child (str "I understand - push to " cc " channel" (when (> cc 1) "s"))]
-         [re-com/md-icon-button :md-icon-name "fa-solid fa-gun" :style {:font-size "18px"}]]]]] :width "600px"]))
+         [re-com/md-icon-button :md-icon-name "ri-router-fill" :style {:font-size "18px"}]]]]] :width "600px"]))
 
 (re-frame/reg-sub ::get-raw-data-input (fn [db [_ flow-id bid]] (get-in db [:flows flow-id :map bid :data :user-input])))
 
@@ -4691,7 +4688,7 @@
                    "zmdi-aspect-ratio"])
                 (when (= ttype :open-fn)
                   [flow-details-block-container "save as a flow block*" flow-id flow-select
-                   [save-custom-block flow-id flow-select] "fa-solid fa-cube"])
+                   [save-custom-block flow-id flow-select] "ri-node-tree"])
                 [flow-details-block-container "flow block map - debugger*" flow-id flow-select
                  [debug-box flow-select @(ut/tracked-subscribe [::get-raw-block-map flow-id flow-select])] "zmdi-bug"]
                 [flow-details-block-container "channel push - debugger*" flow-id flow-select

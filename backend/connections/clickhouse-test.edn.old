@@ -4,9 +4,9 @@
 ;;  ;:dbname "test"
 ;;  :subname "//localhost:8123/test"}
 
-{:jdbc-url "jdbc:clickhouse://10.174.1.150:8123/default"
+{:jdbc-url "jdbc:clickhouse://dev-pig-37:8123/default"
  :username "default"
- :password "notofox"
+ :password "Notofox22=="
  :driver-class-name "ru.yandex.clickhouse.ClickHouseDriver"
  :connection-timeout 5000
  :maximum-pool-size 20
