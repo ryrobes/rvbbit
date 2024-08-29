@@ -1,17 +1,15 @@
 # RⱯBBIT DYNAMIC DATASCAPES
 ## Reactive Data Board & Visual Flow Platform
 
-In a world drowning in data, we don't need more dashboards. We need data landscapes we can explore.
-
-![alt text](docs/rvbbit-dev-mosiac.jpg)	
-
-## "If you want to build a ship, don't drum up people to collect wood and don't assign them tasks and work, but rather teach them to long for the endless immensity of the sea." — Antoine de Saint-Exupéry
-
 ### composability:
 > The art of creating complex systems from simple, reusable parts.
 
 ### feedback loop:
 > A cycle where output influences input, creating a self-reinforcing system.
+
+![alt text](docs/rvbbit-dev-mosiac.jpg)	
+
+## "If you want to build a ship, don't drum up people to collect wood and don't assign them tasks and work, but rather teach them to long for the endless immensity of the sea." — Antoine de Saint-Exupéry
 
 As a long-time dashboard builder, data engineer, and UI hacker, I've always wanted something in-between Tableau & building bespoke web data products to ship answers to my users. The tools were too rigid at times, and building everything from scratch can be tiresome. The eternal push/pull of DE and SWE approaches, as many who work in BI can attest to. How could I have the flexibility & re-usability of code, but the compositional freedom & direct manipulation of a builder tool? 
 
@@ -223,6 +221,13 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 ## Getting Started
 
 - Give it a try - I'm still working on proper documentation (for example, the entire Clover DSL is not yet documented), please open GH issues, discussions or reach out to me on [Twitter](https://twitter.com/ryrobes) if you have any questions!
+- Go to http://localhost:8888 
+- Still working on legit documentation, but for now:
+	- The ./assets/ folder - this is for user content like images, files, etc. Can be referenced as http://localhost:8888/assets/* - very useful for anything that the backend needs to read/write to that the frontend can also access.
+	- The ./defs/ folder - this is where all config EDN files are
+	- The ./connections/ folder - this is where your SQL db connections are. They are each an EDN map with JDBC connection info that gets use by a Hikari connection pool (so there can be Hikari specific settings)
+	- The ./screens/ folder - this is where screen or "deck" definitions live (in the middle of a re-naming of things)
+		- a screen can be opened on boot by going to http://localhost:8888/#/my-screen-name - or by using the floating editor panel, selecting "files" and clicking and dragging the screens row on to the canvas
 
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
@@ -237,12 +242,14 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 
 ## Caveats
 
-- Use Englebarts beautiful invention
-- Some UI jank
+- Use Englebarts beautiful invention please
+- Various UI jank
 - Limited SQL DB support ATM
 	Tested with SQLite, Postgres, MySQL, SQL Server, Vertica, Clickhouse, DuckDB
 	(with various quirks to each as I continute to smooth out the SQL engine) 
+- Have a laundry list of TODOs, will try and get them posted as issues so I can gauge interest and prioritize
 - No concept of users / auth yet
 - Meant to be used interally with a team that you trust (open REPLs, open shell access, etc.)
+- Several features I had previously tweeted about and are 80% done (mostly working), but were pulled to make my (self-imposed) deadline, will def surface them discussion for priorities as well
 
 
