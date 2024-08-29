@@ -2426,6 +2426,7 @@
                                           (if (not single?) (str "query-preview" combohash) "query-preview")
                                           (str (if (not single?) (str "query-preview" combohash "-") "query-preview-") (+ 1 q))))
                                (nth query q)}))
+        queries       (into {} (for [[k v] queries] {k (assoc v :from [[(get-in v [:from 0]) (ut/gen-sql-sql-alias)]])})) ;; some dbs require subq aliases
         queriesrep    (into {}
                             (for [q (range (count query))]
                               {(keyword (if (= q 0) "query-preview" (str "query-preview-" (+ 1 q))))
@@ -5009,9 +5010,11 @@
                                :source-panel-key "none!"
                                :data-type        field-data-type
                                :type             type}
-        db-type               (cstr/lower-case (str (get selected-meta-db :database_name)))
-        qual-table-name       (cond (cstr/includes? db-type "vertica") (str (get selected-meta-table :db_schema) "." table-name)
-                                    :else                              table-name)
+        ;; db-type               (cstr/lower-case (str (get selected-meta-db :database_name)))
+        ;; qual-table-name       (cond (cstr/includes? db-type "vertica") 
+        ;;                             (str (get selected-meta-table :db_schema) "." table-name)
+        ;;                             :else                              table-name)
+        qual-table-name       table-name
         agg?                  (and (= type :meta-fields)
                                    (or (= field-data-type "integer") (= field-data-type "float"))
                                    (not (cstr/includes? (cstr/lower-case (str field-name)) "year"))
@@ -12929,7 +12932,7 @@
            new-h       (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
       ; (tapp>> [:running :update-panels-hash :event :expensive! "full send of all panels to server"])
-       (ut/dispatch-delay 800 [::http/insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
+       (ut/dispatch-delay 800 [::http/insert-alert [:box :child "Syncing panel data with RVBBIT server..."] 12 1 5])
        ;;(conn/push-panels-to-server pp ppr client-name)
        (ut/tracked-dispatch
         [::wfx/push :default

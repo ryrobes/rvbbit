@@ -34,8 +34,7 @@
 
 (defn update-mouse-activity [] (reset! db/last-mouse-activity (js/Date.)))
 
-(defn track-mouse-activity
-  []
+(defn track-mouse-activity []
   (let [debounced-update (debounce update-mouse-activity 1000)] ;; 1000 milliseconds = 1 second
     (.addEventListener js/window "mousemove" (fn [_] (debounced-update)))))
 
@@ -45,8 +44,7 @@
 
 (re-frame/reg-event-db ::alt-key-toggle (fn [db _] (assoc db :alt-key-held? (not (get db :alt-key-held? false)))))
 
-(defn dispatch-keydown-rules
-  []
+(defn dispatch-keydown-rules []
   (ut/tracked-dispatch-sync
     [::rp/set-keydown-rules
      {:event-keys           [;[[::bricks/shift-down] [{:keyCode 16 :shiftKey true}]]
@@ -74,7 +72,7 @@
                              [[::bricks/panel-depth-up] [{:keyCode 82 :shiftKey true}]] ; shift-r
                              [[::bricks/panel-depth-down] [{:keyCode 70 :shiftKey true}]] ; shift-f
                              [[::flows/run-current-flowmap] [{:keyCode 70} {:keyCode 70}]] ; f f
-                             ;[[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde
+                             ;[[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde ;; old echoes TODO bring back
                              [[::bricks/toggle-quake-console] [{:keyCode 192}]] ; ` tilde
                              [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]] ;; ctrl-s
                              [[::bricks/nudge-panel :up] [{:keyCode 87}]] ; w
@@ -94,7 +92,8 @@
 (re-frame/reg-sub
  ::memory-usage-breached-threshold?
  (fn [db _] 
-   (let [{:keys [_ used ttl-heap]} (get db :memory)] (> (/ used ttl-heap) 0.75))))
+   (let [{:keys [_ used ttl-heap]} (get db :memory)] 
+     (> (/ used ttl-heap) 0.75))))
 
 (defonce root-key 
   (reagent/atom (cljs.core/random-uuid)))

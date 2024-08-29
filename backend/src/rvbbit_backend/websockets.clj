@@ -4211,6 +4211,7 @@
         curr-keyparts (vec (keys (get @db/atoms-and-watchers :rvbbit)))
         all-keyparts  (vec (distinct (ut/deep-flatten (map last parts))))
         to-remove     (vec (cset/difference (set curr-keyparts) (set all-keyparts)))]
+    (ut/pretty-spit (str "./defs/backup/signals." (System/currentTimeMillis) ".edn") @signals-atom)
     (reset! signal-parts-atom parts) ;; faster than running it every time - since we need it
     (ut/pp [:reload-signals-subs! parts curr-keyparts all-keyparts {:remove! to-remove}])
     (doseq [rm to-remove] ;; clean up ones we dont need to watch anymore
@@ -4334,6 +4335,7 @@
         all-keyparts  (vec (distinct (ut/deep-flatten (map last parts))))
         to-remove     (vec (filter #(cstr/starts-with? (str %) ":solver/")
                                    (cset/difference (set curr-keyparts) (set all-keyparts))))]
+    (ut/pretty-spit (str "./defs/backup/solvers." (System/currentTimeMillis) ".edn") @solvers-atom)
     (ut/pp [:reload-solver-subs! {:parts parts :curr-keypaths curr-keyparts :all-keyparts all-keyparts :to-remove to-remove}])
     (doseq [kk all-keyparts]
       (ut/pp [:solver-sub-to kk])
@@ -5002,6 +5004,7 @@
   [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache?]
   (doall
    (let [;;_ (ut/pp [:honey-sql honey-sql])
+         
          _ (swap! honey-echo assoc-in [client-name (first ui-keypath)] (assoc honey-sql :connection-id connection-id))
          post-process-fn (get honey-sql :post-process-fn) ;; allowed at the top level only - will
          honey-sql (if (get honey-sql :limit) ;; this is a crap solution since we can't
@@ -5063,6 +5066,7 @@
                                         (= connection-id "cache.db")
                                         (nil? connection-id))           cache-db
                                     :else (get-connection-string connection-id))
+                    target-db-type [(surveyor/db-typer-fn target-db)]
                     has-pivot?
                     #_{:clj-kondo/ignore [:not-empty?]}
                     (not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
@@ -5078,7 +5082,7 @@
                                                 vls     (if sql?
                                                           (if cached? ;; if got exact cache, send it.
                                                             (get @pivot-cache vls0)
-                                                            (try (let [sql-str   (to-sql (assoc vls0 :limit 50))
+                                                            (try (let [sql-str   (to-sql (assoc vls0 :limit 50) target-db-type)
                                                                        sres      (sql-query target-db
                                                                                             sql-str
                                                                                             [:get-pivot-vals-for field :kp
@@ -5217,8 +5221,8 @@
                                                 (= page-num -3)
                                                 (= page-num -4)
                                                 (= page-num -2)) ;; or limit
-                                          (to-sql honey-sql)
-                                          (to-sql (assoc honey-sql :limit (if (cstr/includes? (str ui-keypath) "-hist-") 50 500)))))
+                                          (to-sql honey-sql target-db-type)
+                                          (to-sql (assoc honey-sql :limit (if (cstr/includes? (str ui-keypath) "-hist-") 50 500)) target-db-type)))
                         honey-sql-str2 (first honey-sql-str)
                         ;;;_ (async/thread (get-clover-sql-training clover-sql honey-sql-str2)) ;; ONLY
                         honey-result (timed-expr (if literal-data?
@@ -5350,7 +5354,7 @@
                                  ;;  (not= (hash honey-sql)
                                  ;;        (get-in @sniff-meta-guard [ui-keypath client-name]))
                         )) ;; sniff & push meta only on new sql construct
-                      (ut/pp [:sniff-meta! ui-keypath client-name])
+                      ;; (ut/pp [:sniff-meta! ui-keypath client-name])
                       (qp/slot-queue :sql-meta client-name
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name connection-id deep-meta?))))
 
@@ -7103,10 +7107,10 @@
 
         ;;(ut/pp [:date-map @time-atom])
 
-        (ut/pp [:sql-errors!
-                {:ttl     (count @sql/errors)
-                 :freq    (frequencies (mapv first @sql/errors))
-                 :freq-db (frequencies (mapv second @sql/errors))}])
+        ;; (ut/pp [:sql-errors!
+        ;;         {:ttl     (count @sql/errors)
+        ;;          :freq    (frequencies (mapv first @sql/errors))
+        ;;          :freq-db (frequencies (mapv second @sql/errors))}])
 
         ;;(ut/pp [:solvers-running? @solver-status])
 

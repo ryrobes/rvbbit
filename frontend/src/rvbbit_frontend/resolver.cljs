@@ -229,7 +229,7 @@
                           ;; (has-fn? :str)        (string-walk 4)
                           ;; (has-fn? :str)        (string-walk 5)
                           ;; (has-fn? :str)        (string-walk 6) ;; TODO REMOVE ALL THIS
-                          (has-fn? :str)        string-walk
+                          (has-fn? :str)            string-walk
                           (has-fn? :get-in)         get-in-walk
                           (has-fn? :=)              =-walk-map2
                           (has-fn? :sticky-border-radius) sticky-border-radius

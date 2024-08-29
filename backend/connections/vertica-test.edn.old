@@ -1,8 +1,0 @@
-
-{:classname   "com.vertica.jdbc.Driver"
- :subprotocol "vertica"
- :subname     "_VMart" ; first char gets cut somehow?
- :user        "dbadmin"
- :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
- :port         5433}
-

@@ -1,5 +1,5 @@
 (ns rvbbit-frontend.db
-  (:require ;[rvbbit-frontend.http :as http]
+  (:require
     [reagent.core :as reagent]))
 
 (def brick-size 50)
@@ -294,8 +294,8 @@
    :selected-cols      {}
    :recos-page         0
    :recos-page2        0
-   :selected-tab       "strategic grill locations"
-   :tabs               ["strategic grill locations"]
+   :selected-tab       "snowshoe hare"
+   :tabs               ["snowshoe hare"]
    :click-param        {;:conn-list {:connection_id "-1245280001", :database_name "Microsoft
                         :theme base-theme ;; start off default with base values
                        } ;; temp

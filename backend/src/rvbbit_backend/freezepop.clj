@@ -24,53 +24,20 @@
 
 (def managed-atoms (atom {}))
 
-;; (defn thaw-atom
-;;   "Thaws an atom from disk or creates a new one if the file doesn't exist."
-;;   [initial-state file-path & [out?]]
-;;   (let [file  (io/file file-path)
-;;         state (if (.exists file)
-;;                 (with-open [rdr (io/reader file)]
-;;                   (try (edn/read (java.io.PushbackReader. rdr))
-;;                        (catch Exception e (do (ut/pp [:thaw-atom-error!!!! file e]) (System/exit 0)))))
-;;                 initial-state)
-;;         a     (atom state)]
-;;     (when (not out?) ;; we dont want to manage some of these, do it manually
-;;       (swap! managed-atoms assoc file-path a))
-;;     a))
-
-;; (defn freeze-atoms
-;;   "Freezes all managed atoms to disk."
-;;   []
-;;   (doall
-;;    (pmap (fn [[file-path a]]
-;;            (let [wtr (io/writer file-path)]
-;;              (try (binding [*out* wtr] ;; selective pretty print formatting
-;;                     (if (or (cstr/includes? (str file-path) "signals.")
-;;                             (cstr/includes? (str file-path) "rules.")
-;;                             (cstr/includes? (str file-path) "errors.")
-;;                             (cstr/includes? (str file-path) "autocomplete")
-;;                             (cstr/includes? (str file-path) "training-atom.")
-;;                             (cstr/includes? (str file-path) "sql-cache.")
-;;                             (cstr/includes? (str file-path) "solvers."))
-;;                       (clojure.pprint/pprint @a)
-;;                       (prn @a)))
-;;                   (finally (.close wtr))))
-;;            (let [size-in-bytes      (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
-;;                  size-in-mb         (/ size-in-bytes 1048576.0)
-;;                  size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
-;;              (ut/pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
-;;          @managed-atoms)))
-
 (defn thaw-atom
-  "Thaws an atom from disk or creates a new one if the file doesn't exist."
+  "Thaws an atom from disk or creates a new one if the file doesn't exist or is corrupted."
   [initial-state file-path & [out?]]
   (let [file  (io/file file-path)
         state (if (.exists file)
-                (if (cstr/ends-with? file-path ".msgpack.transit")
-                  (read-transit-data file-path)
-                  (with-open [rdr (io/reader file)]
-                    (try (edn/read (java.io.PushbackReader. rdr))
-                         (catch Exception e (do (ut/pp [:thaw-atom-error!!!! file e]) (System/exit 0))))))
+                (try
+                  (if (cstr/ends-with? file-path ".msgpack.transit")
+                    (read-transit-data file-path)
+                    (with-open [rdr (io/reader file)]
+                      (edn/read (java.io.PushbackReader. rdr))))
+                  (catch Exception e
+                    (ut/pp [:thaw-atom-error!!!! file-path e])
+                    (ut/pp [:using-initial-state-instead])
+                    initial-state))
                 initial-state)
         a     (atom state)]
     (when (not out?) ;; we dont want to manage some of these, do it manually
@@ -82,26 +49,29 @@
   []
   (doall
    (pmap (fn [[file-path a]]
-           (if (cstr/ends-with? file-path ".msgpack.transit")
-             (write-transit-data @a file-path)
-             (let [wtr (io/writer file-path)]
-               (try (binding [*out* wtr] ;; selective pretty print formatting
-                      (if (or (cstr/includes? (str file-path) "signals.")
-                              (cstr/includes? (str file-path) "rules.")
-                              (cstr/includes? (str file-path) "errors.")
-                              (cstr/includes? (str file-path) "autocomplete")
-                              (cstr/includes? (str file-path) "training-atom.")
-                              (cstr/includes? (str file-path) "sql-cache.")
-                              (cstr/includes? (str file-path) "solvers."))
-                        (clojure.pprint/pprint @a)
-                        (prn @a)))
-                    (finally (.close wtr)))))
-           (let [size-in-bytes      (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
-                 size-in-mb         (/ size-in-bytes 1048576.0)
-                 size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
-             (ut/pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
+           (try
+             (if (cstr/ends-with? file-path ".msgpack.transit")
+               (write-transit-data @a file-path)
+               (with-open [wtr (io/writer file-path)]
+                 (binding [*out* wtr] ;; selective pretty print formatting
+                   (if (or (cstr/includes? (str file-path) "signals.")
+                           (cstr/includes? (str file-path) "rules.")
+                           (cstr/includes? (str file-path) "errors.")
+                           (cstr/includes? (str file-path) "autocomplete")
+                           (cstr/includes? (str file-path) "training-atom.")
+                           (cstr/includes? (str file-path) "sql-cache.")
+                           (cstr/includes? (str file-path) "solvers."))
+                     (clojure.pprint/pprint @a)
+                     (prn @a)))))
+             (let [size-in-bytes      (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
+                   size-in-mb         (/ size-in-bytes 1048576.0)
+                   size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
+               (ut/pp ["  " :freezing-atom file-path size-in-mb-rounded :mb]))
+             (catch Exception e
+               (ut/pp [:freeze-atom-error!!!! file-path e]))))
          (dissoc @managed-atoms "./defs/solvers.edn" "./defs/signals.edn") ;; dont freeze these, since we manage them manually
          )))
+
 
 (defn freeze-atom
   "Freezes a single atom to disk."

@@ -4,6 +4,21 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
+ :refresh-sql-server-test {:signal :signal/daily-at-9am
+                           :type   :clojure
+                           :cache? false
+                           :data   (do (ns rvbbit-backend.cruiser
+                                         (:require [rvbbit-backend.websockets :as wss]
+                                                   [rvbbit-backend.pool-party :as ppy]
+                                                   [rvbbit-backend.sql :as sql]))
+                                       (let [conn (get (deref wss/conn-map) "sql-server-test")]
+                                         (lets-give-it-a-whirl-no-viz "connections/sql-server-test.edn"
+                                                                      conn
+                                                                      sql/system-db
+                                                                      default-sniff-tests
+                                                                      default-field-attributes
+                                                                      default-derived-fields
+                                                                      default-viz-shapes)))}
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
@@ -17,6 +32,21 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
+ :refresh-postgres-test {:signal :signal/daily-at-9am
+                         :type   :clojure
+                         :cache? false
+                         :data   (do (ns rvbbit-backend.cruiser
+                                       (:require [rvbbit-backend.websockets :as wss]
+                                                 [rvbbit-backend.pool-party :as ppy]
+                                                 [rvbbit-backend.sql :as sql]))
+                                     (let [conn (get (deref wss/conn-map) "postgres-test")]
+                                       (lets-give-it-a-whirl-no-viz "connections/postgres-test.edn"
+                                                                    conn
+                                                                    sql/system-db
+                                                                    default-sniff-tests
+                                                                    default-field-attributes
+                                                                    default-derived-fields
+                                                                    default-viz-shapes)))}
  :refresh-met-on-tour {:signal :signal/daily-at-9am
                        :type   :clojure
                        :cache? false
@@ -32,6 +62,24 @@
                                                                   default-field-attributes
                                                                   default-derived-fields
                                                                   default-viz-shapes)))}
+ :materialize-dl-state-drag-39
+   {:signal :signal/daily-at-7am
+    :type :sql
+    :snapshot? false
+    :data
+      {:select [:dl_state [[:count 1] :rowcnt] :color]
+       :from
+         [[{:select [:accident :agency :alcohol :arrest_type :article :belts :charge :color :commercial_license
+                     :commercial_vehicle :contributed_to_accident :date_of_stop :description :dl_state :driver_city
+                     :driver_state :fatal :gender :geolocation :hazmat :latitude :location :longitude :make :model
+                     :personal_injury :property_damage :race :search_arrest_reason :search_conducted :search_disposition
+                     :search_outcome :search_reason :search_reason_for_stop :search_type :seqid :state :subagency
+                     :time_of_stop :vehicletype :violation_type :work_zone :year]
+            :from   [[:Traffic_Violations :yy57]]} :kk686]]
+       :group-by [:dl_state :color]
+       :order-by [[:rowcnt :desc]]
+       :page -4
+       :connection-id "mysql-test"}}
  :materialize-OFFENSE-CODE-GROUP-drag-7
    {:signal :signal/daily-at-7am
     :type :sql
@@ -71,6 +119,21 @@
                   (println "(" (count (deref selected-files)) " files selected previously)")
                   res))}
  :count-sql-solver-1 {:signal :solver/sql-solver-1 :type :clojure :data (count :data/sql-solver-1)}
+ :refresh-vertica-test {:signal :signal/daily-at-9am
+                        :type   :clojure
+                        :cache? false
+                        :data   (do (ns rvbbit-backend.cruiser
+                                      (:require [rvbbit-backend.websockets :as wss]
+                                                [rvbbit-backend.pool-party :as ppy]
+                                                [rvbbit-backend.sql :as sql]))
+                                    (let [conn (get (deref wss/conn-map) "vertica-test")]
+                                      (lets-give-it-a-whirl-no-viz "connections/vertica-test.edn"
+                                                                   conn
+                                                                   sql/system-db
+                                                                   default-sniff-tests
+                                                                   default-field-attributes
+                                                                   default-derived-fields
+                                                                   default-viz-shapes)))}
  :send-to-upscaler-3 {:signal    false
                       :type      :clojure
                       :cache?    false
@@ -177,6 +240,21 @@
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
+ :refresh-clickhouse-test {:signal :signal/daily-at-9am
+                           :type   :clojure
+                           :cache? false
+                           :data   (do (ns rvbbit-backend.cruiser
+                                         (:require [rvbbit-backend.websockets :as wss]
+                                                   [rvbbit-backend.pool-party :as ppy]
+                                                   [rvbbit-backend.sql :as sql]))
+                                       (let [conn (get (deref wss/conn-map) "clickhouse-test")]
+                                         (lets-give-it-a-whirl-no-viz "connections/clickhouse-test.edn"
+                                                                      conn
+                                                                      sql/system-db
+                                                                      default-sniff-tests
+                                                                      default-field-attributes
+                                                                      default-derived-fields
+                                                                      default-viz-shapes)))}
  :send-to-upscaler-2 {:signal    false
                       :type      :clojure
                       :cache?    false
@@ -208,6 +286,21 @@
                    (println res)
                    (println "(" (count (deref selected-files-4k)) " files selected previously)")
                    res))}
+ :refresh-mysql-test {:signal :signal/daily-at-9am
+                      :type   :clojure
+                      :cache? false
+                      :data   (do (ns rvbbit-backend.cruiser
+                                    (:require [rvbbit-backend.websockets :as wss]
+                                              [rvbbit-backend.pool-party :as ppy]
+                                              [rvbbit-backend.sql :as sql]))
+                                  (let [conn (get (deref wss/conn-map) "mysql-test")]
+                                    (lets-give-it-a-whirl-no-viz "connections/mysql-test.edn"
+                                                                 conn
+                                                                 sql/system-db
+                                                                 default-sniff-tests
+                                                                 default-field-attributes
+                                                                 default-derived-fields
+                                                                 default-viz-shapes)))}
  :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
                         :type   :clojure
                         :cache? false

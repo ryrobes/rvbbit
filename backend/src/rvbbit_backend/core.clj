@@ -15,7 +15,7 @@
    ;[clojure.math.combinatorics :as combo]
    [rvbbit-backend.pool-party :as ppy]
    [clojure.pprint :as ppt]
-   [clojure.set :as cset]
+   [clojure.set :as cset] 
    [clojure.string :as cstr]
    [clojure.walk :as walk]
    [flowmaps.core :as flow]
@@ -38,7 +38,7 @@
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.sql :as    sql
-    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db cache-db  history-db
+    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db cache-db history-db
             to-sql]]
    ;[rvbbit-backend.surveyor :as surveyor]
    ;[rvbbit-backend.transform :as ts]
@@ -53,7 +53,7 @@
    [java.util Date]
    ;;[java.util.concurrent Executors TimeUnit]
    [java.io ByteArrayInputStream ByteArrayOutputStream]
-   [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ThreadPoolExecutor$CallerRunsPolicy]
+   [java.util.concurrent Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ThreadPoolExecutor$CallerRunsPolicy]
    java.nio.file.Files
    java.nio.file.Paths
    java.nio.file.attribute.FileTime
@@ -381,7 +381,9 @@
                                      map-atom (if signals? wss/signals-atom wss/solvers-atom)
                                      _ (reset! map-atom (edn/read-string (slurp (str (get % :path)))))
                                      _ (ut/pp [(if signals? :signals :solvers) :file-change! signals? (get % :path)])
-                                     _ (if signals? (wss/reload-signals-subs) (wss/reload-solver-subs))]
+                                     _ (if signals? 
+                                         (wss/reload-signals-subs) 
+                                         (wss/reload-solver-subs))]
                                  (doseq [d destinations]
                                    (wss/alert! d
                                                [:v-box :justify :center :style {:opacity 0.7} :children
@@ -669,7 +671,6 @@
   (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   (println " ")
   (wss/fig-render "Curiouser and curiouser!" :pink)
-  (println " ")
 
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
@@ -709,7 +710,7 @@
 
 
   ;; create dirs for various artifacts, if not already present
-  (doseq [dir ["user-content" "user-content/snaps" "user-content/screen-snaps"
+  (doseq [dir ["user-content" "user-content/snaps" "user-content/screen-snaps" "defs/backup"
                "flow-logs" "flow-blocks" "flow-history" "fabric-sessions"]]
     (ext/create-dirs dir))
 

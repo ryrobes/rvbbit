@@ -671,7 +671,7 @@
         output-atom (atom [])
         e (try
             (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
-              (let [user-fn-str   (slurp "./user.clj")
+              (let [user-fn-str   (try (slurp "./user.clj") (catch Exception _ ""))
                     custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
                     gen-ns        (cstr/replace
                                    (str "repl-" (str client-name) "-"

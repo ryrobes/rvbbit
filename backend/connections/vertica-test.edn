@@ -1,0 +1,16 @@
+
+{:classname   "com.vertica.jdbc.Driver"
+ :subprotocol "vertica"
+ :subname     "_mydb?defaultSchema=public" ; first char gets cut somehow?
+ :user        "dbadmin"
+ :password    "Notofox22=="
+ :host        "dev-pig-37"
+ :connection-init-sql "set search_path to public"
+ :port         5433}
+
+;; {:classname   "com.vertica.jdbc.Driver"
+;;  :subprotocol "vertica"
+;;  :subname     "//dev-pig-37:5433/mydb"
+;;  :user        "dbadmin"
+;;  :password    "Notofox22=="
+;;  :connectionProperties "defaultSchema=public"}

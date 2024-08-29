@@ -10,12 +10,14 @@
    [rvbbit-backend.queue-party  :as qp]
    [flowmaps.db               :as flow-db]])
 
+;; the rabbit reactor...
+
 (def key-depth-limit (atom 8)) 
 
 (defonce kit-atom (fpop/thaw-atom {} "./data/atoms/kit-atom.msgpack.transit"))
 (defonce father-time (fpop/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
 (defonce screens-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/screens-atom.edn"))
-(defonce server-atom (fpop/thaw-atom {} "./data/atoms/server-atom.edn"))
+(defonce server-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/server-atom.edn"))
 (defonce flow-status (atom {}))
 (defonce kit-status (atom {}))
 (defonce runstream-atom (atom {}))
@@ -104,7 +106,6 @@
              {base-type atom})))
 
 (def reactor-boot-time (atom (System/currentTimeMillis)))
-
 
 (defn reactor-uptime-seconds []
   (let [uptime-ms      (- (System/currentTimeMillis) @reactor-boot-time)
@@ -239,8 +240,6 @@
 (defn client-subs-late-delivery [ms]
   (vec (keys (filter #(> (val %) ms) (client-sub-latency)))))
 
-
-
 (defn master-watch-splitter-deep [name-kw parent-atom]
   ;(qp/add-watch+
   (ppy/add-watch+
@@ -310,7 +309,7 @@
   [flow-key keypath base-type sub-path client-param-path]
   (let [;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
         ]
-    (cond (cstr/includes? (str flow-key) "running?")  false
+    (cond (cstr/includes? (str flow-key) "running?")  false ;; TODO, mess
           (= base-type :time)                         client-param-path
           (= base-type :signal)                       client-param-path
           (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -441,8 +440,7 @@
         ;;keypath             (if flow? keypath (vec (rest keypath)))
         ;flow-key          (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key) 
         watcher          (make-watcher keypath flow-key :all fn (= sub-type :tracker))
-        atom-to-watch    (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))
-        ]
+        atom-to-watch    (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))]
 
     ;(remove-watch atom-to-watch watch-key) ;; not needed if we're just going to re-add the same atom and watch-key anyways. but good to keep in mind.
 

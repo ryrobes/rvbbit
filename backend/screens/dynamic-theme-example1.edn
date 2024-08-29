@@ -1,0 +1,4382 @@
+{:orders
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :fields-sys [:field_name :field_type :data_type],
+  :gen-viz-211 [],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :gen-viz-401 [],
+  :cached-ufo-sightings-drag-37 (:query_error),
+  :mad-libs-viz
+  {:block-130
+   {"NYPD_Arrest_Data_Year_to_Date_drag_22"
+    [:context_hash
+     :combo_hash
+     :connection_id
+     :shape_name
+     :axes
+     :talias
+     :walk1
+     :walk2
+     :walk3
+     :walka
+     :key_hash
+     :table_type
+     :field_type
+     :data_type
+     :db_type
+     :db_schema
+     :db_catalog
+     :table_name
+     :field_name
+     :derived_calc
+     :derived_name
+     :score0
+     :score1
+     :score2]}},
+  :bigfoot-sightings-locations-drag-12
+  [:alsonoticed
+   :bfroid
+   :class
+   :county
+   :cty_abbrev
+   :cty_name
+   :date
+   :environment
+   :fips_county_code
+   :fips_state_code
+   :fixed_month
+   :fixed_year
+   :housing_units
+   :land_area
+   :latitude
+   :locationdetails
+   :longitude
+   :month
+   :nearestroad
+   :nearesttown
+   :observed
+   :otherstories
+   :otherwitnesses
+   :population
+   :run_id
+   :run_time
+   :season
+   :state
+   :state_abbrev
+   :state_name
+   :submitted
+   :submitted_date
+   :timeandconditions
+   :title
+   :url
+   :water_area
+   :year
+   :zip_lat
+   :zip_long
+   :zip_name
+   :zipcode],
+  :country-drag-24 [:country :rowcnt :city],
+  :Electric-Range-drag-990 [],
+  :Make-drag-801 [],
+  :recos-sys2
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
+  :NYPD_Arrest_Data_Year_to_Date (:query_error),
+  :main_boston_ibr (:query_error),
+  :viz-shapes0-sys2 [:shape :recos],
+  :country_drag_36 (:query_error),
+  :dl_state_drag_39 (:query_error),
+  :query-385 [],
+  :ufo-sightings-drag-37
+  [:city
+   :comments
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :id
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :dl-state-drag-39 [:dl_state :rowcnt :color],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :viz-tables-sys2 [:table_name :recos],
+  :State-drag-734 [],
+  :new-clojure-sqlized [:ffilename],
+  :rowcnt-drag-32 (:query_error),
+  :raw_custom_override341927123__block_86_clojure_new_clojure_ (:query_error),
+  :Electric-Vehicle-Population-Data-drag-580 [],
+  :color-drag-13 [:color :rowcnt],
+  :ufo_sightings_drag_37 (:query_error),
+  :viz-shapes-sys2 [:combo_edn :recos],
+  :NYPD_Arrests_Data_Historic (:query_error),
+  :Traffic-Violations-drag-8
+  [:accident
+   :agency
+   :alcohol
+   :arrest_type
+   :article
+   :belts
+   :charge
+   :color
+   :commercial_license
+   :commercial_vehicle
+   :contributed_to_accident
+   :date_of_stop
+   :description
+   :dl_state
+   :driver_city
+   :driver_state
+   :fatal
+   :gender
+   :geolocation
+   :hazmat
+   :latitude
+   :location
+   :longitude
+   :make
+   :model
+   :personal_injury
+   :property_damage
+   :race
+   :search_arrest_reason
+   :search_conducted
+   :search_disposition
+   :search_outcome
+   :search_reason
+   :search_reason_for_stop
+   :search_type
+   :seqid
+   :state
+   :subagency
+   :time_of_stop
+   :vehicletype
+   :violation_type
+   :work_zone
+   :year],
+  :Electric_Vehicle_Population_Data (:query_error),
+  :gen-viz-296 (:query_error),
+  :viz-shapes
+  [:axes_logic
+   :base_score
+   :connection_id
+   :library_shapes
+   :selected_view
+   :run_id
+   :shape_name
+   :sql_maps],
+  :country_drag_24 (:query_error),
+  :query-1057 [:rowcnt],
+  :meteorite_landings (:query_error),
+  :city-drag-32 (:query_error),
+  :bigfoot_sightings_locations (:query_error),
+  :ufo_sightings (:query_error),
+  :flow-fn-categories-sys [:category],
+  :cached-country-drag-36 (:query_error),
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ssa],
+  :Meteorite_Landings (:query_error),
+  :rowcnt-drag-12 (:query_error),
+  :raw_custom_override_2058175520__block_86_clojure_new_clojure_ (:query_error),
+  :customer_dimension (:query_error),
+  :cached-country-drag-24-1 (:query_error),
+  :reco-counts [:table_name :cnt],
+  :cached-dl-state-drag-39 [:dl_state :rowcnt :color],
+  :Electric_Vehicle_Population_Data_2 (:query_error),
+  :country-drag-36 (:query_error),
+  :flow-fn-all-sys [:name],
+  :Traffic_Violations (:query_error)},
+ :reco-preview "2006850921",
+ :flow? false,
+ :sql-source
+ {:gen-viz-211
+  {:select [[[[:avg :Electric_Range]] :Electric_Range] :Make],
+   :from
+   [{:select
+     [:Base_MSRP
+      :City
+      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+      :County
+      :DOL_Vehicle_ID
+      :Electric_Range
+      :Electric_Utility
+      :Electric_Vehicle_Type
+      :Legislative_District
+      :Make
+      :Model
+      :Model_Year
+      :State
+      :VIN_1_10
+      :Vehicle_Location
+      :_2020_Census_Tract
+      :zipcode],
+     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
+   :group-by [:Make]},
+  :gen-viz-401
+  {:select [[[:count 1] :rows] :Model_Year :State],
+   :from
+   [{:select
+     [:Base_MSRP
+      :City
+      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+      :County
+      :DOL_Vehicle_ID
+      :Electric_Range
+      :Electric_Utility
+      :Electric_Vehicle_Type
+      :Legislative_District
+      :Make
+      :Model
+      :Model_Year
+      :State
+      :VIN_1_10
+      :Vehicle_Location
+      :_2020_Census_Tract
+      :zipcode],
+     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
+   :group-by [:Model_Year :State]},
+  :cached-ufo-sightings-drag-37
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :connection-id "cache.db",
+   :from [[:ufo_sightings_drag_37 :hh786]],
+   :_last-run "09:08:38"},
+  :bigfoot-sightings-locations-drag-12
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :cty_abbrev
+    :cty_name
+    :date
+    :environment
+    :fips_county_code
+    :fips_state_code
+    :fixed_month
+    :fixed_year
+    :housing_units
+    :land_area
+    :latitude
+    :locationdetails
+    :longitude
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :population
+    :run_id
+    :run_time
+    :season
+    :state
+    :state_abbrev
+    :state_name
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :water_area
+    :year
+    :zip_lat
+    :zip_long
+    :zip_name
+    :zipcode],
+   :from [[:bigfoot_sightings_locations :hh322]],
+   :page 1,
+   :_last-run "08:55:51"},
+  :country-drag-24
+  {:select [:country [[:count 1] :rowcnt] :city],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :mm422]]}
+     :ee493]],
+   :group-by [:country :city],
+   :order-by [[:rowcnt :desc]]},
+  :Electric-Range-drag-990
+  {:select [[[:avg :Electric_Range] :Electric_Range_Avg]],
+   :from
+   [[{:select
+      [:Base_MSRP
+       :City
+       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+       :County
+       :DOL_Vehicle_ID
+       :Electric_Range
+       :Electric_Utility
+       :Electric_Vehicle_Type
+       :Legislative_District
+       :Make
+       :Model
+       :Model_Year
+       :State
+       :VIN_1_10
+       :Vehicle_Location
+       :_2020_Census_Tract
+       :zipcode],
+      :from [[:Electric_Vehicle_Population_Data :aa583]]}
+     :gg224]]},
+  :Make-drag-801
+  {:select [:Make [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:Base_MSRP
+       :City
+       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+       :County
+       :DOL_Vehicle_ID
+       :Electric_Range
+       :Electric_Utility
+       :Electric_Vehicle_Type
+       :Legislative_District
+       :Make
+       :Model
+       :Model_Year
+       :State
+       :VIN_1_10
+       :Vehicle_Location
+       :_2020_Census_Tract
+       :zipcode],
+      :from [[:Electric_Vehicle_Population_Data :aa583]]}
+     :dd691]],
+   :group-by [:Make],
+   :order-by [[:rowcnt :desc]]},
+  :NYPD_Arrest_Data_Year_to_Date
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:NYPD_Arrest_Data_Year_to_Date],
+   :limit 111},
+  :main_boston_ibr
+  {:select [:*], :connection-id "system-db", :from [:main_boston_ibr], :limit 111},
+  :country_drag_36
+  {:select [:*], :connection-id "system-db", :from [:country_drag_36], :limit 111},
+  :dl_state_drag_39
+  {:select [:*], :connection-id "system-db", :from [:dl_state_drag_39], :limit 111},
+  :query-385
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:Base_MSRP
+       :City
+       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+       :County
+       :DOL_Vehicle_ID
+       :Electric_Range
+       :Electric_Utility
+       :Electric_Vehicle_Type
+       :Legislative_District
+       :Make
+       :Model
+       :Model_Year
+       :State
+       :VIN_1_10
+       :Vehicle_Location
+       :_2020_Census_Tract
+       :zipcode],
+      :from [[:Electric_Vehicle_Population_Data :aa583]]}
+     :jj797]]},
+  :ufo-sightings-drag-37
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :mm422]]},
+  :dl-state-drag-39
+  {:select [:dl_state [[:count 1] :rowcnt] :color],
+   :from
+   [[{:select
+      [:accident
+       :agency
+       :alcohol
+       :arrest_type
+       :article
+       :belts
+       :charge
+       :color
+       :commercial_license
+       :commercial_vehicle
+       :contributed_to_accident
+       :date_of_stop
+       :description
+       :dl_state
+       :driver_city
+       :driver_state
+       :fatal
+       :gender
+       :geolocation
+       :hazmat
+       :latitude
+       :location
+       :longitude
+       :make
+       :model
+       :personal_injury
+       :property_damage
+       :race
+       :search_arrest_reason
+       :search_conducted
+       :search_disposition
+       :search_outcome
+       :search_reason
+       :search_reason_for_stop
+       :search_type
+       :seqid
+       :state
+       :subagency
+       :time_of_stop
+       :vehicletype
+       :violation_type
+       :work_zone
+       :year],
+      :from [[:Traffic_Violations :yy57]]}
+     :kk686]],
+   :group-by [:dl_state :color],
+   :order-by [[:rowcnt :desc]]},
+  :State-drag-734
+  {:select [:State [[:count 1] :rowcnt] :County],
+   :from
+   [[{:select
+      [:Base_MSRP
+       :City
+       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+       :County
+       :DOL_Vehicle_ID
+       :Electric_Range
+       :Electric_Utility
+       :Electric_Vehicle_Type
+       :Legislative_District
+       :Make
+       :Model
+       :Model_Year
+       :State
+       :VIN_1_10
+       :Vehicle_Location
+       :_2020_Census_Tract
+       :zipcode],
+      :from [[:Electric_Vehicle_Population_Data :aa583]]}
+     :dd661]],
+   :group-by [:State :County],
+   :order-by [[:rowcnt :desc]]},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-29 07:59:17",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1828944435,
+   :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_]},
+  :rowcnt-drag-32
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select [:country :rowcnt :city], :from [[:country_drag_24 :nn237]]}
+        :ee206]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :pp630]]},
+  :raw_custom_override341927123__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override341927123__block_86_clojure_new_clojure_],
+   :limit 111},
+  :Electric-Vehicle-Population-Data-drag-580
+  {:select
+   [:Base_MSRP
+    :City
+    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+    :County
+    :DOL_Vehicle_ID
+    :Electric_Range
+    :Electric_Utility
+    :Electric_Vehicle_Type
+    :Legislative_District
+    :Make
+    :Model
+    :Model_Year
+    :State
+    :VIN_1_10
+    :Vehicle_Location
+    :_2020_Census_Tract
+    :zipcode],
+   :from [[:Electric_Vehicle_Population_Data :aa583]]},
+  :color-drag-13
+  {:select [:color [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:accident
+       :agency
+       :alcohol
+       :arrest_type
+       :article
+       :belts
+       :charge
+       :color
+       :commercial_license
+       :commercial_vehicle
+       :contributed_to_accident
+       :date_of_stop
+       :description
+       :dl_state
+       :driver_city
+       :driver_state
+       :fatal
+       :gender
+       :geolocation
+       :hazmat
+       :latitude
+       :location
+       :longitude
+       :make
+       :model
+       :personal_injury
+       :property_damage
+       :race
+       :search_arrest_reason
+       :search_conducted
+       :search_disposition
+       :search_outcome
+       :search_reason
+       :search_reason_for_stop
+       :search_type
+       :seqid
+       :state
+       :subagency
+       :time_of_stop
+       :vehicletype
+       :violation_type
+       :work_zone
+       :year],
+      :from [[:Traffic_Violations :yy57]]}
+     :uu644]],
+   :group-by [:color],
+   :order-by [[:rowcnt :desc]],
+   :_last-run "07:11:06"},
+  :ufo_sightings_drag_37
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:ufo_sightings_drag_37],
+   :limit 111},
+  :NYPD_Arrests_Data_Historic
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:NYPD_Arrests_Data_Historic],
+   :limit 111},
+  :Traffic-Violations-drag-8
+  {:select
+   [:accident
+    :agency
+    :alcohol
+    :arrest_type
+    :article
+    :belts
+    :charge
+    :color
+    :commercial_license
+    :commercial_vehicle
+    :contributed_to_accident
+    :date_of_stop
+    :description
+    :dl_state
+    :driver_city
+    :driver_state
+    :fatal
+    :gender
+    :geolocation
+    :hazmat
+    :latitude
+    :location
+    :longitude
+    :make
+    :model
+    :personal_injury
+    :property_damage
+    :race
+    :search_arrest_reason
+    :search_conducted
+    :search_disposition
+    :search_outcome
+    :search_reason
+    :search_reason_for_stop
+    :search_type
+    :seqid
+    :state
+    :subagency
+    :time_of_stop
+    :vehicletype
+    :violation_type
+    :work_zone
+    :year],
+   :from [[:Traffic_Violations :yy57]],
+   :_last-run "06:52:33"},
+  :Electric_Vehicle_Population_Data
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:Electric_Vehicle_Population_Data],
+   :limit 111},
+  :gen-viz-296
+  {:select [[[:count 1] :value] [:PERP_SEX :id]],
+   :from
+   [[{:select
+      [:AGE_GROUP
+       :ARREST_BORO
+       :ARREST_DATE
+       :ARREST_KEY
+       :ARREST_PRECINCT
+       :Geo_Col
+       :JURISDICTION_CODE
+       :KY_CD
+       :LAW_CAT_CD
+       :LAW_CODE
+       :Latitude
+       :Longitude
+       :OFNS_DESC
+       :PD_CD
+       :PD_DESC
+       :PERP_RACE
+       :PERP_SEX
+       :X_COORD_CD
+       :Y_COORD_CD],
+      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
+     :ss818]],
+   :group-by [:PERP_SEX]},
+  :country_drag_24
+  {:select [:*], :connection-id "system-db", :from [:country_drag_24], :limit 111},
+  :query-1057
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:accident
+       :agency
+       :alcohol
+       :arrest_type
+       :article
+       :belts
+       :charge
+       :color
+       :commercial_license
+       :commercial_vehicle
+       :contributed_to_accident
+       :date_of_stop
+       :description
+       :dl_state
+       :driver_city
+       :driver_state
+       :fatal
+       :gender
+       :geolocation
+       :hazmat
+       :latitude
+       :location
+       :longitude
+       :make
+       :model
+       :personal_injury
+       :property_damage
+       :race
+       :search_arrest_reason
+       :search_conducted
+       :search_disposition
+       :search_outcome
+       :search_reason
+       :search_reason_for_stop
+       :search_type
+       :seqid
+       :state
+       :subagency
+       :time_of_stop
+       :vehicletype
+       :violation_type
+       :work_zone
+       :year],
+      :from [[:Traffic_Violations :yy57]]}
+     :ff815]],
+   :_last-run "07:11:02"},
+  :meteorite_landings
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:meteorite_landings],
+   :limit 111},
+  :city-drag-32
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:country :rowcnt :city], :from [[:country_drag_24 :nn237]]} :ee206]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :bigfoot_sightings_locations
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:bigfoot_sightings_locations],
+   :limit 111},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :cached-country-drag-36
+  {:select [:country :rowcnt :state :shape],
+   :connection-id "cache.db",
+   :from [[:country_drag_36 :vv537]],
+   :_last-run "09:12:03"},
+  :Meteorite_Landings
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:Meteorite_Landings],
+   :limit 111},
+  :rowcnt-drag-12
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:country :rowcnt :city], :from [[:country_drag_24 :nn237]]}
+     :nn783]]},
+  :raw_custom_override_2058175520__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_],
+   :limit 111},
+  :customer_dimension
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:customer_dimension],
+   :limit 111},
+  :cached-country-drag-24-1
+  {:select [:country :rowcnt :city],
+   :connection-id "cache.db",
+   :from [[:country_drag_24 :nn237]],
+   :_last-run "09:09:33"},
+  :cached-dl-state-drag-39
+  {:select [:dl_state :rowcnt :color],
+   :connection-id "cache.db",
+   :from [[:dl_state_drag_39 :ee286]],
+   :_last-run "07:47:22"},
+  :Electric_Vehicle_Population_Data_2
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:Electric_Vehicle_Population_Data_2],
+   :limit 111},
+  :country-drag-36
+  {:select [:country [[:count 1] :rowcnt] :state :shape],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings_drag_37 :hh786]]}
+     :uu906]],
+   :group-by [:country :state :shape],
+   :order-by [[:rowcnt :desc]]},
+  :Traffic_Violations
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:Traffic_Violations],
+   :limit 111}},
+ :doom-modal? false,
+ :audio-playing? false,
+ :meta
+ {nil
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-fn-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 34,
+     :group-by? true,
+     :median ":get-colors",
+     :max ":write-file",
+     :avg ":alert! (non-numeric average)",
+     :cardinality 100},
+    :description
+    {:min "Basic HTTP call primitive",
+     :data-type "string",
+     :commons
+     {"Basic HTTP call primitive" 2,
+      "Clojure subtract function." 2,
+      "Get top 50 color frequencies from an image in hex form." 1},
+     :distinct 32,
+     :group-by? true,
+     :median "Clojure true? function.",
+     :max "Write you own Clojure function! Godspeed!",
+     :avg
+     "Send a pop-up notification to a client (or :all clients) (non-numeric average)",
+     :cardinality 94},
+    :full_map
+    {:min
+     "{:description \"Basic HTTP call primitive\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs [:req-map], :expandable? false, :required [:req-map]}",
+     :data-type "string",
+     :commons
+     {"{:description \"Clojure add function.\", :fn (fn [& args] (apply + args)), :inputs [:args], :icon \"zmdi-plus\", :types {:args [:integer :float], :out [:integer :float]}}"
+      1,
+      "{:description \"Convert a JSON string to Clojure EDN\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}}"
+      1,
+      "{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1},
+     :distinct 34,
+     :group-by? true,
+     :median
+     "{:description \"Clojure true? function.\", :fn true?, :inputs [:value], :icon \"zmdi-pizza\", :types {:value :boolean, :out :boolean}}",
+     :max
+     "{:file-path \"./flows/node-color-thief-js.edn\", :icon \"zmdi-gradient\", :description \"Take an image local path and generate a color palette map from it.\"}",
+     :avg
+     "{:description \"Send a pop-up notification to a client (or :all clients)\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :inputs [:destination :content :w :h :duration], :icon \"zmdi-alert-polygon\", :style {:color \"#FDFD96\"}, :selected-style {:color \"#FDFD96\"}, :defaults {:destination :client-name, :content \"Alert!\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}} (non-numeric average)",
+     :cardinality 100},
+    :inputs
+    {:min "",
+     :data-type "string",
+     :commons
+     {"[:value1 :value2]" 7,
+      "[:value]" 6,
+      "[:destination :content :w :h :duration]" 3},
+     :distinct 20,
+     :group-by? true,
+     :median "[:query]",
+     :max "[:value]",
+     :avg "[:destination :content :w :h :duration] (non-numeric average)",
+     :cardinality 58},
+    :icon
+    {:min "fa-solid fa-terminal",
+     :data-type "string",
+     :commons {"zmdi-pizza" 3, "zmdi-file-text" 3, "zmdi-alert-polygon" 3},
+     :distinct 20,
+     :group-by? true,
+     :median "zmdi-functions",
+     :max "zmdi-washing-machine",
+     :avg "zmdi-alert-polygon (non-numeric average)",
+     :cardinality 58},
+    :input_types
+    {:min "[:any :any]",
+     :data-type "string",
+     :commons
+     {"[[:integer :float] [:integer :float]]" 6, "[:string]" 6, "[:any]" 3},
+     :distinct 17,
+     :group-by? true,
+     :median "[:string :string]",
+     :max "[]",
+     :avg "[:keyword :any :integer :integer :integer] (non-numeric average)",
+     :cardinality 50},
+    :output_types
+    {:min "",
+     :data-type "string",
+     :commons {":any" 12, ":boolean" 11, ":string" 4},
+     :distinct 8,
+     :group-by? true,
+     :median ":boolean",
+     :max "[:integer :float]",
+     :avg ":any (non-numeric average)",
+     :cardinality 23},
+    :category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 18, ":clojure-base" 16},
+     :distinct 2,
+     :group-by? true,
+     :median ":rabbit-base",
+     :max ":rabbit-base",
+     :avg ":rabbit-base (non-numeric average)",
+     :cardinality 5}},
+   :database-type "SQLite",
+   :rowcount 34},
+  :fields-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :gen-viz-211 {:fields {}},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:min "none",
+     :data-type "string",
+     :commons {"none" 12},
+     :distinct 1,
+     :group-by? true,
+     :median "none",
+     :max "none",
+     :avg "none (non-numeric average)",
+     :cardinality 8},
+    :db_catalog
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 12},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 8},
+    :connection_id
+    {:min "cache.db",
+     :data-type "string",
+     :commons {"cache.db" 12},
+     :distinct 1,
+     :group-by? true,
+     :median "cache.db",
+     :max "cache.db",
+     :avg "cache.db (non-numeric average)",
+     :cardinality 8},
+    :schema_cat
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 12},
+     :distinct 1,
+     :group-by? false,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 8},
+    :table_name
+    {:min "Electric_Vehicle_Population_Data",
+     :data-type "string",
+     :commons
+     {"Electric_Vehicle_Population_Data" 1,
+      "Meteorite_Landings" 1,
+      "solvers_materialize_OFFENSE_CODE_GROUP_drag_7" 1},
+     :distinct 12,
+     :group-by? true,
+     :median "solvers_materialize_OFFENSE_CODE_GROUP_drag_7",
+     :max "spotify_streams_2024",
+     :avg "Electric_Vehicle_Population_Data (non-numeric average)",
+     :cardinality 100},
+    :fields
+    {:min 3,
+     :data-type "integer",
+     :commons {5 2, 4 2, 11 2},
+     :distinct 8,
+     :group-by? false,
+     :median 16.5,
+     :max 30,
+     :avg 11.166666666666666,
+     :cardinality 66}},
+   :database-type "SQLite",
+   :rowcount 12},
+  :gen-viz-401 {:fields {}},
+  :cached-ufo-sightings-drag-37
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings_drag_37) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :mad-libs-viz
+  {:block-130
+   {"NYPD_Arrest_Data_Year_to_Date_drag_22"
+    {:fields {}, :database-type "SQLite", :rowcount 0}}},
+  :bigfoot-sightings-locations-drag-12
+  {:fields
+   {:nearestroad
+    {:min "",
+     :data-type "string",
+     :commons {nil 12, "Route 33" 6, "Rt 2" 3},
+     :distinct 467,
+     :group-by? true,
+     :median "RT. 118",
+     :max "xxxxxxx rd & route 30",
+     :avg "RT 116 (non-numeric average)",
+     :cardinality 93},
+    :water_area
+    {:min "",
+     :data-type "integer",
+     :commons {38115 11, 38709 10, nil 9},
+     :distinct 238,
+     :group-by? true,
+     :median "366723",
+     :max "9988",
+     :avg "42579 (non-numeric average)",
+     :cardinality 47},
+    :housing_units
+    {:min "",
+     :data-type "integer",
+     :commons {51574 11, 64324 10, nil 9},
+     :distinct 241,
+     :group-by? true,
+     :median "295723",
+     :max "9872",
+     :avg "53068 (non-numeric average)",
+     :cardinality 48},
+    :date
+    {:min "",
+     :data-type "string",
+     :commons {nil 107, "15" 25, "12" 12},
+     :distinct 186,
+     :group-by? true,
+     :median "18",
+     :max "within first week",
+     :avg "26 (non-numeric average)",
+     :cardinality 37},
+    :locationdetails
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 72,
+      "Edited out at the request of the witness." 4,
+      "Near White Horse Mt." 2},
+     :distinct 422,
+     :group-by? true,
+     :median "Land is owned by the Monocacy Hunting Club.",
+     :max "very close to the lake, near a road called Alca Flats or Alca road",
+     :avg
+     "The Seven Sisters is a group of Peaks within the Holyoke Mountain Range. (non-numeric average)",
+     :cardinality 84},
+    :submitted_date
+    {:min "1996-05-29",
+     :data-type "string",
+     :commons {"2012-01-09" 2, "2015-10-02" 2, "2000-08-30" 2},
+     :distinct 483,
+     :group-by? true,
+     :median "2007-08-06",
+     :max "2022-03-08",
+     :avg "2020-08-31 (non-numeric average)",
+     :cardinality 96},
+    :bfroid
+    {:min 70,
+     :data-type "integer",
+     :commons {1524 1, 2758 1, 24621 1},
+     :distinct 500,
+     :group-by? true,
+     :median 18643,
+     :max 72283,
+     :avg 25162.426,
+     :cardinality 100},
+    :cty_abbrev
+    {:min "",
+     :data-type "string",
+     :commons {"NY" 82, "WV" 71, "PA" 70},
+     :distinct 16,
+     :group-by? true,
+     :median "NY",
+     :max "WV",
+     :avg "MA (non-numeric average)",
+     :cardinality 3},
+    :otherwitnesses
+    {:min "",
+     :data-type "string",
+     :commons {nil 44, "No" 12, "no" 9},
+     :distinct 410,
+     :group-by? true,
+     :median "My wife has heard wood knocks",
+     :max "yes, in my truck another friend.",
+     :avg "2 hiking a 7 mile trail (non-numeric average)",
+     :cardinality 81},
+    :run_id
+    {:min 34,
+     :data-type "integer",
+     :commons {34 500},
+     :distinct 1,
+     :group-by? true,
+     :median 34,
+     :max 34,
+     :avg 34,
+     :cardinality 0},
+    :fips_county_code
+    {:min "",
+     :data-type "integer",
+     :commons {3 27, 5 22, 27 19},
+     :distinct 95,
+     :group-by? true,
+     :median "3",
+     :max "99",
+     :avg "15 (non-numeric average)",
+     :cardinality 18},
+    :cty_name
+    {:min "",
+     :data-type "string",
+     :commons {"Washington County" 19, "Sussex County" 16, "Warren County" 14},
+     :distinct 207,
+     :group-by? true,
+     :median "Mercer County",
+     :max "York County",
+     :avg "Hampshire County (non-numeric average)",
+     :cardinality 41},
+    :nearesttown
+    {:min "",
+     :data-type "string",
+     :commons {"Lakeville" 2, "Whitehall" 2, "Whitehall, NY" 2},
+     :distinct 474,
+     :group-by? true,
+     :median "MEDINA",
+     :max "wirtz",
+     :avg "South Hadley/Amherst line (non-numeric average)",
+     :cardinality 94},
+    :timeandconditions
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 15,
+      "Around 9 p.m. dim lighting from inside house,partly cloudy and chilly" 1,
+      "middle of the day bright sunlight" 1},
+     :distinct 486,
+     :group-by? true,
+     :median
+     "Dusk, the weather was clear and there were no clouds in the sky because I could see the stars easily. The moon was also giving off more light than usual, so there was a good backdrop for a sillhoutte.",
+     :max
+     "warm summer night with a full moonfairly clear,not many clouds if I remember right",
+     :avg
+     "late morning sunny and windy perfect day for hiking (non-numeric average)",
+     :cardinality 97},
+    :month
+    {:min "",
+     :data-type "string",
+     :commons {"0001-08-01" 62, "0001-10-01" 60, "0001-07-01" 59},
+     :distinct 13,
+     :group-by? true,
+     :median "0001-07-01",
+     :max "0001-12-01",
+     :avg "0001-08-01 (non-numeric average)",
+     :cardinality 2},
+    :county
+    {:min "Adams County",
+     :data-type "string",
+     :commons {"Warren County" 17, "Sussex County" 15, "Washington County" 12},
+     :distinct 220,
+     :group-by? true,
+     :median "Mineral County",
+     :max "York County",
+     :avg "Hampshire County (non-numeric average)",
+     :cardinality 43},
+    :land_area
+    {:min "",
+     :data-type "integer",
+     :commons {1350012 11, 2412318 10, nil 9},
+     :distinct 243,
+     :group-by? true,
+     :median "1961207",
+     :max "990357",
+     :avg "1370182 (non-numeric average)",
+     :cardinality 48},
+    :longitude
+    {:min -116.5906549182677,
+     :data-type "float",
+     :commons {-116.5906549182677 3, -73.51459403906709 3, -73.78847254114332 2},
+     :distinct 489,
+     :group-by? true,
+     :median -77.2298332828631,
+     :max -67.43566366744098,
+     :avg -77.0985237659628,
+     :cardinality 97},
+    :state
+    {:min "California",
+     :data-type "string",
+     :commons {"New York" 81, "West Virginia" 68, "Pennsylvania" 67},
+     :distinct 20,
+     :group-by? true,
+     :median "North Carolina",
+     :max "Wisconsin",
+     :avg "Massachusetts (non-numeric average)",
+     :cardinality 3},
+    :zipcode
+    {:min "",
+     :data-type "integer",
+     :commons {nil 9, 1223 6, 26884 4},
+     :distinct 425,
+     :group-by? true,
+     :median "24085",
+     :max "8902",
+     :avg "1002 (non-numeric average)",
+     :cardinality 85},
+    :fixed_month
+    {:min "",
+     :data-type "string",
+     :commons {"0001-07-01" 82, "0001-08-01" 62, "0001-10-01" 60},
+     :distinct 13,
+     :group-by? true,
+     :median "0001-08-01",
+     :max "0001-12-01",
+     :avg "0001-08-01 (non-numeric average)",
+     :cardinality 2},
+    :submitted
+    {:min "1996-05-29 00:00:00.000000",
+     :data-type "string",
+     :commons
+     {"2006-07-05 00:00:00.000000" 2,
+      "2000-07-30 00:00:00.000000" 2,
+      "2015-10-02 00:00:00.000000" 2},
+     :distinct 483,
+     :group-by? true,
+     :median "2007-08-06 00:00:00.000000",
+     :max "2022-03-08 00:00:00.000000",
+     :avg "2020-08-31 00:00:00.000000 (non-numeric average)",
+     :cardinality 96},
+    :fips_state_code
+    {:min "",
+     :data-type "integer",
+     :commons {36 82, 54 71, 42 70},
+     :distinct 16,
+     :group-by? true,
+     :median "37",
+     :max "9",
+     :avg "25 (non-numeric average)",
+     :cardinality 3},
+    :state_abbrev
+    {:min "",
+     :data-type "string",
+     :commons {"NY" 82, "WV" 71, "PA" 70},
+     :distinct 16,
+     :group-by? true,
+     :median "NY",
+     :max "WV",
+     :avg "MA (non-numeric average)",
+     :cardinality 3},
+    :title
+    {:min
+     "02/15/04 Rensselaer County, NY: Vocalizations, with Tracks Found the Next Day",
+     :data-type "string",
+     :commons
+     {"Nighttime sighting by motorist near Mansfield" 1,
+      "Hunter observes a huge figure scaling a steep hillside in just moments near Clairton"
+      1,
+      "Two witnesses observe creature on edge of forest" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "Motorists have a possible late night sighting outside Seagrove",
+     :max "Youths have evening encounter near Allaire State Park",
+     :avg "Hikers report Sasquatch stalking south of Amherst (non-numeric average)",
+     :cardinality 100},
+    :otherstories
+    {:min "",
+     :data-type "string",
+     :commons {nil 101, "No" 27, "no" 20},
+     :distinct 335,
+     :group-by? true,
+     :median "No",
+     :max
+     "yes- according to the maryland bigfoot digest, several dozen were reported around wat was Daniels, Ellicott City, Granite, Woodstock, Sykesville and the Patapsco State park.My family informed me that it is a common thing around here,along with black bears. 1967-1974, during massive development along the patapsco, according to my grandparents and my families various lifelong friends, dozens of sightings occured- a friend of my grandfather, however, started telling people about his- and was laughed at for it so badly, he refused to officially reportit. Bigfoot is not viewed as a menace or beast by many who claim to have seen it out here- its mainly former city residents who havent adapted to the rural setting. Supposedly sightings of the creatures dates back to before the establishment of towns like Sykesville.",
+     :avg
+     "Berkshires County has a history of bigfoot sighting you can follow the M&M (Metacomet-Manadnock) Trail from the Berkshires to the Seven Sisters section of the trail we were hiking that day. (non-numeric average)",
+     :cardinality 67},
+    :year
+    {:min "",
+     :data-type "string",
+     :commons {"2006" 21, "2015" 19, "2000" 17},
+     :distinct 102,
+     :group-by? true,
+     :median "2003",
+     :max "~1970",
+     :avg "2020 (non-numeric average)",
+     :cardinality 20},
+    :season
+    {:min "Fall",
+     :data-type "string",
+     :commons {"Summer" 183, "Fall" 149, "Spring" 85},
+     :distinct 5,
+     :group-by? true,
+     :median "Summer",
+     :max "Winter",
+     :avg "Summer (non-numeric average)",
+     :cardinality 0},
+    :state_name
+    {:min "",
+     :data-type "string",
+     :commons {"NEW YORK" 82, "WEST VIRGINIA" 71, "PENNSYLVANIA" 70},
+     :distinct 16,
+     :group-by? true,
+     :median "NORTH CAROLINA",
+     :max "WEST VIRGINIA",
+     :avg "MASSACHUSETTS (non-numeric average)",
+     :cardinality 3},
+    :class
+    {:min "Class A",
+     :data-type "string",
+     :commons {"Class B" 278, "Class A" 221, "Class C" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "Class B",
+     :max "Class C",
+     :avg "Class B (non-numeric average)",
+     :cardinality 0},
+    :population
+    {:min "",
+     :data-type "integer",
+     :commons {130943 11, 139352 10, nil 9},
+     :distinct 243,
+     :group-by? true,
+     :median "37152",
+     :max "99088",
+     :avg "146568 (non-numeric average)",
+     :cardinality 48},
+    :zip_long
+    {:min "",
+     :data-type "float",
+     :commons {nil 9, -73.093359 6, -79.371519 4},
+     :distinct 425,
+     :group-by? true,
+     :median "-77.034596",
+     :max "-83.473979",
+     :avg "-72.503237 (non-numeric average)",
+     :cardinality 85},
+    :alsonoticed
+    {:min "",
+     :data-type "string",
+     :commons {nil 161, "No" 11, "Nothing" 5},
+     :distinct 318,
+     :group-by? true,
+     :median "In the report.",
+     :max
+     "yes whatever is was could move at a incredible speed an made alot of noise going thru the brush",
+     :avg " (non-numeric average)",
+     :cardinality 63},
+    :zip_lat
+    {:min "",
+     :data-type "float",
+     :commons {nil 9, 42.314449 6, 38.849407 4},
+     :distinct 425,
+     :group-by? true,
+     :median "40.097937",
+     :max "45.110336",
+     :avg "42.377651 (non-numeric average)",
+     :cardinality 85},
+    :url
+    {:min "http://www.bfro.net/GDB/show_report.asp?id=10046&PrinterFriendly=True",
+     :data-type "string",
+     :commons
+     {"http://www.bfro.net/GDB/show_report.asp?id=31122&PrinterFriendly=True" 1,
+      "http://www.bfro.net/GDB/show_report.asp?id=17550&PrinterFriendly=True" 1,
+      "http://www.bfro.net/GDB/show_report.asp?id=454&PrinterFriendly=True" 1},
+     :distinct 500,
+     :group-by? true,
+     :median
+     "http://www.bfro.net/GDB/show_report.asp?id=33887&PrinterFriendly=True",
+     :max "http://www.bfro.net/GDB/show_report.asp?id=9842&PrinterFriendly=True",
+     :avg
+     "http://www.bfro.net/GDB/show_report.asp?id=65996&PrinterFriendly=True (non-numeric average)",
+     :cardinality 100},
+    :latitude
+    {:min 31.85061002469184,
+     :data-type "float",
+     :commons {43.66661721063447 3, 31.85061002469184 3, 43.33318000000003 2},
+     :distinct 488,
+     :group-by? true,
+     :median 40.111569666220774,
+     :max 45.067645861170966,
+     :avg 39.98439703347789,
+     :cardinality 97},
+    :observed
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 2,
+      " It was a few years ago on a cold, early winter morning.  There was snow on the ground and it was freezing outside.  My mother has a habit of looking out the bathroom window early in the morning.  On this cold winter morning, with the landscaped dressed in a blanket of white and without any visible signs of being touched by human or animal footprints, she saw what looked like 3 very large humanoid footprints. It was so strange that my mother made me get up to take a look.  We put our coats on and went outside to investigate.  We couldn''t believe our eyes.  There in the snow were 3 very, very large humanoid footprints.  We couldn''t figure out where they came from or where they went.  It literally looked as it came from no where and went no where, because the footprints did not leave a trail.  The footprints were so large I could almost stand in it.  You could literally see the 5 toes with foot and toe imprints in the snow.  We couldn''t believe what we were seeing.  Who or what has a foot that big and who or what would be out in this weather barefooted.<BR><BR>"
+      1,
+      " April 29 2006 about 630pm I just left the Livingston mall and was heading home but got all turned about since I don''t go up that way very often. Anyhow I was figuring that I was north of rt 78 and just kind of \"Lewis and Clarked\" it toward home via the mirror compass in my car and made the first left southbound that I could once I realized I was heading west and didn''t recognize any landmarks. <BR><BR>I turn down this road and notice some construction equipment not far off into the trees on the right side of the road. I was driving slower than normal being unfarmiliar with the area and since I kept peeking at the compass to make sure I was still southbound (looking back it must have been overcast since I would have just used the location of the sun as a reference to direction).<BR>As I was driving along I caught movement out of the corner of my eye and saw a young deer (judging by size) bolt out of the trees across the road from left to right about 100-200 feet in front of my car. I just took my foot off the gas and didn''t need to brake, then I looked left for followers and saw what appeard to be a hunter in a dark colored ghillie suit burst from the trees after the deer. I couldnt make out any details of the face feet or hands but he/it was only around 6 feet tall or so and I''d estimate the low 200lb range but was unusually fast especially for someone dressed like that. The second thought in my head since I fish and shoot a bit was that it couldn''t possibly be legal to hunt around that area since its fairly close to residential zones. Then I noticed that the hunter had no weapons in his hands. I got up to the spot where they crossed and looked right and noticed that the biped (hunter) actually closed ground on the deer and was still in pursuit. I don''t know if the deer stopped to look back at some point as they some times do but this thing was in a full tilt sprint over what I would assume to be uneven ground and didn''t stumble once. I didn''t hear or smell anything since I had my roof up and AC & radio on at the time. All of this happened I would estimate in less than 20 seconds total."
+      1},
+     :distinct 499,
+     :group-by? true,
+     :median
+     " It was December,2007. My husband and I and our two dogs were home and My husband was lying on the couch with our dogs,he was reading the newspaper and watching tv. I came into the living room to tell him something, as I was leaning over him,something caught my attention out of my periphiel vision. I saw what looked like two red spots at the _top of my blinds on our living room window. I turned to look at it further and soon the two red spots formed eyes, very large eyes, I kept watching from where I stood and the eyes looked right at me,we were looking at each other. I wasn''t frightened,just astonished to what I was seeing,and then what ever it was it turned it''s head and walked away from my window. Just to state a fact of point,my mini-blinds were white, down all the way and the blinds themselves were folding downward,so,anyone outside can see in,but,if they are up you can''t see in. Mind you,Our moble home is 14'' high and 70''long on two acres of land in a rual area.outside of Montrose,PA. We sold our property in Feb.2008.<BR>I never went outside to investigate what I saw, I figured that I would leave well enough alone,just let whatever it was be on it''s intended journey. Although, I am amazed that niether dog reacted to it.",
+     :max " wood knocks,screams,yodleing,structures,",
+     :avg
+     " Hiking the Seven Sisters Trail from Mt Holyoke to the Notch in the Hadley / Amherst area of Massachusetts. My hiking partner and I got to Taylor''s Notch and could hear the wind ripping through making eerie noises. We both heard a lot of whistling  and breaking branches which I initially attributed to the wind going through the rocky ledges of Taylor''s Notch. We hiked over one large hill and the wind was lessening but we realized the whistling was closer and then there were whooping noises and calls along with the whistles. The calls were going back and forth and I realized we were surrounded. We kept talking loudly hoping to scare off any animals and kept my bear spray in hand for the next mile or so. Not sure what it was but highly unusual and did not sound like a grown or baby bear,canine, coyote, mountain lion, or fox. I frequently hike and spend time outdoors. I am at a loss as to what was with us that day. I am going back soon to see if I can find more. (non-numeric average)",
+     :cardinality 99},
+    :environment
+    {:min "",
+     :data-type "string",
+     :commons {nil 15, "wooded area" 3, "Mountain ridge" 2},
+     :distinct 482,
+     :group-by? true,
+     :median
+     "Pine Wooded area, swamp, creek (I think). I think there is a housing community on the south side of the wooded area (I think this has been built since I was last there in 1979).",
+     :max "woods, hills, fields,",
+     :avg "Mountains and forest (non-numeric average)",
+     :cardinality 96},
+    :fixed_year
+    {:min "",
+     :data-type "string",
+     :commons {"2006" 22, "2000" 19, "2015" 19},
+     :distinct 66,
+     :group-by? true,
+     :median "2003",
+     :max "~197",
+     :avg "2020 (non-numeric average)",
+     :cardinality 13},
+    :run_time
+    {:min "2022-05-20 16:15:40.000000",
+     :data-type "string",
+     :commons
+     {"2022-05-20 16:34:53.000000" 4,
+      "2022-05-20 16:27:44.000000" 4,
+      "2022-05-20 16:41:14.000000" 4},
+     :distinct 303,
+     :group-by? true,
+     :median "2022-05-20 16:36:11.000000",
+     :max "2022-05-20 16:52:51.000000",
+     :avg "2022-05-20 16:27:43.000000 (non-numeric average)",
+     :cardinality 60},
+    :zip_name
+    {:min "",
+     :data-type "string",
+     :commons {"WASHINGTON" 9, nil 9, "BECKET" 6},
+     :distinct 409,
+     :group-by? true,
+     :median "LEXINGTON",
+     :max "ZEBULON",
+     :avg "AMHERST (non-numeric average)",
+     :cardinality 81}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :country-drag-24
+  {:fields
+   {:country
+    {:min "",
+     :data-type "string",
+     :commons {"us" 459, "ca" 22, nil 7},
+     :distinct 5,
+     :group-by? true,
+     :median "us",
+     :max "us",
+     :avg "us (non-numeric average)",
+     :cardinality 0},
+    :rowcnt
+    {:min 25,
+     :data-type "integer",
+     :commons {27 33, 26 27, 29 22},
+     :distinct 118,
+     :group-by? false,
+     :median 36,
+     :max 524,
+     :avg 60.66,
+     :cardinality 23},
+    :city
+    {:min "abilene",
+     :data-type "string",
+     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "livermore",
+     :max "yuma",
+     :avg "seattle (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :Electric-Range-drag-990 {:fields {}},
+  :Make-drag-801 {:fields {}},
+  :recos-sys2
+  {:fields
+   {:query_map
+    {:min
+     "[{:select [:ARREST_KEY :PD_CD :AGE_GROUP], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"]}]",
+     :data-type "string",
+     :commons
+     {"[{:select [[[[:sum :rows]] :rows] :LAW_CAT_CD], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"], :group-by [:LAW_CAT_CD]}]"
+      2,
+      "[{:select [[[[:sum :rows]] :rows] :ARREST_BORO], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"], :group-by [:ARREST_BORO]}]"
+      2,
+      "[{:select [[[[:sum :rows]] :rows] :AGE_GROUP], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"], :group-by [:AGE_GROUP]}]"
+      2},
+     :distinct 21,
+     :group-by? true,
+     :median
+     "[{:select [[[[:avg :PD_CD]] :PD_CD] :LAW_CAT_CD :AGE_GROUP], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"], :group-by [:LAW_CAT_CD :AGE_GROUP]}]",
+     :max
+     "[{:select [[[[:sum :rows]] :rows] :PERP_RACE], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"], :group-by [:PERP_RACE]}]",
+     :avg
+     "[{:select [[[[:sum :rows]] :rows] :ARREST_BORO], :from [\"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"], :group-by [:ARREST_BORO]}] (non-numeric average)",
+     :cardinality 87},
+    :shape_name
+    {:min "basic_h_bar",
+     :data-type "string",
+     :commons
+     {"scatterplot_nivo_color" 1, "basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1},
+     :distinct 24,
+     :group-by? true,
+     :median "drop_down_filter",
+     :max "v_param_buttons",
+     :avg "basic_h_bar (non-numeric average)",
+     :cardinality 100},
+    :w
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 21, 9 2, 6 1},
+     :distinct 3,
+     :group-by? true,
+     :median "",
+     :max "9",
+     :avg "9 (non-numeric average)",
+     :cardinality 12},
+    :combo_edn
+    {:min "\"AGE_GROUP, ARREST_BORO, rows\"",
+     :data-type "string",
+     :commons
+     {"\"LAW_CAT_CD, rows\"" 2, "\"ARREST_BORO, rows\"" 2, "\"AGE_GROUP, rows\"" 2},
+     :distinct 21,
+     :group-by? true,
+     :median "\"ARREST_KEY, PD_CD, PERP_RACE, rows\"",
+     :max "\"PERP_SEX, rows\"",
+     :avg "\"ARREST_BORO, rows\" (non-numeric average)",
+     :cardinality 87},
+    :query_map_str
+    {:min
+     "\nSELECT (AVG(ARREST_KEY)) AS ARREST_KEY, AGE_GROUP, JURISDICTION_CODE\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY AGE_GROUP, JURISDICTION_CODE\n",
+     :data-type "string",
+     :commons
+     {"\nSELECT (SUM(rows)) AS rows, AGE_GROUP\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY AGE_GROUP\n"
+      2,
+      "\nSELECT (SUM(rows)) AS rows, ARREST_BORO\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY ARREST_BORO\n"
+      2,
+      "\nSELECT (SUM(rows)) AS rows, LAW_CAT_CD\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY LAW_CAT_CD\n"
+      2},
+     :distinct 21,
+     :group-by? true,
+     :median
+     "\nSELECT (SUM(rows)) AS rows, LAW_CAT_CD\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY LAW_CAT_CD\n",
+     :max
+     "\nSELECT SUM(rows) AS value, PERP_SEX AS id\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY PERP_SEX\n",
+     :avg
+     "\nSELECT (SUM(rows)) AS rows, ARREST_BORO\nFROM 'query/NYPD_Arrest_Data_Year_to_Date_drag_22'\nGROUP BY ARREST_BORO\n (non-numeric average)",
+     :cardinality 87},
+    :selected_view
+    {:min "",
+     :data-type "string",
+     :commons {"" 20, ":reech" 4},
+     :distinct 2,
+     :group-by? true,
+     :median "",
+     :max ":reech",
+     :avg " (non-numeric average)",
+     :cardinality 8},
+    :combo_hash
+    {:min "-1016271336",
+     :data-type "string",
+     :commons {"-1105189881" 1, "-1140256918" 1, "-1044231051" 1},
+     :distinct 24,
+     :group-by? true,
+     :median "-130712146",
+     :max "1147603838",
+     :avg "-1323861406 (non-numeric average)",
+     :cardinality 100},
+    :h
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 21, 2 1, 9 1},
+     :distinct 4,
+     :group-by? true,
+     :median "",
+     :max "9",
+     :avg "5 (non-numeric average)",
+     :cardinality 16},
+    :condis
+    {:min "",
+     :data-type "string",
+     :commons {"" 23, "{:true? [:= 1 1]}" 1},
+     :distinct 2,
+     :group-by? true,
+     :median "",
+     :max "{:true? [:= 1 1]}",
+     :avg " (non-numeric average)",
+     :cardinality 8},
+    :score
+    {:min 0,
+     :data-type "float",
+     :commons {51.999999999999986 13, 0 9, 17.999999999999986 2},
+     :distinct 3,
+     :group-by? true,
+     :median 51.999999999999986,
+     :max 51.999999999999986,
+     :avg 29.66666666666666,
+     :cardinality 12},
+    :table_name
+    {:min "NYPD_Arrest_Data_Year_to_Date_drag_22",
+     :data-type "string",
+     :commons {"NYPD_Arrest_Data_Year_to_Date_drag_22" 24},
+     :distinct 1,
+     :group-by? true,
+     :median "NYPD_Arrest_Data_Year_to_Date_drag_22",
+     :max "NYPD_Arrest_Data_Year_to_Date_drag_22",
+     :avg "NYPD_Arrest_Data_Year_to_Date_drag_22 (non-numeric average)",
+     :cardinality 4},
+    :connection_id
+    {:min "cache.db",
+     :data-type "string",
+     :commons {"cache.db" 24},
+     :distinct 1,
+     :group-by? true,
+     :median "cache.db",
+     :max "cache.db",
+     :avg "cache.db (non-numeric average)",
+     :cardinality 4},
+    :context_hash
+    {:min "816428219",
+     :data-type "string",
+     :commons {"816428219" 24},
+     :distinct 1,
+     :group-by? true,
+     :median "816428219",
+     :max "816428219",
+     :avg "816428219 (non-numeric average)",
+     :cardinality 4},
+    :viz_map
+    {:min
+     "[:dropdown {:choices :query-preview, :width :panel-width+80-px, :style {:padding-top \"8px\"}, :model :panel-key/PERP_RACE, :field :PERP_RACE}]",
+     :data-type "string",
+     :commons
+     {"[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
+      1,
+      "{:reech [:> :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:> :LineChart {:data :query-preview, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:> :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:> :Tooltip] [:> :XAxis {:dataKey :PERP_RACE}] [:> :Line {:type \"monotone\", :dataKey :rows, :stroke \"#8884d8\", :activeDot {:r 8}, :on-click [:set-recharts-param>]}]]]}"
+      1,
+      "[:vega-lite {:layer [{:encoding {:y {:field :LAW_CAT_CD, :type \"ordinal\"}, :x {:aggregate \"avg\", :field :PD_CD, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :field :AGE_GROUP, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"}} {:actions false}]"
+      1},
+     :distinct 24,
+     :group-by? true,
+     :median
+     "[:vega-lite {:layer [{:encoding {:x {:field :ARREST_BORO, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"}} {:actions false}]",
+     :max
+     "{:reech [:> :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:> :PieChart {:margin {:top 20, :right 20, :bottom 20, :left 20}} [:> :Pie {:nameKey :name, :fill \"#8884d8\", :on-click [:set-recharts-param>], :outerRadius 80, :dataKey :value, :cx \"50%\", :label true, :cy \"50%\", :data :query-preview}] [:> :Tooltip]]]}",
+     :avg
+     "[:vega-lite {:layer [{:encoding {:x {:field :ARREST_BORO, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/NYPD_Arrest_Data_Year_to_Date_drag_22\"}} {:actions false}] (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 24},
+  :tmp--560748831-hist-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :NYPD_Arrest_Data_Year_to_Date
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: NYPD_Arrest_Data_Year_to_Date) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :main_boston_ibr
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: main_boston_ibr) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :viz-shapes0-sys2
+  {:fields
+   {:shape
+    {:min "basic_h_bar",
+     :data-type "string",
+     :commons
+     {"scatterplot_nivo_color" 1, "basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1},
+     :distinct 24,
+     :group-by? false,
+     :median "drop_down_filter",
+     :max "v_param_buttons",
+     :avg "basic_h_bar (non-numeric average)",
+     :cardinality 100},
+    :recos
+    {:min 2,
+     :data-type "integer",
+     :commons {21 8, 6 3, 108 3},
+     :distinct 11,
+     :group-by? false,
+     :median 21,
+     :max 108,
+     :avg 39.5,
+     :cardinality 45}},
+   :database-type "SQLite",
+   :rowcount 24},
+  :country_drag_36
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_36) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :dl_state_drag_39
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: dl_state_drag_39) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :query-385 {:fields {}},
+  :ufo-sightings-drag-37
+  {:fields
+   {:duration_seconds_int
+    {:min 1,
+     :data-type "integer",
+     :commons {300 55, 60 45, 120 41},
+     :distinct 46,
+     :group-by? true,
+     :median 300,
+     :max 172800,
+     :avg 1397.016,
+     :cardinality 9},
+    :comments
+    {:min "&quot;Star&quot; like objects during clear day light in formation.",
+     :data-type "string",
+     :commons
+     {"18 glowing UFOs seen over Phoenix  AZ tonight&#44 10/12/12 8:45PM" 1,
+      "amber fireball descending&#44splits into 3 objects&#44stops&#44they hover above ground with erratic movements"
+      1,
+      "Slow moving bright orange light." 1},
+     :distinct 500,
+     :group-by? true,
+     :median
+     "My older brother and twin sister were leaving the only Edna theater at about 9 PM&#44...we had our bikes and I took a different route home",
+     :max
+     "witnessed a large object and an intense red light that illumiated the object.",
+     :avg
+     "This event took place in early fall around 1949-50. It occurred after a Boy Scout meeting in the Baptist Church. The Baptist Church sit (non-numeric average)",
+     :cardinality 100},
+    :city
+    {:min "addison (i-355 and us 20 (lake st.)",
+     :data-type "string",
+     :commons {"cincinnati" 5, "san diego" 5, "austin" 4},
+     :distinct 423,
+     :group-by? true,
+     :median "los angeles",
+     :max "zlatoust (russia)",
+     :avg "san marcos (non-numeric average)",
+     :cardinality 84},
+    :date_posted
+    {:min "1998-11-01",
+     :data-type "string",
+     :commons {"2013-10-14" 38, "2012-10-30" 31, "2008-10-31" 25},
+     :distinct 115,
+     :group-by? true,
+     :median "2006-12-07",
+     :max "2014-05-02",
+     :avg "2004-04-27 (non-numeric average)",
+     :cardinality 23},
+    :longitude
+    {:min -161.903334,
+     :data-type "float",
+     :commons {-122.3308333 6, -84.4569444 5, -117.1563889 5},
+     :distinct 433,
+     :group-by? true,
+     :median -78.71958335,
+     :max 178.017649,
+     :avg -85.59167632440003,
+     :cardinality 86},
+    :state
+    {:min "",
+     :data-type "string",
+     :commons {"ca" 51, "ny" 35, nil 30},
+     :distinct 53,
+     :group-by? true,
+     :median "mi",
+     :max "wv",
+     :avg "tx (non-numeric average)",
+     :cardinality 10},
+    :duration_seconds
+    {:min "1",
+     :data-type "string",
+     :commons {"300" 55, "60" 45, "120" 41},
+     :distinct 46,
+     :group-by? true,
+     :median "300",
+     :max "900",
+     :avg "2700 (non-numeric average)",
+     :cardinality 9},
+    :duration_hours
+    {:min "+5 minutes",
+     :data-type "string",
+     :commons {"1 minute" 26, "5 minutes" 24, "30 seconds" 22},
+     :distinct 225,
+     :group-by? true,
+     :median "3 minutes",
+     :max "~3 sec",
+     :avg "45 minutes (non-numeric average)",
+     :cardinality 44},
+    :id
+    {:min 1,
+     :data-type "integer",
+     :commons {84 1, 390 1, 49 1},
+     :distinct 500,
+     :group-by? true,
+     :median 323.5,
+     :max 500,
+     :avg 250.5,
+     :cardinality 100},
+    :shape
+    {:min "",
+     :data-type "string",
+     :commons {"light" 104, "circle" 50, "triangle" 46},
+     :distinct 21,
+     :group-by? true,
+     :median "light",
+     :max "unknown",
+     :avg "cylinder (non-numeric average)",
+     :cardinality 4},
+    :datetime
+    {:min "1949-10-10 20:30:00.000000",
+     :data-type "string",
+     :commons
+     {"2008-10-10 20:00:00.000000" 4,
+      "1999-10-11 20:15:00.000000" 4,
+      "2007-10-10 22:00:00.000000" 4},
+     :distinct 449,
+     :group-by? true,
+     :median "2005-10-10 22:08:00.000000",
+     :max "2013-10-11 23:15:00.000000",
+     :avg "1949-10-10 20:30:00.000000 (non-numeric average)",
+     :cardinality 89},
+    :latitude
+    {:min "-23.697479",
+     :data-type "string",
+     :commons {"47.6063889" 6, "39.1619444" 5, "32.7152778" 5},
+     :distinct 430,
+     :group-by? true,
+     :median "39.4666667",
+     :max "70.292489",
+     :avg "29.8830556 (non-numeric average)",
+     :cardinality 86},
+    :country
+    {:min "",
+     :data-type "string",
+     :commons {"us" 411, nil 55, "ca" 17},
+     :distinct 5,
+     :group-by? true,
+     :median "us",
+     :max "us",
+     :avg "us (non-numeric average)",
+     :cardinality 0}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :dl-state-drag-39
+  {:fields
+   {:dl_state
+    {:min "",
+     :data-type "string",
+     :commons {"MD" 28, "VA" 27, "NJ" 26},
+     :distinct 73,
+     :group-by? true,
+     :median "MS",
+     :max "YT",
+     :avg "MD (non-numeric average)",
+     :cardinality 5},
+    :rowcnt
+    {:min 1,
+     :data-type "integer",
+     :commons {1 109, 2 83, 3 71},
+     :distinct 303,
+     :group-by? false,
+     :median 3,
+     :max 329944,
+     :avg 1497.5560098119379,
+     :cardinality 24},
+    :color
+    {:min "",
+     :data-type "string",
+     :commons {"BLACK" 69, "SILVER" 69, "GRAY" 67},
+     :distinct 28,
+     :group-by? true,
+     :median "GREEN",
+     :max "YELLOW",
+     :avg "BLACK (non-numeric average)",
+     :cardinality 2}},
+   :database-type "MySQL",
+   :rowcount 1223},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:min ":new-flow-148843",
+     :data-type "string",
+     :commons
+     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
+     :distinct 96,
+     :group-by? true,
+     :median "eggplanter23",
+     :max "wow-test-2",
+     :avg "a-random-wow (non-numeric average)",
+     :cardinality 96},
+    :file_path
+    {:min "./flows/a-random-wow.edn",
+     :data-type "string",
+     :commons
+     {"./flows/generated-flow-map.edn" 1,
+      "./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1},
+     :distinct 99,
+     :group-by? true,
+     :median "./flows/falcon-flow-49.edn",
+     :max "./flows/yummy-linear-human-hailing-from-firth.edn",
+     :avg "./flows/a-random-wow.edn (non-numeric average)",
+     :cardinality 100},
+    :last_modified
+    {:min "2024-03-12 02:37:43",
+     :data-type "string",
+     :commons
+     {"2024-03-12 02:37:43" 66, "2024-06-22 18:16:16" 1, "2024-03-14 07:50:09" 1},
+     :distinct 34,
+     :group-by? true,
+     :median "2024-03-12 02:37:43",
+     :max "2024-08-14 10:41:01",
+     :avg "2024-08-14 10:41:01 (non-numeric average)",
+     :cardinality 34}},
+   :database-type "SQLite",
+   :rowcount 99},
+  :viz-tables-sys2
+  {:fields
+   {:table_name
+    {:min "NYPD_Arrest_Data_Year_to_Date_drag_22",
+     :data-type "string",
+     :commons {"NYPD_Arrest_Data_Year_to_Date_drag_22" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "NYPD_Arrest_Data_Year_to_Date_drag_22",
+     :max "NYPD_Arrest_Data_Year_to_Date_drag_22",
+     :avg "NYPD_Arrest_Data_Year_to_Date_drag_22 (non-numeric average)",
+     :cardinality 100},
+    :recos
+    {:min 948,
+     :data-type "integer",
+     :commons {948 1},
+     :distinct 1,
+     :group-by? false,
+     :median 948,
+     :max 948,
+     :avg 948,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
+  :State-drag-734 {:fields {}},
+  :new-clojure-sqlized
+  {:fields
+   {:ffilename
+    {:min "Screenshot_20240519_025447aa-4k.webp",
+     :data-type "string",
+     :commons
+     {"b64-image-31549-41819-4k.webp" 1,
+      "b64-image-83886-74618-4k.webp" 1,
+      "b64-image-34647-16558-4k.webp" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "b64-image-51375-69619-4k.webp",
+     :max "b64-image-92508-74703-4k.webp",
+     :avg "Screenshot_20240519_025447aa-4k.webp (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :rowcnt-drag-32
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? false,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_24) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :raw_custom_override341927123__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override341927123__block_86_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :Electric-Vehicle-Population-Data-drag-580 {:fields {}},
+  :color-drag-13
+  {:fields
+   {:color
+    {:min "",
+     :data-type "string",
+     :commons {"RED" 1, "BLUE, DARK" 1, "BLACK" 1},
+     :distinct 28,
+     :group-by? true,
+     :median "GRAY",
+     :max "YELLOW",
+     :avg "BLACK (non-numeric average)",
+     :cardinality 100},
+    :rowcnt
+    {:min 38,
+     :data-type "integer",
+     :commons {133921 1, 380227 1, 9471 1},
+     :distinct 28,
+     :group-by? false,
+     :median 167208.5,
+     :max 380227,
+     :avg 65411.107142857145,
+     :cardinality 100}},
+   :database-type "MySQL",
+   :rowcount 28},
+  :ufo_sightings_drag_37
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings_drag_37) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :new-clojure
+  {:fields
+   {:ffilename
+    {:data-type "string",
+     :distinct 1041,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1041},
+  :viz-shapes-sys2
+  {:fields
+   {:combo_edn
+    {:min "\"AGE_GROUP\"",
+     :data-type "string",
+     :commons
+     {"\"AGE_GROUP, ARREST_BORO, ARREST_KEY\"" 1,
+      "\"ARREST_KEY, Geo_Col\"" 1,
+      "\"ARREST_BORO, PERP_RACE, rows\"" 1},
+     :distinct 146,
+     :group-by? true,
+     :median "\"ARREST_KEY, Longitude\"",
+     :max "\"Y_COORD_CD, rows\"",
+     :avg "\"AGE_GROUP\" (non-numeric average)",
+     :cardinality 100},
+    :recos
+    {:min 1,
+     :data-type "integer",
+     :commons {1 32, 12 30, 6 17},
+     :distinct 10,
+     :group-by? false,
+     :median 12,
+     :max 12,
+     :avg 6.493150684931507,
+     :cardinality 6}},
+   :database-type "SQLite",
+   :rowcount 146},
+  :NYPD_Arrests_Data_Historic
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: NYPD_Arrests_Data_Historic) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :Traffic-Violations-drag-8
+  {:fields
+   {:description
+    {:min "ABANDONING VEH. ON PUBLIC PROPERTY",
+     :data-type "string",
+     :commons
+     {"DRIVER FAILURE TO OBEY PROPERLY PLACED TRAFFIC CONTROL DEVICE INSTRUCTIONS"
+      43,
+      "FAILURE TO DISPLAY REGISTRATION CARD UPON DEMAND BY POLICE OFFICER" 18,
+      "DISPLAYING EXPIRED REGISTRATION PLATE ISSUED BY ANY STATE" 18},
+     :distinct 160,
+     :group-by? true,
+     :median "EXCEEDING POSTED MAXIMUM SPEED LIMIT: 39 MPH IN A POSTED 30 MPH ZONE",
+     :max "WINDOW TINT",
+     :avg
+     "LEAVING UNATTENDED VEH. W/O STOPPING ENGINE, LOCKING IGNITION, REMOVING KEY & SETTING BRAKE (non-numeric average)",
+     :cardinality 31},
+    :belts
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 487, "Yes" 13},
+     :distinct 2,
+     :group-by? true,
+     :median "No",
+     :max "Yes",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :commercial_license
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 492, "Yes" 8},
+     :distinct 2,
+     :group-by? true,
+     :median "No",
+     :max "Yes",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :work_zone
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 500},
+     :distinct 1,
+     :group-by? true,
+     :median "No",
+     :max "No",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :time_of_stop
+    {:min "00:01:00",
+     :data-type "string",
+     :commons {"06:44:00" 15, "23:44:00" 10, "00:55:00" 9},
+     :distinct 246,
+     :group-by? true,
+     :median "15:19:00",
+     :max "23:55:00",
+     :avg "20:02:00 (non-numeric average)",
+     :cardinality 49},
+    :hazmat
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 500},
+     :distinct 1,
+     :group-by? true,
+     :median "No",
+     :max "No",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :geolocation
+    {:min "(0.0, 0.0)",
+     :data-type "string",
+     :commons
+     {"(0.0, 0.0)" 38,
+      "(39.184585, -77.2628033333333)" 15,
+      "(39.0584148333333, -77.0480111666667)" 10},
+     :distinct 254,
+     :group-by? true,
+     :median "(39.0780983333333, -77.1403783333333)",
+     :max "(39.3573416666667, -77.1671866666667)",
+     :avg "(38.9897433333333, -77.09777) (non-numeric average)",
+     :cardinality 50},
+    :personal_injury
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 490, "Yes" 10},
+     :distinct 2,
+     :group-by? true,
+     :median "No",
+     :max "Yes",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :make
+    {:min "ACUR",
+     :data-type "string",
+     :commons {"HONDA" 68, "TOYOTA" 62, "NISSAN" 33},
+     :distinct 54,
+     :group-by? true,
+     :median "HYUNDAI",
+     :max "VOLKSWAGON",
+     :avg "TOYOTA (non-numeric average)",
+     :cardinality 10},
+    :contributed_to_accident
+    {:min "False",
+     :data-type "string",
+     :commons {"False" 471, "True" 29},
+     :distinct 2,
+     :group-by? true,
+     :median "False",
+     :max "True",
+     :avg "False (non-numeric average)",
+     :cardinality 0},
+    :search_outcome
+    {:min "",
+     :data-type "string",
+     :commons {"Warning" 198, "Citation" 175, nil 106},
+     :distinct 5,
+     :group-by? true,
+     :median "Citation",
+     :max "Warning",
+     :avg "Citation (non-numeric average)",
+     :cardinality 0},
+    :color
+    {:min "BEIGE",
+     :data-type "string",
+     :commons {"BLACK" 107, "WHITE" 95, "SILVER" 94},
+     :distinct 19,
+     :group-by? true,
+     :median "GREEN, DK",
+     :max "WHITE",
+     :avg "SILVER (non-numeric average)",
+     :cardinality 3},
+    :commercial_vehicle
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 500},
+     :distinct 1,
+     :group-by? true,
+     :median "No",
+     :max "No",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :driver_state
+    {:min "DC",
+     :data-type "string",
+     :commons {"MD" 453, "DC" 21, "VA" 13},
+     :distinct 9,
+     :group-by? true,
+     :median "MD",
+     :max "WV",
+     :avg "MD (non-numeric average)",
+     :cardinality 1},
+    :vehicletype
+    {:min "01 - Motorcycle",
+     :data-type "string",
+     :commons
+     {"02 - Automobile" 468, "05 - Light Duty Truck" 19, "03 - Station Wagon" 8},
+     :distinct 5,
+     :group-by? true,
+     :median "02 - Automobile",
+     :max "28 - Other",
+     :avg "02 - Automobile (non-numeric average)",
+     :cardinality 0},
+    :search_disposition
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 484, "Nothing" 9, "Property Only" 7},
+     :distinct 3,
+     :group-by? true,
+     :median "",
+     :max "Property Only",
+     :avg " (non-numeric average)",
+     :cardinality 0},
+    :agency
+    {:min "MCP",
+     :data-type "string",
+     :commons {"MCP" 500},
+     :distinct 1,
+     :group-by? true,
+     :median "MCP",
+     :max "MCP",
+     :avg "MCP (non-numeric average)",
+     :cardinality 0},
+    :subagency
+    {:min "1st District, Rockville",
+     :data-type "string",
+     :commons
+     {"4th District, Wheaton" 94,
+      "5th District, Germantown" 80,
+      "2nd District, Bethesda" 78},
+     :distinct 7,
+     :group-by? true,
+     :median "4th District, Wheaton",
+     :max "Headquarters and Special Operations",
+     :avg "2nd District, Bethesda (non-numeric average)",
+     :cardinality 1},
+    :search_reason_for_stop
+    {:min "",
+     :data-type "string",
+     :commons {nil 106, "21-201(a1)" 57, "21-801.1" 33},
+     :distinct 62,
+     :group-by? true,
+     :median "21-201(a1)",
+     :max "64*",
+     :avg "21-1101(a) (non-numeric average)",
+     :cardinality 12},
+    :race
+    {:min "ASIAN",
+     :data-type "string",
+     :commons {"BLACK" 166, "HISPANIC" 157, "WHITE" 128},
+     :distinct 5,
+     :group-by? true,
+     :median "HISPANIC",
+     :max "WHITE",
+     :avg "BLACK (non-numeric average)",
+     :cardinality 0},
+    :search_reason
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 484, "Incident to Arrest" 14, "Probable Cause" 2},
+     :distinct 3,
+     :group-by? true,
+     :median "",
+     :max "Probable Cause",
+     :avg " (non-numeric average)",
+     :cardinality 0},
+    :article
+    {:min "",
+     :data-type "string",
+     :commons {"Transportation Article" 485, nil 14, "Maryland Rules" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "Transportation Article",
+     :max "Transportation Article",
+     :avg "Transportation Article (non-numeric average)",
+     :cardinality 0},
+    :search_arrest_reason
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 486, "Stop" 12, "Other" 2},
+     :distinct 3,
+     :group-by? true,
+     :median "",
+     :max "Stop",
+     :avg " (non-numeric average)",
+     :cardinality 0},
+    :alcohol
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 500},
+     :distinct 1,
+     :group-by? true,
+     :median "No",
+     :max "No",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :longitude
+    {:min -77.3833383333333,
+     :data-type "float",
+     :commons {0 38, -77.2628033333333 15, -77.0480111666667 10},
+     :distinct 254,
+     :group-by? true,
+     :median -77.1537583333333,
+     :max 0,
+     :avg -71.27377324766333,
+     :cardinality 50},
+    :search_type
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 484, "Both" 16},
+     :distinct 2,
+     :group-by? true,
+     :median "",
+     :max "Both",
+     :avg " (non-numeric average)",
+     :cardinality 0},
+    :state
+    {:min "DC",
+     :data-type "string",
+     :commons {"MD" 430, "VA" 42, "DC" 14},
+     :distinct 11,
+     :group-by? true,
+     :median "MD",
+     :max "WV",
+     :avg "MD (non-numeric average)",
+     :cardinality 2},
+    :fatal
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 500},
+     :distinct 1,
+     :group-by? true,
+     :median "No",
+     :max "No",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :charge
+    {:min "11-392.2",
+     :data-type "string",
+     :commons {"21-801.1" 59, "21-201(a1)" 43, "13-411(f)" 19},
+     :distinct 116,
+     :group-by? true,
+     :median "21-202(h1)",
+     :max "64*",
+     :avg "21-1101(a) (non-numeric average)",
+     :cardinality 23},
+    :year
+    {:min 1988,
+     :data-type "integer",
+     :commons {2015 40, 2016 37, 2012 32},
+     :distinct 26,
+     :group-by? true,
+     :median 2011,
+     :max 2021,
+     :avg 2010.26,
+     :cardinality 5},
+    :accident
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 471, "Yes" 29},
+     :distinct 2,
+     :group-by? true,
+     :median "No",
+     :max "Yes",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :property_damage
+    {:min "No",
+     :data-type "string",
+     :commons {"No" 480, "Yes" 20},
+     :distinct 2,
+     :group-by? true,
+     :median "No",
+     :max "Yes",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :violation_type
+    {:min "Citation",
+     :data-type "string",
+     :commons {"Warning" 266, "Citation" 220, "ESERO" 14},
+     :distinct 3,
+     :group-by? true,
+     :median "Warning",
+     :max "Warning",
+     :avg "Citation (non-numeric average)",
+     :cardinality 0},
+    :dl_state
+    {:min "DC",
+     :data-type "string",
+     :commons {"MD" 419, "DC" 30, "XX" 19},
+     :distinct 11,
+     :group-by? true,
+     :median "MD",
+     :max "XX",
+     :avg "MD (non-numeric average)",
+     :cardinality 2},
+    :latitude
+    {:min 0,
+     :data-type "float",
+     :commons {0 38, 39.184585 15, 39.0584148333333 10},
+     :distinct 253,
+     :group-by? true,
+     :median 39.0781933333333,
+     :max 39.3573416666667,
+     :avg 36.12455798528553,
+     :cardinality 50},
+    :date_of_stop
+    {:min "01/08/2021",
+     :data-type "string",
+     :commons {"08/12/2019" 159, "04/06/2021" 71, "07/26/2021" 58},
+     :distinct 29,
+     :group-by? true,
+     :median "08/11/2019",
+     :max "12/05/2020",
+     :avg "08/11/2019 (non-numeric average)",
+     :cardinality 5},
+    :arrest_type
+    {:min "A - Marked Patrol",
+     :data-type "string",
+     :commons
+     {"A - Marked Patrol" 422, "Q - Marked Laser" 42, "B - Unmarked Patrol" 18},
+     :distinct 8,
+     :group-by? true,
+     :median "A - Marked Patrol",
+     :max "R - Unmarked Laser",
+     :avg "A - Marked Patrol (non-numeric average)",
+     :cardinality 1},
+    :gender
+    {:min "F",
+     :data-type "string",
+     :commons {"M" 351, "F" 149},
+     :distinct 2,
+     :group-by? true,
+     :median "M",
+     :max "M",
+     :avg "M (non-numeric average)",
+     :cardinality 0},
+    :seqid
+    {:min "00fcda2f-c906-444a-8a12-b807291a33b0",
+     :data-type "string",
+     :commons
+     {"d35058b7-c0dd-48f9-a557-3d26f936a6b9" 15,
+      "5dc4a500-0b19-457b-8043-fffe0d1f1272" 10,
+      "d924403b-70f8-493c-bd93-bd1b41c47a85" 8},
+     :distinct 278,
+     :group-by? true,
+     :median "8be66bad-ed39-42f4-9b9f-7c7d1541b43d",
+     :max "ff93b257-5dac-4c05-ba47-f7dbe88cc087",
+     :avg "fbc324ab-bc8d-4743-ba23-7f9f370005e1 (non-numeric average)",
+     :cardinality 55},
+    :search_conducted
+    {:min "",
+     :data-type "string",
+     :commons {"No" 378, nil 106, "Yes" 16},
+     :distinct 3,
+     :group-by? true,
+     :median "No",
+     :max "Yes",
+     :avg "No (non-numeric average)",
+     :cardinality 0},
+    :driver_city
+    {:min "ADELPHI",
+     :data-type "string",
+     :commons {"SILVER SPRING" 142, "GAITHERSBURG" 71, "GERMANTOWN" 68},
+     :distinct 63,
+     :group-by? true,
+     :median "NE",
+     :max "WOODBRIDGE",
+     :avg "SILVER SPRING (non-numeric average)",
+     :cardinality 12},
+    :location
+    {:min "10241 OLD GEORGETOWN RD",
+     :data-type "string",
+     :commons
+     {"TEAKWOOD LANE @ TEAKWOOD CIR" 15,
+      "RANDOLPH RD/ GLENALLAN" 10,
+      "RTE 355/ CHRISTOPHER AVE" 9},
+     :distinct 235,
+     :group-by? true,
+     :median "MONT VILL AVE/ RUSSELL AVE",
+     :max "WOODMONT AVE @ RUGBY AVE",
+     :avg "CORDELL ST @ NORFOLK AVE. (non-numeric average)",
+     :cardinality 46},
+    :model
+    {:min "200  4DR",
+     :data-type "string",
+     :commons {"4S" 30, "CIVIC" 23, "ACCORD" 21},
+     :distinct 123,
+     :group-by? true,
+     :median "FTYPE",
+     :max "YUKON",
+     :avg "CAMRY (non-numeric average)",
+     :cardinality 24}},
+   :database-type "MySQL",
+   :rowcount 500},
+  :Electric_Vehicle_Population_Data
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: Electric_Vehicle_Population_Data) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :gen-viz-296
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x15f0d2ec \"HikariDataSource (sql-server-test-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? false,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x15f0d2ec \"HikariDataSource (sql-server-test-pool)\"]}",
+     :avg
+     "The text, ntext, and image data types cannot be compared or sorted, except when using IS NULL or LIKE operator. (non-numeric average)",
+     :cardinality 100}},
+   :database-type "Microsoft SQL Server",
+   :rowcount 4},
+  :viz-shapes
+  {:fields
+   {:axes_logic
+    {:min "{:county [:fips-county-code?], :color [:dimension?]}",
+     :data-type "string",
+     :commons
+     {"{:x [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]], :y [:measure?]}"
+      4,
+      "{:x [:and :dimension? [:or :looks-like-date? :looks-like-datetime? :is-date? :is-datetime?]], :y [:measure?]}"
+      3,
+      "{:x [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :color [:and :dimension? [:or :low-cardinality? :very-low-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :y [:measure?]}"
+      3},
+     :distinct 27,
+     :group-by? true,
+     :median
+     "{:x [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :color [:and :dimension? [:or :low-cardinality? :very-low-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :y [:measure?]}",
+     :max
+     "{:x1 [:and :dimension? [:or :low-cardinality? :very-low-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :x2 [:and :dimension? [:or :low-cardinality? :very-low-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :y [:measure?]}",
+     :avg
+     "{:dim [:and :dimension? :is-string? [:or :low-cardinality? :very-low-cardinality?]]} (non-numeric average)",
+     :cardinality 69},
+    :base_score
+    {:min 1,
+     :data-type "integer",
+     :commons {1 39},
+     :distinct 1,
+     :group-by? true,
+     :median 1,
+     :max 1,
+     :avg 1,
+     :cardinality 2},
+    :connection_id
+    {:min "system-db",
+     :data-type "string",
+     :commons {"system-db" 39},
+     :distinct 1,
+     :group-by? true,
+     :median "system-db",
+     :max "system-db",
+     :avg "system-db (non-numeric average)",
+     :cardinality 2},
+    :library_shapes
+    {:min
+     "[:box :child [:vega-lite {:width \"container\", :height :panel-height+50, :autosize \"none\", :padding {:top 0, :bottom 0, :left 0, :right 0}, :params [{:name \"tx\", :expr \"width/2\"} {:name \"ty\", :expr \"height/2\"} {:name \"zoom_precise\", :value 4, :bind {:input \"range\", :min 2, :max 30, :step 0.05}} {:name \"centerY\", :value 38.76, :bind {:input \"range\", :min -60, :max 60, :step 0.01}} {:name \"centerX\", :value -97.17, :bind {:input \"range\", :min -180, :max 180, :step 0.01}} {:name \"baseTileSize\", :value 256} {:name \"tileUrl\", :value \"https://a.tile.openstreetmap.org/\"} {:name \"zoom\", :expr \"ceil(zoom_precise)\"} {:name \"tilesCount\", :expr \"pow(2,zoom)\"} {:name \"tileSize\", :expr \"baseTileSize*pow(2,zoom_precise-zoom)\"} {:name \"maxTiles\", :expr \"ceil(max(height,width)/tileSize +1)\"} {:name \"basePoint\", :expr \"invert('projection',[0,0])\"} {:name \"dii\", :expr \"((basePoint[0]+180)/360*tilesCount)\"} {:name \"di\", :expr \"floor(dii)\"} {:name \"dx\", :expr \"round((floor(dii)-dii)*tileSize)\"} {:name \"djj\", :expr \"((1-log(tan(basePoint[1]*PI/180) + 1/cos(basePoint[1]*PI/180))/PI)/2 *tilesCount)\"} {:name \"dj\", :expr \"floor(djj)\"} {:name \"dy\", :expr \"round((floor(djj)-djj)*tileSize)\"} {:name \"scale\", :expr \"baseTileSize * pow(2,zoom_precise) / (2 * PI)\"}], :layer [[:if :condi/geo-background? {:data {:name \"tile_list\", :sequence {:start 0, :stop {:signal \"maxTiles\"}, :as \"a\"}}, :transform [{:calculate \"sequence(0,maxTiles)\", :as \"b\"} {:flatten [\"b\"]} {:calculate \"tileUrl+zoom+'/'+(datum.a+di+tilesCount)%tilesCount+'/'+((datum.b+dj))+'.png'\", :as \"url\"} {:calculate \"(datum.a * tileSize + dx)+(tileSize/2)\", :as \"x\"} {:calculate \"(datum.b * tileSize + dy)+(tileSize/2)\", :as \"y\"}], :mark {:type \"image\", :opacity 0.5, :background \"#000000\", :fill \"#000000\", :width {:signal \"tileSize\"}, :height {:signal \"tileSize\"}}, :encoding {:x {:field \"x\", :type \"quantitative\", :scale nil}, :y {:field \"y\", :type \"quantitative\", :scale nil}, :url {:field \"url\", :type \"nominal\"}}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-counties? {:data {:name \"us-counties\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"counties\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :encoding {:fill {:value \"#a500ff22\"}, :fillOpacity {:value 0.1}, :stroke {:value \"#FFA50022\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-states? {:data {:name \"us-states\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"states\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :transform [{:lookup :id, :from {:data {:values :query-preview}, :key :state-field, :fields [:state-field :color-field]}}], :encoding {:color {:field :color-field, :type \"nominal\", :scale {:scheme \"spectral\"}}, :stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/country-lines? {:data {:name \"world\", :url \"https://vega.github.io/vega-datasets/data/world-110m.json\", :format {:type \"topojson\", :feature \"countries\"}}, :mark \"geoshape\", :encoding {:fill {:value \"#FFA500\"}, :fillOpacity {:value 0.1}, :stroke {:value \"#FFA500\"}, :strokeWidth {:value 2}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}]], :background \"transparent\", :config {:view {:stroke \"transparent\"}}} {:actions false}]]",
+     :data-type "string",
+     :commons
+     {"[:box :child [:vega-lite {:width \"container\", :height :panel-height+50, :autosize \"none\", :padding {:top 0, :bottom 0, :left 0, :right 0}, :params [{:name \"tx\", :expr \"width/2\"} {:name \"ty\", :expr \"height/2\"} {:name \"zoom_precise\", :value 4, :bind {:input \"range\", :min 2, :max 30, :step 0.05}} {:name \"centerY\", :value 38.76, :bind {:input \"range\", :min -60, :max 60, :step 0.01}} {:name \"centerX\", :value -97.17, :bind {:input \"range\", :min -180, :max 180, :step 0.01}} {:name \"baseTileSize\", :value 256} {:name \"tileUrl\", :value \"https://a.tile.openstreetmap.org/\"} {:name \"zoom\", :expr \"ceil(zoom_precise)\"} {:name \"tilesCount\", :expr \"pow(2,zoom)\"} {:name \"tileSize\", :expr \"baseTileSize*pow(2,zoom_precise-zoom)\"} {:name \"maxTiles\", :expr \"ceil(max(height,width)/tileSize +1)\"} {:name \"basePoint\", :expr \"invert('projection',[0,0])\"} {:name \"dii\", :expr \"((basePoint[0]+180)/360*tilesCount)\"} {:name \"di\", :expr \"floor(dii)\"} {:name \"dx\", :expr \"round((floor(dii)-dii)*tileSize)\"} {:name \"djj\", :expr \"((1-log(tan(basePoint[1]*PI/180) + 1/cos(basePoint[1]*PI/180))/PI)/2 *tilesCount)\"} {:name \"dj\", :expr \"floor(djj)\"} {:name \"dy\", :expr \"round((floor(djj)-djj)*tileSize)\"} {:name \"scale\", :expr \"baseTileSize * pow(2,zoom_precise) / (2 * PI)\"}], :layer [[:if :condi/geo-background? {:data {:name \"tile_list\", :sequence {:start 0, :stop {:signal \"maxTiles\"}, :as \"a\"}}, :transform [{:calculate \"sequence(0,maxTiles)\", :as \"b\"} {:flatten [\"b\"]} {:calculate \"tileUrl+zoom+'/'+(datum.a+di+tilesCount)%tilesCount+'/'+((datum.b+dj))+'.png'\", :as \"url\"} {:calculate \"(datum.a * tileSize + dx)+(tileSize/2)\", :as \"x\"} {:calculate \"(datum.b * tileSize + dy)+(tileSize/2)\", :as \"y\"}], :mark {:type \"image\", :opacity 0.5, :background \"#000000\", :fill \"#000000\", :width {:signal \"tileSize\"}, :height {:signal \"tileSize\"}}, :encoding {:x {:field \"x\", :type \"quantitative\", :scale nil}, :y {:field \"y\", :type \"quantitative\", :scale nil}, :url {:field \"url\", :type \"nominal\"}}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-counties? {:data {:name \"us-counties\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"counties\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :transform [{:lookup :id, :from {:data {:values :query-preview}, :key :county-field, :fields [:county-field :color-field]}}], :encoding {:color {:field :color-field, :type \"nominal\", :scale {:scheme \"spectral\"}}, :stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-states? {:data {:name \"us-states\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"states\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :encoding {:stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/country-lines? {:data {:name \"world\", :url \"https://vega.github.io/vega-datasets/data/world-110m.json\", :format {:type \"topojson\", :feature \"countries\"}}, :mark \"geoshape\", :encoding {:fill {:value \"#FFA500\"}, :fillOpacity {:value 0.1}, :stroke {:value \"#FFA500\"}, :strokeWidth {:value 2}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}]], :background \"transparent\", :config {:view {:stroke \"transparent\"}}} {:actions false}]]"
+      2,
+      "[:nivo-treemap {:orientLabel false, :labelTextColor \"#000000\", :tile \"squarify\", :identity :name, :labelSkipSize 12, :borderColor \"#000000\", :value :y-field, :enableLabel true, :width :panel-width+70, :parentLabelPosition \"top\", :colors {:scheme \"nivo\"}, :transformation-map {:transform-select [[[:sum :y-field] :y-field] [:x2-field :name]], :from [:data], :nest-by [:x1-field :x2-field]}, :theme :theme/nivo-defaults, :leavesOnly false, :click {:c :x1-field, :x :x2-field, :y :y-field}, :label :name, :parentLabelSize 22, :parentLabelTextColor \"#ffffff\", :enableParentLabel true, :parentLabel \"id\", :height :panel-height+50, :margin {:top 15, :right 5, :bottom 15, :left 15}, :data :query-preview}]"
+      1,
+      "[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
+      1},
+     :distinct 38,
+     :group-by? true,
+     :median
+     "[:v-box :size \"auto\" :height :half-panel-height-px :style {:padding-left \"8px\", :padding-right \"8px\"} :children [[:h-box :justify :between :children [[:box :padding \"16px\" :child [:number :query-preview/agg.0] :style {:font-size \"39px\", :color \"#ffffff\"}] [:h-box :padding \"13px\" :size \"auto\" :children [[:icon :md-icon-name [:if :condi/up-or-down? \"zmdi-chevron-up\" \"zmdi-chevron-down\"] :style {:font-size \"55px\", :color [:if :condi/up-or-down? \"#20f323\" \"#f36464\"], :opacity 0.5, :margin-top \"8px\"}] [:box :child [:percent :query-preview-2/diff.0] :style {:font-size \"25px\", :padding \"15px\"}]]]]] [:box :style {:margin-top \"-10px\"} :size \"auto\" :child [:vega-lite {:layer [{:encoding {:x {:field :x-field, :type \"temporal\", :title nil, :sort \"x\"}, :y {:aggregate \"sum\", :field :agg, :title nil, :scale {:zero false}, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"purples\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"line\", :interpolate \"monotone\", :line true, :point true, :tooltip {:content \"encoding\"}}}], :data {:values :query-preview}, :config {:view {:stroke \"transparent\"}, :line {:strokeWidth 3}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#afafaf\", :titleFont \"Lato\", :titleColor \"#282828\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width :panel-width, :height :half-panel-height, :padding 4, :background \"transparent\"} {:actions false}]] [:box :align :center :justify :center :style {:padding-top \"133px\", :font-size \"20px\"} :child [:string [:x-field \" vs \" :y-field]]]]]",
+     :max
+     "{:reech [:> :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:> :PieChart {:margin {:top 20, :right 20, :bottom 20, :left 20}} [:> :Pie {:nameKey :name, :fill \"#8884d8\", :on-click [:set-recharts-param>], :outerRadius 80, :dataKey :value, :cx \"50%\", :label true, :cy \"50%\", :data :query-preview}] [:> :Tooltip]]]}",
+     :avg
+     "[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2] (non-numeric average)",
+     :cardinality 97},
+    :selected_view
+    {:min "",
+     :data-type "string",
+     :commons {"" 34, ":reech" 4, ":grid" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "",
+     :max ":reech",
+     :avg " (non-numeric average)",
+     :cardinality 7},
+    :run_id
+    {:min 0,
+     :data-type "integer",
+     :commons {0 39},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 2},
+    :shape_name
+    {:min "basic_h_bar",
+     :data-type "string",
+     :commons
+     {"scatterplot_nivo_color" 1, "point_map_freq" 1, "basic_h_bar_avg_color" 1},
+     :distinct 39,
+     :group-by? true,
+     :median "pie_nivo",
+     :max "v_param_buttons",
+     :avg "h_param_buttons (non-numeric average)",
+     :cardinality 100},
+    :sql_maps
+    {:min
+     "[{:select [:county-field :color-field], :from [:table], :group-by [:county-field]}]",
+     :data-type "string",
+     :commons
+     {"[{:select [[[[:sum :y-field]] :y-field] :x-field], :from [:table], :group-by [:x-field]}]"
+      8,
+      "[{:select [[[[:sum :y-field]] :y-field] :x-field :color-field], :from [:table], :group-by [:x-field :color-field]}]"
+      4,
+      "[{:select [[[[:sum :y-field]] :agg] :x-field], :from [:table], :order-by [[:x-field :desc]], :group-by [:x-field]} {:select [[[:max [:round [:raw [\"(100 * ((\" :query-preview/agg.0 \".0 - \" :query-preview/agg.1 \".0) / \" :query-preview/agg.0 \".0))\"]] 2]] :diff]]}]"
+      2},
+     :distinct 26,
+     :group-by? true,
+     :median
+     "[{:select [[[[:avg :y-field]] :y-field] :x-field :color-field], :from [:table], :group-by [:x-field :color-field]}]",
+     :max
+     "[{:select-distinct [:lat-field :long-field], :from [:table]} {:select [[[:min :long-field] :min-long] [[:max :long-field] :max-long] [[:min :lat-field] :min-lat] [[:max :lat-field] :max-lat] [[:avg :lat-field] :a-lat] [[:avg :long-field] :a-long] [[:round [:raw [\"(\" [:max :long-field] \" - \" [:min :long-field] \") * 55\"]] 2] :long_diff] [[:round [:raw [\"(\" [:max :lat-field] \" - \" [:min :lat-field] \") * 55\"]] 2] :lat_diff]], :from [:table], :where [:and [:<> :lat-field -1] [:<> :lat-field nil] [:<> :long-field -1] [:<> :long-field nil]]}]",
+     :avg
+     "[{:select [:dim-field], :from [:table], :group-by [:dim-field], :order-by [:dim-field]} {:vselect [:box :size \"auto\" :height :panel-height+50-px :align :center :justify :center :attr {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style {:border [:if [:= :dim-field :panel-key/dim-field] \"4px solid orange\" \"4px solid #ffffff04\"], :color [:if [:= :dim-field :panel-key/dim-field] \"#ffffff\" \"inherit\"], :cursor \"pointer\", :font-size \"33px\"} :child [:string :dim-field]], :from :query-preview}] (non-numeric average)",
+     :cardinality 66}},
+   :database-type "SQLite",
+   :rowcount 39},
+  :country_drag_24
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_24) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :query-1057
+  {:fields
+   {:rowcnt
+    {:min 1831511,
+     :data-type "integer",
+     :commons {1831511 1},
+     :distinct 1,
+     :group-by? false,
+     :median 1831511,
+     :max 1831511,
+     :avg 1831511,
+     :cardinality 100}},
+   :database-type "MySQL",
+   :rowcount 1},
+  :meteorite_landings
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: meteorite_landings) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :city-drag-32
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? false,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_24) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :bigfoot_sightings_locations
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: bigfoot_sightings_locations) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 1, ":clojure-base" 1},
+     :distinct 2,
+     :group-by? true,
+     :median ":clojure-base",
+     :max ":rabbit-base",
+     :avg ":clojure-base (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 2},
+  :cached-country-drag-36
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_36) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:min "*cache-db*",
+     :data-type "string",
+     :commons {"*cache-db*" 5, "SQLite" 3, "MySQL" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "ClickHouse",
+     :max "Vertica Database",
+     :avg "*cache-db* (non-numeric average)",
+     :cardinality 50},
+    :connection_id
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"history-db" 1, "bigfoot-ufos" 1, "clickhouse-test" 1},
+     :distinct 12,
+     :group-by? true,
+     :median "history-db",
+     :max "vertica-test",
+     :avg "sql-server-test (non-numeric average)",
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:min 0,
+     :data-type "integer",
+     :commons {0 12},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 8}},
+   :database-type "SQLite",
+   :rowcount 12},
+  :Meteorite_Landings
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: Meteorite_Landings) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :rowcnt-drag-12
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? false,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_24) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :raw_custom_override_2058175520__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_2058175520__block_86_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :customer_dimension
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: customer_dimension) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :cached-country-drag-24-1
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: country_drag_24) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:min "Electric_Vehicle_Population_Data_2_drag_16",
+     :data-type "string",
+     :commons
+     {"meteorite_landings_drag_35" 1,
+      "meteorite_landings_drag_2" 1,
+      "main_boston_ibr_drag_35" 1},
+     :distinct 8,
+     :group-by? true,
+     :median "Traffic_Violations_drag_30",
+     :max "meteorite_landings_drag_35",
+     :avg "Electric_Vehicle_Population_Data_2_drag_16 (non-numeric average)",
+     :cardinality 100},
+    :cnt
+    {:min 176,
+     :data-type "integer",
+     :commons {385 2, 2430 1, 3460 1},
+     :distinct 7,
+     :group-by? false,
+     :median 1911.5,
+     :max 3472,
+     :avg 1450.875,
+     :cardinality 87}},
+   :database-type "SQLite",
+   :rowcount 8},
+  :cached-dl-state-drag-39
+  {:fields
+   {:dl_state
+    {:min "",
+     :data-type "string",
+     :commons {"MD" 28, "DC" 24, "VA" 24},
+     :distinct 55,
+     :group-by? true,
+     :median "MT",
+     :max "XX",
+     :avg "MD (non-numeric average)",
+     :cardinality 10},
+    :rowcnt
+    {:min 30,
+     :data-type "integer",
+     :commons {31 11, 42 9, 30 8},
+     :distinct 274,
+     :group-by? true,
+     :median 38.5,
+     :max 329944,
+     :avg 3651.554,
+     :cardinality 54},
+    :color
+    {:min "",
+     :data-type "string",
+     :commons {"SILVER" 54, "BLACK" 52, "WHITE" 51},
+     :distinct 28,
+     :group-by? true,
+     :median "GREEN",
+     :max "YELLOW",
+     :avg "BLACK (non-numeric average)",
+     :cardinality 5}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :Electric_Vehicle_Population_Data_2
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: Electric_Vehicle_Population_Data_2) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :country-drag-36
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? false,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x27e1c83 \"HikariDataSource (cache-db-pool)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings_drag_37) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 34,
+     :group-by? true,
+     :median ":get-colors",
+     :max ":write-file",
+     :avg ":* (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 34},
+  :Traffic_Violations
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: Traffic_Violations) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4}},
+ :default-col-widths
+ {:block-4432 {:rowcnt-drag-32 161},
+  :block-3278 {:bigfoot-sightings-locations-drag-12 100},
+  :block-2467 {:Electric-Vehicle-Population-Data-2-drag-16 100},
+  :block-145 {:NYPD-Arrest-Data-Year-to-Date-drag-22 100},
+  :block-6904 {:cached-ufo-sightings-drag-37 1411},
+  :block-1795 {:city-drag-32 361},
+  :block-970 {:gen-viz-1119 255},
+  :block-86 {:new-clojure-sqlized 361},
+  :block-4748 {:Traffic-Violations-drag-16 ##Inf},
+  :block-1832 {:Make-drag-801 ##Inf},
+  :block-130 {:gen-viz-296 511},
+  :block-5365 {:Electric-Range-drag-990 ##Inf},
+  :block-3189 {:cached-country-drag-36 511},
+  :block-3803 {:main-boston-ibr-drag-43 ##Inf},
+  :block-445 {:gen-viz-503 511},
+  :block-11205 {:color-drag-13 180},
+  :block-971 {:gen-viz-577 511},
+  :system-connections-list* {:connections-sys 126},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-3476 {:meteorite-landings-drag-35 106},
+  :block-3615 {:Meteorite-Landings-drag-16 ##Inf},
+  :block-4030 {:Electric-Vehicle-Population-Data-drag-27 ##Inf},
+  :block-9535 {:Traffic-Violations-drag-8 100},
+  :block-3352 {:State-drag-734 ##Inf},
+  :block-6035 {:NYPD-Arrests-Data-Historic-drag-3 ##Inf},
+  :block-485 {:query-1057 211},
+  :block-10336 {:Electric-Vehicle-Population-Data-drag-580 ##Inf},
+  :block-5886 {:rowcnt-drag-12 161},
+  :block-5215 {:query-385 ##Inf},
+  :block-6277 {:cached-country-drag-24-1 411},
+  :block-4490 {:dl-state-drag-39 120, :cached-dl-state-drag-39 120},
+  :system-tables-list* {:tables-sys 133},
+  :block-10693 {:customer-dimension-drag-44 ##Inf}},
+ :runstream-drops nil,
+ :data-hash -1731103926,
+ :tabs ["background picker"],
+ :mat-pct {:cached-dl-state-drag-39 100},
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :new-block-rand
+   ["Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "It's no use going back to yesterday, because I was a different person then."
+    "Who in the world am I? Ah, that's the great puzzle..."
+    "Curiouser and curiouser!"
+    "If you don't know where you are going any road can take you there."
+    "We're all mad here."
+    "I can't go back to yesterday because I was a different person then."
+    "It's always tea-time."
+    "Begin at the beginning and go on till you come to the end; then stop."
+    "I knew who I was this morning, but I've changed a few times since then."
+    "How long is forever? Sometimes, just one second."
+    "If everybody minded their own business, the world would go around a great deal faster than it does."
+    "I don't think... then you shouldn't talk, said the Hatter."
+    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+    "Well, I never heard it before, but it sounds uncommon nonsense."
+    "Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "We're all mad here."
+    "How long is forever? Sometimes, just one second."
+    "The world is full of obvious things which nobody by any chance ever observes."
+    "Reality is that which, when you stop believing in it, doesn't go away."
+    "The sky above the port was the color of television, tuned to a dead channel."
+    "Information wants to be free."
+    "The future is already here – it's just not evenly distributed."
+    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+    "The 'Net is a waste of time, and that's exactly what's right about it."
+    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+    "The street finds its own uses for things."
+    "Accelerated world. Accelerated nervous system to go with it."
+    "The future has arrived — it's just not evenly distributed yet."
+    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+    "When you want to know how things really work, study them when they're coming apart."
+    "The human sensory system is a lot more complex and weird than most people realize."
+    "Time moves in one direction, memory in another."
+    "The only thing that keeps you sane is to think that it's all a bad dream."
+    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+    "Secrets are not the same as surprises."
+    "Neuromancer. The lane to the land of the dead."],
+   :modes
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
+    [:pre
+     {:style
+      {:color :theme/editor-outer-rim-color,
+       :background-color "#00000000",
+       :border "none",
+       :text-shadow "4px 4px 4px #00000088",
+       :font-size "17px",
+       :font-family :theme/monospaced-font}}
+     [:str :*data]],
+    :edn [:edn :*data],
+    :clover [:box :child :*data],
+    :pretty [:pretty-box :*data],
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
+   :kits {},
+   :clover-templates
+   {:color-theft
+    {:args [:*input],
+     :body
+     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
+    :pretty-box
+    {:args [:*input],
+     :body
+     [:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:color :theme/editor-outer-rim-color,
+       :font-size [:auto-size-px [:str :*input]]}
+      :child
+      [:str :*input]]},
+    :new-block-quotes-box
+    {:args [:*input],
+     :body
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "21px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      [:speak [:str :*input]]]},
+    :clj
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
+    :clj2
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
+    :cheese-burger
+    {:args [:x],
+     :body
+     [:box
+      :style
+      {:color "yellow", :font-size "23px"}
+      :child
+      [:str :x "CHEESEBURGER!"]]}},
+   :openai-api-key "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",
+   :eleven-labs-default-voice-name "Not OG Buffy",
+   :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+   :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alarm-clock-tv"
+    "alarm-clock2"
+    "alarm-clock23"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "base-test-perf"
+    "base-test-perf22"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "blackberries"
+    "blackberries2"
+    "blackberries3"
+    "blank-blue"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "dirty-purple"
+    "duality-of-lepus33aa"
+    "error-monitor"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "error-monitor-vanessa5"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "light-theme"
+    "looking-glass-redux-viking"
+    "looking-glass-redux2"
+    "looking-glass-redux23abb"
+    "looking-glass-redux23b"
+    "looking-glass-redux2aa"
+    "looking-glass-redux79"
+    "looking-glass-sine-wave"
+    "luck-of-the-irish"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "new-age-hacking"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "nostromo-console"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "pnw-demo-dash-llm-training"
+    "pnw-demo-dash-llm-training11"
+    "pomp-girl1"
+    "pomp-girl2"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "repl-demo-july23"
+    "retro-machines"
+    "riffle-test"
+    "server-stats"
+    "server-stats2"
+    "server-stats2a"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "solver-test"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "system-monitor"
+    "system-monitor2"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "tes-save1"
+    "test-blog-screen"
+    "the-future-soon"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-memo"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test1"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"]}},
+ :runstreams nil,
+ :editor? false,
+ :buffy? false,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[nil :queries nil]
+   [:reco-preview :queries :query-preview]
+   [:block-4432 :queries :rowcnt-drag-32]
+   [:block-3278 :queries :bigfoot-sightings-locations-drag-12]
+   [:block-6904 :queries :ufo-sightings-drag-37]
+   [:block-6904 :queries :cached-ufo-sightings-drag-37]
+   [:block-1795 :queries :city-drag-32]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-1832 :queries :Make-drag-801]
+   [:block-989 :queries :gen-viz-401]
+   [:reco-preview-1140256918 :queries :query-preview-1140256918]
+   [:block-130 :queries :gen-viz-296]
+   [:block-5365 :queries :Electric-Range-drag-990]
+   [:block-3189 :queries :country-drag-36]
+   [:block-3189 :queries :cached-country-drag-36]
+   [:block-11205 :queries :color-drag-13]
+   [:reco-preview-105879371 :queries :query-preview-105879371]
+   [:block-3284 :queries :new-clojure-2-sqlized]
+   [:block-9535 :queries :Traffic-Violations-drag-8]
+   [:block-167 :queries :gen-viz-211]
+   [:reco-preview-1076133407 :queries :query-preview-1076133407]
+   [:block-3352 :queries :State-drag-734]
+   [:block-485 :queries :query-1057]
+   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
+   [:block-5886 :queries :rowcnt-drag-12]
+   [:block-5215 :queries :query-385]
+   [:block-6277 :queries :country-drag-24]
+   [:block-6277 :queries :cached-country-drag-24-1]
+   [:block-4490 :queries :dl-state-drag-39]
+   [:block-4490 :queries :cached-dl-state-drag-39]
+   [:reco-preview-1105189881 :queries :query-preview-1105189881]],
+  [:clojure :count-map-keys] [],
+  [:clojure :new-lundberg] [[:* :* :*]],
+  [:clojure :view-lundberg]
+  [[:reco-preview :views :oz]
+   [:block-451 :views :editor-block-2361-hare-vw-2]
+   [:block-467 :views :hare-vw-1]
+   [:block-9956 :views :vv]
+   [:block-86 :views :hare-vw]
+   [:block-989 :views :oz]
+   [:reco-preview-1140256918 :views :oz]
+   [:block-130 :views :oz]
+   [:reco-preview-105879371 :views :oz]
+   [:block-3375 :views :hare-vw-5]
+   [:block-167 :views :oz]
+   [:reco-preview-1076133407 :views :oz]
+   [:block-485 :views :hare-vw-3]
+   [:block-11449 :views :clover-hop]
+   [:block-5215 :views :hi]
+   [:block-2361 :views :hare-vw-2]
+   [:reco-preview-1105189881 :views :oz]],
+  [:clojure :gen-ev] [],
+  [:outliers :get-outliers]
+  [[nil :queries nil]
+   [:reco-preview :queries :query-preview]
+   [:block-4432 :queries :rowcnt-drag-32]
+   [:block-3278 :queries :bigfoot-sightings-locations-drag-12]
+   [:block-6904 :queries :ufo-sightings-drag-37]
+   [:block-6904 :queries :cached-ufo-sightings-drag-37]
+   [:block-1795 :queries :city-drag-32]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-1832 :queries :Make-drag-801]
+   [:block-989 :queries :gen-viz-401]
+   [:reco-preview-1140256918 :queries :query-preview-1140256918]
+   [:block-130 :queries :gen-viz-296]
+   [:block-5365 :queries :Electric-Range-drag-990]
+   [:block-3189 :queries :country-drag-36]
+   [:block-3189 :queries :cached-country-drag-36]
+   [:block-11205 :queries :color-drag-13]
+   [:reco-preview-105879371 :queries :query-preview-105879371]
+   [:block-3284 :queries :new-clojure-2-sqlized]
+   [:block-9535 :queries :Traffic-Violations-drag-8]
+   [:block-167 :queries :gen-viz-211]
+   [:reco-preview-1076133407 :queries :query-preview-1076133407]
+   [:block-3352 :queries :State-drag-734]
+   [:block-485 :queries :query-1057]
+   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
+   [:block-5886 :queries :rowcnt-drag-12]
+   [:block-5215 :queries :query-385]
+   [:block-6277 :queries :country-drag-24]
+   [:block-6277 :queries :cached-country-drag-24-1]
+   [:block-4490 :queries :dl-state-drag-39]
+   [:block-4490 :queries :cached-dl-state-drag-39]
+   [:reco-preview-1105189881 :queries :query-preview-1105189881]]},
+ :memory [476870483 454322479 4294705152],
+ :client-name :vital-bulbous-mouse-20,
+ :flow-editor? true,
+ :window {:w 2191, :h 1209},
+ :quake-console? false,
+ :implicit-rowsets {:solver [:new-clojure nil]},
+ :post-meta
+ {:flow-fn-sys
+  {:description {:distinct 32},
+   :category {:distinct 2},
+   :* {:rowcount 34},
+   :name {:distinct 34},
+   :icon {:distinct 20},
+   :input_types {:distinct 17},
+   :inputs {:distinct 20},
+   :output_types {:distinct 8},
+   :full_map {:distinct 34}},
+  :fields-sys
+  {:* {:rowcount 21},
+   :field_name {:distinct 21},
+   :field_type {:distinct 2},
+   :data_type {:distinct 2}},
+  :tables-sys
+  {:* {:rowcount 11},
+   :db_schema {:distinct 1},
+   :db_catalog {:distinct 0},
+   :connection_id {:distinct 1},
+   :schema_cat {:distinct 0},
+   :table_name {:distinct 11},
+   :fields {:distinct 8}},
+  :mad-libs-viz {:* {:rowcount 0}},
+  :bigfoot-sightings-locations-drag-12
+  {:nearestroad {:distinct 3771},
+   :water_area {:distinct 1318},
+   :housing_units {:distinct 1316},
+   :date {:distinct 1161},
+   :* {:rowcount 5035},
+   :locationdetails {:distinct 4205},
+   :submitted_date {:distinct 3521},
+   :bfroid {:distinct 5035},
+   :cty_abbrev {:distinct 50},
+   :otherwitnesses {:distinct 3704},
+   :run_id {:distinct 1},
+   :fips_county_code {:distinct 176},
+   :cty_name {:distinct 922},
+   :nearesttown {:distinct 3800},
+   :timeandconditions {:distinct 4477},
+   :month {:distinct 12},
+   :county {:distinct 1039},
+   :land_area {:distinct 1330},
+   :longitude {:distinct 4287},
+   :state {:distinct 49},
+   :zipcode {:distinct 2512},
+   :fixed_month {:distinct 12},
+   :submitted {:distinct 3522},
+   :fips_state_code {:distinct 50},
+   :state_abbrev {:distinct 50},
+   :title {:distinct 5031},
+   :otherstories {:distinct 2939},
+   :year {:distinct 430},
+   :season {:distinct 5},
+   :state_name {:distinct 50},
+   :class {:distinct 3},
+   :population {:distinct 1324},
+   :zip_long {:distinct 2512},
+   :alsonoticed {:distinct 2964},
+   :zip_lat {:distinct 2512},
+   :url {:distinct 5035},
+   :latitude {:distinct 4286},
+   :observed {:distinct 4997},
+   :environment {:distinct 4677},
+   :fixed_year {:distinct 132},
+   :run_time {:distinct 2121},
+   :zip_name {:distinct 2116}},
+  :country-drag-24
+  {:* {:rowcount 20182},
+   :country {:distinct 5},
+   :rowcnt {:distinct 142},
+   :city {:distinct 19898}},
+  :recos-sys2
+  {:* {:rowcount 24},
+   :query_map {:distinct 21},
+   :shape_name {:distinct 24},
+   :w {:distinct 2},
+   :combo_edn {:distinct 21},
+   :query_map_str {:distinct 21},
+   :selected_view {:distinct 2},
+   :combo_hash {:distinct 24},
+   :h {:distinct 3},
+   :condis {:distinct 2},
+   :score {:distinct 3},
+   :table_name {:distinct 1},
+   :connection_id {:distinct 1},
+   :context_hash {:distinct 1},
+   :viz_map {:distinct 24}},
+  :NYPD_Arrest_Data_Year_to_Date {},
+  :viz-shapes0-sys2
+  {:* {:rowcount 25}, :shape {:distinct 25}, :recos {:distinct 6}},
+  :dl_state_drag_39 {},
+  :ufo-sightings-drag-37
+  {:* {:rowcount 80332},
+   :duration_seconds_int {:distinct 536},
+   :comments {:distinct 79997},
+   :city {:distinct 19898},
+   :date_posted {:distinct 317},
+   :longitude {:distinct 19455},
+   :state {:distinct 67},
+   :duration_seconds {:distinct 537},
+   :duration_hours {:distinct 8349},
+   :id {:distinct 80332},
+   :shape {:distinct 29},
+   :datetime {:distinct 69434},
+   :latitude {:distinct 18445},
+   :country {:distinct 5}},
+  :dl-state-drag-39
+  {:* {:rowcount 1223},
+   :dl_state {:distinct 72},
+   :rowcnt {:distinct 303},
+   :color {:distinct 27}},
+  :viz-tables-sys2
+  {:* {:rowcount 1}, :table_name {:distinct 1}, :recos {:distinct 1}},
+  :new-clojure-sqlized {:* {:rowcount 1041}, :ffilename {:distinct 1041}},
+  :raw_custom_override341927123__block_86_clojure_new_clojure_ {},
+  :color-drag-13 {:* {:rowcount 28}, :color {:distinct 27}, :rowcnt {:distinct 28}},
+  :viz-shapes-sys2
+  {:* {:rowcount 146}, :combo_edn {:distinct 146}, :recos {:distinct 10}},
+  :Traffic-Violations-drag-8
+  {:description {:distinct 15616},
+   :belts {:distinct 2},
+   :commercial_license {:distinct 2},
+   :work_zone {:distinct 2},
+   :time_of_stop {:distinct 1440},
+   :* {:rowcount 1831511},
+   :hazmat {:distinct 2},
+   :geolocation {:distinct 904778},
+   :personal_injury {:distinct 2},
+   :make {:distinct 4486},
+   :contributed_to_accident {:distinct 2},
+   :search_outcome {:distinct 5},
+   :color {:distinct 27},
+   :commercial_vehicle {:distinct 2},
+   :driver_state {:distinct 68},
+   :vehicletype {:distinct 33},
+   :search_disposition {:distinct 6},
+   :agency {:distinct 1},
+   :subagency {:distinct 9},
+   :search_reason_for_stop {:distinct 790},
+   :race {:distinct 6},
+   :search_reason {:distinct 10},
+   :article {:distinct 5},
+   :search_arrest_reason {:distinct 9},
+   :alcohol {:distinct 2},
+   :longitude {:distinct 377094},
+   :search_type {:distinct 6},
+   :state {:distinct 71},
+   :fatal {:distinct 2},
+   :charge {:distinct 1133},
+   :year {:distinct 392},
+   :accident {:distinct 2},
+   :property_damage {:distinct 2},
+   :violation_type {:distinct 4},
+   :dl_state {:distinct 72},
+   :latitude {:distinct 333985},
+   :date_of_stop {:distinct 4035},
+   :arrest_type {:distinct 19},
+   :gender {:distinct 3},
+   :seqid {:distinct 1036362},
+   :search_conducted {:distinct 2},
+   :driver_city {:distinct 8740},
+   :location {:distinct 242562},
+   :model {:distinct 21543}},
+  :gen-viz-296 {},
+  :viz-shapes
+  {:library_shapes {:distinct 38},
+   :* {:rowcount 39},
+   :shape_name {:distinct 39},
+   :run_id {:distinct 1},
+   :selected_view {:distinct 3},
+   :axes_logic {:distinct 27},
+   :base_score {:distinct 1},
+   :connection_id {:distinct 1},
+   :sql_maps {:distinct 26}},
+  :query-1057 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
+  :meteorite_landings {},
+  :connections-sys
+  {:* {:rowcount 12},
+   :database_name {:distinct 6},
+   :connection_id {:distinct 12},
+   :styler_highlight_8717ssa {:distinct 1}},
+  :raw_custom_override_2058175520__block_86_clojure_new_clojure_ {},
+  :customer_dimension {},
+  :reco-counts {:* {:rowcount 6}, :table_name {:distinct 6}, :cnt {:distinct 5}},
+  :cached-dl-state-drag-39
+  {:* {:rowcount 1223},
+   :dl_state {:distinct 72},
+   :rowcnt {:distinct 303},
+   :color {:distinct 27}},
+  :Electric_Vehicle_Population_Data_2 {},
+  :Traffic_Violations {}},
+ :flow-estimates
+ {:flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :mad-libs-viz {:times 0.005, :run-id :mad-libs-viz},
+  :query-preview-726074229 {:times 0.009, :run-id :query-preview-726074229},
+  :bigfoot-sightings-locations-drag-12
+  {:times 0.034, :run-id :bigfoot-sightings-locations-drag-12},
+  :country-drag-24 {:times 0.125, :run-id :country-drag-24},
+  :recos-sys2 {:times 0.052, :run-id :recos-sys2},
+  :viz-shapes0-sys2 {:times 0.038, :run-id :viz-shapes0-sys2},
+  :query-preview-1834663129 {:times 0.23, :run-id :query-preview-1834663129},
+  :ufo-sightings-drag-37 {:times 0.018, :run-id :ufo-sightings-drag-37},
+  :dl-state-drag-39 {:times 2.946, :run-id :dl-state-drag-39},
+  :query-preview-1693067394 {:times 0.137, :run-id :query-preview-1693067394},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :Electric-Vehicle-Population-Data-2-drag-16
+  {:times 0.036, :run-id :Electric-Vehicle-Population-Data-2-drag-16},
+  :customer-dimension-drag-44 {:times 0.043, :run-id :customer-dimension-drag-44},
+  :query-preview1177742023 {:times 0.196, :run-id :query-preview1177742023},
+  :viz-tables-sys2 {:times 0.031, :run-id :viz-tables-sys2},
+  :new-clojure-sqlized {:times 0.002, :run-id :new-clojure-sqlized},
+  :Electric-Vehicle-Population-Data-drag-27
+  {:times 0.006, :run-id :Electric-Vehicle-Population-Data-drag-27},
+  :meteorite-landings-drag-35 {:times 0.021, :run-id :meteorite-landings-drag-35},
+  :color-drag-13 {:times 71.305, :run-id :color-drag-13},
+  :NYPD-Arrests-Data-Historic-drag-3
+  {:times 0.007, :run-id :NYPD-Arrests-Data-Historic-drag-3},
+  :query-preview-1533118677 {:times 0.168, :run-id :query-preview-1533118677},
+  :viz-shapes-sys2 {:times 0.117, :run-id :viz-shapes-sys2},
+  :Traffic-Violations-drag-8 {:times 0.045, :run-id :Traffic-Violations-drag-8},
+  :Traffic-Violations-drag-16 {:times 0.011, :run-id :Traffic-Violations-drag-16},
+  :refresh-clickhouse-test {:times 0.008, :run-id :refresh-clickhouse-test},
+  :viz-shapes {:times 0.002, :run-id :viz-shapes},
+  :query-preview-1261557982 {:times 0.263, :run-id :query-preview-1261557982},
+  :query-1057 {:times 3.786, :run-id :query-1057},
+  :query-preview-75673601 {:times 0.111, :run-id :query-preview-75673601},
+  :query-preview804620096 {:times 0.202, :run-id :query-preview804620096},
+  :query-preview1641607438 {:times 0.121, :run-id :query-preview1641607438},
+  :flow-fn-categories-sys {:times 0.001, :run-id :flow-fn-categories-sys},
+  :query-preview-678328371 {:times 0.35, :run-id :query-preview-678328371},
+  :query-preview-42044337 {:times 0.01, :run-id :query-preview-42044337},
+  :raw-custom-override-773588708
+  {:times 0.011, :run-id :raw-custom-override-773588708},
+  :query-preview1607913060 {:times 0.12, :run-id :query-preview1607913060},
+  :query-preview926163586 {:times 0.17, :run-id :query-preview926163586},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :NYPD-Arrest-Data-Year-to-Date-drag-22
+  {:times 0.038, :run-id :NYPD-Arrest-Data-Year-to-Date-drag-22},
+  :Meteorite-Landings-drag-16 {:times 0.007, :run-id :Meteorite-Landings-drag-16},
+  :reco-counts {:times 0.012, :run-id :reco-counts},
+  :cached-dl-state-drag-39 {:times 0.003, :run-id :cached-dl-state-drag-39},
+  :query-preview-2073789659 {:times 0.394, :run-id :query-preview-2073789659},
+  :flow-fn-all-sys {:times 0.001, :run-id :flow-fn-all-sys}},
+ :status
+ {:heartbeat
+  {:kick
+   [:solver/raw-custom-override-773588708
+    :solver-status/vital-bulbous-mouse-20>raw-custom-override-2058175520>running?
+    :solver/raw-custom-override-2058175520
+    :solver-status/vital-bulbous-mouse-20>get-my-colors-1106579780>running?
+    :solver-meta/raw-custom-override-2058175520>output>evald-result>value-hash
+    :solver/get-my-colors-1549798807
+    :flow-status/my-new-flow2225>*running?
+    :solver-status/vital-bulbous-mouse-20>get-my-colors-1549798807>running?
+    :solver/get-my-colors-1106579780
+    :kit/kicks>vital-bulbous-mouse-20
+    :solver-status/vital-bulbous-mouse-20>raw-custom-override-773588708>running?]},
+  :reco
+  {:meteorite-landings-drag-35 :done,
+   :Electric-Vehicle-Population-Data-2-drag-16 :done,
+   :NYPD-Arrest-Data-Year-to-Date-drag-22 :done,
+   :Traffic-Violations-drag-8 :done},
+  :alert2 {:alerts :alert2},
+  :alert3 {:alerts :alert2}},
+ :screen-name "dynamic-theme-example1",
+ :recos-page2 4,
+ :selected-tab "background picker",
+ :col-names nil,
+ :snapshots nil,
+ :alerts
+ [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:box
+     :child
+     "sent screen save request to server... Please wait."
+     :style
+     {:font-size "12px", :opacity 0.66}]]
+   11
+   0.5
+   4423
+   -1247625457]],
+ :recos-page 0,
+ :rs-overrides-hashmap {},
+ :base-sniff-queries
+ {:NYPD_Arrest_Data_Year_to_Date 219988061,
+  :main_boston_ibr 1154335123,
+  :country_drag_36 504085189,
+  :dl_state_drag_39 -2069855834,
+  :raw_custom_override341927123__block_86_clojure_new_clojure_ -1941578138,
+  :ufo_sightings_drag_37 553591323,
+  :NYPD_Arrests_Data_Historic 583968570,
+  :Electric_Vehicle_Population_Data 1659044548,
+  :country_drag_24 -1623429091,
+  :meteorite_landings 1129642037,
+  :bigfoot_sightings_locations -435790458,
+  :ufo_sightings 484893751,
+  :Meteorite_Landings 1600924701,
+  :raw_custom_override_2058175520__block_86_clojure_new_clojure_ 2139886593,
+  :customer_dimension -1635887376,
+  :Electric_Vehicle_Population_Data_2 -469738,
+  :Traffic_Violations 2095797941},
+ :user-params-hash -1093756612,
+ :grid-recos? true,
+ :preview-keys2 ["-105879371" "-1140256918" "-1105189881" "-1076133407"],
+ :resolved-queries
+ {nil {:_last-run "08:01:49"},
+  :query-preview
+  {:select
+   [[[[:avg :Electric_Range]] :Electric_Range]
+    :Make
+    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
+   :from
+   [[{:select
+      [:Base_MSRP
+       :City
+       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
+       :County
+       :DOL_Vehicle_ID
+       :Electric_Range
+       :Electric_Utility
+       :Electric_Vehicle_Type
+       :Legislative_District
+       :Make
+       :Model
+       :Model_Year
+       :State
+       :VIN_1_10
+       :Vehicle_Location
+       :_2020_Census_Tract
+       :zipcode],
+      :from [[:Electric_Vehicle_Population_Data :aa583]]}
+     :ff556]],
+   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-29 07:59:17",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1828944435,
+   :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_]},
+  :query-preview-1140256918
+  {:select [[[[:avg :PD_CD]] :PD_CD] :PERP_SEX],
+   :from
+   [[{:select
+      [:AGE_GROUP
+       :ARREST_BORO
+       :ARREST_DATE
+       :ARREST_KEY
+       :ARREST_PRECINCT
+       :Geo_Col
+       :JURISDICTION_CODE
+       :KY_CD
+       :LAW_CAT_CD
+       :LAW_CODE
+       :Latitude
+       :Longitude
+       :OFNS_DESC
+       :PD_CD
+       :PD_DESC
+       :PERP_RACE
+       :PERP_SEX
+       :X_COORD_CD
+       :Y_COORD_CD],
+      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
+     :dd77]],
+   :group-by [:PERP_SEX]},
+  :query-preview-105879371
+  {:select [[[[:avg :ARREST_KEY]] :ARREST_KEY] :AGE_GROUP :JURISDICTION_CODE],
+   :from
+   [[{:select
+      [:AGE_GROUP
+       :ARREST_BORO
+       :ARREST_DATE
+       :ARREST_KEY
+       :ARREST_PRECINCT
+       :Geo_Col
+       :JURISDICTION_CODE
+       :KY_CD
+       :LAW_CAT_CD
+       :LAW_CODE
+       :Latitude
+       :Longitude
+       :OFNS_DESC
+       :PD_CD
+       :PD_DESC
+       :PERP_RACE
+       :PERP_SEX
+       :X_COORD_CD
+       :Y_COORD_CD],
+      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
+     :ff206]],
+   :group-by [:AGE_GROUP :JURISDICTION_CODE]},
+  :new-clojure-2-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-28 07:45:10",
+   :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+   :_sqlized-hash nil,
+   :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]},
+  :query-preview-1076133407
+  {:select [[:PERP_RACE :id] [:PERP_RACE :label]],
+   :from
+   [[{:select
+      [:AGE_GROUP
+       :ARREST_BORO
+       :ARREST_DATE
+       :ARREST_KEY
+       :ARREST_PRECINCT
+       :Geo_Col
+       :JURISDICTION_CODE
+       :KY_CD
+       :LAW_CAT_CD
+       :LAW_CODE
+       :Latitude
+       :Longitude
+       :OFNS_DESC
+       :PD_CD
+       :PD_DESC
+       :PERP_RACE
+       :PERP_SEX
+       :X_COORD_CD
+       :Y_COORD_CD],
+      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
+     :ff347]],
+   :group-by [:PERP_RACE],
+   :order-by [:PERP_RACE]},
+  :query-preview-1105189881
+  {:select [[[[:avg :PD_CD]] :PD_CD] :LAW_CAT_CD :AGE_GROUP],
+   :from
+   [[{:select
+      [:AGE_GROUP
+       :ARREST_BORO
+       :ARREST_DATE
+       :ARREST_KEY
+       :ARREST_PRECINCT
+       :Geo_Col
+       :JURISDICTION_CODE
+       :KY_CD
+       :LAW_CAT_CD
+       :LAW_CODE
+       :Latitude
+       :Longitude
+       :OFNS_DESC
+       :PD_CD
+       :PD_DESC
+       :PERP_RACE
+       :PERP_SEX
+       :X_COORD_CD
+       :Y_COORD_CD],
+      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
+     :xx576]],
+   :group-by [:LAW_CAT_CD :AGE_GROUP]}},
+ :panels
+ {nil {:queries {nil {:_last-run "08:01:49"}}},
+  :block-86
+  {:clojure
+   {:new-clojure
+    (do
+      (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+            rel-dir "./images/large/"
+            files (->>
+                    (file-seq (clojure.java.io/file dir))
+                    (filter (fn [x] (.isFile x)))
+                    (filter
+                      (fn [x]
+                        (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                    (map (fn [x] (.getName x))))]
+        (println (count files))
+        (vec (for [f (sort files)] {:ffilename (str f)}))))},
+   :name "block-86",
+   :w 8,
+   :selected-view :new-clojure-sqlized,
+   :root [3 2],
+   :h 15,
+   :queries
+   {:new-clojure-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-29 07:59:17",
+     :_sqlized-by [:block-86 :clojure :new-clojure],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override-2058175520>output>evald-result>value-hash,
+     :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_]}},
+   :tab "background picker",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Secrets are not the same as surprises."]}},
+  :block-3284
+  {:queries
+   {:new-clojure-2-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-28 07:45:10",
+     :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override647179980>output>evald-result>value-hash,
+     :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]}}}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#96caa8",
+  "boolean" "#aeb982",
+  "map" "#8c80b7",
+  "list" "#9a1280",
+  "string" "#d6e6cc",
+  "any" "#477174",
+  "vector" "#50c26a",
+  "keyword" "#ddd3bb",
+  "rabbit-code" "#c64c94",
+  "datetime" "#72334d",
+  "integer" "#bac18e",
+  "unknown" "#630d4c",
+  "date" "#081409"},
+ :solver-fn nil,
+ :click-param
+ {:recos-sys
+  {:combo_hash "2006850921",
+   :combo_edn
+   "Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility, Electric_Range, Make",
+   :shape_name "basic_v_bar_avg_color",
+   :query_map
+   "[{:select [[[[:avg :Electric_Range]] :Electric_Range] :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility], :from [\"query/Electric_Vehicle_Population_Data_drag_580\"], :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}]",
+   :viz_map
+   "[:vega-lite {:layer [{:encoding {:y {:field :Make, :type \"ordinal\"}, :x {:aggregate \"avg\", :field :Electric_Range, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :field :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/Electric_Vehicle_Population_Data_drag_580\"}} {:actions false}]",
+   :condis ""},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 28,
+   :block_data
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style :param/glass-fish-style, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected :param/generated-colors>second-darkest, :block-title-font-color \"#ffffff\", :universal-pop-color :param/tetradss>0, :base-block-color \"#04041e82\", :editor-rim-color :param/generated-colors>colors>4, :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :param/generated-colors>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :param/generated-colors>dominant, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :param/rel-image-path \")\"], :transition \"all 1.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#00000088\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :universal-pop-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :fields-sys {:field_name "class", :field_type "VARCHAR(7)", :data_type "string"},
+  :viz-shapes-sys {:combo_edn nil},
+  :tables-sys
+  {:db_schema "default",
+   :db_catalog "default",
+   :connection_id "clickhouse-test",
+   :schema_cat "default/default",
+   :table_name "main_boston_ibr",
+   :fields 22},
+  :offenses-drag-DISTRICT-260 {:DISTRICT "B3", :rowcnt 35442},
+  :files-sys
+  {:file_path "./screens/duality-of-lepus33aa.edn",
+   :screen_name "duality-of-lepus33aa",
+   :blocks 70,
+   :queries 28,
+   :ts "2024-08-23 03:12:39"},
+  :albums-drag-289
+  {:album_name "St. Anger",
+   :img_300 "https://i.scdn.co/image/ab67616d00001e022fe08610316f3e5ebaa06d68",
+   :img_640 "https://i.scdn.co/image/ab67616d0000b2732fe08610316f3e5ebaa06d68",
+   :popularity 53,
+   :release_date "2003-06-05"},
+  :viz-tables-sys2 {:table_name :NYPD-Arrest-Data-Year-to-Date-drag-22},
+  :user-dropdown-sys {:req-field nil},
+  :new-clojure-sqlized {:ffilename "b64-image-34647-16558-4k.webp"},
+  :viz-tables-sys {:table_name "bigfoot_sightings_locations_drag_305"},
+  :bigfoot-sightings-locations-drag-305
+  {:nearestroad "Federal Street",
+   :water_area 42579,
+   :housing_units 53068,
+   :date nil,
+   :locationdetails
+   "Take Route 9 through Belchertown and enter Federal street via either entrance as it is a road that turns off Rt 9, runs for about 3-4 miles then ends again at another intersection of Rt 9. It was around the street address if 722 Federal street.",
+   :submitted_date "2020-07-11",
+   :bfroid 65734,
+   :cty_abbrev "MA",
+   :otherwitnesses
+   "There were about 4-5 of us. Maybe a bit more. We were all just sitting on the porch talking. There was a light illuminating us on the porch but the meadow and woods were shrouded in darkness.",
+   :run_id 34,
+   :fips_county_code 15,
+   :cty_name "Hampshire County",
+   :nearesttown "Belchertown",
+   :timeandconditions "Late at night. After midnight but before dawn.",
+   :month nil,
+   :county "Hampshire County",
+   :land_area 1370182,
+   :longitude -72.44578160338926,
+   :state "Massachusetts",
+   :zipcode 1007,
+   :fixed_month "0001-04-01",
+   :submitted "2020-07-11 00:00:00.000000",
+   :fips_state_code 25,
+   :state_abbrev "MA",
+   :title
+   "Possible tree push over and vocalization near Belchertown and Quabbin Reservoir",
+   :otherstories "No, I have not.",
+   :year "1998",
+   :season "Spring",
+   :state_name "MASSACHUSETTS",
+   :class "Class B",
+   :population 146568,
+   :zip_long -72.411005,
+   :alsonoticed
+   "No, nothing. I do remember thinking it was weird that wed hear trees falling in the woods a fair bit. But this could really mean not much.",
+   :zip_lat 42.278424,
+   :url "http://www.bfro.net/GDB/show_report.asp?id=65734&PrinterFriendly=True",
+   :latitude 42.326315539106616,
+   :observed
+   " Hello!<BR><BR>This is something that happened a long time ago and to be honest I never thought it could be connected to Sasquatch/Bigfoot but recently Ive been reading about the topic a lot and I figured Id send it to you guys after finding your site and just checking out reports from areas where Ive lived in the past. Anyway, I found a report from Belchertown, MA and I lived a rural part of Belchertown for several years when I was in college. <BR><BR>This was sometime around 1997-1998 in Belchertown. My housemates and I were out on our porch which faced a 2-3 acre meadow. This open meadow and the porch were on the east side of the house. The entire area past the meadow to the East was wooded with houses and cabins here and there for about a mile until you hit a lake. Behind the house was abput 10-20 yards of woods with a walking trail and then another 10 yards past was a train tracks running East/west then more woods. <BR><BR>Anyway, my housemates and I were out on the porch when we heard the sound of a tree crashing to the ground.  About 19 seconds later while we all were kindve shocked there was an enormously loud and guttural growl/scream/roar.  In all my life I have never heard any animal sound that could match it in intensity, volume, and it just sounded plain angry and vivacious. It is hard to describe just how loud it was and how stunned we all were that this was coming from an animal just inside the tree line.  There were coyotes, owls, foxes galore back there and the sounds they made were a world away in comparison.  <BR><BR>We all immediately looked at each other, got up and went into the house as fast as we could without saying a word. <BR><BR>Everyone assumed it was an animal but after reading about and hearing recordings of presumed Sasquatch scream and howls it brought the memory rushing back because it is so similar to what we heard. <BR><BR>Anyway, just wanted to send this in as I saw there was another report for this area. <BR><BR>Best regards ",
+   :environment
+   "The property was about 7 acres. Most of it a meadow but wooded in front of the street with a small creek near the road. Woods surrounded the entire property and behind the house there was a public trail and a train track running parallel East/west behind the house. To the east of the 2-3 acre was a wooded area filled with many large Birch trees. The houses in this area are mostly in the woods.",
+   :fixed_year "1998",
+   :run_time "2022-05-20 16:27:43.000000",
+   :zip_name "BELCHERTOWN"},
+  :param
+  {:background-image-path [:str :param/path-dir :param/rel-image-path],
+   :keper "b64-image3-30849-74975-4k.webp",
+   :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
+   :selected-view-data nil,
+   :selected-view nil,
+   :generated-colors
+   [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
+   :rel-image-path [:str "images/large/" :new-clojure-sqlized/ffilename],
+   :tetradss [:tetrads :param/generated-colors>dominant],
+   :selected-block :block-86,
+   :glass-fish-style
+   {:background-color [:str :param/generated-colors>darkest 73],
+    :border-radius [:sticky-border-radius "24px"],
+    :backdrop-filter "blur(4px) brightness(40%)",
+    :filter nil}},
+  :viz-shapes0-sys {:shape nil, :recos 266},
+  :theme
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :base-block-style :param/glass-fish-style,
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected :param/generated-colors>second-darkest,
+   :block-title-font-color "#ffffff",
+   :universal-pop-color :param/tetradss>0,
+   :base-block-color "#04041e82",
+   :editor-rim-color :param/generated-colors>colors>4,
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors :param/generated-colors>data-colors,
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color :param/generated-colors>dominant,
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image [:str "url(" :param/rel-image-path ")"],
+    :transition "all 1.8s ease-in-out",
+    :background-blend-mode "overlay",
+    :background-size "cover",
+    :background-color "#00000088"},
+   :editor-font-color "#ffffff",
+   :base-font "Poppins",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :bigfoot-sightings-locations-drag-class-428 {:class "Class A", :rowcnt 2486},
+  :class-drag-987 nil,
+  :connections-sys
+  {:database_name "*cache-db*",
+   :connection_id "cache.db",
+   :styler_highlight_8717ssa 0},
+  :sys {:selected-tab "marvelous ape", :selected-tab-idx 0}},
+ :selected-flow "my-new-flow2225"}

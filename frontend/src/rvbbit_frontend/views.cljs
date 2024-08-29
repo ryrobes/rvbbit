@@ -3642,7 +3642,7 @@
                                              ccc (count cc)
                                              cc (if (> ccc 7) (subs cc 0 7) cc)]
                                          [re-com/h-box ;:padding "8px"
-                          ;:justify :end 
+                                          ;:justify :end 
                                           :align :center ;:size "auto"
                                           :width (px (- single-width 10))
                                           :children [;[re-com/box
@@ -3662,7 +3662,7 @@
                                           :style {:color (theme-pull :theme/editor-font-color nil)
                                                   :border-top  (str "3px solid " cc 55)
                                                   :border-left (str "3px solid " cc 55)
-                                    ;:background-color (str cc 35)
+                                                   ;:background-color (str cc 35)
                                                   :border-radius "9px 0px 0px 0px"}])
                                        [re-com/box :align :center :justify :center :child (str "viz preview: " reco-combo) :style
                                         {:font-size        "16px"
@@ -3675,7 +3675,7 @@
                                          :color            (str (theme-pull :theme/editor-font-color nil) 66) ;; "#ffffff66"
                                          }])]:style
                           {;:padding-left   "8px"
-             ;:margin-left    "8px"
+                           ;:margin-left    "8px"
                            :padding-top    "12px"
                            :padding-bottom "4px"
                            :padding-right  "10px"
@@ -3730,25 +3730,24 @@
                                        ;(get custom-map :background-size)
                                           )})))]]))
 
-(dnd2/subscribe! ;;;(js/document.getElementById "base-canvas")
-                 (js/document.querySelector "div") ;; "base-canvas"
-                 :canvas02
-                 {:drop (fn [_ files]
-                          (when (not (= ""
-                                        (-> files
-                                            .-value)))
-                            (let [^js/File file0 (-> files
-                                                     (aget 0))
-                                  fname          (-> file0
-                                                     .-name)]
-                              (ut/tapp>> [:run? (cstr/lower-case fname)])
-                              (if (cstr/ends-with? (cstr/lower-case fname) ".csv")
-                                (do (ut/tapp>> [:saving-csv-to-server fname])
-                                    (ut/read-file file0 #(ut/tracked-dispatch [::http/save-csv fname (str %)]))
-                                    (set! (-> files
-                                              .-value)
-                                          ""))
-                                (ut/tapp>> [:invalid-file fname])))))})
+;; (dnd2/subscribe! (js/document.querySelector "div") ;; "base-canvas"
+;;                  :canvas02
+;;                  {:drop (fn [_ files]
+;;                           (when (not (= ""
+;;                                         (-> files
+;;                                             .-value)))
+;;                             (let [^js/File file0 (-> files
+;;                                                      (aget 0))
+;;                                   fname          (-> file0
+;;                                                      .-name)]
+;;                               (ut/tapp>> [:run? (cstr/lower-case fname)])
+;;                               (if (cstr/ends-with? (cstr/lower-case fname) ".csv")
+;;                                 (do (ut/tapp>> [:saving-csv-to-server fname])
+;;                                     (ut/read-file file0 #(ut/tracked-dispatch [::http/save-csv fname (str %)]))
+;;                                     (set! (-> files
+;;                                               .-value)
+;;                                           ""))
+;;                                 (ut/tapp>> [:invalid-file fname])))))})
 
 (defn ifnil [x n] (if (nil? x) n x))
 
@@ -4278,7 +4277,7 @@
 
 (defonce fanfare? (atom true)) 
 (defonce time-freq (reagent/atom 45))
-(defonce selected-stats-page (reagent/atom :client))
+(defonce selected-stats-page (reagent/atom :help))
 
 (defn stats-page [w h client-name ttt solver-map]
   (let [puget-data-color-map {} ;; @(ut/tracked-sub ::conn/puget-data-color-map {})
@@ -4428,7 +4427,8 @@
                        (with-out-str
                          (fig-render ":keybindings" :pink)
                          
-                         (rvbbit-backend.util/pp {:SPACEBAR "toggle floating editor"
+                         (rvbbit-backend.util/pp [["general context sensitive keybindings"
+                                                   {:SPACEBAR "toggle floating editor"
                                                   :SHIFT-SPACEBAR "toggle sidepanel / history / kits / snapshots"
                                                   :TILDE "toggle 'hop bar' for quick commands to spawn runners / configured kits, etc"
                                                   :ESC "un-selects selected card - or opens this panel if nothing selected"
@@ -4442,7 +4442,16 @@
                                                   :CTRL-S "save the current screen or flow (if flow panel is up)"
                                                   :P "peek at all cards by minimizing them some, allowing the lines to stand out"
                                                   :SHIFT-R-F "move a card one layer up or down, z-index for overlapping cards"
-                                                  :CTRL-SPACEBAR "toggle flow panel / solver / signal / system panel"} {:width 90})
+                                                  :CTRL-SPACEBAR "toggle flow panel / solver / signal / system panel"}]
+                                                  :_
+                                                  ["on the open canvas deck"
+                                                   {:LEFT-CLICK "select card by clicking on it's header"
+                                                   :RIGHT-CLICK "creates a new card (with a clover view by default)"
+                                                   :MIDDLE-CLICK "creates a new parameters and param editor card on canvas"}]
+                                                  :_
+                                                  "Please pay respects to Lord Engelbart & use a proper mouse. Touchpad has not been tested or optimized for."] 
+                                                 
+                                                 {:width 90})
                          
                          (println " ")
                          (rvbbit-backend.util/pp "latest docs will be on the GitHub page - linked below...")

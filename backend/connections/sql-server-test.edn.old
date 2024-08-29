@@ -1,3 +1,0 @@
-
-"jdbc:sqlserver://localhost:1433;databaseName=imdb;encrypt=false;username=sa;password=yourStrong(!)Password"
-

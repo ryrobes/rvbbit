@@ -55,7 +55,7 @@
            ;new-h       (hash pp) ;; (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
        (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
-       (ut/dispatch-delay 800 [::insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
+       (ut/dispatch-delay 800 [::insert-alert [:box :child "Syncing panel data with RVBBIT server..."] 12 1 5])
      ;;(conn/push-panels-to-server pp ppr client-name)
        (ut/tracked-dispatch
         [::wfx/push :default

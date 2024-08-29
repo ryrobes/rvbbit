@@ -10,7 +10,7 @@
  :max-lifetime       1800000
  :minimum-idle       10
  :maximum-pool-size  10
- :jdbc-url           "jdbc:postgresql://postgres:Notofox22==@dev-pig-37:5432"
+ :jdbc-url           "jdbc:postgresql://dev-pig-37:5432/postgres"
  :adapter            "postgresql"
  :username           "postgres"
  :password           "Notofox22=="

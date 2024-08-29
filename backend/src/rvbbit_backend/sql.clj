@@ -548,8 +548,10 @@
                             :else                     lookup-value)]
     val))
 
+
+
 (defn to-sql
-  [honey-map & [key-vector system-db]]
+  [honey-map & [key-vector system-db]] ;; db-typer-fn TODO to do proper MSSQL dialect here
   (let [sql-dialect (when key-vector
                       (cond (cstr/includes? (cstr/lower-case (first key-vector)) "microsoft") :sqlserver
                             (cstr/includes? (cstr/lower-case (first key-vector)) "mysql")     :mysql
@@ -565,7 +567,7 @@
         (and (not (empty? value-keys)) (not (nil? key-vector)) (not (nil? system-db)))
         value-mapping (if value-keys? (into {} (for [v value-keys] {v (lookup-value key-vector v system-db)})) {})
         hm (walk/postwalk-replace value-mapping honey-map) ; (walk/postwalk {} honey-map)
-        fixed-honey-map
+        fixed-honey-map ;;hm
         (cond (and (= sql-dialect :sqlserver) (get hm :limit)) (let [limit           (get hm :limit)
                                                                      select-distinct (get hm :select-distinct)
                                                                      select          (get hm :select)]
@@ -586,7 +588,8 @@
                                                                        :else           ["sqlserver top issue"]))
               (and (= sql-dialect :oracle) (get hm :limit))    (let [limit (get hm :limit)]
                                                                  (dissoc (assoc hm :fetch limit) :limit))
-              :else                                            hm)]
+              :else                                            hm)
+              ]
     (try (-> fixed-honey-map
              (honey/format (merge {:pretty true :inline true} (if (nil? sql-dialect) {} {:dialect sql-dialect}))))
          (catch Exception e
@@ -594,6 +597,12 @@
                (insert-error-row! :honey-format honey-map e)
                (to-sql {:union-all [{:select [[(str (.getMessage e)) :query_error]]}
                                     {:select [["(from HoneySQL formatter)" :query_error]]}]}))))))
+
+;; (ut/pp 
+;;  ;(to-sql {:select [:*] :from [:tests] :limit 123} )
+ 
+;;      (honey/format {:select [:*] :from [:tests] :limit 123} {:pretty true :inline true :dialect :sqlserver})
+;;  )
 
 (defn fetch-all-tables
   [db-conn & [quick?]]
