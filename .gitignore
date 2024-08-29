@@ -47,3 +47,5 @@ fabric-outputs/
 fabric-sessions/
 checkouts/
 backend/resources/public
+*.csv
+backend/defs/backup
