@@ -10,14 +10,11 @@
    [hikari-cp.core      :as hik]
    [honey.sql           :as honey]
    [rvbbit-backend.util :as ut]
+   [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.surveyor :as svy]
    [taskpool.taskpool   :as tp]))
-
-
-
-
 
 
 (def query-history (atom {}))
@@ -40,8 +37,9 @@
     (if-let [pool (@client-db-pools db-key)]
       {:datasource pool}
       (let [_ (ut/pp [:creating-new-client-db-pool db-name])
+            _ (ext/create-dirs "db/client-temp") ;; just in case
             pool @(pool-create
-                   {:jdbc-url (str "jdbc:sqlite:file:./db/client-temp/"
+                   {:jdbc-url (str "jdbc:sqlite:file:./db/client-temp/" ;; should move to duckdb anyways 
                                    (cstr/replace (str db-name) ":" "")
                                    ".db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL")
                     :idle-timeout      600000
@@ -183,36 +181,42 @@
       :cache        "shared"}
      "ghost-db")})
 
-
-(def import-db
-  {:datasource
-   @(pool-create
-     {:jdbc-url ;;"jdbc:sqlite:db/csv-imports.db"
-      "jdbc:sqlite:file:./db/csv-imports.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
-      :cache    "shared"}
-     "imports-db-pool")})
-
-;; (def cache-db
+;; (def import-db
 ;;   {:datasource
 ;;    @(pool-create
-;;      {:jdbc-url
-;;      ;;  "jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
-;;       "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+;;      {:jdbc-url ;;"jdbc:sqlite:db/csv-imports.db"
+;;       "jdbc:sqlite:file:./db/csv-imports.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
 ;;       :cache    "shared"}
-;;      "cache-db-pool")})
+;;      "imports-db-pool")})
 
-(def default-schema "base")
-(def cache-db ;; duck test 
+(def mem-cache-db
   {:datasource
    @(pool-create
-     {:jdbc-url "jdbc:duckdb:./db/cache.duck"
-      ;:driver-class-name "org.duckdb.DuckDBDriver"
-      :idle-timeout      600000
-      :maximum-pool-size 20
-      ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
-      :max-lifetime      1800000}
+     {:jdbc-url
+      "jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
+      ;;"jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+      :cache    "shared"}
+     "mem-cache-db-pool")})
+
+(def cache-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url
+      ;;"jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
+      "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+      :cache    "shared"}
      "cache-db-pool")})
 
+;; (def default-schema "base")
+;; (def cache-db ;; duck test 
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url "jdbc:duckdb:./db/cache.duck"
+;;       :idle-timeout      600000
+;;       :maximum-pool-size 20
+;;       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+;;       :max-lifetime      1800000}
+;;      "cache-db-pool")})
 
 
 
@@ -227,8 +231,8 @@
 
 
 
-(defn insert-error-row-OLD!
-  [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
+
+(defn insert-error-row-OLD! [error-db-conn query error]
   (jdbc/with-db-connection
     [sdb system-db] ;; ?
     (let [ins (-> {:insert-into [:errors] :values [{:db_conn (str error-db-conn) :sql_stmt (str query) :error_str (str error)}]}
@@ -239,26 +243,19 @@
 
 ;; (ut/pp (take 100 (filter #(cstr/includes? (str %) "cache-db-pool") @errors)))
 
-(defn insert-error-row!
-  [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
+(defn insert-error-row! [error-db-conn query error]
   (swap! errors conj [(str error) (str error-db-conn) query])
-  (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 400) (catch Throwable _ (str query)))})
+  ;; (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 400) (catch Throwable _ (str query)))})
   )
 
-
-
-
-
-(defn asort
-  [m order]
+(defn asort [m order]
   (let [order-map (apply hash-map (interleave order (range)))]
     (conj (sorted-map-by #(compare (order-map %1) (order-map %2))) ; empty map with the desired
           (select-keys m order))))
 
 (defonce map-orders (atom {}))
 
-(defn wrap-maps
-  [query arrays]
+(defn wrap-maps [query arrays]
   (let [headers (first arrays)
         mm      (vec (doall (for [r (rest arrays)]
                               (asort (into {} ;(sorted-map)

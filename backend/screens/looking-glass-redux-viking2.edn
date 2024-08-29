@@ -861,7 +861,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :edn [:edn :*data],
     :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
@@ -885,9 +885,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -905,7 +905,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
@@ -1522,7 +1522,7 @@
        ["openai-image-gen-ladder3"
         "modded-spooks"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "A hyperrealistic image of a full-figured woman of Irish-Scottish descent, in her late twenties. She is situated in a dystopian New England-styled town under a harsh snowstorm, combining elements of cyberpunk, vaporwave, and vintage 20th-century noir aesthetics. The backdrop is a mesmerizing midnight sky with forest silhouettes bordering the town and neon lights in rose pink, purple, and sky blue illuminating the otherwise hidden landscape. The woman's key features include her long, loose hair, elaborately inked wilderness and rabbit tattoo extending to her neckline, and an emblamatic necklace. Her plump lips are slightly open, enhancing her allure. Her attire, visible from the mid-torso upwards, resonates with the style of pin-up art from the late 1800s to early 1900s."]}]]
       [:img {:src "./images/gen/b64-image3-99285-42525.png", :width "90%"}]]]},
@@ -1736,7 +1736,7 @@
       :background-position "center",
       :transition "all 1.8s ease-in-out",
       :background-image
-      [:string3
+      [:str
        "url("
        :flow/openai-image-gen-ladder3>:relative-url-path-for-png-version
        ")"],
@@ -1788,7 +1788,7 @@
        ["openai-image-gen-ladder3"
         "candy-striper"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Create a hyperrealistic visual representation of a full-figured woman in her late twenties of Irish-Scottish descent, featuring her fair complexion. She stands in a dystopian, New England-inspired town during a snowstorm. The scene is an innovative blend of cyberpunk and vaporwave aesthetics, referencing a vintage noir style of the 20th century against a captivating midnight backdrop. A forest shadows the town outskirts, and neon lights illuminate this eerie landscape in rose pink, purple, and sky blue. Focus on her allure through her long flowing hair and tattoos up to her neckline with wilderness and rabbit motifs, reflected in her necklace. Her mildly parted, plump lips add to her charm. Her outfit, reminiscent of the pin-up art period from the late 1800s to early 1900s, is captured from mid-torso upwards."]}]]
       [:img {:src "./images/gen/b64-image3-92836-10815.png", :width "90%"}]]]},
@@ -1959,7 +1959,7 @@
      :child
      [:click-solver
       [:send-to-upscaler-4
-       [:string3 :solver-meta/send-to-upscaler-4>extra>runs " upscaler->4"]]]]},
+       [:str :solver-meta/send-to-upscaler-4>extra>runs " upscaler->4"]]]]},
    :queries {}},
   :block-983
   {:mad-libs-combo-hash ["1408146803" "fields_drag_16"],
@@ -2065,9 +2065,9 @@
      :child
      [:a
       {:href
-       [:string3 :flow/openai-image-gen-ladder3>:relative-url-path-for-png-version],
+       [:str :flow/openai-image-gen-ladder3>:relative-url-path-for-png-version],
        :target "_blank"}
-      [:string3
+      [:str
        :flow/openai-image-gen-ladder3>:relative-url-path-for-png-version]]]},
    :queries {}},
   :block-2143
@@ -2150,7 +2150,7 @@
      :child
      [:click-solver
       [:send-to-upscaler-1
-       [:string3 :solver-meta/send-to-upscaler-1>extra>runs " upscaler->1"]]]]},
+       [:str :solver-meta/send-to-upscaler-1>extra>runs " upscaler->1"]]]]},
    :name "solver-play",
    :root [1 26],
    :tab "fat zebra"},
@@ -2308,7 +2308,7 @@
        ["openai-image-gen-ladder3"
         "heavy3"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace. Her full lips are slightly parted, enhancing her allure. She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up."]}]]
       [:img {:src "./images/gen/b64-image3-79986-26679.png", :width "90%"}]]]},
@@ -2395,7 +2395,7 @@
        ["openai-image-gen-ladder3"
         "asdadf"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Create a 16:9, high-definition illustration set in an environment with cyberpunk aesthetics blended with a vibe inspired by traditional New England myths, imbued with an other-worldly, mystifying charm. Centered in the scene is a Caucasian woman in her late 20s with fair skin. She carries a full-sized figure, deep-set eyes rimmed with dark makeup, pouty lips, a pointed nose, and hair that flows freely. Her skin is embellished with intricate tattoos that draw inspiration from Celtic designs, showcasing images of rabbits and wilderness across her neck, collarbone, and shoulders. The ambiance of the scene comprises abstract glimmers of blue and pink light that, caught against her, accentuate her curves and the paleness of her complexion. Sporting a choker ribbon and a pendant necklace, she radiates a captivating allure. As she poses against a wall, she emanates an intriguing aura of mystery."]}]]
       [:img {:src "./images/gen/b64-image3-94250-51986.png", :width "90%"}]]]},
@@ -2613,7 +2613,7 @@
        ["openai-image-gen-ladder3"
         "retro-cyber"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Create a hyperrealistic image of a full-bodied woman in her late twenties of Irish-Scottish descent, showcasing a fair complexion in a snow-ensnared, New England-styled town with a dystopian twist. The scene is artistically bathed in a fusion of cyberpunk and vaporwave aesthetics, harking back to the vintage noir themes of the 20th century, under a dramatic midnight vista. Encroaching the town are forest silhouettes, with the eeriness of the landscape highlighted by rose pink, purple, and sky blue neon glows. Her allure is intensified by her long, free-flowing hair and tattoos coating her shoulders and neck, adorned with wilderness and rabbit designs, mirroring her necklace design. Her slightly parted, plump lips add to her enticing aura. The scene captures her from mid-torso up, dressed in attire indicative of the pin-up art motive prevalent from the late 1800s to early 1900s."]}]]
       [:img {:src "./images/gen/b64-image3-90441-31699.png", :width "90%"}]]]},
@@ -2641,7 +2641,7 @@
      :child
      [:click-solver
       [:send-to-upscaler-2
-       [:string3 :solver-meta/send-to-upscaler-2>extra>runs " upscaler->2"]]]]},
+       [:str :solver-meta/send-to-upscaler-2>extra>runs " upscaler->2"]]]]},
    :name "solver-play",
    :root [6 26],
    :tab "fat zebra"},
@@ -2668,7 +2668,7 @@
        ["openai-image-gen-ladder3"
         "icerr"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Create a hyperrealistic image of a full-bodied woman in her late twenties of Irish-Scottish descent, showcasing a fair complexion in a snow-ensnared, New England-styled town with a dystopian twist. The scene is artistically bathed in a fusion of cyberpunk and vaporwave aesthetics, harking back to the vintage noir themes of the 20th century, under a dramatic midnight vista. Encroaching the town are forest silhouettes, with the eeriness of the landscape highlighted by rose pink, purple, and sky blue neon glows. Her allure is intensified by her long, free-flowing hair and tattoos coating her shoulders and neck, adorned with wilderness and rabbit designs, mirroring her necklace design. Her slightly parted, plump lips add to her enticing aura. The scene captures her from mid-torso up, dressed in attire indicative of the pin-up art motive prevalent from the late 1800s to early 1900s."]}]]
       [:img {:src "./images/gen/b64-image3-42325-15471.png", :width "90%"}]]]},
@@ -2698,7 +2698,7 @@
        ["openai-image-gen-ladder3"
         "jesic74"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Generate a highly realistic image of a full-figured Caucasian woman of Irish-Scottish descent, in her late twenties with fair skin. Her long red hair flows gracefully, and her lips are plump. Tattoos displaying wilderness and rabbit designs intricately spread up to her neckline. A necklace with a rabbit emblem hangs from her neck. This woman is positioned in a merging of cyberpunk and vaporwave aesthetics, morphed into a dystopian small-town that is reminiscent of New England, during a harsh snowstorm. The setting sinks into a vibe resonant of the 20th-century noir style, under a midnight sky with a bordering forest in the distance. Eerie neon lighting bathes the scene in rose pink, purple, and sky blue shades. Her attire is a dress that is reminiscent of pin-up art that broadly originated from the late 1800s to early 1900s. The picture centers on a close-up shot of this woman from her mid-torso to her head."]}]]
       [:img {:src "./images/gen/b64-image3-33767-79761.png", :width "90%"}]]]},
@@ -2888,7 +2888,7 @@
        ["openai-image-gen-ladder3"
         "sage-tek"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Design a detailed 16:9, high-definition, cyberpunk-style illustration. The scene is filled with traditional New England myths' vibes and other-worldly charm, enhanced by a majestic environment. The central character is a Caucasian woman in her late 20s, full-bodied and attractive, with long, beautifully flowing hair, full, pouty lips, and an upturned nose. Her pale skin showcases intricate, Celtic-inspired tattoos of rabbits and wilderness that extend over her neck, collarbone, and shoulders. Abstract glows of blue and pink light mysteriously highlight her curvy figure and fair skin. She wears deep, dark makeup that forms a striking contrast with her pale complexion. She is adorned with a choker ribbon and pendant necklace, contributing to her alluring vibe. As she leans against a wall, her charisma envelops the scene in enticing mystery."]}]]
       [:img {:src "./images/gen/b64-image3-25111-10618.png", :width "90%"}]]]},
@@ -2918,7 +2918,7 @@
        ["openai-image-gen-ladder3"
         "dynamic-mirror"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           :flow/openai-image-gen-ladder3>:output-revised-prompt]}]]
       [:img
@@ -3111,7 +3111,7 @@
      :child
      [:click-solver
       [:send-to-upscaler-3
-       [:string3 :solver-meta/send-to-upscaler-3>extra>runs " upscaler->3"]]]]},
+       [:str :solver-meta/send-to-upscaler-3>extra>runs " upscaler->3"]]]]},
    :queries {}},
   :block-12236
   {:h 4,
@@ -3239,7 +3239,7 @@
        ["openai-image-gen-ladder3"
         "vibes45"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace. Her full lips are slightly parted, enhancing her allure. She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up."]}]]
       [:img {:src "./images/gen/b64-image3-47156-17398.png", :width "90%"}]]]},
@@ -3273,7 +3273,7 @@
       ["openai-image-gen-ladder3"
        "ladder-latest++!"
        {:prompt
-        [:string3
+        [:str
          :param/healing-pink-llama
          :flow/openai-image-gen-ladder3>:output-revised-prompt]}]]]},
    :queries {}},
@@ -3829,7 +3829,7 @@
       ["openai-image-gen-ladder3"
        "freeze-ladder!"
        {:prompt
-        [:string3
+        [:str
          " Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.  "
          :flow/openai-image-gen-ladder3>:output-revised-prompt]}]]]},
    :queries {}},
@@ -3885,7 +3885,7 @@
        ["openai-image-gen-ladder3"
         "all-redsr"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Imagine a vibrant, cyberpunk-meets-vaporwave setting in the northeastern U.S., which is now encroached by lush woodland. Render this scenery in hues of neon blue, pink, and purple, emphasizing the environment's inherent drama through the mirror-like reflections from the rain-drenched surroundings. Placed in the center of this dystopian, yet strikingly beautiful scenery is a fair-skinned Irish woman in her late 20s. Her commanding demeanor indicated by her radiant confidence. The tattoos of detailed elaborations of rabbits and wilderness scenes stretch from her neck to her arms, giving a spotlight to her unconventional pin-up aesthetics. The intensity of her long, blazing red hair, curves, and full lips enhances her attractivity. Draping around her neck is a rabbit-themed necklace that amplifies her unique fashion sense. Meeting the viewer’s eye is the woman’s sultry gaze, capturing her fearless spirit and establishing her strong presence in the midst of the spellbinding scene."]}]]
       [:img {:src "./images/gen/b64-image3-92117-74628.png", :width "90%"}]]]},
@@ -4118,7 +4118,7 @@
        ["openai-image-gen-ladder3"
         "modded-wointer-go"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "A hyperrealistic depiction of a woman in her late twenties, of Irish-Scottish descent, with a full-figured appearance. She is situated in a New England-styled dystopian town set amidst a heavy snowstorm; the ambience leans towards a fusion of cyberpunk, vaporwave and vintage 20th-century noir aesthetics. The backdrop presents a mesmerizing midnight sky with silhouettes of forests suggesting the town's boundaries, and neon lights in rose pink, purple, and sky blue piercing through the otherwise shrouded landscape. Her long, free-flowing hair, a comprehensive tattoo showcasing wilderness and rabbit designs stretching to her neckline, and a symbolic pendant necklace are her salient features. Her slightly open, voluptuous lips embellish her charm. She is noticeably dressed from the mid-torso upwards, her clothing mirroring trends found in pin-up art from the late 1800s to early 1900s."]}]]
       [:img {:src "./images/gen/b64-image3-39393-31394.png", :width "90%"}]]]},
@@ -4148,7 +4148,7 @@
        ["openai-image-gen-ladder3"
         "shannyt1"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Create a hyperrealistic image of a full-figured Irish-Scottish woman in her late twenties with fair skin. She sports long red hair, plump lips, and intricate wilderness and rabbit tattoos extending to her neckline. A rabbit emblem necklace adorns her neck. She is standing in a cyberpunk-vaporwave fusion of a dystopian small-town, a New England-inspired scenery blanketed by a snowstorm. The setting is submerged in a 20th-century noir atmosphere, with a midnight canopy overhead and a looming forest at the edges. The eerie neon lighting casts hues of rose pink, purple, and sky blue. She's wearing a dress influenced by pin-up art from the late 1800s to the early 1900s. The composition focuses on a close-up from her mid-torso upwards."]}]]
       [:img {:src "./images/gen/b64-image3-31690-556.png", :width "90%"}]]]},
@@ -4485,7 +4485,7 @@
        ["openai-image-gen-ladder3"
         "ice stomr"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion is standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town is submerged in a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights emitting hues of rose pink, purple, and sky blue. The woman's allure is enhanced by her cascading hair and intricate tattoos extending up to her neckline, marked by a recurring rabbit emblem that can also be seen on her necklace. Her full lips are slightly parted, adding to her overall allure. The dress she wears harks back to an earlier era, drawing influence from pin-up art prevalent from the late 1800s to the early 1900s. Camera close-up from mid-torso up."]}]]
       [:img {:src "./images/gen/b64-image3-32946-16966.png", :width "90%"}]]]},
@@ -4591,7 +4591,7 @@
        ["openai-image-gen-ladder3"
         "bigcottager"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion is standing in the midst of a New England inspired dystopian small town during a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town is sunk in a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canvas overhead. A forest is on the outskirts. The scene is eerily lighted with neon lights of rose pink, purple, and sky blue hues. The woman's charm is boosted by her flowing hair and complex tattoos reaching her neckline, featuring a repeated rabbit symbol also seen on her necklace. Her full lips are slightly parted, contributing to her overall allure. Her dress derives inspiration from a past age, influenced by pin-up art popular from the late 1800s to the early 1900s. The camera is zoomed in from mid-torso up."]}]]
       [:img {:src "./images/gen/b64-image3-81362-16393.png", :width "90%"}]]]},
@@ -4681,7 +4681,7 @@
        ["openai-image-gen-ladder3"
         "tek-ne1"
         {:prompt
-         [:string3
+         [:str
           "Use this prompt exactly as is with no modifications at all please. "
           "Craft a hyperrealistic rendering of a melded scene, merging the crisp ambiance of a frosty New England morning with the layered, illuminated intrigue of Cyberpunk aesthetic. Fill the view with a landscape crowded by quaint architecture, obscured by a gentle flurry of snowfall. Their light emanates a tranquil blend of soft pink and neon blue hues. Form the composition so an Irish woman in her early 30s emerges on the left. She is self-possessed, sophisticated, bearing a voluptuous figure and a distinctive upturned nose. Her long hair, slightly moist from the falling snow, spills elegantly over her shoulders. Delicately etched on her fair skin are radiant tattoos of rabbits and Irish wilderness, distributed on her neck, collarbone, and shoulders. These tattoos emit a faint glow, catching the shy rays of the sun. The interplay of illumination forms a serene atmosphere, her form achieving a striking balance between light and shadow."]}]]
       [:img {:src "./images/gen/b64-image3-21759-56362.png", :width "90%"}]]]},
@@ -4972,7 +4972,7 @@
       ["openai-image-gen-ladder3"
        "dynamic-mirror"
        {:prompt
-        [:string3
+        [:str
          "Use this prompt exactly as is with no modifications at all please. "
          "A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion is standing in the midst of a New England inspired dystopian small town during a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town is sunk in a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canvas overhead. A forest is on the outskirts. The scene is eerily lighted with neon lights of rose pink, purple, and sky blue hues. The woman's charm is boosted by her flowing hair and complex tattoos reaching her neckline, featuring a repeated rabbit symbol also seen on her necklace. Her full lips are slightly parted, contributing to her overall allure. Her dress derives inspiration from a past age, influenced by pin-up art popular from the late 1800s to the early 1900s. The camera is zoomed in from mid-torso up."]}]]
      [:img {:src "./images/gen/b64-image3-81362-16393.png", :width "90%"}]]],

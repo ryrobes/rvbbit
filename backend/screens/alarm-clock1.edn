@@ -1522,9 +1522,9 @@
    :editor-param-background-color "#000000",
    :base-block-style
    {:border-radius "30px",
-    :background-color [:string3 :solver/colors-of-the-moment>darkest 88],
+    :background-color [:str :solver/colors-of-the-moment>darkest 88],
     :text-shadow
-    [:string3
+    [:str
      "4px 4px 10px "
      :solver/colors-of-the-moment>darkest
      ", 4px 4px 10px "
@@ -1566,7 +1566,7 @@
    :block-title-font-color "#ffffff",
    :base-block-color "#04041e82",
    :editor-rim-color
-   [:string3 :solver/colors-of-the-moment>most-contrasting-light 88],
+   [:str :solver/colors-of-the-moment>most-contrasting-light 88],
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
    :vega-default-color-scheme {:scheme "pastel2"},
@@ -1623,7 +1623,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
+   {:background-image [:str "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-position "center",

@@ -10,7 +10,7 @@
    [rvbbit-backend.db     :as db]
    [clojure.walk          :as walk]
    [rvbbit-backend.sql    :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db cache-db import-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
+    :refer [sql-exec sql-query sql-query-one system-db cache-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
    [rvbbit-backend.ddl    :as sqlite-ddl]
    [rvbbit-backend.surveyor :as svy]

@@ -223,7 +223,7 @@
                 (pretty-spit view-file-base vv)))));)
 
 (defn write-panels [client-name panels]
-  (ut/pp [:write-panels! client-name (keys panels)])  
+  (ut/pp [:write-panels! client-name (count (keys panels)) :panels])  
   (pretty-spit (str "./live/" (fixstr client-name) ".edn") panels :client) ;; overwrite existing FULL deck image
   (let [name-mapping-raw (into {} (for [[k v] panels] {k (get v :name)}))
         name-mapping     (ut/generate-unique-names name-mapping-raw)

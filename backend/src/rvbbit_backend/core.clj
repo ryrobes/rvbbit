@@ -38,7 +38,7 @@
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.sql :as    sql
-    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db cache-db import-db history-db
+    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db cache-db  history-db
             to-sql]]
    ;[rvbbit-backend.surveyor :as surveyor]
    ;[rvbbit-backend.transform :as ts]
@@ -259,7 +259,11 @@
 
 (defn update-all-conn-meta []
   (let [prefix "connections/"
-        files  (ut/get-file-vectors-simple prefix ".edn")]
+        files  (ut/get-file-vectors-simple prefix ".edn")
+        current-conn-ids (vec (for [f files ;; remove "missing" DBs - TODO more robust archive and reappear
+                                    :let [f-path    (str prefix f)
+                                          conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))]]
+                                conn-name))]
     (doseq [f    files
             :let [f-path    (str prefix f)
                   conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))
@@ -293,7 +297,8 @@
                                                                                   cruiser/default-field-attributes
                                                                                   cruiser/default-derived-fields
                                                                                   cruiser/default-viz-shapes)))))
-        (catch Exception e (do (swap! wss/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))))
+        (catch Exception e (do (swap! wss/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))
+    (cruiser/clean-up-some-db-metadata current-conn-ids)))
 
 ;; (update-all-conn-meta)
 
@@ -322,9 +327,28 @@
                                                                                                 cruiser/default-derived-fields
                                                                                                 cruiser/default-viz-shapes))
             (cstr/ends-with? (str (get % :path)) ".csv") (let [f-path (str (get % :path))
-                                                               f-op   (get % :type)]
+                                                               f-op   (get % :type)
+                                                               clients (vec (keys @wss/client-queues))]
+                                                           (let [destinations clients]
+                                                             (doseq [d destinations]
+                                                               (wss/alert! d
+                                                                           [:v-box :justify :center :style {:opacity 0.9} :children
+                                                                            [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                                                              :child (str "Note: CSV file being imported to cache-db")]
+                                                                             [:box :child (str (get % :path))]]]
+                                                                           14 2
+                                                                           11)))
                                                            (ut/pp [:csv-file-change! f-op f-path])
-                                                           (wss/process-csv {} f-path)))
+                                                           (wss/process-csv {} f-path)
+                                                           (let [destinations clients]
+                                                             (doseq [d destinations]
+                                                               (wss/alert! d
+                                                                           [:v-box :justify :center :style {:opacity 0.9} :children
+                                                                            [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                                                              :child (str "Note: CSV file import finished")]
+                                                                             [:box :child (str (get % :path))]]]
+                                                                           14 2
+                                                                           11)))))
      file-path)))
 
 
@@ -637,24 +661,20 @@
 
 (defn -main [& args]
   (println " ")
+  
   (ut/print-ansi-art "nname.ans")
-  (ut/pp [:version 0 :august 2024 "Hi."])
-  (println " ")
   (ut/print-ansi-art "rrvbbit.ans")
+  (ut/pp [:version 0 :august 2024 "Hi."])
+  (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
+  (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
+  (println " ")
+  (wss/fig-render "Curiouser and curiouser!" :pink)
+  (println " ")
+
+  (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+
   (qp/create-slot-queue-system)
   (fpop/thaw-flow-results)
-  #_{:clj-kondo/ignore [:inline-def]}
-  (defonce start-conn-watcher (watch-connections-folder))
-  #_{:clj-kondo/ignore [:inline-def]}
-  (defonce start-screen-watcher (watch-screens-folder))
-  #_{:clj-kondo/ignore [:inline-def]}
-  (defonce start-flow-watcher (watch-flows-folder))
-  #_{:clj-kondo/ignore [:inline-def]}
-  (defonce start-settings-watcher (watch-config-files))
-  #_{:clj-kondo/ignore [:inline-def]}
-  (defonce start-solver-watcher (watch-solver-files))
-  #_{:clj-kondo/ignore [:inline-def]}
-  (defonce session-file-watcher (wss/subscribe-to-session-changes))
 
   (sql-exec system-db "drop table if exists jvm_stats;")
   (sql-exec system-db "drop table if exists errors;")
@@ -670,8 +690,26 @@
   (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest2)
   (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest3)
 
+  (when harvest-on-boot?
+    (update-all-conn-meta))
+
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-conn-watcher (watch-connections-folder))
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-screen-watcher (watch-screens-folder))
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-flow-watcher (watch-flows-folder))
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-settings-watcher (watch-config-files))
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-solver-watcher (watch-solver-files))
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce session-file-watcher (wss/subscribe-to-session-changes))
+
+
+
   ;; create dirs for various artifacts, if not already present
-  (doseq [dir ["user-content" "user-content/snaps" "user-content/screen-snaps" 
+  (doseq [dir ["user-content" "user-content/snaps" "user-content/screen-snaps"
                "flow-logs" "flow-blocks" "flow-history" "fabric-sessions"]]
     (ext/create-dirs dir))
 
@@ -716,10 +754,7 @@
    cruiser/default-viz-shapes
    (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
 
-  ;; (when harvest-on-boot?
-  ;;   (update-all-conn-meta))
-
-  (cruiser/lets-give-it-a-whirl-no-viz ;;; force system-db as a conn, takes a sec
+  (cruiser/lets-give-it-a-whirl-no-viz
    "system-db"
    system-db
    system-db
@@ -728,7 +763,7 @@
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
 
-  (cruiser/lets-give-it-a-whirl-no-viz ;;; force flows-db as a conn, takes a sec
+  (cruiser/lets-give-it-a-whirl-no-viz
    "flows-db"
    flows-db
    system-db
@@ -737,7 +772,8 @@
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
 
-  (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
+  (cruiser/clean-up-db-metadata "cache.db")
+  (cruiser/lets-give-it-a-whirl-no-viz
    "cache.db"
    cache-db
    system-db
@@ -746,7 +782,7 @@
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
 
-  (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
+  (cruiser/lets-give-it-a-whirl-no-viz
    "history-db"
    history-db
    system-db
@@ -755,7 +791,7 @@
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
 
-  (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+
 
 
 
@@ -795,7 +831,16 @@
   (start-scheduler 240 ;; was 30
                    #(ppy/execute-in-thread-pools
                      :param-sql-sync
-                     (fn [] (wss/param-sql-sync)))
+                     (fn []
+                       (cruiser/lets-give-it-a-whirl-no-viz
+                        "cache.db"
+                        cache-db
+                        system-db
+                        cruiser/default-sniff-tests
+                        cruiser/default-field-attributes
+                        cruiser/default-derived-fields
+                        cruiser/default-viz-shapes)
+                       (wss/param-sql-sync)))
                    "Parameter Sync" 30)
 
   ;; (start-scheduler 45
@@ -1076,7 +1121,7 @@
                            ;(shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
-                           (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
+                           ;(shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                            ;(shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))

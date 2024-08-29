@@ -305,7 +305,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :data [:data-viewer :*data],
     :pretty [:pretty-box :*data],
     :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
@@ -328,9 +328,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -348,7 +348,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
    :debug-level 1,
    :screens
@@ -901,10 +901,10 @@
    :style
    {:border-radius "0px 0px 0px 40px",
     :_border-left
-    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
+    [:str "3px solid " :solver/colors-of-the-moment>second-brightest],
     :_border-top
-    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
-    :background-color [:string3 :solver/colors-of-the-moment>darkest 99],
+    [:str "3px solid " :solver/colors-of-the-moment>second-brightest],
+    :background-color [:str :solver/colors-of-the-moment>darkest 99],
     :backdrop-filter "blur(4px)"},
    :selected-view :hi,
    :root [41 0],
@@ -928,7 +928,7 @@
       :padding-top "26px",
       :padding-left "55px",
       :text-shadow
-      [:string3
+      [:str
        "2px 2px 10px "
        :solver/colors-of-the-moment>darkest
        ", 2px 2px 10px "
@@ -1328,10 +1328,10 @@
    :style
    {:border-radius "0px 0px 0px 40px",
     :_border-left
-    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
+    [:str "3px solid " :solver/colors-of-the-moment>second-brightest],
     :_border-top
-    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
-    :background-color [:string3 :solver/colors-of-the-moment>darkest 99],
+    [:str "3px solid " :solver/colors-of-the-moment>second-brightest],
+    :background-color [:str :solver/colors-of-the-moment>darkest 99],
     :backdrop-filter "blur(4px)"},
    :selected-view :hi,
    :root [64 3],
@@ -1358,7 +1358,7 @@
        :style
        {:font-size "18px",
         :text-shadow
-        [:string3
+        [:str
          "2px 2px 10px "
          :solver/colors-of-the-moment>darkest
          ", 2px 2px 10px "
@@ -1660,9 +1660,9 @@
      :center
      :style
      {:font-size "45px",
-      :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
+      :color [:str [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
      :child
-     [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
+     [:str [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
  :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#c4b8b4",
@@ -1762,7 +1762,7 @@
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
    :base-block-color "#04041e82",
-   :editor-rim-color [:string3 :solver/colors-of-the-moment>brightest 99],
+   :editor-rim-color [:str :solver/colors-of-the-moment>brightest 99],
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
    :vega-default-color-scheme {:scheme "pastel2"},
@@ -1805,7 +1805,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
+   {:background-image [:str "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-position "center",

@@ -10,12 +10,12 @@
  :max-lifetime       1800000
  :minimum-idle       10
  :maximum-pool-size  10
- :jdbc-url           "jdbc:postgresql://ryanr:notofox@10.174.1.248:5432" ;; needs both? wtf, worked
+ :jdbc-url           "jdbc:postgresql://postgres:Notofox22==@dev-pig-37:5432"
  :adapter            "postgresql"
- :username           "ryanr"
- :password           "notofox"
- :database-name      "imdb"
- :server-name        "10.174.1.248"
+ :username           "postgres"
+ :password           "Notofox22=="
+ :database-name      "rabbit"
+ :server-name        "dev-pig-37"
  :port-number        5432
  :register-mbeans    false}
 

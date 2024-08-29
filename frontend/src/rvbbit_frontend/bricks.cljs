@@ -11070,7 +11070,7 @@
               :FunnelChart reech/FunnelChart
               :*client-name client-name
               :*client-name-str (pr-str client-name)
-              :str (fn [args] (apply str args))
+              ;:str (fn [args] (apply str args))
               :left-pad (fn [[num len]] (let [num-str (str num) padded-num (.padStart num-str len "0")] padded-num))
               :>> (fn [[x y]] (true? (> x y)))
               :<< (fn [[x y]] (true? (< x y)))
@@ -11483,7 +11483,7 @@
 ;;                                                                :input-map {}
 ;;                                                                :data :code}]}
 ;;                        :cheese-burger  {:args [:x]
-;;                                         :body [:box :style {:color "yellow" :font-size "23px"} :child [:string3 :x "CHEESEBURGER!"]]}})
+;;                                         :body [:box :style {:color "yellow" :font-size "23px"} :child [:str :x "CHEESEBURGER!"]]}})
 (re-frame/reg-sub
  ::clover-templates
  (fn [db _]
@@ -11518,7 +11518,7 @@
    (get-in db [:server :settings :runners view-type :clover-fn]
            ;[:box
            ; :style {:color "red" :background-color "black"}
-           ; :child [:string3 "no clover-fn found" :clover-body]]
+           ; :child [:str "no clover-fn found" :clover-body]]
            :clover-body)))
 
 (re-frame/reg-sub
@@ -11658,14 +11658,14 @@
                           (ut/postwalk-replacer logic-kps obody)))
 
         ;; string-walk (fn [num obody]
-        ;;               (let [kps       (ut/extract-patterns obody :string3 num)
+        ;;               (let [kps       (ut/extract-patterns obody :str num)
         ;;                     logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
         ;;                 (ut/postwalk-replacer logic-kps obody)))
 
         string-walk (fn [obody]
                       (let [process-string3 (fn [form]
                                               (if (and (vector? form)
-                                                       (= (first form) :string3)
+                                                       (= (first form) :str)
                                                        (> (count form) 1))
                                                 (apply str (rest form))
                                                 form))]
@@ -12102,7 +12102,7 @@
         ;; _ (when (or (= panel-key :block-5662) (= panel-key :virtual-panel)) (tapp>> [:body panel-key body is-runner? curr-view-mode selected-view-type]))
 
         body (if (or is-runner? (and (not clover?) (not query?)))
-               ;;{(first body) [:box :child [:string3 (last body)]]}
+               ;;{(first body) [:box :child [:str (last body)]]}
                (let [wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
                      ;;sub-param (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup)))
                      ;;sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
@@ -12342,7 +12342,7 @@
           (has-fn? :slider)         slider-walk-map2
           (has-fn? :into)           into-walk-map2
           (has-fn? :auto-size-px)   auto-size-walk-map2
-          (has-fn? :string3)        string-walk
+          (has-fn? :str)        string-walk
           (has-fn? :push>)          push-walk
           (has-fn? :push>>)         push-walk-fn
           (has-fn? :invert-hex-color) invert-hex-color-walk

@@ -1735,7 +1735,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :edn [:edn :*data],
     :text [:console :*data],
     :terminal [:terminal :*data],
@@ -1761,9 +1761,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -1781,7 +1781,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
@@ -2708,7 +2708,7 @@
     :new-view
     [:box
      :child
-     [:string3 :new-clojure]
+     [:str :new-clojure]
      :align
      :center
      :justify
@@ -3256,7 +3256,7 @@
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
-     [[:box :child [:string3 :jvm-stats-drag-40/sys_load.0 "%"]]
+     [[:box :child [:str :jvm-stats-drag-40/sys_load.0 "%"]]
       [:box
        :style
        {:font-size "18px", :margin-top "-10px"}
@@ -3529,7 +3529,7 @@
       :margin-top "7px",
       :transition "all 0.6s ease-in-out"}
      :child
-     [:string3 "uptime: " :server/uptime]]},
+     [:str "uptime: " :server/uptime]]},
    :queries {}},
   :block-7665
   {:h 5,
@@ -3992,7 +3992,7 @@
    :queries 0,
    :views 29,
    :block_data
-   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#04041e82\", :editor-rim-color [:string3 :solver/colors-of-the-moment>brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:string3 \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#04041e82\", :editor-rim-color [:str :solver/colors-of-the-moment>brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
    :view_names
    ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1",
    :query_names ""},
@@ -4265,8 +4265,8 @@
    {:background-color "#00000088", :filter "brightness(200%)"},
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
-   :base-block-color [:string3 :param/theme-dark 82],
-   :editor-rim-color [:string3 :solver/colors-of-the-moment>second-brightest 99],
+   :base-block-color [:str :param/theme-dark 82],
+   :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99],
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
    :vega-default-color-scheme {:scheme "pastel2"},
@@ -4309,7 +4309,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
+   {:background-image [:str "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-blend-mode "hard-light",

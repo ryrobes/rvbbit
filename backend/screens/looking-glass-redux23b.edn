@@ -2075,7 +2075,7 @@
       :background-position "center",
       :transition "all 1.8s ease-in-out",
       :background-image
-      [:string3
+      [:str
        "url("
        :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
        ")"],

@@ -5,7 +5,7 @@
 ;;  :subname "//localhost:8123/test"}
 
 {:jdbc-url "jdbc:clickhouse://dev-pig-37:8123/default"
- :username "default"
+ :username "admin"
  :password "Notofox22=="
  :driver-class-name "ru.yandex.clickhouse.ClickHouseDriver"
  :connection-timeout 5000

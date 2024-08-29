@@ -4838,7 +4838,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :edn [:edn :*data],
     :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
@@ -4862,9 +4862,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -4882,7 +4882,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
@@ -9596,7 +9596,7 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     [:string3 123 "fart" "bananas"]]},
+     [:str 123 "fart" "bananas"]]},
    :queries {}},
   :block-208
   {:mad-libs-combo-hash ["929252748" "year_drag_22"],
@@ -10178,7 +10178,7 @@
   :new-clojure-sqlized-clone-33 {:class "Class B", :other_val 620},
   :block-3251 {:max-combos 4, :dimensions-to-scan []},
   :param
-  {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
+  {:background-image-path [:str :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/large/",
    :unreal-desert-coyote "new parameter value!",
    :thorough-electric-blue-termite "new parameter value!",
@@ -10275,7 +10275,7 @@
    :grid-font-color "#ffffff",
    :canvas-background-css
    {:background-image
-    [:string3 "url(" "images/large/b64-image3-89947-3461-4k.webp" ")"],
+    [:str "url(" "images/large/b64-image3-89947-3461-4k.webp" ")"],
     :transition "all 1.8s ease-in-out",
     :background-size "cover",
     :background-blend-mode "overlay",

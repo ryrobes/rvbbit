@@ -114,14 +114,14 @@
                           (ut/postwalk-replacer logic-kps obody)))
           
           ;; string-walk (fn [num obody]
-          ;;               (let [kps       (ut/extract-patterns obody :string3 num)
+          ;;               (let [kps       (ut/extract-patterns obody :str num)
           ;;                     logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
           ;;                 (ut/postwalk-replacer logic-kps obody)))
           
         string-walk (fn [obody]
                       (let [process-string3 (fn [form]
                                               (if (and (vector? form)
-                                                       (= (first form) :string3)
+                                                       (= (first form) :str)
                                                        (> (count form) 1))
                                                 (apply str (rest form))
                                                 form))]
@@ -158,8 +158,9 @@
           singles {:text   str
                    :>>     (fn [[x y]] (true? (> x y)))
                    :<<     (fn [[x y]] (true? (< x y)))
-                   :str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
-                   :string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))}
+                   ;:str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
+                   ;:string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
+                   }
           obody-key-set (ut/deep-flatten block-map)
           client-name @(ut/tracked-sub ::client-name {})
           solver-clover-walk
@@ -223,12 +224,12 @@
                           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
                           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
                           (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
-                          ;; (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these
-                          ;; (has-fn? :string3)        (string-walk 3)
-                          ;; (has-fn? :string3)        (string-walk 4)
-                          ;; (has-fn? :string3)        (string-walk 5)
-                          ;; (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS
-                          (has-fn? :string3)        string-walk
+                          ;; (has-fn? :str)        (string-walk 2) ;; TODO, remove all these
+                          ;; (has-fn? :str)        (string-walk 3)
+                          ;; (has-fn? :str)        (string-walk 4)
+                          ;; (has-fn? :str)        (string-walk 5)
+                          ;; (has-fn? :str)        (string-walk 6) ;; TODO REMOVE ALL THIS
+                          (has-fn? :str)        string-walk
                           (has-fn? :get-in)         get-in-walk
                           (has-fn? :=)              =-walk-map2
                           (has-fn? :sticky-border-radius) sticky-border-radius

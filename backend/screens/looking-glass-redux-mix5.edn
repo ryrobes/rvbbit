@@ -1543,7 +1543,7 @@
       :background-position "center",
       :transition "all 1.8s ease-in-out",
       :background-image
-      [:string3
+      [:str
        "url("
        :flow/openai-image-gen-ladder5>:relative-url-path-for-png-version
        ")"],
@@ -1914,7 +1914,7 @@
       ["openai-image-gen-ladder5"
        "freeze-ladder!"
        {:prompt
-        [:string3
+        [:str
          " Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter. But more intricate, more whimsical, and more sultry and seductive. "
          :flow/openai-image-gen-ladder5>:output-revised-prompt]}]]]},
    :queries {}},

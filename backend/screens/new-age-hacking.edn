@@ -2865,7 +2865,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :edn [:edn :*data],
     :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
@@ -2889,9 +2889,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -2909,7 +2909,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
@@ -5364,7 +5364,7 @@
    :queries 0,
    :views 28,
    :block_data
-   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style :param/glass-fish-style, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected :param/generated-colors>second-darkest, :block-title-font-color \"#ffffff\", :universal-pop-color :param/tetradss>0, :base-block-color \"#04041e82\", :editor-rim-color :param/generated-colors>colors>4, :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :param/generated-colors>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :param/generated-colors>dominant, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:string3 \"url(\" :param/rel-image-path \")\"], :transition \"all 1.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#00000088\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style :param/glass-fish-style, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected :param/generated-colors>second-darkest, :block-title-font-color \"#ffffff\", :universal-pop-color :param/tetradss>0, :base-block-color \"#04041e82\", :editor-rim-color :param/generated-colors>colors>4, :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :param/generated-colors>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :param/generated-colors>dominant, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :param/rel-image-path \")\"], :transition \"all 1.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#00000088\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
    :view_names
    ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :universal-pop-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
    :query_names ""},
@@ -5442,7 +5442,7 @@
    :zip_name "BELCHERTOWN"},
   :param
   {:left-curl-max 35,
-   :background-image-path [:string3 :param/path-dir :param/rel-image-path],
+   :background-image-path [:str :param/path-dir :param/rel-image-path],
    :keper "b64-image3-30849-74975-4k.webp",
    :branch-color "#a2f7c6",
    :right-curl-max 36,
@@ -5469,11 +5469,11 @@
    :twig-color "#f5e1f499",
    :left-curl-min 2,
    :gradient-end "#ffffff",
-   :rel-image-path [:string3 "images/large/" :new-clojure-1-sqlized/ffilename],
+   :rel-image-path [:str "images/large/" :new-clojure-1-sqlized/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
    :selected-block :block-2343,
    :glass-fish-style
-   {:background-color [:string3 :param/generated-colors>darkest 73],
+   {:background-color [:str :param/generated-colors>darkest 73],
     :border-radius [:sticky-border-radius "33px"],
     :box-shadow "10px 5px 5px #00000034",
     :backdrop-filter "blur(4px) brightness(40%)",
@@ -5561,7 +5561,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :param/rel-image-path ")"],
+   {:background-image [:str "url(" :param/rel-image-path ")"],
     :transition "all 1.8s ease-in-out",
     :background-blend-mode "overlay",
     :background-size "cover",

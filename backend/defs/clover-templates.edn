@@ -22,8 +22,8 @@
                             :size "auto"
                             :align :center :justify :center
                             :style {:color :theme/editor-outer-rim-color
-                                    :font-size [:auto-size-px [:string3 :*input]]}
-                            :child [:string3 :*input]]}
+                                    :font-size [:auto-size-px [:str :*input]]}
+                            :child [:str :*input]]}
  :new-block-quotes-box {:args [:*input]
                         :body [:box :align :center
                                :justify :center
@@ -35,7 +35,7 @@
                                        :color        :theme/editor-outer-rim-color
                                        :font-family  :theme/base-font}
                                :child [:speak
-                                       [:string3 :*input]]]}
+                                       [:str :*input]]]}
  :clj            {:args [:code]
                   :body  [:run-solver
                           {:signal false
@@ -53,4 +53,4 @@
  :cheese-burger  {:args [:x]
                   :body [:box
                          :style {:color "yellow" :font-size "23px"}
-                         :child [:string3 :x "CHEESEBURGER!"]]}}
+                         :child [:str :x "CHEESEBURGER!"]]}}

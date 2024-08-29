@@ -8708,9 +8708,9 @@
      :median
      "{:name \"23. When grouping by city, state and aggregating by :rows, there are values that are significantly ABOVE the mean. These values deviate by 11.62 standard deviations, with an absolute difference of 169 from the mean. This outlier was identified using the 1.00th percentile threshold.\", :highlight-columns {:ufo-sightings-drag-7 [:city :state]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-2521 :queries :ufo-sightings-drag-7 :style-rules [:* :higlight1864615410]] {:logic [:and [:= :city \"san antonio\"] [:= :state \"tx\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"3.7597136\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"14.563608900698714\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"978\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:city :state]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":city\"] [:box :child \"\\\"san antonio\\\"\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":state\"] [:box :child \"\\\"tx\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:city :state [[:count 1] :rows]], :from [:query/ufo-sightings-drag-7], :_query-id :kit-query-18646154100-agg, :_h 4, :connection-id \"bigfoot-ufos\", :group-by [:city :state], :style-rules {[:* :highlight-group] {:logic [:and [:= :city \"san antonio\"] [:= :state \"tx\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[3 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/ufo-sightings-drag-7], :_query-id :kit-query-18646154100-detail, :_h 8, :connection-id \"bigfoot-ufos\", :where [:*if :kit-query-18646154100-agg/*.clicked [:*all= :kit-query-18646154100-agg/*.clicked [:city :state]] [:and [:= :city \"san antonio\"] [:= :state \"tx\"]]]}], :order 22}",
      :max
-     "{:name \"csv export of :ufo-sightings-drag-7 in :block-2521\", :parameters {}, :step-mutates {}, :ask-mutates {}, :content [[:v-box :size \"auto\" :align :center :justify :center :width \"490px\" :style {:border [:string3 \"3px solid \" nil], :border-radius \"14px\"} :padding \"10px\" :gap \"5px\" :children [[:box :child \"Success. File saved locally to: \"] [:box :style {:font-size \"17px\"} :child \"user-content/data-exports/ufo-sightings-drag-7_block-2521.csv\"] [:box :style {:font-size \"17px\"} :child \"3,677 rows exported\"] [:img {:src \"https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp\", :style {:width \"100%\", :padding \"5px\", :border-radius \"14px\", :height \"100%\", :object-fit \"cover\"}}] [:box :child \"..if you could... print this out for me... that'd be great...\"]]]]}",
+     "{:name \"csv export of :ufo-sightings-drag-7 in :block-2521\", :parameters {}, :step-mutates {}, :ask-mutates {}, :content [[:v-box :size \"auto\" :align :center :justify :center :width \"490px\" :style {:border [:str \"3px solid \" nil], :border-radius \"14px\"} :padding \"10px\" :gap \"5px\" :children [[:box :child \"Success. File saved locally to: \"] [:box :style {:font-size \"17px\"} :child \"user-content/data-exports/ufo-sightings-drag-7_block-2521.csv\"] [:box :style {:font-size \"17px\"} :child \"3,677 rows exported\"] [:img {:src \"https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp\", :style {:width \"100%\", :padding \"5px\", :border-radius \"14px\", :height \"100%\", :object-fit \"cover\"}}] [:box :child \"..if you could... print this out for me... that'd be great...\"]]]]}",
      :avg
-     "{:name \"csv export of :ufo-sightings-drag-7 in :block-2521\", :parameters {}, :step-mutates {}, :ask-mutates {}, :content [[:v-box :size \"auto\" :align :center :justify :center :width \"490px\" :style {:border [:string3 \"3px solid \" nil], :border-radius \"14px\"} :padding \"10px\" :gap \"5px\" :children [[:box :child \"Success. File saved locally to: \"] [:box :style {:font-size \"17px\"} :child \"user-content/data-exports/ufo-sightings-drag-7_block-2521.csv\"] [:box :style {:font-size \"17px\"} :child \"3,677 rows exported\"] [:img {:src \"https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp\", :style {:width \"100%\", :padding \"5px\", :border-radius \"14px\", :height \"100%\", :object-fit \"cover\"}}] [:box :child \"..if you could... print this out for me... that'd be great...\"]]]]} (non-numeric average)",
+     "{:name \"csv export of :ufo-sightings-drag-7 in :block-2521\", :parameters {}, :step-mutates {}, :ask-mutates {}, :content [[:v-box :size \"auto\" :align :center :justify :center :width \"490px\" :style {:border [:str \"3px solid \" nil], :border-radius \"14px\"} :padding \"10px\" :gap \"5px\" :children [[:box :child \"Success. File saved locally to: \"] [:box :style {:font-size \"17px\"} :child \"user-content/data-exports/ufo-sightings-drag-7_block-2521.csv\"] [:box :style {:font-size \"17px\"} :child \"3,677 rows exported\"] [:img {:src \"https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp\", :style {:width \"100%\", :padding \"5px\", :border-radius \"14px\", :height \"100%\", :object-fit \"cover\"}}] [:box :child \"..if you could... print this out for me... that'd be great...\"]]]]} (non-numeric average)",
      :cardinality 100},
     :item_key
     {:min ":export-to-csv",
@@ -8936,7 +8936,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :edn [:edn :*data],
     :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
@@ -8960,9 +8960,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :new-block-quotes-box
     {:args [:*input],
      :body
@@ -8980,7 +8980,7 @@
        :color :theme/editor-outer-rim-color,
        :font-family :theme/base-font}
       :child
-      [:speak [:string3 :*input]]]},
+      [:speak [:str :*input]]]},
     :clj
     {:args [:code],
      :body
@@ -8998,7 +8998,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :openai-api-key "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",
    :eleven-labs-default-voice-name "Not OG Buffy",
    :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -11659,7 +11659,7 @@
    :queries 0,
    :views 28,
    :block_data
-   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style :param/glass-fish-style, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected :param/generated-colors>second-darkest, :block-title-font-color \"#ffffff\", :universal-pop-color :param/tetradss>0, :base-block-color \"#04041e82\", :editor-rim-color :param/generated-colors>colors>4, :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :param/generated-colors>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :param/generated-colors>dominant, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:string3 \"url(\" :param/rel-image-path \")\"], :transition \"all 1.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#00000088\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style :param/glass-fish-style, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected :param/generated-colors>second-darkest, :block-title-font-color \"#ffffff\", :universal-pop-color :param/tetradss>0, :base-block-color \"#04041e82\", :editor-rim-color :param/generated-colors>colors>4, :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :param/generated-colors>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :param/generated-colors>dominant, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :param/rel-image-path \")\"], :transition \"all 1.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#00000088\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
    :view_names
    ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :universal-pop-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
    :query_names ""},
@@ -11743,18 +11743,18 @@
    :run_time "2022-05-20 16:27:43.000000",
    :zip_name "BELCHERTOWN"},
   :param
-  {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
+  {:background-image-path [:str :param/path-dir :param/rel-image-path],
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data nil,
    :selected-view [nil nil],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
-   :rel-image-path [:string3 "images/large/" :new-clojure-sqlized/ffilename],
+   :rel-image-path [:str "images/large/" :new-clojure-sqlized/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
    :selected-block :block-529,
    :glass-fish-style
-   {:background-color [:string3 :param/generated-colors>darkest 73],
+   {:background-color [:str :param/generated-colors>darkest 73],
     :border-radius [:sticky-border-radius "24px"],
     :backdrop-filter "blur(4px) brightness(40%)",
     :filter nil}},
@@ -11841,7 +11841,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :param/rel-image-path ")"],
+   {:background-image [:str "url(" :param/rel-image-path ")"],
     :transition "all 1.8s ease-in-out",
     :background-blend-mode "overlay",
     :background-size "cover",

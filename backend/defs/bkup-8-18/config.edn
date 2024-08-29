@@ -19,7 +19,7 @@
                               :text-shadow "4px 4px 4px #00000088"
                               :font-size "17px"
                               :font-family :theme/monospaced-font}}
-                     [:string3 :*data]]
+                     [:str :*data]]
          :edn       [:edn :*data]
          :text      [:console :*data]
          :terminal  [:terminal :*data]
@@ -109,7 +109,7 @@
                                  " 🥕🐇"))
                      :syntax "clojure"
                      :placeholder-clover [:v-box
-                                          :children [;[:box :child [:string3 :*solver-name* " running..."]]
+                                          :children [;[:box :child [:str :*solver-name* " running..."]]
                                                      [:img {:src "images/running.gif"
                                                             ;:width "70px" 
                                                             ;:height "70px"
@@ -217,7 +217,7 @@
                                                                  [:h-box 
                                                                   :gap "10px"
                                                                   :children [[:slider :max-combos 2 10 1 200 max-combos]
-                                                                                    [:box :child [:string3 max-combos]]]]
+                                                                                    [:box :child [:str max-combos]]]]
                                                                  [:h-box
                                                                   ;:justify :between
                                                                   :style {:font-size "33px"

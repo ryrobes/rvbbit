@@ -585,7 +585,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :data [:data-viewer :*data],
     :pretty [:pretty-box :*data],
     :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
@@ -608,9 +608,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -628,7 +628,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
    :debug-level 1,
    :screens
@@ -2080,7 +2080,7 @@
        :style
        {:font-size "18px",
         :text-shadow
-        [:string3
+        [:str
          "2px 2px 10px "
          :solver/colors-of-the-moment>darkest
          ", 2px 2px 10px "
@@ -2172,7 +2172,7 @@
    :distinguished-hexagonal-badger-16>stats>memory nil},
   :viz-tables-sys {:table_name "offenses_drag_DISTRICT_23"},
   :param
-  {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
+  {:background-image-path [:str :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
    (do
@@ -2292,7 +2292,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :param/rel-image-path ")"],
+   {:background-image [:str "url(" :param/rel-image-path ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},

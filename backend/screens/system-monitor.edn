@@ -519,9 +519,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -539,7 +539,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
    :openapi-org-id nil,
    :debug-level 1,
@@ -1635,7 +1635,7 @@
       :color :param/generated-colors>colors>0,
       :font-family :theme/base-font}
      :child
-     [:string3 :data/new-clojure-2]]}},
+     [:str :data/new-clojure-2]]}},
   :block-7319
   {:h 5,
    :w 8,
@@ -1838,7 +1838,7 @@
        :style
        {:font-size "18px",
         :text-shadow
-        [:string3
+        [:str
          "2px 2px 10px "
          :solver/colors-of-the-moment>darkest
          ", 2px 2px 10px "
@@ -1908,7 +1908,7 @@
     :filter nil},
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :rel-image-path "images/large/b64-image3-48163-50841-4k.webp",
-   :background-image-path [:string3 :param/path-dir :param/rel-image-path],
+   :background-image-path [:str :param/path-dir :param/rel-image-path],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :selected-block :block-7922},
@@ -1994,7 +1994,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :param/rel-image-path ")"],
+   {:background-image [:str "url(" :param/rel-image-path ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},

@@ -387,7 +387,7 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     [:string3 :*data]],
+     [:str :*data]],
     :edn [:edn :*data],
     :clover [:box :child :*data],
     :pretty [:pretty-box :*data],
@@ -411,9 +411,9 @@
       :center
       :style
       {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:string3 :*input]]}
+       :font-size [:auto-size-px [:str :*input]]}
       :child
-      [:string3 :*input]]},
+      [:str :*input]]},
     :clj
     {:args [:code],
      :body
@@ -431,7 +431,7 @@
       :style
       {:color "yellow", :font-size "23px"}
       :child
-      [:string3 :x "CHEESEBURGER!"]]}},
+      [:str :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
@@ -1204,7 +1204,7 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     [:string3 :time/hour "." :time/minute "." :time/second]]},
+     [:str :time/hour "." :time/minute "." :time/second]]},
    :queries {}},
   :block-721
   {:clojure
@@ -1872,7 +1872,7 @@
      :color :theme/editor-outer-rim-color,
      :font-family :theme/base-font}
     :child
-    [:string3 :time/second]],
+    [:str :time/second]],
    :selected-block :block-2236,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",

@@ -9,7 +9,7 @@
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :default "./screens/looking-glass-redux.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
- :harvest-on-boot? false
+ :harvest-on-boot? true ;;false
  ;; ^^ do a full database sniff for each connection on boot? (generally not needed)
  :modes {:pre       [:pre
                      {:style {:color :theme/editor-outer-rim-color
@@ -18,7 +18,7 @@
                               :text-shadow "4px 4px 4px #00000088"
                               :font-size "17px"
                               :font-family :theme/monospaced-font}}
-                     [:string3 :*data]]
+                     [:str :*data]]
          :edn       [:edn :*data]
          :text      [:console :*data]
          :terminal  [:terminal :*data]
@@ -108,7 +108,7 @@
                                  " 🥕🐇"))
                      :syntax "clojure"
                      :placeholder-clover [:v-box
-                                          :children [;[:box :child [:string3 :*solver-name* " running..."]]
+                                          :children [;[:box :child [:str :*solver-name* " running..."]]
                                                      [:img {:src "images/running.gif"
                                                             ;:width "70px" 
                                                             ;:height "70px"
@@ -185,7 +185,7 @@
                                                                                                :content [[:v-box
                                                                                                           :size "auto" :align :center :justify :center
                                                                                                           :width "490px"
-                                                                                                          :style {:border [:string3 "3px solid " :theme/editor-outer-rim-color]
+                                                                                                          :style {:border [:str "3px solid " :theme/editor-outer-rim-color]
                                                                                                                   :border-radius "14px"}
                                                                                                           :padding "10px"
                                                                                                           :gap "5px"
@@ -509,7 +509,7 @@
                                                                  [:h-box
                                                                   :gap "10px"
                                                                   :children [[:slider :max-combos 2 10 1 200 max-combos]
-                                                                             [:box :child [:string3 max-combos]]]]
+                                                                             [:box :child [:str max-combos]]]]
                                                                  [:h-box
                                                                   ;:justify :between
                                                                   :style {:font-size "33px"

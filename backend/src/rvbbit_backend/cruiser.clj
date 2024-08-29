@@ -1,25 +1,26 @@
 (ns rvbbit-backend.cruiser
-  (:require ;[datalevin.core :as d]
-    [clojure.java.jdbc         :as jdbc]
-    [clojure.core.async        :as async]
-    [clojure.edn               :as edn]
-    [hikari-cp.core            :as hik]
-    [rvbbit-backend.embeddings :as em]
-    [taskpool.taskpool         :as tp]
-    [honey.sql                 :as honey]
-    [clojure.string            :as cstr]
-    [clojure.walk              :as walk]
-    [com.climate.claypoole     :as cp]
-    [rvbbit-backend.clickhouse-ddl :as clickhouse-ddl]
-    [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset-sql-query usage
-    [rvbbit-backend.util       :as ut]
-    [rvbbit-backend.surveyor   :as surveyor]
+  (:require
+   [clojure.java.jdbc         :as jdbc]
+   [clojure.core.async        :as async]
+   [clojure.edn               :as edn]
+   [hikari-cp.core            :as hik]
+   [rvbbit-backend.embeddings :as em]
+   [taskpool.taskpool         :as tp]
+   [honey.sql                 :as honey]
+   [clojure.string            :as cstr]
+   [clojure.walk              :as walk]
+   [com.climate.claypoole     :as cp]
+   [rvbbit-backend.external    :as ext]
+    ;[rvbbit-backend.clickhouse-ddl :as clickhouse-ddl]
+   [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset-sql-query usage
+   [rvbbit-backend.util       :as ut]
+   [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party  :as ppy]
-    [rvbbit-backend.sql        :as    sql
-                               :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db import-db
-                                       insert-error-row! to-sql pool-create]]
-    [clojure.math.combinatorics :as combo]
-    [clj-time.jdbc]) ;; enables joda time returns
+   [rvbbit-backend.sql        :as    sql
+    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db  
+            insert-error-row! to-sql pool-create]]
+   [clojure.math.combinatorics :as combo]
+   [clj-time.jdbc]) ;; enables joda time returns
   (:import
     [java.util Date UUID]))
 
@@ -1318,6 +1319,14 @@
                                       (str description) (str inputs) (str icon) (str (vec (vals (dissoc types :out))))
                                       (str (get types :out)) (str file-path)]]}))))
 
+(defn clean-up-db-metadata [conn-id]
+  (doseq [tt [:attributes :connections :fields :combo_rows :combos :tests]]
+    (sql-exec system-db (to-sql {:delete-from [tt] :where [:= :connection_id conn-id]}))))
+
+(defn clean-up-some-db-metadata [conn-ids]
+  (let [conn-ids (vec (into conn-ids ["system-db" "flows-db" "cache.db" "history-db"]))]
+    (doseq [tt [:attributes :connections :fields :combo_rows :combos :tests]]
+      (sql-exec system-db (to-sql {:delete-from [tt] :where [:not [:in :connection_id conn-ids]]})))))
 
 (defn lets-give-it-a-whirl
   [f-path target-db system-db sniff-tests-map field-attributes-map derived-field-map viz-shape-map & sql-filter]
@@ -1394,8 +1403,10 @@
       (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
             orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db)
             connection_id     (get connect-meta :connection_id)
+            _ (when (and (empty? sql-filter) (not (= connection_id "cache.db")))  
+               (clean-up-db-metadata connection_id)) ;; clean up any previous runs
             this-run-id       (get-latest-run-id system-db connect-meta)
-            field-vectors-all (create-target-field-vectors target-db connect-meta) ;; this is a
+            field-vectors-all (create-target-field-vectors target-db connect-meta)
             sys-schemas?      (fn [v]
                                 (let [catalog-name (str (nth v 4))
                                       schema-name  (str (nth v 3))
@@ -1422,7 +1433,7 @@
                                  connect-meta
                                  sql-filter)
         (update-connection-data! system-db this-run-id connection_id)
-        (ut/pp [:lets-give-it-a-whirl-no-viz-success! :fields (count field-vectors)])
+        (ut/pp [:db-metadata-without-viz-success! :fields (count field-vectors) connection_id])
         ;(group-by (fn [v] [(nth v 2) (nth v 5)]) field-vectors)
         ;; {:connect-meta connect-meta
         ;;  ;;:ff (first field-vectors)
