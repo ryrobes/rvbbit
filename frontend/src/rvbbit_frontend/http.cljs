@@ -972,10 +972,12 @@
                           (dissoc :data) ;; but NOT clover edn data TODO
                           (dissoc :flows) ;;; mostly ephemeral with the UI....
                           (dissoc :http-reqs)
+                          (dissoc :orders)
                           (dissoc :sql-str)
                           (ut/dissoc-in [:server :settings :runners])
                           (dissoc :file-changed)
                           (assoc :panels (select-keys (get db :panels) p0)))
+          image (ut/replace-large-base64 image) ;; sneaky foot gun.
           click-params-running (filter #(cstr/ends-with? (str %) "running?") (keys (get image :click-param)))
           image (assoc image :click-param (apply dissoc (get image :click-param) click-params-running))
           bogus-kw    (vec (find-bogus-keywords image))

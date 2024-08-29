@@ -663,14 +663,13 @@
 
 (defn -main [& args]
   (println " ")
-  
-  (ut/print-ansi-art "nname.ans")
-  (ut/print-ansi-art "rrvbbit.ans")
+  (ut/print-ansi-art "data/nname.ans")
+  (ut/print-ansi-art "data/rrvbbit.ans")
   (ut/pp [:version 0 :august 2024 "Hi."])
   (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
   (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
-  (println " ")
-  (wss/fig-render "Curiouser and curiouser!" :pink)
+  ;; (println " ")
+  ;; (wss/fig-render "Curiouser and curiouser!" :pink)
 
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
@@ -710,8 +709,8 @@
 
 
   ;; create dirs for various artifacts, if not already present
-  (doseq [dir ["user-content" "user-content/snaps" "user-content/screen-snaps" "defs/backup"
-               "flow-logs" "flow-blocks" "flow-history" "fabric-sessions"]]
+  (doseq [dir ["assets" "assets/snaps" "assets/screen-snaps" "defs/backup"
+               "flow-logs" "flow-blocks" "flow-history" "fabric-sessions" "live"]]
     (ext/create-dirs dir))
 
   ;; temp test indexes

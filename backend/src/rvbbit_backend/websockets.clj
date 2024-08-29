@@ -1283,7 +1283,8 @@
 (defmethod wl/handle-push :current-panels
   [{:keys [panels client-name resolved-panels materialized-panels everything?]}]
   (ut/pp [:panels-push! client-name (count (keys panels))])
-  (let [panels (if everything? panels
+  (let [panels (ut/deep-remove-keys panels [:_last-run])
+        panels (if everything? panels
                    (merge (get @client-panels client-name) panels))]
     
     (qp/serial-slot-queue :panel-update-serial :serial
@@ -5888,9 +5889,9 @@
              session     (get-in request [:edn-params :session])
              client-name (get-in request [:edn-params :client-name] "unknown")
              client-name (cstr/replace (str client-name) ":" "")
-             file-path   (str "./user-content/snaps/" client-name ".jpg")
+             file-path   (str "./assets/snaps/" client-name ".jpg")
              ;ifile-path  (str "./assets/snaps/" client-name ".jpg")
-             sess-path   (str "./user-content/snaps/" client-name ".edn")]
+             sess-path   (str "./assets/snaps/" client-name ".edn")]
          (spit sess-path session)
          (ut/save-base64-to-jpeg image file-path)
          ;(ut/save-base64-to-jpeg image ifile-path)
@@ -5901,7 +5902,7 @@
 (defn save-screen-snap [request]
   (try (let [image       (get-in request [:edn-params :image])
              screen-name (get-in request [:edn-params :screen-name] "unknown")
-             file-path   (str "./user-content/screen-snaps/" screen-name ".jpg")
+             file-path   (str "./assets/screen-snaps/" screen-name ".jpg")
              ;ifile-path  (str "./assets/screen-snaps/" screen-name ".jpg")
              ]
          (ut/save-base64-to-jpeg image file-path)
@@ -7399,7 +7400,7 @@
 
 (defn resolve-user-space-dir []
   (let [working-dir (System/getProperty "user.dir")
-        user-space (io/file working-dir "user-content")]
+        user-space (io/file working-dir "assets")]
     (when (.exists user-space)
       (.getCanonicalPath user-space))))
 

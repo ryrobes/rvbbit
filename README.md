@@ -1,27 +1,17 @@
 # RⱯBBIT DYNAMIC DATASCAPES
 ## Reactive Data Board & Visual Flow Platform
 
-[ Some kind of quote or dictionary term? ] creativity is working on something for longer than is reasonable?
-composability def. compostion?
-The dictionary definition of "composability" is "the quality of being composed or assembled."
-The dictionary definition of "composition" is "the act of combining parts into a whole."
-The dictionary definition of "feedback loops" is "a loop that allows information to be passed back and forth between parts of a system."
-Visual Composition is the act of combining parts into a whole. In Hypercard, you could compose a board by dragging and dropping cards onto a board. In RVBBIT, you can compose a board by writing code.
-
 In a world drowning in data, we don't need more dashboards. We need data landscapes we can explore.
 
-"If you want to build a ship, don't drum up people to collect wood and don't assign them tasks and work, but rather teach them to long for the endless immensity of the sea." — Antoine de Saint-Exupéry
+![alt text](docs/rvbbit-dev-mosiac.jpg)	
 
-composability (n): the art of creating complex systems from simple, reusable parts.
-feedback loop (n): a cycle where output influences input, creating a self-reinforcing system.
+## "If you want to build a ship, don't drum up people to collect wood and don't assign them tasks and work, but rather teach them to long for the endless immensity of the sea." — Antoine de Saint-Exupéry
 
-Data Visualization Alignment Chart:
-Lawful Good: Excel | Chaotic Good: D3.js
-Lawful Neutral: Tableau | True Neutral: matplotlib
-Lawful Evil: PowerBI | Chaotic Evil: RⱯBBIT
+### composability:
+> The art of creating complex systems from simple, reusable parts.
 
-
-Why?
+### feedback loop:
+> A cycle where output influences input, creating a self-reinforcing system.
 
 As a long-time dashboard builder, data engineer, and UI hacker, I've always wanted something in-between Tableau & building bespoke web data products to ship answers to my users. The tools were too rigid at times, and building everything from scratch can be tiresome. The eternal push/pull of DE and SWE approaches, as many who work in BI can attest to. How could I have the flexibility & re-usability of code, but the compositional freedom & direct manipulation of a builder tool? 
 
@@ -31,9 +21,19 @@ To paraphrase Alan Kay, "Simple things should be simple, complex things should b
 
 A data platform should feel more like using a game engine than using an "app". 
 
-What is it?
+### So I spent the last 3 years building prototypes and trying to figure out I wanted in a tool like this. Then 14+ months ago, I quit my job and set out to build it for real. 
 
-### A highly dynamic & flexible platform for composing interactive data boards, a data workspace canvas, & flow-based programming system
+I wanted a data board tool that FELT and LOOKED like it was from the future. Not from 1997 or 2004... It's the future, damnit. Where is all the glorious cyberpunk UI? I wanted to be able to make things for "Real work", but also feel like your in a hacker movie. I'm a simple man.
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <img src="docs/dash-left.jpg" width="48%" />
+  <img src="docs/dash-right.jpg" width="48%" /> 
+</div>
+
+
+Ok, enough with all the nonsense. WTF *is* it?
+
+## A highly dynamic & flexible platform for composing interactive data boards, a data workspace canvas, & flow-based programming system
 
 You could even call it a "non-linear anti-notebook that puts composition and presentation front & center rather than an afterthought". Heresy!   
 [Notebook enjoyers scroll their procedural top-to-bottom rectangular fists up and down at me angrily]
@@ -41,9 +41,7 @@ You could even call it a "non-linear anti-notebook that puts composition and pre
 Did you say "Data boards"? Yes. "Dashboard" is very 1990s. 
 More Minority Report, less Office Space. Baby steps.
 
-RVBBIT is a highly expressive hypermedia platform for interactive data visualization & analysis, synthesizing influences from HyperCard, Smalltalk, and Lisp/Clojure. At its core is the 'reactor,' an advanced system of reactive pathways that orchestrates a dynamic interplay of data and functionality across the entire platform.
-
-RVBBIT draws significant inspiration from pioneering systems like Smalltalk, HyperCard, & the breadcrumbs left by Bret Victor. Like Smalltalk, it embraces the idea of a fully malleable, live programming environment where everything is an object and can be inspected and modified. From HyperCard, the vision of an intuitive, visual programming paradigm that empowers users to create interactive, linked information systems. This blend of influences results in a platform that combines the power of a modern programming environment with the accessibility and rapid prototyping capabilities reminiscent of these groundbreaking tools - yet hyper focused on building data products such as dashboards, data science views, and interactive explorations.
+RVBBIT draws significant inspiration from pioneering systems like Smalltalk, HyperCard, & the endless trail of breadcrumbs left by Bret Victor. Like Smalltalk, it embraces the idea of a fully malleable, live programming environment where everything is an object and can be inspected and modified. From HyperCard, the vision of an intuitive, visual programming paradigm that empowers users to create interactive, linked information systems. Yet hyper focused on building data products such as dashboards, data science views, interactive explorations, & opening windows of understanding.
 
 ## "Low bar, High ceiling"
 
@@ -98,9 +96,6 @@ While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, kn
 - Are universal across all objects
 	+ A custom view click action can trigger a REPL execution, which then can trigger a SQL query, which then can cascade into a chart or view update, or mutate the users canvas in some way, and so on.
 
-## reusables ?
-use a query or a view from another saved deck - it gets updated, the changes stream into your deck, live.    
-
 ## Configurable Card "Runners"
 
 Besides the built-in runners of SQL queries and Views (UI) - the combination of arbitrary parametrized code + an integrated Flow system enables all kinds of functionality that can be packaged up as a new runners and available for users to build with. Essentially creating new Card types with new functionality.
@@ -109,6 +104,7 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 	+ A custom nREPL connection that executes some arbitary code or text and returns some specific output - like a shell command, or to a Python interpreter, an R calculation - or perhaps an nREPL across the office that has special libraries and hardware to process very specific tasks. All wrapped up in a friendly interface. Just another "card" on your data board.
 
 ## Flow Based Programming Builder / Runner
+
 	also runstreams. flows can be pinned to a data board
 	completely integrated
 	
@@ -117,18 +113,19 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 ## Signals & Solvers
 
 ## Metrics & KPIs
-coming soon. 
+coming soon. Since, if you think about, KPIs and Metrics are just different kinds of signals and solvers.
 
 ## Dynamic Theme System
 Did I mention reactive parameters? Yes, the theme of the UI is itself a set of reactive parameters. CSS maps everywhere. Specific card overrides, global defaults, conditional formatting. Data-driven dynamic theme changes? Yes.
 
 ## The Canvas
-minimize cards, pin them to all tabs
+Minimize cards, pin them to all tabs, go nuts.
 
 ## Recursive Composition
 Arrange a set of a cards in a board tab - drag that composed tab into another board, it's now it's own single card. Great for composing and organizing groups of cards that share functionality or need to be re-used (ex: a "sidebar menu" for a series of dashboard tabs)
 
 ## Kits (plug-ins)
+
 
 ## Card History
 A visual undo log of all card changes and their code diffs. Easy to scrub between old versions or even drag them out as new cards.
@@ -138,24 +135,17 @@ A visual undo log of all card changes and their code diffs. Easy to scrub betwee
 ## Designed with AI mutation in mind
 Due to a unified DSL and Clojure's Data as Code, Code as Data structure - the entire canvas is meant to be freely mutable by any Flow, function, DSL action. Super-prompting + context injection (because user-context is just a set of reactive parameters, of course) can go far.
 
-## **Demos**
-
-(Placeholder for gifs and videos demonstrating various features)
-Example public dashboards in read-only mode?
-
 ## Caveats
 
 - Use Englebarts beautiful invention
 - Some UI jank
 - Limited SQL DB support ATM
+	Tested with SQLite, Postgres, MySQL, SQL Server, Vertica, Clickhouse, DuckDB
+	(with various quirks to each as I continute to smooth out the SQL engine) 
 - No concept of users / auth yet
+- Meant to be used interally with a team that you trust (open REPLs, open shell access, etc.)
 
 ---
 
-For more information, please check out our individual demo pages and full videos showcasing RVBBIT as:
-- A SQL dashboard
-- A canvas of REPLs
-- Dynamic parameters
-- A flow runner with UI bindings
-- AI assist using a context-aware Fabric pattern
+
 
