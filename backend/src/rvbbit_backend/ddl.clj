@@ -1868,8 +1868,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 
 
-(def sample-kit-output
-  
+(def sample-kit-output ;; pre-new kit system, but uses the same DSL for output
   {:top-20-outliers
      {:data
         [{:ask-mutates {"Highlight these in your source query?"

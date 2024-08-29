@@ -62,7 +62,11 @@
    java.time.ZoneId)
   (:gen-class))
 
-;; lots of refactoring and namespace cleanup to do - but I am still very much in "Move Fast" mode.
+;; =======================================================================================================================================
+;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
+;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
+;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
+;; =======================================================================================================================================
 
 (def harvest-on-boot? (get (config/settings) :harvest-on-boot? true))
 
@@ -395,22 +399,6 @@
                                    (wss/kick d (if signals? :signals-file :solvers-file) @map-atom 1 :none (str "file updated " (get % :path))))))))
                     file-path)))
 
-
-;; (defn thaw-flow-results []
-;;   (ut/pp [:thawing-flow-results-atom...])
-;;   (let [file-path "./data/atoms/flow-db-results-atom.edn"
-;;         file      (io/file file-path)
-;;         state     (if (.exists file)
-;;                     (with-open [rdr (io/reader file)]
-;;                       (try (edn/read (java.io.PushbackReader. rdr))
-;;                            (catch Exception e (do (ut/pp [:flow-results-thaw-atom-error!!!! file e]) (System/exit 0)))))
-;;                     {})]
-;;     (reset! flow-db/results-atom state)))
-
-;; (defn freeze-flow-results []
-;;   (with-open [wtr (io/writer "./data/atoms/flow-db-results-atom.edn")]
-;;     (binding [*out* wtr] (prn @flow-db/results-atom)))) 
-
 (defn start-services []
   (ut/pp [:starting-services...])
   (evl/create-nrepl-server!) ;; needs to start
@@ -490,7 +478,6 @@
                                     {}
                                     (for [k     kks ;(keys @flow-db/results-atom)
                                           :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
-                    ;(qp/serial-slot-queue :update-stat-atom-serial :serial (fn []
                                       (let [cc              (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf?
                                             blocks          (get-in @flow-db/working-data [k :components-list])
                                             running-blocks  (vec (for [[k v] (get @flow-db/tracker k) :when (nil? (get v :end))] k))
@@ -542,11 +529,7 @@
                                                                        :in_error        (cstr/includes? (str res) ":error")
                                                                        :human_elapsed   (str human-elapsed)}
                                                            insert-sql {:insert-into [:flow_history] :values [row]}]
-                             ;(wss/enqueue-task3 ;; temp remove to test some shit 3/9/24
-                             ;  (fn []
-                                                       (sql-exec flows-db (to-sql insert-sql)) ;; sql-exec has its own queue now
-                             ;    ))
-                                                       )
+                                                       (sql-exec flows-db (to-sql insert-sql))) ;; sql-exec has it's own serial queue 
                                                      (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
                                             _ (swap! last-look assoc k done?)
                                             _ (when run-sql? (swap! saved-uids conj run-id))
@@ -790,10 +773,6 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
-
-
-
-
 
   ;;;  (reboot-reactor-and-resub)
 

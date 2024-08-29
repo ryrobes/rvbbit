@@ -84,11 +84,6 @@
 ;; (freeze-atom "./defs/solvers.edn")
 ;; (ut/pp  (keys @managed-atoms))
 
-
-
-
-
-
 ;; (defn write-transit [data]
 ;;   (let [baos (ByteArrayOutputStream.)
 ;;         writer (transit/writer baos :msgpack)]
@@ -108,7 +103,6 @@
 (defn freeze-flow-results []
   (let [file-path "./data/atoms/flow-db-results-atom.msgpack.transit"]
     (write-transit-data @flow-db/results-atom file-path)))
-
 
 ;; (defn thaw-flow-results []
 ;;   (ut/pp [:thawing-flow-results-atom...])

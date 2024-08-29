@@ -67,6 +67,11 @@
    [java.lang                              ProcessBuilder]
    [java.io                                BufferedReader InputStreamReader StringWriter]))
 
+;; =======================================================================================================================================
+;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
+;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
+;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
+;; =======================================================================================================================================
 
 (defonce cpu-usage (atom []))
 (defonce solver-usage (atom []))
@@ -468,10 +473,6 @@
 ;;       :register-mbeans    false}
 ;;      "cache-db")})
 
-
-
-
-
 (def transit-file-mapping (fpop/thaw-atom {} "./data/atoms/transit-file-mapping-atom.edn"))
 
 (defn write-transit-data
@@ -636,68 +637,12 @@
                    :let  [values     (vec (for [r batch] (vals r)))
                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
              (sql-exec db-conn insert-sql extra))
-           ;(enqueue-task5 
-           ;(qp/slot-queue :sql-meta client-name
-           ;               (fn [] ;; so our sniffer metadata picks up the new column
 
-          ;;  (cruiser/captured-sniff "cache.db"
-          ;;                          db-conn
-          ;;                          db-conn
-          ;;                          cache-db
-          ;;                          (hash rowset-fixed)
-          ;;                          [:= :table-name table-name]
-          ;;                          true
-          ;;                          rowset-fixed
-          ;;                          client-name)
-           
-             ;               ))
           ;;  (ut/pp [:SNAP-INSERTED-SUCCESS2! (count rowset) :into table-name-str])
            (ut/pp [:INSERTED-SUCCESS-SNAP! (count rowset) :into table-name-str (str db-conn) ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
-
-
-
-
-;; (defn insert-rowset-plus-one ;; [rowset query & columns-vec]
-;;   "takes a 'rowset' (vector of uniform maps) or a vector with a vector of column names
-;;    - inserts it into an in memory SQL db, executes a SQL query on it
-;;    (via a honey-sql map) and returns it"
-;;   [rowset table-name & columns-vec]
-;;   (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
-;;                               (and (not (map? (first rowset))) (vector? rowset)) :vectors)
-;;         columns-vec-arg (first columns-vec)
-;;         db-conn         cache-db ;cruiser/mem-db2
-;;         rowset-fixed    (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec-arg r))) rowset)
-;;         columns         (keys (first rowset-fixed))
-;;         values          (vec (for [r rowset-fixed] (vals r)))
-;;         table-name-str  (ut/unkeyword table-name)
-;;         ddl-str         (ddl/create-attribute-sample table-name-str rowset-fixed)
-;;         insert-sql      (to-sql {:insert-into [table-name] :columns columns :values values})
-;;         extra           [ddl-str columns-vec-arg table-name table-name-str]]
-;;     (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
-;;     (sql-exec db-conn ddl-str extra)
-;;     (sql-exec db-conn insert-sql extra)
-;;     {:sql-cache-table table-name :rows (count rowset)}))
-
-;; (def external-changes (async/chan)) ;; anything we dump on here goes to the client (single client)
-
-
-
-
-
-
-
-
-
-
-;; (defonce push-queue (atom clojure.lang.PersistentQueue/EMPTY)) ;; needs to be on a PER CLIENT BASIS !!!!! TODO
-;; (defonce tracker-history (atom {}))
-;; (defonce queue-status (atom {}))
-;; (defonce queue-data (atom {}))
-
-
 
 (declare sub-to-value)
 
@@ -756,24 +701,6 @@
 
 
 (defmethod wl/handle-request :ack2 [{:keys [client-name body]}] (inc-score! client-name :last-ack true) {})
-
-;; (defmethod wl/handle-request :puget-document [{:keys [text data-colors width opts-map]}] 
-;;   (let [color-map
-;;         (assoc (walk/postwalk-replace
-;;                 {:integer :number
-;;                  :universal-pop-color :delimiter
-;;                  :rabbit-code :function-symbol}
-;;                 (into {} (for [[k v] data-colors]
-;;                            {k (if (or (= k :universal-pop-color)
-;;                                       (= k :keyword)
-;;                                       (= k :nil))
-;;                                 [:bold v]
-;;                                 [v])}))) :tag [(get data-colors :universal-pop-color)])
-;;         text (edn/read-string text)]
-;;     (puget/with-options
-;;       (merge {:width width
-;;               :color-scheme color-map} opts-map)
-;;       (puget/cprint text))))
 
 (defmethod wl/handle-request :puget-document [{:keys [text data-colors width opts-map]}]
   (let [data-colors (walk/keywordize-keys data-colors)

@@ -10,7 +10,7 @@
    [rvbbit-backend.queue-party  :as qp]
    [flowmaps.db               :as flow-db]])
 
-;; the rabbit reactor...
+;; the rabbit "reactor"...
 
 (def key-depth-limit (atom 8)) 
 

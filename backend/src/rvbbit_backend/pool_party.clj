@@ -101,26 +101,6 @@
     (.setThreadFactory base-pool thread-factory)
     base-pool))
 
-
-
-
-
-;; for later to test with:
-;; (defn create-adaptive-pool [] 
-;;   (Executors/newWorkStealingPool))
-
-;; (defn create-bounded-pool []
-;;   (ThreadPoolExecutor. 1 100 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 1000) (ThreadPoolExecutor$CallerRunsPolicy.)))
-
-
-;; (defn get-or-create-cached-thread-pool [name]
-;;   (if-let [queue (@dyn-pools name)]
-;;     queue
-;;     (let [new-queue (create-cached-thread-pool name)]
-;;       (ut/pp [:*creating-thread-pool-for name])
-;;       (swap! dyn-pools assoc name new-queue)
-;;       new-queue)))
-
 (defn get-or-create-cached-thread-pool [name]
   (if-let [queue (@dyn-pools name)]
     queue
@@ -243,32 +223,6 @@
                (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
                ;(throw e)
                ))))))))
-
-;; (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
-;;   (fn [key ref old-state new-state]
-;;     (when (not= old-state new-state)
-;;       (let [diff (clojure.data/diff old-state new-state)
-;;             changed-kp (into #{} (comp (take 2)
-;;                                        (remove nil?)
-;;                                        (mapcat ut/keypaths)
-;;                                        (distinct))
-;;                              diff)]
-;;         (when (seq changed-kp)
-;;           (execute-in-thread-pools
-;;            (keyword (str (if client-name
-;;                            "subscriptions/"
-;;                            "watchers/") 
-;;                          (cstr/replace (str base-type) ":" "")
-;;                           ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
-;;                          (when client-name ".*")))
-;;            (fn []
-;;              (try
-;;                (watcher-fn key ref old-state new-state)
-;;                (catch Exception e
-;;                  (ut/pp [:error-in-wrap-custom-watcher-pool-exec key e])
-;;                  ;;(throw e)
-;;                  )))))))))
-
 
 (defn add-watch+ [atom key watcher-fn base-type & [client-name flow-key]]
   (let [;base-type (if false ;(= base-type :solver-status)

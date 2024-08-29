@@ -45,7 +45,7 @@ More Minority Report, less Office Space. Baby steps.
 
 RVBBIT also draws significant inspiration from systems like Smalltalk, HyperCard, & the endless trail of breadcrumbs left by Bret Victor. Like Smalltalk, it embraces the idea of a fully malleable, live programming environment where everything is an object and can be inspected and modified. From HyperCard, the vision of an intuitive, visual programming paradigm that empowers users to create interactive, linked information systems. Yet hyper focused on building data products such as dashboards, data science views, interactive explorations, & unparalleled reactivity.
 
-Inspired by the future, borrowing from the past - as all good things should.
+Inspired by the future, borrows from the past - as all good things should. Oh, and I love Clojure and SQL, so get ready for that.
 
 ## "Low bar, High ceiling"
 
@@ -55,7 +55,11 @@ RVBBIT helps bridge these gaps in it's overall approach to building - it helps y
 The user can then modify this working code, or use other UI like value scrubbers to mutate and see the changes in a quick feedback loop cycle - this builds understanding.
 No hidden "magic", no step-by-step 'wizards' that create un-editable artifacts or configurations that are opaque.
 
+
+
 # "Interactive data tools are feedback loop factories"
+
+
 
 ## Ladder of Abstraction
 
@@ -76,8 +80,6 @@ This also has a 3rd order effect - due to RVBBIT's open systems - advanced users
 
 While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, knowing Clojure is *not* a requirement. You can build an entire dashboard with only drag & drop and a SQL database - but its full flexibility is unlocked with some Clojure knowledge.
 
-[SQL VIDEO]
-
 ## SQL Specific Features
 
 - Drag and drop SQL operations on a "cutting board" canvas
@@ -88,11 +90,60 @@ While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, kn
 - Cache table cross joins
 	+ A unified SQL cache layer allows joining of arbitrary queries, no matter what database they come from (or if they came from a Clojure REPL value, any other place)
 
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=IhqEOnrv38E" target="_blank">
+      <img src="https://img.youtube.com/vi/IhqEOnrv38E/0.jpg" alt="Basic SQL ops" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Basic SQL</p>
+  </div>
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=OT5yBr06QII" target="_blank">
+      <img src="https://img.youtube.com/vi/OT5yBr06QII/0.jpg" alt="Basic SQL Viz Ops" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Basic SQL + Viz</p>
+  </div>
+</div>	
+
+## A 'Data Desktop'
+
+### The Canvas
+- Minimize cards, pin them to all tabs, turn then into docked customizable icons.
+
+### Recursive Composition
+- Arrange a set of a cards in a board tab - drag that composed tab into another board, it's now it's own single card. Great for composing and organizing groups of cards that share functionality or need to be re-used (ex: a "sidebar menu" for a series of dashboard tabs)
+
+### Card History
+A visual undo log of all card changes and their code diffs. Easy to scrub between old versions or even drag them out as new cards. Works for views, code, and queries.
+
 ## Clojure REPL Specific Features
 
 - Connect to any remote nREPL, or use the built in one
 - "Visualization" of common CLJ data types including visual GET-INs via dragging
 - Realtime console output, console as data
+
+## Configurable Card "Runners"
+
+Besides the built-in runners of SQL queries and Views (UI) - the combination of arbitrary parametrized code + an integrated Flow system enables all kinds of functionality that can be packaged up as a new runners and available for users to build with. Essentially creating new Card types with new functionality.
+- Examples
+	+ A flow that hits OpenAI's DALLE3 API, with a prompt, downloads the image, saves it as a JPEG, adds Exif data, and then displays it in a generated HTML view. All the user knows is that there is an :image-generator card - they type in text (the card's 'source') and the output is an image to be used on their canvas
+	+ A custom nREPL connection that executes some arbitary code or text and returns some specific output - like a shell command, or to a Python interpreter, an R calculation - or perhaps an nREPL across the office that has special libraries and hardware to process very specific tasks. All wrapped up in a friendly interface. Just another "card" on your data board.	
+
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=9CPvZtFu2fo" target="_blank">
+      <img src="https://img.youtube.com/vi/9CPvZtFu2fo/0.jpg" alt="as a Clojure REPL client" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">as a Clojure REPL client</p>
+  </div>
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=4sp151pex78" target="_blank">
+      <img src="https://img.youtube.com/vi/4sp151pex78/0.jpg" alt="Custom Card Runners" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Custom Card Runners</p>
+  </div>
+</div>
+
 
 ## Reactive Parameters
 
@@ -104,44 +155,85 @@ While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, kn
 - Are universal across all objects
 	+ A custom view click action can trigger a REPL execution, which then can trigger a SQL query, which then can cascade into a chart or view update, or mutate the users canvas in some way, and so on.
 
-## Configurable Card "Runners"
-
-Besides the built-in runners of SQL queries and Views (UI) - the combination of arbitrary parametrized code + an integrated Flow system enables all kinds of functionality that can be packaged up as a new runners and available for users to build with. Essentially creating new Card types with new functionality.
-- Examples
-	+ A flow that hits OpenAI's DALLE3 API, with a prompt, downloads the image, saves it as a JPEG, adds Exif data, and then displays it in a generated HTML view. All the user knows is that there is an :image-generator card - they type in text (the card's 'source') and the output is an image to be used on their canvas
-	+ A custom nREPL connection that executes some arbitary code or text and returns some specific output - like a shell command, or to a Python interpreter, an R calculation - or perhaps an nREPL across the office that has special libraries and hardware to process very specific tasks. All wrapped up in a friendly interface. Just another "card" on your data board.
-
-## Flow Based Programming Builder / Runner
-
-	also runstreams. flows can be pinned to a data board
-	completely integrated
-	
 ## Snapshots
 
-## Signals & Solvers
+- Take an image of all the current parameters in a deck - and then swap between them like special storytelling tabs. It can even mutate block positions, visibility, theme parameters, and current tab selected.
 
 ## Metrics & KPIs
-coming soon. Since, if you think about, KPIs and Metrics are just different kinds of signals and solvers.
 
-## Dynamic Theme System
-Did I mention reactive parameters? Yes, the theme of the UI is itself a set of reactive parameters. CSS maps everywhere. Specific card overrides, global defaults, conditional formatting. Data-driven dynamic theme changes? Yes.
+- Coming soon. Since, if you think about, KPIs and Metrics are just different kinds of signals and solvers.		
 
-## The Canvas
-Minimize cards, pin them to all tabs, go nuts.
+> You could say that RVBBIT is really a "Reaction Engine" with 'useful surfaces'.
 
-## Recursive Composition
-Arrange a set of a cards in a board tab - drag that composed tab into another board, it's now it's own single card. Great for composing and organizing groups of cards that share functionality or need to be re-used (ex: a "sidebar menu" for a series of dashboard tabs)
+## Flows
 
-## Kits (plug-ins)
+- Full flow-based-programming interface with Clojure functions - to create "visual functions"
+- Custom "flow parts" can be created and reused in user space
+- Flows can be used to create custom runners (data analysis, image generation, R scripts, Python, API calls, etc)
+- Each "step" in a flow it's it's own pub/sub value (a signal and a solver, essentially)
+- Users can utilize flows without even knowing it, it's just another abstractions for getting things done. 
 
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=7JsOqQXz2gI" target="_blank">
+      <img src="https://img.youtube.com/vi/7JsOqQXz2gI/0.jpg" alt="Signals and Solvers - Reactivity" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Signals and Solvers - Reactivity</p>
+  </div>
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=nZKSIbc4x3Y" target="_blank">
+      <img src="https://img.youtube.com/vi/nZKSIbc4x3Y/0.jpg" alt="Flows - Reactivity and Feedback loops" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Flows - Reactivity and Feedback loops</p>
+  </div>
+</div>	
 
-## Card History
-A visual undo log of all card changes and their code diffs. Easy to scrub between old versions or even drag them out as new cards.
+## Human First, Machine Friendly
 
-## Value Scrubbers
+- Side-effect of having a unified DSL and parameter access model is that it is not only easy to "write" to a users canvas, but also fairly easy for an LLM to read and understand (and written to).
+- If installed 'Fabric' can be used to fix cards, generate new ones, even entire decks, based on natural language descriptions and a back and forth feedback loop UX.
 
-## Designed with AI mutation in mind
-Due to a unified DSL and Clojure's Data as Code, Code as Data structure - the entire canvas is meant to be freely mutable by any Flow, function, DSL action. Super-prompting + context injection (because user-context is just a set of reactive parameters, of course) can go far.
+## Extendable and Hackable
+
+- "Kits" can add new functionality to the canvas, cards, or queries
+- Runners are just functions and or flows
+- Solvers and Signals are just functions and or flows
+- The theme of the UI is itself a set of reactive parameters. CSS maps everywhere. Specific card overrides, global defaults, conditional formatting. Data-driven dynamic theme changes? Yes.
+
+## "Specializable"
+
+- I can easily envision RVBBIT "packages" that are tailored to specific industries or use cases. 
+	- Example: "JIRA for RVBBIT" with a number of pre-built cards and flows for use-cases like managing projects, tracking issues, reporting, etc.
+
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=18ZPDTYwzeA" target="_blank">
+      <img src="https://img.youtube.com/vi/18ZPDTYwzeA/0.jpg" alt="Using AI to mutate the canvas" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Using AI to mutate the canvas"</p>
+  </div>
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=a5B3SRAD6v8" target="_blank">
+      <img src="https://img.youtube.com/vi/a5B3SRAD6v8/0.jpg" alt="User Space Kits and Plug-ins" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">User Space Kits and Plug-ins</p>
+  </div>
+</div>		
+
+## Getting Started
+
+- Give it a try - I'm still working on proper documentation (for example, the entire Clover DSL is not yet documented), please open GH issues, discussions or reach out to me on [Twitter](https://twitter.com/ryrobes) if you have any questions!
+
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/watch?v=fD6WCfR1PsU" target="_blank">
+      <img src="https://img.youtube.com/vi/fD6WCfR1PsU/0.jpg" alt="Video 1 Title" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Getting Started with RVBBIT</p>
+  </div>
+  <div style="width: 48%; text-align: center;">
+  </div>
+</div>	
 
 ## Caveats
 
@@ -152,8 +244,5 @@ Due to a unified DSL and Clojure's Data as Code, Code as Data structure - the en
 	(with various quirks to each as I continute to smooth out the SQL engine) 
 - No concept of users / auth yet
 - Meant to be used interally with a team that you trust (open REPLs, open shell access, etc.)
-
----
-
 
 

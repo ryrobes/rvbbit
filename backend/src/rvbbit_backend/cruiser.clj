@@ -24,9 +24,6 @@
   (:import
     [java.util Date UUID]))
 
-
-
-
 (defn general-data-type-infer
   [field-type]
   (let [ft (cstr/lower-case field-type)]
@@ -51,21 +48,6 @@
         (float? v)   "float"
         (boolean? v) "boolean"
         :else        "unknown"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 (def filter-db
   {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
@@ -116,11 +98,7 @@
                    (vals (asort r columns-vec-arg-underscores)))))
           results)))))
 
-
-
-
-(defn keyhash-from-field-vector
-  [f]
+(defn keyhash-from-field-vector [f]
   (str (hash (str (nth f 0) ; db-type (Mysql, etc)
                   (nth f 2) ; table-type (view, table)
                   (nth f 3) ; db-schema
@@ -130,8 +108,7 @@
                   (try (nth f 9) (catch Exception e nil)) ;; derived-calc if exists
              ))))
 
-(defn contexthash-from-field-vector
-  [f]
+(defn contexthash-from-field-vector [f]
   (str (hash (str (nth f 0) ; db-type (Mysql, etc)
                   (nth f 2) ; table-type (view, table)
                   (nth f 3) ; db-schema
@@ -139,8 +116,7 @@
                   (nth f 5) ; table-name
              ))))
 
-(defn sqlize-keywords
-  [honey-map]
+(defn sqlize-keywords [honey-map]
   (walk/postwalk-replace (into {}
                                (for [k (filter keyword? (ut/deep-flatten honey-map))]
                                  (if (cstr/ends-with? (str k) "?")
@@ -823,31 +799,6 @@
     (sql-exec system-db remove-old-rows)
     (sql-exec system-db rowset-insert)))
 
-;; (def target-db ;"jdbc:sqlite:./rabbit-sample-data.db")
-;;   {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "./data/rabbit-sample-data.db"})
-
-;; (def target-db2 {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "./data/boston-crime-data.db"})
-
-;; (def target-db3 "jdbc:postgresql://postgres:postgrespw@localhost:49154/postgres")
-
-;; (def target-db4 ;"jdbc:clickhouse://localhost:8123/test")
-;;   {:classname "ru.yandex.clickhouse.ClickHouseDriver" :subprotocol "clickhouse" :subname "//localhost:8123/default"})
-
-;; (def target-db5 ;"jdbc:vertica://dbadmin@localhost:5433/VMart")
-;;   {:classname   "com.vertica.jdbc.Driver" ;; "org.clojars.prepor.Driver"
-;;    :subprotocol "vertica"
-;;    :subname     "_VMart" ; first char gets cut somehow?
-;;    :user        "dbadmin"
-;;    :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
-;;    :port        5433})
-
-;; (def target-db6 "jdbc:mysql://root@localhost:3306/imdb")
-
-;; (def target-db7 "jdbc:sqlserver://localhost:1433;databaseName=imdb;encrypt=false;username=sa;password=yourStrong(!)Password") ;"jdbc:sqlserver://sa:yourStrong(!)Password@localhost:1433;database=imdb")
-
-
-;; (def target-db8 "jdbc:oracle:scott/tiger@localhost:1521:XE") ; "jdbc:oracle://system:tiger@localhost:1521:XE")
-
 (defn slread
   [file]
   (try (edn/read-string (slurp file)) ;; just in case the file is empty or can't parse as EDN
@@ -975,7 +926,7 @@
                                      (insert-found-fields! system-db context axis-name shape-name found-fields))))))))))))
 
 
-
+;; insanity below - it's faster than it deserves to be though
 (defonce score-atom0 (atom {}))
 (defonce score-atom1 (atom {}))
 (defonce score-atom2 (atom {}))
@@ -1588,42 +1539,4 @@
                               (to-sql {:drop-table (keyword (last sql-filter))})
                               )) ;)
          nil))));))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;; (def mem-db-sqlite2 "jdbc:sqlite::memory:?cache=shared") ;"jdbc:sqlite::memory:"
-
-;; (def mem-db-sqlite3 {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :cache "shared" :subname ":memory:"})
-
-;; (def mem-db-sqlite
-;;   {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "db/query-cache.db?busy_timeout=20000&cache=shared"})
-
-;; (def mem-db-mysql "jdbc:mysql://root:mysqlpw@localhost:3306")
-
-;; (def mem-db-vertica ;"jdbc:vertica://dbadmin@localhost:5433/VMart")
-;;   {:classname   "com.vertica.jdbc.Driver" ;; "org.clojars.prepor.Driver"
-;;    :subprotocol "vertica"
-;;    :subname     "_VMart" ; first char gets cut somehow?
-;;    :user        "dbadmin"
-;;    :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
-;;    :port        5433})
-
-;; (def mem-db-pgsql "jdbc:postgresql://postgres:postgrespw@localhost:5555/postgres")
-
-;; (def mem-db-clickhouse ;"jdbc:clickhouse://localhost:8123/test")
-;;   {:classname "ru.yandex.clickhouse.ClickHouseDriver" :subprotocol "clickhouse" :subname "//localhost:8123/default"})
-
 
