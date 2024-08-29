@@ -76,7 +76,7 @@ This also has a 3rd order effect - due to RVBBIT's open systems - advanced users
 ## Clojure based 
 ### Data is Code, Code is Data.
 
-While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, knowing Clojure is *not* a requirement. You can build an entire dashboard with only drag & drop and a SQL database - but its full flexibility is unlocked with some Clojure knowledge.
+While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, knowing Clojure is *not* a requirement. You can build an entire dashboard with only drag & drop and a SQL database - but its full flexibility is unlocked with some Clojure knowledge and some creative thinking. Shape rotators welcome.
 
 ## SQL Specific Features
 
@@ -88,18 +88,19 @@ While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, kn
 - Cache table cross joins
 	+ A unified SQL cache layer allows joining of arbitrary queries, no matter what database they come from (or if they came from a Clojure REPL value, any other place)
 
+<br/>
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=IhqEOnrv38E" target="_blank">
-      <img src="https://img.youtube.com/vi/IhqEOnrv38E/0.jpg" alt="Basic SQL ops" style="width: 100%;">
+      <img src="docs/bbs.jpg" alt="Basic SQL ops" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Basic SQL</p>
+    <p style="margin-top: 10px; font-size: 21px;">Basic SQL ▶</p>
   </div>
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=OT5yBr06QII" target="_blank">
-      <img src="https://img.youtube.com/vi/OT5yBr06QII/0.jpg" alt="Basic SQL Viz Ops" style="width: 100%;">
+      <img src="docs/ddd.jpg" alt="Basic SQL Viz Ops" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Basic SQL + Viz</p>
+    <p style="margin-top: 10px; font-size: 21px;">Basic SQL + Viz ▶</p>
   </div>
 </div>	
 
@@ -127,18 +128,19 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 	+ A flow that hits OpenAI's DALLE3 API, with a prompt, downloads the image, saves it as a JPEG, adds Exif data, and then displays it in a generated HTML view. All the user knows is that there is an :image-generator card - they type in text (the card's 'source') and the output is an image to be used on their canvas
 	+ A custom nREPL connection that executes some arbitary code or text and returns some specific output - like a shell command, or to a Python interpreter, an R calculation - or perhaps an nREPL across the office that has special libraries and hardware to process very specific tasks. All wrapped up in a friendly interface. Just another "card" on your data board.	
 
+<br/>
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=9CPvZtFu2fo" target="_blank">
-      <img src="https://img.youtube.com/vi/9CPvZtFu2fo/0.jpg" alt="as a Clojure REPL client" style="width: 100%;">
+      <img src="docs/rpl.jpg" alt="as a Clojure REPL client" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">as a Clojure REPL client</p>
+    <p style="margin-top: 10px; font-size: 21px;">as a Clojure REPL client ▶</p>
   </div>
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=4sp151pex78" target="_blank">
-      <img src="https://img.youtube.com/vi/4sp151pex78/0.jpg" alt="Custom Card Runners" style="width: 100%;">
+      <img src="docs/rrr.jpg" alt="Custom Card Runners" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Custom Card Runners</p>
+    <p style="margin-top: 10px; font-size: 21px;">Custom Card Runners ▶</p>
   </div>
 </div>
 
@@ -171,18 +173,19 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 - Each "step" in a flow it's it's own pub/sub value (a signal and a solver, essentially)
 - Users can utilize flows without even knowing it, it's just another abstractions for getting things done. 
 
+<br/>
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=7JsOqQXz2gI" target="_blank">
-      <img src="https://img.youtube.com/vi/7JsOqQXz2gI/0.jpg" alt="Signals and Solvers - Reactivity" style="width: 100%;">
+      <img src="docs/sigsol.jpg" alt="Signals and Solvers - Reactivity" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Signals and Solvers - Reactivity</p>
+    <p style="margin-top: 10px; font-size: 21px;">Signals and Solvers - Reactivity ▶</p>
   </div>
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=nZKSIbc4x3Y" target="_blank">
-      <img src="https://img.youtube.com/vi/nZKSIbc4x3Y/0.jpg" alt="Flows - Reactivity and Feedback loops" style="width: 100%;">
+      <img src="docs/ffl.jpg" alt="Flows - Reactivity and Feedback loops" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Flows - Reactivity and Feedback loops</p>
+    <p style="margin-top: 10px; font-size: 21px;">Flows - Reactivity and Feedback loops ▶</p>
   </div>
 </div>	
 
@@ -203,18 +206,19 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 - I can easily envision RVBBIT "packages" that are tailored to specific industries or use cases. 
 	- Example: "JIRA for RVBBIT" with a number of pre-built cards and flows for use-cases like managing projects, tracking issues, reporting, etc.
 
+<br/>
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=18ZPDTYwzeA" target="_blank">
-      <img src="https://img.youtube.com/vi/18ZPDTYwzeA/0.jpg" alt="Using AI to mutate the canvas" style="width: 100%;">
+      <img src="docs/aii.jpg" alt="Using AI to mutate the canvas" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Using AI to mutate the canvas"</p>
+    <p style="margin-top: 10px; font-size: 21px;">Using AI to mutate the canvas ▶</p>
   </div>
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=a5B3SRAD6v8" target="_blank">
-      <img src="https://img.youtube.com/vi/a5B3SRAD6v8/0.jpg" alt="User Space Kits and Plug-ins" style="width: 100%;">
+      <img src="docs/kitt.jpg" alt="User Space Kits and Plug-ins" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">User Space Kits and Plug-ins</p>
+    <p style="margin-top: 10px; font-size: 21px;">User Space Kits and Plug-ins ▶</p>
   </div>
 </div>		
 
@@ -229,12 +233,13 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 	- The ./screens/ folder - this is where screen or "deck" definitions live (in the middle of a re-naming of things)
 		- a screen can be opened on boot by going to http://localhost:8888/#/my-screen-name - or by using the floating editor panel, selecting "files" and clicking and dragging the screens row on to the canvas
 
+<br/>
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=fD6WCfR1PsU" target="_blank">
-      <img src="https://img.youtube.com/vi/fD6WCfR1PsU/0.jpg" alt="Video 1 Title" style="width: 100%;">
+      <img src="docs/gss.jpg" alt="Video 1 Title" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Getting Started with RVBBIT</p>
+    <p style="margin-top: 10px; font-size: 21px;">Getting Started with RVBBIT ▶</p>
   </div>
   <div style="width: 48%; text-align: center;">
   </div>
@@ -242,8 +247,8 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 
 ## Caveats
 
-- Use Englebarts beautiful invention please
-- Various UI jank
+- Use Engelbart's beautiful invention please 🐁
+- Smattering of various UI jank; being worked on
 - Limited SQL DB support ATM
 	Tested with SQLite, Postgres, MySQL, SQL Server, Vertica, Clickhouse, DuckDB
 	(with various quirks to each as I continute to smooth out the SQL engine) 
