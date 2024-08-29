@@ -15,19 +15,21 @@ In a world drowning in data, we don't need more dashboards. We need data landsca
 
 As a long-time dashboard builder, data engineer, and UI hacker, I've always wanted something in-between Tableau & building bespoke web data products to ship answers to my users. The tools were too rigid at times, and building everything from scratch can be tiresome. The eternal push/pull of DE and SWE approaches, as many who work in BI can attest to. How could I have the flexibility & re-usability of code, but the compositional freedom & direct manipulation of a builder tool? 
 
-I don't want my creativity limited by tool nor timeline. 
+## I don't want creativity limited by tool nor timeline. 
 
 To paraphrase Alan Kay, "Simple things should be simple, complex things should be possible". I wanted 'beautiful' to be possible as well.
 
-A data platform should feel more like using a game engine than using an "app". 
+## A data platform should feel more like using a game engine than using an "app". 
 
-### So I spent the last 3 years building prototypes and trying to figure out I wanted in a tool like this. Then 14+ months ago, I quit my job and set out to build it for real. 
+### So I spent the last 4 years building prototypes and trying to figure out I wanted in a tool like this - how it could work, and what actually MAKES SENSE, while also pushing the limits a bit. 
 
-I wanted a data board tool that FELT and LOOKED like it was from the future. Not from 1997 or 2004... It's the future, damnit. Where is all the glorious cyberpunk UI? I wanted to be able to make things for "Real work", but also feel like your in a hacker movie. I'm a simple man.
+Then 14+ months ago, I quit my job and set out to build it for real. 
+
+Also, I wanted a data board tool that FELT & LOOKED like it was from the future. Not from 1997 or 2004... It's the future, damnit. Where is all the glorious cyberpunk UI? I wanted to be able to make things for "Real work", but maybe also feel like you are in a hacker movie. Hey, I'm a simple man.
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
-  <img src="docs/dash-left.jpg" width="48%" />
-  <img src="docs/dash-right.jpg" width="48%" /> 
+  <img src="docs/dash-left.jpg" width="47%" />
+  <img src="docs/dash-right.jpg" width="47%" /> 
 </div>
 
 
@@ -41,7 +43,9 @@ You could even call it a "non-linear anti-notebook that puts composition and pre
 Did you say "Data boards"? Yes. "Dashboard" is very 1990s. 
 More Minority Report, less Office Space. Baby steps.
 
-RVBBIT draws significant inspiration from pioneering systems like Smalltalk, HyperCard, & the endless trail of breadcrumbs left by Bret Victor. Like Smalltalk, it embraces the idea of a fully malleable, live programming environment where everything is an object and can be inspected and modified. From HyperCard, the vision of an intuitive, visual programming paradigm that empowers users to create interactive, linked information systems. Yet hyper focused on building data products such as dashboards, data science views, interactive explorations, & opening windows of understanding.
+RVBBIT also draws significant inspiration from systems like Smalltalk, HyperCard, & the endless trail of breadcrumbs left by Bret Victor. Like Smalltalk, it embraces the idea of a fully malleable, live programming environment where everything is an object and can be inspected and modified. From HyperCard, the vision of an intuitive, visual programming paradigm that empowers users to create interactive, linked information systems. Yet hyper focused on building data products such as dashboards, data science views, interactive explorations, & unparalleled reactivity.
+
+Inspired by the future, borrowing from the past - as all good things should.
 
 ## "Low bar, High ceiling"
 
@@ -50,6 +54,8 @@ The skill level of users varies, but we all still need to get sh*t done. Answers
 RVBBIT helps bridge these gaps in it's overall approach to building - it helps you create in board strokes by generating "code" (SQL, view DSL, Clojure, etc) in it's cards from simple drag and drop operations. 
 The user can then modify this working code, or use other UI like value scrubbers to mutate and see the changes in a quick feedback loop cycle - this builds understanding.
 No hidden "magic", no step-by-step 'wizards' that create un-editable artifacts or configurations that are opaque.
+
+# "Interactive data tools are feedback loop factories"
 
 ## Ladder of Abstraction
 
@@ -68,7 +74,9 @@ This also has a 3rd order effect - due to RVBBIT's open systems - advanced users
 ## Clojure based 
 ### Data is Code, Code is Data.
 
-While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, knowing Clojure is *not* a hard requirement. You can build an entire dashboard with only drag & drop and a SQL database - but its full flexibility is unlocked with some Clojure knowledge.
+While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, knowing Clojure is *not* a requirement. You can build an entire dashboard with only drag & drop and a SQL database - but its full flexibility is unlocked with some Clojure knowledge.
+
+[SQL VIDEO]
 
 ## SQL Specific Features
 
