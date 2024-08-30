@@ -1248,7 +1248,7 @@
   [command]
   (let [;;shell                    (or (System/getenv "SHELL") "/bin/sh")
         ;;output                   (shell/sh shell "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
-        output                   (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+        output                   (shell/sh "/usr/bin/env" "bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
         split-lines              (vec (remove empty? (cstr/split-lines (get output :out))))
         exit-code                (get output :exit)
         error                    (vec (remove empty? (cstr/split-lines (get output :err))))
@@ -7441,7 +7441,7 @@
   [command]
   (let [;;shell                    (or (System/getenv "SHELL") "/bin/sh")
         ;;output                   (shell/sh shell "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
-        output                   (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+        output                   (shell/sh "/usr/bin/env" "bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
         split-lines              (vec (remove empty? (cstr/split-lines (get output :out))))
         exit-code                (get output :exit)
         error                    (vec (remove empty? (cstr/split-lines (get output :err))))

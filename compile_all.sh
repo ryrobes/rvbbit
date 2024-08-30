@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if the current directory path ends with "rvbbit"
 if [[ "${PWD}" != */rvbbit ]]; then

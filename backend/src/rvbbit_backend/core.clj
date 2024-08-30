@@ -654,7 +654,7 @@
   ;; (println " ")
   ;; (wss/fig-render "Curiouser and curiouser!" :pink)
 
-   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+   (shell/sh "/usr/bin/env" "bash" "-c" (str "rm -rf " "live/*"))
 
    (qp/create-slot-queue-system)
    (fpop/thaw-flow-results)
@@ -1108,13 +1108,13 @@
                             (ut/zprint-file "./defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
                             (ut/zprint-file "./defs/solvers.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
                            ;(ut/ppa [:clearing-cache-db])
-                           ;(shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
-                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-logs/*"))
-                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
-                           ;(shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
-                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
-                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
-                           ;(shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))
+                           ;(shell/sh "/usr/bin/env" "bash" "-c" (str "rm " "db/cache.db"))
+                            (shell/sh "/usr/bin/env" "bash" "-c" (str "rm " "flow-logs/*"))
+                            (shell/sh "/usr/bin/env" "bash" "-c" (str "rm " "reaction-logs/*"))
+                           ;(shell/sh "/usr/bin/env" "bash" "-c" (str "rm " "status-change-logs/*"))
+                            (shell/sh "/usr/bin/env" "bash" "-c" (str "rm " "tracker-logs/*"))
+                            (shell/sh "/usr/bin/env" "bash"  "-c" (str "rm " "reaction-logs/*"))
+                           ;(shell/sh "/usr/bin/env" "bash" "-c" (str "rm " "db/system.db"))
                             ))
 
    (ppy/add-watch+
