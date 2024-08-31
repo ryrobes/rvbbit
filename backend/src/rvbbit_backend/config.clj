@@ -1,7 +1,6 @@
 (ns rvbbit-backend.config
   (:require
     [clojure.edn     :as edn]
-    [rvbbit-backend.util :as ut]
     [clojure.java.io :as io]
     [clojure.string  :as cstr]))
 
@@ -31,7 +30,7 @@
 (defn settings []
   (let [config (try (read-string (slurp "./defs/config.edn"))
                     (catch Exception e
-                      (do (ut/pp [:ERROR! "defs/config.edn cannot be read!!! This is bad, please address."])
+                      (do (println [:ERROR! "defs/config.edn cannot be read!!! This is bad, please address."])
                           {:error (str e) :debug-level 1})))
         sec-edn "./defs/secrets.edn"
         secrets (try (read-string (slurp sec-edn))
