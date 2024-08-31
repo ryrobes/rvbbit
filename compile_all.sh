@@ -24,7 +24,8 @@ rm -rf backend/resources/public/images/gen/
 rm -rf backend/resources/public/images/large/
 echo "UI copied. compiling uberjar."
 cd backend
-mkdir target
+mkdir target -p
+mkdir db -p
 ls ./target -l -h
 lein clean
 lein uberjar
