@@ -53,4 +53,5 @@ checkouts/
 backend/resources/public
 *.csv
 backend/defs/backup/
+backend/defs/secrets.edn
 

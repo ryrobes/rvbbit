@@ -1,6 +1,7 @@
 (ns rvbbit-backend.config
   (:require
     [clojure.edn     :as edn]
+    [rvbbit-backend.util :as ut]
     [clojure.java.io :as io]
     [clojure.string  :as cstr]))
 
@@ -19,12 +20,23 @@
       {}
       files)))
 
-(def kits (slurp-edn-files "./kits"))
+;; (def kits (slurp-edn-files "./kits")) ;; this pathway is deprecated
 
-(def kit-fns
-  (into {}
-        (for [[k v] kits]
-          (into {}
-                (for [[kk vv] (get v :packages)] {kk (merge (merge (dissoc v :packages) {:kit-name kk :package-name k}) vv)})))))
+;; (def kit-fns
+;;   (into {}
+;;         (for [[k v] kits]
+;;           (into {}
+;;                 (for [[kk vv] (get v :packages)] {kk (merge (merge (dissoc v :packages) {:kit-name kk :package-name k}) vv)})))))
 
-(defn settings [] (try (read-string (slurp "./defs/config.edn")) (catch Exception e {:error (str e) :debug-level 1})))
+(defn settings []
+  (let [config (try (read-string (slurp "./defs/config.edn"))
+                    (catch Exception e
+                      (do (ut/pp [:ERROR! "defs/config.edn cannot be read!!! This is bad, please address."])
+                          {:error (str e) :debug-level 1})))
+        sec-edn "./defs/secrets.edn"
+        secrets (try (read-string (slurp sec-edn))
+                     (catch Exception _
+                       {:no-secrets-file-found-at sec-edn}))]
+    (merge config 
+           secrets)))
+    

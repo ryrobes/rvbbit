@@ -7,13 +7,13 @@
 ;; docs coming soon, doc!
 
 {:debug-level 1 ;; for console output. somewhat deprecated.
- :default "./screens/looking-glass-redux.edn"
+ :default "./screens/frost-terminal2.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
  :harvest-on-boot? true ;;false
  ;; ^^ do a full database sniff for each connection on boot? (generally not needed)
  :modes {:pre       [:pre
                      {:style {:color :theme/editor-outer-rim-color
-                              :background-color "#00000000"
+                              :background-color "#00000000 "
                               :border "none"
                               :text-shadow "4px 4px 4px #00000088"
                               :font-size "17px"
@@ -147,7 +147,7 @@
                                                                  '[rvbbit-backend.util :as ut]
                                                                  '[clojure.string :as cstr]
                                                                  '[clojure.java.io :as io])
-                                                        (let [dest-dir "user-content/data-exports"
+                                                        (let [dest-dir "assets/data-exports"
                                                               _ (ext/create-dirs dest-dir) ;; if not exists, create it
                                                               transit-file :transit-rowset
                                                               data-key     :data-key
@@ -713,11 +713,7 @@
         ;;              :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Super Experimental! (not really useful ATM)"
         ;;              :icon "images/python.svg"}
            }
- :openai-api-key     nil
- :openai-org-id      nil
- :elevenlabs-api-key nil
- ;; dont get too excited, these keys are all scrubbed by now.
- :eleven-labs-default-voice-name "Not OG Buffy"
+
  :new-block-rand  ["Why, sometimes I've believed as many as six impossible things before breakfast."
                    "Imagination is the only weapon in the war against reality."
                    "It's no use going back to yesterday, because I was a different person then."
