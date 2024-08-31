@@ -922,6 +922,7 @@
                       ;(ut/pp (sql-exec system-db "delete from jvm_stats where 1=1;"))
                       (reset! wss/solvers-cache-hits-atom {})
                       (reset! wss/solvers-cache-atom {})
+                      (reset! sql/sql-query-log [])
                       ;;(reset! sql/errors {}) ;; just for now
                       (reset! wss/agg-cache {}) ;; <--- bigggger
                       (reset! ut/df-cache {}))  ;; <--- big boy

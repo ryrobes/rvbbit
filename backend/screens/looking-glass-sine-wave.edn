@@ -1,28 +1,170 @@
-{:orders
- {:ufo_sightings (:query_error),
-  :reco-counts [:table_name :cnt],
-  :bi-polar-wavez [:step_int :step_val],
-  :blocks-sys
-  [:block_key :block_name :queries :views :block_data :view_names :query_names],
-  :fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :files-sys [:file_path :screen_name :blocks :queries :ts],
-  :connections-sys [:database_name :connection_id]},
- :reco-preview nil,
+{:reco-preview nil,
  :sql-source
- {:ufo_sightings
-  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
-  :bi-polar-wavez
-  {:select [:step_int :step_val],
-   :from
-   [{:data
-     (mapv
-       (fn [n] {:step_int n, :step_val (Math/sin (* n (/ Math/PI 70)))})
-       (range 22))}],
-   :col-widths {:step_int 90, :step_val 170}}},
+ {:bi-polar-wavez {},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-29 11:51:30",
+   :_sqlized-by [:block-9240 :clojure :new-clojure],
+   :_sqlized-hash 944862118,
+   :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_]},
+  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_],
+   :limit 111}},
  :meta
- {:ufo_sightings
+ {nil
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :fields-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :tables-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :bi-polar-wavez
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x3f36d387 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x3f36d387 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (near \"LIMIT\": syntax error) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :files-sys
+  {:fields
+   {:file_path
+    {:min "./screens/dynamic-theme-example1.edn",
+     :data-type "string",
+     :commons
+     {"./screens/dynamic-theme-example1.edn" 1,
+      "/home/ryanr/rvbbit-0.1.0-alpha.1/./screens/ecto-cooler-shade.edn" 1,
+      "./screens/winter-theme-choom.edn" 1},
+     :distinct 10,
+     :group-by? true,
+     :median "./screens/server-stats2.edn",
+     :max "/home/ryanr/rvbbit-0.1.0-alpha.1/./screens/ecto-cooler-shade.edn",
+     :avg "./screens/dynamic-theme-example1.edn (non-numeric average)",
+     :cardinality 100},
+    :screen_name
+    {:min "dynamic-theme-example1",
+     :data-type "string",
+     :commons
+     {"ecto-cooler-shade" 2, "dynamic-theme-example1" 1, "winter-theme-choom" 1},
+     :distinct 9,
+     :group-by? true,
+     :median "new-age-hacking",
+     :max "winter-theme-choom",
+     :avg "dynamic-theme-example1 (non-numeric average)",
+     :cardinality 89},
+    :blocks
+    {:min 5,
+     :data-type "integer",
+     :commons {6 3, 37 1, 47 1},
+     :distinct 8,
+     :group-by? true,
+     :median 29.5,
+     :max 80,
+     :avg 29.6,
+     :cardinality 80},
+    :queries
+    {:min 0,
+     :data-type "integer",
+     :commons {1 4, 0 1, 25 1},
+     :distinct 7,
+     :group-by? true,
+     :median 7.5,
+     :max 26,
+     :avg 8.8,
+     :cardinality 69},
+    :ts
+    {:min "2024-08-29 11:32:45",
+     :data-type "string",
+     :commons
+     {"2024-08-29 11:32:45" 8, "2024-08-29 11:37:33" 1, "2024-08-29 11:32:46" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "2024-08-29 11:32:45",
+     :max "2024-08-29 11:37:33",
+     :avg "2024-08-29 11:32:45 (non-numeric average)",
+     :cardinality 30}},
+   :database-type "SQLite",
+   :rowcount 10},
+  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x3f36d387 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x3f36d387 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_1731765785__block_9240_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :new-clojure-sqlized
+  {:fields
+   {:step_int
+    {:min 0,
+     :data-type "integer",
+     :commons {49 1, 8 1, 63 1},
+     :distinct 69,
+     :group-by? true,
+     :median 4,
+     :max 68,
+     :avg 34,
+     :cardinality 100},
+    :step_val
+    {:min -1,
+     :data-type "float",
+     :commons {-1 5, 1 4, 0.9238795325112867 2},
+     :distinct 61,
+     :group-by? true,
+     :median -9.809554005910593E-16,
+     :max 1,
+     :avg 0.0035985924830832902,
+     :cardinality 88}},
+   :database-type "SQLite",
+   :rowcount 69},
+  :new-clojure
+  {:fields
+   {:step_int
+    {:data-type "integer",
+     :distinct 69,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :step_val
+    {:data-type "integer",
+     :distinct 61,
+     :group-by? true,
+     :commons {},
+     :cardinality 88}},
+   :rowcount 69},
+  :ufo_sightings
   {:fields
    {:query_error
     {:data-type "string",
@@ -34,6 +176,40 @@
       1},
      :cardinality 100}},
    :rowcount 2},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:min "*cache-db*",
+     :data-type "string",
+     :commons {"*cache-db*" 4, "SQLite" 3},
+     :distinct 2,
+     :group-by? true,
+     :median "*cache-db*",
+     :max "SQLite",
+     :avg "*cache-db* (non-numeric average)",
+     :cardinality 28},
+    :connection_id
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"cache.db" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
+     :distinct 7,
+     :group-by? true,
+     :median "flows-db",
+     :max "system-db",
+     :avg "system-db (non-numeric average)",
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:min 0,
+     :data-type "integer",
+     :commons {0 7},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 14}},
+   :database-type "SQLite",
+   :rowcount 7},
   :reco-counts
   {:fields
    {:table_name
@@ -48,489 +224,280 @@
      :group-by? false,
      :commons {4 2},
      :cardinality 50}},
-   :rowcount 2},
-  :bi-polar-wavez
-  {:fields
-   {:step_int
-    {:data-type "integer",
-     :distinct 22,
-     :group-by? true,
-     :commons {8 1, 18 1, 10 1},
-     :cardinality 100},
-    :step_val
-    {:data-type "float",
-     :distinct 22,
-     :group-by? true,
-     :commons {0.8090169943749475 1, 0.3513748240813427 1, 0.47386866247299864 1},
-     :cardinality 100}},
-   :rowcount 22},
-  :blocks-sys
-  {:fields
-   {:block_key
-    {:data-type "string",
-     :distinct 39,
-     :group-by? true,
-     :commons {":block-2322" 1, ":block-8930" 1, ":block-173" 1},
-     :cardinality 100},
-    :block_name
-    {:data-type "string",
-     :distinct 35,
-     :group-by? true,
-     :commons
-     {"drag-from-select-all-jvm_stats" 3,
-      "drag-from-select-all-errors" 3,
-      "clone-gen-viz-100238" 1},
-     :cardinality 89},
-    :queries
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {1 30, 0 9},
-     :cardinality 5},
-    :views
-    {:data-type "integer",
-     :distinct 5,
-     :group-by? true,
-     :commons {0 19, 1 10, 2 7},
-     :cardinality 12},
-    :block_data
-    {:data-type "string",
-     :distinct 39,
-     :group-by? true,
-     :commons
-     {"{:h 4, :w 7, :root [29 14], :tab \"welcome to the party pal\", :name \"block-6761\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-6761.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}], :cell-drop-1493 [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"14px\"} :child [:string :errors-drag-33/sql_stmt.0]]}, :queries {}, :selected-view :cell-drop-1493}"
-      1,
-      "{:name \"block-2322\", :w 5, :selected-view :query-2008, :root [21 9], :h 5, :connection-id \"system-db\", :queries {:query-2008 {:select [[[:count 1] :errors]], :refresh-every 600, :cache? false, :from [[{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]} :rr251]], :_last-run \"12:06:41\"}}, :tab \"welcome to the party pal\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-2322.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
-      1,
-      "{:h 4, :w 8, :connection-id \"system\", :name \"drag-from-seclt-jvm!!\", :queries {:ts1-drag-13 {:select [[[:max :ts1] :last_ts]], :refresh-every 600, :cache? false, :from [[{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]} :kk909]], :_last-run \"12:06:41\"}}, :root [27 5], :tab \"welcome to the party pal\"}"
-      1},
-     :cardinality 100},
-    :view_names
-    {:data-type "string",
-     :distinct 9,
-     :group-by? true,
-     :commons {"" 19, ":hi :stack" 7, ":reech" 4},
-     :cardinality 23},
-    :query_names
-    {:data-type "string",
-     :distinct 31,
-     :group-by? true,
-     :commons {"" 9, ":value-drag-42" 1, ":client-stats-drag-33" 1},
-     :cardinality 79}},
-   :rowcount 39},
-  :fields-sys {:fields {}, :rowcount 0},
-  :tables-sys {:fields {}, :rowcount 0},
-  :files-sys
-  {:fields
-   {:file_path
-    {:data-type "string",
-     :distinct 146,
-     :group-by? true,
-     :commons
-     {"./screens/weave-test122.edn" 1,
-      "./screens/nightcity-cape-cod.edn" 1,
-      "./screens/counting-lord-of-the-woods.edn" 1},
-     :cardinality 100},
-    :screen_name
-    {:data-type "string",
-     :distinct 139,
-     :group-by? true,
-     :commons
-     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
-     :cardinality 95},
-    :blocks
-    {:data-type "integer",
-     :distinct 45,
-     :group-by? true,
-     :commons {3 45, 14 6, 12 6},
-     :cardinality 30},
-    :queries
-    {:data-type "integer",
-     :distinct 32,
-     :group-by? true,
-     :commons {0 53, 5 11, 11 9},
-     :cardinality 21},
-    :ts
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"2024-04-30 20:10:01" 65, "2024-04-30 20:10:00" 33, "2024-04-30 20:10:02" 28},
-     :cardinality 4}},
-   :rowcount 146},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10}},
+   :rowcount 2}},
  :default-col-widths
- {:block-11609 {:city-drag-26 180},
-  :block-7416 {:rowcnt-drag-2 161},
-  :block-9240 {:bi-polar-wavez 255},
-  :block-8805 {:duration-hours-drag-43 180},
-  :system-connections-list* {:connections-sys 111},
+ {:system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys ##Inf},
   :system-fields-list* {:fields-sys ##Inf},
-  :block-7319 {:shape-drag-7 180},
-  :block-3777 {:state-drag-3 180},
-  :files-list* {:files-sys 178},
-  :blocks-list* {:blocks-sys 127},
-  :block-1449 {:ufo-sightings-drag-9 141},
-  :system-tables-list* {:tables-sys ##Inf}},
+  :files-list* {:files-sys 170},
+  :blocks-list* {:blocks-sys ##Inf},
+  :block-9240 {:bi-polar-wavez 261, :new-clojure-sqlized 130}},
  :runstream-drops nil,
- :data-hash 1897338845,
  :tabs ["the-creative-process"],
  :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
    :default "./screens/looking-glass-redux.edn",
-   :eleven-labs-api-key nil,
-   :kits
-   {:outliers
-    {:description
-     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
-     :image-url "images/outliers-image.png",
-     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
-     :name "Outliers",
-     :icon "zmdi-functions",
-     :author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :run-on :queries,
-     :repl {:host "127.0.0.1", :port 42999},
-     :kit-name :outliers,
-     :package-name :query-basics-1},
-    :forecast
-    {:description "WIP: basic timeseries forecasting based on previous values",
-     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
-     :name "Forecasting",
-     :icon "zmdi-brightness-7",
-     :author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :run-on :queries,
-     :repl {:host "127.0.0.1", :port 42999},
-     :kit-name :forecast,
-     :package-name :query-basics-1},
-    :buffy
-    {:author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :kit-name :buffy,
-     :package-name :grab-bag,
-     :fn (rvbbit-backend.assistants/buffy :query-name),
-     :name "Ask Buffy!",
-     :icon "zmdi-cocktail",
-     :run-on :queries,
-     :description "What does Buffy think about this data? Who knows!"}},
-   :graphite-host "127.0.0.1",
-   :openapi-org-id nil,
+   :new-block-rand
+   ["Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "It's no use going back to yesterday, because I was a different person then."
+    "Who in the world am I? Ah, that's the great puzzle..."
+    "Curiouser and curiouser!"
+    "If you don't know where you are going any road can take you there."
+    "We're all mad here."
+    "I can't go back to yesterday because I was a different person then."
+    "It's always tea-time."
+    "Begin at the beginning and go on till you come to the end; then stop."
+    "I knew who I was this morning, but I've changed a few times since then."
+    "How long is forever? Sometimes, just one second."
+    "If everybody minded their own business, the world would go around a great deal faster than it does."
+    "I don't think... then you shouldn't talk, said the Hatter."
+    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+    "Well, I never heard it before, but it sounds uncommon nonsense."
+    "Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "We're all mad here."
+    "How long is forever? Sometimes, just one second."
+    "The world is full of obvious things which nobody by any chance ever observes."
+    "Reality is that which, when you stop believing in it, doesn't go away."
+    "The sky above the port was the color of television, tuned to a dead channel."
+    "Information wants to be free."
+    "The future is already here – it's just not evenly distributed."
+    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+    "The 'Net is a waste of time, and that's exactly what's right about it."
+    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+    "The street finds its own uses for things."
+    "Accelerated world. Accelerated nervous system to go with it."
+    "The future has arrived — it's just not evenly distributed yet."
+    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+    "When you want to know how things really work, study them when they're coming apart."
+    "The human sensory system is a lot more complex and weird than most people realize."
+    "Time moves in one direction, memory in another."
+    "The only thing that keeps you sane is to think that it's all a bad dream."
+    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+    "Secrets are not the same as surprises."
+    "Neuromancer. The lane to the land of the dead."],
+   :modes
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
+    [:pre
+     {:style
+      {:color :theme/editor-outer-rim-color,
+       :background-color "#00000000",
+       :border "none",
+       :text-shadow "4px 4px 4px #00000088",
+       :font-size "17px",
+       :font-family :theme/monospaced-font}}
+     [:str :*data]],
+    :edn [:edn :*data],
+    :clover [:box :child :*data],
+    :pretty [:pretty-box :*data],
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
+   :kits {},
+   :clover-templates
+   {:color-theft
+    {:args [:*input],
+     :body
+     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
+    :pretty-box
+    {:args [:*input],
+     :body
+     [:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:color :theme/editor-outer-rim-color,
+       :font-size [:auto-size-px [:str :*input]]}
+      :child
+      [:str :*input]]},
+    :new-block-quotes-box
+    {:args [:*input],
+     :body
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "21px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      [:speak [:str :*input]]]},
+    :clj
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
+    :clj2
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
+    :cheese-burger
+    {:args [:x],
+     :body
+     [:box
+      :style
+      {:color "yellow", :font-size "23px"}
+      :child
+      [:str :x "CHEESEBURGER!"]]}},
+   :openai-api-key "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",
+   :eleven-labs-default-voice-name "Not OG Buffy",
+   :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+   :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
    :debug-level 1,
    :screens
-   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
-    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
-    "SSuccessful-oval-sea-urchin-of-mountain-range"
-    "aaa-run-amok"
-    "aaaaah-esday-the-day"
-    "aaaaah-wednesday-the-day"
-    "aaaah-wednesday-the-day"
-    "alice-puzzle-1"
-    "asdasdasdasd"
-    "autumn-theme"
-    "battle-mage"
-    "bigfoot-snapshots"
-    "bigfoot-snapshots2"
-    "bigfoot-snapshots3"
-    "blackberries"
-    "blank-sizzle"
-    "blank-sizzle2"
-    "blue-pines"
-    "boston-test-10-3-23"
-    "broken-jacket"
-    "bunch of bullshit"
-    "bunch of bullshit2"
-    "bunch of bullshit4"
-    "caliope"
-    "calliope"
-    "canvas-scrubber-test1"
-    "capecod-viking"
-    "chaos simple"
-    "chaos-views"
-    "chompers"
-    "claude-testing2"
-    "clean-grey-defaults"
-    "code-data-literal-stonks-test"
-    "conifer-boughs"
-    "counting-lord-of-the-woods"
-    "crazy-alice"
-    "dark-crested-jackelope"
-    "data-literals-test-sunday"
-    "data-literals-test-sundaydd"
-    "demo-dark-pumpkin-bkgrd-sept23"
-    "demo-light-bkgrd-sept23"
-    "demo-lime-green-slime"
-    "desktops-and-broomsticks"
-    "error-monitor"
-    "error-monitor-vanessa"
-    "error-monitor-vanessa2"
-    "error-monitor-vanessa3"
-    "evil-main-street"
-    "fake-books-1"
-    "fake-bricks"
-    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
-    "final-fantasy-dorchester"
-    "fox-hills"
-    "glass-fish-board-test"
-    "green-storm-city"
-    "hue-board-1"
-    "late-winter-theme"
-    "lavender-side-eye"
-    "layout-test-1"
-    "layout-test-12"
-    "light-theme"
-    "literal-data-test"
-    "looking-glass-redux"
-    "looking-glass-redux2"
-    "looking-glass-redux23a"
-    "looking-glass-redux23abb"
-    "looking-glass-redux2a"
-    "looking-glass-redux2aa"
-    "looking-glass-redux45"
-    "looking-glass-redux79"
+   ["dynamic-theme-example1"
+    "ecto-cooler-shade"
     "looking-glass-sine-wave"
-    "luck-of-the-irish"
-    "mapbox-test"
-    "may-20"
-    "my-goodness"
-    "my-goodness-the-sequel"
-    "neverwinter-amy"
-    "night-city-never-sleeps"
-    "nightcity-cape-cod"
-    "nivo-getting-better!"
-    "nivo-hacking-2023"
-    "nivo-hacking-2023333"
-    "nivo-hacking-october-2nd"
-    "old-defaults"
-    "old-fashioned-christmas"
-    "old-town-snow-stars"
-    "pensive-look"
-    "pensive-look2"
-    "pine-wood-dawn"
-    "pink-and-green-elk"
-    "pink-dusk-falls"
-    "pinup-rabbit-fields"
-    "poor-touring-me"
-    "pres-sql-test-1"
-    "purple-dusk-old-town"
-    "purple-nightshades"
-    "purple-techno-sunset"
-    "recharts-test-blocks"
-    "refresh-test"
-    "retro-machines"
-    "riffle-test"
-    "sick-of-your-shit"
-    "sizzle-board-1"
-    "sneaky-swamp-creatures1"
-    "stop-drawing-dead-dashboards"
-    "swamp-nightgown"
-    "swamp-reacher"
-    "tallica-param-test2"
-    "tangerine-dreams"
-    "technicolor-shanny"
-    "the-future-soon"
-    "the-generated-lass"
-    "the-generated-lass-glow"
-    "the-generated-lass-ne"
-    "the-generated-lass-sgt"
-    "the-generated-lassff"
-    "the-memo"
-    "the-memo2"
-    "the-outer-blues"
-    "trad-hybrid"
-    "tweet-bigfoot-is-blurry"
+    "new-age-hacking"
+    "server-stats2"
+    "test-blog-screen"
     "tweet-demo-thing-bigfoot-is-blurry"
-    "unnamed-screen!"
-    "viking-pastels"
-    "weave-test"
-    "weave-test1"
-    "weave-test122"
-    "who ya gonna call?"
-    "who ya gonna call? again"
     "winter-theme"
-    "winter-theme-choom"
-    "winter-theme2"
-    "winter-theme33"
-    "winter-theme45"
-    "winter-theme47"
-    "winter-twin-peaks"
-    "witchy425"
-    "wonderland-horror-interface"
-    "wow-board"],
-   :openapi-key "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"}},
+    "winter-theme-choom"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [129007887 110670635 4294705152],
- :status-data
- {"kick-test!"
-  {:kick
-   {:data
-    [{:sent! "kick-test!",
-      :to :enthusiastic-wide-donkey-34,
-      :at "2024-05-03 13:14:03",
-      :payload
-      {:query-log
-       {:data
-        [{:content ["2024-05-03 13:14:03 - query ran in 0 ms."],
-          :name "query-log-:bi-polar-wavez",
-          :order 1714756443,
-          :parameters {},
-          :forced-mutates {},
-          :step-mutates {}}],
-        :description "query-log-:bi-polar-wavez",
-        :mutates {},
-        :options {:actions? false, :pages? false, :search? false},
-        :parameters {}}},
-      :payload-kp [:bi-polar-wavez "kick-test!"]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :heartbeat
-  {:kick
-   {:data
-    [{:sent! :heartbeat,
-      :to :all,
-      :at "2024-05-03 13:13:51",
-      :payload nil,
-      :payload-kp [:heartbeat :heartbeat]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}}},
- :flow-subs
- [:flow/flow-forever>*running?
-  :flow/flow-forever>:final-math
-  :flow/live-scratch-flow>*running?
-  :time/now-seconds],
- :client-name :enthusiastic-wide-donkey-34,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[:block-9240 :queries :new-clojure-sqlized] [nil :queries nil]],
+  [:clojure :count-map-keys] [],
+  [:clojure :new-lundberg] [[:* :* :*]],
+  [:clojure :view-lundberg]
+  [[:block-3341 :views :hi]
+   [:block-9240 :views :hi]
+   [:block-9240 :views :stack]
+   [:block-1285 :views :poised-maroon-fly]
+   [:block-3904 :views :reech]
+   [:block-8155 :views :genius-plum-coyote]
+   [:block-5402 :views :hare-vw]],
+  [:clojure :gen-ev] [],
+  [:outliers :get-outliers]
+  [[:block-9240 :queries :new-clojure-sqlized] [nil :queries nil]]},
+ :memory [359804492 340651984 4294705152],
+ :client-name :brave-pyramidal-butterfly-10,
  :flow-editor? true,
- :openai-api-key "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",
- :window {:w 1487, :h 1054},
- :post-meta {:bi-polar-wavez {:* {:rowcount 22}}},
+ :window {:w 2672, :h 1368},
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil :new-clojure]},
+ :post-meta
+ {:tables-sys
+  {:* {:rowcount 25},
+   :db_schema {:distinct 1},
+   :db_catalog {:distinct 0},
+   :connection_id {:distinct 1},
+   :schema_cat {:distinct 0},
+   :table_name {:distinct 25},
+   :fields {:distinct 15}},
+  :files-sys
+  {:* {:rowcount 10},
+   :file_path {:distinct 10},
+   :screen_name {:distinct 9},
+   :blocks {:distinct 8},
+   :queries {:distinct 7},
+   :ts {:distinct 3}},
+  :blocks-sys
+  {:* {:rowcount 7},
+   :block_key {:distinct 7},
+   :block_name {:distinct 7},
+   :queries {:distinct 2},
+   :views {:distinct 4},
+   :block_data {:distinct 7},
+   :view_names {:distinct 7},
+   :query_names {:distinct 2}},
+  :bi-polar-wavez {},
+  :connections-sys
+  {:* {:rowcount 7},
+   :database_name {:distinct 2},
+   :connection_id {:distinct 7},
+   :styler_highlight_8717ssa {:distinct 1}},
+  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_ {},
+  :new-clojure-sqlized
+  {:* {:rowcount 69}, :step_int {:distinct 69}, :step_val {:distinct 61}}},
  :flow-estimates
- {"counting-loop" {:times 6, :run-id "e1a27f0a-a8c4-45ed-89fc-896103d03013"}},
+ {:connections-sys {:times 0.001, :run-id :connections-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :tables-sys {:times 0.001, :run-id :tables-sys},
+  :files-sys {:times 0.001, :run-id :files-sys},
+  :blocks-sys {:times 0.001, :run-id :blocks-sys},
+  :raw-custom-override-1731765785
+  {:times 0.077, :run-id :raw-custom-override-1731765785},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized}},
  :status
- {"kick-test!" {:kick :bi-polar-wavez},
-  :heartbeat
+ {:heartbeat
   {:kick
-   [:flow/flow-forever>*running?
-    :flow/flow-forever>:final-math
-    :flow/live-scratch-flow>*running?
-    :time/now-seconds]}},
+   [:time/now-seconds
+    :flow-status/flow-forever>*running?
+    :solver/raw-custom-override-1731765785
+    :solver-meta/raw-custom-override-1731765785>output>evald-result>value-hash
+    :flow-status/my-new-flow2210>*running?
+    :kit/kicks>brave-pyramidal-butterfly-10
+    :time/second
+    :solver-status/brave-pyramidal-butterfly-10>raw-custom-override-1731765785>running?]},
+  :alert2 {:alerts :alert2},
+  :alert1 {:alerts :alert2},
+  :file-change {:file-changed :done}},
  :screen-name "looking-glass-sine-wave",
  :recos-page2 0,
  :selected-tab "the-creative-process",
  :col-names nil,
  :snapshots nil,
- :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
- :alerts [],
+ :alerts
+ [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:box
+     :child
+     "sent screen save request to server... Please wait."
+     :style
+     {:font-size "12px", :opacity 0.66}]]
+   11
+   0.5
+   860
+   -1247625457]],
  :recos-page 0,
- :repl-output
- {:bi-polar-wavez
-  {:ns "rabbit-board.user",
-   :value
-   [[{:step_int 0, :step_val 0}
-     {:step_int 1, :step_val 0.044864830350514924}
-     {:step_int 2, :step_val 0.0896393089034335}
-     {:step_int 3, :step_val 0.13423326581765546}
-     {:step_int 4, :step_val 0.17855689479863665}
-     {:step_int 5, :step_val 0.2225209339563144}
-     {:step_int 6, :step_val 0.2660368455666751}
-     {:step_int 7, :step_val 0.3090169943749474}
-     {:step_int 8, :step_val 0.3513748240813427}
-     {:step_int 9, :step_val 0.3930250316539236}
-     {:step_int 10, :step_val 0.4338837391175581}
-     {:step_int 11, :step_val 0.47386866247299864}
-     {:step_int 12, :step_val 0.5128992774059061}
-     {:step_int 13, :step_val 0.5508969814521025}
-     {:step_int 14, :step_val 0.5877852522924731}
-     {:step_int 15, :step_val 0.6234898018587335}
-     {:step_int 16, :step_val 0.6579387259397126}
-     {:step_int 17, :step_val 0.6910626489868646}
-     {:step_int 18, :step_val 0.7227948638273916}
-     {:step_int 19, :step_val 0.7530714660036109}
-     {:step_int 20, :step_val 0.7818314824680298}
-     {:step_int 21, :step_val 0.8090169943749475}]],
-   :status #{"done"},
-   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
-   :out [""],
-   :output-lines 0,
-   :values 22}},
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:ufo_sightings 484893751},
- :panels-hash 2066608608,
- :sessions
- (["sunny-globular-locust-of-wadi.edn"
-   "1020 hours, 15 minutes, 37 seconds"
-   3672937302]
-   ["light-baby-blue-dog-banned-from-sandur.edn"
-    "1020 hours, 37 minutes, 47 seconds"
-    3674267462]
-   ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "1020 hours, 38 minutes, 52 seconds"
-    3674332990]
-   ["upbeat-oval-ox-of-pediplain.edn"
-    "1020 hours, 38 minutes, 59 seconds"
-    3674339630]
-   ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "1020 hours, 39 minutes, 29 seconds"
-    3674369866]
-   ["effective-spherical-fox-of-the-volcanic-field.edn"
-    "1020 hours, 51 minutes, 58 seconds"
-    3675118034]
-   ["courageous-linear-platypus-of-corrie.edn"
-    "1020 hours, 59 minutes, 43 seconds"
-    3675583007]
-   ["trusting-ivory-alligator-of-crevasse.edn"
-    "1020 hours, 59 minutes, 44 seconds"
-    3675584515]
-   ["angelic-champagne-parrot-banned-from-inselberg.edn"
-    "1020 hours, 59 minutes, 44 seconds"
-    3675584259]),
- :last-run-throwaway "13:08:19",
- :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1443450241,
+ :base-sniff-queries
+ {:raw_custom_override_1731765785__block_9240_clojure_new_clojure_ -189601823},
+ :user-params-hash -1622561911,
  :grid-recos? true,
  :preview-keys2 [],
+ :session-hash -1241972244,
  :resolved-queries
- {:bi-polar-wavez
-  {:select [:step_int :step_val],
-   :from
-   [{:data
-     (mapv
-       (fn [n] {:step_int n, :step_val (Math/sin (* n (/ Math/PI 70)))})
-       (range 22))}],
-   :col-widths {:step_int 90, :step_val 170}}},
+ {:new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-29 11:51:30",
+   :_sqlized-by [:block-9240 :clojure :new-clojure],
+   :_sqlized-hash 944862118,
+   :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_]},
+  nil {:_last-run "11:50:12"}},
  :panels
  {:block-3341
   {:name "block-3341",
    :w 22,
-   :style {:border-radius "12px 0px 0px 0px"},
    :selected-view :hi,
    :root [1 1],
    :h 2,
@@ -556,24 +523,31 @@
      :child
      [:string :time/now-seconds]]}},
   :block-9240
-  {:name "block-9240",
-   :w 6,
-   :style {:border-radius "0px 12px 0px 0px"},
-   :selected-view :bi-polar-wavez,
+  {:clojure
+   {:new-clojure
+    (do
+      (mapv
+        (fn [n]
+          {:step_int n,
+           :step_val
+           (Math/sin (* (* n (/ Math/PI :param/suffering-flux)) :time/second))})
+        (range :param/length-of-suffering)))},
+   :name "block-9240",
+   :w 10,
+   :selected-mode {:new-clojure :terminal, :* :terminal},
+   :selected-view :new-clojure,
    :root [23 1],
-   :h 10,
+   :h 12,
    :connection-id nil,
    :queries
-   {:bi-polar-wavez
-    {:select [:step_int :step_val],
-     :from
-     [{:data
-       (mapv
-         (fn [n]
-           {:step_int n,
-            :step_val (Math/sin (* n (/ Math/PI :param/suffering-flux)))})
-         (range :param/length-of-suffering))}],
-     :col-widths {:step_int 90, :step_val 170}}},
+   {:new-clojure-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-29 11:51:30",
+     :_sqlized-by [:block-9240 :clojure :new-clojure],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override-1731765785>output>evald-result>value-hash,
+     :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_]}},
    :tab "the-creative-process",
    :views
    {:hi
@@ -599,7 +573,7 @@
   {:drag-meta {:type :open-input},
    :w 10,
    :selected-view :poised-maroon-fly,
-   :h 2,
+   :h 3,
    :views
    {:poised-maroon-fly
     [:box
@@ -608,10 +582,10 @@
      :child
      [:scrubber [:param :length-of-suffering]]]},
    :tab "the-creative-process",
-   :root [13 10],
+   :root [13 12],
    :name "block-1285"},
   :block-3904
-  {:h 7,
+  {:h 9,
    :w 22,
    :root [1 3],
    :tab "the-creative-process",
@@ -624,7 +598,7 @@
      {:width "100%", :height :panel-height+50}
      [:>
       :LineChart
-      {:data :bi-polar-wavez, :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      {:data :new-clojure-sqlized, :margin {:top 5, :bottom 5, :right 30, :left 20}}
       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
       [:> :Tooltip]
       [:> :XAxis {:dataKey :step_int}]
@@ -640,56 +614,40 @@
   {:drag-meta {:type :open-input},
    :w 12,
    :selected-view :genius-plum-coyote,
-   :h 2,
+   :h 3,
    :views
    {:genius-plum-coyote
     [:box :style {:font-size "24px"} :child [:scrubber [:param :suffering-flux]]]},
    :tab "the-creative-process",
-   :root [1 10],
-   :name "block-8155"}},
- :selected-block :block-9240,
- :signals-map
- {:fun-gorilla
-  {:signal
-   [:and
-    [:= :client/cute-prismatic-human-7>click-param>param>jessica "jessica"]
-    [:changed? :time/second]
-    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
-    [:or [:= 2 1] [:< 9 4]]
-    [:signal/worthy-fish-signal]]},
-  :cool-raccoon-signal-yo
-  {:signal
-   [:or
-    [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-    [:and
-     [:or [:> :time/hour 12] [:< :time/hour 6]]
-     [:or
-      [:= :time/second 10]
-      [:= :time/second 20]
-      [:= :time/second 45]
-      [:= :time/second 25]]]]},
-  :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
-  :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
-  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
-  :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :exciting-cheetah-signal
-  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
-  :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
-  :dragging-to-potential-cross-breed?
-  {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
-  :special-lion-signal
-  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
-  :optimistic-sheep-signal
-  {:signal
-   [:and
-    [:= :time/day 1]
-    [:= :time/hour 9]
-    [:changed? :time/minute]
-    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
-  :glowing-bat-signal
-  {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
+   :root [1 12],
+   :name "block-8155"},
+  nil {:queries {nil {:_last-run "11:50:12"}}},
+  :block-5402
+  {:h 2,
+   :w 10,
+   :root [23 13],
+   :tab "the-creative-process",
+   :selected-view :hare-vw,
+   :name "block-5402",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :time/second]]},
+   :queries {}}},
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#E7EBC4",
   "boolean" "#46436C",
@@ -704,6 +662,7 @@
   "unknown" "#777490",
   "date" "#221F4A",
   "nil" "#11E125D4"},
+ :solver-fn nil,
  :click-param
  {:blocks-sys
   {:block_key ":*theme*",
@@ -715,39 +674,25 @@
    :view_names
    ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
    :query_names ""},
-  :flow {},
   :files-sys
   {:file_path "./screens/error-monitor-vanessa3.edn",
    :screen_name "error-monitor-vanessa3",
    :blocks 39,
    :queries 30,
    :ts "2024-04-30 20:10:00"},
-  :time
-  {:hour 13,
-   :now "Friday, May 3rd 1:02PM",
-   :second 54,
-   :now-seconds "Friday, May 3rd 1:14:35PM",
-   :minute 2},
   :viz-tables-sys2 {},
   :param
-  {:suffering-flux 70,
-   :length-of-suffering 22,
-   :selected-view [:queries :bi-polar-wavez],
-   :selected-view-data
-   {:select [:step_int :step_val],
-    :from
-    [{:data
-      (mapv
-        (fn [n]
-          {:step_int n,
-           :step_val (Math/sin (* n (/ Math/PI :param/suffering-flux)))})
-        (range :param/length-of-suffering))}],
-    :col-widths {:step_int 90, :step_val 170}},
-   :selected-block :block-9240},
+  {:suffering-flux 80,
+   :length-of-suffering 69,
+   :selected-view nil,
+   :selected-view-data nil,
+   :selected-block :block-3904},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
-   :base-block-style {:backdrop-filter "blur(2px) brightness(32%) "},
+   :base-block-style
+   {:border-radius [:sticky-border-radius "20px"],
+    :backdrop-filter "blur(2px) brightness(32%) "},
    :vega-defaults
    {:view {:stroke "transparent"},
     :axis
@@ -838,7 +783,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/large/b64-decoded-1992949-8k-4k.png)",
+   {:background-image "url(assets/openai-images/b64-image3-2332-3524.png)",
     :transition "all 0.8s ease-in-out",
     :background-blend-mode "overlay",
     :background-size "cover",
@@ -850,5 +795,4 @@
    :editor-grid-font-color "#ffffff"},
   :ufo-sightings-drag-9 {},
   :sys {:selected-tab "the-creative-process", :selected-tab-idx 0}},
- :selected-flow "live-scratch-flow",
- :post-condi {:c345-up-or-down? [{:v 0}]}}
+ :selected-flow "my-new-flow2210"}

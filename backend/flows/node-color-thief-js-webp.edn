@@ -1,5 +1,30 @@
 {:flowmaps
- {:shell-command-1
+ {:path-correction
+  {:y 750,
+   :fn (fn [x] x),
+   :w 175,
+   :raw-fn (fn [x] (str "../" x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 100,
+   :x 1550,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :shell-command-1
   {:w 200,
    :h 100,
    :x 1350,
@@ -74,12 +99,7 @@
   {:y 1025,
    :fn (fn [x] x),
    :w 200,
-   :raw-fn
-   (fn [x y]
-     (let [x (if (clojure.string/starts-with? (str x) "./images/")
-               (clojure.string/replace (str x) "./images/" "/home/ryanr/rvbbit/frontend/resources/public/images/")
-               x)]
-       (str "convert " x " -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg " y))),
+   :raw-fn (fn [x y] (str "convert " x " -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg " y)),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
@@ -237,18 +257,15 @@
    :icon "zmdi-group",
    :ports {:in {:delimiter :string, :value-1 :any, :value-2 :any}, :out {:out :string}}},
   :image-path
-  {:y 750,
+  {:y 550,
    :w 475,
    :types nil,
    :z 0,
    :ports {:out {:out {:out :string}}, :in {}},
    :inputs nil,
    :h 125,
-   :x 1425,
-   :data
-   {:drag-meta {:type :open-block},
-    :flow-item {:expandable? true},
-    :user-input "./images/large/b64-image-94588-74015-4k.webp"}},
+   :x 1475,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input "extras/node-colorthief/logo.png"}},
   :get-color-edges
   {:y 2100,
    :fn (fn [x] x),
@@ -451,7 +468,7 @@
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
-    :user-input "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"}},
+    :user-input "cd ../extras/node-colorthief ; node ./colorThief2.js"}},
   :waiter-fn
   {:y 1300,
    :fn (fn [x] x),
@@ -502,7 +519,7 @@
      :inputs [:x],
      :expandable? true,
      :drag-meta {:type :open-fn}}}}},
- :zoom [-3.68 -547 0.791],
+ :zoom [149.21 -219.97 0.565],
  :opts {:close-on-done? true, :retry-on-error? false, :timeout 800000, :retries 0},
  :flow-id "node-color-thief-js-webp",
  :flowmaps-connections
@@ -510,8 +527,6 @@
   [:clojure-string-join-1 :shell-command-1/command]
   [:shell-command-1/output :join-output-as-string/value]
   [:join-output-as-string :json-to-edn/json-string]
-  [:image-path :convert-to-png/x]
-  [:image-path :temp-name/x]
   [:temp-name :convert-to-png/y]
   [:convert-to-png :run-the-convert-command/command]
   [:run-the-convert-command :waiter-fn/cmd]
@@ -521,4 +536,7 @@
   [:get-color-edges :done]
   [:json-to-edn :json-to-edn_dominantColor/x]
   [:json-to-edn_colorPalette :get-color-edges/colors]
-  [:json-to-edn_dominantColor :get-color-edges/dom]]}
+  [:json-to-edn_dominantColor :get-color-edges/dom]
+  [:image-path :path-correction/x]
+  [:path-correction :temp-name/x]
+  [:path-correction :convert-to-png/x]]}

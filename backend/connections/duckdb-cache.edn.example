@@ -1,0 +1,6 @@
+{:jdbc-url "jdbc:duckdb:./db/cache.duck"
+ :idle-timeout      600000
+ :maximum-pool-size 20
+ :connection-init-sql "CREATE SCHEMA IF NOT EXISTS base; USE base;"
+  :max-lifetime      1800000}
+

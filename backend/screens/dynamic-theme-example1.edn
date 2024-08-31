@@ -1,834 +1,61 @@
-{:orders
- {:flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :fields-sys [:field_name :field_type :data_type],
-  :gen-viz-211 [],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :gen-viz-401 [],
-  :cached-ufo-sightings-drag-37 (:query_error),
-  :mad-libs-viz
-  {:block-130
-   {"NYPD_Arrest_Data_Year_to_Date_drag_22"
-    [:context_hash
-     :combo_hash
-     :connection_id
-     :shape_name
-     :axes
-     :talias
-     :walk1
-     :walk2
-     :walk3
-     :walka
-     :key_hash
-     :table_type
-     :field_type
-     :data_type
-     :db_type
-     :db_schema
-     :db_catalog
-     :table_name
-     :field_name
-     :derived_calc
-     :derived_name
-     :score0
-     :score1
-     :score2]}},
-  :bigfoot-sightings-locations-drag-12
-  [:alsonoticed
-   :bfroid
-   :class
-   :county
-   :cty_abbrev
-   :cty_name
-   :date
-   :environment
-   :fips_county_code
-   :fips_state_code
-   :fixed_month
-   :fixed_year
-   :housing_units
-   :land_area
-   :latitude
-   :locationdetails
-   :longitude
-   :month
-   :nearestroad
-   :nearesttown
-   :observed
-   :otherstories
-   :otherwitnesses
-   :population
-   :run_id
-   :run_time
-   :season
-   :state
-   :state_abbrev
-   :state_name
-   :submitted
-   :submitted_date
-   :timeandconditions
-   :title
-   :url
-   :water_area
-   :year
-   :zip_lat
-   :zip_long
-   :zip_name
-   :zipcode],
-  :country-drag-24 [:country :rowcnt :city],
-  :Electric-Range-drag-990 [],
-  :Make-drag-801 [],
-  :recos-sys2
-  [:context_hash
-   :combo_hash
-   :connection_id
-   :shape_name
-   :query_map
-   :query_map_str
-   :viz_map
-   :combo_edn
-   :selected_view
-   :table_name
-   :condis
-   :h
-   :w
-   :score],
-  :NYPD_Arrest_Data_Year_to_Date (:query_error),
-  :main_boston_ibr (:query_error),
-  :viz-shapes0-sys2 [:shape :recos],
-  :country_drag_36 (:query_error),
-  :dl_state_drag_39 (:query_error),
-  :query-385 [],
-  :ufo-sightings-drag-37
-  [:city
-   :comments
-   :country
-   :date_posted
-   :datetime
-   :duration_hours
-   :duration_seconds
-   :duration_seconds_int
-   :id
-   :latitude
-   :longitude
-   :shape
-   :state],
-  :dl-state-drag-39 [:dl_state :rowcnt :color],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :viz-tables-sys2 [:table_name :recos],
-  :State-drag-734 [],
-  :new-clojure-sqlized [:ffilename],
-  :rowcnt-drag-32 (:query_error),
-  :raw_custom_override341927123__block_86_clojure_new_clojure_ (:query_error),
-  :Electric-Vehicle-Population-Data-drag-580 [],
-  :color-drag-13 [:color :rowcnt],
-  :ufo_sightings_drag_37 (:query_error),
-  :viz-shapes-sys2 [:combo_edn :recos],
-  :NYPD_Arrests_Data_Historic (:query_error),
-  :Traffic-Violations-drag-8
-  [:accident
-   :agency
-   :alcohol
-   :arrest_type
-   :article
-   :belts
-   :charge
-   :color
-   :commercial_license
-   :commercial_vehicle
-   :contributed_to_accident
-   :date_of_stop
-   :description
-   :dl_state
-   :driver_city
-   :driver_state
-   :fatal
-   :gender
-   :geolocation
-   :hazmat
-   :latitude
-   :location
-   :longitude
-   :make
-   :model
-   :personal_injury
-   :property_damage
-   :race
-   :search_arrest_reason
-   :search_conducted
-   :search_disposition
-   :search_outcome
-   :search_reason
-   :search_reason_for_stop
-   :search_type
-   :seqid
-   :state
-   :subagency
-   :time_of_stop
-   :vehicletype
-   :violation_type
-   :work_zone
-   :year],
-  :Electric_Vehicle_Population_Data (:query_error),
-  :gen-viz-296 (:query_error),
-  :viz-shapes
-  [:axes_logic
-   :base_score
-   :connection_id
-   :library_shapes
-   :selected_view
-   :run_id
-   :shape_name
-   :sql_maps],
-  :country_drag_24 (:query_error),
-  :query-1057 [:rowcnt],
-  :meteorite_landings (:query_error),
-  :city-drag-32 (:query_error),
-  :bigfoot_sightings_locations (:query_error),
-  :ufo_sightings (:query_error),
-  :flow-fn-categories-sys [:category],
-  :cached-country-drag-36 (:query_error),
-  :connections-sys [:database_name :connection_id :styler_highlight_8717ssa],
-  :Meteorite_Landings (:query_error),
-  :rowcnt-drag-12 (:query_error),
-  :raw_custom_override_2058175520__block_86_clojure_new_clojure_ (:query_error),
-  :customer_dimension (:query_error),
-  :cached-country-drag-24-1 (:query_error),
-  :reco-counts [:table_name :cnt],
-  :cached-dl-state-drag-39 [:dl_state :rowcnt :color],
-  :Electric_Vehicle_Population_Data_2 (:query_error),
-  :country-drag-36 (:query_error),
-  :flow-fn-all-sys [:name],
-  :Traffic_Violations (:query_error)},
- :reco-preview "2006850921",
+{:reco-preview "2006850921",
  :flow? false,
  :sql-source
- {:gen-viz-211
-  {:select [[[[:avg :Electric_Range]] :Electric_Range] :Make],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Make]},
-  :gen-viz-401
-  {:select [[[:count 1] :rows] :Model_Year :State],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Model_Year :State]},
-  :cached-ufo-sightings-drag-37
-  {:select
-   [:city
-    :comments
-    :country
-    :date_posted
-    :datetime
-    :duration_hours
-    :duration_seconds
-    :duration_seconds_int
-    :id
-    :latitude
-    :longitude
-    :shape
-    :state],
+ {:new-query
+  {:select [:*],
    :connection-id "cache.db",
-   :from [[:ufo_sightings_drag_37 :hh786]],
-   :_last-run "09:08:38"},
-  :bigfoot-sightings-locations-drag-12
-  {:select
-   [:alsonoticed
-    :bfroid
-    :class
-    :county
-    :cty_abbrev
-    :cty_name
-    :date
-    :environment
-    :fips_county_code
-    :fips_state_code
-    :fixed_month
-    :fixed_year
-    :housing_units
-    :land_area
-    :latitude
-    :locationdetails
-    :longitude
-    :month
-    :nearestroad
-    :nearesttown
-    :observed
-    :otherstories
-    :otherwitnesses
-    :population
-    :run_id
-    :run_time
-    :season
-    :state
-    :state_abbrev
-    :state_name
-    :submitted
-    :submitted_date
-    :timeandconditions
-    :title
-    :url
-    :water_area
-    :year
-    :zip_lat
-    :zip_long
-    :zip_name
-    :zipcode],
-   :from [[:bigfoot_sightings_locations :hh322]],
-   :page 1,
-   :_last-run "08:55:51"},
-  :country-drag-24
-  {:select [:country [[:count 1] :rowcnt] :city],
-   :from
-   [[{:select
-      [:city
-       :comments
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :id
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :mm422]]}
-     :ee493]],
-   :group-by [:country :city],
-   :order-by [[:rowcnt :desc]]},
-  :Electric-Range-drag-990
-  {:select [[[:avg :Electric_Range] :Electric_Range_Avg]],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :gg224]]},
-  :Make-drag-801
-  {:select [:Make [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :dd691]],
-   :group-by [:Make],
-   :order-by [[:rowcnt :desc]]},
-  :NYPD_Arrest_Data_Year_to_Date
+   :_sqlized-at "2024-08-31 19:01:24",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1754071114,
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]},
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
-   :from [:NYPD_Arrest_Data_Year_to_Date],
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_],
    :limit 111},
-  :main_boston_ibr
-  {:select [:*], :connection-id "system-db", :from [:main_boston_ibr], :limit 111},
-  :country_drag_36
-  {:select [:*], :connection-id "system-db", :from [:country_drag_36], :limit 111},
-  :dl_state_drag_39
-  {:select [:*], :connection-id "system-db", :from [:dl_state_drag_39], :limit 111},
-  :query-385
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :jj797]]},
-  :ufo-sightings-drag-37
-  {:select
-   [:city
-    :comments
-    :country
-    :date_posted
-    :datetime
-    :duration_hours
-    :duration_seconds
-    :duration_seconds_int
-    :id
-    :latitude
-    :longitude
-    :shape
-    :state],
-   :from [[:ufo_sightings :mm422]]},
-  :dl-state-drag-39
-  {:select [:dl_state [[:count 1] :rowcnt] :color],
-   :from
-   [[{:select
-      [:accident
-       :agency
-       :alcohol
-       :arrest_type
-       :article
-       :belts
-       :charge
-       :color
-       :commercial_license
-       :commercial_vehicle
-       :contributed_to_accident
-       :date_of_stop
-       :description
-       :dl_state
-       :driver_city
-       :driver_state
-       :fatal
-       :gender
-       :geolocation
-       :hazmat
-       :latitude
-       :location
-       :longitude
-       :make
-       :model
-       :personal_injury
-       :property_damage
-       :race
-       :search_arrest_reason
-       :search_conducted
-       :search_disposition
-       :search_outcome
-       :search_reason
-       :search_reason_for_stop
-       :search_type
-       :seqid
-       :state
-       :subagency
-       :time_of_stop
-       :vehicletype
-       :violation_type
-       :work_zone
-       :year],
-      :from [[:Traffic_Violations :yy57]]}
-     :kk686]],
-   :group-by [:dl_state :color],
-   :order-by [[:rowcnt :desc]]},
-  :State-drag-734
-  {:select [:State [[:count 1] :rowcnt] :County],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :dd661]],
-   :group-by [:State :County],
-   :order-by [[:rowcnt :desc]]},
+  :raw_custom_override_639436668__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_639436668__block_86_clojure_new_clojure_],
+   :limit 111},
   :new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-08-29 07:59:17",
+   :_sqlized-at "2024-08-31 19:01:24",
    :_sqlized-by [:block-86 :clojure :new-clojure],
-   :_sqlized-hash 1828944435,
-   :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_]},
-  :rowcnt-drag-32
-  {:select [[[:sum :rowcnt] :rowcnt_sum]],
-   :from
-   [[{:select [:city [[:count 1] :rowcnt]],
-      :from
-      [[{:select [:country :rowcnt :city], :from [[:country_drag_24 :nn237]]}
-        :ee206]],
-      :group-by [:city],
-      :order-by [[:rowcnt :desc]]}
-     :pp630]]},
-  :raw_custom_override341927123__block_86_clojure_new_clojure_
+   :_sqlized-hash 1754071114,
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]},
+  :image-files
   {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override341927123__block_86_clojure_new_clojure_],
-   :limit 111},
-  :Electric-Vehicle-Population-Data-drag-580
-  {:select
-   [:Base_MSRP
-    :City
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-    :County
-    :DOL_Vehicle_ID
-    :Electric_Range
-    :Electric_Utility
-    :Electric_Vehicle_Type
-    :Legislative_District
-    :Make
-    :Model
-    :Model_Year
-    :State
-    :VIN_1_10
-    :Vehicle_Location
-    :_2020_Census_Tract
-    :zipcode],
-   :from [[:Electric_Vehicle_Population_Data :aa583]]},
-  :color-drag-13
-  {:select [:color [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:accident
-       :agency
-       :alcohol
-       :arrest_type
-       :article
-       :belts
-       :charge
-       :color
-       :commercial_license
-       :commercial_vehicle
-       :contributed_to_accident
-       :date_of_stop
-       :description
-       :dl_state
-       :driver_city
-       :driver_state
-       :fatal
-       :gender
-       :geolocation
-       :hazmat
-       :latitude
-       :location
-       :longitude
-       :make
-       :model
-       :personal_injury
-       :property_damage
-       :race
-       :search_arrest_reason
-       :search_conducted
-       :search_disposition
-       :search_outcome
-       :search_reason
-       :search_reason_for_stop
-       :search_type
-       :seqid
-       :state
-       :subagency
-       :time_of_stop
-       :vehicletype
-       :violation_type
-       :work_zone
-       :year],
-      :from [[:Traffic_Violations :yy57]]}
-     :uu644]],
-   :group-by [:color],
-   :order-by [[:rowcnt :desc]],
-   :_last-run "07:11:06"},
-  :ufo_sightings_drag_37
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:ufo_sightings_drag_37],
-   :limit 111},
-  :NYPD_Arrests_Data_Historic
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:NYPD_Arrests_Data_Historic],
-   :limit 111},
-  :Traffic-Violations-drag-8
-  {:select
-   [:accident
-    :agency
-    :alcohol
-    :arrest_type
-    :article
-    :belts
-    :charge
-    :color
-    :commercial_license
-    :commercial_vehicle
-    :contributed_to_accident
-    :date_of_stop
-    :description
-    :dl_state
-    :driver_city
-    :driver_state
-    :fatal
-    :gender
-    :geolocation
-    :hazmat
-    :latitude
-    :location
-    :longitude
-    :make
-    :model
-    :personal_injury
-    :property_damage
-    :race
-    :search_arrest_reason
-    :search_conducted
-    :search_disposition
-    :search_outcome
-    :search_reason
-    :search_reason_for_stop
-    :search_type
-    :seqid
-    :state
-    :subagency
-    :time_of_stop
-    :vehicletype
-    :violation_type
-    :work_zone
-    :year],
-   :from [[:Traffic_Violations :yy57]],
-   :_last-run "06:52:33"},
-  :Electric_Vehicle_Population_Data
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:Electric_Vehicle_Population_Data],
-   :limit 111},
-  :gen-viz-296
-  {:select [[[:count 1] :value] [:PERP_SEX :id]],
-   :from
-   [[{:select
-      [:AGE_GROUP
-       :ARREST_BORO
-       :ARREST_DATE
-       :ARREST_KEY
-       :ARREST_PRECINCT
-       :Geo_Col
-       :JURISDICTION_CODE
-       :KY_CD
-       :LAW_CAT_CD
-       :LAW_CODE
-       :Latitude
-       :Longitude
-       :OFNS_DESC
-       :PD_CD
-       :PD_DESC
-       :PERP_RACE
-       :PERP_SEX
-       :X_COORD_CD
-       :Y_COORD_CD],
-      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
-     :ss818]],
-   :group-by [:PERP_SEX]},
-  :country_drag_24
-  {:select [:*], :connection-id "system-db", :from [:country_drag_24], :limit 111},
-  :query-1057
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:accident
-       :agency
-       :alcohol
-       :arrest_type
-       :article
-       :belts
-       :charge
-       :color
-       :commercial_license
-       :commercial_vehicle
-       :contributed_to_accident
-       :date_of_stop
-       :description
-       :dl_state
-       :driver_city
-       :driver_state
-       :fatal
-       :gender
-       :geolocation
-       :hazmat
-       :latitude
-       :location
-       :longitude
-       :make
-       :model
-       :personal_injury
-       :property_damage
-       :race
-       :search_arrest_reason
-       :search_conducted
-       :search_disposition
-       :search_outcome
-       :search_reason
-       :search_reason_for_stop
-       :search_type
-       :seqid
-       :state
-       :subagency
-       :time_of_stop
-       :vehicletype
-       :violation_type
-       :work_zone
-       :year],
-      :from [[:Traffic_Violations :yy57]]}
-     :ff815]],
-   :_last-run "07:11:02"},
-  :meteorite_landings
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:meteorite_landings],
-   :limit 111},
-  :city-drag-32
-  {:select [:city [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:country :rowcnt :city], :from [[:country_drag_24 :nn237]]} :ee206]],
-   :group-by [:city],
-   :order-by [[:rowcnt :desc]]},
-  :bigfoot_sightings_locations
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:bigfoot_sightings_locations],
-   :limit 111},
-  :ufo_sightings
-  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
-  :cached-country-drag-36
-  {:select [:country :rowcnt :state :shape],
    :connection-id "cache.db",
-   :from [[:country_drag_36 :vv537]],
-   :_last-run "09:12:03"},
-  :Meteorite_Landings
+   :_sqlized-at "2024-08-31 19:01:24",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1754071114,
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]},
+  :raw_custom_override704242473__block_9201_clojure_new_clojure_1_
   {:select [:*],
    :connection-id "system-db",
-   :from [:Meteorite_Landings],
+   :from [:raw_custom_override704242473__block_9201_clojure_new_clojure_1_],
    :limit 111},
-  :rowcnt-drag-12
-  {:select [[[:sum :rowcnt] :rowcnt_sum]],
-   :from
-   [[{:select [:country :rowcnt :city], :from [[:country_drag_24 :nn237]]}
-     :nn783]]},
-  :raw_custom_override_2058175520__block_86_clojure_new_clojure_
+  :new-clojure-1-sqlized
   {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_],
-   :limit 111},
-  :customer_dimension
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:customer_dimension],
-   :limit 111},
-  :cached-country-drag-24-1
-  {:select [:country :rowcnt :city],
    :connection-id "cache.db",
-   :from [[:country_drag_24 :nn237]],
-   :_last-run "09:09:33"},
-  :cached-dl-state-drag-39
-  {:select [:dl_state :rowcnt :color],
-   :connection-id "cache.db",
-   :from [[:dl_state_drag_39 :ee286]],
-   :_last-run "07:47:22"},
-  :Electric_Vehicle_Population_Data_2
+   :_sqlized-at "2024-08-31 18:42:15",
+   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+   :_sqlized-hash -1073545200,
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_
   {:select [:*],
    :connection-id "system-db",
-   :from [:Electric_Vehicle_Population_Data_2],
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_],
    :limit 111},
-  :country-drag-36
-  {:select [:country [[:count 1] :rowcnt] :state :shape],
-   :from
-   [[{:select
-      [:city
-       :comments
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :id
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings_drag_37 :hh786]]}
-     :uu906]],
-   :group-by [:country :state :shape],
-   :order-by [[:rowcnt :desc]]},
-  :Traffic_Violations
+  :raw_custom_override656085601__block_86_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
-   :from [:Traffic_Violations],
+   :from [:raw_custom_override656085601__block_86_clojure_new_clojure_],
    :limit 111}},
- :doom-modal? false,
- :audio-playing? false,
+ :selected-flow-block :image-path,
+ :skip-me {:yo nil},
  :meta
  {nil
   {:fields
@@ -941,6 +168,7 @@
      :cardinality 5}},
    :database-type "SQLite",
    :rowcount 34},
+  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :fields-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :gen-viz-211 {:fields {}},
   :tables-sys
@@ -948,68 +176,69 @@
    {:db_schema
     {:min "none",
      :data-type "string",
-     :commons {"none" 12},
+     :commons {"none" 9},
      :distinct 1,
      :group-by? true,
      :median "none",
      :max "none",
      :avg "none (non-numeric average)",
-     :cardinality 8},
+     :cardinality 11},
     :db_catalog
     {:min "",
      :data-type "unknown",
-     :commons {nil 12},
+     :commons {nil 9},
      :distinct 1,
      :group-by? true,
      :median "",
      :max "",
      :avg " (non-numeric average)",
-     :cardinality 8},
+     :cardinality 11},
     :connection_id
     {:min "cache.db",
      :data-type "string",
-     :commons {"cache.db" 12},
+     :commons {"cache.db" 9},
      :distinct 1,
      :group-by? true,
      :median "cache.db",
      :max "cache.db",
      :avg "cache.db (non-numeric average)",
-     :cardinality 8},
+     :cardinality 11},
     :schema_cat
     {:min "",
      :data-type "unknown",
-     :commons {nil 12},
+     :commons {nil 9},
      :distinct 1,
      :group-by? false,
      :median "",
      :max "",
      :avg " (non-numeric average)",
-     :cardinality 8},
+     :cardinality 11},
     :table_name
-    {:min "Electric_Vehicle_Population_Data",
+    {:min "raw_custom_override1571289185__block_9201_clojure_new_clojure_1_",
      :data-type "string",
      :commons
-     {"Electric_Vehicle_Population_Data" 1,
-      "Meteorite_Landings" 1,
-      "solvers_materialize_OFFENSE_CODE_GROUP_drag_7" 1},
-     :distinct 12,
+     {"raw_custom_override_2135220472__block_9240_clojure_new_clojure_" 1,
+      "raw_custom_override1571289185__block_9201_clojure_new_clojure_1_" 1,
+      "solvers_sql_solver_1" 1},
+     :distinct 9,
      :group-by? true,
-     :median "solvers_materialize_OFFENSE_CODE_GROUP_drag_7",
-     :max "spotify_streams_2024",
-     :avg "Electric_Vehicle_Population_Data (non-numeric average)",
+     :median "raw_custom_override_1756380670__block_9201_clojure_new_clojure_1_",
+     :max "solvers_sql_solver_1",
+     :avg
+     "raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ (non-numeric average)",
      :cardinality 100},
     :fields
-    {:min 3,
+    {:min 2,
      :data-type "integer",
-     :commons {5 2, 4 2, 11 2},
-     :distinct 8,
+     :commons {3 6, 5 1, 6 1},
+     :distinct 4,
      :group-by? false,
-     :median 16.5,
-     :max 30,
-     :avg 11.166666666666666,
-     :cardinality 66}},
+     :median 3,
+     :max 6,
+     :avg 3.4444444444444446,
+     :cardinality 44}},
    :database-type "SQLite",
-   :rowcount 12},
+   :rowcount 9},
   :gen-viz-401 {:fields {}},
   :cached-ufo-sightings-drag-37
   {:fields
@@ -1520,6 +749,23 @@
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 500},
+  :new-query
+  {:fields
+   {:ffilename
+    {:min "alice-grid3.png-q10.jpg",
+     :data-type "string",
+     :commons
+     {"sinisterlook4-4k.webp-q10.jpg" 1,
+      "b64-image3-75023-50602-4k.webp-q10.jpg" 1,
+      "b64-image3-30849-74975-4k.webp-q10.jpg" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "b64-image3-2332-3524-4k.webp-q10.jpg",
+     :max "sinisterlook4-4k.webp-q10.jpg",
+     :avg "alice-grid3.png-q10.jpg (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 6},
   :Electric-Range-drag-990 {:fields {}},
   :Make-drag-801 {:fields {}},
   :recos-sys2
@@ -1805,6 +1051,26 @@
    :database-type "SQLite",
    :rowcount 4},
   :query-385 {:fields {}},
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_1159300590__block_86_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
   :ufo-sightings-drag-37
   {:fields
    {:duration_seconds_int
@@ -2022,6 +1288,84 @@
      :cardinality 34}},
    :database-type "SQLite",
    :rowcount 99},
+  :files-sys
+  {:fields
+   {:file_path
+    {:min "./screens/dynamic-theme-example1.edn",
+     :data-type "string",
+     :commons
+     {"./screens/dynamic-theme-example1.edn" 1,
+      "/home/ryanr/rvbbit-0.1.0-alpha.1a/./screens/nice-car-choom.edn" 1,
+      "./screens/winter-theme-choom.edn" 1},
+     :distinct 11,
+     :group-by? true,
+     :median "./screens/random-collection.edn",
+     :max "/home/ryanr/rvbbit-0.1.0-alpha.1a/./screens/nice-car-choom.edn",
+     :avg "./screens/dynamic-theme-example1.edn (non-numeric average)",
+     :cardinality 100},
+    :screen_name
+    {:min "dynamic-theme-example1",
+     :data-type "string",
+     :commons {"frost-terminal2" 2, "nice-car-choom" 2, "random-collection" 1},
+     :distinct 9,
+     :group-by? true,
+     :median "nice-car-choom",
+     :max "winter-theme-choom",
+     :avg "dynamic-theme-example1 (non-numeric average)",
+     :cardinality 81},
+    :blocks
+    {:min 2,
+     :data-type "integer",
+     :commons {6 4, 4 1, 48 1},
+     :distinct 8,
+     :group-by? true,
+     :median 5,
+     :max 48,
+     :avg 12.454545454545455,
+     :cardinality 72},
+    :queries
+    {:min 0,
+     :data-type "integer",
+     :commons {1 5, 2 2, 0 1},
+     :distinct 6,
+     :group-by? true,
+     :median 1,
+     :max 17,
+     :avg 4.090909090909091,
+     :cardinality 54},
+    :ts
+    {:min "2024-08-29 18:28:51",
+     :data-type "string",
+     :commons
+     {"2024-08-29 18:28:51" 9, "2024-08-31 18:52:18" 1, "2024-08-31 18:51:33" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "2024-08-29 18:28:51",
+     :max "2024-08-31 18:52:18",
+     :avg "2024-08-29 18:28:51 (non-numeric average)",
+     :cardinality 27}},
+   :database-type "SQLite",
+   :rowcount 11},
+  :raw_custom_override_639436668__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_639436668__block_86_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
   :viz-tables-sys2
   {:fields
    {:table_name
@@ -2050,20 +1394,12 @@
   :new-clojure-sqlized
   {:fields
    {:ffilename
-    {:min "Screenshot_20240519_025447aa-4k.webp",
-     :data-type "string",
-     :commons
-     {"b64-image-31549-41819-4k.webp" 1,
-      "b64-image-83886-74618-4k.webp" 1,
-      "b64-image-34647-16558-4k.webp" 1},
-     :distinct 500,
+    {:data-type "string",
+     :distinct 7,
      :group-by? true,
-     :median "b64-image-51375-69619-4k.webp",
-     :max "b64-image-92508-74703-4k.webp",
-     :avg "Screenshot_20240519_025447aa-4k.webp (non-numeric average)",
+     :commons {},
      :cardinality 100}},
-   :database-type "SQLite",
-   :rowcount 500},
+   :rowcount 7},
   :rowcnt-drag-32
   {:fields
    {:query_error
@@ -2153,11 +1489,11 @@
   {:fields
    {:ffilename
     {:data-type "string",
-     :distinct 1041,
+     :distinct 6,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 1041},
+   :rowcount 6},
   :viz-shapes-sys2
   {:fields
    {:combo_edn
@@ -2832,6 +2168,23 @@
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 4},
+  :image-files
+  {:fields
+   {:ffilename
+    {:min "alice-grid3.png-q10.jpg",
+     :data-type "string",
+     :commons
+     {"sinisterlook4-4k.webp-q10.jpg" 1,
+      "b64-image3-75023-50602-4k.webp-q10.jpg" 1,
+      "b64-image3-30849-74975-4k.webp-q10.jpg" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "b64-image3-2332-3524-4k.webp-q10.jpg",
+     :max "sinisterlook4-4k.webp-q10.jpg",
+     :avg "alice-grid3.png-q10.jpg (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 6},
   :query-1057
   {:fields
    {:rowcnt
@@ -2965,35 +2318,35 @@
    {:database_name
     {:min "*cache-db*",
      :data-type "string",
-     :commons {"*cache-db*" 5, "SQLite" 3, "MySQL" 1},
-     :distinct 6,
+     :commons {"*cache-db*" 4, "SQLite" 3},
+     :distinct 2,
      :group-by? true,
-     :median "ClickHouse",
-     :max "Vertica Database",
+     :median "*cache-db*",
+     :max "SQLite",
      :avg "*cache-db* (non-numeric average)",
-     :cardinality 50},
+     :cardinality 28},
     :connection_id
     {:min "bigfoot-ufos",
      :data-type "string",
-     :commons {"history-db" 1, "bigfoot-ufos" 1, "clickhouse-test" 1},
-     :distinct 12,
+     :commons {"cache.db" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
+     :distinct 7,
      :group-by? true,
-     :median "history-db",
-     :max "vertica-test",
-     :avg "sql-server-test (non-numeric average)",
+     :median "flows-db",
+     :max "system-db",
+     :avg "system-db (non-numeric average)",
      :cardinality 100},
     :styler_highlight_8717ssa
     {:min 0,
      :data-type "integer",
-     :commons {0 12},
+     :commons {0 7},
      :distinct 1,
      :group-by? true,
      :median 0,
      :max 0,
      :avg 0,
-     :cardinality 8}},
+     :cardinality 14}},
    :database-type "SQLite",
-   :rowcount 12},
+   :rowcount 7},
   :Meteorite_Landings
   {:fields
    {:query_error
@@ -3041,14 +2394,14 @@
      :data-type "string",
      :commons
      {nil 1,
-      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}"
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1f5246e2 \"HikariDataSource (system-db)\"]}"
       1,
       "(from database connection)" 1},
      :distinct 4,
      :group-by? true,
      :median "(from database connection)",
      :max
-     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x4f79a762 \"HikariDataSource (system-db)\"]}",
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1f5246e2 \"HikariDataSource (system-db)\"]}",
      :avg
      "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_2058175520__block_86_clojure_new_clojure_) (non-numeric average)",
      :cardinality 100}},
@@ -3071,6 +2424,26 @@
      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1db7acc9 \"HikariDataSource (system-db)\"]}",
      :avg
      "[SQLITE_ERROR] SQL error or missing database (no such table: customer_dimension) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :raw_custom_override656085601__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override656085601__block_86_clojure_new_clojure_) (non-numeric average)",
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 4},
@@ -3230,48 +2603,24 @@
    :database-type "SQLite",
    :rowcount 4}},
  :default-col-widths
- {:block-4432 {:rowcnt-drag-32 161},
-  :block-3278 {:bigfoot-sightings-locations-drag-12 100},
-  :block-2467 {:Electric-Vehicle-Population-Data-2-drag-16 100},
-  :block-145 {:NYPD-Arrest-Data-Year-to-Date-drag-22 100},
-  :block-6904 {:cached-ufo-sightings-drag-37 1411},
-  :block-1795 {:city-drag-32 361},
-  :block-970 {:gen-viz-1119 255},
-  :block-86 {:new-clojure-sqlized 361},
-  :block-4748 {:Traffic-Violations-drag-16 ##Inf},
-  :block-1832 {:Make-drag-801 ##Inf},
-  :block-130 {:gen-viz-296 511},
-  :block-5365 {:Electric-Range-drag-990 ##Inf},
-  :block-3189 {:cached-country-drag-36 511},
-  :block-3803 {:main-boston-ibr-drag-43 ##Inf},
-  :block-445 {:gen-viz-503 511},
-  :block-11205 {:color-drag-13 180},
-  :block-971 {:gen-viz-577 511},
+ {:flow-list* {:flows-sys 187},
+  :block-86 {:new-clojure-sqlized 511, :new-clojure 361},
+  :block-10072 {:new-query 511, :image-files 361},
   :system-connections-list* {:connections-sys 126},
+  :block-9201 {:new-clojure-1-sqlized 380},
   :system-fields-list* {:fields-sys ##Inf},
-  :block-3476 {:meteorite-landings-drag-35 106},
-  :block-3615 {:Meteorite-Landings-drag-16 ##Inf},
-  :block-4030 {:Electric-Vehicle-Population-Data-drag-27 ##Inf},
-  :block-9535 {:Traffic-Violations-drag-8 100},
-  :block-3352 {:State-drag-734 ##Inf},
-  :block-6035 {:NYPD-Arrests-Data-Historic-drag-3 ##Inf},
-  :block-485 {:query-1057 211},
-  :block-10336 {:Electric-Vehicle-Population-Data-drag-580 ##Inf},
-  :block-5886 {:rowcnt-drag-12 161},
-  :block-5215 {:query-385 ##Inf},
-  :block-6277 {:cached-country-drag-24-1 411},
-  :block-4490 {:dl-state-drag-39 120, :cached-dl-state-drag-39 120},
-  :system-tables-list* {:tables-sys 133},
-  :block-10693 {:customer-dimension-drag-44 ##Inf}},
+  :files-list* {:files-sys 170},
+  :blocks-list* {:blocks-sys ##Inf},
+  :block-3735 {:new-clojure-sqlized 311},
+  :system-tables-list* {:tables-sys 133}},
  :runstream-drops nil,
- :data-hash -1731103926,
+ :zoom-start [149.21 -219.97 0.565],
  :tabs ["background picker"],
- :mat-pct {:cached-dl-state-drag-39 100},
  :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
-   :default "./screens/looking-glass-redux.edn",
+   :default "./screens/frost-terminal2.edn",
    :new-block-rand
    ["Why, sometimes I've believed as many as six impossible things before breakfast."
     "Imagination is the only weapon in the war against reality."
@@ -3326,7 +2675,7 @@
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
-       :background-color "#00000000",
+       :background-color "#00000000 ",
        :border "none",
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
@@ -3400,146 +2749,15 @@
    :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
    :debug-level 1,
    :screens
-   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
-    "SSuccessful-oval-sea-urchin-of-mountain-range"
-    "aaa-run-amok"
-    "aaaaah-esday-the-day"
-    "aaaaah-wednesday-the-day"
-    "aaaah-wednesday-the-day"
-    "alarm-clock-tv"
-    "alarm-clock2"
-    "alarm-clock23"
-    "alice-puzzle-1"
-    "asdasdasdasd"
-    "autumn-theme"
-    "base-test-perf"
-    "base-test-perf22"
-    "battle-mage"
-    "bigfoot-snapshots"
-    "bigfoot-snapshots2"
-    "blackberries"
-    "blackberries2"
-    "blackberries3"
-    "blank-blue"
-    "blank-sizzle"
-    "blank-sizzle2"
-    "blue-pines"
-    "boston-test-10-3-23"
-    "broken-jacket"
-    "bunch of bullshit"
-    "bunch of bullshit2"
-    "bunch of bullshit4"
-    "caliope"
-    "calliope"
-    "canvas-scrubber-test1"
-    "chompers"
-    "claude-testing2"
-    "clean-grey-defaults"
-    "code-data-literal-stonks-test"
-    "conifer-boughs"
-    "counting-lord-of-the-woods"
-    "crazy-alice"
-    "dark-crested-jackelope"
-    "data-literals-test-sunday"
-    "data-literals-test-sundaydd"
-    "demo-dark-pumpkin-bkgrd-sept23"
-    "demo-lime-green-slime"
-    "dirty-purple"
-    "duality-of-lepus33aa"
-    "error-monitor"
-    "error-monitor-vanessa2"
-    "error-monitor-vanessa3"
-    "error-monitor-vanessa5"
-    "evil-main-street"
-    "fake-books-1"
-    "fake-bricks"
-    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
-    "final-fantasy-dorchester"
-    "fox-hills"
-    "glass-fish-board-test"
-    "green-storm-city"
-    "late-winter-theme"
-    "lavender-side-eye"
-    "layout-test-1"
-    "light-theme"
-    "looking-glass-redux-viking"
-    "looking-glass-redux2"
-    "looking-glass-redux23abb"
-    "looking-glass-redux23b"
-    "looking-glass-redux2aa"
-    "looking-glass-redux79"
+   ["dynamic-theme-example1"
+    "ecto-cooler-shade"
+    "frost-terminal2"
     "looking-glass-sine-wave"
-    "luck-of-the-irish"
-    "my-goodness"
-    "my-goodness-the-sequel"
-    "neverwinter-amy"
-    "new-age-hacking"
-    "nightcity-cape-cod"
-    "nivo-getting-better!"
-    "nivo-hacking-2023"
-    "nivo-hacking-2023333"
-    "nivo-hacking-october-2nd"
-    "nostromo-console"
-    "old-defaults"
-    "old-fashioned-christmas"
-    "old-town-snow-stars"
-    "pensive-look"
-    "pine-wood-dawn"
-    "pink-and-green-elk"
-    "pink-dusk-falls"
-    "pinup-rabbit-fields"
-    "pnw-demo-dash-llm-training"
-    "pnw-demo-dash-llm-training11"
-    "pomp-girl1"
-    "pomp-girl2"
-    "poor-touring-me"
-    "pres-sql-test-1"
-    "purple-dusk-old-town"
-    "purple-nightshades"
-    "purple-techno-sunset"
-    "repl-demo-july23"
-    "retro-machines"
-    "riffle-test"
-    "server-stats"
+    "nice-car-choom"
+    "random-collection"
     "server-stats2"
-    "server-stats2a"
-    "sick-of-your-shit"
-    "sizzle-board-1"
-    "sneaky-swamp-creatures1"
-    "solver-test"
-    "stop-drawing-dead-dashboards"
-    "swamp-nightgown"
-    "swamp-reacher"
-    "system-monitor"
-    "system-monitor2"
-    "tallica-param-test2"
-    "tangerine-dreams"
-    "technicolor-shanny"
-    "tes-save1"
-    "test-blog-screen"
-    "the-future-soon"
-    "the-generated-lass-glow"
-    "the-generated-lass-ne"
-    "the-generated-lass-sgt"
-    "the-generated-lassff"
-    "the-memo"
-    "the-outer-blues"
-    "trad-hybrid"
-    "tweet-bigfoot-is-blurry"
-    "tweet-demo-thing-bigfoot-is-blurry"
-    "unnamed-screen!"
-    "viking-pastels"
-    "weave-test1"
     "winter-theme"
-    "winter-theme-choom"
-    "winter-theme2"
-    "winter-theme33"
-    "winter-theme45"
-    "winter-theme47"
-    "winter-twin-peaks"
-    "witchy425"
-    "wonderland-horror-interface"
-    "wow-board"]}},
+    "winter-theme-choom"]}},
  :runstreams nil,
  :editor? false,
  :buffy? false,
@@ -3547,94 +2765,51 @@
  {[:clojure :export-to-csv]
   [[nil :queries nil]
    [:reco-preview :queries :query-preview]
-   [:block-4432 :queries :rowcnt-drag-32]
-   [:block-3278 :queries :bigfoot-sightings-locations-drag-12]
-   [:block-6904 :queries :ufo-sightings-drag-37]
-   [:block-6904 :queries :cached-ufo-sightings-drag-37]
-   [:block-1795 :queries :city-drag-32]
    [:block-86 :queries :new-clojure-sqlized]
-   [:block-1832 :queries :Make-drag-801]
-   [:block-989 :queries :gen-viz-401]
-   [:reco-preview-1140256918 :queries :query-preview-1140256918]
-   [:block-130 :queries :gen-viz-296]
-   [:block-5365 :queries :Electric-Range-drag-990]
-   [:block-3189 :queries :country-drag-36]
-   [:block-3189 :queries :cached-country-drag-36]
-   [:block-11205 :queries :color-drag-13]
-   [:reco-preview-105879371 :queries :query-preview-105879371]
+   [:block-10072 :queries :image-files]
+   [:block-9201 :queries :new-clojure-1-sqlized]
    [:block-3284 :queries :new-clojure-2-sqlized]
-   [:block-9535 :queries :Traffic-Violations-drag-8]
-   [:block-167 :queries :gen-viz-211]
-   [:reco-preview-1076133407 :queries :query-preview-1076133407]
-   [:block-3352 :queries :State-drag-734]
-   [:block-485 :queries :query-1057]
-   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
-   [:block-5886 :queries :rowcnt-drag-12]
-   [:block-5215 :queries :query-385]
-   [:block-6277 :queries :country-drag-24]
-   [:block-6277 :queries :cached-country-drag-24-1]
-   [:block-4490 :queries :dl-state-drag-39]
-   [:block-4490 :queries :cached-dl-state-drag-39]
-   [:reco-preview-1105189881 :queries :query-preview-1105189881]],
+   [:block-3735 :queries :new-clojure-sqlized]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
   [:clojure :view-lundberg]
-  [[:reco-preview :views :oz]
-   [:block-451 :views :editor-block-2361-hare-vw-2]
-   [:block-467 :views :hare-vw-1]
-   [:block-9956 :views :vv]
-   [:block-86 :views :hare-vw]
-   [:block-989 :views :oz]
-   [:reco-preview-1140256918 :views :oz]
-   [:block-130 :views :oz]
-   [:reco-preview-105879371 :views :oz]
-   [:block-3375 :views :hare-vw-5]
-   [:block-167 :views :oz]
-   [:reco-preview-1076133407 :views :oz]
-   [:block-485 :views :hare-vw-3]
-   [:block-11449 :views :clover-hop]
-   [:block-5215 :views :hi]
-   [:block-2361 :views :hare-vw-2]
-   [:reco-preview-1105189881 :views :oz]],
+  [[:block-1084 :views :hare-vw-8]
+   [:reco-preview :views :oz]
+   [:block-6790 :views :hare-vw-9]
+   [:block-4970 :views :hare-vw-3]
+   [:block-9973 :views :hare-vw-2]
+   [:block-4733 :views :hare-vw-7]
+   [:block-2399 :views :hare-vw-9]
+   [:block-10072 :views :hare-vw-6]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:hello-there-brother :views :heya!]
+   [:block-7437 :views :hare-vw-7]
+   [:block-7437 :views :new-view]
+   [:block-7845 :views :hare-vw-4]
+   [:block-11130 :views :hare-vw-2]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-4687 :views :hare-vw-5]
+   [:block-5999 :views :hare-vw-1]
+   [:block-3735 :views :hare-vw-6]],
   [:clojure :gen-ev] [],
   [:outliers :get-outliers]
   [[nil :queries nil]
    [:reco-preview :queries :query-preview]
-   [:block-4432 :queries :rowcnt-drag-32]
-   [:block-3278 :queries :bigfoot-sightings-locations-drag-12]
-   [:block-6904 :queries :ufo-sightings-drag-37]
-   [:block-6904 :queries :cached-ufo-sightings-drag-37]
-   [:block-1795 :queries :city-drag-32]
    [:block-86 :queries :new-clojure-sqlized]
-   [:block-1832 :queries :Make-drag-801]
-   [:block-989 :queries :gen-viz-401]
-   [:reco-preview-1140256918 :queries :query-preview-1140256918]
-   [:block-130 :queries :gen-viz-296]
-   [:block-5365 :queries :Electric-Range-drag-990]
-   [:block-3189 :queries :country-drag-36]
-   [:block-3189 :queries :cached-country-drag-36]
-   [:block-11205 :queries :color-drag-13]
-   [:reco-preview-105879371 :queries :query-preview-105879371]
+   [:block-10072 :queries :image-files]
+   [:block-9201 :queries :new-clojure-1-sqlized]
    [:block-3284 :queries :new-clojure-2-sqlized]
-   [:block-9535 :queries :Traffic-Violations-drag-8]
-   [:block-167 :queries :gen-viz-211]
-   [:reco-preview-1076133407 :queries :query-preview-1076133407]
-   [:block-3352 :queries :State-drag-734]
-   [:block-485 :queries :query-1057]
-   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
-   [:block-5886 :queries :rowcnt-drag-12]
-   [:block-5215 :queries :query-385]
-   [:block-6277 :queries :country-drag-24]
-   [:block-6277 :queries :cached-country-drag-24-1]
-   [:block-4490 :queries :dl-state-drag-39]
-   [:block-4490 :queries :cached-dl-state-drag-39]
-   [:reco-preview-1105189881 :queries :query-preview-1105189881]]},
- :memory [476870483 454322479 4294705152],
- :client-name :vital-bulbous-mouse-20,
+   [:block-3735 :queries :new-clojure-sqlized]]},
+ :flow-drop-down? true,
+ :memory [140364944 109154108 4294705152],
+ :client-name :blissful-long-skunk-39,
+ :alt-key-held? false,
  :flow-editor? true,
- :window {:w 2191, :h 1209},
+ :window {:w 2776, :h 1467},
  :quake-console? false,
- :implicit-rowsets {:solver [:new-clojure nil]},
+ :implicit-rowsets {:solver [:new-clojure-1 nil :new-clojure :new-clojure-sqlized]},
  :post-meta
  {:flow-fn-sys
   {:description {:distinct 32},
@@ -3646,270 +2821,141 @@
    :inputs {:distinct 20},
    :output_types {:distinct 8},
    :full_map {:distinct 34}},
-  :fields-sys
-  {:* {:rowcount 21},
-   :field_name {:distinct 21},
-   :field_type {:distinct 2},
-   :data_type {:distinct 2}},
+  :blocks-sys
+  {:* {:rowcount 5},
+   :block_key {:distinct 5},
+   :block_name {:distinct 5},
+   :queries {:distinct 2},
+   :views {:distinct 3},
+   :block_data {:distinct 5},
+   :view_names {:distinct 3},
+   :query_names {:distinct 3}},
   :tables-sys
-  {:* {:rowcount 11},
+  {:* {:rowcount 9},
    :db_schema {:distinct 1},
    :db_catalog {:distinct 0},
    :connection_id {:distinct 1},
    :schema_cat {:distinct 0},
-   :table_name {:distinct 11},
-   :fields {:distinct 8}},
-  :mad-libs-viz {:* {:rowcount 0}},
-  :bigfoot-sightings-locations-drag-12
-  {:nearestroad {:distinct 3771},
-   :water_area {:distinct 1318},
-   :housing_units {:distinct 1316},
-   :date {:distinct 1161},
-   :* {:rowcount 5035},
-   :locationdetails {:distinct 4205},
-   :submitted_date {:distinct 3521},
-   :bfroid {:distinct 5035},
-   :cty_abbrev {:distinct 50},
-   :otherwitnesses {:distinct 3704},
-   :run_id {:distinct 1},
-   :fips_county_code {:distinct 176},
-   :cty_name {:distinct 922},
-   :nearesttown {:distinct 3800},
-   :timeandconditions {:distinct 4477},
-   :month {:distinct 12},
-   :county {:distinct 1039},
-   :land_area {:distinct 1330},
-   :longitude {:distinct 4287},
-   :state {:distinct 49},
-   :zipcode {:distinct 2512},
-   :fixed_month {:distinct 12},
-   :submitted {:distinct 3522},
-   :fips_state_code {:distinct 50},
-   :state_abbrev {:distinct 50},
-   :title {:distinct 5031},
-   :otherstories {:distinct 2939},
-   :year {:distinct 430},
-   :season {:distinct 5},
-   :state_name {:distinct 50},
-   :class {:distinct 3},
-   :population {:distinct 1324},
-   :zip_long {:distinct 2512},
-   :alsonoticed {:distinct 2964},
-   :zip_lat {:distinct 2512},
-   :url {:distinct 5035},
-   :latitude {:distinct 4286},
-   :observed {:distinct 4997},
-   :environment {:distinct 4677},
-   :fixed_year {:distinct 132},
-   :run_time {:distinct 2121},
-   :zip_name {:distinct 2116}},
-  :country-drag-24
-  {:* {:rowcount 20182},
-   :country {:distinct 5},
-   :rowcnt {:distinct 142},
-   :city {:distinct 19898}},
-  :recos-sys2
-  {:* {:rowcount 24},
-   :query_map {:distinct 21},
-   :shape_name {:distinct 24},
-   :w {:distinct 2},
-   :combo_edn {:distinct 21},
-   :query_map_str {:distinct 21},
-   :selected_view {:distinct 2},
-   :combo_hash {:distinct 24},
-   :h {:distinct 3},
-   :condis {:distinct 2},
-   :score {:distinct 3},
-   :table_name {:distinct 1},
-   :connection_id {:distinct 1},
-   :context_hash {:distinct 1},
-   :viz_map {:distinct 24}},
-  :NYPD_Arrest_Data_Year_to_Date {},
-  :viz-shapes0-sys2
-  {:* {:rowcount 25}, :shape {:distinct 25}, :recos {:distinct 6}},
-  :dl_state_drag_39 {},
-  :ufo-sightings-drag-37
-  {:* {:rowcount 80332},
-   :duration_seconds_int {:distinct 536},
-   :comments {:distinct 79997},
-   :city {:distinct 19898},
-   :date_posted {:distinct 317},
-   :longitude {:distinct 19455},
-   :state {:distinct 67},
-   :duration_seconds {:distinct 537},
-   :duration_hours {:distinct 8349},
-   :id {:distinct 80332},
-   :shape {:distinct 29},
-   :datetime {:distinct 69434},
-   :latitude {:distinct 18445},
-   :country {:distinct 5}},
-  :dl-state-drag-39
-  {:* {:rowcount 1223},
-   :dl_state {:distinct 72},
-   :rowcnt {:distinct 303},
-   :color {:distinct 27}},
-  :viz-tables-sys2
-  {:* {:rowcount 1}, :table_name {:distinct 1}, :recos {:distinct 1}},
-  :new-clojure-sqlized {:* {:rowcount 1041}, :ffilename {:distinct 1041}},
-  :raw_custom_override341927123__block_86_clojure_new_clojure_ {},
-  :color-drag-13 {:* {:rowcount 28}, :color {:distinct 27}, :rowcnt {:distinct 28}},
-  :viz-shapes-sys2
-  {:* {:rowcount 146}, :combo_edn {:distinct 146}, :recos {:distinct 10}},
-  :Traffic-Violations-drag-8
-  {:description {:distinct 15616},
-   :belts {:distinct 2},
-   :commercial_license {:distinct 2},
-   :work_zone {:distinct 2},
-   :time_of_stop {:distinct 1440},
-   :* {:rowcount 1831511},
-   :hazmat {:distinct 2},
-   :geolocation {:distinct 904778},
-   :personal_injury {:distinct 2},
-   :make {:distinct 4486},
-   :contributed_to_accident {:distinct 2},
-   :search_outcome {:distinct 5},
-   :color {:distinct 27},
-   :commercial_vehicle {:distinct 2},
-   :driver_state {:distinct 68},
-   :vehicletype {:distinct 33},
-   :search_disposition {:distinct 6},
-   :agency {:distinct 1},
-   :subagency {:distinct 9},
-   :search_reason_for_stop {:distinct 790},
-   :race {:distinct 6},
-   :search_reason {:distinct 10},
-   :article {:distinct 5},
-   :search_arrest_reason {:distinct 9},
-   :alcohol {:distinct 2},
-   :longitude {:distinct 377094},
-   :search_type {:distinct 6},
-   :state {:distinct 71},
-   :fatal {:distinct 2},
-   :charge {:distinct 1133},
-   :year {:distinct 392},
-   :accident {:distinct 2},
-   :property_damage {:distinct 2},
-   :violation_type {:distinct 4},
-   :dl_state {:distinct 72},
-   :latitude {:distinct 333985},
-   :date_of_stop {:distinct 4035},
-   :arrest_type {:distinct 19},
-   :gender {:distinct 3},
-   :seqid {:distinct 1036362},
-   :search_conducted {:distinct 2},
-   :driver_city {:distinct 8740},
-   :location {:distinct 242562},
-   :model {:distinct 21543}},
-  :gen-viz-296 {},
-  :viz-shapes
-  {:library_shapes {:distinct 38},
-   :* {:rowcount 39},
-   :shape_name {:distinct 39},
-   :run_id {:distinct 1},
-   :selected_view {:distinct 3},
-   :axes_logic {:distinct 27},
-   :base_score {:distinct 1},
-   :connection_id {:distinct 1},
-   :sql_maps {:distinct 26}},
-  :query-1057 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
-  :meteorite_landings {},
-  :connections-sys
-  {:* {:rowcount 12},
-   :database_name {:distinct 6},
-   :connection_id {:distinct 12},
-   :styler_highlight_8717ssa {:distinct 1}},
-  :raw_custom_override_2058175520__block_86_clojure_new_clojure_ {},
-  :customer_dimension {},
-  :reco-counts {:* {:rowcount 6}, :table_name {:distinct 6}, :cnt {:distinct 5}},
-  :cached-dl-state-drag-39
-  {:* {:rowcount 1223},
-   :dl_state {:distinct 72},
-   :rowcnt {:distinct 303},
-   :color {:distinct 27}},
-  :Electric_Vehicle_Population_Data_2 {},
-  :Traffic_Violations {}},
+   :table_name {:distinct 9},
+   :fields {:distinct 4}},
+  :new-query {:* {:rowcount 6}, :ffilename {:distinct 6}},
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_ {},
+  :files-sys
+  {:* {:rowcount 11},
+   :file_path {:distinct 11},
+   :screen_name {:distinct 9},
+   :blocks {:distinct 8},
+   :queries {:distinct 6},
+   :ts {:distinct 3}},
+  :new-clojure-sqlized {:* {:rowcount 6}, :ffilename {:distinct 6}},
+  :image-files {:* {:rowcount 6}, :ffilename {:distinct 6}},
+  :new-clojure-1-sqlized
+  {:* {:rowcount 25}, :step_int {:distinct 25}, :step_val {:distinct 25}},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ {},
+  :raw_custom_override656085601__block_86_clojure_new_clojure_ {}},
  :flow-estimates
  {:flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
-  :fields-sys {:times 0.001, :run-id :fields-sys},
-  :tables-sys {:times 0.018, :run-id :tables-sys},
-  :mad-libs-viz {:times 0.005, :run-id :mad-libs-viz},
-  :query-preview-726074229 {:times 0.009, :run-id :query-preview-726074229},
-  :bigfoot-sightings-locations-drag-12
-  {:times 0.034, :run-id :bigfoot-sightings-locations-drag-12},
-  :country-drag-24 {:times 0.125, :run-id :country-drag-24},
-  :recos-sys2 {:times 0.052, :run-id :recos-sys2},
-  :viz-shapes0-sys2 {:times 0.038, :run-id :viz-shapes0-sys2},
-  :query-preview-1834663129 {:times 0.23, :run-id :query-preview-1834663129},
-  :ufo-sightings-drag-37 {:times 0.018, :run-id :ufo-sightings-drag-37},
-  :dl-state-drag-39 {:times 2.946, :run-id :dl-state-drag-39},
-  :query-preview-1693067394 {:times 0.137, :run-id :query-preview-1693067394},
+  :blocks-sys {:times 0.001, :run-id :blocks-sys},
+  :fields-sys {:times 0.003, :run-id :fields-sys},
+  :tables-sys {:times 0.004, :run-id :tables-sys},
+  :new-query {:times 0.001, :run-id :new-query},
+  :raw-custom-override1571289185
+  {:times 0.047, :run-id :raw-custom-override1571289185},
+  :raw-custom-override-1159300590
+  {:times 0.04, :run-id :raw-custom-override-1159300590},
   :flows-sys {:times 0.001, :run-id :flows-sys},
-  :Electric-Vehicle-Population-Data-2-drag-16
-  {:times 0.036, :run-id :Electric-Vehicle-Population-Data-2-drag-16},
-  :customer-dimension-drag-44 {:times 0.043, :run-id :customer-dimension-drag-44},
-  :query-preview1177742023 {:times 0.196, :run-id :query-preview1177742023},
-  :viz-tables-sys2 {:times 0.031, :run-id :viz-tables-sys2},
-  :new-clojure-sqlized {:times 0.002, :run-id :new-clojure-sqlized},
-  :Electric-Vehicle-Population-Data-drag-27
-  {:times 0.006, :run-id :Electric-Vehicle-Population-Data-drag-27},
-  :meteorite-landings-drag-35 {:times 0.021, :run-id :meteorite-landings-drag-35},
-  :color-drag-13 {:times 71.305, :run-id :color-drag-13},
-  :NYPD-Arrests-Data-Historic-drag-3
-  {:times 0.007, :run-id :NYPD-Arrests-Data-Historic-drag-3},
-  :query-preview-1533118677 {:times 0.168, :run-id :query-preview-1533118677},
-  :viz-shapes-sys2 {:times 0.117, :run-id :viz-shapes-sys2},
-  :Traffic-Violations-drag-8 {:times 0.045, :run-id :Traffic-Violations-drag-8},
-  :Traffic-Violations-drag-16 {:times 0.011, :run-id :Traffic-Violations-drag-16},
-  :refresh-clickhouse-test {:times 0.008, :run-id :refresh-clickhouse-test},
-  :viz-shapes {:times 0.002, :run-id :viz-shapes},
-  :query-preview-1261557982 {:times 0.263, :run-id :query-preview-1261557982},
-  :query-1057 {:times 3.786, :run-id :query-1057},
-  :query-preview-75673601 {:times 0.111, :run-id :query-preview-75673601},
-  :query-preview804620096 {:times 0.202, :run-id :query-preview804620096},
-  :query-preview1641607438 {:times 0.121, :run-id :query-preview1641607438},
+  :files-sys {:times 0.006, :run-id :files-sys},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
   :flow-fn-categories-sys {:times 0.001, :run-id :flow-fn-categories-sys},
-  :query-preview-678328371 {:times 0.35, :run-id :query-preview-678328371},
-  :query-preview-42044337 {:times 0.01, :run-id :query-preview-42044337},
-  :raw-custom-override-773588708
-  {:times 0.011, :run-id :raw-custom-override-773588708},
-  :query-preview1607913060 {:times 0.12, :run-id :query-preview1607913060},
-  :query-preview926163586 {:times 0.17, :run-id :query-preview926163586},
-  :connections-sys {:times 0.001, :run-id :connections-sys},
-  :NYPD-Arrest-Data-Year-to-Date-drag-22
-  {:times 0.038, :run-id :NYPD-Arrest-Data-Year-to-Date-drag-22},
-  :Meteorite-Landings-drag-16 {:times 0.007, :run-id :Meteorite-Landings-drag-16},
-  :reco-counts {:times 0.012, :run-id :reco-counts},
-  :cached-dl-state-drag-39 {:times 0.003, :run-id :cached-dl-state-drag-39},
-  :query-preview-2073789659 {:times 0.394, :run-id :query-preview-2073789659},
-  :flow-fn-all-sys {:times 0.001, :run-id :flow-fn-all-sys}},
+  :connections-sys {:times 0.003, :run-id :connections-sys},
+  :raw-custom-override840077249
+  {:times 0.01, :run-id :raw-custom-override840077249},
+  :new-clojure-1-sqlized {:times 0.001, :run-id :new-clojure-1-sqlized},
+  :flow-fn-all-sys {:times 0.001, :run-id :flow-fn-all-sys},
+  :raw-custom-override-639436668
+  {:times 0.049, :run-id :raw-custom-override-639436668}},
  :status
  {:heartbeat
   {:kick
-   [:solver/raw-custom-override-773588708
-    :solver-status/vital-bulbous-mouse-20>raw-custom-override-2058175520>running?
-    :solver/raw-custom-override-2058175520
-    :solver-status/vital-bulbous-mouse-20>get-my-colors-1106579780>running?
-    :solver-meta/raw-custom-override-2058175520>output>evald-result>value-hash
-    :solver/get-my-colors-1549798807
-    :flow-status/my-new-flow2225>*running?
-    :solver-status/vital-bulbous-mouse-20>get-my-colors-1549798807>running?
-    :solver/get-my-colors-1106579780
-    :kit/kicks>vital-bulbous-mouse-20
-    :solver-status/vital-bulbous-mouse-20>raw-custom-override-773588708>running?]},
-  :reco
-  {:meteorite-landings-drag-35 :done,
-   :Electric-Vehicle-Population-Data-2-drag-16 :done,
-   :NYPD-Arrest-Data-Year-to-Date-drag-22 :done,
-   :Traffic-Violations-drag-8 :done},
+   [:solver/get-my-colors443245623
+    :solver-meta/raw-custom-override-1159300590>output>evald-result>out
+    :solver/raw-custom-override-639436668
+    :kit/kicks>blissful-long-skunk-39
+    :solver-status/blissful-long-skunk-39>get-my-colors1591178817>running?
+    :solver-status/blissful-long-skunk-39>raw-custom-override-639436668>running?
+    :solver-status/blissful-long-skunk-39>get-my-colors443245623>running?
+    :solver/get-my-colors1591178817
+    :solver/raw-custom-override-1159300590
+    :flow-status/chicken-flow-676>*running?
+    :solver-meta/raw-custom-override-1159300590>output>evald-result>value-hash
+    :solver-status/blissful-long-skunk-39>raw-custom-override-1159300590>running?]},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
   :alert2 {:alerts :alert2},
-  :alert3 {:alerts :alert2}},
+  :file-change {:file-changed :done}},
  :screen-name "dynamic-theme-example1",
- :recos-page2 4,
+ :recos-page2 0,
  :selected-tab "background picker",
  :col-names nil,
  :snapshots nil,
  :alerts
  [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :children
+     [[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow get-my-colors443245623-solver-flow- has finished"]
+        nil
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "less than a second "]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "returns: {:second-darkest \"#2d2d54\", :highest-saturation \"#52cadf\", :most-contrasting \"#ad2d73\", :darkest \"#170c21\", :contrast-with-dominant \"#52cadf\", :colors [\"#ad2d73..."]]]]]]
+   10
+   1.35
+   1511
+   286554028]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :children
+     [[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow get-my-colors1591178817-solver-flow- has finished"]
+        nil
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "less than a second "]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "returns: {:second-darkest \"#2d2d54\", :highest-saturation \"#52cadf\", :most-contrasting \"#ad2d73\", :darkest \"#170c21\", :contrast-with-dominant \"#52cadf\", :colors [\"#ad2d73..."]]]]]]
+   10
+   1.35
+   1511
+   1707540423]
+  [[:box
     :style
     {:font-size "15px"}
     :child
@@ -3920,119 +2966,136 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   4423
+   1515
    -1247625457]],
  :recos-page 0,
+ :flow-runner
+ {:node-color-thief-js-webp>run-the-convert-command
+  {:output [],
+   :exception [],
+   :seconds [],
+   :exit-code 0,
+   :command
+   "convert ../extras/node-colorthief/logo.png-q10.jpg -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg /tmp/img1819246105-547.png"},
+  :node-color-thief-js-webp>clojure-string-join-1
+  "cd ../extras/node-colorthief ; node ./colorThief2.js /tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>convert-to-png
+  "convert ../extras/node-colorthief/logo.png-q10.jpg -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg /tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>join-output-as-string
+  "{   \"dominantColor\": \"#eb38a8\",   \"colorPalette\": [     \"#19e9f3\",     \"#f10c98\",     \"#e4eff5\",     \"#05040b\",     \"#2a2f9e\",     \"#9c046c\",     \"#120952\",     \"#5c0464\",     \"#144c6c\",     \"#240c34\"   ] }",
+  :node-color-thief-js-webp>get-color-edges
+  {:second-darkest "#240c34",
+   :highest-saturation "#9c046c",
+   :most-contrasting "#19e9f3",
+   :darkest "#05040b",
+   :contrast-with-dominant "#19e9f3",
+   :colors
+   ["#19e9f3"
+    "#f10c98"
+    "#e4eff5"
+    "#05040b"
+    "#2a2f9e"
+    "#9c046c"
+    "#120952"
+    "#5c0464"
+    "#144c6c"
+    "#240c34"
+    "#eb38a8"],
+   :most-frequent "#e4eff5",
+   :data-colors
+   {"float" "#7cdafd",
+    "boolean" "#ff4967",
+    "map" "#19f39c",
+    "list" "#870014",
+    "string" "#ffffff",
+    "any" "#970e3d",
+    "vector" "#5f2ad9",
+    "keyword" "#f5e7e4",
+    "rabbit-code" "#d02300",
+    "datetime" "#4f0274",
+    "integer" "#5deeff",
+    "unknown" "#480a1b",
+    "date" "#040f05"},
+   :dominant "#eb38a8",
+   :most-contrasting-dark "#05040b",
+   :second-brightest "#19e9f3",
+   :brightest "#e4eff5",
+   :most-contrasting-light "#19e9f3"},
+  :node-color-thief-js-webp>shell-command-1
+  {:output
+   ["{"
+    "  \"dominantColor\": \"#eb38a8\","
+    "  \"colorPalette\": ["
+    "    \"#19e9f3\","
+    "    \"#f10c98\","
+    "    \"#e4eff5\","
+    "    \"#05040b\","
+    "    \"#2a2f9e\","
+    "    \"#9c046c\","
+    "    \"#120952\","
+    "    \"#5c0464\","
+    "    \"#144c6c\","
+    "    \"#240c34\""
+    "  ]"
+    "}"],
+   :exception [],
+   :seconds [],
+   :exit-code 0,
+   :command
+   "cd ../extras/node-colorthief ; node ./colorThief2.js /tmp/img1819246105-547.png"},
+  :node-color-thief-js-webp>image-path "extras/node-colorthief/logo.png-q10.jpg",
+  :node-color-thief-js-webp>path-correction
+  "../extras/node-colorthief/logo.png-q10.jpg",
+  :node-color-thief-js-webp>json-to-edn_colorPalette
+  ["#19e9f3"
+   "#f10c98"
+   "#e4eff5"
+   "#05040b"
+   "#2a2f9e"
+   "#9c046c"
+   "#120952"
+   "#5c0464"
+   "#144c6c"
+   "#240c34"],
+  :node-color-thief-js-webp>json-to-edn
+  {:dominantColor "#eb38a8",
+   :colorPalette
+   ["#19e9f3"
+    "#f10c98"
+    "#e4eff5"
+    "#05040b"
+    "#2a2f9e"
+    "#9c046c"
+    "#120952"
+    "#5c0464"
+    "#144c6c"
+    "#240c34"]},
+  :node-color-thief-js-webp>waiter-fn "/tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>json-to-edn_dominantColor "#eb38a8",
+  :node-color-thief-js-webp>shell-command-in
+  "cd ../extras/node-colorthief ; node ./colorThief2.js",
+  :node-color-thief-js-webp>temp-name "/tmp/img1819246105-547.png"},
  :rs-overrides-hashmap {},
  :base-sniff-queries
- {:NYPD_Arrest_Data_Year_to_Date 219988061,
-  :main_boston_ibr 1154335123,
-  :country_drag_36 504085189,
-  :dl_state_drag_39 -2069855834,
-  :raw_custom_override341927123__block_86_clojure_new_clojure_ -1941578138,
-  :ufo_sightings_drag_37 553591323,
-  :NYPD_Arrests_Data_Historic 583968570,
-  :Electric_Vehicle_Population_Data 1659044548,
-  :country_drag_24 -1623429091,
-  :meteorite_landings 1129642037,
-  :bigfoot_sightings_locations -435790458,
-  :ufo_sightings 484893751,
-  :Meteorite_Landings 1600924701,
-  :raw_custom_override_2058175520__block_86_clojure_new_clojure_ 2139886593,
-  :customer_dimension -1635887376,
-  :Electric_Vehicle_Population_Data_2 -469738,
-  :Traffic_Violations 2095797941},
- :user-params-hash -1093756612,
+ {:raw_custom_override704242473__block_9201_clojure_new_clojure_1_ 849525671,
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ 1512429098,
+  :raw_custom_override656085601__block_86_clojure_new_clojure_ -1227832306,
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_ -1838011445,
+  :raw_custom_override_639436668__block_86_clojure_new_clojure_ -1199741315},
+ :user-params-hash -1166285382,
  :grid-recos? true,
- :preview-keys2 ["-105879371" "-1140256918" "-1105189881" "-1076133407"],
+ :preview-keys2 [],
+ :session-hash -970245623,
+ :no-ui? false,
  :resolved-queries
- {nil {:_last-run "08:01:49"},
-  :query-preview
-  {:select
-   [[[[:avg :Electric_Range]] :Electric_Range]
-    :Make
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :ff556]],
-   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]},
+ {nil {:_last-run "19:07:04"},
   :new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-08-29 07:59:17",
+   :_sqlized-at "2024-08-31 19:01:24",
    :_sqlized-by [:block-86 :clojure :new-clojure],
-   :_sqlized-hash 1828944435,
-   :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_]},
-  :query-preview-1140256918
-  {:select [[[[:avg :PD_CD]] :PD_CD] :PERP_SEX],
-   :from
-   [[{:select
-      [:AGE_GROUP
-       :ARREST_BORO
-       :ARREST_DATE
-       :ARREST_KEY
-       :ARREST_PRECINCT
-       :Geo_Col
-       :JURISDICTION_CODE
-       :KY_CD
-       :LAW_CAT_CD
-       :LAW_CODE
-       :Latitude
-       :Longitude
-       :OFNS_DESC
-       :PD_CD
-       :PD_DESC
-       :PERP_RACE
-       :PERP_SEX
-       :X_COORD_CD
-       :Y_COORD_CD],
-      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
-     :dd77]],
-   :group-by [:PERP_SEX]},
-  :query-preview-105879371
-  {:select [[[[:avg :ARREST_KEY]] :ARREST_KEY] :AGE_GROUP :JURISDICTION_CODE],
-   :from
-   [[{:select
-      [:AGE_GROUP
-       :ARREST_BORO
-       :ARREST_DATE
-       :ARREST_KEY
-       :ARREST_PRECINCT
-       :Geo_Col
-       :JURISDICTION_CODE
-       :KY_CD
-       :LAW_CAT_CD
-       :LAW_CODE
-       :Latitude
-       :Longitude
-       :OFNS_DESC
-       :PD_CD
-       :PD_DESC
-       :PERP_RACE
-       :PERP_SEX
-       :X_COORD_CD
-       :Y_COORD_CD],
-      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
-     :ff206]],
-   :group-by [:AGE_GROUP :JURISDICTION_CODE]},
+   :_sqlized-hash 1754071114,
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]},
   :new-clojure-2-sqlized
   {:select [:*],
    :connection-id "cache.db",
@@ -4040,93 +3103,76 @@
    :_sqlized-by [:block-3284 :clojure :new-clojure-2],
    :_sqlized-hash nil,
    :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]},
-  :query-preview-1076133407
-  {:select [[:PERP_RACE :id] [:PERP_RACE :label]],
-   :from
-   [[{:select
-      [:AGE_GROUP
-       :ARREST_BORO
-       :ARREST_DATE
-       :ARREST_KEY
-       :ARREST_PRECINCT
-       :Geo_Col
-       :JURISDICTION_CODE
-       :KY_CD
-       :LAW_CAT_CD
-       :LAW_CODE
-       :Latitude
-       :Longitude
-       :OFNS_DESC
-       :PD_CD
-       :PD_DESC
-       :PERP_RACE
-       :PERP_SEX
-       :X_COORD_CD
-       :Y_COORD_CD],
-      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
-     :ff347]],
-   :group-by [:PERP_RACE],
-   :order-by [:PERP_RACE]},
-  :query-preview-1105189881
-  {:select [[[[:avg :PD_CD]] :PD_CD] :LAW_CAT_CD :AGE_GROUP],
-   :from
-   [[{:select
-      [:AGE_GROUP
-       :ARREST_BORO
-       :ARREST_DATE
-       :ARREST_KEY
-       :ARREST_PRECINCT
-       :Geo_Col
-       :JURISDICTION_CODE
-       :KY_CD
-       :LAW_CAT_CD
-       :LAW_CODE
-       :Latitude
-       :Longitude
-       :OFNS_DESC
-       :PD_CD
-       :PD_DESC
-       :PERP_RACE
-       :PERP_SEX
-       :X_COORD_CD
-       :Y_COORD_CD],
-      :from [[:NYPD_Arrest_Data_Year_to_Date :tt918]]}
-     :xx576]],
-   :group-by [:LAW_CAT_CD :AGE_GROUP]}},
+  :query-preview
+  {:select
+   [[[[:avg :Electric_Range]] :Electric_Range]
+    :Make
+    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
+   :from [[nil :tt887]],
+   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]},
+  :image-files
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-31 19:01:24",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1754071114,
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]}},
  :panels
- {nil {:queries {nil {:_last-run "08:01:49"}}},
+ {nil {:queries {nil {:_last-run "19:07:04"}}},
   :block-86
   {:clojure
    {:new-clojure
     (do
-      (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-            rel-dir "./images/large/"
+      (let [dir "assets/openai-images/"
+            rel-dir "assets/openai-images/"
             files (->>
                     (file-seq (clojure.java.io/file dir))
                     (filter (fn [x] (.isFile x)))
                     (filter
+                      (fn [x] (not (clojure.string/includes? (str x) "directory"))))
+                    (filter
                       (fn [x]
-                        (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                        (not (clojure.string/includes? (str (.getName x)) "8k-"))))
                     (map (fn [x] (.getName x))))]
-        (println (count files))
+        (println "found " (count files) " files")
         (vec (for [f (sort files)] {:ffilename (str f)}))))},
    :name "block-86",
    :w 8,
-   :selected-view :new-clojure-sqlized,
+   :selected-mode {:new-clojure :text},
+   :selected-view :new-clojure,
    :root [3 2],
-   :h 15,
+   :h 2,
+   :display {:new-clojure :output},
    :queries
    {:new-clojure-sqlized
     {:select [:*],
      :connection-id "cache.db",
-     :_sqlized-at "2024-08-29 07:59:17",
+     :_sqlized-at "2024-08-31 19:01:24",
      :_sqlized-by [:block-86 :clojure :new-clojure],
      :_sqlized-hash
-     :solver-meta/raw-custom-override-2058175520>output>evald-result>value-hash,
-     :from [:raw_custom_override_2058175520__block_86_clojure_new_clojure_]}},
+     :solver-meta/raw-custom-override-1159300590>output>evald-result>value-hash,
+     :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]}},
    :tab "background picker",
+   :views {}},
+  :block-3284
+  {:queries
+   {:new-clojure-2-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-28 07:45:10",
+     :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override647179980>output>evald-result>value-hash,
+     :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]}}},
+  :block-10072
+  {:h 10,
+   :w 8,
+   :root [3 4],
+   :tab "background picker",
+   :selected-view :image-files,
+   :name "block-10072",
    :views
-   {:hare-vw
+   {:hare-vw-6
     [:box
      :align
      :center
@@ -4141,32 +3187,56 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     "Secrets are not the same as surprises."]}},
-  :block-3284
-  {:queries
-   {:new-clojure-2-sqlized
+     "The street finds its own uses for things."]},
+   :queries
+   {:image-files
     {:select [:*],
      :connection-id "cache.db",
-     :_sqlized-at "2024-08-28 07:45:10",
-     :_sqlized-by [:block-3284 :clojure :new-clojure-2],
+     :_sqlized-at "2024-08-31 19:01:24",
+     :_sqlized-by [:block-86 :clojure :new-clojure],
      :_sqlized-hash
-     :solver-meta/raw-custom-override647179980>output>evald-result>value-hash,
-     :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]}}}},
+     :solver-meta/raw-custom-override-1159300590>output>evald-result>value-hash,
+     :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_]}}},
+  :block-4733
+  {:h 4,
+   :w 15,
+   :root [3 15],
+   :tab "background picker",
+   :selected-view :hare-vw-7,
+   :name "block-4733",
+   :views
+   {:hare-vw-7
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Note: if the colors look funky and are not changing with the image selection - make sure that inside the rvbbit-dir/extras/node-colorthieft directory you can run 'test-me.sh' to ensure you have the right deps installed in order for the 'colorthief' flow to work correctly."]},
+   :queries {}}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#96caa8",
-  "boolean" "#aeb982",
-  "map" "#8c80b7",
-  "list" "#9a1280",
-  "string" "#d6e6cc",
-  "any" "#477174",
-  "vector" "#50c26a",
-  "keyword" "#ddd3bb",
-  "rabbit-code" "#c64c94",
-  "datetime" "#72334d",
-  "integer" "#bac18e",
-  "unknown" "#630d4c",
-  "date" "#081409"},
+ {"float" "#fcfbfb",
+  "boolean" "#e0b4b4",
+  "map" "#d1c0b9",
+  "list" "#9e469b",
+  "string" "#ffffff",
+  "any" "#5155ba",
+  "vector" "#9cd4a5",
+  "keyword" "#ffffff",
+  "rabbit-code" "#6dc8a5",
+  "datetime" "#448392",
+  "integer" "#e9acdf",
+  "unknown" "#72336e",
+  "date" "#2a2e4a"},
  :solver-fn nil,
  :click-param
  {:recos-sys
@@ -4198,6 +3268,7 @@
    :schema_cat "default/default",
    :table_name "main_boston_ibr",
    :fields 22},
+  :new-query {:ffilename "b64-image3-30849-74975-4k.webp-q10.jpg"},
   :offenses-drag-DISTRICT-260 {:DISTRICT "B3", :rowcnt 35442},
   :files-sys
   {:file_path "./screens/duality-of-lepus33aa.edn",
@@ -4213,7 +3284,7 @@
    :release_date "2003-06-05"},
   :viz-tables-sys2 {:table_name :NYPD-Arrest-Data-Year-to-Date-drag-22},
   :user-dropdown-sys {:req-field nil},
-  :new-clojure-sqlized {:ffilename "b64-image-34647-16558-4k.webp"},
+  :new-clojure-sqlized {},
   :viz-tables-sys {:table_name "bigfoot_sightings_locations_drag_305"},
   :bigfoot-sightings-locations-drag-305
   {:nearestroad "Federal Street",
@@ -4266,14 +3337,29 @@
   :param
   {:background-image-path [:str :param/path-dir :param/rel-image-path],
    :keper "b64-image3-30849-74975-4k.webp",
-   :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data nil,
-   :selected-view nil,
+   :path-dir "",
+   :selected-view-data
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "21px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    "Note: if the colors look funky and are not changing with the image selection - make sure that inside the rvbbit-dir/extras/node-colorthieft directory you can run 'test-me.sh' to ensure you have the right deps installed."],
+   :selected-view [:views :hare-vw-7],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
-   :rel-image-path [:str "images/large/" :new-clojure-sqlized/ffilename],
+   :rel-image-path [:str "assets/openai-images/" :image-files/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-86,
+   :selected-block :block-4733,
    :glass-fish-style
    {:background-color [:str :param/generated-colors>darkest 73],
     :border-radius [:sticky-border-radius "24px"],
@@ -4372,6 +3458,7 @@
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
+  :image-files {:ffilename "b64-image3-30849-74975-4k.webp-q10.jpg"},
   :bigfoot-sightings-locations-drag-class-428 {:class "Class A", :rowcnt 2486},
   :class-drag-987 nil,
   :connections-sys
@@ -4379,4 +3466,4 @@
    :connection_id "cache.db",
    :styler_highlight_8717ssa 0},
   :sys {:selected-tab "marvelous ape", :selected-tab-idx 0}},
- :selected-flow "my-new-flow2225"}
+ :selected-flow "chicken-flow-676"}

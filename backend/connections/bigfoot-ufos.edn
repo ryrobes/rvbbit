@@ -1,7 +1,4 @@
 
-;; {:classname   "org.sqlite.JDBC"
-;;  :subprotocol "sqlite"
-;;  :subname     "./data/rabbit-sample-data.db"}
 
 {:jdbc-url "jdbc:sqlite:data/rabbit-sample-data.db"
  ;:idle-timeout       600000

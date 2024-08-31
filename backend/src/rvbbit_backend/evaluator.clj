@@ -275,7 +275,7 @@
           ;;                          rowset-fixed
           ;;                          client-name)
 
-           (ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
+           ;;(ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))

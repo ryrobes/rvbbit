@@ -1,0 +1,1389 @@
+{:reco-preview nil,
+ :flow? false,
+ :sql-source
+ {:new-clojure-1-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-31 18:42:15",
+   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+   :_sqlized-hash -1073545200,
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]},
+  :raw_custom_override704242473__block_9201_clojure_new_clojure_1_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override704242473__block_9201_clojure_new_clojure_1_],
+   :limit 111},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_],
+   :limit 111}},
+ :selected-flow-block :image-path,
+ :skip-me {:yo nil},
+ :meta
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 35,
+     :group-by? true,
+     :median ":http-call",
+     :max "node-color-thief-js-webp",
+     :avg ":alert! (non-numeric average)",
+     :cardinality 100},
+    :description
+    {:min "",
+     :data-type "string",
+     :commons
+     {"Basic HTTP call primitive" 2,
+      "Clojure subtract function." 2,
+      "Get top 50 color frequencies from an image in hex form." 1},
+     :distinct 33,
+     :group-by? true,
+     :median "Clojure true? function.",
+     :max "Write you own Clojure function! Godspeed!",
+     :avg
+     "Send a pop-up notification to a client (or :all clients) (non-numeric average)",
+     :cardinality 94},
+    :full_map
+    {:min
+     "{:description \"Basic HTTP call primitive\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs [:req-map], :expandable? false, :required [:req-map]}",
+     :data-type "string",
+     :commons
+     {"{:description \"Clojure add function.\", :fn (fn [& args] (apply + args)), :inputs [:args], :icon \"zmdi-plus\", :types {:args [:integer :float], :out [:integer :float]}}"
+      1,
+      "{:description \"Convert a JSON string to Clojure EDN\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}}"
+      1,
+      "{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1},
+     :distinct 35,
+     :group-by? true,
+     :median
+     "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+     :max
+     "{:file-path \"./flows/node-color-thief-js.edn\", :icon \"zmdi-gradient\", :description \"Take an image local path and generate a color palette map from it.\"}",
+     :avg
+     "{:description \"Send a pop-up notification to a client (or :all clients)\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :inputs [:destination :content :w :h :duration], :icon \"zmdi-alert-polygon\", :style {:color \"#FDFD96\"}, :selected-style {:color \"#FDFD96\"}, :defaults {:destination :client-name, :content \"Alert!\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}} (non-numeric average)",
+     :cardinality 100},
+    :inputs
+    {:min "",
+     :data-type "string",
+     :commons
+     {"[:value1 :value2]" 7,
+      "[:value]" 6,
+      "[:destination :content :w :h :duration]" 3},
+     :distinct 21,
+     :group-by? true,
+     :median "[:query]",
+     :max "[:value]",
+     :avg "[:destination :content :w :h :duration] (non-numeric average)",
+     :cardinality 60},
+    :icon
+    {:min "fa-solid fa-terminal",
+     :data-type "string",
+     :commons {"zmdi-pizza" 3, "zmdi-file-text" 3, "zmdi-alert-polygon" 3},
+     :distinct 21,
+     :group-by? true,
+     :median "zmdi-gradient",
+     :max "zmdi-washing-machine",
+     :avg "zmdi-alert-polygon (non-numeric average)",
+     :cardinality 60},
+    :input_types
+    {:min "[:any :any]",
+     :data-type "string",
+     :commons
+     {"[[:integer :float] [:integer :float]]" 6, "[:string]" 6, "[:any]" 3},
+     :distinct 17,
+     :group-by? true,
+     :median "[:string :string]",
+     :max "[]",
+     :avg "[:keyword :any :integer :integer :integer] (non-numeric average)",
+     :cardinality 48},
+    :output_types
+    {:min "",
+     :data-type "string",
+     :commons {":any" 12, ":boolean" 11, ":string" 4},
+     :distinct 8,
+     :group-by? true,
+     :median ":boolean",
+     :max "[:integer :float]",
+     :avg ":any (non-numeric average)",
+     :cardinality 22},
+    :category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 18, ":clojure-base" 16, ":sub-flow" 1},
+     :distinct 3,
+     :group-by? true,
+     :median ":rabbit-base",
+     :max ":sub-flow",
+     :avg ":rabbit-base (non-numeric average)",
+     :cardinality 8}},
+   :database-type "SQLite",
+   :rowcount 35},
+  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:min "DAY_OF_WEEK",
+     :data-type "string",
+     :commons {"DISTRICT" 1, "SHOOTING" 1, "HOUR" 1},
+     :distinct 17,
+     :group-by? true,
+     :median "OCCURRED_ON_DATE",
+     :max "YEAR",
+     :avg "DAY_OF_WEEK (non-numeric average)",
+     :cardinality 100},
+    :field_type
+    {:min "BOOLEAN",
+     :data-type "string",
+     :commons {"DECIMAL" 7, "VARCHAR" 7, "BOOLEAN" 1},
+     :distinct 5,
+     :group-by? true,
+     :median "DECIMAL",
+     :max "VARCHAR",
+     :avg "DATE (non-numeric average)",
+     :cardinality 29},
+    :data_type
+    {:min "boolean",
+     :data-type "string",
+     :commons {"float" 7, "string" 7, "boolean" 1},
+     :distinct 5,
+     :group-by? true,
+     :median "float",
+     :max "string",
+     :avg "date (non-numeric average)",
+     :cardinality 29}},
+   :database-type "SQLite",
+   :rowcount 17},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:min "none",
+     :data-type "string",
+     :commons {"none" 2},
+     :distinct 1,
+     :group-by? true,
+     :median "none",
+     :max "none",
+     :avg "none (non-numeric average)",
+     :cardinality 50},
+    :db_catalog
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 2},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 50},
+    :connection_id
+    {:min "boston-crime",
+     :data-type "string",
+     :commons {"boston-crime" 2},
+     :distinct 1,
+     :group-by? true,
+     :median "boston-crime",
+     :max "boston-crime",
+     :avg "boston-crime (non-numeric average)",
+     :cardinality 50},
+    :schema_cat
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 2},
+     :distinct 1,
+     :group-by? false,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 50},
+    :table_name
+    {:min "offense_codes",
+     :data-type "string",
+     :commons {"offenses" 1, "offense_codes" 1},
+     :distinct 2,
+     :group-by? true,
+     :median "offense_codes",
+     :max "offenses",
+     :avg "offense_codes (non-numeric average)",
+     :cardinality 100},
+    :fields
+    {:min 3,
+     :data-type "integer",
+     :commons {18 1, 3 1},
+     :distinct 2,
+     :group-by? false,
+     :median 10.5,
+     :max 18,
+     :avg 10.5,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 2},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:min "a-random-wow",
+     :data-type "string",
+     :commons
+     {"node-color-thief-js-webp" 2, "counting-loop" 1, "simple-python-exec" 1},
+     :distinct 5,
+     :group-by? true,
+     :median "node-color-thief-js-webp",
+     :max "simple-python-exec",
+     :avg "node-color-thief-js-webp (non-numeric average)",
+     :cardinality 83},
+    :file_path
+    {:min "./flows/a-random-wow.edn",
+     :data-type "string",
+     :commons
+     {"./flows/counting-loop.edn" 1,
+      "./flows/simple-python-exec.edn" 1,
+      "./flows/a-random-wow.edn" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "./flows/node-color-thief-js-webp.edn",
+     :max "/home/ryanr/rvbbit-0.1.0-alpha.1/./flows/node-color-thief-js-webp.edn",
+     :avg
+     "/home/ryanr/rvbbit-0.1.0-alpha.1/./flows/node-color-thief-js-webp.edn (non-numeric average)",
+     :cardinality 100},
+    :last_modified
+    {:min "2024-03-13 10:39:25",
+     :data-type "string",
+     :commons
+     {"2024-03-13 10:39:25" 1, "2024-06-22 20:55:46" 1, "2024-08-14 10:41:01" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "2024-08-14 10:41:01",
+     :max "2024-08-29 12:47:41",
+     :avg "2024-08-29 12:47:41 (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 6},
+  :files-sys
+  {:fields
+   {:file_path
+    {:min "./screens/dynamic-theme-example1.edn",
+     :data-type "string",
+     :commons
+     {"./screens/dynamic-theme-example1.edn" 1,
+      "./screens/winter-theme-choom.edn" 1,
+      "./screens/looking-glass-sine-wave.edn" 1},
+     :distinct 10,
+     :group-by? true,
+     :median "./screens/nice-car-choom.edn",
+     :max "/home/ryanr/rvbbit-0.1.0-alpha.1a/./screens/frost-terminal2.edn",
+     :avg "./screens/dynamic-theme-example1.edn (non-numeric average)",
+     :cardinality 100},
+    :screen_name
+    {:min "dynamic-theme-example1",
+     :data-type "string",
+     :commons
+     {"frost-terminal2" 2, "random-collection" 1, "dynamic-theme-example1" 1},
+     :distinct 9,
+     :group-by? true,
+     :median "looking-glass-sine-wave",
+     :max "winter-theme-choom",
+     :avg "dynamic-theme-example1 (non-numeric average)",
+     :cardinality 89},
+    :blocks
+    {:min 2,
+     :data-type "integer",
+     :commons {6 3, 4 1, 48 1},
+     :distinct 8,
+     :group-by? true,
+     :median 26.5,
+     :max 48,
+     :avg 13.1,
+     :cardinality 80},
+    :queries
+    {:min 0,
+     :data-type "integer",
+     :commons {1 4, 2 2, 0 1},
+     :distinct 6,
+     :group-by? true,
+     :median 8.5,
+     :max 17,
+     :avg 4.4,
+     :cardinality 60},
+    :ts
+    {:min "2024-08-29 18:28:51",
+     :data-type "string",
+     :commons {"2024-08-29 18:28:51" 9, "2024-08-31 18:51:33" 1},
+     :distinct 2,
+     :group-by? true,
+     :median "2024-08-29 18:28:51",
+     :max "2024-08-31 18:51:33",
+     :avg "2024-08-29 18:28:51 (non-numeric average)",
+     :cardinality 20}},
+   :database-type "SQLite",
+   :rowcount 10},
+  :query-1
+  {:fields
+   {:greetings
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"heya, friendo" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :offenses-drag-21
+  {:fields
+   {:SHOOTING
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 500},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 0},
+    :DISTRICT
+    {:min "",
+     :data-type "string",
+     :commons {"C11" 82, "B2" 75, "B3" 49},
+     :distinct 13,
+     :group-by? true,
+     :median "C11",
+     :max "E5",
+     :avg "D14 (non-numeric average)",
+     :cardinality 2},
+    :INCIDENT_NUMBER
+    {:min "I182070372",
+     :data-type "string",
+     :commons {"I182070397" 5, "I182070779" 4, "I182070889" 3},
+     :distinct 454,
+     :group-by? true,
+     :median "I182070648",
+     :max "I182070945",
+     :avg "I182070945 (non-numeric average)",
+     :cardinality 90},
+    :OFFENSE_DESCRIPTION
+    {:min "AFFRAY",
+     :data-type "string",
+     :commons
+     {"SICK/INJURED/MEDICAL - PERSON" 43,
+      "VERBAL DISPUTE" 34,
+      "INVESTIGATE PERSON" 33},
+     :distinct 89,
+     :group-by? true,
+     :median "M/V - LEAVING SCENE - PROPERTY DAMAGE",
+     :max "WEAPON - OTHER - OTHER VIOLATION",
+     :avg "LARCENY ALL OTHERS (non-numeric average)",
+     :cardinality 17},
+    :DAY_OF_WEEK
+    {:min "0001-01-02",
+     :data-type "string",
+     :commons {"0001-01-07" 228, "0001-01-08" 178, "0001-01-06" 75},
+     :distinct 7,
+     :group-by? true,
+     :median "0001-01-07",
+     :max "0001-01-08",
+     :avg "0001-01-07 (non-numeric average)",
+     :cardinality 1},
+    :MONTH
+    {:min 6,
+     :data-type "integer",
+     :commons {9 477, 8 21, 7 1},
+     :distinct 4,
+     :group-by? true,
+     :median 9,
+     :max 9,
+     :avg 8.948,
+     :cardinality 0},
+    :YEAR
+    {:min 2018,
+     :data-type "integer",
+     :commons {2018 500},
+     :distinct 1,
+     :group-by? true,
+     :median 2018,
+     :max 2018,
+     :avg 2018,
+     :cardinality 0},
+    :HOUR
+    {:min 0,
+     :data-type "integer",
+     :commons {18 45, 14 33, 20 32},
+     :distinct 24,
+     :group-by? true,
+     :median 18,
+     :max 23,
+     :avg 13.43,
+     :cardinality 4},
+    :STREET
+    {:min "",
+     :data-type "string",
+     :commons {nil 41, "WASHINGTON ST" 20, "HUNTINGTON AVE" 12},
+     :distinct 275,
+     :group-by? true,
+     :median "HILLSIDE ST",
+     :max "WOODROW AVE",
+     :avg "LINCOLN ST (non-numeric average)",
+     :cardinality 55},
+    :OFFENSE_CODE_GROUP
+    {:min "Aggravated Assault",
+     :data-type "string",
+     :commons
+     {"Motor Vehicle Accident Response" 69, "Medical Assistance" 50, "Larceny" 41},
+     :distinct 41,
+     :group-by? true,
+     :median "Motor Vehicle Accident Response",
+     :max "Warrant Arrests",
+     :avg "Larceny (non-numeric average)",
+     :cardinality 8},
+    :UCR_PART
+    {:min "Other",
+     :data-type "string",
+     :commons {"Part Three" 265, "Part Two" 140, "Part One" 93},
+     :distinct 4,
+     :group-by? true,
+     :median "Part Three",
+     :max "Part Two",
+     :avg "Part One (non-numeric average)",
+     :cardinality 0},
+    :Long
+    {:min "",
+     :data-type "float",
+     :commons {-1 6, -71.1136693 5, nil 5},
+     :distinct 413,
+     :group-by? true,
+     :median "-71.07849582",
+     :max "-71.17087959",
+     :avg "-71.13937053 (non-numeric average)",
+     :cardinality 82},
+    :REPORTING_AREA
+    {:min "",
+     :data-type "integer",
+     :commons {nil 42, 519 6, 177 5},
+     :distinct 282,
+     :group-by? true,
+     :median "361",
+     :max "957",
+     :avg "808 (non-numeric average)",
+     :cardinality 56},
+    :Location
+    {:min "(-1.00000000, -1.00000000)",
+     :data-type "string",
+     :commons
+     {"(-1.00000000, -1.00000000)" 6,
+      "(0.00000000, 0.00000000)" 5,
+      "(42.24635332, -71.11366930)" 5},
+     :distinct 413,
+     :group-by? true,
+     :median "(42.32177032, -71.09779774)",
+     :max "(42.38512136, -71.01150101)",
+     :avg "(42.35779134, -71.13937053) (non-numeric average)",
+     :cardinality 82},
+    :OFFENSE_CODE
+    {:min 301,
+     :data-type "integer",
+     :commons {3006 43, 3301 34, 3115 33},
+     :distinct 89,
+     :group-by? true,
+     :median 3203,
+     :max 3831,
+     :avg 2357.544,
+     :cardinality 17},
+    :Lat
+    {:min "",
+     :data-type "float",
+     :commons {-1 6, 42.24635332 5, nil 5},
+     :distinct 413,
+     :group-by? true,
+     :median "42.32177032",
+     :max "42.38512136",
+     :avg "42.35779134 (non-numeric average)",
+     :cardinality 82},
+    :OCCURRED_ON_DATE
+    {:min "2018-06-15 00:00:00.000000",
+     :data-type "string",
+     :commons
+     {"2018-09-02 00:00:00.000000" 5,
+      "2018-09-03 10:00:00.000000" 5,
+      "2018-09-01 17:03:00.000000" 5},
+     :distinct 404,
+     :group-by? true,
+     :median "2018-09-02 18:20:00.000000",
+     :max "2018-09-03 21:25:00.000000",
+     :avg "2018-09-02 13:00:00.000000 (non-numeric average)",
+     :cardinality 80}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :ufo_sightings
+  {:fields
+   {:duration_seconds_int
+    {:data-type "integer",
+     :distinct 46,
+     :group-by? true,
+     :commons {300 55, 60 45, 120 41},
+     :cardinality 9},
+    :comments
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"18 glowing UFOs seen over Phoenix  AZ tonight&#44 10/12/12 8:45PM" 1,
+      "amber fireball descending&#44splits into 3 objects&#44stops&#44they hover above ground with erratic movements"
+      1,
+      "Slow moving bright orange light." 1},
+     :cardinality 100},
+    :city
+    {:data-type "string",
+     :distinct 423,
+     :group-by? true,
+     :commons {"cincinnati" 5, "san diego" 5, "austin" 4},
+     :cardinality 84},
+    :date_posted
+    {:data-type "string",
+     :distinct 115,
+     :group-by? true,
+     :commons {"2013-10-14" 38, "2012-10-30" 31, "2008-10-31" 25},
+     :cardinality 23},
+    :longitude
+    {:data-type "float",
+     :distinct 433,
+     :group-by? true,
+     :commons {-122.3308333 6, -84.4569444 5, -117.1563889 5},
+     :cardinality 86},
+    :state
+    {:data-type "string",
+     :distinct 53,
+     :group-by? true,
+     :commons {"ca" 51, "ny" 35, nil 30},
+     :cardinality 10},
+    :duration_seconds
+    {:data-type "string",
+     :distinct 46,
+     :group-by? true,
+     :commons {"300" 55, "60" 45, "120" 41},
+     :cardinality 9},
+    :duration_hours
+    {:data-type "string",
+     :distinct 225,
+     :group-by? true,
+     :commons {"1 minute" 26, "5 minutes" 24, "30 seconds" 22},
+     :cardinality 44},
+    :id
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {84 1, 390 1, 49 1},
+     :cardinality 100},
+    :shape
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"light" 104, "circle" 50, "triangle" 46},
+     :cardinality 4},
+    :datetime
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons
+     {"2008-10-10 20:00:00.000000" 4,
+      "1999-10-11 20:15:00.000000" 4,
+      "2007-10-10 22:00:00.000000" 4},
+     :cardinality 89},
+    :latitude
+    {:data-type "string",
+     :distinct 430,
+     :group-by? true,
+     :commons {"47.6063889" 6, "39.1619444" 5, "32.7152778" 5},
+     :cardinality 86},
+    :country
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"us" 411, nil 55, "ca" 17},
+     :cardinality 0}},
+   :rowcount 500},
+  :offenses
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1f5246e2 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x1f5246e2 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: offenses) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":sub-flow" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :distinct 3,
+     :group-by? true,
+     :median ":rabbit-base",
+     :max ":sub-flow",
+     :avg ":clojure-base (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 3},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:min "*cache-db*",
+     :data-type "string",
+     :commons {"*cache-db*" 4, "SQLite" 3},
+     :distinct 2,
+     :group-by? true,
+     :median "*cache-db*",
+     :max "SQLite",
+     :avg "*cache-db* (non-numeric average)",
+     :cardinality 28},
+    :connection_id
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"cache.db" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
+     :distinct 7,
+     :group-by? true,
+     :median "flows-db",
+     :max "system-db",
+     :avg "system-db (non-numeric average)",
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:min 0,
+     :data-type "integer",
+     :commons {0 7},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 14}},
+   :database-type "SQLite",
+   :rowcount 7},
+  :greetings-drag-9
+  {:fields
+   {:greetings
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"heya, friendo" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {1 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :query-2
+  {:fields
+   {:greetings
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"heya, friendo" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :query
+  {:fields
+   {:greetings
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"heya, friendo" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"ufo_sightings_drag_14" 1},
+     :cardinality 100},
+    :cnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {159 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :tmp-1515591306-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-11668 :queries :query-1]" 1},
+     :cardinality 100},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":query-1" 1},
+     :cardinality 100},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2023-11-26 02:05:24" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 1},
+     :cardinality 100},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-11668" 1},
+     :cardinality 100},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"([:select 0 1] [:select 0 0] [:select 0] [:select])" 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":surprising-rhomboidal-swan-of-malpaís" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"{:select [[\"heya, friendo\" :greetings]]}" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"{:select [[\"heya, friendo\" :greetings]]}" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 35,
+     :group-by? true,
+     :median ":http-call",
+     :max "node-color-thief-js-webp",
+     :avg ":* (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 35}},
+ :default-col-widths
+ {:block-9201 {:new-clojure-1-sqlized 380},
+  :flow-list* {:flows-sys 187},
+  :system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys 170},
+  :files-list* {:files-sys 170},
+  :blocks-list* {:blocks-sys ##Inf}},
+ :runstream-drops nil,
+ :zoom-start [149.21 -219.97 0.565],
+ :tabs ["strategic grill locations"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/frost-terminal2.edn",
+   :new-block-rand
+   ["Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "It's no use going back to yesterday, because I was a different person then."
+    "Who in the world am I? Ah, that's the great puzzle..."
+    "Curiouser and curiouser!"
+    "If you don't know where you are going any road can take you there."
+    "We're all mad here."
+    "I can't go back to yesterday because I was a different person then."
+    "It's always tea-time."
+    "Begin at the beginning and go on till you come to the end; then stop."
+    "I knew who I was this morning, but I've changed a few times since then."
+    "How long is forever? Sometimes, just one second."
+    "If everybody minded their own business, the world would go around a great deal faster than it does."
+    "I don't think... then you shouldn't talk, said the Hatter."
+    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+    "Well, I never heard it before, but it sounds uncommon nonsense."
+    "Why, sometimes I've believed as many as six impossible things before breakfast."
+    "Imagination is the only weapon in the war against reality."
+    "Who in the world am I? Ah, that's the great puzzle."
+    "We're all mad here."
+    "How long is forever? Sometimes, just one second."
+    "The world is full of obvious things which nobody by any chance ever observes."
+    "Reality is that which, when you stop believing in it, doesn't go away."
+    "The sky above the port was the color of television, tuned to a dead channel."
+    "Information wants to be free."
+    "The future is already here – it's just not evenly distributed."
+    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+    "The 'Net is a waste of time, and that's exactly what's right about it."
+    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+    "The street finds its own uses for things."
+    "Accelerated world. Accelerated nervous system to go with it."
+    "The future has arrived — it's just not evenly distributed yet."
+    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+    "When you want to know how things really work, study them when they're coming apart."
+    "The human sensory system is a lot more complex and weird than most people realize."
+    "Time moves in one direction, memory in another."
+    "The only thing that keeps you sane is to think that it's all a bad dream."
+    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+    "Secrets are not the same as surprises."
+    "Neuromancer. The lane to the land of the dead."],
+   :modes
+   {:terminal [:terminal :*data],
+    :markdown [:markdown :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :pre
+    [:pre
+     {:style
+      {:color :theme/editor-outer-rim-color,
+       :background-color "#00000000 ",
+       :border "none",
+       :text-shadow "4px 4px 4px #00000088",
+       :font-size "17px",
+       :font-family :theme/monospaced-font}}
+     [:str :*data]],
+    :edn [:edn :*data],
+    :clover [:box :child :*data],
+    :pretty [:pretty-box :*data],
+    :text [:console :*data],
+    :data [:data-viewer :*data]},
+   :kits {},
+   :clover-templates
+   {:color-theft
+    {:args [:*input],
+     :body
+     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
+    :pretty-box
+    {:args [:*input],
+     :body
+     [:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:color :theme/editor-outer-rim-color,
+       :font-size [:auto-size-px [:str :*input]]}
+      :child
+      [:str :*input]]},
+    :new-block-quotes-box
+    {:args [:*input],
+     :body
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:font-size "21px",
+       :font-weight 700,
+       :padding-top "6px",
+       :padding-left "14px",
+       :margin-top "-8px",
+       :color :theme/editor-outer-rim-color,
+       :font-family :theme/base-font}
+      :child
+      [:speak [:str :*input]]]},
+    :clj
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
+    :clj2
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
+    :cheese-burger
+    {:args [:x],
+     :body
+     [:box
+      :style
+      {:color "yellow", :font-size "23px"}
+      :child
+      [:str :x "CHEESEBURGER!"]]}},
+   :openai-api-key "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",
+   :eleven-labs-default-voice-name "Not OG Buffy",
+   :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+   :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+   :debug-level 1,
+   :screens
+   ["dynamic-theme-example1"
+    "ecto-cooler-shade"
+    "frost-terminal2"
+    "looking-glass-sine-wave"
+    "nice-car-choom"
+    "random-collection"
+    "server-stats2"
+    "winter-theme"
+    "winter-theme-choom"]}},
+ :runstreams nil,
+ :editor? true,
+ :buffy? false,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[nil :queries :tmp-1510118111-hist-sys]
+   [nil :queries nil]
+   [:block-9201 :queries :new-clojure-1-sqlized]],
+  [:clojure :count-map-keys] [],
+  [:clojure :new-lundberg] [[:* :* :*]],
+  [:clojure :view-lundberg]
+  [[:block-1084 :views :hare-vw-8]
+   [:block-4970 :views :hare-vw-3]
+   [:block-9973 :views :hare-vw-2]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:block-7437 :views :hare-vw-7]
+   [:block-7437 :views :new-view]
+   [:block-7845 :views :hare-vw-4]
+   [:block-11130 :views :hare-vw-2]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-4687 :views :hare-vw-5]
+   [:block-5999 :views :hare-vw-1]],
+  [:clojure :gen-ev] [],
+  [:outliers :get-outliers]
+  [[nil :queries :tmp-1510118111-hist-sys]
+   [nil :queries nil]
+   [:block-9201 :queries :new-clojure-1-sqlized]]},
+ :flow-drop-down? true,
+ :memory [109163473 86436553 4294705152],
+ :client-name :blissful-long-skunk-39,
+ :alt-key-held? false,
+ :flow-editor? true,
+ :window {:w 2776, :h 1467},
+ :quake-console? false,
+ :implicit-rowsets {:solver [:new-clojure-1 nil]},
+ :post-meta
+ {:new-clojure-1-sqlized
+  {:* {:rowcount 25}, :step_int {:distinct 25}, :step_val {:distinct 25}},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ {},
+  :flow-fn-sys
+  {:description {:distinct 32},
+   :category {:distinct 2},
+   :* {:rowcount 34},
+   :name {:distinct 34},
+   :icon {:distinct 20},
+   :input_types {:distinct 17},
+   :inputs {:distinct 20},
+   :output_types {:distinct 8},
+   :full_map {:distinct 34}},
+  :tables-sys
+  {:* {:rowcount 9},
+   :db_schema {:distinct 1},
+   :db_catalog {:distinct 0},
+   :connection_id {:distinct 1},
+   :schema_cat {:distinct 0},
+   :table_name {:distinct 9},
+   :fields {:distinct 9}},
+  :files-sys
+  {:* {:rowcount 10},
+   :file_path {:distinct 10},
+   :screen_name {:distinct 9},
+   :blocks {:distinct 8},
+   :queries {:distinct 6},
+   :ts {:distinct 2}},
+  :blocks-sys
+  {:* {:rowcount 6},
+   :block_key {:distinct 6},
+   :block_name {:distinct 5},
+   :queries {:distinct 2},
+   :views {:distinct 3},
+   :block_data {:distinct 6},
+   :view_names {:distinct 3},
+   :query_names {:distinct 1}}},
+ :flow-estimates
+ {:flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
+  :blocks-sys {:times 0.001, :run-id :blocks-sys},
+  :fields-sys {:times 0.003, :run-id :fields-sys},
+  :tables-sys {:times 0.004, :run-id :tables-sys},
+  :raw-custom-override1571289185
+  {:times 0.047, :run-id :raw-custom-override1571289185},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :files-sys {:times 0.001, :run-id :files-sys},
+  :flow-fn-categories-sys {:times 0.001, :run-id :flow-fn-categories-sys},
+  :connections-sys {:times 0.003, :run-id :connections-sys},
+  :raw-custom-override840077249
+  {:times 0.01, :run-id :raw-custom-override840077249},
+  :new-clojure-1-sqlized {:times 0.001, :run-id :new-clojure-1-sqlized},
+  :flow-fn-all-sys {:times 0.001, :run-id :flow-fn-all-sys}},
+ :status
+ {:heartbeat
+  {:kick
+   [:solver-status/blissful-long-skunk-39>raw-custom-override840077249>running?
+    :time/now
+    :kit/kicks>blissful-long-skunk-39
+    :flow-status/chicken-flow-676>*running?
+    :solver/raw-custom-override840077249
+    :flow-status/a-random-wow>*running?
+    :flow-status/node-color-thief-js-webp>*running?]},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
+ :screen-name "nice-car-choom",
+ :recos-page2 0,
+ :selected-tab "strategic grill locations",
+ :col-names nil,
+ :snapshots nil,
+ :alerts
+ [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:box
+     :child
+     "sent screen save request to server... Please wait."
+     :style
+     {:font-size "12px", :opacity 0.66}]]
+   11
+   0.5
+   613
+   -1247625457]],
+ :recos-page 0,
+ :flow-runner
+ {:node-color-thief-js-webp>run-the-convert-command
+  {:output [],
+   :exception [],
+   :seconds [],
+   :exit-code 0,
+   :command
+   "convert ../extras/node-colorthief/logo.png-q10.jpg -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg /tmp/img1819246105-547.png"},
+  :node-color-thief-js-webp>clojure-string-join-1
+  "cd ../extras/node-colorthief ; node ./colorThief2.js /tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>convert-to-png
+  "convert ../extras/node-colorthief/logo.png-q10.jpg -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg /tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>join-output-as-string
+  "{   \"dominantColor\": \"#eb38a8\",   \"colorPalette\": [     \"#19e9f3\",     \"#f10c98\",     \"#e4eff5\",     \"#05040b\",     \"#2a2f9e\",     \"#9c046c\",     \"#120952\",     \"#5c0464\",     \"#144c6c\",     \"#240c34\"   ] }",
+  :node-color-thief-js-webp>get-color-edges
+  {:second-darkest "#240c34",
+   :highest-saturation "#9c046c",
+   :most-contrasting "#19e9f3",
+   :darkest "#05040b",
+   :contrast-with-dominant "#19e9f3",
+   :colors
+   ["#19e9f3"
+    "#f10c98"
+    "#e4eff5"
+    "#05040b"
+    "#2a2f9e"
+    "#9c046c"
+    "#120952"
+    "#5c0464"
+    "#144c6c"
+    "#240c34"
+    "#eb38a8"],
+   :most-frequent "#e4eff5",
+   :data-colors
+   {"float" "#7cdafd",
+    "boolean" "#ff4967",
+    "map" "#19f39c",
+    "list" "#870014",
+    "string" "#ffffff",
+    "any" "#970e3d",
+    "vector" "#5f2ad9",
+    "keyword" "#f5e7e4",
+    "rabbit-code" "#d02300",
+    "datetime" "#4f0274",
+    "integer" "#5deeff",
+    "unknown" "#480a1b",
+    "date" "#040f05"},
+   :dominant "#eb38a8",
+   :most-contrasting-dark "#05040b",
+   :second-brightest "#19e9f3",
+   :brightest "#e4eff5",
+   :most-contrasting-light "#19e9f3"},
+  :node-color-thief-js-webp>shell-command-1
+  {:output
+   ["{"
+    "  \"dominantColor\": \"#eb38a8\","
+    "  \"colorPalette\": ["
+    "    \"#19e9f3\","
+    "    \"#f10c98\","
+    "    \"#e4eff5\","
+    "    \"#05040b\","
+    "    \"#2a2f9e\","
+    "    \"#9c046c\","
+    "    \"#120952\","
+    "    \"#5c0464\","
+    "    \"#144c6c\","
+    "    \"#240c34\""
+    "  ]"
+    "}"],
+   :exception [],
+   :seconds [],
+   :exit-code 0,
+   :command
+   "cd ../extras/node-colorthief ; node ./colorThief2.js /tmp/img1819246105-547.png"},
+  :node-color-thief-js-webp>image-path "extras/node-colorthief/logo.png-q10.jpg",
+  :node-color-thief-js-webp>path-correction
+  "../extras/node-colorthief/logo.png-q10.jpg",
+  :node-color-thief-js-webp>json-to-edn_colorPalette
+  ["#19e9f3"
+   "#f10c98"
+   "#e4eff5"
+   "#05040b"
+   "#2a2f9e"
+   "#9c046c"
+   "#120952"
+   "#5c0464"
+   "#144c6c"
+   "#240c34"],
+  :node-color-thief-js-webp>json-to-edn
+  {:dominantColor "#eb38a8",
+   :colorPalette
+   ["#19e9f3"
+    "#f10c98"
+    "#e4eff5"
+    "#05040b"
+    "#2a2f9e"
+    "#9c046c"
+    "#120952"
+    "#5c0464"
+    "#144c6c"
+    "#240c34"]},
+  :node-color-thief-js-webp>waiter-fn "/tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>json-to-edn_dominantColor "#eb38a8",
+  :node-color-thief-js-webp>shell-command-in
+  "cd ../extras/node-colorthief ; node ./colorThief2.js",
+  :node-color-thief-js-webp>temp-name "/tmp/img1819246105-547.png"},
+ :rs-overrides-hashmap {},
+ :base-sniff-queries
+ {:raw_custom_override704242473__block_9201_clojure_new_clojure_1_ 849525671,
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ 1512429098},
+ :user-params-hash -218061856,
+ :grid-recos? true,
+ :session-hash 1918314609,
+ :no-ui? false,
+ :resolved-queries {nil {:_last-run "18:52:14"}},
+ :panels
+ {:hello-there-brother
+  {:h 3,
+   :w 12,
+   :root [2 2],
+   :name "hello there!",
+   :tab "strategic grill locations",
+   :views
+   {:heya!
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :color :theme/editor-outer-rim-color,
+      :padding-top "14px",
+      :opacity 1,
+      :font-family :theme/base-font}
+     :child
+     "sup choom 🐇 ❄️ 🎄"]},
+   :queries {}},
+  :queries {{:select [["heya, friendo"] :greetings]} {:view nil}},
+  :views {[:box "heya" :size "auto" :style {:font-size "22px"}] {:view nil}},
+  nil {:queries {nil {:_last-run "18:52:14"}}}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#7de883",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#d6e367",
+  "unknown" "#c7005d",
+  "date" "#3b528b",
+  "nil" "#ff2147"},
+ :solver-fn nil,
+ :click-param
+ {:blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme, who ya gonna call? )",
+   :queries 0,
+   :views 26,
+   :block_data
+   "{:theme-name \"who ya gonna call?\", :codemirror-theme \"ayu-mirage\", :editor-param-background-color \"#0b1122\", :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :nivo-colors {:scheme \"purpleRed_green\"}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#0b031b\", :block-title-font-color \"#ffffff\", :base-block-color \"#00000099\", :editor-rim-color \"#0b1122\", :vega-default-color-scheme {:scheme \"accent\"}, :editor-grid-selected-font-color \"#ffffff\", :monospaced-font \"IBM Plex Mono\", :editor-grid-selected-background-color \"#FFA50087\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#33ffb7\", :grid-selected-font-color \"#ffffff\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#8879bc\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(https://cdn.wallpapersafari.com/55/82/slqbaD.jpg)\", :transition \"all 0.6s ease-in-out\", :background-color \"#222222\", :background-size \"cover\"}, :editor-font-color \"#ffffff\", :base-font \"Oxygen Mono\", :block-tab-selected-font-color \"#FFA500\", :editor-background-color \"#000000\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":theme-name :codemirror-theme :editor-param-background-color :vega-defaults :nivo-colors :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :vega-default-color-scheme :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "boston-crime",
+   :schema_cat nil,
+   :table_name "offenses",
+   :fields 18},
+  :user-sys nil,
+  :files-sys
+  {:file_path "./screens/night-city-never-sleeps.edn",
+   :screen_name "night-city-never-sleeps",
+   :blocks 33,
+   :queries 33,
+   :ts "2023-12-01 06:06:54"},
+  :ufo-sightings-drag-22
+  {:duration_seconds_int 900,
+   :comments
+   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
+   :city "kaneohe",
+   :date_posted "2004-01-22",
+   :longitude -157.8036111,
+   :state "hi",
+   :duration_seconds "900",
+   :duration_hours "15 minutes",
+   :id 5,
+   :shape "light",
+   :datetime "1960-10-10 20:00:00.000000",
+   :latitude "21.4180556",
+   :country "us"},
+  :param
+  {:keys 123,
+   :keys2 [3 4 5],
+   :string "this is string",
+   :bools true,
+   :float 324.444,
+   :selected-block :block-11339,
+   :selected-view nil,
+   :selected-view-data nil},
+  :theme
+  {:theme-name "who ya gonna call?",
+   :codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#0b1122",
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :nivo-colors {:scheme "purpleRed_green"},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#0b031b",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#00000099",
+   :editor-rim-color "#0b1122",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "accent"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#7de883",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#d6e367",
+    "unknown" "#c7005d",
+    "date" "#3b528b",
+    "nil" "#ff2147"},
+   :editor-grid-selected-font-color "#ffffff",
+   :monospaced-font "IBM Plex Mono",
+   :editor-grid-selected-background-color "#FFA50087",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#ff005a",
+   :grid-selected-font-color "#ffffff",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#8879bc",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(https://cdn.wallpapersafari.com/55/82/slqbaD.jpg)",
+    :transition "all 0.6s ease-in-out",
+    :background-color "#222222",
+    :background-size "cover"},
+   :editor-font-color "#ffffff",
+   :base-font "Oxygen Mono",
+   :block-tab-selected-font-color "#FFA500",
+   :editor-background-color "#000000",
+   :editor-grid-font-color "#ffffff"},
+  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :connections-sys
+  {:database_name "SQLite",
+   :connection_id "boston-crime",
+   :styler_highlight_8717ssa 0}},
+ :selected-flow "chicken-flow-676"}

@@ -1,6 +1,3 @@
-;; {:classname   "org.sqlite.JDBC"
-;;  :subprotocol "sqlite"
-;;  :subname     "./data/boston-crime-data.db"}
 
 {:jdbc-url "jdbc:sqlite:data/boston-crime-data.db"
  :cache "shared"}

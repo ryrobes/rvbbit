@@ -1,9 +1,0 @@
-{:jdbc-url "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
-                                           :idle-timeout        600000
-                                           :max-lifetime       1800000
-                                           :memory true
-                                           :mode "memory"
-                                           :auto_vacuum "FULL"
-                                           :cache "shared"}
-
-

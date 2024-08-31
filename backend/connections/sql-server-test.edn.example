@@ -1,0 +1,3 @@
+
+{:jdbc-url  "jdbc:sqlserver://dev-box:1433;databaseName=rabbit;encrypt=false;username=sa;password=test"}
+

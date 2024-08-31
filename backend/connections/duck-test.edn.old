@@ -1,4 +1,0 @@
-{:classname   "org.duckdb.DuckDBDriver"
-               :subprotocol "duckdb"
-               :subname    "db/cache.db"}
-

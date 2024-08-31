@@ -319,6 +319,29 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :shell-command-2
+  {:y 1050,
+   :w 225,
+   :right-click? true,
+   :icon "zmdi-washing-machine",
+   :z 0,
+   :ports {:in {:command :string}, :out {:out :any}},
+   :h 100,
+   :x 2325,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :name ":shell-command",
+     :type :shell-command,
+     :icon "zmdi-washing-machine",
+     :defaults {:command "ls -la"},
+     :types {:command :string, :out :any},
+     :style {:color "#ffdd3c"},
+     :selected-style {:color "#ffdd3c"},
+     :inputs [:command],
+     :expandable? true,
+     :required [:command]},
+    :drag-meta {:type :shell-command}}},
   :shell-command-1
   {:y 2600,
    :w 350,
@@ -407,6 +430,31 @@
      :expandable? true,
      :required [:command]},
     :drag-meta {:type :shell-command}}},
+  :open-fn-2
+  {:y 950,
+   :fn (fn [x] x),
+   :w 175,
+   :raw-fn (fn [x] "cd .. ; pwd"),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 75,
+   :x 2325,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :pop-color
   {:y 2075,
    :fn (fn [x] (get-in x [:colorPalette 0])),
@@ -437,15 +485,6 @@
    :ports {:in {}, :out {:out :string}},
    :x 1925,
    :y 575},
-  :base-save-directory
-  {:w 150,
-   :h 60,
-   :z 0,
-   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input "/home/ryanr/rvbbit-out"},
-   :right-click? true,
-   :ports {:in {}, :out {:out :string}},
-   :x 2075,
-   :y 1200},
   :color-palette
   {:y 2025,
    :fn (fn [x] x),
@@ -628,10 +667,7 @@
    :inputs nil,
    :h 60,
    :x 1775,
-   :data
-   {:drag-meta {:type :open-block},
-    :flow-item {:expandable? true},
-    :user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen"}},
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input ".."}},
   :prompt
   {:y 575,
    :w 300,
@@ -646,7 +682,7 @@
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
     :user-input
-    "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body."}},
+    "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off the scene, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. On the outskirts, many rabbits eye the scene."}},
   :create-png-path
   {:y 1775,
    :description
@@ -704,7 +740,7 @@
    :w 600,
    :raw-fn
    (fn [x bg-color color _]
-     (let [x (clojure.string/replace (str x) "/home/ryanr/rvbbit/frontend/resources/public" ".")]
+     (let [x (clojure.string/replace (str x) ".." "assets/openai-images")]
        [:v-box
         :padding
         "10px"
@@ -751,10 +787,10 @@
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
   :generate-file-path
-  {:y 1300,
+  {:y 1325,
    :fn (fn [x] x),
-   :w 350,
-   :raw-fn (fn [base-dir] (str base-dir "/b64-image4-" (rand-int 99999) "-" (rand-int 99999) ".png")),
+   :w 425,
+   :raw-fn (fn [base-dir] (str base-dir "/b64-image3-" (rand-int 99999) "-" (rand-int 99999) ".png")),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
@@ -762,7 +798,7 @@
    :ports {:in {:base-dir :any}, :out {:out :string}},
    :inputs nil,
    :h 85,
-   :x 2100,
+   :x 2125,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -844,10 +880,34 @@
     :flow-item {:expandable? true, :meta {}},
     :user-input
     {:headers
-     {"Authorization" "Bearer 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", "Content-Type" "application/json"},
+     {"Authorization" "Bearer WAT!", "Content-Type" "application/json"},
      :method :post,
      :url "https://api.openai.com/v1/images/generations",
      :body :req-body*}}},
+  :abs-file-base-path
+  {:y 1175,
+   :fn (fn [x] (get-in x [:output 0])),
+   :w 250,
+   :raw-fn (fn [x] (str (get-in x [:output 0]) "/assets/openai-images")),
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 100,
+   :x 2300,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (get-in x [:output 0])),
+     :name ":open-fn",
+     :raw-fn (fn [x] (get-in x [:output 0])),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :write-exif-to-image-command
   {:y 2475,
    :fn (fn [x] x),
@@ -956,17 +1016,8 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :zoom [-785 -862 0.925],
- :opts
- {:close-on-done? true,
-  :retry-on-error? true,
-  :retries 404,
-  :overrides
-  {:prompt
-   "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nGenerate a high-definition, fantasy-inspired illustration in a 16:9 ratio. The scene is set in an otherworldly, yet characteristically New England small town during winter. The main figure is a Caucasian woman in her late 20s, with a robust, hyper curvaceous physique. She sports a sultry yet pleased expression, with long hair, full lips, and a slightly upturned nose. Intricate Celtic-style tattoos of rabbits and wilderness decorate her neck, collarbone, and shoulders. Her body emanates mysterious blue and pink lights. She's wearing a choker ribbon and a long necklace, encapsulating a confident, playful aura as she shares a sly glance with the viewer. This piece is influenced by pinup noir femme fatale and cyberpunk aesthetics, channeling a strong burlesque vibe.",
-   :style-param "vivid",
-   :prompt-2
-   "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nCreate a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."}},
+ :zoom [154.5 -248.51 0.445],
+ :opts {:close-on-done? true, :retry-on-error? true, :timeout 120000, :retries 404, :overrides {:style-param "vivid"}},
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
  [[:http-req-map/* :oai-api-call/req-map]
@@ -988,9 +1039,7 @@
   [:execute-shell-command/command :hiccup-image-box-w-png/_]
   [:hiccup-image-box-w-png/* :relative-url-path-for-png-version/x]
   [:relative-url-path-for-png-version :done]
-  [:base-save-directory :generate-file-path/base-dir]
   [:base-web-directory :create-png-path/base-web-dir]
-  [:base-save-directory :create-png-path/base-dir]
   [:request-body-map/* :http-req-map/req-body*]
   [:size-param :request-body-map/size*]
   [:style-param :request-body-map/style*]
@@ -1013,4 +1062,9 @@
   [:save-base64-to-webp-file :write-exif-to-image-command/img-path]
   [:write-file-1_file-path :write-exif-to-image-command/x]
   [:write-exif-to-image-command :shell-command-1/command]
-  [:shell-command-1 :relative-url-path-for-png-version/bang]]}
+  [:shell-command-1 :relative-url-path-for-png-version/bang]
+  [:quality-param :open-fn-2/x]
+  [:open-fn-2 :shell-command-2/command]
+  [:shell-command-2 :abs-file-base-path/x]
+  [:abs-file-base-path :generate-file-path/base-dir]
+  [:abs-file-base-path :create-png-path/base-dir]]}

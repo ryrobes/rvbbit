@@ -1,100 +1,250 @@
 {:reco-preview nil,
+ :flow? false,
  :sql-source
- {:bigfoot-sightings-drag-3
-  {:select
-   [:alsonoticed
-    :bfroid
-    :class
-    :county
-    :date
-    :environment
-    :fixed_month
-    :fixed_year
-    :locationdetails
-    :month
-    :nearestroad
-    :nearesttown
-    :observed
-    :otherstories
-    :otherwitnesses
-    :run_id
-    :run_time
-    :season
-    :sketch
-    :state
-    :submitted
-    :submitted_date
-    :timeandconditions
-    :title
-    :url
-    :year],
-   :from [[:bigfoot_sightings :rr807]]},
-  :bigfoot_sightings
+ {:new-clojure-1-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-31 18:42:15",
+   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+   :_sqlized-hash -1073545200,
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]},
+  :raw_custom_override704242473__block_9201_clojure_new_clojure_1_
   {:select [:*],
    :connection-id "system-db",
-   :from [:bigfoot_sightings],
+   :from [:raw_custom_override704242473__block_9201_clojure_new_clojure_1_],
+   :limit 111},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_],
    :limit 111}},
+ :selected-flow-block :image-path,
+ :skip-me {:yo nil},
  :meta
- {:blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+ {nil
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-fn-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 34,
+     :group-by? true,
+     :median ":get-colors",
+     :max ":write-file",
+     :avg ":alert! (non-numeric average)",
+     :cardinality 100},
+    :description
+    {:min "Basic HTTP call primitive",
+     :data-type "string",
+     :commons
+     {"Basic HTTP call primitive" 2,
+      "Clojure subtract function." 2,
+      "Get top 50 color frequencies from an image in hex form." 1},
+     :distinct 32,
+     :group-by? true,
+     :median "Clojure true? function.",
+     :max "Write you own Clojure function! Godspeed!",
+     :avg
+     "Send a pop-up notification to a client (or :all clients) (non-numeric average)",
+     :cardinality 94},
+    :full_map
+    {:min
+     "{:description \"Basic HTTP call primitive\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs [:req-map], :expandable? false, :required [:req-map]}",
+     :data-type "string",
+     :commons
+     {"{:description \"Clojure add function.\", :fn (fn [& args] (apply + args)), :inputs [:args], :icon \"zmdi-plus\", :types {:args [:integer :float], :out [:integer :float]}}"
+      1,
+      "{:description \"Convert a JSON string to Clojure EDN\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}}"
+      1,
+      "{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1},
+     :distinct 34,
+     :group-by? true,
+     :median
+     "{:description \"Clojure true? function.\", :fn true?, :inputs [:value], :icon \"zmdi-pizza\", :types {:value :boolean, :out :boolean}}",
+     :max
+     "{:file-path \"./flows/node-color-thief-js.edn\", :icon \"zmdi-gradient\", :description \"Take an image local path and generate a color palette map from it.\"}",
+     :avg
+     "{:description \"Send a pop-up notification to a client (or :all clients)\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :inputs [:destination :content :w :h :duration], :icon \"zmdi-alert-polygon\", :style {:color \"#FDFD96\"}, :selected-style {:color \"#FDFD96\"}, :defaults {:destination :client-name, :content \"Alert!\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}} (non-numeric average)",
+     :cardinality 100},
+    :inputs
+    {:min "",
+     :data-type "string",
+     :commons
+     {"[:value1 :value2]" 7,
+      "[:value]" 6,
+      "[:destination :content :w :h :duration]" 3},
+     :distinct 20,
+     :group-by? true,
+     :median "[:query]",
+     :max "[:value]",
+     :avg "[:destination :content :w :h :duration] (non-numeric average)",
+     :cardinality 58},
+    :icon
+    {:min "fa-solid fa-terminal",
+     :data-type "string",
+     :commons {"zmdi-pizza" 3, "zmdi-file-text" 3, "zmdi-alert-polygon" 3},
+     :distinct 20,
+     :group-by? true,
+     :median "zmdi-functions",
+     :max "zmdi-washing-machine",
+     :avg "zmdi-alert-polygon (non-numeric average)",
+     :cardinality 58},
+    :input_types
+    {:min "[:any :any]",
+     :data-type "string",
+     :commons
+     {"[[:integer :float] [:integer :float]]" 6, "[:string]" 6, "[:any]" 3},
+     :distinct 17,
+     :group-by? true,
+     :median "[:string :string]",
+     :max "[]",
+     :avg "[:keyword :any :integer :integer :integer] (non-numeric average)",
+     :cardinality 50},
+    :output_types
+    {:min "",
+     :data-type "string",
+     :commons {":any" 12, ":boolean" 11, ":string" 4},
+     :distinct 8,
+     :group-by? true,
+     :median ":boolean",
+     :max "[:integer :float]",
+     :avg ":any (non-numeric average)",
+     :cardinality 23},
+    :category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 18, ":clojure-base" 16},
+     :distinct 2,
+     :group-by? true,
+     :median ":rabbit-base",
+     :max ":rabbit-base",
+     :avg ":rabbit-base (non-numeric average)",
+     :cardinality 5}},
+   :database-type "SQLite",
+   :rowcount 34},
+  :new-clojure-1
+  {:fields
+   {:step_int
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :step_val
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 25},
+  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :fields-sys
   {:fields
    {:field_name
-    {:data-type "string",
+    {:min "alsonoticed",
+     :data-type "string",
+     :commons {"submitted_date" 1, "nearestroad" 1, "observed" 1},
      :distinct 26,
      :group-by? true,
-     :commons {"submitted_date" 1, "nearestroad" 1, "observed" 1},
+     :median "observed",
+     :max "year",
+     :avg "alsonoticed (non-numeric average)",
      :cardinality 100},
     :field_type
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"DATE" 3, "DECIMAL" 2, "TIMESTAMP" 2},
-     :cardinality 80},
-    :data_type
-    {:data-type "string",
+    {:min "BOOLEAN",
+     :data-type "string",
+     :commons {"VARCHAR" 18, "DATE" 3, "TIMESTAMP" 2},
      :distinct 5,
      :group-by? true,
+     :median "VARCHAR",
+     :max "VARCHAR",
+     :avg "VARCHAR (non-numeric average)",
+     :cardinality 19},
+    :data_type
+    {:min "boolean",
+     :data-type "string",
      :commons {"string" 18, "date" 3, "datetime" 2},
+     :distinct 5,
+     :group-by? true,
+     :median "string",
+     :max "string",
+     :avg "string (non-numeric average)",
      :cardinality 19}},
+   :database-type "SQLite",
    :rowcount 26},
   :tables-sys
   {:fields
    {:db_schema
-    {:data-type "string",
+    {:min "none",
+     :data-type "string",
+     :commons {"none" 9},
      :distinct 1,
      :group-by? true,
-     :commons {"none" 9},
+     :median "none",
+     :max "none",
+     :avg "none (non-numeric average)",
      :cardinality 11},
     :db_catalog
-    {:data-type "unknown",
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 9},
      :distinct 1,
      :group-by? true,
-     :commons {nil 9},
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
      :cardinality 11},
     :connection_id
-    {:data-type "string",
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"bigfoot-ufos" 9},
      :distinct 1,
      :group-by? true,
-     :commons {"bigfoot-ufos" 9},
+     :median "bigfoot-ufos",
+     :max "bigfoot-ufos",
+     :avg "bigfoot-ufos (non-numeric average)",
      :cardinality 11},
     :schema_cat
-    {:data-type "unknown",
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 9},
      :distinct 1,
      :group-by? false,
-     :commons {nil 9},
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
      :cardinality 11},
     :table_name
-    {:data-type "string",
+    {:min "bigfoot_sightings",
+     :data-type "string",
+     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
      :distinct 9,
      :group-by? true,
-     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
+     :median "ufo_sightings",
+     :max "us_zipcodes",
+     :avg "bigfoot_sightings (non-numeric average)",
      :cardinality 100},
     :fields
-    {:data-type "integer",
+    {:min 2,
+     :data-type "integer",
+     :commons {42 1, 14 1, 11 1},
      :distinct 9,
      :group-by? false,
-     :commons {42 1, 14 1, 11 1},
+     :median 27,
+     :max 42,
+     :avg 14,
      :cardinality 100}},
+   :database-type "SQLite",
    :rowcount 9},
   :tmp--626210007-hist-sys
   {:fields
@@ -490,14 +640,13 @@
    {:flow_id
     {:min "a-random-wow",
      :data-type "string",
-     :commons
-     {"node-color-thief-js-webp" 2, "counting-loop" 1, "simple-python-exec" 1},
+     :commons {"counting-loop" 1, "simple-python-exec" 1, "a-random-wow" 1},
      :distinct 5,
      :group-by? true,
      :median "node-color-thief-js-webp",
      :max "simple-python-exec",
-     :avg "node-color-thief-js-webp (non-numeric average)",
-     :cardinality 83},
+     :avg "openai-image-gen-ladder (non-numeric average)",
+     :cardinality 100},
     :file_path
     {:min "./flows/a-random-wow.edn",
      :data-type "string",
@@ -505,26 +654,25 @@
      {"./flows/counting-loop.edn" 1,
       "./flows/simple-python-exec.edn" 1,
       "./flows/a-random-wow.edn" 1},
-     :distinct 6,
+     :distinct 5,
      :group-by? true,
      :median "./flows/node-color-thief-js-webp.edn",
-     :max "/home/ryanr/rvbbit-0.1.0-alpha.1/./flows/node-color-thief-js-webp.edn",
-     :avg
-     "/home/ryanr/rvbbit-0.1.0-alpha.1/./flows/node-color-thief-js-webp.edn (non-numeric average)",
+     :max "./flows/simple-python-exec.edn",
+     :avg "./flows/openai-image-gen-ladder.edn (non-numeric average)",
      :cardinality 100},
     :last_modified
     {:min "2024-03-13 10:39:25",
      :data-type "string",
      :commons
      {"2024-03-13 10:39:25" 1, "2024-06-22 20:55:46" 1, "2024-08-14 10:41:01" 1},
-     :distinct 6,
+     :distinct 5,
      :group-by? true,
      :median "2024-08-14 10:41:01",
-     :max "2024-08-29 12:47:41",
-     :avg "2024-08-29 12:47:41 (non-numeric average)",
+     :max "2024-08-29 16:22:18",
+     :avg "2024-08-29 16:22:18 (non-numeric average)",
      :cardinality 100}},
    :database-type "SQLite",
-   :rowcount 6},
+   :rowcount 5},
   :files-sys
   {:fields
    {:file_path
@@ -625,21 +773,118 @@
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 4},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 1, ":clojure-base" 1},
+     :distinct 2,
+     :group-by? true,
+     :median ":clojure-base",
+     :max ":rabbit-base",
+     :avg ":clojure-base (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 2},
+  :raw_custom_override704242473__block_9201_clojure_new_clojure_1_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override704242473__block_9201_clojure_new_clojure_1_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
   :connections-sys
   {:fields
    {:database_name
-    {:data-type "string",
-     :distinct 3,
+    {:min "*cache-db*",
+     :data-type "string",
+     :commons {"*cache-db*" 4, "SQLite" 3},
+     :distinct 2,
      :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
+     :median "*cache-db*",
+     :max "SQLite",
+     :avg "*cache-db* (non-numeric average)",
+     :cardinality 28},
     :connection_id
-    {:data-type "string",
-     :distinct 10,
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"cache.db" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
+     :distinct 7,
      :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :median "flows-db",
+     :max "system-db",
+     :avg "system-db (non-numeric average)",
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:min 0,
+     :data-type "integer",
+     :commons {0 7},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 14}},
+   :database-type "SQLite",
+   :rowcount 7},
+  :new-clojure-1-sqlized
+  {:fields
+   {:step_int
+    {:min 0,
+     :data-type "integer",
+     :commons {8 1, 18 1, 10 1},
+     :distinct 25,
+     :group-by? true,
+     :median 2,
+     :max 24,
+     :avg 12,
+     :cardinality 100},
+    :step_val
+    {:min -0.9898214418809329,
+     :data-type "float",
+     :commons {-0.2817325568414294 1, 0.9096319953545179 1, 0.7557495743542582 1},
+     :distinct 25,
+     :group-by? true,
+     :median 0.28173255684142906,
+     :max 0.989821441880933,
+     :avg 0.06982284064940751,
      :cardinality 100}},
-   :rowcount 10},
+   :database-type "SQLite",
+   :rowcount 25},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x5a8dfd2e \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override1571289185__block_9201_clojure_new_clojure_1_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
   :reco-counts {:fields {}, :rowcount 0},
   :tmp-1816643893-hist-sys
   {:fields
@@ -710,21 +955,35 @@
       1},
      :cardinality 100}},
    :rowcount 1},
-  :kit-results-sys {:fields {}, :rowcount 0}},
+  :kit-results-sys {:fields {}, :rowcount 0},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 34,
+     :group-by? true,
+     :median ":get-colors",
+     :max ":write-file",
+     :avg ":* (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 34}},
  :default-col-widths
- {:block-7985 {:bigfoot-sightings-drag-3 100},
+ {:block-9201 {:new-clojure-1-sqlized 380},
+  :flow-list* {:flows-sys 187},
   :system-connections-list* {:connections-sys 126},
   :system-tables-list* {:tables-sys 133},
-  :system-fields-list* {:fields-sys 170},
-  :files-list* {:files-sys 170},
-  :blocks-list* {:blocks-sys ##Inf}},
+  :system-fields-list* {:fields-sys 170}},
  :runstream-drops nil,
- :tabs ["winter-wonder-lands"],
- :selected-cols {},
+ :zoom-start [149.21 -219.97 0.565],
+ :tabs ["the cold grey machine whirred to life"],
+ :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
-   :default "./screens/looking-glass-redux.edn",
+   :default "./screens/frost-terminal2.edn",
    :new-block-rand
    ["Why, sometimes I've believed as many as six impossible things before breakfast."
     "Imagination is the only weapon in the war against reality."
@@ -779,7 +1038,7 @@
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
-       :background-color "#00000000",
+       :background-color "#00000000 ",
        :border "none",
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
@@ -855,66 +1114,57 @@
    :screens
    ["dynamic-theme-example1"
     "ecto-cooler-shade"
-    "frost-terminal"
+    "frost-terminal2"
     "looking-glass-sine-wave"
-    "new-age-hacking"
     "nice-car-choom"
     "random-collection"
     "server-stats2"
-    "test-blog-screen"
-    "tweet-demo-thing-bigfoot-is-blurry"
     "winter-theme"
     "winter-theme-choom"]}},
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
  :valid-kits
  {[:clojure :export-to-csv]
-  [[nil :queries nil]
-   [nil :queries :-sqlized]
-   [:block-7985 :queries :bigfoot-sightings-drag-3]],
+  [[nil :queries nil] [:block-9201 :queries :new-clojure-1-sqlized]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
   [:clojure :view-lundberg]
-  [[:block-832 :views :hare-vw-1] [:block-958 :views :hare-vw]],
+  [[:block-1084 :views :hare-vw-8]
+   [:block-9973 :views :hare-vw-2]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:block-7437 :views :hare-vw-7]
+   [:block-7437 :views :new-view]
+   [:block-7845 :views :hare-vw-4]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-4687 :views :hare-vw-5]],
   [:clojure :gen-ev] [],
   [:outliers :get-outliers]
-  [[nil :queries nil]
-   [nil :queries :-sqlized]
-   [:block-7985 :queries :bigfoot-sightings-drag-3]]},
- :memory [150586576 133566772 4294705152],
- :client-name :quick-rectangular-spider-44,
+  [[nil :queries nil] [:block-9201 :queries :new-clojure-1-sqlized]]},
+ :flow-drop-down? true,
+ :memory [112510430 98132546 4294705152],
+ :client-name :blissful-long-skunk-39,
+ :alt-key-held? false,
  :flow-editor? true,
- :window {:w 2672, :h 1368},
+ :window {:w 2776, :h 1467},
+ :quake-console? false,
+ :implicit-rowsets {:solver [:new-clojure-1 nil]},
  :post-meta
- {:bigfoot-sightings-drag-3
-  {:nearestroad {:distinct 3771},
-   :date {:distinct 1161},
-   :* {:rowcount 5035},
-   :locationdetails {:distinct 4205},
-   :submitted_date {:distinct 3521},
-   :sketch {:distinct 1},
-   :bfroid {:distinct 5035},
-   :otherwitnesses {:distinct 3704},
-   :run_id {:distinct 1},
-   :nearesttown {:distinct 3800},
-   :timeandconditions {:distinct 4477},
-   :month {:distinct 12},
-   :county {:distinct 1039},
-   :state {:distinct 49},
-   :fixed_month {:distinct 12},
-   :submitted {:distinct 3522},
-   :title {:distinct 5031},
-   :otherstories {:distinct 2939},
-   :year {:distinct 430},
-   :season {:distinct 5},
-   :class {:distinct 3},
-   :alsonoticed {:distinct 2964},
-   :url {:distinct 5035},
-   :observed {:distinct 4997},
-   :environment {:distinct 4677},
-   :fixed_year {:distinct 132},
-   :run_time {:distinct 2121}},
+ {:new-clojure-1-sqlized
+  {:* {:rowcount 25}, :step_int {:distinct 25}, :step_val {:distinct 25}},
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ {},
+  :flow-fn-sys
+  {:description {:distinct 32},
+   :category {:distinct 2},
+   :* {:rowcount 34},
+   :name {:distinct 34},
+   :icon {:distinct 20},
+   :input_types {:distinct 17},
+   :inputs {:distinct 20},
+   :output_types {:distinct 8},
+   :full_map {:distinct 34}},
   :tables-sys
   {:* {:rowcount 9},
    :db_schema {:distinct 1},
@@ -922,39 +1172,37 @@
    :connection_id {:distinct 1},
    :schema_cat {:distinct 0},
    :table_name {:distinct 9},
-   :fields {:distinct 9}},
-  :blocks-sys
-  {:* {:rowcount 37},
-   :block_key {:distinct 37},
-   :block_name {:distinct 33},
-   :queries {:distinct 2},
-   :views {:distinct 4},
-   :block_data {:distinct 37},
-   :view_names {:distinct 9},
-   :query_names {:distinct 2}},
-  :files-sys
-  {:* {:rowcount 15},
-   :file_path {:distinct 15},
-   :screen_name {:distinct 12},
-   :blocks {:distinct 11},
-   :queries {:distinct 9},
-   :ts {:distinct 7}}},
+   :fields {:distinct 9}}},
  :flow-estimates
- {:bigfoot-sightings-drag-3 {:times 0.026, :run-id :bigfoot-sightings-drag-3},
-  :tables-sys {:times 0.002, :run-id :tables-sys},
-  :fields-sys {:times 0.001, :run-id :fields-sys},
+ {:flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
+  :fields-sys {:times 0.003, :run-id :fields-sys},
+  :tables-sys {:times 0.004, :run-id :tables-sys},
+  :raw-custom-override1571289185
+  {:times 0.047, :run-id :raw-custom-override1571289185},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :flow-fn-categories-sys {:times 0.001, :run-id :flow-fn-categories-sys},
   :connections-sys {:times 0.003, :run-id :connections-sys},
-  :files-sys {:times 0.002, :run-id :files-sys},
-  :blocks-sys {:times 0.001, :run-id :blocks-sys}},
+  :raw-custom-override840077249
+  {:times 0.01, :run-id :raw-custom-override840077249},
+  :new-clojure-1-sqlized {:times 0.001, :run-id :new-clojure-1-sqlized},
+  :flow-fn-all-sys {:times 0.001, :run-id :flow-fn-all-sys}},
  :status
  {:heartbeat
   {:kick
-   [:flow-status/a-random-wow>*running?
-    :kit/kicks>quick-rectangular-spider-44
-    :flow-status/my-new-flow107>*running?]}},
- :screen-name "winter-theme",
+   [:solver-status/blissful-long-skunk-39>raw-custom-override840077249>running?
+    :time/now
+    :kit/kicks>blissful-long-skunk-39
+    :flow-status/chicken-flow-676>*running?
+    :solver/raw-custom-override840077249
+    :flow-status/a-random-wow>*running?
+    :flow-status/node-color-thief-js-webp>*running?]},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
+ :screen-name "frost-terminal2",
  :recos-page2 0,
- :selected-tab "winter-wonder-lands",
+ :selected-tab "the cold grey machine whirred to life",
+ :col-names nil,
  :snapshots {:params {}},
  :alerts
  [[[:box
@@ -968,26 +1216,356 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   33
+   568
    -1247625457]],
  :recos-page 0,
+ :flow-runner
+ {:node-color-thief-js-webp>run-the-convert-command
+  {:output [],
+   :exception [],
+   :seconds [],
+   :exit-code 0,
+   :command
+   "convert ../extras/node-colorthief/logo.png-q10.jpg -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg /tmp/img1819246105-547.png"},
+  :node-color-thief-js-webp>clojure-string-join-1
+  "cd ../extras/node-colorthief ; node ./colorThief2.js /tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>convert-to-png
+  "convert ../extras/node-colorthief/logo.png-q10.jpg -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg /tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>join-output-as-string
+  "{   \"dominantColor\": \"#eb38a8\",   \"colorPalette\": [     \"#19e9f3\",     \"#f10c98\",     \"#e4eff5\",     \"#05040b\",     \"#2a2f9e\",     \"#9c046c\",     \"#120952\",     \"#5c0464\",     \"#144c6c\",     \"#240c34\"   ] }",
+  :node-color-thief-js-webp>get-color-edges
+  {:second-darkest "#240c34",
+   :highest-saturation "#9c046c",
+   :most-contrasting "#19e9f3",
+   :darkest "#05040b",
+   :contrast-with-dominant "#19e9f3",
+   :colors
+   ["#19e9f3"
+    "#f10c98"
+    "#e4eff5"
+    "#05040b"
+    "#2a2f9e"
+    "#9c046c"
+    "#120952"
+    "#5c0464"
+    "#144c6c"
+    "#240c34"
+    "#eb38a8"],
+   :most-frequent "#e4eff5",
+   :data-colors
+   {"float" "#7cdafd",
+    "boolean" "#ff4967",
+    "map" "#19f39c",
+    "list" "#870014",
+    "string" "#ffffff",
+    "any" "#970e3d",
+    "vector" "#5f2ad9",
+    "keyword" "#f5e7e4",
+    "rabbit-code" "#d02300",
+    "datetime" "#4f0274",
+    "integer" "#5deeff",
+    "unknown" "#480a1b",
+    "date" "#040f05"},
+   :dominant "#eb38a8",
+   :most-contrasting-dark "#05040b",
+   :second-brightest "#19e9f3",
+   :brightest "#e4eff5",
+   :most-contrasting-light "#19e9f3"},
+  :node-color-thief-js-webp>shell-command-1
+  {:output
+   ["{"
+    "  \"dominantColor\": \"#eb38a8\","
+    "  \"colorPalette\": ["
+    "    \"#19e9f3\","
+    "    \"#f10c98\","
+    "    \"#e4eff5\","
+    "    \"#05040b\","
+    "    \"#2a2f9e\","
+    "    \"#9c046c\","
+    "    \"#120952\","
+    "    \"#5c0464\","
+    "    \"#144c6c\","
+    "    \"#240c34\""
+    "  ]"
+    "}"],
+   :exception [],
+   :seconds [],
+   :exit-code 0,
+   :command
+   "cd ../extras/node-colorthief ; node ./colorThief2.js /tmp/img1819246105-547.png"},
+  :node-color-thief-js-webp>image-path "extras/node-colorthief/logo.png-q10.jpg",
+  :node-color-thief-js-webp>path-correction
+  "../extras/node-colorthief/logo.png-q10.jpg",
+  :node-color-thief-js-webp>json-to-edn_colorPalette
+  ["#19e9f3"
+   "#f10c98"
+   "#e4eff5"
+   "#05040b"
+   "#2a2f9e"
+   "#9c046c"
+   "#120952"
+   "#5c0464"
+   "#144c6c"
+   "#240c34"],
+  :node-color-thief-js-webp>json-to-edn
+  {:dominantColor "#eb38a8",
+   :colorPalette
+   ["#19e9f3"
+    "#f10c98"
+    "#e4eff5"
+    "#05040b"
+    "#2a2f9e"
+    "#9c046c"
+    "#120952"
+    "#5c0464"
+    "#144c6c"
+    "#240c34"]},
+  :node-color-thief-js-webp>waiter-fn "/tmp/img1819246105-547.png",
+  :node-color-thief-js-webp>json-to-edn_dominantColor "#eb38a8",
+  :node-color-thief-js-webp>shell-command-in
+  "cd ../extras/node-colorthief ; node ./colorThief2.js",
+  :node-color-thief-js-webp>temp-name "/tmp/img1819246105-547.png"},
  :rs-overrides-hashmap {"a-random-wow" nil},
- :base-sniff-queries {:bigfoot_sightings 302026766},
- :user-params-hash -2109861012,
+ :base-sniff-queries
+ {:raw_custom_override704242473__block_9201_clojure_new_clojure_1_ 849525671,
+  :raw_custom_override1571289185__block_9201_clojure_new_clojure_1_ 1512429098},
+ :user-params-hash -1620358832,
  :grid-recos? true,
- :resolved-queries {nil {:_last-run "13:12:32"}},
+ :session-hash 1918314609,
+ :no-ui? false,
+ :resolved-queries
+ {nil {:_last-run "18:50:24"},
+  :new-clojure-1-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-31 18:42:16",
+   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+   :_sqlized-hash 1165825886,
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]}},
  :panels
- {nil {:queries {nil {:_last-run "13:12:32"}}},
-  :block-9513
-  {:name "pyramidal eagle",
+ {nil {:queries {nil {:_last-run "18:50:24"}}},
+  :block-1084
+  {:h 7,
+   :w 12,
+   :root [2 17],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-8,
+   :name "block-1084",
+   :views
+   {:hare-vw-8
+    [:iframe
+     {:width "560",
+      :height "315",
+      :src "https://www.youtube.com/embed/IhqEOnrv38E?si=Wa9MtF8qL7bDYvsS",
+      :title "YouTube video player",
+      :frameBorder "0",
+      :allow
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+      :referrerPolicy "strict-origin-when-cross-origin",
+      :allowFullScreen true}]},
+   :queries {}},
+  :block-9973
+  {:h 6,
+   :w 23,
+   :root [2 5],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-2,
+   :name "block-9973",
+   :views
+   {:hare-vw-2
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:color :theme/editor-outer-rim-color,
+      :text-align "justify",
+      :font-size "32px",
+      :font-weight 200,
+      :margin-top "-8px",
+      :padding-right "90px",
+      :padding-top "6px",
+      :padding-left "34px",
+      :text-shadow "4px 4px 4px #00000099",
+      :font-family :theme/base-font}
+     :child
+     "At long last it finally comes out. A huge labor of love that has taken far more time & toll on me than I had ever anticipated. In some ways it's a culmination of my entire career as an artist & a 'data person'. If you're seeing this, no matter if you love it or hate it - thank you."]},
+   :queries {}},
+  :block-4719
+  {:h 3,
+   :w 22,
+   :root [2 11],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-3,
+   :name "block-4719",
+   :views
+   {:hare-vw-3
+    [:box
+     :align
+     :end
+     :justify
+     :center
+     :style
+     {:font-size "55px",
+      :font-weight 200,
+      :padding-top "6px",
+      :padding-right "50px",
+      :text-shadow "4px 4px 4px #00000099",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family "Homemade Apple"}
+     :child
+     "Ryan Robitaille"]},
+   :queries {}},
+  :block-8499
+  {:h 3,
+   :w 23,
+   :root [2 2],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw,
+   :name "block-8499",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "61px",
+      :font-weight 700,
+      :text-shadow "4px 4px 4px #00000099",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Welcome to RⱯBBIT 0.1.0 Alpha! 🍀 "]},
+   :queries {}},
+  :block-9201
+  {:queries
+   {:new-clojure-1-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-31 18:42:16",
+     :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override1571289185>output>evald-result>value-hash,
+     :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]}}},
+  :block-7845
+  {:h 2,
+   :w 32,
+   :root [2 14],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-4,
+   :name "block-7845",
+   :views
+   {:hare-vw-4
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :opacity 0.4,
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "If you get lost, hit escape a couple times - a help screen will be in reach that has the keybindings (and will eventually have full documentation)"]},
+   :queries {}},
+  :block-8806
+  {:h 9,
+   :w 9,
+   :root [25 2],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-1,
+   :name "block-8806",
+   :views
+   {:hare-vw-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:img {:width "100%", :src "images/rvbbit-logo-no-bkgrnd.png"}]]},
+   :queries {}},
+  :block-1584
+  {:h 3,
+   :w 18,
+   :root [16 17],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-6,
+   :name "block-1584",
+   :views
+   {:hare-vw-6
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "57px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :time/now]]},
+   :queries {}},
+  :block-4687
+  {:clojure
+   {:new-clojure
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on Java "
+          jvm-version
+          " 🥕🐇")))},
+   :name "block-4687",
    :w 10,
-   :selected-view :vv,
-   :root [26 14],
-   :h 8,
-   :tab "winter-wonder-lands",
-   :minimized? true,
-   :ghosted? false,
-   :views {:vv [:grid "pyramidal eagle"]}}},
+   :selected-view :new-clojure,
+   :root [24 11],
+   :h 3,
+   :queries {},
+   :tab "the cold grey machine whirred to life",
+   :views
+   {:hare-vw-5
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."]}}},
  :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#2c728e",
@@ -1036,76 +1614,45 @@
    :table_name "bigfoot_sightings",
    :fields 27},
   :flows-sys
-  {:flow_id "simple-python-exec",
-   :file_path "./flows/simple-python-exec.edn",
-   :last_modified "2024-01-19 10:37:23"},
+  {:flow_id "node-color-thief-js-webp",
+   :file_path "./flows/node-color-thief-js-webp.edn",
+   :last_modified "2024-08-29 12:47:41"},
   :files-sys
   {:file_path "./screens/winter-theme2.edn",
    :screen_name "winter-theme2",
    :blocks 11,
    :queries 3,
    :ts "2023-12-07 07:57:47"},
-  :chat-drag-23 {:YEAR 2017, :rows 734, :styler_highlight_group 0},
-  :offenses-drag-17
-  {:SHOOTING nil,
-   :DISTRICT "C11",
-   :INCIDENT_NUMBER "I182070943",
-   :OFFENSE_DESCRIPTION "VANDALISM",
-   :DAY_OF_WEEK "0001-01-02",
-   :MONTH 8,
-   :YEAR 2018,
-   :HOUR 0,
-   :STREET "HECLA ST",
-   :OFFENSE_CODE_GROUP "Vandalism",
-   :UCR_PART "Part Two",
-   :Long -71.06030035,
-   :REPORTING_AREA 347,
-   :Location "(42.30682138, -71.06030035)",
-   :OFFENSE_CODE 1402,
-   :Lat 42.30682138,
-   :OCCURRED_ON_DATE "2018-08-21 00:00:00.000000"},
+  :chat-drag-23 {},
+  :offenses-drag-17 {:SHOOTING nil},
   :viz-tables-sys2 {:table_name :OFFENSE-CODE-GROUP-drag-40},
-  :STREET-drag-11 {:STREET "BLUE HILL AVE", :rowcnt 7794},
-  :ufo-sightings-drag-22
-  {:duration_seconds_int 900,
-   :comments
-   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
-   :city "kaneohe",
-   :date_posted "2004-01-22",
-   :longitude -157.8036111,
-   :state "hi",
-   :duration_seconds "900",
-   :duration_hours "15 minutes",
-   :id 5,
-   :shape "light",
-   :datetime "1960-10-10 20:00:00.000000",
-   :latitude "21.4180556",
-   :country "us"},
+  :STREET-drag-11 {},
+  :ufo-sightings-drag-22 {},
   :param
   {:nutritious-periwinkle-sheep "hello from a data board!",
-   :offense "VANDALISM",
    :float 324.444,
    :string "this is string",
-   :essential-olive-toad "from clojure boar param",
-   :poised-spring-bud-fly
-   ["import sys, random "
-    "from datetime import date"
-    ""
-    "print(\"damn son!\")"
-    "print(random.randrange(1,300))"
-    "print('{{:param/nutritious-periwinkle-sheep}}')"
-    ""
-    "today = date.today()"
-    "print(\"Today's date:\", today)"
-    ""
-    "####INTERESTING...."
-    ""
-    ""
-    ""
-    ""],
+   :selected-view-data
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "21px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    "Why, sometimes I've believed as many as six impossible things before breakfast."],
+   :selected-view [:views :hare-vw-6],
    :keys 123,
    :bools true,
-   :keys2 [3 4 5]},
+   :keys2 [3 4 5],
+   :selected-block :block-1584},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1166,7 +1713,7 @@
     "rabbitsql" "#FC0FC0",
     "nil" "#eeeeee"},
    :editor-grid-selected-font-color "#000000",
-   :monospaced-font "JetBrains Mono",
+   :monospaced-font "IBM Plex Mono",
    :editor-grid-selected-background-color "#8879bc",
    :nivo-defaults
    {:font-family :theme/base-font,
@@ -1208,24 +1755,15 @@
     :background-blend-mode "normal",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
-   :base-font "Instagram Sans",
+   :base-font "Alata",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
-  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :ufo-sightings-drag-22.* {},
   :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
-  :narratives
-  {:base>narrative-22>theme :cyberpunk,
-   :base>narrative-22>craps "#ffffff",
-   :base>narrative-22>floatss 123.4,
-   :base>narrative-1>floaty 123.4,
-   :base>narrative-1>stuff1 "some stuff!",
-   :base>narrative-22>namer "some stuff!",
-   :base>narrative-22>vibes? true,
-   :base>narrative-22>gopv ["test" "test3" "test4"],
-   :base>narrative-22>mappy {:map 34}},
-  :sys {:selected-tab "pyramidal eagle", :selected-tab-idx 1},
+  :narratives {},
+  :sys {:selected-tab "winter-wonder-lands", :selected-tab-idx 0},
   :kits-sys
   {:enabled
    [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]}},
- :selected-flow "my-new-flow107"}
+ :selected-flow "chicken-flow-676"}

@@ -1,0 +1,10 @@
+
+{:classname   "com.vertica.jdbc.Driver"
+ :subprotocol "vertica"
+ :subname     "_mydb?defaultSchema=public"
+ :user        "dbadmin"
+ :password    "test"
+ :host        "dev-pbox"
+ :connection-init-sql "set search_path to public"
+ :port         5433}
+

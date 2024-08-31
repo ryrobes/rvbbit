@@ -1,6 +1,0 @@
-{:jdbc-url "jdbc:h2:mem:cachedb;DATABASE_TO_UPPER=FALSE" ; "jdbc:hsqldb:mem:cachedb" ;"jdbc:duckdb:db/cache.duck" IGNORECASE=TRUE;
-                                          :idle-timeout       600000
-                                          :max-lifetime       1800000
-                                          ;:cache "shared"
-                                          }
-

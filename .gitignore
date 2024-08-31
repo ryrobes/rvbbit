@@ -15,8 +15,8 @@ pom.xml.asc
 node_modules/
 *.log
 gen/
-backend/db/
-backend/data/
+backend/db/*
+backend/data/*
 backend/flow-history/
 backend/kit-rowsets/
 logs/
@@ -49,9 +49,4 @@ checkouts/
 backend/resources/public
 *.csv
 backend/defs/backup/
-backend/screens/
-backend/flows/
-backend/user-content/
-backend/assets/
-backend/connections/
 

@@ -604,7 +604,7 @@
           ;;                          rowset-fixed
           ;;                          client-name)
 
-           (ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
+           ;;(ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
@@ -639,7 +639,7 @@
              (sql-exec db-conn insert-sql extra))
 
           ;;  (ut/pp [:SNAP-INSERTED-SUCCESS2! (count rowset) :into table-name-str])
-           (ut/pp [:INSERTED-SUCCESS-SNAP! (count rowset) :into table-name-str (str db-conn) ddl-str (first rowset-fixed)])
+           ;;(ut/pp [:INSERTED-SUCCESS-SNAP! (count rowset) :into table-name-str (str db-conn) ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
@@ -5417,7 +5417,7 @@
                                                             (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
                                                             (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
                                                             (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result))
-                                                          ;(swap! db/last-solvers-data-atom assoc (first ui-keypath) (get output :result)) ;;  :data/ ... TBD
+                                                            (swap! db/last-solvers-data-atom assoc (first ui-keypath) (get output :result)) ;;  :data/ ... TBD
                                                           ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                                                             (when (= page -3) ;; materialize and schedule a new solver job if not exists
                                                             ;;; insert a new solver job if not exists :materialize-query-name
