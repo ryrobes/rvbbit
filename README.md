@@ -120,6 +120,23 @@ A visual undo log of all card changes and their code diffs. Easy to scrub betwee
 - Connect to any remote nREPL, or use the built in one
 - "Visualization" of common CLJ data types including visual GET-INs via dragging
 - Realtime console output, console as data
+- works seamlessly with the "clover" DSL on the canvas - server rendered structures rendered by the client
+  - write "normal" REPL code to produce renderable items, with the full power of your REPL.
+  - REPLs are the engine and the canvas is your flexible view surface
+
+
+<br/>
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+  <div style="width: 48%; text-align: center;">
+    <img src="docs/repl-dlsl.gif"  />
+    <p style="margin-top: 10px; font-size: 21px;">Arbitrary REPL, server-generated interactive views</p>
+  </div>
+  <div style="width: 48%; text-align: center;">
+    <img src="docs/repl-dlsl22.gif"   /> 
+    <p style="margin-top: 10px; font-size: 21px;">Reactive Parameters (values) also allow cross client data access</p>
+  </div>
+</div>
+
 
 ## Configurable Card "Runners"
 
@@ -134,13 +151,13 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
     <a href="https://www.youtube.com/watch?v=9CPvZtFu2fo" target="_blank">
       <img src="docs/rpl.jpg" alt="as a Clojure REPL client" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">as a Clojure REPL client ▶</p>
+    <p style="margin-top: 10px; font-size: 21px;">as a Clojure REPL client - with SQL interaction ▶</p>
   </div>
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=4sp151pex78" target="_blank">
       <img src="docs/rrr.jpg" alt="Custom Card Runners" style="width: 100%;">
     </a>
-    <p style="margin-top: 10px; font-size: 21px;">Custom Card Runners ▶</p>
+    <p style="margin-top: 10px; font-size: 21px;">Custom Card Runners - run anything ▶</p>
   </div>
 </div>
 
