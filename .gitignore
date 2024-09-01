@@ -1,6 +1,5 @@
 pom.xml
 pom.xml.asc
-*.jar
 *.class
 *.tmp
 /lib/
@@ -53,4 +52,6 @@ backend/assets/data-exports/*.csv
 backend/defs/backup/
 backend/defs/bkup*
 backend/defs/secrets.edn
-
+*-lock.json
+*.jar
+!backend/extras/rabbit-kit-outliers/rabbit-kit-outliers.jar
