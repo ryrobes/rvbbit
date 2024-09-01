@@ -30,4 +30,6 @@ ls ./target -l -h
 lein clean
 lein uberjar
 ls ./target -l -h
-echo "done."
+find backend/target -name "rvbbit*standalone.jar" -exec cp {} backend/rvbbit.jar \;
+cat backend/data/rvbbit.txt
+echo "done. go to ./backend/ and run ./run-rabbit.sh - then visit localhost:8888"
