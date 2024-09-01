@@ -57,3 +57,4 @@ backend/defs/secrets.edn
 !backend/extras/rabbit-kit-outliers/rabbit-kit-outliers.jar
 /rvbbit-*
 .zprint*
+docker-staging/

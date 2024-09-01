@@ -9,7 +9,6 @@ fi
 
 # If we're here, we're safe-ish.
 
-# clear
 export LEIN_SNAPSHOTS_IN_RELEASE=true ## for now, until we have a better build process. besides, most of the snapshot deps are mine.
 
 draw_bordered_text() {
@@ -68,14 +67,28 @@ cp -r screens "../$DIR_NAME/screens"
 cp user.clj "../$DIR_NAME/"
 cp run-rabbit.sh "../$DIR_NAME/"
 cp rvbbit.jar "../$DIR_NAME/"
+
+## my dev repo has lots of things in gitignore - but still present locally. wont apply to fresh clones.
+rm -rf ../docker-staging
 rm -rf "../$DIR_NAME/assets/data-exports"
 rm -rf "../$DIR_NAME/data/atoms"
 rm -rf "../$DIR_NAME/defs/backup"
+rm -f "../$DIR_NAME/defs/secrets.edn"
 rm -rf "../$DIR_NAME/extras/node-colorthief/node_modules"
 rm "../$DIR_NAME/extras/node-colorthief/package-lock.json"
+mkdir -p "../$DIR_NAME/data/atoms"
+mkdir -p "../$DIR_NAME/assets/data-exports"
+
+## due to docker "layering" I cannot remove files once added to a layer, so I have to pre-remove them here first
+## also only applies to local dev repo, not fresh clones.
+mkdir -p ../docker-staging
 
 rm -rf "../$DIR_NAME.zip"
 zip -rq "../$DIR_NAME.zip" "../$DIR_NAME/"
+
+cd "../$DIR_NAME"
+cp -r * ../docker-staging/
+cd ../backend
 
 echo ""
 cat data/nname.ans
@@ -85,6 +98,6 @@ echo ""
 
 # draw_bordered_text "building Docker image..."
 # cd ..
-# docker build -t rvbbit .
+# docker build --no-cache -t rvbbit .
 # docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root:/app/ rvbbit 
 

@@ -14,27 +14,30 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY backend/rvbbit.jar .
-COPY backend/defs ./defs
-COPY backend/connections ./connections
-COPY backend/assets ./assets
-COPY backend/resources ./resources
-COPY backend/data ./data
-RUN mkdir ./db
-COPY backend/flows ./flows
-COPY backend/extras ./extras
-COPY backend/screens ./screens
-COPY backend/user.clj ./user.clj
 
-RUN  rm -rf ./assets/data-exports \
-    && rm -rf ./data/atoms \
-    && rm -rf ./defs/backup \
-    && rm -rf ./extras/node-colorthief/node_modules \
-    && rm -f ./extras/node-colorthief/package-lock.json  
+#COPY docker-staging/* .
+# Copy all necessary files and delete unnecessary ones in a single RUN command
+COPY docker-staging/rvbbit.jar .
+COPY docker-staging/defs ./defs
+COPY docker-staging/connections ./connections
+COPY docker-staging/assets ./assets
+COPY docker-staging/resources ./resources
+COPY docker-staging/data ./data
+COPY docker-staging/flows ./flows
+COPY docker-staging/extras ./extras
+COPY docker-staging/screens ./screens
+COPY docker-staging/user.clj ./user.clj
 
-RUN mkdir ./data/atoms
-RUN mkdir ./assets/data-exports
-RUN mkdir ./shell-root
+RUN mkdir ./db \
+    # && rm -rf ./assets/data-exports \
+    # && rm -f ./defs/secrets.edn \
+    # && rm -rf ./data/atoms \
+    # && rm -rf ./defs/backup \
+    # && rm -rf ./extras/node-colorthief/node_modules \
+    # && rm -f ./extras/node-colorthief/package-lock.json \
+    # && mkdir ./data/atoms \
+    # && mkdir ./assets/data-exports \
+    && mkdir ./shell-root
 
 # # Specify the command to run your application
 # CMD ["java", "-jar", "rvbbit.jar"]
