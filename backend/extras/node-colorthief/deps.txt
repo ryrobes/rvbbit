@@ -1,0 +1,4 @@
+Requires node, npm, and the CLI tool convert to be installed (convert gets used in the subsequent flow).
+
+Then run ./test-me.sh to see if it works.
+(this is required to use the color-thief flow that I showed in the videos)

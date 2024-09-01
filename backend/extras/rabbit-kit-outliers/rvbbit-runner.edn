@@ -1,0 +1,108 @@
+;; merge with RVBBIT's config.edn to use this kit (will be automated in the future)
+;; launch the nREPL with the following command: java -jar rabbit-kit-outliers-0.1.0-SNAPSHOT-standalone.jar
+{:outliers {:type :nrepl
+            :runner {:port 45999 :host "127.0.0.1"}
+            :when-expr (do
+                         (require '[nrepl.core :as nrepl])
+                         (try
+                           (do
+                             (with-open [conn (nrepl/connect :port 45999 :host "127.0.0.1")]
+                               (-> (nrepl/client conn 1000)
+                                   (nrepl/message {:op "eval" :code "(+ 1 1)"})))
+                             true)
+                           (catch Exception _ false))) ;; connection refused will throw
+            :modes [:text :clover :data :terminal]
+            :hop-bar? false ;; only used for the kit runner menu on query slice panels 
+            :slice-bar? false
+            :default (let [clojure-version (clojure-version)
+                           jvm-version (System/getProperty
+                                        "java.version")]
+                       (str ;; default, never going to see this code, just a placeholder since this is a kit runner REPL only :hop-bar? false :slice-bar? false
+                        "🐇🥕 Outliers nREPL Library. Clojure "
+                        clojure-version
+                        " on " jvm-version " JVM "
+                        " 🥕🐇"))
+            :syntax "clojure"
+            :ext ".clj"
+            :kits {:get-outliers {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                                             (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
+                                                                      :when (get v :queries)]
+                                                                  (for  [kk (keys (get v :queries))]
+                                                                    [k :queries kk])))))
+                                  :output :kit-map
+                                  :icon-location :query ;; :card, :canvas 
+                                  :tooltip "Run a dimensional outlier analysis on a SQL rowset (offline, NOT on the db host)"
+                                  :kit-view-opts {:max-combos 4 ;; will be applied, client-side when view starts up
+                                                  :dimensions-to-scan []}
+                                  :kit-view-exprs [(let [panel-key :panel-key  ;; function "view" runs in the host nrepl
+                                                         max-combos (keyword (str (cstr/replace (str panel-key) ":" "") "/max-combos"))
+                                                         query-meta :query-metadata
+                                                         dimensions (vec (for [[k {:keys [:group-by?]}]
+                                                                               (get query-meta :fields)
+                                                                               :when group-by?] k))
+                                                         dimensions-to-scan (keyword (str (cstr/replace (str panel-key) ":" "") "/dimensions-to-scan"))]
+                                                     [:v-box
+                                                      :size "auto"
+                                                      :align :center
+                                                      :padding "6px"
+                                                      :gap "10px"
+                                                      :children
+                                                      [[:box :child "dimensional outliers options"
+                                                        :style {:font-weight 700
+                                                                :font-size "45px"
+                                                                :color "orange"
+                                                                :font-family "Homemade Apple"}]
+                                                       [:box :child "group-by dimensions to include"]
+                                                       [:v-box
+                                                        :children
+                                                        (for [dimensions-chunk (partition-all 5 dimensions)]
+                                                          [:h-box
+                                                           :gap "8px"
+                                                           :size "auto"
+                                                           :children (for [dd dimensions-chunk]
+                                                                       [:box
+                                                                        :size "auto"
+                                                                        :padding "6px"
+                                                                        :child (str dd)
+                                                                        :style {:border "1px solid #ffffff33"
+                                                                                :background-color [:when [:some dd dimensions-to-scan] "orange"]
+                                                                                :color [:when [:some dd dimensions-to-scan] "black"]
+                                                                                :font-size "18px" :cursor "pointer"}
+                                                                        :attr {:on-click [:set-parameters :dimensions-to-scan dd]}])])]
+                                                       [:box :child "max dimension combos to run"]
+                                                       [:h-box
+                                                        :gap "10px"
+                                                        :children [[:slider :max-combos 2 10 1 200 max-combos]
+                                                                   [:box :child [:str max-combos]]]]
+                                                       [:h-box
+                                                                             ;:justify :between
+                                                        :style {:font-size "33px"
+                                                                :font-weight 700}
+                                                        :gap "50px"
+                                                        :children [[:box
+                                                                    :style {;:border "1px solid green"
+                                                                            :cursor "pointer"}
+                                                                    :child "GO?"
+                                                                    :attr {:on-click [:set-parameter :go! :go!]}]
+                                                                   [:box
+                                                                    :style {;:border "1px solid red" 
+                                                                            :cursor "pointer"}
+                                                                    :child "CANCEL"
+                                                                    :attr {:on-click [:set-parameter :go! :cancel!]}]]]]])]
+                                  :kit-expr (rabbit-kit-outliers.core/get-outliers  ;; runs in the host nrepl
+                                             :data-key
+                                             :panel-key
+                                             :transit-rowset
+                                             :transit-rowset-meta
+                                             :opts-map)
+                                                        ;; return a function that will be called when the kit is run IN the calling REPL after being populated by this higher fn
+                                  :icon "ri-book-shelf-fill"}}
+            :placeholder-on-running? true
+            :clover-fn [:run-solver
+                        {:signal false
+                         :cache? false
+                         :type :clojure
+                         :input-map {}
+                         :data :clover-body}]
+            :description "Clojure REPL only used for the Outliers Kit Runner."
+            :icon "images/fbc-logo.gif"}}
