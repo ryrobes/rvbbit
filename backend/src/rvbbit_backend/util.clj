@@ -276,6 +276,27 @@
         jvm-name (.getName runtime-mxbean)]
     (first (clojure.string/split jvm-name #"@"))))
 
+;; (defn get-cpu-usage-unix [pid]
+;;   (let [process-builder (ProcessBuilder. ["sh" "-c" (str "top -b -n 1 | grep " pid)])
+;;         process (.start process-builder)
+;;         reader (BufferedReader. (InputStreamReader. (.getInputStream process)))]
+;;     (try
+;;       (let [output (reduce str (line-seq reader))]
+;;         (if (clojure.string/blank? output)
+;;           (throw (Exception. "CPU usage not found"))
+;;           ;; Assuming a more generic parsing strategy that doesn't rely on fixed positions
+;;           (let [parts (clojure.string/split output #"\s+")
+;;                 cpu-usage-index (->> parts
+;;                                      (map-indexed vector)
+;;                                      (filter #(re-matches #"\d+\.\d+" (second %)))
+;;                                      (first)
+;;                                      (first))]
+;;             (if cpu-usage-index
+;;               (Float/parseFloat (nth parts cpu-usage-index))
+;;               (throw (Exception. "CPU usage not found"))))))
+;;       (finally
+;;         (.close reader)))))
+
 (defn get-cpu-usage-unix [pid]
   (let [process-builder (ProcessBuilder. ["sh" "-c" (str "top -b -n 1 | grep " pid)])
         process (.start process-builder)
@@ -283,8 +304,7 @@
     (try
       (let [output (reduce str (line-seq reader))]
         (if (clojure.string/blank? output)
-          (throw (Exception. "CPU usage not found"))
-          ;; Assuming a more generic parsing strategy that doesn't rely on fixed positions
+          0.0
           (let [parts (clojure.string/split output #"\s+")
                 cpu-usage-index (->> parts
                                      (map-indexed vector)
@@ -293,17 +313,11 @@
                                      (first))]
             (if cpu-usage-index
               (Float/parseFloat (nth parts cpu-usage-index))
-              (throw (Exception. "CPU usage not found"))))))
+              0.0))))
+      (catch Exception _
+        0.0)
       (finally
         (.close reader)))))
-
-;; "java.util.IllegalFormatConversionException: f != java.lang.Long"
-;; (defn cumulative-to-delta [cumulative-values]
-;;   (vec
-;;    (cons 0  ; First value has no previous value to subtract from
-;;          (map -
-;;               (rest cumulative-values)
-;;               cumulative-values))))
 
 (defn memory-used []
   (int (Math/floor (/ (float (/ (- (-> (java.lang.Runtime/getRuntime)

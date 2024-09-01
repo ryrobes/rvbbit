@@ -23,7 +23,7 @@
   [jdbc-body name]
   (delay (let [base  {:idle-timeout 600000 :max-lifetime 1800000 :pool-name name}
                bbase (merge base jdbc-body)]
-           (ut/pp [:creating-conn-pool name])
+          ;;  (ut/pp [:creating-conn-pool name])
            (hik/make-datasource bbase))))
 
 (defn close-pool [ds]
