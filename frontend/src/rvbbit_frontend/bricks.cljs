@@ -13763,33 +13763,34 @@
                         [;;  (when (not selected?)
                          (when col-selected?
                            ^{:key (str "brick-" brick-vec "-header-pp")}
-                           [re-com/md-icon-button :md-icon-name (if col-selected? "zmdi-pause" "zmdi-play") :style
-                            {:font-size "15px" :opacity 0.25 :cursor "pointer"}])
+                           [re-com/md-icon-button :md-icon-name (if col-selected? "zmdi-pause" "zmdi-play") 
+                            :style {:font-size "15px" :opacity 0.25 :cursor "pointer"}])
                          (when hovered-on?
                            ^{:key (str "brick-" brick-vec "-header-pin")}
                            [re-com/md-icon-button :md-icon-name (if is-pinned? "zmdi-pin-off" "zmdi-pin") :on-click
-                            #(do (ut/tracked-dispatch [::toggle-pin-block brick-vec-key])) ;(reset!
-                                                                                                   ;over-block?
-                                                                                                   ;false)
+                            #(do (ut/tracked-dispatch [::toggle-pin-block brick-vec-key])) 
                             :style {:font-size "15px" :opacity (if is-pinned? 0.8 0.1) :cursor "pointer"}])
                          (when hovered-on?
                            ^{:key (str "brick-" brick-vec "-header-min")}
                            [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click
                             #(do (ut/tracked-dispatch [::toggle-minimize-block brick-vec-key])
                                  (when selected? (ut/tracked-dispatch [::select-block "none!"]))
-                                 (do (reset! over-block? false))) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])
+                                 (reset! over-block? false)) 
+                            :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])
                          (when hovered-on?
                            ^{:key (str "brick-" brick-vec "-header-icon")}
                            [re-com/md-icon-button :md-icon-name "zmdi-photo-size-select-small" :on-click
                             #(do (ut/tracked-dispatch [::toggle-icon-block brick-vec-key])
                                  (ut/tracked-dispatch [::write-iconized-view brick-vec-key])
                                  (when selected? (ut/tracked-dispatch [::select-block "none!"]))
-                                 (do (reset! over-block? false))) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])
+                                 (reset! over-block? false)) 
+                            :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])
                          (when hovered-on?
                            ^{:key (str "brick-" brick-vec "-header-close")}
                            [re-com/md-icon-button :md-icon-name "zmdi-close" :on-click
-                            #(do (ut/tracked-dispatch [::delete-panel brick-vec-key]) (do (reset! over-block? false))) :style
-                            {:font-size "15px" :opacity 0.33 :cursor "pointer"}])]])]]
+                            #(do (ut/tracked-dispatch [::delete-panel brick-vec-key]) 
+                                 (reset! over-block? false)) 
+                            :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])]])]]
                    [re-com/gap :size "20px"]) ;)
                  ^{:key (str "brick-" brick-vec "-content-box")}
                  [re-com/box :padding "4px" :size "none" :height (px (- block-height 40)) :style
@@ -13806,7 +13807,10 @@
                                   [honeycomb brick-vec-key selected-view]
                                   [honeycomb brick-vec-key])]))]
                  (if (or (and (not ghosted?) (not no-ui?)) selected?)
-                   (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view :location :card}])]
+                   (let [hovered-on? (and (not @dragging-editor?)
+                                          (or selected? (= brick-vec-key @over-block)))
+                         valid-kits  (when hovered-on? 
+                                       @(ut/tracked-subscribe [::valid-kits-for {:panel-key brick-vec-key :data-key selected-view :location :card}]))]
                      ^{:key (str "brick-" brick-vec "-footer")}
                      [re-com/box :size "none" :width (px (- block-width 4)) :height "15px" :style
                       {:overflow "hidden" :z-index (if selected? (+ zz 10) zz)} :child

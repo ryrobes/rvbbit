@@ -1760,8 +1760,7 @@
          ;panel-keys (set (keys (bricks/only-relevant-tabs panels-map selected-tab)))
          ;;_ (ut/tapp>> [:panel-keys runner-key])
          panel-keys @(ut/tracked-sub ::bricks/relevant-tab-panels-set {})
-         panels-map (select-keys (get db :panels) panel-keys)
-         ]
+         panels-map (select-keys (get db :panels) panel-keys)]
      (vec (distinct (find-ns-declarations (for [[_ v] panels-map] (vals (get v runner-key)))))))))
 
 ;; (ut/tapp>> [:ns @(ut/tracked-sub ::local-namespaces-for {:runner-key :clojure})]) 
@@ -1989,6 +1988,11 @@
                      :align :center 
                      :justify :center])))
 
+(re-frame/reg-sub
+ ::openai-key-valid?
+ (fn [db _]
+   (get-in db [:server :settings :openai-valid?] false)))
+
 (declare custom-icon-button)
 
 (defn recording-button []
@@ -2006,6 +2010,7 @@
   (let [hh                  (* 2  db/brick-size)
         reacts!             [@console-responses @console-history @hide-responses? @ns-selected]
         nss                 @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
+        oai-valid?          @(ut/tracked-sub ::openai-key-valid? {})
         is-fabric?          (= (get @selected-mode :name) :fabric)
         fabric-settings     (when is-fabric? @(ut/tracked-sub ::bricks/fabric-settings {}))
         selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
@@ -2272,7 +2277,7 @@
                                            :child (str selected-block " " data-key)
                                            ])
                                         [re-com/gap :size "6px"]
-                                        [recording-button]
+                                        (when oai-valid? [recording-button])
                                         [re-com/gap :size "6px"]
                                         ]]]]]]))
 
@@ -4843,6 +4848,7 @@
                      websocket-status server-subs things-running flow-watcher-subs-grouped
                      client-name screen-name]
   (let [things-running (vec (distinct (filter #(cstr/includes? (str %) ">running?") things-running)))
+        oai-valid?      @(ut/tracked-sub ::openai-key-valid? {})
         left [re-com/h-box
               :style {:position "fixed"
                       :z-index 98
@@ -4942,15 +4948,16 @@
                                                                                  {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
                                                                                   :timeout 50000}]))]]])])
 
-                          [custom-icon-button
-                           (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
-                             {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
-                              :tooltip "transcribe voice to :param/voice"
-                              :on-click (if audio-recording?
-                                          #(ut/tracked-dispatch [::audio/stop-recording])
-                                          #(ut/tracked-dispatch [::audio/start-recording]))
-                              :active? audio-recording?
-                              :color (if audio-recording? "red" "#ffffff")})]
+                          (when oai-valid?
+                            [custom-icon-button
+                             (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
+                               {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
+                                :tooltip "transcribe voice to :param/voice"
+                                :on-click (if audio-recording?
+                                            #(ut/tracked-dispatch [::audio/stop-recording])
+                                            #(ut/tracked-dispatch [::audio/start-recording]))
+                                :active? audio-recording?
+                                :color (if audio-recording? "red" "#ffffff")})])
 
                           (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
                             [custom-icon-button

@@ -275,3 +275,4 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 - Several features I had previously tweeted about and are 80% done (mostly working), but were pulled to make my (self-imposed) deadline, will def surface them discussion for priorities as well
 
 
+Copyright © 2024 Ryan Robitaille

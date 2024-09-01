@@ -33,7 +33,7 @@
                      :modes [:rowset]
                      :hop-bar? false
                      :ext ".edn"
-                     :icon "images/sql.png"} ;; basic clover-sql query runner
+                     :icon "images/sql.png "} ;; basic clover-sql query runner
 
            :views   {:default []
                      :modes [:clover :edn :data]

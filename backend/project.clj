@@ -39,7 +39,7 @@
                        [org.clojure/math.combinatorics "0.1.6"]
                        ;[hikari-cp "3.0.1"] ;; https://github.com/tomekw/hikari-cp
                        [hikari-cp "3.1.0"] ;; https://github.com/tomekw/hikari-cp
-                       [net.clojars.wkok/openai-clojure "0.11.1"]
+                      ;;  [net.clojars.wkok/openai-clojure "0.11.1"]
                        ;[clj-http "3.12.3"]
                        [clj-http "3.13.0"]
                        [cheshire "5.11.0"]

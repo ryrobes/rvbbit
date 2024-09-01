@@ -810,6 +810,31 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :open-fn-4
+  {:y 1125,
+   :fn (fn [x] x),
+   :w 150,
+   :raw-fn (fn [x] (str "Bearer " :settings/openai-api-key)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 60,
+   :x 1675,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :relative-url-path-for-png-version
   {:y 2825,
    :fn (fn [x] (get-in x [10 0 2])),
@@ -871,16 +896,19 @@
    :description ["Request map for the HTTP call. Headers, Method, URL, and the call body map."],
    :w 175,
    :right-click? true,
+   :types nil,
    :z 0,
-   :ports {:in {:req-body* :any}, :out {:headers :map, :method :keyword, :url :string, :body :map, :* :map}},
+   :ports
+   {:in {:apikey* :any, :req-body* :any},
+    :out {:out {:headers :map, :method :keyword, :url :string, :body :keyword, :* :map}}},
+   :inputs nil,
    :h 60,
    :x 1850,
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true, :meta {}},
     :user-input
-    {:headers
-     {"Authorization" "Bearer WAT!", "Content-Type" "application/json"},
+    {:headers {"Authorization" :apikey*, "Content-Type" "application/json"},
      :method :post,
      :url "https://api.openai.com/v1/images/generations",
      :body :req-body*}}},
@@ -1016,7 +1044,7 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :zoom [154.5 -248.51 0.445],
+ :zoom [-1087.26 -804.94 1.25],
  :opts {:close-on-done? true, :retry-on-error? true, :timeout 120000, :retries 404, :overrides {:style-param "vivid"}},
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
@@ -1067,4 +1095,6 @@
   [:open-fn-2 :shell-command-2/command]
   [:shell-command-2 :abs-file-base-path/x]
   [:abs-file-base-path :generate-file-path/base-dir]
-  [:abs-file-base-path :create-png-path/base-dir]]}
+  [:abs-file-base-path :create-png-path/base-dir]
+  [:size-param :open-fn-4/x]
+  [:open-fn-4 :http-req-map/apikey*]]}

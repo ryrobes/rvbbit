@@ -10,7 +10,7 @@
    [nextjournal.beholder      :as beholder]
    [io.pedestal.http          :as http]
    [clojure.java.shell        :as shell]
-   [rvbbit-backend.assistants :as assistants]
+  ;;  [rvbbit-backend.assistants :as assistants]
    [flowmaps.db               :as flow-db]
    [clojure.data              :as data]
    [rvbbit-backend.external   :as ext]
@@ -4387,12 +4387,12 @@
     )
   [:copy-that client-name])
 
-(defmethod wl/handle-request :open-ai-push
-  [{:keys [kind convo panels client-name]}]
-  (doall (let [resp (assistants/chat convo)]
-           (do ;(ut/write-csv recos-csv "./recos.csv")
-             (ut/pp [:chat-resp resp])
-             {:convo resp :client-name client-name}))))
+;; (defmethod wl/handle-request :open-ai-push
+;;   [{:keys [kind convo panels client-name]}]
+;;   (doall (let [resp (assistants/chat convo)]
+;;            (do ;(ut/write-csv recos-csv "./recos.csv")
+;;              (ut/pp [:chat-resp resp])
+;;              {:convo resp :client-name client-name}))))
 
 (def sql-cache (atom (cache/lru-cache-factory {} :threshold 1000)))
 

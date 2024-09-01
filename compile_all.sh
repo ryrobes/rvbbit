@@ -28,6 +28,7 @@ draw_bordered_text() {
 
 cd frontend
 ./clean-me.sh
+draw_bordered_text "Cleaning, pulling deps, compiling UI..."
 npm install
 rm -rf .shadow-cljs
 npx shadow-cljs release app
@@ -52,6 +53,7 @@ find ./target -name "rvbbit*standalone.jar" -exec cp {} rvbbit.jar \;
 VERSION=$(grep -m1 'defproject' project.clj | sed 's/^[^"]*"//' | sed 's/".*//')
 VERSION=${VERSION%.*}
 DIR_NAME="rvbbit-$VERSION"
+rm -rf "../$DIR_NAME"
 mkdir -p "../$DIR_NAME"
 draw_bordered_text "creating release... $DIR_NAME"
 cp -r assets "../$DIR_NAME/assets"
@@ -66,7 +68,13 @@ cp -r screens "../$DIR_NAME/screens"
 cp user.clj "../$DIR_NAME/"
 cp run-rabbit.sh "../$DIR_NAME/"
 cp rvbbit.jar "../$DIR_NAME/"
+rm -rf "../$DIR_NAME/assets/data-exports"
+rm -rf "../$DIR_NAME/data/atoms"
+rm -rf "../$DIR_NAME/defs/backup"
+rm -rf "../$DIR_NAME/extras/node-colorthief/node_modules"
+rm "../$DIR_NAME/extras/node-colorthief/package-lock.json"
 
+rm -rf "../$DIR_NAME.zip"
 zip -rq "../$DIR_NAME.zip" "../$DIR_NAME/"
 
 echo ""
@@ -75,4 +83,8 @@ echo ""
 draw_bordered_text "done. go to ./backend/ or ./$DIR_NAME/  and run ./run-rabbit.sh, then visit localhost:8888"
 echo ""
 
+# draw_bordered_text "building Docker image..."
+# cd ..
+# docker build -t rvbbit .
+# docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root:/app/ rvbbit 
 
