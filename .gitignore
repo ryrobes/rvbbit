@@ -16,7 +16,6 @@ node_modules/
 *.log
 gen/
 backend/db/*
-backend/data/*.db
 backend/data/*.edn
 backend/data/*.transit
 backend/data/atoms

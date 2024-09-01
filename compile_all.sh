@@ -41,6 +41,7 @@ draw_bordered_text "UI copied. compiling uberjar."
 cd backend
 mkdir target -p
 mkdir db -p
+mkdir data/atoms -p
 # ls ./target/*.jar -l -h
 lein clean
 lein uberjar
