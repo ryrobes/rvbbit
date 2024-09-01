@@ -41,7 +41,7 @@ draw_bordered_text "UI copied. compiling uberjar."
 cd backend
 mkdir target -p
 mkdir db -p
-ls ./target/*.jar -l -h
+# ls ./target/*.jar -l -h
 lein clean
 lein uberjar
 ls ./target/*.jar -l -h
@@ -65,7 +65,7 @@ cp user.clj "../$DIR_NAME/"
 cp run-rabbit.sh "../$DIR_NAME/"
 cp rvbbit.jar "../$DIR_NAME/"
 
-zip -r "../$DIR_NAME.zip" "../$DIR_NAME/"
+zip -rq "../$DIR_NAME.zip" "../$DIR_NAME/"
 
 echo ""
 cat data/nname.ans

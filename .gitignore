@@ -49,7 +49,9 @@ fabric-outputs/
 fabric-sessions/
 checkouts/
 backend/resources/public
-*.csv
+backend/connections/*.csv
+backend/assets/data-exports/*.csv
 backend/defs/backup/
+backend/defs/bkup*
 backend/defs/secrets.edn
 
