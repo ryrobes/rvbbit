@@ -7,7 +7,8 @@
    [clojure.walk              :as walk]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.freezepop :as fpop]
-   [rvbbit-backend.queue-party  :as qp]
+   ;[rvbbit-backend.queue-party  :as qp]
+   [rvbbit-backend.config  :refer [settings-atom]]
    [flowmaps.db               :as flow-db]])
 
 ;; the rabbit "reactor"...
@@ -20,6 +21,7 @@
 (defonce server-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/server-atom.edn"))
 (defonce flow-status (atom {}))
 (defonce kit-status (atom {}))
+
 (defonce runstream-atom (atom {}))
 (defonce params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
 (defonce panels-atom (fpop/thaw-atom {} "./data/atoms/panels-atom.msgpack.transit"))
@@ -49,6 +51,7 @@
 
 (def master-atom-map
   [[:master-time-watcher  father-time  :time]
+   [:master-settings-watcher  settings-atom  :settings]
    [:master-screen-watcher  screens-atom  :screen]
    [:master-params-watcher  params-atom  :client]
    [:master-panels-watcher  panels-atom  :panel]
@@ -70,6 +73,7 @@
 
 (def sharded-atoms
   (atom {:time (atom {})
+         :settings (atom {})
          :screen (atom {})
          :client (atom {})
          :panel (atom {})
@@ -312,6 +316,7 @@
     (cond (cstr/includes? (str flow-key) "running?")  false ;; TODO, mess
           (= base-type :time)                         client-param-path
           (= base-type :signal)                       client-param-path
+          (= base-type :settings)                     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :kit)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -403,6 +408,7 @@
         screen?         (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?           (= base-type :time)
         signal?         (= base-type :signal)
+        settings?       (= base-type :settings)
         solver?         (= base-type :solver)
         kit?            (= base-type :kit)
         data?           (= base-type :data)
@@ -421,6 +427,7 @@
         keypath         (cond ;flow? keypath
                           ;;;true [:v]
                           signal?         (vec (rest keypath))
+                          settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -476,6 +483,7 @@
                                         ;; ":screen/")
           time? (= base-type :time)
           signal? (= base-type :signal)
+          settings? (= base-type :settings)
           solver? (= base-type :solver)
           kit? (= base-type :kit)
           flow-status? (= base-type :flow-status)
@@ -495,6 +503,7 @@
                     signal?         (vec (rest keypath))
                     data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -572,7 +581,10 @@
       ;;(cstr/includes? (str flow-key) "*running?")  false
       (= base-type :time)                         (get @father-time client-param-path)
       ;;(= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
-      (= base-type :signal)                       (get @last-signals-atom client-param-path)
+      (= base-type :signal)                       (get-in @settings-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :settings)                     (get @settings-atom client-param-path)
       (= base-type :data)                         (get-in @last-solvers-data-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -619,6 +631,10 @@
                     ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
       (= base-type :data)                         (get-in @last-solvers-data-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :settings)                     (get-in @settings-atom
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)

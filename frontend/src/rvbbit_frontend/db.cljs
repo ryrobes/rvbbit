@@ -6,7 +6,7 @@
 (def version "0.1.0-alpha.1")
 (def version-date "8/2024")
 
-(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :panel-hash})
+(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
 
 (def bar-hover-text (reagent/atom nil))
 (def console-voice-text (reagent/atom nil))

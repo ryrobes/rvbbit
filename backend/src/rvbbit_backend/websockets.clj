@@ -1997,6 +1997,9 @@
                                                                                                :client-id   client-name
                                                                                                'save!       'rvbbit-backend.websockets/save!
                                                                                                'tap>        'rvbbit-backend.websockets/ttap>}
+                                                                                              (into {} (for [kk (keys @config/settings-atom)]  ;; TODO allow full clover keypath lookup
+                                                                                                {(keyword (str "settings/" (cstr/replace (str kk) ":" "")))
+                                                                                                 (get @config/settings-atom kk)}))
                                                                                               (ut/deselect-keys (get opts :opts) ;; TODO,
                                                                                                                 [:retries :retry-on-error? :close-on-done? :debug?
                                                                                                                  :timeout]))

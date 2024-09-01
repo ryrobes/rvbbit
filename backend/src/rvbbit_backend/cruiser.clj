@@ -1354,8 +1354,8 @@
       (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
             orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db)
             connection_id     (get connect-meta :connection_id)
-            _ (when (and (empty? sql-filter) (not (= connection_id "cache.db")))  
-               (clean-up-db-metadata connection_id)) ;; clean up any previous runs
+            _ (when (and (empty? sql-filter) (not (= connection_id "cache.db")))
+                (clean-up-db-metadata connection_id)) ;; clean up any previous runs
             this-run-id       (get-latest-run-id system-db connect-meta)
             field-vectors-all (create-target-field-vectors target-db connect-meta)
             sys-schemas?      (fn [v]
@@ -1384,7 +1384,8 @@
                                  connect-meta
                                  sql-filter)
         (update-connection-data! system-db this-run-id connection_id)
-        (ut/pp [:db-metadata-without-viz-success! :fields (count field-vectors) connection_id])
+        (when (not (cstr/includes? connection_id "mem-cache"))
+          (ut/pp [:db-metadata-without-viz-success! :fields (count field-vectors) connection_id]))
         ;(group-by (fn [v] [(nth v 2) (nth v 5)]) field-vectors)
         ;; {:connect-meta connect-meta
         ;;  ;;:ff (first field-vectors)

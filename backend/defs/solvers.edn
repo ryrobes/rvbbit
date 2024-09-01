@@ -4,7 +4,6 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
-
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
@@ -18,7 +17,6 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
- 
  :refresh-met-on-tour {:signal :signal/daily-at-9am
                        :type   :clojure
                        :cache? false
@@ -115,16 +113,19 @@
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
- :wallpaper-of-the-moment {:signal  :signal/every-5-minutes
-                           :type    :clojure
-                           :things? true
-                           :data    (do (let [relative-dir   "assets/openai-images"
-                                              dir            (clojure.java.io/file relative-dir)
-                                              image-files    (filter (fn [x] (.isFile x)) (file-seq dir))
-                                              image-paths    (map (fn [x] (.getPath x)) image-files)
-                                              relative-paths (map (fn [x] (.substring x (count (.getPath dir))))
-                                                               image-paths)]
-                                          (str relative-dir (when (seq relative-paths) (rand-nth relative-paths)))))}
+ :wallpaper-of-the-moment
+   {:signal  :signal/every-5-minutes
+    :type    :clojure
+    :things? true
+    :data    (do (let [relative-dir   "assets/openai-images"
+                       dir            (clojure.java.io/file relative-dir)
+                       image-files    (filter (fn [x]
+                                                (and (.isFile x)
+                                                     (not (clojure.string/includes? (.getName x) "directory"))))
+                                        (file-seq dir))
+                       image-paths    (map (fn [x] (.getPath x)) image-files)
+                       relative-paths (map (fn [x] (.substring x (count (.getPath dir)))) image-paths)]
+                   (str relative-dir (when (seq relative-paths) (rand-nth relative-paths)))))}
  :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
                         :type   :clojure
                         :cache? false

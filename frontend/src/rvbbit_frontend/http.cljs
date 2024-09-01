@@ -243,8 +243,10 @@
 (re-frame/reg-event-db
  ::sub-to-flow-value
  (fn [db [_ key]]
-   (let [client-name (get db :client-name)]
-     (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to " key)) 10 0.75 5])
+   (let [client-name (get db :client-name)
+         hide-sub-alerts? (get-in db [:server :settings :hide-sub-and-unsub-alerts?] false)]
+     (when (not hide-sub-alerts?)
+       (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to " key)) 10 0.75 5]))
      (ut/tracked-dispatch
       [::wfx/push :default
        {:kind :sub-to-flow-value
@@ -255,8 +257,10 @@
 (re-frame/reg-event-db
  ::unsub-to-flow-value
  (fn [db [_ key]]
-   (let [client-name (get db :client-name)]
-     (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to " key)) 10 0.75 5])
+   (let [client-name (get db :client-name)
+         hide-sub-alerts? (get-in db [:server :settings :hide-sub-and-unsub-alerts?] false)]
+     (when (not hide-sub-alerts?)
+       (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to " key)) 10 0.75 5]))
      (ut/tracked-dispatch
       [::wfx/push :default
        {:kind :unsub-to-flow-value

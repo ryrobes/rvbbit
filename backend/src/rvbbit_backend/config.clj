@@ -1,8 +1,11 @@
 (ns rvbbit-backend.config
   (:require
-    [clojure.edn     :as edn]
-    [clojure.java.io :as io]
-    [clojure.string  :as cstr]))
+   ;[rvbbit-backend.db :refer [settings-atom]]
+   [clojure.edn     :as edn]
+   [clojure.java.io :as io]
+   [clojure.string  :as cstr]))
+
+(defonce settings-atom (atom {}))
 
 (defn slurp-edn-files
   [dir]
@@ -35,7 +38,8 @@
         sec-edn "./defs/secrets.edn"
         secrets (try (read-string (slurp sec-edn))
                      (catch Exception _
-                       {:no-secrets-file-found-at sec-edn}))]
-    (merge config 
-           secrets)))
+                       {:no-secrets-file-found-at sec-edn}))
+        settings-map (merge config secrets)]
+    (reset! settings-atom settings-map)
+    settings-map))
     

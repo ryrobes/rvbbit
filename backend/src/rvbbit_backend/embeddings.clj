@@ -7,10 +7,8 @@
     [rvbbit-backend.util     :as ut]
     [wkok.openai-clojure.api :as api]))
 
-
-
-(def selected-recos (fpop/thaw-atom {} "./data/selected-recos.edn"))
-(reset! selected-recos (distinct @selected-recos)) ;; we should be reducing to a multiplier, but this is fine for now.
+(def selected-recos (atom {})) ;; (fpop/thaw-atom {} "./data/selected-recos.edn"))
+;;(reset! selected-recos (distinct @selected-recos)) ;; we should be reducing to a multiplier, but this is fine for now.
 
 
 
