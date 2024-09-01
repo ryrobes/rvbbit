@@ -1,141 +1,7 @@
 {:reco-preview "2006850921",
  :sql-source
- {:gen-viz-211
-  {:select [[[[:avg :Electric_Range]] :Electric_Range] :Make],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Make]},
-  :season-drag-828
-  {:select [:season [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:alsonoticed
-       :bfroid
-       :class
-       :county
-       :cty_abbrev
-       :cty_name
-       :date
-       :environment
-       :fips_county_code
-       :fips_state_code
-       :fixed_month
-       :fixed_year
-       :housing_units
-       :land_area
-       :latitude
-       :locationdetails
-       :longitude
-       :month
-       :nearestroad
-       :nearesttown
-       :observed
-       :otherstories
-       :otherwitnesses
-       :population
-       :run_id
-       :run_time
-       :season
-       :state
-       :state_abbrev
-       :state_name
-       :submitted
-       :submitted_date
-       :timeandconditions
-       :title
-       :url
-       :water_area
-       :year
-       :zip_lat
-       :zip_long
-       :zip_name
-       :zipcode],
-      :from [[:bigfoot_sightings_locations :kk67]],
-      :where [:= :class "Class A"]}
-     :dd830]],
-   :group-by [:season],
-   :order-by [[:rowcnt :desc]]},
-  :gen-viz-401
-  {:select [[[:count 1] :rows] :Model_Year :State],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Model_Year :State]},
-  :deniro-drag-Year-802
-  {:select [:Year [[:count 1] :rowcnt]],
-   :from [[:deniro :ee457]],
-   :group-by [:Year],
-   :order-by [[:rowcnt :desc]]},
-  :Electric-Range-drag-685
-  {:select [[[:avg :Electric_Range] :Electric_Range_Avg]],
-   :from
-   [[{:select
-      [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-      :from
-      [[{:select
-         [[[[:avg :Electric_Range]] :Electric_Range]
-          :Make
-          :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-         :from
-         [{:select
-           [:Base_MSRP
-            :City
-            :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-            :County
-            :DOL_Vehicle_ID
-            :Electric_Range
-            :Electric_Utility
-            :Electric_Vehicle_Type
-            :Legislative_District
-            :Make
-            :Model
-            :Model_Year
-            :State
-            :VIN_1_10
-            :Vehicle_Location
-            :_2020_Census_Tract
-            :zipcode],
-           :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-         :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}
-        :cc758]]}
-     :cc649]]},
-  :OFFENSE-CODE-GROUP-drag-327
-  {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
+ {:query-3274
+  {:select [[[:count 1] :rowcnt]],
    :from
    [[{:select
       [:DAY_OF_WEEK
@@ -155,199 +21,63 @@
        :STREET
        :UCR_PART
        :YEAR],
-      :from [[:offenses :yy713]],
-      :where [:= :DISTRICT "B2"]}
-     :qq486]],
-   :group-by [:OFFENSE_CODE_GROUP],
-   :order-by [[:rowcnt :desc]]},
-  :offenses-drag-DISTRICT-260
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from [[:offenses :hh24]],
-   :group-by [:DISTRICT],
-   :order-by [[:rowcnt :desc]]},
-  :gen-viz-49
-  {:select-distinct [:Lat :Long :DISTRICT],
+      :from [[:offenses :xx560]]}
+     :tt587]]},
+  :query-6590
+  {:select [[[:count 1] :rowcnt]],
    :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :yy713]],
-     :where [:= :DISTRICT "B2"]}]},
-  :bi-polar-wavez {},
-  :albums {:select [:*], :connection-id "system-db", :from [:albums], :limit 111},
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :hh223]]}
+     :jj650]]},
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_],
+   :limit 111},
   :raw_custom_override_1731765785__block_9240_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
    :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_],
    :limit 111},
-  :albums-drag-289
-  {:select [:album_name :img_300 :img_640 :popularity :release_date],
-   :from [[:albums :gg872]]},
   :new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-08-29 11:51:40",
+   :_sqlized-at "2024-08-31 22:21:40",
    :_sqlized-by [:block-9240 :clojure :new-clojure],
-   :_sqlized-hash 1352283424,
-   :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_]},
-  :gen-viz-821
-  {:select [[[:count 1] :rows] :tour_name],
-   :from
-   [{:select [:location :show_date :show_id :show_name :title :tour_name],
-     :from [[:shows :cc542]]}],
-   :group-by [:tour_name]},
-  :Electric-Vehicle-Population-Data-drag-580
-  {:select
-   [:Base_MSRP
-    :City
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-    :County
-    :DOL_Vehicle_ID
-    :Electric_Range
-    :Electric_Utility
-    :Electric_Vehicle_Type
-    :Legislative_District
-    :Make
-    :Model
-    :Model_Year
-    :State
-    :VIN_1_10
-    :Vehicle_Location
-    :_2020_Census_Tract
-    :zipcode],
-   :from [[:Electric_Vehicle_Population_Data :aa583]]},
-  :bigfoot-sightings-locations-drag-305
-  {:select
-   [:alsonoticed
-    :bfroid
-    :class
-    :county
-    :cty_abbrev
-    :cty_name
-    :date
-    :environment
-    :fips_county_code
-    :fips_state_code
-    :fixed_month
-    :fixed_year
-    :housing_units
-    :land_area
-    :latitude
-    :locationdetails
-    :longitude
-    :month
-    :nearestroad
-    :nearesttown
-    :observed
-    :otherstories
-    :otherwitnesses
-    :population
-    :run_id
-    :run_time
-    :season
-    :state
-    :state_abbrev
-    :state_name
-    :submitted
-    :submitted_date
-    :timeandconditions
-    :title
-    :url
-    :water_area
-    :year
-    :zip_lat
-    :zip_long
-    :zip_name
-    :zipcode],
-   :from [[:bigfoot_sightings_locations :kk67]],
-   :where [:= :class "Class A"]},
-  :Score-drag-523
-  {:select [[[:avg :Score] :avg_review_score]],
-   :from [[{:select [:Score :Title], :from [[:deniro :cc738]]} :gg593]]},
-  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
-  :deniro-drag-796 {:select [:Score :Title], :from [[:deniro :cc738]]},
-  :gen-viz-987
-  {:select [[[:count 1] :rows] :YEAR],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :yy713]],
-     :where [:= :DISTRICT "B2"]}],
-   :group-by [:YEAR]},
-  :Electric_Vehicle_Population_Data
+   :_sqlized-hash -737243788,
+   :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_]},
+  :raw_custom_override1589124350__block_9240_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
-   :from [:Electric_Vehicle_Population_Data],
+   :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_],
    :limit 111},
-  :raw_custom_override1743953670__block_977_clojure_new_clojure_1_
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override1743953670__block_977_clojure_new_clojure_1_],
-   :limit 111},
-  :gen-viz-1217
-  {:select
-   [[[:min :Long] :min-long]
-    [[:max :Long] :max-long]
-    [[:min :Lat] :min-lat]
-    [[:max :Lat] :max-lat]
-    [[:avg :Lat] :a-lat]
-    [[:avg :Long] :a-long]
-    [[:round [:raw ["(" [:max :Long] " - " [:min :Long] ") * 55"]] 2] :long_diff]
-    [[:round [:raw ["(" [:max :Lat] " - " [:min :Lat] ") * 55"]] 2] :lat_diff]],
-   :from
-   [{:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :yy713]],
-     :where [:= :DISTRICT "B2"]}],
-   :where [:and [:<> :Lat -1] [:<> :Lat nil] [:<> :Long -1] [:<> :Long nil]]},
-  :offenses-drag-761
+  :offenses-drag-30
   {:select
    [:DAY_OF_WEEK
     :DISTRICT
@@ -366,178 +96,81 @@
     :STREET
     :UCR_PART
     :YEAR],
-   :from [[:offenses :yy713]],
-   :where [:= :DISTRICT "B2"]},
-  :bigfoot-sightings-locations-drag-class-428
-  {:select [:class [[:count 1] :rowcnt]],
-   :from [[:bigfoot_sightings_locations :ff215]],
-   :group-by [:class],
-   :order-by [[:rowcnt :desc]]},
-  :tour-name-drag-420
-  {:select [:tour_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:location :show_date :show_id :show_name :title :tour_name],
-      :from [[:shows :cc542]]}
-     :pp438]],
-   :group-by [:tour_name],
-   :order-by [[:rowcnt :desc]]},
-  :bigfoot_sightings_locations
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:bigfoot_sightings_locations],
-   :limit 111},
-  :offenses
-  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
-  :deniro {:select [:*], :connection-id "system-db", :from [:deniro], :limit 111},
-  :gen-viz-363
-  {:select [:fips_state_code [[:count 1] :rows]],
-   :from
-   [{:select
-     [:alsonoticed
-      :bfroid
-      :class
-      :county
-      :cty_abbrev
-      :cty_name
-      :date
-      :environment
-      :fips_county_code
-      :fips_state_code
-      :fixed_month
-      :fixed_year
-      :housing_units
-      :land_area
-      :latitude
-      :locationdetails
-      :longitude
-      :month
-      :nearestroad
-      :nearesttown
-      :observed
-      :otherstories
-      :otherwitnesses
-      :population
-      :run_id
-      :run_time
-      :season
-      :state
-      :state_abbrev
-      :state_name
-      :submitted
-      :submitted_date
-      :timeandconditions
-      :title
-      :url
-      :water_area
-      :year
-      :zip_lat
-      :zip_long
-      :zip_name
-      :zipcode],
-     :from [[:bigfoot_sightings_locations :kk67]],
-     :where [:= :class "Class A"]}],
-   :group-by [:fips_state_code]},
-  :shows-drag-525
-  {:select [:location :show_date :show_id :show_name :title :tour_name],
-   :from [[:shows :cc542]]},
-  :new-clojure-1-sqlized
+   :from [[:offenses :xx560]]},
+  :image-files
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-08-25 19:12:11",
-   :_sqlized-by [:block-977 :clojure :new-clojure-1],
+   :_sqlized-at "2024-08-31 19:01:24",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
    :_sqlized-hash nil,
-   :from [:raw_custom_override1743953670__block_977_clojure_new_clojure_1_]},
-  :gen-viz-413
+   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_],
+   :_last-run "22:17:25"},
+  :raw_custom_override86093687__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override86093687__block_86_clojure_new_clojure_],
+   :limit 111},
+  :bigfoot_sightings
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:bigfoot_sightings],
+   :limit 111},
+  :DISTRICT-drag-31
+  {:select [:DISTRICT [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Location
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :xx560]]}
+     :aa151]],
+   :group-by [:DISTRICT],
+   :order-by [[:rowcnt :desc]]},
+  :bigfoot-sightings-drag-28
   {:select
-   [[[[:avg :Electric_Range]] :Electric_Range]
-    :Make
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :from
-   [{:select
-     [:Base_MSRP
-      :City
-      :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-      :County
-      :DOL_Vehicle_ID
-      :Electric_Range
-      :Electric_Utility
-      :Electric_Vehicle_Type
-      :Legislative_District
-      :Make
-      :Model
-      :Model_Year
-      :State
-      :VIN_1_10
-      :Vehicle_Location
-      :_2020_Census_Tract
-      :zipcode],
-     :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]},
-  :gen-viz-413-clone-633
-  {:select [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :from
-   [[{:select
-      [[[[:avg :Electric_Range]] :Electric_Range]
-       :Make
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-      :from
-      [{:select
-        [:Base_MSRP
-         :City
-         :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-         :County
-         :DOL_Vehicle_ID
-         :Electric_Range
-         :Electric_Utility
-         :Electric_Vehicle_Type
-         :Legislative_District
-         :Make
-         :Model
-         :Model_Year
-         :State
-         :VIN_1_10
-         :Vehicle_Location
-         :_2020_Census_Tract
-         :zipcode],
-        :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-      :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}
-     :cc758]]},
-  :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941
-  {:select [:Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:Electric_Range :Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-      :from
-      [[{:select
-         [[[[:avg :Electric_Range]] :Electric_Range]
-          :Make
-          :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-         :from
-         [{:select
-           [:Base_MSRP
-            :City
-            :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-            :County
-            :DOL_Vehicle_ID
-            :Electric_Range
-            :Electric_Utility
-            :Electric_Vehicle_Type
-            :Legislative_District
-            :Make
-            :Model
-            :Model_Year
-            :State
-            :VIN_1_10
-            :Vehicle_Location
-            :_2020_Census_Tract
-            :zipcode],
-           :from [[:Electric_Vehicle_Population_Data :aa583]]}],
-         :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}
-        :cc758]]}
-     :xx436]],
-   :group-by [:Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :order-by [[:rowcnt :desc]],
-   :col-widths {:rowcnt 95, :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility 515}}},
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :locationdetails
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :run_id
+    :run_time
+    :season
+    :sketch
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :hh223]]},
+  :offenses
+  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111}},
  :doom-modal? false,
  :meta
  {nil
@@ -813,57 +446,60 @@
      :data-type "string",
      :commons
      {"./screens/dynamic-theme-example1.edn" 1,
-      "/home/ryanr/rvbbit-0.1.0-alpha.1/./screens/looking-glass-sine-wave.edn" 1,
-      "/home/ryanr/rvbbit-0.1.0-alpha.1/./screens/ecto-cooler-shade.edn" 1},
+      "/home/ryanr/test-compiles/rvbbit/rvbbit-0.1.0-alpha/./screens/looking-glass-sine-wave.edn"
+      1,
+      "/home/ryanr/test-compiles/rvbbit/rvbbit-0.1.0-alpha/./screens/dynamic-theme-example1.edn"
+      1},
      :distinct 11,
      :group-by? true,
-     :median "./screens/test-blog-screen.edn",
-     :max "/home/ryanr/rvbbit-0.1.0-alpha.1/./screens/looking-glass-sine-wave.edn",
+     :median "./screens/random-collection.edn",
+     :max
+     "/home/ryanr/test-compiles/rvbbit/rvbbit-0.1.0-alpha/./screens/looking-glass-sine-wave.edn",
      :avg "./screens/dynamic-theme-example1.edn (non-numeric average)",
      :cardinality 100},
     :screen_name
     {:min "dynamic-theme-example1",
      :data-type "string",
      :commons
-     {"ecto-cooler-shade" 2,
+     {"dynamic-theme-example1" 2,
       "looking-glass-sine-wave" 2,
-      "dynamic-theme-example1" 1},
+      "random-collection" 1},
      :distinct 9,
      :group-by? true,
-     :median "new-age-hacking",
+     :median "looking-glass-sine-wave",
      :max "winter-theme-choom",
      :avg "dynamic-theme-example1 (non-numeric average)",
      :cardinality 81},
     :blocks
-    {:min 5,
+    {:min 4,
      :data-type "integer",
-     :commons {6 3, 49 1, 37 1},
-     :distinct 9,
+     :commons {6 3, 9 2, 7 2},
+     :distinct 7,
      :group-by? true,
      :median 6,
-     :max 80,
-     :avg 27.727272727272727,
-     :cardinality 81},
+     :max 48,
+     :avg 13.363636363636363,
+     :cardinality 63},
     :queries
     {:min 0,
      :data-type "integer",
-     :commons {1 4, 0 1, 25 1},
-     :distinct 8,
+     :commons {2 3, 1 3, 0 1},
+     :distinct 7,
      :group-by? true,
-     :median 14,
-     :max 26,
-     :avg 8.181818181818182,
-     :cardinality 72},
+     :median 17,
+     :max 17,
+     :avg 4.454545454545454,
+     :cardinality 63},
     :ts
-    {:min "2024-08-29 11:32:45",
+    {:min "2024-08-31 22:11:05",
      :data-type "string",
      :commons
-     {"2024-08-29 11:32:45" 8, "2024-08-29 11:51:31" 1, "2024-08-29 11:37:33" 1},
+     {"2024-08-31 22:11:06" 6, "2024-08-31 22:11:05" 3, "2024-08-31 22:21:29" 1},
      :distinct 4,
      :group-by? true,
-     :median "2024-08-29 11:32:45",
-     :max "2024-08-29 11:51:31",
-     :avg "2024-08-29 11:32:45 (non-numeric average)",
+     :median "2024-08-31 22:11:06",
+     :max "2024-08-31 22:21:29",
+     :avg "2024-08-31 22:11:06 (non-numeric average)",
      :cardinality 36}},
    :database-type "SQLite",
    :rowcount 11},
@@ -1468,10 +1104,10 @@
      :cardinality 100},
     :step_val
     {:data-type "integer",
-     :distinct 37,
+     :distinct 69,
      :group-by? true,
      :commons {},
-     :cardinality 53}},
+     :cardinality 100}},
    :rowcount 69},
   :deniro-drag-796 {:fields {}},
   :gen-viz-987
@@ -2214,29 +1850,17 @@
      :cardinality 60}},
    :rowcount 10}},
  :default-col-widths
- {:block-5567 {:season-drag-828 180},
-  :block-6751 {:gen-viz-413-clone-633 ##Inf},
-  :block-8873 {:bigfoot-sightings-locations-drag-305 100},
-  :block-5404 {:tour-name-drag-420 205},
-  :block-8119 {:Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941 ##Inf},
-  :block-9240 {:bi-polar-wavez 261, :new-clojure-sqlized 130},
-  :block-7822 {:offenses-drag-761 100},
-  :block-5706 {:Electric-Range-drag-685 ##Inf},
-  :block-7210 {:OFFENSE-CODE-GROUP-drag-327 155},
+ {:block-7305 {:DISTRICT-drag-31 180},
+  :block-86 {:new-clojure-sqlized 361},
+  :block-10072 {:image-files 511},
   :system-connections-list* {:connections-sys 126},
-  :block-7226 {:offenses-drag-DISTRICT-260 105},
-  :block-977 {:new-clojure-1-sqlized 461},
-  :system-fields-list* {:fields-sys 170},
-  :block-5922 {:albums-drag-289 172},
-  :block-3924 {:Score-drag-523 ##Inf},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-10146 {:query-6590 211},
   :files-list* {:files-sys 170},
-  :block-10336 {:Electric-Vehicle-Population-Data-drag-580 ##Inf},
-  :block-3908 {:deniro-drag-Year-802 ##Inf},
-  :block-91 {:gen-viz-363 255},
-  :block-1922 {:shows-drag-525 126},
-  :block-11046 {:bigfoot-sightings-locations-drag-class-428 180},
+  :block-2115 {:bigfoot-sightings-drag-28 100},
   :blocks-list* {:blocks-sys ##Inf},
-  :block-3689 {:deniro-drag-796 ##Inf},
+  :block-12180 {:offenses-drag-30 100},
+  :block-3431 {:query-3274 211},
   :system-tables-list* {:tables-sys 133}},
  :runstream-drops nil,
  :tabs
@@ -2249,7 +1873,7 @@
  :server
  {:settings
   {:harvest-on-boot? true,
-   :default "./screens/looking-glass-redux.edn",
+   :default "./screens/frost-terminal2.edn",
    :new-block-rand
    ["Why, sometimes I've believed as many as six impossible things before breakfast."
     "Imagination is the only weapon in the war against reality."
@@ -2304,7 +1928,7 @@
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
-       :background-color "#00000000",
+       :background-color "#00000000 ",
        :border "none",
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
@@ -2372,22 +1996,20 @@
       {:color "yellow", :font-size "23px"}
       :child
       [:str :x "CHEESEBURGER!"]]}},
-   :openai-api-key "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",
-   :eleven-labs-default-voice-name "Not OG Buffy",
-   :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
-   :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
    :debug-level 1,
    :screens
    ["dynamic-theme-example1"
     "ecto-cooler-shade"
+    "frost-terminal2"
     "looking-glass-sine-wave"
-    "new-age-hacking"
+    "nice-car-choom"
+    "random-collection"
     "server-stats2"
-    "test-blog-screen"
-    "tweet-demo-thing-bigfoot-is-blurry"
     "winter-theme"
-    "winter-theme-choom"]}},
+    "winter-theme-choom"],
+   :no-secrets-file-found-at "./defs/secrets.edn"}},
  :runstreams nil,
+ :lines? false,
  :editor? false,
  :buffy? false,
  :valid-kits
@@ -2397,34 +2019,33 @@
    [:reco-preview :queries :query-preview]
    [:block-356 :queries :gen-viz-821]
    [:block-5567 :queries :season-drag-828]
-   [:block-6751 :queries :gen-viz-413-clone-633]
+   [:block-7305 :queries :DISTRICT-drag-31]
    [:block-757 :queries :gen-viz-49]
    [:block-757 :queries :gen-viz-1217]
    [:block-8873 :queries :bigfoot-sightings-locations-drag-305]
    [:block-5404 :queries :tour-name-drag-420]
-   [:block-8119 :queries :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941]
    [:block-9240 :queries :new-clojure-sqlized]
+   [:block-86 :queries :new-clojure-sqlized]
    [:block-7822 :queries :offenses-drag-761]
-   [:block-5706 :queries :Electric-Range-drag-685]
-   [:block-989 :queries :gen-viz-401]
-   [:block-107 :queries :gen-viz-413]
+   [:block-10072 :queries :image-files]
    [:block-7210 :queries :OFFENSE-CODE-GROUP-drag-327]
+   [:block-9201 :queries :new-clojure-1-sqlized]
    [:block-7226 :queries :offenses-drag-DISTRICT-260]
-   [:block-977 :queries :new-clojure-1-sqlized]
+   [:block-10146 :queries :query-6590]
    [:block-5922 :queries :albums-drag-289]
-   [:block-3924 :queries :Score-drag-523]
+   [:block-3284 :queries :new-clojure-2-sqlized]
    [:block-743 :queries :gen-viz-987]
-   [:block-167 :queries :gen-viz-211]
-   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
-   [:block-3908 :queries :deniro-drag-Year-802]
    [:block-91 :queries :gen-viz-363]
+   [:block-2115 :queries :bigfoot-sightings-drag-28]
    [:block-1922 :queries :shows-drag-525]
    [:block-11046 :queries :bigfoot-sightings-locations-drag-class-428]
-   [:block-3689 :queries :deniro-drag-796]],
+   [:block-12180 :queries :offenses-drag-30]
+   [:block-3431 :queries :query-3274]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
   [:clojure :view-lundberg]
-  [[:reco-preview :views :oz]
+  [[:block-1084 :views :hare-vw-8]
+   [:reco-preview :views :oz]
    [:block-356 :views :oz]
    [:block-8804 :views :param]
    [:block-757 :views :oz]
@@ -2436,26 +2057,32 @@
    [:block-1285 :views :poised-maroon-fly]
    [:block-5402 :views :hare-vw]
    [:block-7979 :views :param]
-   [:block-989 :views :oz]
-   [:block-144 :views :hi]
-   [:block-144 :views :oz]
+   [:block-9973 :views :hare-vw-2]
+   [:block-4733 :views :hare-vw-7]
+   [:block-10072 :views :hare-vw-6]
    [:block-9849 :views :param]
-   [:block-107 :views :oz]
+   [:block-4719 :views :hare-vw-3]
    [:block-3904 :views :reech]
+   [:block-8499 :views :hare-vw]
    [:hello-there-brother :views :heya!]
-   [:block-977 :views :hare-vw-2]
    [:block-1183 :views :view-clone]
+   [:block-10146 :views :hare-vw-7]
    [:block-2932 :views :hi]
    [:block-7550 :views :view-clone]
    [:block-743 :views :oz]
+   [:block-7845 :views :hare-vw-4]
    [:block-2811 :views :hi]
    [:block-2811 :views :oz]
-   [:block-167 :views :oz]
+   [:block-8806 :views :hare-vw-1]
    [:block-91 :views :oz]
    [:block-11429 :views :param]
+   [:block-1584 :views :hare-vw-6]
+   [:block-4687 :views :hare-vw-5]
    [:block-12141 :views :hare-vw]
+   [:block-1320 :views :hare-vw-9]
    [:block-8155 :views :genius-plum-coyote]
-   [:block-2343 :views :editor-block-12141-new-clojure]],
+   [:block-2343 :views :editor-block-12141-new-clojure]
+   [:block-3431 :views :hare-vw-9]],
   [:clojure :gen-ev] [],
   [:outliers :get-outliers]
   [[nil :queries :tmp-2091232537-hist-sys]
@@ -2463,202 +2090,153 @@
    [:reco-preview :queries :query-preview]
    [:block-356 :queries :gen-viz-821]
    [:block-5567 :queries :season-drag-828]
-   [:block-6751 :queries :gen-viz-413-clone-633]
+   [:block-7305 :queries :DISTRICT-drag-31]
    [:block-757 :queries :gen-viz-49]
    [:block-757 :queries :gen-viz-1217]
    [:block-8873 :queries :bigfoot-sightings-locations-drag-305]
    [:block-5404 :queries :tour-name-drag-420]
-   [:block-8119 :queries :Clean-Alternative-Fuel-Vehicle-CAFV-Eligibility-drag-941]
    [:block-9240 :queries :new-clojure-sqlized]
+   [:block-86 :queries :new-clojure-sqlized]
    [:block-7822 :queries :offenses-drag-761]
-   [:block-5706 :queries :Electric-Range-drag-685]
-   [:block-989 :queries :gen-viz-401]
-   [:block-107 :queries :gen-viz-413]
+   [:block-10072 :queries :image-files]
    [:block-7210 :queries :OFFENSE-CODE-GROUP-drag-327]
+   [:block-9201 :queries :new-clojure-1-sqlized]
    [:block-7226 :queries :offenses-drag-DISTRICT-260]
-   [:block-977 :queries :new-clojure-1-sqlized]
+   [:block-10146 :queries :query-6590]
    [:block-5922 :queries :albums-drag-289]
-   [:block-3924 :queries :Score-drag-523]
+   [:block-3284 :queries :new-clojure-2-sqlized]
    [:block-743 :queries :gen-viz-987]
-   [:block-167 :queries :gen-viz-211]
-   [:block-10336 :queries :Electric-Vehicle-Population-Data-drag-580]
-   [:block-3908 :queries :deniro-drag-Year-802]
    [:block-91 :queries :gen-viz-363]
+   [:block-2115 :queries :bigfoot-sightings-drag-28]
    [:block-1922 :queries :shows-drag-525]
    [:block-11046 :queries :bigfoot-sightings-locations-drag-class-428]
-   [:block-3689 :queries :deniro-drag-796]]},
- :memory [764335122 541784234 4294705152],
- :client-name :brave-pyramidal-butterfly-10,
+   [:block-12180 :queries :offenses-drag-30]
+   [:block-3431 :queries :query-3274]]},
+ :memory [270863582 181707638 4294705152],
+ :client-name :protected-linear-hound-16,
  :flow-editor? true,
- :window {:w 2672, :h 1368},
+ :window {:w 2770, :h 1550},
  :quake-console? false,
- :implicit-rowsets {:solver [nil :new-clojure]},
+ :implicit-rowsets {:solver [:new-clojure nil]},
  :post-meta
  {:blocks-sys
-  {:* {:rowcount 49},
-   :block_key {:distinct 49},
-   :block_name {:distinct 48},
+  {:* {:rowcount 33},
+   :block_key {:distinct 33},
+   :block_name {:distinct 33},
    :queries {:distinct 3},
    :views {:distinct 4},
-   :block_data {:distinct 49},
-   :view_names {:distinct 12},
-   :query_names {:distinct 26}},
+   :block_data {:distinct 33},
+   :view_names {:distinct 11},
+   :query_names {:distinct 15}},
   :fields-sys
-  {:* {:rowcount 41},
-   :field_name {:distinct 41},
-   :field_type {:distinct 4},
-   :data_type {:distinct 4}},
+  {:* {:rowcount 26},
+   :field_name {:distinct 26},
+   :field_type {:distinct 5},
+   :data_type {:distinct 5}},
+  :query-3274 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
   :tables-sys
-  {:* {:rowcount 25},
+  {:* {:rowcount 2},
    :db_schema {:distinct 1},
    :db_catalog {:distinct 0},
    :connection_id {:distinct 1},
    :schema_cat {:distinct 0},
-   :table_name {:distinct 25},
-   :fields {:distinct 15}},
-  :offenses-drag-DISTRICT-260
-  {:* {:rowcount 13}, :DISTRICT {:distinct 12}, :rowcnt {:distinct 13}},
-  :gen-viz-49
-  {:* {:rowcount 2348},
-   :Lat {:distinct 2346},
-   :Long {:distinct 2346},
-   :DISTRICT {:distinct 1}},
-  :bi-polar-wavez {},
+   :table_name {:distinct 2},
+   :fields {:distinct 2}},
+  :query-6590 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_ {},
   :files-sys
   {:* {:rowcount 11},
    :file_path {:distinct 11},
    :screen_name {:distinct 9},
-   :blocks {:distinct 9},
-   :queries {:distinct 8},
+   :blocks {:distinct 7},
+   :queries {:distinct 7},
    :ts {:distinct 4}},
-  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_ {},
   :new-clojure-sqlized
-  {:* {:rowcount 69}, :step_int {:distinct 69}, :step_val {:distinct 37}},
-  :bigfoot-sightings-locations-drag-305
-  {:nearestroad {:distinct 1930},
-   :water_area {:distinct 928},
-   :housing_units {:distinct 924},
-   :date {:distinct 599},
-   :* {:rowcount 2486},
-   :locationdetails {:distinct 2082},
-   :submitted_date {:distinct 2004},
-   :bfroid {:distinct 2486},
-   :cty_abbrev {:distinct 50},
-   :otherwitnesses {:distinct 1813},
-   :run_id {:distinct 1},
-   :fips_county_code {:distinct 153},
-   :cty_name {:distinct 689},
-   :nearesttown {:distinct 2035},
-   :timeandconditions {:distinct 2181},
-   :month {:distinct 12},
-   :county {:distinct 821},
-   :land_area {:distinct 930},
-   :longitude {:distinct 2197},
-   :state {:distinct 49},
-   :zipcode {:distinct 1428},
-   :fixed_month {:distinct 12},
-   :submitted {:distinct 2004},
-   :fips_state_code {:distinct 50},
-   :state_abbrev {:distinct 50},
-   :title {:distinct 2484},
-   :otherstories {:distinct 1412},
-   :year {:distinct 260},
-   :season {:distinct 5},
-   :state_name {:distinct 50},
-   :class {:distinct 1},
-   :population {:distinct 928},
-   :zip_long {:distinct 1428},
-   :alsonoticed {:distinct 1429},
-   :zip_lat {:distinct 1428},
-   :url {:distinct 2486},
-   :latitude {:distinct 2197},
-   :observed {:distinct 2460},
-   :environment {:distinct 2302},
-   :fixed_year {:distinct 103},
-   :run_time {:distinct 1613},
-   :zip_name {:distinct 1266}},
-  :gen-viz-987 {:* {:rowcount 4}, :rows {:distinct 4}, :YEAR {:distinct 4}},
-  :Electric_Vehicle_Population_Data {},
-  :raw_custom_override1743953670__block_977_clojure_new_clojure_1_ {},
-  :offenses-drag-761
+  {:* {:rowcount 69}, :step_int {:distinct 69}, :step_val {:distinct 69}},
+  :raw_custom_override1589124350__block_9240_clojure_new_clojure_ {},
+  :offenses-drag-30
   {:SHOOTING {:distinct 1},
-   :DISTRICT {:distinct 1},
-   :* {:rowcount 49945},
-   :INCIDENT_NUMBER {:distinct 43403},
-   :OFFENSE_DESCRIPTION {:distinct 196},
+   :DISTRICT {:distinct 12},
+   :* {:rowcount 319073},
+   :INCIDENT_NUMBER {:distinct 282517},
+   :OFFENSE_DESCRIPTION {:distinct 244},
    :DAY_OF_WEEK {:distinct 7},
    :MONTH {:distinct 12},
    :YEAR {:distinct 4},
    :HOUR {:distinct 24},
-   :STREET {:distinct 678},
-   :OFFENSE_CODE_GROUP {:distinct 61},
+   :STREET {:distinct 4657},
+   :OFFENSE_CODE_GROUP {:distinct 67},
    :UCR_PART {:distinct 4},
-   :Long {:distinct 2346},
-   :REPORTING_AREA {:distinct 166},
-   :Location {:distinct 2348},
-   :OFFENSE_CODE {:distinct 189},
-   :Lat {:distinct 2346},
-   :OCCURRED_ON_DATE {:distinct 41998}},
-  :bigfoot_sightings_locations {},
-  :offenses {},
-  :deniro {},
-  :connections-sys
-  {:* {:rowcount 7},
-   :database_name {:distinct 2},
-   :connection_id {:distinct 7},
-   :styler_highlight_8717ssa {:distinct 1}},
-  :shows-drag-525
-  {:* {:rowcount 2214},
-   :location {:distinct 553},
-   :show_date {:distinct 2194},
-   :show_id {:distinct 2214},
-   :show_name {:distinct 1196},
-   :title {:distinct 2212},
-   :tour_name {:distinct 31}},
-  :c405-geo-background? {:* {:rowcount 1}, :v {:distinct 1}}},
+   :Long {:distinct 18178},
+   :REPORTING_AREA {:distinct 878},
+   :Location {:distinct 18194},
+   :OFFENSE_CODE {:distinct 222},
+   :Lat {:distinct 18178},
+   :OCCURRED_ON_DATE {:distinct 233229}},
+  :image-files {},
+  :raw_custom_override86093687__block_86_clojure_new_clojure_ {},
+  :bigfoot_sightings {},
+  :DISTRICT-drag-31
+  {:* {:rowcount 13}, :DISTRICT {:distinct 12}, :rowcnt {:distinct 13}},
+  :bigfoot-sightings-drag-28
+  {:nearestroad {:distinct 3771},
+   :date {:distinct 1161},
+   :* {:rowcount 5035},
+   :locationdetails {:distinct 4205},
+   :submitted_date {:distinct 3521},
+   :sketch {:distinct 1},
+   :bfroid {:distinct 5035},
+   :otherwitnesses {:distinct 3704},
+   :run_id {:distinct 1},
+   :nearesttown {:distinct 3800},
+   :timeandconditions {:distinct 4477},
+   :month {:distinct 12},
+   :county {:distinct 1039},
+   :state {:distinct 49},
+   :fixed_month {:distinct 12},
+   :submitted {:distinct 3522},
+   :title {:distinct 5031},
+   :otherstories {:distinct 2939},
+   :year {:distinct 430},
+   :season {:distinct 5},
+   :class {:distinct 3},
+   :alsonoticed {:distinct 2964},
+   :url {:distinct 5035},
+   :observed {:distinct 4997},
+   :environment {:distinct 4677},
+   :fixed_year {:distinct 132},
+   :run_time {:distinct 2121}},
+  :offenses {}},
  :flow-estimates
- {:blocks-sys {:times 0.001, :run-id :blocks-sys},
-  :fields-sys {:times 0.001, :run-id :fields-sys},
-  :season-drag-828 {:times 0.028, :run-id :season-drag-828},
-  :tables-sys {:times 0.001, :run-id :tables-sys},
-  :OFFENSE-CODE-GROUP-drag-327 {:times 0.063, :run-id :OFFENSE-CODE-GROUP-drag-327},
-  :offenses-drag-DISTRICT-260 {:times 0.205, :run-id :offenses-drag-DISTRICT-260},
-  :gen-viz-49 {:times 0.006, :run-id :gen-viz-49},
+ {:blocks-sys {:times 0.002, :run-id :blocks-sys},
+  :fields-sys {:times 0.002, :run-id :fields-sys},
+  :tables-sys {:times 0.003, :run-id :tables-sys},
+  :raw-custom-override1680656988
+  {:times 0.015, :run-id :raw-custom-override1680656988},
+  :raw-custom-override-1152793386
+  {:times 0.01, :run-id :raw-custom-override-1152793386},
   :files-sys {:times 0.001, :run-id :files-sys},
-  :albums-drag-289 {:times 0.009, :run-id :albums-drag-289},
   :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
-  :gen-viz-821 {:times 0.01, :run-id :gen-viz-821},
-  :bigfoot-sightings-locations-drag-305
-  {:times 0.053, :run-id :bigfoot-sightings-locations-drag-305},
-  :raw-custom-override-1554565181
-  {:times 0.124, :run-id :raw-custom-override-1554565181},
-  :gen-viz-987 {:times 0.044, :run-id :gen-viz-987},
-  :gen-viz-1217 {:times 0.058, :run-id :gen-viz-1217},
-  :offenses-drag-761 {:times 0.016, :run-id :offenses-drag-761},
-  :bigfoot-sightings-locations-drag-class-428
-  {:times 0.007, :run-id :bigfoot-sightings-locations-drag-class-428},
-  :tour-name-drag-420 {:times 0.009, :run-id :tour-name-drag-420},
-  :connections-sys {:times 0.001, :run-id :connections-sys},
-  :gen-viz-363 {:times 0.026, :run-id :gen-viz-363},
-  :shows-drag-525 {:times 0.006, :run-id :shows-drag-525},
-  :raw-custom-override-1731765785
-  {:times 0.077, :run-id :raw-custom-override-1731765785}},
+  :offenses-drag-30 {:times 0.021, :run-id :offenses-drag-30},
+  :bigfoot-sightings-drag-28 {:times 0.037, :run-id :bigfoot-sightings-drag-28},
+  :raw-custom-override1589124350
+  {:times 0.077, :run-id :raw-custom-override1589124350},
+  :connections-sys {:times 0.004, :run-id :connections-sys}},
  :status
  {:heartbeat
   {:kick
-   [:solver/get-my-colors-1529021143
-    :solver/raw-custom-override-374999243
-    :solver/get-my-colors1447844037
-    :solver-status/brave-pyramidal-butterfly-10>get-my-colors-1529021143>running?
-    :solver-status/brave-pyramidal-butterfly-10>get-my-colors1447844037>running?
-    :solver-status/brave-pyramidal-butterfly-10>raw-custom-override-1554565181>running?
-    :solver-status/brave-pyramidal-butterfly-10>raw-custom-override-374999243>running?
-    :flow-status/my-new-flow2210>*running?
-    :kit/kicks>brave-pyramidal-butterfly-10
-    :solver/raw-custom-override-1554565181]},
-  :alert2 {:alerts :alert2},
+   [:flow-status/my-new-flow101>*running?
+    :solver-status/protected-linear-hound-16>get-my-colors-1477659433>running?
+    :solver/get-my-colors-1477659433
+    :solver-status/protected-linear-hound-16>get-my-colors-440234198>running?
+    :solver-status/protected-linear-hound-16>raw-custom-override1680656988>running?
+    :solver/raw-custom-override-1368594183
+    :kit/kicks>protected-linear-hound-16
+    :solver-status/protected-linear-hound-16>raw-custom-override-1368594183>running?
+    :solver/get-my-colors-440234198
+    :solver/raw-custom-override1680656988]},
   :alert1 {:alerts :alert2},
-  :file-change {:file-changed :done},
+  :alert2 {:alerts :alert2},
   :alert3 {:alerts :alert2}},
  :screen-name "random-collection",
  :recos-page2 0,
@@ -2677,25 +2255,23 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   2335
+   744
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
- {:raw_custom_override_1731765785__block_9240_clojure_new_clojure_ -189601823,
-  :albums 1594413685,
-  :shows 89957543,
-  :offenses -505802446,
-  :raw_custom_override1743953670__block_977_clojure_new_clojure_1_ -1413451384,
-  :bigfoot_sightings_locations -435790458,
-  :deniro -1955456670,
-  :Electric_Vehicle_Population_Data 1659044548},
- :user-params-hash 636849344,
+ {:offenses -505802446,
+  :bigfoot_sightings 302026766,
+  :raw_custom_override_1159300590__block_86_clojure_new_clojure_ -1838011445,
+  :raw_custom_override86093687__block_86_clojure_new_clojure_ -1892756218,
+  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_ -189601823,
+  :raw_custom_override1589124350__block_9240_clojure_new_clojure_ 1893543296},
+ :user-params-hash 1258331591,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash 1457356785,
+ :session-hash 1222757859,
  :resolved-queries
- {nil {:_last-run "12:14:21"},
+ {nil {:_last-run "22:21:53"},
   :season-drag-828
   {:select [:season [[:count 1] :rowcnt]],
    :from
@@ -2936,33 +2512,6 @@
    :from [[:bigfoot_sightings_locations :ff215]],
    :group-by [:class],
    :order-by [[:rowcnt :desc]]},
-  :query-preview
-  {:select
-   [[[[:avg :Electric_Range]] :Electric_Range]
-    :Make
-    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
-   :from
-   [[{:select
-      [:Base_MSRP
-       :City
-       :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility
-       :County
-       :DOL_Vehicle_ID
-       :Electric_Range
-       :Electric_Utility
-       :Electric_Vehicle_Type
-       :Legislative_District
-       :Make
-       :Model
-       :Model_Year
-       :State
-       :VIN_1_10
-       :Vehicle_Location
-       :_2020_Census_Tract
-       :zipcode],
-      :from [[:Electric_Vehicle_Population_Data :aa583]]}
-     :tt24]],
-   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]},
   :tour-name-drag-420
   {:select [:tour_name [[:count 1] :rowcnt]],
    :from
@@ -3026,7 +2575,7 @@
  :panels
  {nil
   {:queries
-   {:tmp-2091232537-hist-sys {:_last-run "20:04:45"}, nil {:_last-run "12:14:21"}}},
+   {:tmp-2091232537-hist-sys {:_last-run "20:04:45"}, nil {:_last-run "22:21:53"}}},
   :block-356
   {:name "basic_v_bar - rows, tour_name - 1232",
    :w 12,
@@ -4046,19 +3595,19 @@
    :tab "tree of victor-y"}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#b2a693",
+ {"float" "#b2a692",
   "boolean" "#aa6bc1",
   "map" "#5ccc80",
   "list" "#8a235d",
-  "string" "#cad9dc",
+  "string" "#c9d8db",
   "any" "#8a2635",
-  "vector" "#40b17e",
+  "vector" "#43adb0",
   "keyword" "#e7b299",
-  "rabbit-code" "#0f59d0",
-  "datetime" "#402e6d",
+  "rabbit-code" "#10bcd0",
+  "datetime" "#412e6d",
   "integer" "#72d56c",
-  "unknown" "#5c2a2b",
-  "date" "#3a4923"},
+  "unknown" "#5b2a2c",
+  "date" "#394822"},
  :solver-fn nil,
  :click-param
  {:recos-sys
@@ -4156,7 +3705,7 @@
   :param
   {:left-curl-max 35,
    :background-image-path
-   "../assets/openai-images/b64-image3-22058-69286-4k.webp",
+   "assets/openai-images/b64-image3-22058-69286-4k.webp-q10.jpg",
    :branch-color "#17b772",
    :right-curl-max 36,
    :branch-length-mod 91,
@@ -4181,7 +3730,7 @@
    :twig-color "#40bfb9",
    :left-curl-min 2,
    :gradient-end "#18bcb0",
-   :rel-image-path "assets/openai-images/b64-image3-22058-69286-4k.webp",
+   :rel-image-path "assets/openai-images/b64-image3-22058-69286-4k.webp-q10.jpg",
    :tetradss [:tetrads :param/generated-colors>dominant],
    :selected-block :block-12141,
    :glass-fish-style
@@ -4288,13 +3837,4 @@
   :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
   :new-clojure-1-sqlized {:ffilename "vap9.png"},
   :sys {:selected-tab "tree of victor-y", :selected-tab-idx 4}},
- :selected-flow "my-new-flow2210",
- :post-condi
- {:c843-country-lines? [{:v 1}],
-  :c632-us-states? [{:v 0}],
-  :c875-geo-background? [{:v 1}],
-  :c261-us-counties? [{:v 0}],
-  :c0-us-states? [{:v 1}],
-  :c405-geo-background? [{:v 0}],
-  :c390-country-lines? [{:v 0}],
-  :c291-us-counties? [{:v 0}]}}
+ :selected-flow "my-new-flow101"}

@@ -4,26 +4,12 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
- :refresh-sql-server-test {:signal :signal/daily-at-9am
-                           :type   :clojure
-                           :cache? false
-                           :data   (do (ns rvbbit-backend.cruiser
-                                         (:require [rvbbit-backend.websockets :as wss]
-                                                   [rvbbit-backend.pool-party :as ppy]
-                                                   [rvbbit-backend.sql :as sql]))
-                                       (let [conn (get (deref wss/conn-map) "sql-server-test")]
-                                         (lets-give-it-a-whirl-no-viz "connections/sql-server-test.edn"
-                                                                      conn
-                                                                      sql/system-db
-                                                                      default-sniff-tests
-                                                                      default-field-attributes
-                                                                      default-derived-fields
-                                                                      default-viz-shapes)))}
+
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
-                        :data   (let [dir     "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-                                      rel-dir "./images/large/"
+                        :data   (let [dir     "assets/openai-images"
+                                      rel-dir "assets/openai-images/"
                                       _ (Thread/sleep 5000)
                                       files   (->> (file-seq (clojure.java.io/file dir))
                                                    (filter (fn [x] (.isFile x)))
@@ -32,21 +18,7 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
- :refresh-postgres-test {:signal :signal/daily-at-9am
-                         :type   :clojure
-                         :cache? false
-                         :data   (do (ns rvbbit-backend.cruiser
-                                       (:require [rvbbit-backend.websockets :as wss]
-                                                 [rvbbit-backend.pool-party :as ppy]
-                                                 [rvbbit-backend.sql :as sql]))
-                                     (let [conn (get (deref wss/conn-map) "postgres-test")]
-                                       (lets-give-it-a-whirl-no-viz "connections/postgres-test.edn"
-                                                                    conn
-                                                                    sql/system-db
-                                                                    default-sniff-tests
-                                                                    default-field-attributes
-                                                                    default-derived-fields
-                                                                    default-viz-shapes)))}
+ 
  :refresh-met-on-tour {:signal :signal/daily-at-9am
                        :type   :clojure
                        :cache? false
@@ -62,271 +34,7 @@
                                                                   default-field-attributes
                                                                   default-derived-fields
                                                                   default-viz-shapes)))}
- :materialize-dl-state-drag-39
-   {:signal :signal/daily-at-7am
-    :type :sql
-    :snapshot? false
-    :data
-      {:select [:dl_state [[:count 1] :rowcnt] :color]
-       :from
-         [[{:select [:accident :agency :alcohol :arrest_type :article :belts :charge :color :commercial_license
-                     :commercial_vehicle :contributed_to_accident :date_of_stop :description :dl_state :driver_city
-                     :driver_state :fatal :gender :geolocation :hazmat :latitude :location :longitude :make :model
-                     :personal_injury :property_damage :race :search_arrest_reason :search_conducted :search_disposition
-                     :search_outcome :search_reason :search_reason_for_stop :search_type :seqid :state :subagency
-                     :time_of_stop :vehicletype :violation_type :work_zone :year]
-            :from   [[:Traffic_Violations :yy57]]} :kk686]]
-       :group-by [:dl_state :color]
-       :order-by [[:rowcnt :desc]]
-       :page -4
-       :connection-id "mysql-test"}}
- :materialize-OFFENSE-CODE-GROUP-drag-7
-   {:signal :signal/daily-at-7am
-    :type :sql
-    :snapshot? false
-    :data
-      {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]]
-       :from
-         [[{:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE
-                     :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
-                     :YEAR]
-            :from   [[:offenses :tt484]]} :oo74]]
-       :group-by [:OFFENSE_CODE_GROUP]
-       :order-by [[:rowcnt :desc]]
-       :page -4
-       :connection-id "boston-crime"}}
- :wallpaper-of-the-moment-8k
-   {:signal :signal/every-5-minutes
-    :type   :clojure
-    :cache? false
-    :data   (do (defonce selected-files (atom []))
-                (let [dir         "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-                      rel-dir     "./images/large/"
-                      _ (println "8k yo. That's big.")
-                      _ (Thread/sleep 8000)
-                      files       (->> (file-seq (clojure.java.io/file dir))
-                                       (filter (fn [x] (.isFile x)))
-                                       (filter (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))
-                                       (map (fn [x] (.getName x)))
-                                       (shuffle))
-                      random-file (first (remove (set (deref selected-files)) files))
-                      _ (if random-file
-                          (swap! selected-files conj random-file)
-                          (do (reset! selected-files [])
-                              (let [random-file (first files)] (swap! selected-files conj random-file))))
-                      res         (str rel-dir random-file)]
-                  (println res)
-                  (println "(" (count (deref selected-files)) " files selected previously)")
-                  res))}
- :count-sql-solver-1 {:signal :solver/sql-solver-1 :type :clojure :data (count :data/sql-solver-1)}
- :refresh-vertica-test {:signal :signal/daily-at-9am
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (deref wss/conn-map) "vertica-test")]
-                                      (lets-give-it-a-whirl-no-viz "connections/vertica-test.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
- :send-to-upscaler-3 {:signal    false
-                      :type      :clojure
-                      :cache?    false
-                      :input-map {:rating 3 :source-path :flow/openai-image-gen-ladder3>:save-base64-to-webp-file}
-                      :data      (let [source-path :source-path
-                                       file-name   (.getName (clojure.java.io/file source-path))
-                                       dest-path   (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
-                                   (with-open [in-file  (clojure.java.io/input-stream source-path)
-                                               out-file (clojure.java.io/output-stream dest-path)]
-                                     (clojure.java.io/copy in-file out-file)))}
- :colors-of-the-moment-8k {:signal :signal/changed-wallpaper-8k?
-                           :cache? true
-                           :type   :flow
-                           :data   {:flowmap "node-color-thief-js-webp"
-                                    :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}}
-                                    :return  nil}}
- :get-my-colors {:signal    false
-                 :cache?    true
-                 :type      :flow
-                 :input-map {:input-image-path
-                               "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-3490-16567.png"}
-                 :data      {:flowmap "node-color-thief-js-webp" :opts {:overrides {:image-path :input-image-path}}}}
- :send-to-upscaler-1 {:signal    false
-                      :type      :clojure
-                      :cache?    false
-                      :input-map {:rating 1 :source-path :flow/openai-image-gen-ladder3>:save-base64-to-webp-file}
-                      :data      (let [source-path :source-path
-                                       file-name   (.getName (clojure.java.io/file source-path))
-                                       dest-path   (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
-                                   (with-open [in-file  (clojure.java.io/input-stream source-path)
-                                               out-file (clojure.java.io/output-stream dest-path)]
-                                     (clojure.java.io/copy in-file out-file)))}
- :vibrant-antelope-solver {:signal :signal/cool-raccoon-signal-yo :type :clojure :data (+ 1 2 3 88 (rand-int 1234))}
- :sql-snapshot-solver-1
-   {:signal :signal/every-5-minutes
-    :type :sql
-    :snapshot? true
-    :data
-      {:cache?          false
-       :group-by        [:ts]
-       :from            [{:select   [:recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts]
-                          :from     [[:client_memory :ee183]]
-                          :order-by [[:mem_time :desc]]}]
-       :order-by        [[:ts :desc]]
-       :connection-id   "system-db"
-       :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
-       :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
- :solver-fn-test1 {:signal    false
-                   :type      :clojure
-                   :cache?    true
-                   :input-map {:some-string "HEYa!" :some-number 123}
-                   :data      (str :some-string (+ 123 :some-number))}
- :send-to-upscaler-4 {:signal    false
-                      :type      :clojure
-                      :cache?    false
-                      :input-map {:rating 4 :source-path :flow/openai-image-gen-ladder3>:save-base64-to-webp-file}
-                      :data      (let [source-path :source-path
-                                       file-name   (.getName (clojure.java.io/file source-path))
-                                       dest-path   (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
-                                   (with-open [in-file  (clojure.java.io/input-stream source-path)
-                                               out-file (clojure.java.io/output-stream dest-path)]
-                                     (clojure.java.io/copy in-file out-file)))}
- :sql-solver-1
-   {:signal :signal/every-5-minutes
-    :type :sql
-    :snapshot? false
-    :data
-      {:cache?          false
-       :group-by        [:ts]
-       :from            [{:select   [:recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts]
-                          :from     [[:client_memory :ee183]]
-                          :order-by [[:mem_time :desc]]}]
-       :order-by        [[:ts :desc]]
-       :connection-id   "system-db"
-       :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
-       :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
- :materialize-offenses-drag-20 {:signal    :signal/daily-at-7am
-                                :type      :sql
-                                :snapshot? false
-                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                            :SHOOTING :STREET :UCR_PART :YEAR]
-                                            :from          [[:offenses :tt484]]
-                                            :page          -4
-                                            :connection-id "boston-crime"}}
- :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
- :refresh-boston-crime {:signal :signal/daily-at-9am
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (deref wss/conn-map) "boston-crime")]
-                                      (lets-give-it-a-whirl-no-viz "connections/boston-crime.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
- :png-wallpaper? {:signal :signal/changed-wallpaper?
-                  :type   :clojure
-                  :cache? true
-                  :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
- :refresh-clickhouse-test {:signal :signal/daily-at-9am
-                           :type   :clojure
-                           :cache? false
-                           :data   (do (ns rvbbit-backend.cruiser
-                                         (:require [rvbbit-backend.websockets :as wss]
-                                                   [rvbbit-backend.pool-party :as ppy]
-                                                   [rvbbit-backend.sql :as sql]))
-                                       (let [conn (get (deref wss/conn-map) "clickhouse-test")]
-                                         (lets-give-it-a-whirl-no-viz "connections/clickhouse-test.edn"
-                                                                      conn
-                                                                      sql/system-db
-                                                                      default-sniff-tests
-                                                                      default-field-attributes
-                                                                      default-derived-fields
-                                                                      default-viz-shapes)))}
- :send-to-upscaler-2 {:signal    false
-                      :type      :clojure
-                      :cache?    false
-                      :input-map {:rating 2 :source-path :flow/openai-image-gen-ladder3>:save-base64-to-webp-file}
-                      :data      (let [source-path :source-path
-                                       file-name   (.getName (clojure.java.io/file source-path))
-                                       dest-path   (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
-                                   (with-open [in-file  (clojure.java.io/input-stream source-path)
-                                               out-file (clojure.java.io/output-stream dest-path)]
-                                     (clojure.java.io/copy in-file out-file)))}
- :wallpaper-of-the-moment
-   {:signal  :signal/every-5-minutes
-    :type    :clojure
-    :things? true
-    :data    (do (def selected-files-4k (atom []))
-                 (let [dir         "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-                       rel-dir     "./images/large/"
-                       files       (->> (file-seq (clojure.java.io/file dir))
-                                        (filter (fn [x] (.isFile x)))
-                                        (filter (fn [x] (not (clojure.string/includes? (str (.getName x)) "8k"))))
-                                        (map (fn [x] (.getName x)))
-                                        (shuffle))
-                       random-file (rand-nth (vec (remove (set (deref selected-files-4k)) files)))
-                       _ (if random-file
-                           (swap! selected-files-4k conj random-file)
-                           (do (reset! selected-files-4k [])
-                               (let [random-file (first files)] (swap! selected-files-4k conj random-file))))
-                       res         (str rel-dir random-file)]
-                   (println res)
-                   (println "(" (count (deref selected-files-4k)) " files selected previously)")
-                   res))}
- :refresh-mysql-test {:signal :signal/daily-at-9am
-                      :type   :clojure
-                      :cache? false
-                      :data   (do (ns rvbbit-backend.cruiser
-                                    (:require [rvbbit-backend.websockets :as wss]
-                                              [rvbbit-backend.pool-party :as ppy]
-                                              [rvbbit-backend.sql :as sql]))
-                                  (let [conn (get (deref wss/conn-map) "mysql-test")]
-                                    (lets-give-it-a-whirl-no-viz "connections/mysql-test.edn"
-                                                                 conn
-                                                                 sql/system-db
-                                                                 default-sniff-tests
-                                                                 default-field-attributes
-                                                                 default-derived-fields
-                                                                 default-viz-shapes)))}
- :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (deref wss/conn-map) "bigfoot-ufos")]
-                                      (lets-give-it-a-whirl-no-viz "connections/bigfoot-ufos.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
- :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}
- :materialize-us-counties-drag-15 {:signal    false
-                                   :type      :sql
-                                   :snapshot? false
-                                   :data      {:select        [:fips_county_code :fips_state_code :housing_units
-                                                               :land_area :latitude :longitude :name :population
-                                                               :state_abbrev :water_area]
-                                               :from          [[:us_counties :mm7]]
-                                               :page          -4
-                                               :connection-id "bigfoot-ufos"}}
- :random-karl-casey
+ :random-mp3
    {:signal :signal/changed-wallpaper?
     :type :clojure
     :cache? false
@@ -347,4 +55,89 @@
                                (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
                                (into []))]
             (if (seq mp3-files) (rand-nth mp3-files) nil)))
-        [:play-click-custom (find-random-mp3 "/home/ryanr/Music")])}}
+        [:play-click-custom (find-random-mp3 "~/Music")])}
+ :get-my-colors {:signal    false
+                 :cache?    true
+                 :type      :flow
+                 :input-map {:input-image-path "extras/node-colorthief/logo.png"}
+                 :data      {:flowmap "node-color-thief-js-webp" :opts {:overrides {:image-path :input-image-path}}}}
+ :vibrant-antelope-solver {:signal :signal/cool-raccoon-signal-yo :type :clojure :data (+ 1 2 3 88 (rand-int 1234))}
+ :sql-snapshot-solver-1
+   {:signal :signal/every-5-minutes
+    :type :sql
+    :snapshot? true
+    :data
+      {:cache?          false
+       :group-by        [:ts]
+       :from            [{:select   [:recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts]
+                          :from     [[:client_memory :ee183]]
+                          :order-by [[:mem_time :desc]]}]
+       :order-by        [[:ts :desc]]
+       :connection-id   "system-db"
+       :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
+       :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
+ :solver-fn-test1 {:signal    false
+                   :type      :clojure
+                   :cache?    true
+                   :input-map {:some-string "HEYa!" :some-number 123}
+                   :data      (str :some-string (+ 123 :some-number))}
+ :sql-solver-1
+   {:signal :signal/every-5-minutes
+    :type :sql
+    :snapshot? false
+    :data
+      {:cache?          false
+       :group-by        [:ts]
+       :from            [{:select   [:recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts]
+                          :from     [[:client_memory :ee183]]
+                          :order-by [[:mem_time :desc]]}]
+       :order-by        [[:ts :desc]]
+       :connection-id   "system-db"
+       :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
+       :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
+ :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
+ :refresh-boston-crime {:signal :signal/daily-at-9am
+                        :type   :clojure
+                        :cache? false
+                        :data   (do (ns rvbbit-backend.cruiser
+                                      (:require [rvbbit-backend.websockets :as wss]
+                                                [rvbbit-backend.pool-party :as ppy]
+                                                [rvbbit-backend.sql :as sql]))
+                                    (let [conn (get (deref wss/conn-map) "boston-crime")]
+                                      (lets-give-it-a-whirl-no-viz "connections/boston-crime.edn"
+                                                                   conn
+                                                                   sql/system-db
+                                                                   default-sniff-tests
+                                                                   default-field-attributes
+                                                                   default-derived-fields
+                                                                   default-viz-shapes)))}
+ :png-wallpaper? {:signal :signal/changed-wallpaper?
+                  :type   :clojure
+                  :cache? true
+                  :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
+ :wallpaper-of-the-moment {:signal  :signal/every-5-minutes
+                           :type    :clojure
+                           :things? true
+                           :data    (do (let [relative-dir   "assets/openai-images"
+                                              dir            (clojure.java.io/file relative-dir)
+                                              image-files    (filter (fn [x] (.isFile x)) (file-seq dir))
+                                              image-paths    (map (fn [x] (.getPath x)) image-files)
+                                              relative-paths (map (fn [x] (.substring x (count (.getPath dir))))
+                                                               image-paths)]
+                                          (str relative-dir (when (seq relative-paths) (rand-nth relative-paths)))))}
+ :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
+                        :type   :clojure
+                        :cache? false
+                        :data   (do (ns rvbbit-backend.cruiser
+                                      (:require [rvbbit-backend.websockets :as wss]
+                                                [rvbbit-backend.pool-party :as ppy]
+                                                [rvbbit-backend.sql :as sql]))
+                                    (let [conn (get (deref wss/conn-map) "bigfoot-ufos")]
+                                      (lets-give-it-a-whirl-no-viz "connections/bigfoot-ufos.edn"
+                                                                   conn
+                                                                   sql/system-db
+                                                                   default-sniff-tests
+                                                                   default-field-attributes
+                                                                   default-derived-fields
+                                                                   default-viz-shapes)))}
+ :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}}
