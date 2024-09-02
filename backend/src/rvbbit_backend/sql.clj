@@ -191,46 +191,43 @@
 
 (def mem-cache-db
   {:datasource
-   @(pool-create
-     {:jdbc-url
+   @(pool-create ;; these tables get removed after being used, so it causes too much write thrash to put in the user-space memory db 
+                 ;; (plus this is more transatiotional and SQLIte works better)
+     {:jdbc-url  ;; used for ephemeral table testing / metadata sniffing. fast and doesn't need to be persistent.
       "jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
       ;;"jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
       :cache    "shared"}
      "mem-cache-db-pool")})
 
+;; (def cache-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url
+;;       ;;"jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
+;;       "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+;;       :cache    "shared"}
+;;      "cache-db-pool")})
+
+;;(def default-schema "base")
 (def cache-db
   {:datasource
    @(pool-create
-     {:jdbc-url
-      ;;"jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
-      "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
-      :cache    "shared"}
+     {:jdbc-url "jdbc:duckdb:./db/cache.duck"
+      :idle-timeout      600000
+      :maximum-pool-size 20
+      ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+      :max-lifetime      1800000}
      "cache-db-pool")})
 
-;; (def default-schema "base")
-;; (def cache-db ;; duck test 
-;;   {:datasource
-;;    @(pool-create
-;;      {:jdbc-url "jdbc:duckdb:./db/cache.duck"
-;;       :idle-timeout      600000
-;;       :maximum-pool-size 20
-;;       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
-;;       :max-lifetime      1800000}
-;;      "cache-db-pool")})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(def cache-db-memory 
+  {:datasource
+   @(pool-create
+     {:jdbc-url "jdbc:duckdb::memory:cache-db-memory" ;; named instance should use a shared cache
+      :idle-timeout      600000
+      :maximum-pool-size 20
+      ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+      :max-lifetime      1800000}
+     "cache-db-memory-pool")})
 
 (defn insert-error-row-OLD! [error-db-conn query error]
   (jdbc/with-db-connection

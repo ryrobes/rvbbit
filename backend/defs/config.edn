@@ -8,8 +8,10 @@
 
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :hide-sub-and-unsub-alerts? false
+ :show-query-times? false 
  :default "./screens/frost-terminal2.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
+ ;;    if this screen can't be read or is nil, you will get a basic blank screen with a default theme
  :harvest-on-boot? true ;;false
  ;; ^^ do a full database sniff for each connection on boot? (generally not needed)
  :modes {:pre       [:pre
@@ -132,7 +134,39 @@
                                     Since this system is EDN based, all code has to be wrapped in a (do ..) form in order to be evaluated as a single expression. If a user-provided do block already exists, just use it, do not double wrap it - a single parent (do ...) form is all that is needed.
                                     Being saved in EDN also means that it cannot use Clojure artifacts that are invalid EDN - so, do not use the shorthand for anon functions (#(this %)), or shorthand atom derefs (@atom), or shortcode sets (#{}) always use the full for version for these things - instead w/o the special characters (deref, set, (fn[x]...))."
                      :icon "images/clojure-alt.svg"
-                     :kits {:export-to-csv {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                     :kits {;; unfinished: might work better as a flow block... WIP
+                            ;; :openai-data-clean {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
+                            ;;                                (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
+                            ;;                                                         :when (get v :queries)] ;; only things eligble are query results
+                            ;;                                                     (for  [kk (keys (get v :queries))]
+                            ;;                                                       [k :queries kk])))))
+                            ;;                     :output :kit-map
+                            ;;                     :icon-location :query
+                            ;;                     :tooltip "Experimental! Use OpenAI's API to clean data. Use as little data as possible to save tokens."
+                            ;;                     :icon "ri-openai-fill"
+                            ;;                     :kit-expr (do
+                            ;;                                 (require '[cognitect.transit :as transit]
+                            ;;                                          '[clojure.data.csv :as csv]
+                            ;;                                          '[rvbbit-backend.external :as ext]
+                            ;;                                          '[rvbbit-backend.assistant :as ass]
+                            ;;                                          '[rvbbit-backend.util :as ut]
+                            ;;                                          '[clojure.string :as cstr]
+                            ;;                                          '[clojure.java.io :as io])
+                            ;;                                 (ass/oai-call {:url "https://api.openai.com/v1/chat/completions"
+                            ;;                                                :method :post
+                            ;;                                                :body {:model "gpt-4o"
+                            ;;                                                       :messages [{:role "system"
+                            ;;                                                                   :content (str "You are a data cleaner. You are given a dataset and instructions, 
+                            ;;                                                                                      you will not respond to anything, you will just clean the data and return it as valid Clojure EDN. 
+                            ;;                                                                                           Do NOT send backticks or language identifiers, JUST the EDN structure please. 
+                            ;;                                                                                      The instructions are: 'Fix the YEAR col - make a guess if you have to with the information given.
+                            ;;                                                                                      If a range is given, pick something in the middle - just make a reasonable assumption as to what
+                            ;;                                                                                      the user intended. If you CANNOT decide or there is not enough information, 
+                            ;;                                                                                      use -1 as the answer for that column.'"
+                            ;;                                                                                 "here is the data: " (pr-str test-data))}]}}
+                            ;;                                               :settings/openai-api-key
+                            ;;                                               :settings/openai-org-id))}
+                            :export-to-csv {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
                                                        (vec (apply concat (for [[k v] client-panels ;; ^^ runs on the local repl, not the host
                                                                                 :when (get v :queries)] ;; only things eligble are query results
                                                                             (for  [kk (keys (get v :queries))]

@@ -810,31 +810,6 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
-  :open-fn-4
-  {:y 1125,
-   :fn (fn [x] x),
-   :w 150,
-   :raw-fn (fn [x] (str "Bearer " :settings/openai-api-key)),
-   :right-click? true,
-   :icon "zmdi-functions",
-   :types nil,
-   :z 0,
-   :ports {:in {:x :any}, :out {:out :any}},
-   :inputs nil,
-   :h 60,
-   :x 1675,
-   :data
-   {:flow-item
-    {:category ":rabbit-base",
-     :fn (fn [x] x),
-     :name ":open-fn",
-     :raw-fn (fn [x] x),
-     :type :open-fn,
-     :icon "zmdi-functions",
-     :types {:x :any, :out :any},
-     :inputs [:x],
-     :expandable? true,
-     :drag-meta {:type :open-fn}}}},
   :relative-url-path-for-png-version
   {:y 2825,
    :fn (fn [x] (get-in x [10 0 2])),
@@ -891,6 +866,31 @@
    :ports {:in {}, :out {:out :string}},
    :x 1950,
    :y 650},
+  :build-auth-string
+  {:y 1125,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] (str "Bearer " :settings/openai-api-key)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 60,
+   :x 1650,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :http-req-map
   {:y 1225,
    :description ["Request map for the HTTP call. Headers, Method, URL, and the call body map."],
@@ -1044,7 +1044,7 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :zoom [-1087.26 -804.94 1.25],
+ :zoom [-983.54 -592.03 1.225],
  :opts {:close-on-done? true, :retry-on-error? true, :timeout 120000, :retries 404, :overrides {:style-param "vivid"}},
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
@@ -1096,5 +1096,5 @@
   [:shell-command-2 :abs-file-base-path/x]
   [:abs-file-base-path :generate-file-path/base-dir]
   [:abs-file-base-path :create-png-path/base-dir]
-  [:size-param :open-fn-4/x]
-  [:open-fn-4 :http-req-map/apikey*]]}
+  [:build-auth-string :http-req-map/apikey*]
+  [:size-param :build-auth-string/x]]}

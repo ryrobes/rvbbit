@@ -4,6 +4,16 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
+ :materialize-offenses-drag-4 {:signal    :signal/daily-at-7am
+                               :type      :sql
+                               :snapshot? false
+                               :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
+                                                           :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
+                                                           :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                                           :SHOOTING :STREET :UCR_PART :YEAR]
+                                           :from          [[:offenses :dd96]]
+                                           :page          -4
+                                           :connection-id "boston-crime"}}
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
@@ -32,6 +42,31 @@
                                                                   default-field-attributes
                                                                   default-derived-fields
                                                                   default-viz-shapes)))}
+ :materialize-cached-offenses-drag-43-1
+   {:signal    :signal/daily-at-7am
+    :type      :sql
+    :snapshot? false
+    :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH
+                                :OCCURRED_ON_DATE :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                :SHOOTING :STREET :UCR_PART :YEAR]
+                :from          [[:offenses_drag_43 :zz175]]
+                :page          -4
+                :connection-id "cache.db.memory"}}
+ :materialize-DISTRICT-drag-18
+   {:signal :signal/daily-at-7am
+    :type :sql
+    :snapshot? false
+    :data
+      {:select [:DISTRICT [[:count 1] :rowcnt] :OFFENSE_CODE :STREET]
+       :from
+         [[{:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE
+                     :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
+                     :YEAR]
+            :from   [[:offenses :ww131]]} :kk71]]
+       :group-by [:DISTRICT :OFFENSE_CODE :STREET]
+       :order-by [[:rowcnt :desc]]
+       :page -4
+       :connection-id "boston-crime"}}
  :random-mp3
    {:signal :signal/changed-wallpaper?
     :type :clojure
@@ -93,6 +128,26 @@
        :connection-id   "system-db"
        :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
        :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
+ :materialize-offenses-drag-43 {:signal    :signal/daily-at-7am
+                                :type      :sql
+                                :snapshot? false
+                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
+                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
+                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                                            :SHOOTING :STREET :UCR_PART :YEAR]
+                                            :from          [[:offenses :aa855]]
+                                            :page          -4
+                                            :connection-id "boston-crime"}}
+ :materialize-offenses-drag-20 {:signal    :signal/daily-at-7am
+                                :type      :sql
+                                :snapshot? false
+                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
+                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
+                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                                            :SHOOTING :STREET :UCR_PART :YEAR]
+                                            :from          [[:offenses :zz384]]
+                                            :page          -4
+                                            :connection-id "boston-crime"}}
  :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
  :refresh-boston-crime {:signal :signal/daily-at-9am
                         :type   :clojure
@@ -113,6 +168,16 @@
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
+ :materialize-offenses-drag-24 {:signal    :signal/daily-at-7am
+                                :type      :sql
+                                :snapshot? false
+                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
+                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
+                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                                            :SHOOTING :STREET :UCR_PART :YEAR]
+                                            :from          [[:offenses :ww131]]
+                                            :page          -4
+                                            :connection-id "boston-crime"}}
  :wallpaper-of-the-moment
    {:signal  :signal/every-5-minutes
     :type    :clojure
@@ -141,4 +206,18 @@
                                                                    default-field-attributes
                                                                    default-derived-fields
                                                                    default-viz-shapes)))}
+ :materialize-Lat-drag-22
+   {:signal :signal/daily-at-7am
+    :type :sql
+    :snapshot? false
+    :data
+      {:select [[[:sum :Lat] :Lat_sum] :OFFENSE_CODE_GROUP]
+       :from
+         [[{:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE
+                     :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
+                     :YEAR]
+            :from   [[:offenses :ww131]]} :ee900]]
+       :group-by [:OFFENSE_CODE_GROUP]
+       :page -4
+       :connection-id "boston-crime"}}
  :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}}

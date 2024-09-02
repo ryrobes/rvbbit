@@ -6,32 +6,31 @@
    [rvbbit-backend.util :as ut]
    [clojure.core.memoize :as memo]))
 
-(defn jdbc-conn-good? [conn] true)
 
-(defn normalize-jdbc-data-type [x] x)
+;; (defn get-test-conn-meta
+;;   [db-conn]
+;;   (into []
+;;         (for [t (vec (jdbc/with-db-metadata [m db-conn]
+;;                                             (jdbc/metadata-result (.getTables m
+;;                                                                               nil ;; catalog pattern
+;;                                                                               nil ;; schema pattern
+;;                                                                               nil ;; table name
+;;                                                                               (into-array ["TABLE" "VIEW"]) ;; types
+;;                                                                   ))))]
+;;           (do (ut/pp t)
+;;             (merge t ;(select-keys t [:table_schem :table_name :table_type])
+;;                    {:fields (for [f (jdbc/with-db-metadata [m db-conn]
+;;                                                            (jdbc/metadata-result (.getColumns m
+;;                                                                                               (:table_cat t) ;nil
+;;                                                                                                              ;;(get
+;;                                                                                                              ;db-conn
+;;                                                                                               (:table_schem t) ;nil
+;;                                                                                               (:table_name t)
+;;                                                                                               nil)))]
+;;                               (do (ut/pp f)
+;;                                 f))})))))
 
-(defn get-test-conn-meta
-  [db-conn]
-  (into []
-        (for [t (vec (jdbc/with-db-metadata [m db-conn]
-                                            (jdbc/metadata-result (.getTables m
-                                                                              nil ;; catalog pattern
-                                                                              nil ;; schema pattern
-                                                                              nil ;; table name
-                                                                              (into-array ["TABLE" "VIEW"]) ;; types
-                                                                  ))))]
-          (do ;(ut/ppln t)
-            (merge t ;(select-keys t [:table_schem :table_name :table_type])
-                   {:fields (for [f (jdbc/with-db-metadata [m db-conn]
-                                                           (jdbc/metadata-result (.getColumns m
-                                                                                              (:table_cat t) ;nil
-                                                                                                             ;;(get
-                                                                                                             ;db-conn
-                                                                                              (:table_schem t) ;nil
-                                                                                              (:table_name t)
-                                                                                              nil)))]
-                              (do ;(ut/ppln f)
-                                f))})))))
+
 
 (defn get-jdbc-conn-meta
   [db-conn]
@@ -90,7 +89,9 @@
                       {[conn-type conn-id (:table_type table-map)
                         (if (nil? (:table_schem table-map)) "none" (:table_schem table-map)) (:table_cat table-map)
                         (:table_name table-map) (:column_name field)]
-                         {:column_type (:type_name field) :meta_ddl_gen (jt/instant)}}))))))
+                         {:column_type (:type_name field) 
+                          ;;:meta_ddl_gen (jt/instant)
+                          }}))))))
 
 (defn db-typer-fn [db-conn]
   (try 

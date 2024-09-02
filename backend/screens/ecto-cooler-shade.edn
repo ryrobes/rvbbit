@@ -1,4 +1,76 @@
-{:reco-preview nil,
+{:reco-preview "2006850921",
+ :sql-source
+ {:gen-viz-1022
+  {:select
+   [[[[:count 1]] :rows]
+    [[:substr :submitted_date 6 2] :by_month_sqlite_submitted_date]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :month
+       :run_time
+       :season
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :bb86]]}
+     :cc805]],
+   :group-by [[:substr :submitted_date 6 2]]},
+  :bigfoot-sightings-drag-35
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :month
+    :run_time
+    :season
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :bb86]],
+   :_last-run "09:11:13"},
+  :bigfoot_sightings
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:bigfoot_sightings],
+   :limit 111},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-09-02 09:54:04",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1632173835,
+   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_]},
+  :raw_custom_override86093687__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override86093687__block_86_clojure_new_clojure_],
+   :limit 111},
+  :raw_custom_override_793100426__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_],
+   :limit 111}},
  :meta
  {nil
   {:fields
@@ -111,6 +183,7 @@
      :cardinality 5}},
    :database-type "SQLite",
    :rowcount 34},
+  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :fields-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :bigfoot-sightings-drag-35-hist-93-535036263
   {:fields
@@ -1666,6 +1739,65 @@
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 10},
+  :files-sys
+  {:fields
+   {:file_path
+    {:min "./screens/cyan-pink-creepers.edn",
+     :data-type "string",
+     :commons
+     {"/home/ryanr/rvbbit/backend/./screens/frost-terminal2.edn" 2,
+      "./screens/dynamic-theme-example1.edn" 1,
+      "./screens/looking-glass-sine-wave.edn" 1},
+     :distinct 15,
+     :group-by? true,
+     :median "./screens/nice-car-choom.edn",
+     :max "/home/ryanr/rvbbit/backend/./screens/frost-terminal2.edn",
+     :avg "./screens/cyan-pink-creepers.edn (non-numeric average)",
+     :cardinality 93},
+    :screen_name
+    {:min "cyan-pink-creepers",
+     :data-type "string",
+     :commons
+     {"frost-terminal2" 3, "dynamic-theme-example1" 2, "cyan-pink-creepers" 2},
+     :distinct 12,
+     :group-by? true,
+     :median "frost-terminal2",
+     :max "winter-theme",
+     :avg "cyan-pink-creepers (non-numeric average)",
+     :cardinality 75},
+    :blocks
+    {:min 4,
+     :data-type "integer",
+     :commons {15 4, 10 2, 6 2},
+     :distinct 10,
+     :group-by? true,
+     :median 24,
+     :max 48,
+     :avg 14.1875,
+     :cardinality 62},
+    :queries
+    {:min 1,
+     :data-type "integer",
+     :commons {2 5, 1 3, 3 3},
+     :distinct 7,
+     :group-by? true,
+     :median 2,
+     :max 17,
+     :avg 4.8125,
+     :cardinality 43},
+    :ts
+    {:min "2024-09-02 09:51:39",
+     :data-type "string",
+     :commons
+     {"2024-09-02 09:51:39" 12, "2024-09-02 09:52:42" 2, "2024-09-02 09:54:22" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "2024-09-02 09:51:39",
+     :max "2024-09-02 09:54:22",
+     :avg "2024-09-02 09:51:39 (non-numeric average)",
+     :cardinality 25}},
+   :database-type "SQLite",
+   :rowcount 16},
   :grid1-sys*
   {:fields
    {:flow_id
@@ -5614,165 +5746,117 @@
      :cardinality 34}},
    :database-type "SQLite",
    :rowcount 50}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys 170},
+  :files-list* {:files-sys 170},
+  :blocks-list* {:blocks-sys ##Inf},
+  :block-8590 {:bigfoot-sightings-drag-35 100}},
  :runstream-drops nil,
  :tabs ["snowshoe hare"],
  :selected-cols {},
- :server
- {:settings
-  {:harvest-on-boot? true,
-   :default "./screens/looking-glass-redux.edn",
-   :new-block-rand
-   ["Why, sometimes I've believed as many as six impossible things before breakfast."
-    "Imagination is the only weapon in the war against reality."
-    "It's no use going back to yesterday, because I was a different person then."
-    "Who in the world am I? Ah, that's the great puzzle..."
-    "Curiouser and curiouser!"
-    "If you don't know where you are going any road can take you there."
-    "We're all mad here."
-    "I can't go back to yesterday because I was a different person then."
-    "It's always tea-time."
-    "Begin at the beginning and go on till you come to the end; then stop."
-    "I knew who I was this morning, but I've changed a few times since then."
-    "How long is forever? Sometimes, just one second."
-    "If everybody minded their own business, the world would go around a great deal faster than it does."
-    "I don't think... then you shouldn't talk, said the Hatter."
-    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
-    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
-    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
-    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
-    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
-    "Well, I never heard it before, but it sounds uncommon nonsense."
-    "Why, sometimes I've believed as many as six impossible things before breakfast."
-    "Imagination is the only weapon in the war against reality."
-    "Who in the world am I? Ah, that's the great puzzle."
-    "We're all mad here."
-    "How long is forever? Sometimes, just one second."
-    "The world is full of obvious things which nobody by any chance ever observes."
-    "Reality is that which, when you stop believing in it, doesn't go away."
-    "The sky above the port was the color of television, tuned to a dead channel."
-    "Information wants to be free."
-    "The future is already here – it's just not evenly distributed."
-    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
-    "The 'Net is a waste of time, and that's exactly what's right about it."
-    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
-    "The street finds its own uses for things."
-    "Accelerated world. Accelerated nervous system to go with it."
-    "The future has arrived — it's just not evenly distributed yet."
-    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
-    "When you want to know how things really work, study them when they're coming apart."
-    "The human sensory system is a lot more complex and weird than most people realize."
-    "Time moves in one direction, memory in another."
-    "The only thing that keeps you sane is to think that it's all a bad dream."
-    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
-    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
-    "Secrets are not the same as surprises."
-    "Neuromancer. The lane to the land of the dead."],
-   :modes
-   {:terminal [:terminal :*data],
-    :markdown [:markdown :*data],
-    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
-    :pre
-    [:pre
-     {:style
-      {:color :theme/editor-outer-rim-color,
-       :background-color "#00000000",
-       :border "none",
-       :text-shadow "4px 4px 4px #00000088",
-       :font-size "17px",
-       :font-family :theme/monospaced-font}}
-     [:str :*data]],
-    :edn [:edn :*data],
-    :clover [:box :child :*data],
-    :pretty [:pretty-box :*data],
-    :text [:console :*data],
-    :data [:data-viewer :*data]},
-   :kits {},
-   :clover-templates
-   {:color-theft
-    {:args [:*input],
-     :body
-     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
-    :pretty-box
-    {:args [:*input],
-     :body
-     [:box
-      :size
-      "auto"
-      :align
-      :center
-      :justify
-      :center
-      :style
-      {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:str :*input]]}
-      :child
-      [:str :*input]]},
-    :new-block-quotes-box
-    {:args [:*input],
-     :body
-     [:box
-      :align
-      :center
-      :justify
-      :center
-      :style
-      {:font-size "21px",
-       :font-weight 700,
-       :padding-top "6px",
-       :padding-left "14px",
-       :margin-top "-8px",
-       :color :theme/editor-outer-rim-color,
-       :font-family :theme/base-font}
-      :child
-      [:speak [:str :*input]]]},
-    :clj
-    {:args [:code],
-     :body
-     [:run-solver
-      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
-    :clj2
-    {:args [:code],
-     :body
-     [:run-solver
-      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
-    :cheese-burger
-    {:args [:x],
-     :body
-     [:box
-      :style
-      {:color "yellow", :font-size "23px"}
-      :child
-      [:str :x "CHEESEBURGER!"]]}},
-   :openai-api-key "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",
-   :eleven-labs-default-voice-name "Not OG Buffy",
-   :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
-   :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
-   :debug-level 1,
-   :screens
-   ["dynamic-theme-example1"
-    "ecto-cooler-shade"
-    "looking-glass-sine-wave"
-    "new-age-hacking"
-    "server-stats2"
-    "test-blog-screen"
-    "tweet-demo-thing-bigfoot-is-blurry"
-    "winter-theme"
-    "winter-theme-choom"]}},
+ :server {:settings nil},
  :runstreams nil,
  :editor? false,
  :buffy? false,
  :valid-kits
- {[:clojure :export-to-csv] [],
+ {[:clojure :export-to-csv]
+  [[nil :queries nil]
+   [:reco-preview :queries :query-preview]
+   [:block-724 :queries :gen-viz-1022]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:block-3284 :queries :new-clojure-2-sqlized]
+   [:block-8590 :queries :bigfoot-sightings-drag-35]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
-  [:clojure :view-lundberg] [],
+  [:clojure :view-lundberg]
+  [[:block-1084 :views :hare-vw-8]
+   [:reco-preview :views :oz]
+   [:block-724 :views :reech]
+   [:block-9973 :views :hare-vw-2]
+   [:block-4733 :views :hare-vw-7]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:block-482 :views :hare-vw-16]
+   [:block-9709 :views :hare-vw-17]
+   [:block-10760 :views :hare-vw-14]
+   [:block-7845 :views :hare-vw-4]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-1320 :views :hare-vw-9]
+   [:block-9482 :views :hare-vw-15]],
   [:clojure :gen-ev] [],
-  [:outliers :get-outliers] []},
- :memory [893227112 872205544 4294705152],
- :client-name :brave-pyramidal-butterfly-10,
+  [:outliers :get-outliers]
+  [[nil :queries nil]
+   [:reco-preview :queries :query-preview]
+   [:block-724 :queries :gen-viz-1022]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:block-3284 :queries :new-clojure-2-sqlized]
+   [:block-8590 :queries :bigfoot-sightings-drag-35]]},
+ :memory [143807919 123569947 4294705152],
+ :client-name :wealthy-magenta-beaver-27,
  :flow-editor? true,
- :window {:w 2672, :h 1368},
- :status {:heartbeat {:kick []}},
+ :window {:w 2236, :h 1342},
+ :implicit-rowsets {:solver [:new-clojure nil]},
+ :post-meta
+ {:fields-sys
+  {:* {:rowcount 26},
+   :field_name {:distinct 26},
+   :field_type {:distinct 5},
+   :data_type {:distinct 5}},
+  :files-sys
+  {:* {:rowcount 16},
+   :file_path {:distinct 15},
+   :screen_name {:distinct 12},
+   :blocks {:distinct 10},
+   :queries {:distinct 7},
+   :ts {:distinct 4}},
+  :blocks-sys
+  {:* {:rowcount 6},
+   :block_key {:distinct 6},
+   :block_name {:distinct 6},
+   :queries {:distinct 2},
+   :views {:distinct 3},
+   :block_data {:distinct 6},
+   :view_names {:distinct 5},
+   :query_names {:distinct 2}},
+  :new-clojure-sqlized {:* {:rowcount 17}, :ffilename {:distinct 17}}},
+ :flow-estimates
+ {:blocks-sys {:times 0.002, :run-id :blocks-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :files-sys {:times 0.002, :run-id :files-sys},
+  :bigfoot-sightings-drag-35 {:times 0.022, :run-id :bigfoot-sightings-drag-35},
+  :raw-custom-override-793100426
+  {:times 0.452, :run-id :raw-custom-override-793100426},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
+  :gen-viz-1022 {:times 0.011, :run-id :gen-viz-1022},
+  :raw-custom-override714264689
+  {:times 0.017, :run-id :raw-custom-override714264689},
+  :connections-sys {:times 0.001, :run-id :connections-sys}},
+ :status
+ {:heartbeat
+  {:kick
+   [:time/now-seconds
+    :solver-status/wealthy-magenta-beaver-27>raw-custom-override714264689>running?
+    :solver/get-my-colors-1790973138
+    :solver-status/wealthy-magenta-beaver-27>get-my-colors-1790973138>running?
+    :kit/kicks>wealthy-magenta-beaver-27
+    :flow-status/my-new-flow3587>*running?
+    :solver-status/wealthy-magenta-beaver-27>raw-custom-override-793100426>running?
+    :solver-meta/raw-custom-override-793100426>output>evald-result>out
+    :solver-meta/raw-custom-override-793100426>output>evald-result>value-hash
+    :solver/get-my-colors1909740824
+    :solver/raw-custom-override714264689
+    :solver/raw-custom-override-793100426
+    :flow-status/a-random-wow>*running?
+    :solver-status/wealthy-magenta-beaver-27>get-my-colors1909740824>running?]},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
  :screen-name "ecto-cooler-shade",
  :recos-page2 0,
  :selected-tab "snowshoe hare",
@@ -5789,15 +5873,23 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   18
+   148
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :user-params-hash -729873338,
+ :base-sniff-queries
+ {:bigfoot_sightings 302026766,
+  :raw_custom_override86093687__block_86_clojure_new_clojure_ -1892756218,
+  :raw_custom_override_793100426__block_86_clojure_new_clojure_ 1038642995},
+ :user-params-hash -462559696,
  :grid-recos? true,
- :resolved-queries {:tmp-1510118111-hist-sys {:_last-run "11:34:10"}},
+ :session-hash -791672054,
+ :resolved-queries
+ {:tmp-1510118111-hist-sys {:_last-run "11:34:10"}, nil {:_last-run "09:54:40"}},
  :panels
- {nil {:queries {:tmp-1510118111-hist-sys {:_last-run "11:34:10"}}},
+ {nil
+  {:queries
+   {:tmp-1510118111-hist-sys {:_last-run "11:34:10"}, nil {:_last-run "09:54:40"}}},
   :block-5999
   {:h 3,
    :w 11,
@@ -5907,24 +5999,7 @@
   :viz-tables-sys2 {:table_name :bigfoot-sightings-drag-35},
   :class-drag-41 nil,
   :param
-  {:selected-view [:views :hare-vw-4],
-   :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :style
-    {:font-size "21px",
-     :font-weight 700,
-     :padding-top "6px",
-     :padding-left "14px",
-     :margin-top "-8px",
-     :color :theme/editor-outer-rim-color,
-     :font-family :theme/base-font}
-    :child
-    "You're entirely bonkers. But I'll tell you a secret... all the best people are."],
-   :selected-block :block-12017},
+  {:selected-view nil, :selected-view-data nil, :selected-block :block-12017},
   :theme
   {:theme-name "who ya gonna call?",
    :codemirror-theme "ayu-mirage",
@@ -6036,4 +6111,4 @@
    :connection_id "system-db",
    :styler_highlight_8717ssa 0},
   :tracker nil},
- :selected-flow "my-new-flow2210"}
+ :selected-flow "my-new-flow3587"}

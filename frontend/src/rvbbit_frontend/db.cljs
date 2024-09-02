@@ -11,6 +11,8 @@
 (def bar-hover-text (reagent/atom nil))
 (def console-voice-text (reagent/atom nil))
 
+(def running-queries (atom #{}))
+
 (def click-params-snapshot (atom nil))
 (def param-v-boxes (reagent/atom nil))
 (def solver-view-mode (reagent/atom "return value"))

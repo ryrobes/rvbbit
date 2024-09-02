@@ -50,7 +50,7 @@ find ./target -name "rvbbit*standalone.jar" -exec cp {} rvbbit.jar \;
 
 
 VERSION=$(grep -m1 'defproject' project.clj | sed 's/^[^"]*"//' | sed 's/".*//')
-VERSION=${VERSION%.*}
+##VERSION=${VERSION%.*}
 DIR_NAME="rvbbit-$VERSION"
 rm -rf "../$DIR_NAME"
 mkdir -p "../$DIR_NAME"

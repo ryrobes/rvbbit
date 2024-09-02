@@ -12,8 +12,7 @@
    ; [wkok.openai-clojure.api :as api]
    ))
 
-;; (def openapi-key (get (config/settings) :openai-api-key))
-;; (def openapi-org-id (get (config/settings) :openai-org-id))
+
 
 (defn oai-call [req openai-api-key openai-org-id]
   (try

@@ -1,0 +1,1834 @@
+{:reco-preview "2006850921",
+ :sql-source
+ {:client_memory
+  {:select [:*], :connection-id "system-db", :from [:client_memory], :limit 111},
+  :raw_custom_override_793100426__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_],
+   :limit 111},
+  :bigfoot-sightings-drag-35
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :month
+    :run_time
+    :season
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :bb86]],
+   :_last-run "09:11:13"},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-09-02 09:54:04",
+   :_sqlized-by [:block-86 :clojure :new-clojure],
+   :_sqlized-hash 1632173835,
+   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_]},
+  :gen-viz-1022
+  {:select
+   [[[[:count 1]] :rows]
+    [[:substr :submitted_date 6 2] :by_month_sqlite_submitted_date]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :month
+       :run_time
+       :season
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :bb86]]}
+     :cc805]],
+   :group-by [[:substr :submitted_date 6 2]]},
+  :raw_custom_override86093687__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override86093687__block_86_clojure_new_clojure_],
+   :limit 111},
+  :bigfoot_sightings
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:bigfoot_sightings],
+   :limit 111},
+  :client-memory-drag-36
+  {:select
+   [:client_name
+    :recent_messages_per_second
+    :messages_per_second
+    :mem_used
+    :batches
+    :packets
+    :ts],
+   :where [:= :client_name :*client-name-str],
+   :from [[:client_memory :ee183]],
+   :refresh-every 10,
+   :cache? false,
+   :_last-run "23:17:36",
+   :order-by [[:mem_time :desc]]},
+  :gen-viz-516
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 50,
+   :group-by [:ts],
+   :_last-run "23:17:36",
+   :refresh-every 10,
+   :from
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts :desc]],
+   :connection-id "system-db",
+   :select
+   [[[[:sum :mem_used]] :mem_used]
+    [[:sum :recent_messages_per_second] :messages_per_second]
+    :ts],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (reverse
+         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
+ :meta
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 126,
+     :group-by? true,
+     :commons {"game-of-life-test1" 4, ":=" 1, ":>=" 1},
+     :cardinality 97},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 95, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 25},
+    :full_map
+    {:data-type "string",
+     :distinct 127,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"game-of-life-test1\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/game-of-life-test1.edn\", :defaults {:cols-int 20, :iterations-max 44, :tick-delay-ms 500, :rows-int 20}, :types {:cols-int :integer, :iterations-max :integer, :tick-delay-ms :integer, :rows-int :integer, :out nil}, :inputs [:cols-int :iterations-max :tick-delay-ms :rows-int], :required [:cols-int :iterations-max :tick-delay-ms :rows-int]}"
+      3,
+      "{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1},
+     :cardinality 98},
+    :inputs
+    {:data-type "string",
+     :distinct 67,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 51},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 95, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 16},
+    :input_types
+    {:data-type "string",
+     :distinct 57,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 44},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 63, "" 25, ":boolean" 12},
+     :cardinality 10},
+    :category
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {":sub-flows" 92, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 3}},
+   :rowcount 129},
+  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :fields-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :client_memory
+  {:fields
+   {:mem_limit
+    {:min 2172649472,
+     :data-type "integer",
+     :commons {4294705152 74, 2172649472 37},
+     :distinct 2,
+     :group-by? true,
+     :median 4294705152,
+     :max 4294705152,
+     :avg 3.5873532586666665E9,
+     :cardinality 1},
+    :server_subs
+    {:min 0,
+     :data-type "integer",
+     :commons {27 36, 10 36, 6 24},
+     :distinct 7,
+     :group-by? true,
+     :median 27,
+     :max 27,
+     :avg 15.09009009009009,
+     :cardinality 6},
+    :mem_used
+    {:min 101776048,
+     :data-type "integer",
+     :commons {399378497 1, 394395120 1, 105669571 1},
+     :distinct 111,
+     :group-by? true,
+     :median 158436317,
+     :max 592031765,
+     :avg 2.5038357323423424E8,
+     :cardinality 100},
+    :client_subs
+    {:min "",
+     :data-type "integer",
+     :commons {27 36, 10 36, 6 24},
+     :distinct 7,
+     :group-by? true,
+     :median "27",
+     :max "6",
+     :avg " (non-numeric average)",
+     :cardinality 6},
+    :recent_messages_per_second
+    {:min "",
+     :data-type "float",
+     :commons {1.73 19, 0.47 19, 1.67 8},
+     :distinct 35,
+     :group-by? true,
+     :median "1.8",
+     :max "9.93",
+     :avg " (non-numeric average)",
+     :cardinality 31},
+    :mem_time
+    {:min "2024-08-29T05:17:31.260Z",
+     :data-type "string",
+     :commons
+     {"2024-08-29T05:21:00.944Z" 1,
+      "2024-08-29T05:20:11.738Z" 1,
+      "2024-08-29T05:23:00.721Z" 1},
+     :distinct 111,
+     :group-by? true,
+     :median "2024-08-29T05:22:15.728Z",
+     :max "2024-08-29T05:27:11.595Z",
+     :avg "2024-08-29T05:17:31.260Z (non-numeric average)",
+     :cardinality 100},
+    :ts
+    {:min "2024-08-29 01:17:31",
+     :data-type "string",
+     :commons
+     {"2024-08-29 01:23:15" 3, "2024-08-29 01:20:30" 3, "2024-08-29 01:22:00" 3},
+     :distinct 56,
+     :group-by? true,
+     :median "2024-08-29 01:22:00",
+     :max "2024-08-29 01:26:31",
+     :avg "2024-08-29 01:17:31 (non-numeric average)",
+     :cardinality 50},
+    :messages_per_second
+    {:min "",
+     :data-type "float",
+     :commons {1.72 4, 1.68 4, 1.7 4},
+     :distinct 80,
+     :group-by? true,
+     :median "1.72",
+     :max "8.6",
+     :avg " (non-numeric average)",
+     :cardinality 72},
+    :latency
+    {:min 148,
+     :data-type "integer",
+     :commons {209 3, 215 3, 216 3},
+     :distinct 90,
+     :group-by? true,
+     :median 237,
+     :max 832,
+     :avg 283.0450450450451,
+     :cardinality 81},
+    :batches
+    {:min 15,
+     :data-type "integer",
+     :commons {657943 1, 658655 1, 37 1},
+     :distinct 111,
+     :group-by? true,
+     :median 4124,
+     :max 2319079,
+     :avg 992471.8198198198,
+     :cardinality 100},
+    :client_name
+    {:min ":composed-linear-mole-27",
+     :data-type "string",
+     :commons
+     {":nurturing-spherical-dolphin-12" 37,
+      ":divine-cylindrical-prairie-dog-44" 37,
+      ":transformative-round-crow-22" 21},
+     :distinct 4,
+     :group-by? true,
+     :median ":nurturing-spherical-dolphin-12",
+     :max ":transformative-round-crow-22",
+     :avg ":transformative-round-crow-22 (non-numeric average)",
+     :cardinality 3},
+    :mem_total
+    {:min 156445999,
+     :data-type "integer",
+     :commons {182807985 6, 183070129 3, 182807943 3},
+     :distinct 101,
+     :group-by? true,
+     :median 183074454,
+     :max 613729229,
+     :avg 2.846434524414414E8,
+     :cardinality 90},
+    :packets
+    {:min 7,
+     :data-type "integer",
+     :commons {342761 1, 23469 1, 8 1},
+     :distinct 111,
+     :group-by? true,
+     :median 23479,
+     :max 342761,
+     :avg 122169.95495495496,
+     :cardinality 100},
+    :mem_used_mb
+    {:min "100.7744",
+     :data-type "string",
+     :commons {"114.35" 1, "396.8593" 1, "380.5479" 1},
+     :distinct 111,
+     :group-by? true,
+     :median "151.7076",
+     :max "99.8256",
+     :avg "151.8935 (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 111},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:min "none",
+     :data-type "string",
+     :commons {"none" 4},
+     :distinct 1,
+     :group-by? true,
+     :median "none",
+     :max "none",
+     :avg "none (non-numeric average)",
+     :cardinality 25},
+    :db_catalog
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 4},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 25},
+    :connection_id
+    {:min "cache.db.memory",
+     :data-type "string",
+     :commons {"cache.db.memory" 4},
+     :distinct 1,
+     :group-by? true,
+     :median "cache.db.memory",
+     :max "cache.db.memory",
+     :avg "cache.db.memory (non-numeric average)",
+     :cardinality 25},
+    :schema_cat
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 4},
+     :distinct 1,
+     :group-by? false,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 25},
+    :table_name
+    {:min "DISTRICT_drag_18",
+     :data-type "string",
+     :commons {"offenses_drag_43" 1, "offenses_drag_20" 1, "Lat_drag_22" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "Lat_drag_22",
+     :max "offenses_drag_43",
+     :avg "DISTRICT_drag_18 (non-numeric average)",
+     :cardinality 100},
+    :fields
+    {:min 4,
+     :data-type "integer",
+     :commons {19 2, 4 1, 6 1},
+     :distinct 3,
+     :group-by? false,
+     :median 11.5,
+     :max 19,
+     :avg 12,
+     :cardinality 75}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :gen-viz-797
+  {:fields
+   {:rows
+    {:min 1,
+     :data-type "integer",
+     :commons {76 5, 146 4, 116 4},
+     :distinct 230,
+     :group-by? false,
+     :median 283,
+     :max 1510,
+     :avg 253.41324921135646,
+     :cardinality 72},
+    :date_posted
+    {:min "1998-03-07",
+     :data-type "string",
+     :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
+     :distinct 317,
+     :group-by? true,
+     :median "2004-11-09",
+     :max "2014-05-08",
+     :avg "1998-03-07 (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 317},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:min "a-random-wow",
+     :data-type "string",
+     :commons
+     {"openai-image-gen-ladder" 2, "game-of-life-test1" 2, "simple-python-exec" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "game-of-life-test1",
+     :max "simple-python-exec",
+     :avg "game-of-life-test1 (non-numeric average)",
+     :cardinality 75},
+    :file_path
+    {:min "./flows/a-random-wow.edn",
+     :data-type "string",
+     :commons
+     {"/home/ryanr/rvbbit/backend/./flows/game-of-life-test1.edn" 2,
+      "./flows/simple-python-exec.edn" 1,
+      "./flows/node-color-thief-js-webp.edn" 1},
+     :distinct 7,
+     :group-by? true,
+     :median "./flows/openai-image-gen-ladder.edn",
+     :max "/home/ryanr/rvbbit/backend/./flows/openai-image-gen-ladder.edn",
+     :avg
+     "/home/ryanr/rvbbit/backend/./flows/game-of-life-test1.edn (non-numeric average)",
+     :cardinality 87},
+    :last_modified
+    {:min "2024-08-31 19:10:15",
+     :data-type "string",
+     :commons
+     {"2024-08-31 19:10:15" 4, "2024-09-02 08:25:12" 2, "2024-09-01 02:42:12" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "2024-08-31 19:10:15",
+     :max "2024-09-02 08:25:12",
+     :avg "2024-09-02 08:25:12 (non-numeric average)",
+     :cardinality 50}},
+   :database-type "SQLite",
+   :rowcount 8},
+  :files-sys
+  {:fields
+   {:file_path
+    {:min "./screens/cyan-pink-creepers.edn",
+     :data-type "string",
+     :commons
+     {"/home/ryanr/rvbbit/backend/./screens/frost-terminal2.edn" 2,
+      "./screens/dynamic-theme-example1.edn" 1,
+      "./screens/looking-glass-sine-wave.edn" 1},
+     :distinct 16,
+     :group-by? true,
+     :median "./screens/random-collection.edn",
+     :max "/home/ryanr/rvbbit/backend/./screens/frost-terminal2.edn",
+     :avg "./screens/cyan-pink-creepers.edn (non-numeric average)",
+     :cardinality 94},
+    :screen_name
+    {:min "cyan-pink-creepers",
+     :data-type "string",
+     :commons
+     {"frost-terminal2" 3, "dynamic-theme-example1" 2, "ecto-cooler-shade" 2},
+     :distinct 12,
+     :group-by? true,
+     :median "frost-terminal2",
+     :max "winter-theme",
+     :avg "cyan-pink-creepers (non-numeric average)",
+     :cardinality 70},
+    :blocks
+    {:min 4,
+     :data-type "integer",
+     :commons {15 4, 6 3, 10 2},
+     :distinct 10,
+     :group-by? true,
+     :median 33,
+     :max 48,
+     :avg 13.705882352941176,
+     :cardinality 58},
+    :queries
+    {:min 1,
+     :data-type "integer",
+     :commons {2 6, 1 3, 3 3},
+     :distinct 7,
+     :group-by? true,
+     :median 2,
+     :max 17,
+     :avg 4.647058823529412,
+     :cardinality 41},
+    :ts
+    {:min "2024-09-02 09:51:39",
+     :data-type "string",
+     :commons
+     {"2024-09-02 09:51:39" 12, "2024-09-02 09:52:42" 2, "2024-09-02 09:54:45" 1},
+     :distinct 5,
+     :group-by? true,
+     :median "2024-09-02 09:51:39",
+     :max "2024-09-02 09:54:45",
+     :avg "2024-09-02 09:51:39 (non-numeric average)",
+     :cardinality 29}},
+   :database-type "SQLite",
+   :rowcount 17},
+  :gen-viz-94
+  {:fields
+   {:diff
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 1},
+     :distinct 1,
+     :group-by? false,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {2187 1, 1719 1, 2202 1},
+     :cardinality 100},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 82,
+     :group-by? true,
+     :commons {13.93 4, 13.54 4, 12.87 4},
+     :cardinality 73},
+    :uptime_seconds
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {915 1, 1364 1, 1004 1},
+     :cardinality 100},
+    :queries_per_second
+    {:data-type "float",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 110, 0 1},
+     :cardinality 1},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 111,
+     :group-by? true,
+     :commons
+     {"2024-05-19 21:48:11" 1, "2024-05-19 21:34:41" 1, "2024-05-19 21:56:41" 1},
+     :cardinality 100},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 84,
+     :group-by? true,
+     :commons {14.59 3, 14.41 3, 14.32 3},
+     :cardinality 75},
+    :messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {6424 1, 15022 1, 7808 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 20,
+     :group-by? true,
+     :commons {53 14, 41 11, 38 10},
+     :cardinality 18},
+    :sys_load
+    {:data-type "float",
+     :distinct 92,
+     :group-by? true,
+     :commons {3.16 4, 2.9 3, 3.48 2},
+     :cardinality 82},
+    :unix_ms
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {1716169781645 1, 1716169391660 1, 1716169121653 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 109,
+     :group-by? true,
+     :commons {2593 2, 2595 2, 2220 1},
+     :cardinality 98},
+    :recent_queries_run
+    {:data-type "integer",
+     :distinct 31,
+     :group-by? true,
+     :commons {16 17, 24 14, 20 14},
+     :cardinality 27},
+    :thread_count
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? true,
+     :commons {201 17, 203 12, 205 12},
+     :cardinality 16},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 92,
+     :group-by? true,
+     :commons {94 2, 37 2, 105 2},
+     :cardinality 82},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 73, 11 38},
+     :cardinality 1},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {10 107, 8 2, 9 1},
+     :cardinality 3},
+    :recent_messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {6424 1, 15022 1, 7808 1},
+     :cardinality 100},
+    :recent_queries_per_second
+    {:data-type "float",
+     :distinct 36,
+     :group-by? true,
+     :commons {1.07 16, 1.33 14, 1.6 14},
+     :cardinality 32},
+    :seconds_since_last_update
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 59, 15 51, -1 1},
+     :cardinality 2}},
+   :rowcount 111},
+  :rowcnt-drag-2
+  {:fields
+   {:rowcnt_sum
+    {:min 80332,
+     :data-type "integer",
+     :commons {80332 1},
+     :distinct 1,
+     :group-by? false,
+     :median 80332,
+     :max 80332,
+     :avg 80332,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
+  :gen-viz-828
+  {:fields
+   {:agg
+    {:min 1,
+     :data-type "integer",
+     :commons {76 5, 146 4, 116 4},
+     :distinct 230,
+     :group-by? false,
+     :median 283,
+     :max 1510,
+     :avg 253.41324921135646,
+     :cardinality 72},
+    :date_posted
+    {:min "1998-03-07",
+     :data-type "string",
+     :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
+     :distinct 317,
+     :group-by? true,
+     :median "2004-11-09",
+     :max "2014-05-08",
+     :avg "2014-05-08 (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x680477b2 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x680477b2 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":sub-flow" 1, ":rabbit-base" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :gen-viz-84
+  {:fields
+   {:rows
+    {:min 105,
+     :data-type "integer",
+     :commons {65114 1, 1905 1, 105 1},
+     :distinct 6,
+     :group-by? false,
+     :median 1769,
+     :max 65114,
+     :avg 13388.666666666666,
+     :cardinality 100},
+    :country
+    {:min "",
+     :data-type "string",
+     :commons {"us" 1, "gb" 1, "de" 1},
+     :distinct 6,
+     :group-by? true,
+     :median "ca",
+     :max "us",
+     :avg " (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:min "*cache-db*",
+     :data-type "string",
+     :commons {"*cache-db*" 5, "SQLite" 3},
+     :distinct 2,
+     :group-by? true,
+     :median "*cache-db*",
+     :max "SQLite",
+     :avg "*cache-db* (non-numeric average)",
+     :cardinality 25},
+    :connection_id
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"cache.db" 1, "cache.db.memory" 1, "bigfoot-ufos" 1},
+     :distinct 8,
+     :group-by? true,
+     :median "cache.db.memory",
+     :max "system-db",
+     :avg "system-db (non-numeric average)",
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:min 0,
+     :data-type "integer",
+     :commons {0 8},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 12}},
+   :database-type "SQLite",
+   :rowcount 8},
+  :ufo-sightings-drag-9
+  {:fields
+   {:duration_seconds_int
+    {:min 0.02,
+     :data-type "integer",
+     :commons {120 53, 180 45, 300 45},
+     :distinct 54,
+     :group-by? true,
+     :median 3,
+     :max 21600,
+     :avg 811.38024,
+     :cardinality 10},
+    :city
+    {:min "",
+     :data-type "string",
+     :commons {"akron" 41, "abilene" 32, "aberdeen" 19},
+     :distinct 157,
+     :group-by? true,
+     :median "addison",
+     :max "alabaster",
+     :avg " (non-numeric average)",
+     :cardinality 31},
+    :date_posted
+    {:min "1998-09-26",
+     :data-type "string",
+     :commons {"2001-08-05" 20, "2008-10-31" 12, "2009-12-12" 11},
+     :distinct 194,
+     :group-by? true,
+     :median "2006-12-14",
+     :max "2014-04-24",
+     :avg "2004-10-27 (non-numeric average)",
+     :cardinality 38},
+    :longitude
+    {:min -176.6580556,
+     :data-type "float",
+     :commons {-81.5191667 41, 138.598633 37, -99.7327778 30},
+     :distinct 178,
+     :group-by? true,
+     :median -81.9775,
+     :max 139.804479,
+     :avg -53.354860199,
+     :cardinality 35},
+    :state
+    {:min "",
+     :data-type "string",
+     :commons {nil 120, "oh" 48, "tx" 39},
+     :distinct 45,
+     :group-by? true,
+     :median "ma",
+     :max "wy",
+     :avg "oh (non-numeric average)",
+     :cardinality 9},
+    :duration_seconds
+    {:min "0.02",
+     :data-type "string",
+     :commons {"120" 53, "300" 45, "180" 45},
+     :distinct 54,
+     :group-by? true,
+     :median "3",
+     :max "9000",
+     :avg "5 (non-numeric average)",
+     :cardinality 10},
+    :duration_hours
+    {:min ".02 seconds",
+     :data-type "string",
+     :commons {"2 minutes" 21, "3 minutes" 18, "1 minute" 18},
+     :distinct 225,
+     :group-by? true,
+     :median "3 - 4 seconds",
+     :max "~6 h",
+     :avg "2-5 seconds (non-numeric average)",
+     :cardinality 44},
+    :shape
+    {:min "",
+     :data-type "string",
+     :commons {"light" 103, "triangle" 62, "fireball" 49},
+     :distinct 22,
+     :group-by? true,
+     :median "light",
+     :max "unknown",
+     :avg "cylinder (non-numeric average)",
+     :cardinality 4},
+    :datetime
+    {:min "1931-06-01 13:00:00.000000",
+     :data-type "string",
+     :commons
+     {"1989-06-04 22:30:00.000000" 3,
+      "2010-05-29 21:50:00.000000" 2,
+      "2006-11-30 12:17:00.000000" 2},
+     :distinct 492,
+     :group-by? true,
+     :median "2005-12-01 05:00:00.000000",
+     :max "2014-04-22 20:30:00.000000",
+     :avg "2004-10-24 23:27:00.000000 (non-numeric average)",
+     :cardinality 98},
+    :latitude
+    {:min "-16.197424",
+     :data-type "string",
+     :commons {"41.0813889" 41, "-34.928661" 37, "32.4486111" 30},
+     :distinct 178,
+     :group-by? true,
+     :median "38.9172222",
+     :max "9.066667",
+     :avg "-21.846665 (non-numeric average)",
+     :cardinality 35},
+    :country
+    {:min "",
+     :data-type "string",
+     :commons {"us" 288, nil 113, "au" 37},
+     :distinct 6,
+     :group-by? true,
+     :median "us",
+     :max "us",
+     :avg " (non-numeric average)",
+     :cardinality 1}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :duration-hours-drag-43
+  {:fields
+   {:duration_hours
+    {:min "00:01",
+     :data-type "string",
+     :commons {"30 min." 1, "3 days" 1, "5-7 min" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "30-40 minutes",
+     :max "~5 minutes",
+     :avg "5 minutes (non-numeric average)",
+     :cardinality 100},
+    :rowcnt
+    {:min 11,
+     :data-type "integer",
+     :commons {12 29, 13 23, 14 22},
+     :distinct 162,
+     :group-by? false,
+     :median 22,
+     :max 4716,
+     :avg 134.282,
+     :cardinality 32}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :city-drag-26
+  {:fields
+   {:city
+    {:min "abilene",
+     :data-type "string",
+     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "littleton",
+     :max "yuma",
+     :avg "seattle (non-numeric average)",
+     :cardinality 100},
+    :rowcnt
+    {:min 25,
+     :data-type "integer",
+     :commons {27 35, 26 24, 29 23},
+     :distinct 118,
+     :group-by? false,
+     :median 36,
+     :max 525,
+     :avg 60.866,
+     :cardinality 23}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :reco-counts {:fields {}, :rowcount 0},
+  :state-drag-3
+  {:fields
+   {:state
+    {:min "",
+     :data-type "string",
+     :commons {"nd" 1, "az" 1, "in" 1},
+     :distinct 68,
+     :group-by? true,
+     :median "nd",
+     :max "yt",
+     :avg "ca (non-numeric average)",
+     :cardinality 100},
+    :rowcnt
+    {:min 7,
+     :data-type "integer",
+     :commons {183 1, 968 1, 633 1},
+     :distinct 68,
+     :group-by? false,
+     :median 1763,
+     :max 9655,
+     :avg 1181.3529411764705,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 68},
+  :client-memory-drag-36
+  {:fields
+   {:client_name
+    {:min ":wealthy-magenta-beaver-27",
+     :data-type "string",
+     :commons {":wealthy-magenta-beaver-27" 10},
+     :distinct 1,
+     :group-by? true,
+     :median ":wealthy-magenta-beaver-27",
+     :max ":wealthy-magenta-beaver-27",
+     :avg ":wealthy-magenta-beaver-27 (non-numeric average)",
+     :cardinality 10},
+    :recent_messages_per_second
+    {:min "",
+     :data-type "float",
+     :commons {1.47 2, 3.13 1, 2.13 1},
+     :distinct 9,
+     :group-by? true,
+     :median "1.6",
+     :max "4.4",
+     :avg "3.2 (non-numeric average)",
+     :cardinality 89},
+    :messages_per_second
+    {:min "",
+     :data-type "float",
+     :commons {1.69 1, 2.14 1, 1.57 1},
+     :distinct 10,
+     :group-by? true,
+     :median "1.69",
+     :max "2.5",
+     :avg "2.5 (non-numeric average)",
+     :cardinality 100},
+    :mem_used
+    {:min 52342977,
+     :data-type "integer",
+     :commons {59889823 1, 58596846 1, 52342977 1},
+     :distinct 10,
+     :group-by? true,
+     :median 106258313,
+     :max 160173649,
+     :avg 1.048181352E8,
+     :cardinality 100},
+    :batches
+    {:min 10,
+     :data-type "integer",
+     :commons {105 1, 10 1, 81 1},
+     :distinct 10,
+     :group-by? true,
+     :median 248.5,
+     :max 308,
+     :avg 140.9,
+     :cardinality 100},
+    :packets
+    {:min 2,
+     :data-type "integer",
+     :commons {8 1, 52 1, 5 1},
+     :distinct 10,
+     :group-by? true,
+     :median 53.5,
+     :max 66,
+     :avg 26,
+     :cardinality 100},
+    :ts
+    {:min "2024-09-02 09:52:26",
+     :data-type "string",
+     :commons
+     {"2024-09-02 09:52:26" 1, "2024-09-02 09:54:11" 1, "2024-09-02 09:53:56" 1},
+     :distinct 10,
+     :group-by? true,
+     :median "2024-09-02 09:53:26",
+     :max "2024-09-02 09:54:41",
+     :avg "2024-09-02 09:54:41 (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 10},
+  :gen-viz-516
+  {:fields
+   {:mb
+    {:min 49,
+     :data-type "integer",
+     :commons {49 1, 80 1, 124 1},
+     :distinct 10,
+     :group-by? true,
+     :median 100.5,
+     :max 152,
+     :avg 99.4,
+     :cardinality 100},
+    :mem_used
+    {:min 52342977,
+     :data-type "integer",
+     :commons {59889823 1, 58596846 1, 52342977 1},
+     :distinct 10,
+     :group-by? true,
+     :median 106258313,
+     :max 160173649,
+     :avg 1.048181352E8,
+     :cardinality 100},
+    :messages_per_second
+    {:min "",
+     :data-type "float",
+     :commons {1.47 2, 3.13 1, 2.13 1},
+     :distinct 9,
+     :group-by? true,
+     :median "1.6",
+     :max "4.4",
+     :avg " (non-numeric average)",
+     :cardinality 89},
+    :ts
+    {:min "2024-09-02 09:52:26",
+     :data-type "string",
+     :commons
+     {"2024-09-02 09:52:26" 1, "2024-09-02 09:54:11" 1, "2024-09-02 09:53:56" 1},
+     :distinct 10,
+     :group-by? true,
+     :median "2024-09-02 09:53:26",
+     :max "2024-09-02 09:54:41",
+     :avg "2024-09-02 09:52:26 (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 10},
+  :shape-drag-7
+  {:fields
+   {:shape
+    {:min "",
+     :data-type "string",
+     :commons {"formation" 1, "cone" 1, "rectangle" 1},
+     :distinct 30,
+     :group-by? true,
+     :median "egg",
+     :max "unknown",
+     :avg "light (non-numeric average)",
+     :cardinality 100},
+    :rowcnt
+    {:min 1,
+     :data-type "integer",
+     :commons {1 5, 2 2, 1283 1},
+     :distinct 25,
+     :group-by? false,
+     :median 1145,
+     :max 16565,
+     :avg 2677.733333333333,
+     :cardinality 83}},
+   :database-type "SQLite",
+   :rowcount 30},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 126,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100}},
+   :rowcount 126}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys 170},
+  :files-list* {:files-sys 170},
+  :blocks-list* {:blocks-sys ##Inf},
+  :block-8590 {:bigfoot-sightings-drag-35 100},
+  :block-8473 {:client-memory-drag-36 123}},
+ :runstream-drops nil,
+ :tabs ["star-shaped wallaby"],
+ :selected-cols {},
+ :server {:settings nil},
+ :runstreams
+ {"game-of-life-test1"
+  {:open? true,
+   :open-outputs? true,
+   :values
+   {:iterations-max {:value :param/conway-iterations, :source :param, :open? false},
+    :tick-delay-ms {:value :param/conway-tick-ms, :source :param, :open? false}}}},
+ :editor? false,
+ :buffy? false,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[nil :queries :tmp-1492519494-hist-sys]
+   [:reco-preview :queries :query-preview]
+   [:block-1152 :queries :gen-viz-516]
+   [:block-724 :queries :gen-viz-1022]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:block-8473 :queries :client-memory-drag-36]
+   [:block-3284 :queries :new-clojure-2-sqlized]
+   [:block-8590 :queries :bigfoot-sightings-drag-35]],
+  [:clojure :count-map-keys] [],
+  [:clojure :new-lundberg] [[:* :* :*]],
+  [:clojure :view-lundberg]
+  [[:block-1084 :views :hare-vw-8]
+   [:block-4780 :views :flow-play-runstreamed]
+   [:reco-preview :views :oz]
+   [:block-1152 :views :every-45-seconds]
+   [:block-6330 :views :hi]
+   [:block-724 :views :reech]
+   [:block-4970 :views :hare-vw-3]
+   [:block-9973 :views :hare-vw-2]
+   [:block-4733 :views :hare-vw-7]
+   [:block-11523 :views :sub-0]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:block-8473 :views :hi]
+   [:block-8473 :views :stack]
+   [:block-482 :views :hare-vw-16]
+   [:block-8563 :views :hi]
+   [:block-7234 :views :hare-vw-5]
+   [:block-9709 :views :hare-vw-17]
+   [:block-203 :views :hi]
+   [:block-10760 :views :hare-vw-14]
+   [:block-7845 :views :hare-vw-4]
+   [:block-11130 :views :hare-vw-2]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-5999 :views :hare-vw-1]
+   [:block-1320 :views :hare-vw-9]
+   [:block-3879 :views :hi]
+   [:block-9482 :views :hare-vw-15]],
+  [:clojure :gen-ev] [],
+  [:outliers :get-outliers]
+  [[nil :queries :tmp-1492519494-hist-sys]
+   [:reco-preview :queries :query-preview]
+   [:block-1152 :queries :gen-viz-516]
+   [:block-724 :queries :gen-viz-1022]
+   [:block-86 :queries :new-clojure-sqlized]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:block-8473 :queries :client-memory-drag-36]
+   [:block-3284 :queries :new-clojure-2-sqlized]
+   [:block-8590 :queries :bigfoot-sightings-drag-35]]},
+ :memory [190087421 175871661 4294705152],
+ :sched {:gen-viz-516 164, :client-memory-drag-36 164},
+ :client-name :wealthy-magenta-beaver-27,
+ :flow-editor? true,
+ :window {:w 2236, :h 1342},
+ :implicit-rowsets {:solver [:new-clojure nil]},
+ :post-meta
+ {:fields-sys
+  {:* {:rowcount 26},
+   :field_name {:distinct 26},
+   :field_type {:distinct 5},
+   :data_type {:distinct 5}},
+  :files-sys
+  {:* {:rowcount 16},
+   :file_path {:distinct 15},
+   :screen_name {:distinct 12},
+   :blocks {:distinct 10},
+   :queries {:distinct 7},
+   :ts {:distinct 4}},
+  :blocks-sys {:* {:rowcount 0}},
+  :new-clojure-sqlized {:* {:rowcount 17}, :ffilename {:distinct 17}}},
+ :flow-estimates
+ {:blocks-sys {:times 0.002, :run-id :blocks-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :client_memory {:times 0.008, :run-id :client_memory},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :files-sys {:times 0.002, :run-id :files-sys},
+  :bigfoot-sightings-drag-35 {:times 0.022, :run-id :bigfoot-sightings-drag-35},
+  :raw-custom-override-793100426
+  {:times 0.452, :run-id :raw-custom-override-793100426},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
+  :gen-viz-1022 {:times 0.011, :run-id :gen-viz-1022},
+  :raw-custom-override714264689
+  {:times 0.017, :run-id :raw-custom-override714264689},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :client-memory-drag-36 {:times 0.004, :run-id :client-memory-drag-36},
+  :gen-viz-516 {:times 0.003, :run-id :gen-viz-516}},
+ :status
+ {:heartbeat
+  {:kick
+   [:client/wealthy-magenta-beaver-27>stats>memory
+    :server/conway-iteration
+    :flow-status/game-of-life-test1>*running?
+    :solver/get-my-colors-1790973138
+    :solver-status/wealthy-magenta-beaver-27>get-my-colors-1790973138>running?
+    :kit/kicks>wealthy-magenta-beaver-27
+    :client/*client-name*>stats>recent-messages-per-second
+    :flow-status/my-new-flow3587>*running?
+    :solver/get-my-colors1909740824
+    :server/conway-render
+    :solver-status/wealthy-magenta-beaver-27>get-my-colors1909740824>running?
+    :server/conway-iteration-map]},
+  :alert1 {:alerts :alert2},
+  :alert3 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
+ :screen-name "game-of-life",
+ :recos-page2 0,
+ :selected-tab "star-shaped wallaby",
+ :snapshots nil,
+ :alerts
+ [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:box
+     :child
+     "sent screen save request to server... Please wait."
+     :style
+     {:font-size "12px", :opacity 0.66}]]
+   11
+   0.5
+   175
+   -1247625457]],
+ :recos-page 0,
+ :rs-overrides-hashmap
+ {"game-of-life-test1" {:iterations-max 100, :tick-delay-ms 800}},
+ :base-sniff-queries
+ {:bigfoot_sightings 302026766,
+  :raw_custom_override86093687__block_86_clojure_new_clojure_ -1892756218,
+  :raw_custom_override_793100426__block_86_clojure_new_clojure_ 1038642995,
+  :client_memory -1981695802},
+ :user-params-hash 346074573,
+ :grid-recos? true,
+ :session-hash 1770325002,
+ :resolved-queries
+ {:tmp-1492519494-hist-sys {:_last-run "08:36:11"},
+  nil {:_last-run "09:55:00"},
+  :gen-viz-516
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 50,
+   :group-by [:ts],
+   :_last-run "23:17:36",
+   :refresh-every 10,
+   :from
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts :desc]],
+   :connection-id "system-db",
+   :select
+   [[[[:sum :mem_used]] :mem_used]
+    [[:sum :recent_messages_per_second] :messages_per_second]
+    :ts],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (reverse
+         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
+  :client-memory-drag-36
+  {:select
+   [:client_name
+    :recent_messages_per_second
+    :messages_per_second
+    :mem_used
+    :batches
+    :packets
+    :ts],
+   :where [:= :client_name :*client-name-str],
+   :from [[:client_memory :ee183]],
+   :refresh-every 10,
+   :cache? false,
+   :_last-run "23:17:36",
+   :order-by [[:mem_time :desc]]}},
+ :panels
+ {nil
+  {:queries
+   {:tmp-1492519494-hist-sys {:_last-run "08:36:11"}, nil {:_last-run "09:55:00"}}},
+  :block-4780
+  {:h 2,
+   :w 7,
+   :views
+   {:flow-play-runstreamed
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "25px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow
+      ["game-of-life-test1" "run game-of-life-test1" :runstream-overrides]]]},
+   :name "flow-play-from-runstreams",
+   :root [33 1],
+   :tab "star-shaped wallaby"},
+  :block-1152
+  {:name "block-12050",
+   :w 34,
+   :style {:border-radius "0px 0px 0px 20px"},
+   :selected-view :client-memory-drag-36,
+   :root [1 22],
+   :h 6,
+   :connection-id "system-db",
+   :queries
+   {:gen-viz-516
+    {:cache? false,
+     :where [:= :client_name :*client-name-str],
+     :limit 50,
+     :group-by [:ts],
+     :_last-run "23:17:36",
+     :refresh-every 10,
+     :from [:query/client-memory-drag-36],
+     :order-by [[:ts :desc]],
+     :connection-id "system-db",
+     :select
+     [[[[:sum :mem_used]] :mem_used]
+      [[:sum :recent_messages_per_second] :messages_per_second]
+      :ts],
+     :post-process-fn
+     (fn [x]
+       (vec
+         (reverse
+           (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
+   :tab "star-shaped wallaby",
+   :views
+   {:every-45-seconds
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data :gen-viz-516,
+       :style {:font-family :theme/base-font},
+       :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
+      [:>
+       :Tooltip
+       {:content-style
+        {:background-color "#00000099",
+         :font-weight 700,
+         :border "1px solid transparent",
+         :border-radius "4px"}}]
+      [:> :XAxis {:dataKey :ts}]
+      [:>
+       :YAxis
+       {:yAxisId "left",
+        :label
+        {:value "MB",
+         :angle -90,
+         :fill "#8884d8",
+         :style {:font-size "20px", :font-weight 700},
+         :position "middle",
+         :dx -25},
+        :domain ["auto" "auto"]}]
+      [:>
+       :YAxis
+       {:yAxisId "right",
+        :label
+        {:value "Messages per Second",
+         :angle 90,
+         :fill "#82ca9d",
+         :style {:font-weight 700, :font-size "15px"},
+         :position "middle",
+         :dx 20},
+        :domain ["auto" "auto"],
+        :orientation "right"}]
+      [:>
+       :Line
+       {:type "monotone",
+        :dataKey :mb,
+        :yAxisId "left",
+        :stroke-width 3,
+        :stroke "#8884d8",
+        :activeDot {:r 8}}]
+      [:>
+       :Bar
+       {:type "monotone",
+        :dataKey :messages_per_second,
+        :yAxisId "right",
+        :fill "#00000000",
+        :stroke-width 3,
+        :stroke "#82ca9d"}]]]}},
+  :block-6330
+  {:name "block-6330",
+   :w 5,
+   :style {:border-radius "0px 0px 20px 0px"},
+   :selected-view :hi,
+   :root [35 25],
+   :h 3,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :views
+   {:hi
+    [:v-box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "60px",
+      :color "#8884d8",
+      :font-weight 700,
+      :transition "all 0.6s ease-in-out"}
+     :children
+     [[:box :child [:number :client/*client-name*>stats>memory]]
+      [:box
+       :style
+       {:font-size "18px", :margin-top "-10px"}
+       :child
+       "js used heap (mb)"]]]}},
+  :block-11523
+  {:h 21,
+   :w 21,
+   :ghosted? true,
+   :style
+   {:background-blend-mode "multiply",
+    :background-color "#00000000",
+    :border-radius "20px 20px 0px 0px"},
+   :views
+   {:sub-0
+    [:box
+     :size
+     "auto"
+     :justify
+     :center
+     :align
+     :center
+     :child
+     :server/conway-render]},
+   :name "subscription intuitive-amaranth-opossum-39:my-strring0",
+   :root [1 1],
+   :tab "star-shaped wallaby"},
+  :block-8473
+  {:name "block-8473",
+   :w 18,
+   :style {:border-radius "0px 20px 0px 0px"},
+   :selected-view :client-memory-drag-36,
+   :root [22 15],
+   :h 7,
+   :connection-id "system-db",
+   :queries
+   {:client-memory-drag-36
+    {:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :refresh-every 10,
+     :cache? false,
+     :_last-run "23:17:36",
+     :order-by [[:mem_time :desc]]}},
+   :tab "star-shaped wallaby",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-8473.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-8563
+  {:h 2,
+   :w 7,
+   :root [33 7],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-8563",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-8563.:hi"}
+     :style
+     {:font-size "16px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     :server/conway-iteration-map]},
+   :queries {}},
+  :block-7234
+  {:h 4,
+   :w 7,
+   :root [33 3],
+   :tab "star-shaped wallaby",
+   :selected-view :hare-vw-5,
+   :name "block-7234",
+   :views
+   {:hare-vw-5
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "44px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Click above to start the flow!."]},
+   :queries {}},
+  "none!" {:w 1},
+  :block-203
+  {:h 3,
+   :w 5,
+   :root [35 22],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-203",
+   :views
+   {:hi
+    [:v-box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "56px",
+      :color "#82ca9d",
+      :font-weight 700,
+      :transition "all 0.6s ease-in-out"}
+     :children
+     [[:box :child [:string :client/*client-name*>stats>recent-messages-per-second]]
+      [:box
+       :style
+       {:font-size "18px", :margin-top "-10px"}
+       :child
+       "messages/sec (recent)"]]]},
+   :queries {}},
+  :block-3879
+  {:name "block-3879",
+   :w 9,
+   :style {:border-radius "0px 30px 0px 0px"},
+   :selected-view :hi,
+   :root [22 13],
+   :h 2,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :size
+     "auto"
+     :style
+     {:font-size "28px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str
+      "iterations left: "
+      :server/conway-iteration
+      " (of "
+      :param/conway-iterations
+      ")"]]}}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#ff2050",
+  "boolean" "#8EA2A8",
+  "map" "#379fb5",
+  "list" "#36fb04",
+  "string" "#CEEFD1",
+  "any" "#eeeeee",
+  "vector" "#2C4761",
+  "keyword" "#006666",
+  "rabbit-code" "#9F93AE",
+  "datetime" "#A7B2B4",
+  "integer" "#723c5f",
+  "unknown" "#77919B",
+  "date" "#6A6391",
+  "nil" "#68beff"},
+ :solver-fn nil,
+ :click-param
+ {:flows-sys
+  {:flow_id "game-of-life-test1",
+   :file_path "./flows/game-of-life-test1.edn",
+   :last_modified "2024-05-19 23:03:01"},
+  :searches-types-sys {:item_type "client-params"},
+  :searches-rows-sys
+  {:item_sub_type "param",
+   :item_type "client-params",
+   :item_key "intuitive-amaranth-opossum-39",
+   :display_name ":my-strring",
+   :sample "STRINGY!",
+   :value ":client/intuitive-amaranth-opossum-39>param>my-strring",
+   :is_live 0,
+   :block_meta nil},
+  :param
+  {:selected-view nil,
+   :selected-view-data {:w 1},
+   :conway [:box :child "hey"],
+   :selected-block :block-3879,
+   :conway-tick-ms 800,
+   :conway-iterations 100},
+  :theme
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :base-block-style
+   {:background-color "#00000000",
+    :text-shadow "4px 4px 4px #00000088",
+    :background-blend-mode "hard-light",
+    :backdrop-filter "blur(2px) brightness(30%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#04041e82",
+   :editor-rim-color "#379fb5",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#ff2050",
+    "boolean" "#8EA2A8",
+    "map" "#379fb5",
+    "list" "#36fb04",
+    "string" "#CEEFD1",
+    "any" "#eeeeee",
+    "vector" "#2C4761",
+    "keyword" "#006666",
+    "rabbit-code" "#9F93AE",
+    "datetime" "#A7B2B4",
+    "integer" "#723c5f",
+    "unknown" "#77919B",
+    "date" "#6A6391",
+    "nil" "#68beff"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "Nova Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#379fb5",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image
+    "url(assets/openai-images/b64-image3-89074-50204-4k.webp-q10.jpg)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Nova Square",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :connections-sys
+  {:database_name "*cache-db*",
+   :connection_id "cache.db.memory",
+   :styler_highlight_8717ssa 0},
+  :ufo-sightings-drag-9
+  {:duration_seconds_int 20,
+   :comments
+   "My older brother and twin sister were leaving the only Edna theater at about 9 PM&#44...we had our bikes and I took a different route home",
+   :city "edna",
+   :date_posted "2004-01-17",
+   :longitude -96.6458333,
+   :state "tx",
+   :duration_seconds "20",
+   :duration_hours "1/2 hour",
+   :id 4,
+   :shape "circle",
+   :datetime "1956-10-10 21:00:00.000000",
+   :latitude "28.9783333",
+   :country "us"},
+  :sys {:selected-tab "fat zebra", :selected-tab-idx 0},
+  :searches-sub-types-sys
+  {:item_key "intuitive-amaranth-opossum-39",
+   :is_live 0,
+   :items 19,
+   :styler_highlight_4018a 0}},
+ :selected-flow "my-new-flow3587"}

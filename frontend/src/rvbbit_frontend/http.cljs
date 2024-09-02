@@ -839,6 +839,7 @@
                                                     (catch :default _ (get res-meta :fields)))
                                meta            (merge res-meta {:fields res-meta-fields})
                                new-map         (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)]
+                           (swap! db/running-queries disj (last ui-keypath))
                            (if (not (nil? map-order)) ;; indicates bigger problem, too risky
                              (if (and (not (nil? repl-output)) (ut/ne? repl-output))
                                (-> db
@@ -959,6 +960,7 @@
                           (dissoc :signals-map)
                           (dissoc :repl-output)
                           (dissoc :solver-fn)
+                          (dissoc :server)
                           (ut/dissoc-in [:solver-fn :runs])
                           (ut/dissoc-in [:click-param :signal-history])
                           (ut/dissoc-in [:click-param :solver-meta])

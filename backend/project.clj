@@ -1,4 +1,4 @@
-(defproject rvbbit-backend "0.1.0-alpha.1"
+(defproject rvbbit-backend "0.1.1-alpha"
   :description        "RVBBIT - Dynamic Datascapes, by Ryan Robitaille"
   :url                "https://github.com/ryrobes/rvbbit"
   :license            {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
@@ -16,7 +16,7 @@
                        [philoskim/debux "0.9.1"]
                        [org.clojure/java.jdbc "0.7.12"]
                        [clj-taskpool "0.1.0"] ;; https://github.com/WickedShell/clj-taskpool
-                       [tea-time "1.0.1"] ;; https://github.com/aphyr/tea-time - task scheduler
+                       ;;[tea-time "1.0.1"] ;; https://github.com/aphyr/tea-time - task scheduler
                        ;;[mvxcvi/puget "1.3.2"] ;; https://github.com/greglook/puget
                        [com.ryrobes/puget "1.3.5-SNAPSHOT"]
                        [clojure.java-time "1.1.0"] ;; https://github.com/dm3/clojure.java-time

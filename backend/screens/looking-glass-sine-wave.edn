@@ -1,7 +1,65 @@
 {:reco-preview "2006850921",
  :sql-source
- {:query-3274
-  {:select [[[:count 1] :rowcnt]],
+ {:client_memory
+  {:select [:*], :connection-id "system-db", :from [:client_memory], :limit 111},
+  :gen-viz-507
+  {:select [[[[:count 1]] :rows] :YEAR :DISTRICT],
+   :from
+   [{:select
+     [:DAY_OF_WEEK
+      :DISTRICT
+      :HOUR
+      :INCIDENT_NUMBER
+      :Lat
+      :Long
+      :MONTH
+      :OFFENSE_CODE
+      :OFFENSE_CODE_GROUP
+      :OFFENSE_DESCRIPTION
+      :REPORTING_AREA
+      :STREET
+      :YEAR],
+     :from
+     [[{:select
+        [:DAY_OF_WEEK
+         :DISTRICT
+         :HOUR
+         :INCIDENT_NUMBER
+         :Lat
+         :Long
+         :MONTH
+         :OCCURRED_ON_DATE
+         :OFFENSE_CODE
+         :OFFENSE_CODE_GROUP
+         :OFFENSE_DESCRIPTION
+         :REPORTING_AREA
+         :SHOOTING
+         :STREET
+         :UCR_PART
+         :YEAR],
+        :from [[:offenses :mm47]],
+        :order-by [[:DISTRICT :desc]]}
+       :pp28]],
+     :where
+     [:and
+      [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+      [:= :HOUR 0]]}],
+   :group-by [:YEAR :DISTRICT]},
+  :OFFENSE-CODE-GROUP-drag-40
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Long
+    :MONTH
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :STREET
+    :YEAR],
    :from
    [[{:select
       [:DAY_OF_WEEK
@@ -9,7 +67,6 @@
        :HOUR
        :INCIDENT_NUMBER
        :Lat
-       :Location
        :Long
        :MONTH
        :OCCURRED_ON_DATE
@@ -21,70 +78,27 @@
        :STREET
        :UCR_PART
        :YEAR],
-      :from [[:offenses :xx560]]}
-     :tt587]]},
-  :query-6590
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:alsonoticed
-       :bfroid
-       :class
-       :county
-       :date
-       :environment
-       :fixed_month
-       :fixed_year
-       :locationdetails
-       :month
-       :nearestroad
-       :nearesttown
-       :observed
-       :otherstories
-       :otherwitnesses
-       :run_id
-       :run_time
-       :season
-       :sketch
-       :state
-       :submitted
-       :submitted_date
-       :timeandconditions
-       :title
-       :url
-       :year],
-      :from [[:bigfoot_sightings :hh223]]}
-     :jj650]]},
-  :raw_custom_override_1159300590__block_86_clojure_new_clojure_
+      :from [[:offenses :mm47]],
+      :order-by [[:DISTRICT :desc]]}
+     :pp28]],
+   :page 1,
+   :where
+   [:and
+    [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+    [:= :HOUR 0]],
+   :_last-run "08:15:18"},
+  :raw_custom_override_793100426__block_86_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
-   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_],
+   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_],
    :limit 111},
-  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override_1731765785__block_9240_clojure_new_clojure_],
-   :limit 111},
-  :new-clojure-sqlized
-  {:select [:*],
-   :connection-id "cache.db",
-   :_sqlized-at "2024-08-31 22:21:28",
-   :_sqlized-by [:block-9240 :clojure :new-clojure],
-   :_sqlized-hash 1022913944,
-   :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_]},
-  :raw_custom_override1589124350__block_9240_clojure_new_clojure_
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_],
-   :limit 111},
-  :offenses-drag-30
+  :offenses-drag-9
   {:select
    [:DAY_OF_WEEK
     :DISTRICT
     :HOUR
     :INCIDENT_NUMBER
     :Lat
-    :Location
     :Long
     :MONTH
     :OCCURRED_ON_DATE
@@ -96,27 +110,10 @@
     :STREET
     :UCR_PART
     :YEAR],
-   :from [[:offenses :xx560]]},
-  :image-files
-  {:select [:*],
-   :connection-id "cache.db",
-   :_sqlized-at "2024-08-31 19:01:24",
-   :_sqlized-by [:block-86 :clojure :new-clojure],
-   :_sqlized-hash nil,
-   :from [:raw_custom_override_1159300590__block_86_clojure_new_clojure_],
-   :_last-run "22:17:25"},
-  :raw_custom_override86093687__block_86_clojure_new_clojure_
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override86093687__block_86_clojure_new_clojure_],
-   :limit 111},
-  :bigfoot_sightings
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:bigfoot_sightings],
-   :limit 111},
-  :DISTRICT-drag-31
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
+   :from [[:offenses :mm47]],
+   :order-by [[:DISTRICT :desc]]},
+  :OFFENSE-CODE-GROUP-drag-21
+  {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
    :from
    [[{:select
       [:DAY_OF_WEEK
@@ -124,7 +121,112 @@
        :HOUR
        :INCIDENT_NUMBER
        :Lat
-       :Location
+       :Long
+       :MONTH
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :STREET
+       :YEAR],
+      :from
+      [[{:select
+         [:DAY_OF_WEEK
+          :DISTRICT
+          :HOUR
+          :INCIDENT_NUMBER
+          :Lat
+          :Long
+          :MONTH
+          :OCCURRED_ON_DATE
+          :OFFENSE_CODE
+          :OFFENSE_CODE_GROUP
+          :OFFENSE_DESCRIPTION
+          :REPORTING_AREA
+          :SHOOTING
+          :STREET
+          :UCR_PART
+          :YEAR],
+         :from [[:offenses :mm47]],
+         :order-by [[:DISTRICT :desc]]}
+        :pp28]],
+      :where
+      [:and
+       [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+       [:= :HOUR 0]]}
+     :jj742]],
+   :group-by [:OFFENSE_CODE_GROUP],
+   :order-by [[:rowcnt :desc]]},
+  :bigfoot-sightings-drag-35
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :month
+    :run_time
+    :season
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :bb86]],
+   :_last-run "09:11:13"},
+  :new-clojure-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-09-02 09:55:47",
+   :_sqlized-by [:block-9240 :clojure :new-clojure],
+   :_sqlized-hash 851656045,
+   :from [:raw_custom_override1070344508__block_9240_clojure_new_clojure_]},
+  :raw_custom_override1589124350__block_9240_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_],
+   :limit 111},
+  :gen-viz-1022
+  {:select
+   [[[[:count 1]] :rows]
+    [[:substr :submitted_date 6 2] :by_month_sqlite_submitted_date]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :month
+       :run_time
+       :season
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :bb86]]}
+     :cc805]],
+   :group-by [[:substr :submitted_date 6 2]]},
+  :STREET-drag-11
+  {:select [:STREET [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
        :Long
        :MONTH
        :OCCURRED_ON_DATE
@@ -136,42 +238,175 @@
        :STREET
        :UCR_PART
        :YEAR],
-      :from [[:offenses :xx560]]}
-     :aa151]],
-   :group-by [:DISTRICT],
+      :from [[:offenses :mm47]],
+      :order-by [[:DISTRICT :desc]]}
+     :dd35]],
+   :group-by [:STREET],
    :order-by [[:rowcnt :desc]]},
-  :bigfoot-sightings-drag-28
-  {:select
-   [:alsonoticed
-    :bfroid
-    :class
-    :county
-    :date
-    :environment
-    :fixed_month
-    :fixed_year
-    :locationdetails
-    :month
-    :nearestroad
-    :nearesttown
-    :observed
-    :otherstories
-    :otherwitnesses
-    :run_id
-    :run_time
-    :season
-    :sketch
-    :state
-    :submitted
-    :submitted_date
-    :timeandconditions
-    :title
-    :url
-    :year],
-   :from [[:bigfoot_sightings :hh223]]},
+  :rowcnt-drag-21
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:DAY_OF_WEEK
+          :DISTRICT
+          :HOUR
+          :INCIDENT_NUMBER
+          :Lat
+          :Long
+          :MONTH
+          :OFFENSE_CODE
+          :OFFENSE_CODE_GROUP
+          :OFFENSE_DESCRIPTION
+          :REPORTING_AREA
+          :STREET
+          :YEAR],
+         :from
+         [[{:select
+            [:DAY_OF_WEEK
+             :DISTRICT
+             :HOUR
+             :INCIDENT_NUMBER
+             :Lat
+             :Long
+             :MONTH
+             :OCCURRED_ON_DATE
+             :OFFENSE_CODE
+             :OFFENSE_CODE_GROUP
+             :OFFENSE_DESCRIPTION
+             :REPORTING_AREA
+             :SHOOTING
+             :STREET
+             :UCR_PART
+             :YEAR],
+            :from [[:offenses :mm47]],
+            :order-by [[:DISTRICT :desc]]}
+           :pp28]],
+         :where
+         [:and
+          [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+          [:= :HOUR 0]]}
+        :jj742]],
+      :group-by [:OFFENSE_CODE_GROUP],
+      :order-by [[:rowcnt :desc]]}
+     :ii178]]},
+  :raw_custom_override1070344508__block_9240_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override1070344508__block_9240_clojure_new_clojure_],
+   :limit 111},
+  :raw_custom_override86093687__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override86093687__block_86_clojure_new_clojure_],
+   :limit 111},
+  :bigfoot_sightings
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:bigfoot_sightings],
+   :limit 111},
+  :offense_codes
+  {:select [:*], :connection-id "system-db", :from [:offense_codes], :limit 111},
   :offenses
-  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111}},
- :doom-modal? false,
+  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
+  :gen-viz-544
+  {:select
+   [[[[:sum :REPORTING_AREA]] :REPORTING_AREA]
+    [[:substr :DAY_OF_WEEK 0 11] :day_sqlite_DAY_OF_WEEK]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :STREET
+       :YEAR],
+      :from
+      [[{:select
+         [:DAY_OF_WEEK
+          :DISTRICT
+          :HOUR
+          :INCIDENT_NUMBER
+          :Lat
+          :Long
+          :MONTH
+          :OCCURRED_ON_DATE
+          :OFFENSE_CODE
+          :OFFENSE_CODE_GROUP
+          :OFFENSE_DESCRIPTION
+          :REPORTING_AREA
+          :SHOOTING
+          :STREET
+          :UCR_PART
+          :YEAR],
+         :from [[:offenses :mm47]],
+         :order-by [[:DISTRICT :desc]]}
+        :pp28]],
+      :where
+      [:and
+       [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+       [:= :HOUR 0]]}
+     :dd292]],
+   :group-by [[:substr :DAY_OF_WEEK 0 11]]},
+  :NAME-drag-37
+  {:select [:NAME [[:count 1] :rowcnt]],
+   :from [[{:select [:CODE :NAME], :from [[:offense_codes :kk735]]} :hh925]],
+   :group-by [:NAME],
+   :order-by [[:rowcnt :desc]]},
+  :offense-codes-drag-1 {:select [:CODE :NAME], :from [[:offense_codes :kk735]]},
+  :client-memory-drag-36
+  {:select
+   [:client_name
+    :recent_messages_per_second
+    :messages_per_second
+    :mem_used
+    :batches
+    :packets
+    :ts],
+   :where [:= :client_name :*client-name-str],
+   :from [[:client_memory :ee183]],
+   :refresh-every 10,
+   :cache? false,
+   :_last-run "23:17:36",
+   :order-by [[:mem_time :desc]]},
+  :gen-viz-516
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 50,
+   :group-by [:ts],
+   :_last-run "23:17:36",
+   :refresh-every 10,
+   :from
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts :desc]],
+   :connection-id "system-db",
+   :select
+   [[[[:sum :mem_used]] :mem_used]
+    [[:sum :recent_messages_per_second] :messages_per_second]
+    :ts],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (reverse
+         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
  :meta
  {nil
   {:fields
@@ -182,7 +417,94 @@
      :commons {},
      :cardinality 100}},
    :rowcount 1},
-  :blocks-sys {:fields {}, :database-type "SQLite", :rowcount 0},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:min ":*theme*",
+     :data-type "string",
+     :commons {":block-2322" 1, ":block-8930" 1, ":block-173" 1},
+     :distinct 39,
+     :group-by? true,
+     :median ":block-6761",
+     :max "welcome to the party pal",
+     :avg ":block-10778 (non-numeric average)",
+     :cardinality 100},
+    :block_name
+    {:min " - ts, used_memory_mb - 650",
+     :data-type "string",
+     :commons
+     {"drag-from-select-all-jvm_stats" 3,
+      "drag-from-select-all-errors" 3,
+      "clone-gen-viz-100238" 1},
+     :distinct 35,
+     :group-by? true,
+     :median "drag-from-pie_nivo - \"error_str, rows\" - 134",
+     :max "select-all-tests",
+     :avg " - ts, used_memory_mb - 650 (non-numeric average)",
+     :cardinality 89},
+    :queries
+    {:min 0,
+     :data-type "integer",
+     :commons {1 30, 0 9},
+     :distinct 2,
+     :group-by? true,
+     :median 1,
+     :max 1,
+     :avg 0.7692307692307693,
+     :cardinality 5},
+    :views
+    {:min 0,
+     :data-type "integer",
+     :commons {0 19, 1 10, 2 7},
+     :distinct 5,
+     :group-by? true,
+     :median 1,
+     :max 27,
+     :avg 1.4615384615384615,
+     :cardinality 12},
+    :block_data
+    {:min
+     "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#1b0d1282\", :editor-rim-color \"#c167be\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#E7EBC4\", \"boolean\" \"#46436C\", \"map\" \"#716182\", \"list\" \"#3A315C\", \"string\" \"#C1E0C2\", \"vector\" \"#55476F\", \"keyword\" \"#158165E2\", \"rabbit-code\" \"#1951A8F0\", \"datetime\" \"#A8A1AA\", \"integer\" \"#B4B4B4\", \"unknown\" \"#777490\", \"date\" \"#221F4A\", \"nil\" \"#11E125D4\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#d6d3f0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#c167be\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/large/b64-decoded-1992949-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+     :data-type "string",
+     :commons
+     {"{:h 4, :w 7, :root [29 14], :tab \"welcome to the party pal\", :name \"block-6761\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-6761.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}], :cell-drop-1493 [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"14px\"} :child [:string :errors-drag-33/sql_stmt.0]]}, :queries {}, :selected-view :cell-drop-1493}"
+      1,
+      "{:name \"block-2322\", :w 5, :selected-view :query-2008, :root [21 9], :h 5, :connection-id \"system-db\", :queries {:query-2008 {:select [[[:count 1] :errors]], :refresh-every 600, :cache? false, :from [[{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]} :rr251]], :_last-run \"12:06:41\"}}, :tab \"welcome to the party pal\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-2322.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
+      1,
+      "{:h 4, :w 8, :connection-id \"system\", :name \"drag-from-seclt-jvm!!\", :queries {:ts1-drag-13 {:select [[[:max :ts1] :last_ts]], :refresh-every 600, :cache? false, :from [[{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]} :kk909]], :_last-run \"12:06:41\"}}, :root [27 5], :tab \"welcome to the party pal\"}"
+      1},
+     :distinct 39,
+     :group-by? true,
+     :median
+     "{:h 7, :w 17, :name \"chat-view-clone-gen-viz-100238\", :views {:reech-copy-16 [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :RadarChart {:outerRadius 90, :width 730, :height 250, :data :gen-viz-1002-clone-38} [:reagent-gt :PolarGrid] [:reagent-gt :PolarAngleAxis {:dataKey :ts}] [:reagent-gt :PolarRadiusAxis {:angle 45}] [:reagent-gt :Radar {:name \"Memory Use\", :dataKey :used_memory_mb, :stroke \"#17becf\", :fill \"#17becf\", :fillOpacity 0.6}]]]}, :root [47 25], :tab \"welcome to the party pal\", :queries {}}",
+     :max
+     "{:panels {:block-494 {:name \"select-all-jvm_stats\", :w 17, :block-key \":block-4658\", :selected-view :jvm-stats-drag-40, :root [47 1], :h 10, :file-path \"./screens/refresh-test.edn\", :connection-id \"system\", :queries {:jvm-stats-drag-40 {:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :refresh-every 600, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :_last-run \"12:06:41\"}}, :tab \"welcome to the party pal\"}, :block-899 {:h 4, :w 8, :connection-id \"system\", :name \"drag-from-seclt-jvm!!\", :queries {:ts1-drag-13 {:select [[[:max :ts1] :last_ts]], :refresh-every 600, :cache? false, :from [[{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]} :kk909]], :_last-run \"12:06:41\"}}, :root [27 5], :tab \"welcome to the party pal\"}, :block-7811 {:h 7, :w 17, :name \"chat-view-clone-gen-viz-100238\", :views {:reech-copy-16 [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :RadarChart {:outerRadius 90, :width 730, :height 250, :data :gen-viz-1002-clone-38} [:reagent-gt :PolarGrid] [:reagent-gt :PolarAngleAxis {:dataKey :ts}] [:reagent-gt :PolarRadiusAxis {:angle 45}] [:reagent-gt :Radar {:name \"Memory Use\", :dataKey :used_memory_mb, :stroke \"#17becf\", :fill \"#17becf\", :fillOpacity 0.6}]]]}, :root [47 25], :tab \"welcome to the party pal\", :queries {}}, :block-7838 {:h 10, :w 21, :connection-id \"system-db\", :name \"select-all-errors\", :queries {:errors-drag-33 {:select [:db_conn :error_str :sql_stmt :ts], :refresh-every 600, :cache? false, :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]], :style-rules {[:* :highlight-8704] {:logic [:*if {:db_conn [\":honey-format\"]} [:*all= {:db_conn [\":honey-format\"]} [:db_conn]] [:= 1 0]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}, [:* :highlight-row-3194] {:logic [:*if {:db_conn [\":honey-format\"]} [:*all= {:db_conn [\":honey-format\"]} [:db_conn]] false], :style {:background-color \"#33ffb745\", :border \"1px solid #33ffb7\"}}, [:* :highlight-row-2606] {:logic [:*if {} [:*all= {} [:error_str]] false], :style {:background-color \"maroon\", :border \"1px solid yellow\"}}}, :_last-run \"12:06:41\"}}, :root [0 1], :tab \"welcome to the party pal\", :selected-view :errors-drag-33}, :block-10778 {:mad-libs-combo-hash [\"-221538232\" \"jvm_stats_drag_40\"], :name \" - ts, used_memory_mb - 650\", :w 12, :block-key \":block-942\", :selected-view :reech, :root [35 5], :h 4, :file-path \"./screens/refresh-test.edn\", :connection-id \"system\", :queries {:gen-viz-1002 {:cache? false, :limit 100, :group-by [:ts1], :_last-run \"12:06:41\", :refresh-every 600, :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :order-by [[2 :desc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] :ts1], :post-process-fn reverse}}, :tab \"welcome to the party pal\", :views {:reech [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :AreaChart {:data :gen-viz-1002, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:reagent-gt :Tooltip] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :Area {:type \"monotone\", :dataKey :used_memory_mb, :stroke \"#8884d8\", :activeDot {:r 8}}]]]}}, :block-843 {:mad-libs-combo-hash [\"627452206\" \"errors_drag_33\"], :name \"pie_nivo - \\\"db_conn, rows\\\" - 541\", :w 16, :selected-view :oz, :root [0 18], :h 10, :connection-id \"system-db\", :queries {:gen-viz-541 {:select [[[:count 1] :value] [:db_conn :id]], :refresh-every 600, :cache? false, :from [{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :where [:*if {} [:*all= {} [:error_str]] [:= 1 1]], :order-by [[:ts :desc]]}], :group-by [:db_conn], :_last-run \"12:06:42\"}}, :tab \"welcome to the party pal\", :conditionals nil, :views {:oz [:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :db_conn, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-541, :arcLinkLabelsTextColor \"#ffffff\"}]}}, :block-8179 {:h 10, :w 28, :connection-id \"system-db\", :name \"select-all-client_stats\", :queries {:client-stats-drag-33 {:select [:ack :client_latency :client_name :client_subs :last_seen :last_seen_seconds :push :queue_size :server_subs :memory :ts], :cache? false, :refresh-every 20, :order-by [[:client_name :asc]], :from [[:client_stats :ww254]], :_last-run \"00:19:42\"}}, :root [30 29], :tab \"welcome to the party pal\", :z 3}, :block-8930 {:h 4, :w 16, :tab \"welcome to the party pal\", :root [20 28], :name \"block-8930\", :views {:param-val [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"28px\"} :child [:string :block-173/error_str]]}, :queries {}}, :block-1816 {:h 4, :w 21, :root [-2 32], :tab \"welcome to the party pal\", :selected-view :hi, :name \"block-1816\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-1816.:hi\"} :style {:font-size \"106px\", :font-weight 700, :font-family \"Homemade Apple\", :padding-top \"5px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color} :child \"Jessica!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-586 {:mad-libs-combo-hash [\"-1544090599\" \"errors_drag_33\"], :name \"recharts_line - \\\"rows, ts\\\" - 412\", :w 21, :selected-view :reech, :root [0 11], :h 7, :connection-id \"system-db\", :queries {:gen-viz-52 {:select [[[[:count 1]] :rows] :ts], :from [{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]}], :refresh-every 600, :cache? false, :group-by [:ts], :_last-run \"12:06:42\"}}, :tab \"welcome to the party pal\", :conditionals nil, :views {:reech [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :LineChart {:data :gen-viz-52, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:reagent-gt :Tooltip] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :Line {:type \"monotone\", :dataKey :rows, :stroke \"#8884d8\", :activeDot {:r 8}}]]]}}, :block-910 {:h 4, :w 6, :connection-id \"system\", :name \"drag-from-select-all-jvm_stats\", :queries {:sql-cache-size-drag-13 {:select [[[:sum :sql_cache_size] :sql_cache_size]], :refresh-every 600, :cache? false, :where [:= :ts1 \"2024-05-05 04:11:37\"], :from [[{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]} :tt68]], :_last-run \"12:06:43\"}}, :root [21 1], :tab \"welcome to the party pal\"}, :block-9727 {:mad-libs-combo-hash [\"-832307070\" \"jvm_stats_drag_40\"], :name \"recharts_area - thread_count, ts - 249\", :w 12, :block-key \":block-539\", :selected-view :reech, :root [35 1], :h 4, :file-path \"./screens/refresh-test.edn\", :connection-id \"system\", :queries {:gen-viz-553 {:cache? false, :limit 100, :group-by [:ts], :_last-run \"12:06:41\", :refresh-every 600, :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :order-by [[:ts :desc]], :select [[[[:avg :thread_count]] :thread_count] :ts], :post-process-fn reverse}}, :tab \"welcome to the party pal\", :conditionals nil, :views {:reech [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :AreaChart {:data :gen-viz-553, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:reagent-gt :Tooltip] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :Area {:type \"monotone\", :dataKey :thread_count, :stroke \"#8884d8\", :activeDot {:r 8}}]]]}}, :block-6761 {:h 4, :w 7, :root [29 14], :tab \"welcome to the party pal\", :name \"block-6761\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-6761.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}], :cell-drop-1493 [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"14px\"} :child [:string :errors-drag-33/sql_stmt.0]]}, :queries {}, :selected-view :cell-drop-1493}, :block-12200 {:h 4, :w 6, :connection-id \"system\", :name \"drag-from-select-all-jvm_stats\", :queries {:sql-cache-size-drag-0 {:select [[[:sum :thread_count] :thread_count]], :where [:= :ts1 \"2024-05-05 04:11:37\"], :refresh-every 600, :from [[{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]} :ww325]], :_last-run \"12:06:43\"}}, :root [21 5], :tab \"welcome to the party pal\"}, :block-7692 {:mad-libs-combo-hash [\"265236441\" \"jvm_stats_drag_40\"], :name \"recharts_h_bar - sql_cache_size, ts - 391\", :w 17, :block-key \":block-425\", :root [47 11], :h 6, :file-path \"./screens/refresh-test.edn\", :connection-id \"system\", :queries {:gen-viz-101 {:select [[[[:avg :sql_cache_size]] :sql_cache_size] :ts], :refresh-every 600, :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :group-by [:ts], :order-by [[:ts :desc]], :limit 200, :post-process-fn reverse, :_last-run \"12:06:41\"}}, :tab \"welcome to the party pal\", :conditionals nil, :views {:reech [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :BarChart {:data :gen-viz-101, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:reagent-gt :Tooltip] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :Bar {:dataKey :sql_cache_size, :stroke \"#8884d8\", :fill \"#8884d8\"}]]]}}, :block-9505 {:h 11, :w 11, :connection-id \"system-db\", :name \"drag-from-select-all-errors\", :queries {:error-str-drag-13 {:select [:error_str [[:count 1] :rowcnt]], :from [[{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]} :oo201]], :refresh-every 600, :cache? false, :group-by [:error_str], :order-by [[:rowcnt :desc]], :col-widths {:rowcnt 85, :error_str 425}, :_last-run \"12:06:42\"}}, :root [36 21], :tab \"welcome to the party pal\"}, :block-901 {:name \"clone-gen-viz-100238\", :w 17, :selected-view :reech-copy-16, :root [47 17], :h 8, :connection-id \"system\", :queries {:gen-viz-1002-clone-38 {:select [[[:round [:avg :used_memory_mb]] :used_memory_mb] [[:raw \"strftime('%d-%H', ts1)\"] :ts1]], :group-by [2], :refresh-every 600, :cache? false, :order-by [[2 :asc]], :from [[{:group-by [:ts1], :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :order-by [[2 :desc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] :ts1]} :mm308]], :_last-run \"12:06:42\"}}, :tab \"welcome to the party pal\", :views {:reech-copy-16 [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :BarChart {:data :gen-viz-1002-clone-38, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:reagent-gt :Tooltip] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :Bar {:type \"monotone\", :dataKey :used_memory_mb, :stroke \"#8884d8\", :label {:position \"middle\"}, :activeDot {:r 8}}]]]}}, :block-7772 {:h 4, :w 4, :connection-id \"system-db\", :name \"drag-from-pie_nivo - \\\"error_str, rows\\\" - 134\", :queries {:value-drag-33 {:select [[[:sum :value] :right_filter]], :refresh-every 600, :cache? false, :from [[{:select [[[:count 1] :value] [:error_str :id]], :from [{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :where [:*if {} [:*all= {} [:db_conn]] [:= 1 1]], :order-by [[:ts :desc]]}], :group-by [:error_str]} :vv191]], :_last-run \"12:06:42\"}}, :root [16 28], :tab \"welcome to the party pal\"}, :block-5247 {:name \"block-5247\", :w 7, :selected-view :query-4913, :root [26 9], :h 5, :connection-id \"system-db\", :queries {:query-4913 {:select [[[:count 1] :fields]], :refresh-every 600, :cache? false, :from [[{:select [:connection_id :context_hash :data_type :db_catalog :db_schema :db_type :derived_calc :derived_name :field_name :field_type :is_group_by :key_hash :run_id :table_name :table_type :updated], :from [[:fields :dd721]], :order-by [[:table_name :desc]]} :cc719]], :_last-run \"12:06:42\"}}, :tab \"welcome to the party pal\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-5247.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-8563 {:h 4, :w 8, :root [21 14], :tab \"welcome to the party pal\", :name \"block-8563\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-8563.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}], :cell-drop-9274 [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"14px\"} :child [:string :errors-drag-33/error_str.0]]}, :queries {}, :selected-view :cell-drop-9274}, :block-8587 {:h 5, :w 7, :connection-id \"system-db\", :name \"drag-from-select-all-errors\", :queries {:ts-drag-40 {:select [[[:round [:* [:- [:julianday [\"now\"]] [:julianday [:min :ts]]] 1440] 2] :minutes_running]], :refresh-every 600, :cache? false, :from [[{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]} :ww688]], :_last-run \"12:06:42\"}}, :root [40 9], :tab \"welcome to the party pal\"}, :block-8692 {:h 4, :w 8, :connection-id \"system\", :name \"drag-from-select-all-jvm_stats\", :queries {:used-memory-mb-drag-17 {:select [[[:sum :used_memory_mb] :used_memory_mb]], :refresh-every 600, :where [:= :ts1 \"2024-05-05 04:11:37\"], :from [[{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]} :yy930]], :_last-run \"12:06:43\"}}, :root [27 1], :tab \"welcome to the party pal\"}, :block-2866 {:h 5, :w 7, :connection-id \"system-db\", :name \"clone-query-491344\", :queries {:query-4913-clone-44 {:select [[[:count [:distinct :table_name]] :tables]], :refresh-every 600, :cache? false, :from [[{:select [:connection_id :context_hash :data_type :db_catalog :db_schema :db_type :derived_calc :derived_name :field_name :field_type :is_group_by :key_hash :run_id :table_name :table_type :updated], :from [[:fields :dd721]], :order-by [[:table_name :desc]]} :cc719]], :_last-run \"12:06:41\"}}, :root [33 9], :tab \"welcome to the party pal\"}, :block-2322 {:name \"block-2322\", :w 5, :selected-view :query-2008, :root [21 9], :h 5, :connection-id \"system-db\", :queries {:query-2008 {:select [[[:count 1] :errors]], :refresh-every 600, :cache? false, :from [[{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]} :rr251]], :_last-run \"12:06:41\"}}, :tab \"welcome to the party pal\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-2322.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-173 {:mad-libs-combo-hash [\"1852369169\" \"errors_drag_33\"], :name \"pie_nivo - \\\"error_str, rows\\\" - 134\", :w 20, :selected-view :oz, :root [16 18], :h 10, :connection-id \"system-db\", :queries {:gen-viz-442 {:select [[[:count 1] :value] [:error_str :id]], :refresh-every 600, :cache? false, :from [{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :where [:*if {} [:*all= {} [:db_conn]] [:= 1 1]], :order-by [[:ts :desc]]}], :group-by [:error_str], :_last-run \"12:06:42\"}}, :tab \"welcome to the party pal\", :conditionals nil, :views {:oz [:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :error_str, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-442, :arcLinkLabelsTextColor \"#ffffff\"}]}}, :block-6532 {:h 4, :w 4, :connection-id \"system-db\", :name \"drag-from-pie_nivo - \\\"db_conn, rows\\\" - 541\", :queries {:value-drag-42 {:select [[[:sum :value] :left_filter]], :refresh-every 600, :cache? false, :from [[{:select [[[:count 1] :value] [:db_conn :id]], :from [{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :where [:*if {} [:*all= {} [:error_str]] [:= 1 1]], :order-by [[:ts :desc]]}], :group-by [:db_conn]} :ee177]], :_last-run \"12:06:42\"}}, :root [12 28], :tab \"welcome to the party pal\"}, :block-1491 {:h 7, :w 11, :connection-id \"system-db\", :name \"drag-from-select-all-errors\", :queries {:db-conn-drag-13 {:select [:db_conn [[:count 1] :rowcnt]], :from [[{:select [:db_conn :error_str :sql_stmt :ts], :from [[:errors :gg987]], :order-by [[:ts :desc]], :where [:and [:and [:*if {} [:*all= {} [:db_conn]] [:= 1 1]] [:*if {} [:*all= {} [:error_str]] [:= 1 1]]]]} :vv105]], :refresh-every 600, :cache? false, :group-by [:db_conn], :order-by [[:rowcnt :desc]], :col-widths {:db_conn 415, :rowcnt 95}, :_last-run \"12:06:42\"}}, :root [36 14], :tab \"welcome to the party pal\", :selected-view :db-conn-drag-13}, :block-10701 {:h 4, :w 12, :tab \"welcome to the party pal\", :root [0 28], :name \"block-10701\", :views {:param-val [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"28px\"} :child [:string :block-843/db_conn]]}, :queries {}}}, :click-param {:param {:selected-view [:queries :gen-viz-1002-clone-38], :selected-view-data {:select [[[:round [:avg :used_memory_mb]] :used_memory_mb] [[:raw \"strftime('%d-%H', ts1)\"] :ts1]], :group-by [2], :refresh-every 600, :cache? false, :order-by [[2 :asc]], :from [[:query/gen-viz-1002 :mm308]], :_last-run \"12:06:42\"}, :selected-block :block-901}}}",
+     :avg
+     "{:mad-libs-combo-hash [\"-221538232\" \"jvm_stats_drag_40\"], :name \" - ts, used_memory_mb - 650\", :w 12, :block-key \":block-942\", :selected-view :reech, :root [35 5], :h 4, :file-path \"./screens/refresh-test.edn\", :connection-id \"system\", :queries {:gen-viz-1002 {:cache? false, :limit 100, :group-by [:ts1], :_last-run \"12:06:41\", :refresh-every 600, :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :order-by [[2 :desc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] :ts1], :post-process-fn reverse}}, :tab \"welcome to the party pal\", :views {:reech [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :AreaChart {:data :gen-viz-1002, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:reagent-gt :Tooltip] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :Area {:type \"monotone\", :dataKey :used_memory_mb, :stroke \"#8884d8\", :activeDot {:r 8}}]]]}} (non-numeric average)",
+     :cardinality 100},
+    :view_names
+    {:min "",
+     :data-type "string",
+     :commons {"" 19, ":hi :stack" 7, ":reech" 4},
+     :distinct 9,
+     :group-by? true,
+     :median
+     ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+     :max ":reech-copy-16",
+     :avg ":reech (non-numeric average)",
+     :cardinality 23},
+    :query_names
+    {:min "",
+     :data-type "string",
+     :commons {"" 9, ":value-drag-42" 1, ":client-stats-drag-33" 1},
+     :distinct 31,
+     :group-by? true,
+     :median ":gen-viz-52",
+     :max ":value-drag-42",
+     :avg ":gen-viz-1002 (non-numeric average)",
+     :cardinality 79}},
+   :database-type "SQLite",
+   :rowcount 39},
   :fields-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :tables-sys {:fields {}, :database-type "SQLite", :rowcount 0},
   :bi-polar-wavez
@@ -208,64 +530,61 @@
   :files-sys
   {:fields
    {:file_path
-    {:min "./screens/dynamic-theme-example1.edn",
+    {:min "./screens/cyan-pink-creepers.edn",
      :data-type "string",
      :commons
-     {"./screens/dynamic-theme-example1.edn" 1,
-      "/home/ryanr/test-compiles/rvbbit/rvbbit-0.1.0-alpha/./screens/dynamic-theme-example1.edn"
-      1,
-      "./screens/winter-theme-choom.edn" 1},
-     :distinct 10,
+     {"/home/ryanr/rvbbit/backend/./screens/frost-terminal2.edn" 2,
+      "./screens/dynamic-theme-example1.edn" 1,
+      "./screens/looking-glass-sine-wave.edn" 1},
+     :distinct 18,
      :group-by? true,
-     :median "./screens/nice-car-choom.edn",
-     :max
-     "/home/ryanr/test-compiles/rvbbit/rvbbit-0.1.0-alpha/./screens/dynamic-theme-example1.edn",
-     :avg "./screens/dynamic-theme-example1.edn (non-numeric average)",
-     :cardinality 100},
+     :median "./screens/rotating-theme-blank.edn",
+     :max "/home/ryanr/rvbbit/backend/./screens/light-theme.edn",
+     :avg "./screens/cyan-pink-creepers.edn (non-numeric average)",
+     :cardinality 94},
     :screen_name
-    {:min "dynamic-theme-example1",
+    {:min "cyan-pink-creepers",
      :data-type "string",
-     :commons
-     {"dynamic-theme-example1" 2, "random-collection" 1, "frost-terminal2" 1},
-     :distinct 9,
+     :commons {"frost-terminal2" 3, "light-theme" 2, "game-of-life" 2},
+     :distinct 12,
      :group-by? true,
-     :median "looking-glass-sine-wave",
-     :max "winter-theme-choom",
-     :avg "dynamic-theme-example1 (non-numeric average)",
-     :cardinality 89},
+     :median "game-of-life",
+     :max "winter-theme",
+     :avg "cyan-pink-creepers (non-numeric average)",
+     :cardinality 63},
     :blocks
     {:min 4,
      :data-type "integer",
-     :commons {6 3, 7 2, 4 1},
-     :distinct 7,
+     :commons {15 5, 6 3, 10 2},
+     :distinct 10,
      :group-by? true,
-     :median 6,
+     :median 15,
      :max 48,
-     :avg 13.8,
-     :cardinality 69},
+     :avg 13.736842105263158,
+     :cardinality 52},
     :queries
-    {:min 0,
+    {:min 1,
      :data-type "integer",
-     :commons {1 3, 2 2, 0 1},
-     :distinct 7,
+     :commons {2 6, 1 3, 3 3},
+     :distinct 8,
      :group-by? true,
-     :median 16.5,
+     :median 2,
      :max 17,
-     :avg 4.7,
-     :cardinality 69},
+     :avg 4.894736842105263,
+     :cardinality 42},
     :ts
-    {:min "2024-08-31 22:11:05",
+    {:min "2024-09-02 09:51:39",
      :data-type "string",
      :commons
-     {"2024-08-31 22:11:06" 6, "2024-08-31 22:11:05" 3, "2024-08-31 22:19:56" 1},
-     :distinct 3,
+     {"2024-09-02 09:51:39" 12, "2024-09-02 09:52:42" 2, "2024-09-02 09:55:27" 1},
+     :distinct 7,
      :group-by? true,
-     :median "2024-08-31 22:11:06",
-     :max "2024-08-31 22:19:56",
-     :avg "2024-08-31 22:11:06 (non-numeric average)",
-     :cardinality 30}},
+     :median "2024-09-02 09:51:39",
+     :max "2024-09-02 09:55:27",
+     :avg "2024-09-02 09:51:39 (non-numeric average)",
+     :cardinality 36}},
    :database-type "SQLite",
-   :rowcount 10},
+   :rowcount 19},
   :raw_custom_override_1731765785__block_9240_clojure_new_clojure_
   {:fields
    {:query_error
@@ -301,14 +620,15 @@
     :step_val
     {:min -1,
      :data-type "float",
-     :commons {0.999229036240723 2, -0.996917333733128 2, -0.9723699203976764 2},
-     :distinct 66,
+     :commons
+     {-0.9992290362407232 2, -0.07845909572784429 1, 0.30901699437494745 1},
+     :distinct 68,
      :group-by? true,
-     :median 0.07845909572784514,
-     :max 0.999229036240723,
-     :avg 0.025708381689598395,
-     :cardinality 95}},
-   :database-type "SQLite",
+     :median -0.9992290362407232,
+     :max 0.993068456954926,
+     :avg -0.001066049150247916,
+     :cardinality 98}},
+   :database-type "DuckDB",
    :rowcount 69},
   :raw_custom_override1589124350__block_9240_clojure_new_clojure_
   {:fields
@@ -317,14 +637,14 @@
      :data-type "string",
      :commons
      {nil 1,
-      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x45339f9 \"HikariDataSource (system-db)\"]}"
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7833407 \"HikariDataSource (system-db)\"]}"
       1,
       "(from database connection)" 1},
      :distinct 4,
      :group-by? true,
      :median "(from database connection)",
      :max
-     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x45339f9 \"HikariDataSource (system-db)\"]}",
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7833407 \"HikariDataSource (system-db)\"]}",
      :avg
      "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override1589124350__block_9240_clojure_new_clojure_) (non-numeric average)",
      :cardinality 100}},
@@ -340,11 +660,31 @@
      :cardinality 100},
     :step_val
     {:data-type "integer",
-     :distinct 66,
+     :distinct 69,
      :group-by? true,
      :commons {},
-     :cardinality 95}},
+     :cardinality 100}},
    :rowcount 69},
+  :raw_custom_override1070344508__block_9240_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7833407 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7833407 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override1070344508__block_9240_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
   :ufo_sightings
   {:fields
    {:query_error
@@ -407,357 +747,339 @@
      :cardinality 50}},
    :rowcount 2}},
  :default-col-widths
- {:block-7305 {:DISTRICT-drag-31 180},
-  :block-86 {:new-clojure-sqlized 361},
-  :block-10072 {:image-files 511},
+ {:block-10812 {:OFFENSE-CODE-GROUP-drag-21 180},
+  :block-10518 {:NAME-drag-37 155},
   :system-connections-list* {:connections-sys 126},
-  :system-fields-list* {:fields-sys ##Inf},
-  :block-10146 {:query-6590 211},
+  :block-8473 {:client-memory-drag-36 123},
+  :system-fields-list* {:fields-sys 170},
   :files-list* {:files-sys 170},
-  :block-2115 {:bigfoot-sightings-drag-28 100},
-  :blocks-list* {:blocks-sys ##Inf},
-  :block-12180 {:offenses-drag-30 100},
-  :block-3431 {:query-3274 211},
-  :system-tables-list* {:tables-sys 133}},
+  :block-11793 {:STREET-drag-11 180},
+  :block-984 {:OFFENSE-CODE-GROUP-drag-40 100},
+  :blocks-list* {:blocks-sys 127},
+  :block-6800 {:offenses-drag-9 103},
+  :system-tables-list* {:tables-sys 133},
+  :block-10504 {:offense-codes-drag-1 105},
+  :block-12128 {:NAME-drag-37 155},
+  :block-8590 {:bigfoot-sightings-drag-35 100},
+  :block-11160 {:rowcnt-drag-21 161}},
  :runstream-drops nil,
  :tabs ["the-creative-process"],
- :selected-cols nil,
- :server
- {:settings
-  {:harvest-on-boot? true,
-   :default "./screens/frost-terminal2.edn",
-   :new-block-rand
-   ["Why, sometimes I've believed as many as six impossible things before breakfast."
-    "Imagination is the only weapon in the war against reality."
-    "It's no use going back to yesterday, because I was a different person then."
-    "Who in the world am I? Ah, that's the great puzzle..."
-    "Curiouser and curiouser!"
-    "If you don't know where you are going any road can take you there."
-    "We're all mad here."
-    "I can't go back to yesterday because I was a different person then."
-    "It's always tea-time."
-    "Begin at the beginning and go on till you come to the end; then stop."
-    "I knew who I was this morning, but I've changed a few times since then."
-    "How long is forever? Sometimes, just one second."
-    "If everybody minded their own business, the world would go around a great deal faster than it does."
-    "I don't think... then you shouldn't talk, said the Hatter."
-    "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
-    "You're entirely bonkers. But I'll tell you a secret... all the best people are."
-    "It was much pleasanter at home, when one wasn't always growing larger and smaller."
-    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
-    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
-    "Well, I never heard it before, but it sounds uncommon nonsense."
-    "Why, sometimes I've believed as many as six impossible things before breakfast."
-    "Imagination is the only weapon in the war against reality."
-    "Who in the world am I? Ah, that's the great puzzle."
-    "We're all mad here."
-    "How long is forever? Sometimes, just one second."
-    "The world is full of obvious things which nobody by any chance ever observes."
-    "Reality is that which, when you stop believing in it, doesn't go away."
-    "The sky above the port was the color of television, tuned to a dead channel."
-    "Information wants to be free."
-    "The future is already here – it's just not evenly distributed."
-    "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
-    "The 'Net is a waste of time, and that's exactly what's right about it."
-    "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
-    "The street finds its own uses for things."
-    "Accelerated world. Accelerated nervous system to go with it."
-    "The future has arrived — it's just not evenly distributed yet."
-    "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
-    "When you want to know how things really work, study them when they're coming apart."
-    "The human sensory system is a lot more complex and weird than most people realize."
-    "Time moves in one direction, memory in another."
-    "The only thing that keeps you sane is to think that it's all a bad dream."
-    "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
-    "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
-    "Secrets are not the same as surprises."
-    "Neuromancer. The lane to the land of the dead."],
-   :modes
-   {:terminal [:terminal :*data],
-    :markdown [:markdown :*data],
-    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
-    :pre
-    [:pre
-     {:style
-      {:color :theme/editor-outer-rim-color,
-       :background-color "#00000000 ",
-       :border "none",
-       :text-shadow "4px 4px 4px #00000088",
-       :font-size "17px",
-       :font-family :theme/monospaced-font}}
-     [:str :*data]],
-    :edn [:edn :*data],
-    :clover [:box :child :*data],
-    :pretty [:pretty-box :*data],
-    :text [:console :*data],
-    :data [:data-viewer :*data]},
-   :kits {},
-   :clover-templates
-   {:color-theft
-    {:args [:*input],
-     :body
-     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
-    :pretty-box
-    {:args [:*input],
-     :body
-     [:box
-      :size
-      "auto"
-      :align
-      :center
-      :justify
-      :center
-      :style
-      {:color :theme/editor-outer-rim-color,
-       :font-size [:auto-size-px [:str :*input]]}
-      :child
-      [:str :*input]]},
-    :new-block-quotes-box
-    {:args [:*input],
-     :body
-     [:box
-      :align
-      :center
-      :justify
-      :center
-      :style
-      {:font-size "21px",
-       :font-weight 700,
-       :padding-top "6px",
-       :padding-left "14px",
-       :margin-top "-8px",
-       :color :theme/editor-outer-rim-color,
-       :font-family :theme/base-font}
-      :child
-      [:speak [:str :*input]]]},
-    :clj
-    {:args [:code],
-     :body
-     [:run-solver
-      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
-    :clj2
-    {:args [:code],
-     :body
-     [:run-solver
-      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
-    :cheese-burger
-    {:args [:x],
-     :body
-     [:box
-      :style
-      {:color "yellow", :font-size "23px"}
-      :child
-      [:str :x "CHEESEBURGER!"]]}},
-   :debug-level 1,
-   :screens
-   ["dynamic-theme-example1"
-    "ecto-cooler-shade"
-    "frost-terminal2"
-    "looking-glass-sine-wave"
-    "nice-car-choom"
-    "random-collection"
-    "server-stats2"
-    "winter-theme"
-    "winter-theme-choom"],
-   :no-secrets-file-found-at "./defs/secrets.edn"}},
+ :selected-cols {},
+ :server {:settings nil},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :lines? false,
  :editor? false,
  :buffy? false,
  :valid-kits
  {[:clojure :export-to-csv]
   [[nil :queries nil]
    [:reco-preview :queries :query-preview]
-   [:block-7305 :queries :DISTRICT-drag-31]
-   [:block-9240 :queries :new-clojure-sqlized]
+   [:block-1152 :queries :gen-viz-516]
+   [:block-724 :queries :gen-viz-1022]
    [:block-86 :queries :new-clojure-sqlized]
-   [:block-10072 :queries :image-files]
+   [:block-10812 :queries :OFFENSE-CODE-GROUP-drag-21]
+   [:block-496 :queries :gen-viz-507]
+   [:block-10518 :queries :NAME-drag-37]
    [:block-9201 :queries :new-clojure-1-sqlized]
-   [:block-10146 :queries :query-6590]
+   [:block-8473 :queries :client-memory-drag-36]
    [:block-3284 :queries :new-clojure-2-sqlized]
-   [:block-2115 :queries :bigfoot-sightings-drag-28]
-   [:block-12180 :queries :offenses-drag-30]
-   [:block-3431 :queries :query-3274]],
+   [:block-407 :queries :gen-viz-544]
+   [:block-11793 :queries :STREET-drag-11]
+   [:block-984 :queries :OFFENSE-CODE-GROUP-drag-40]
+   [:block-6800 :queries :offenses-drag-9]
+   [:block-10504 :queries :offense-codes-drag-1]
+   [:block-12128 :queries :NAME-drag-37]
+   [:block-8590 :queries :bigfoot-sightings-drag-35]
+   [:block-11160 :queries :rowcnt-drag-21]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
   [:clojure :view-lundberg]
   [[:block-1084 :views :hare-vw-8]
+   [:block-4780 :views :flow-play-runstreamed]
    [:reco-preview :views :oz]
-   [:block-3341 :views :hi]
-   [:block-9240 :views :hi]
-   [:block-9240 :views :stack]
-   [:block-1285 :views :poised-maroon-fly]
-   [:block-5402 :views :hare-vw]
+   [:block-1152 :views :every-45-seconds]
+   [:block-6330 :views :hi]
+   [:block-724 :views :reech]
+   [:block-4970 :views :hare-vw-3]
    [:block-9973 :views :hare-vw-2]
    [:block-4733 :views :hare-vw-7]
-   [:block-10072 :views :hare-vw-6]
+   [:block-496 :views :oz]
+   [:block-11523 :views :sub-0]
    [:block-4719 :views :hare-vw-3]
-   [:block-3904 :views :reech]
    [:block-8499 :views :hare-vw]
-   [:block-10146 :views :hare-vw-7]
+   [:block-8473 :views :hi]
+   [:block-8473 :views :stack]
+   [:block-482 :views :hare-vw-16]
+   [:block-8563 :views :hi]
+   [:block-7234 :views :hare-vw-5]
+   [:block-9709 :views :hare-vw-17]
+   [:block-203 :views :hi]
+   [:block-10760 :views :hare-vw-14]
    [:block-7845 :views :hare-vw-4]
+   [:block-11130 :views :hare-vw-2]
+   [:block-407 :views :oz]
    [:block-8806 :views :hare-vw-1]
    [:block-1584 :views :hare-vw-6]
-   [:block-4687 :views :hare-vw-5]
+   [:block-5999 :views :hare-vw-1]
    [:block-1320 :views :hare-vw-9]
-   [:block-8155 :views :genius-plum-coyote]
-   [:block-3431 :views :hare-vw-9]],
+   [:block-3879 :views :hi]
+   [:block-9482 :views :hare-vw-15]],
   [:clojure :gen-ev] [],
   [:outliers :get-outliers]
   [[nil :queries nil]
    [:reco-preview :queries :query-preview]
-   [:block-7305 :queries :DISTRICT-drag-31]
-   [:block-9240 :queries :new-clojure-sqlized]
+   [:block-1152 :queries :gen-viz-516]
+   [:block-724 :queries :gen-viz-1022]
    [:block-86 :queries :new-clojure-sqlized]
-   [:block-10072 :queries :image-files]
+   [:block-10812 :queries :OFFENSE-CODE-GROUP-drag-21]
+   [:block-496 :queries :gen-viz-507]
+   [:block-10518 :queries :NAME-drag-37]
    [:block-9201 :queries :new-clojure-1-sqlized]
-   [:block-10146 :queries :query-6590]
+   [:block-8473 :queries :client-memory-drag-36]
    [:block-3284 :queries :new-clojure-2-sqlized]
-   [:block-2115 :queries :bigfoot-sightings-drag-28]
-   [:block-12180 :queries :offenses-drag-30]
-   [:block-3431 :queries :query-3274]]},
- :memory [140538167 99177679 4294705152],
- :client-name :protected-linear-hound-16,
+   [:block-407 :queries :gen-viz-544]
+   [:block-11793 :queries :STREET-drag-11]
+   [:block-984 :queries :OFFENSE-CODE-GROUP-drag-40]
+   [:block-6800 :queries :offenses-drag-9]
+   [:block-10504 :queries :offense-codes-drag-1]
+   [:block-12128 :queries :NAME-drag-37]
+   [:block-8590 :queries :bigfoot-sightings-drag-35]
+   [:block-11160 :queries :rowcnt-drag-21]]},
+ :memory [184104459 157528659 4294705152],
+ :sched {:gen-viz-516 164, :client-memory-drag-36 164},
+ :client-name :wealthy-magenta-beaver-27,
  :flow-editor? true,
- :window {:w 2770, :h 1550},
- :quake-console? false,
+ :window {:w 2236, :h 1342},
  :implicit-rowsets {:solver [:new-clojure nil]},
  :post-meta
- {:blocks-sys
-  {:* {:rowcount 9},
-   :block_key {:distinct 9},
-   :block_name {:distinct 9},
-   :queries {:distinct 2},
-   :views {:distinct 4},
-   :block_data {:distinct 9},
-   :view_names {:distinct 8},
-   :query_names {:distinct 2}},
-  :fields-sys
+ {:fields-sys
   {:* {:rowcount 26},
    :field_name {:distinct 26},
    :field_type {:distinct 5},
    :data_type {:distinct 5}},
-  :query-3274 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
-  :tables-sys
-  {:* {:rowcount 2},
-   :db_schema {:distinct 1},
-   :db_catalog {:distinct 0},
-   :connection_id {:distinct 1},
-   :schema_cat {:distinct 0},
-   :table_name {:distinct 2},
-   :fields {:distinct 2}},
-  :query-6590 {:* {:rowcount 1}, :rowcnt {:distinct 1}},
-  :raw_custom_override_1159300590__block_86_clojure_new_clojure_ {},
   :files-sys
-  {:* {:rowcount 9},
-   :file_path {:distinct 9},
-   :screen_name {:distinct 9},
-   :blocks {:distinct 7},
-   :queries {:distinct 6},
-   :ts {:distinct 2}},
+  {:* {:rowcount 18},
+   :file_path {:distinct 17},
+   :screen_name {:distinct 12},
+   :blocks {:distinct 10},
+   :queries {:distinct 8},
+   :ts {:distinct 6}},
+  :blocks-sys
+  {:* {:rowcount 39},
+   :block_key {:distinct 39},
+   :block_name {:distinct 35},
+   :queries {:distinct 2},
+   :views {:distinct 5},
+   :block_data {:distinct 39},
+   :view_names {:distinct 9},
+   :query_names {:distinct 31}},
   :new-clojure-sqlized
-  {:* {:rowcount 69}, :step_int {:distinct 69}, :step_val {:distinct 66}},
-  :raw_custom_override1589124350__block_9240_clojure_new_clojure_ {},
-  :offenses-drag-30
-  {:SHOOTING {:distinct 1},
-   :DISTRICT {:distinct 12},
-   :* {:rowcount 319073},
-   :INCIDENT_NUMBER {:distinct 282517},
-   :OFFENSE_DESCRIPTION {:distinct 244},
-   :DAY_OF_WEEK {:distinct 7},
-   :MONTH {:distinct 12},
-   :YEAR {:distinct 4},
-   :HOUR {:distinct 24},
-   :STREET {:distinct 4657},
-   :OFFENSE_CODE_GROUP {:distinct 67},
-   :UCR_PART {:distinct 4},
-   :Long {:distinct 18178},
-   :REPORTING_AREA {:distinct 878},
-   :Location {:distinct 18194},
-   :OFFENSE_CODE {:distinct 222},
-   :Lat {:distinct 18178},
-   :OCCURRED_ON_DATE {:distinct 233229}},
-  :image-files {},
-  :raw_custom_override86093687__block_86_clojure_new_clojure_ {},
-  :bigfoot_sightings {},
-  :DISTRICT-drag-31
-  {:* {:rowcount 13}, :DISTRICT {:distinct 12}, :rowcnt {:distinct 13}},
-  :bigfoot-sightings-drag-28
-  {:nearestroad {:distinct 3771},
-   :date {:distinct 1161},
-   :* {:rowcount 5035},
-   :locationdetails {:distinct 4205},
-   :submitted_date {:distinct 3521},
-   :sketch {:distinct 1},
-   :bfroid {:distinct 5035},
-   :otherwitnesses {:distinct 3704},
-   :run_id {:distinct 1},
-   :nearesttown {:distinct 3800},
-   :timeandconditions {:distinct 4477},
-   :month {:distinct 12},
-   :county {:distinct 1039},
-   :state {:distinct 49},
-   :fixed_month {:distinct 12},
-   :submitted {:distinct 3522},
-   :title {:distinct 5031},
-   :otherstories {:distinct 2939},
-   :year {:distinct 430},
-   :season {:distinct 5},
-   :class {:distinct 3},
-   :alsonoticed {:distinct 2964},
-   :url {:distinct 5035},
-   :observed {:distinct 4997},
-   :environment {:distinct 4677},
-   :fixed_year {:distinct 132},
-   :run_time {:distinct 2121}},
-  :offenses {}},
+  {:* {:rowcount 69}, :step_int {:distinct 69}, :step_val {:distinct 68}},
+  :gen-viz-544
+  {:* {:rowcount 7},
+   :REPORTING_AREA {:distinct 7},
+   :day_sqlite_DAY_OF_WEEK {:distinct 7}},
+  :OFFENSE-CODE-GROUP-drag-21
+  {:* {:rowcount 1}, :OFFENSE_CODE_GROUP {:distinct 1}, :rowcnt {:distinct 1}},
+  :offense_codes {},
+  :STREET-drag-11
+  {:* {:rowcount 4658}, :STREET {:distinct 4657}, :rowcnt {:distinct 397}}},
  :flow-estimates
- {:blocks-sys {:times 0.001, :run-id :blocks-sys},
-  :fields-sys {:times 0.002, :run-id :fields-sys},
-  :tables-sys {:times 0.003, :run-id :tables-sys},
-  :raw-custom-override1680656988
-  {:times 0.015, :run-id :raw-custom-override1680656988},
-  :raw-custom-override-1152793386
-  {:times 0.01, :run-id :raw-custom-override-1152793386},
-  :files-sys {:times 0.001, :run-id :files-sys},
+ {:blocks-sys {:times 0.002, :run-id :blocks-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :client_memory {:times 0.008, :run-id :client_memory},
+  :gen-viz-507 {:times 0.03, :run-id :gen-viz-507},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :OFFENSE-CODE-GROUP-drag-40 {:times 0.04, :run-id :OFFENSE-CODE-GROUP-drag-40},
+  :offenses-drag-9 {:times 0.071, :run-id :offenses-drag-9},
+  :files-sys {:times 0.002, :run-id :files-sys},
+  :OFFENSE-CODE-GROUP-drag-21 {:times 0.032, :run-id :OFFENSE-CODE-GROUP-drag-21},
+  :bigfoot-sightings-drag-35 {:times 0.022, :run-id :bigfoot-sightings-drag-35},
+  :raw-custom-override-793100426
+  {:times 0.452, :run-id :raw-custom-override-793100426},
   :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
-  :offenses-drag-30 {:times 0.021, :run-id :offenses-drag-30},
-  :bigfoot-sightings-drag-28 {:times 0.037, :run-id :bigfoot-sightings-drag-28},
-  :raw-custom-override1589124350
-  {:times 0.077, :run-id :raw-custom-override1589124350},
-  :connections-sys {:times 0.004, :run-id :connections-sys}},
+  :gen-viz-1022 {:times 0.011, :run-id :gen-viz-1022},
+  :STREET-drag-11 {:times 0.286, :run-id :STREET-drag-11},
+  :rowcnt-drag-21 {:times 0.025, :run-id :rowcnt-drag-21},
+  :raw-custom-override714264689
+  {:times 0.017, :run-id :raw-custom-override714264689},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :gen-viz-544 {:times 0.031, :run-id :gen-viz-544},
+  :raw-custom-override1070344508
+  {:times 0.077, :run-id :raw-custom-override1070344508},
+  :NAME-drag-37 {:times 0.002, :run-id :NAME-drag-37},
+  :offense-codes-drag-1 {:times 0.003, :run-id :offense-codes-drag-1},
+  :client-memory-drag-36 {:times 0.004, :run-id :client-memory-drag-36},
+  :gen-viz-516 {:times 0.003, :run-id :gen-viz-516}},
  :status
  {:heartbeat
   {:kick
-   [:solver-meta/raw-custom-override86093687>output>evald-result>out
-    :time/now-seconds
-    :flow-status/flow-forever>*running?
-    :flow-status/my-new-flow101>*running?
-    :solver-meta/raw-custom-override1589124350>output>evald-result>value-hash
-    :solver-meta/raw-custom-override86093687>output>evald-result>value-hash
-    :solver-status/protected-linear-hound-16>get-my-colors-1477659433>running?
-    :solver-status/protected-linear-hound-16>raw-custom-override1589124350>running?
-    :solver/raw-custom-override1589124350
-    :solver/get-my-colors-1477659433
-    :solver-status/protected-linear-hound-16>get-my-colors-440234198>running?
-    :solver-status/protected-linear-hound-16>raw-custom-override86093687>running?
-    :solver-status/protected-linear-hound-16>raw-custom-override1680656988>running?
-    :solver-meta/raw-custom-override-1731765785>output>evald-result>value-hash
-    :time/second
-    :solver/raw-custom-override86093687
-    :kit/kicks>protected-linear-hound-16
-    :solver/get-my-colors-440234198
-    :solver/raw-custom-override1680656988]},
+   [:client/*client-name*>stats>memory
+    :server/conway-iteration
+    :flow-status/game-of-life-test1>*running?
+    :solver/get-my-colors-1790973138
+    :solver-status/wealthy-magenta-beaver-27>get-my-colors-1790973138>running?
+    :kit/kicks>wealthy-magenta-beaver-27
+    :client/*client-name*>stats>recent-messages-per-second
+    :flow-status/my-new-flow3587>*running?
+    :solver/get-my-colors1909740824
+    :server/conway-render
+    :solver-status/wealthy-magenta-beaver-27>get-my-colors1909740824>running?
+    :server/conway-iteration-map]},
   :alert1 {:alerts :alert2},
-  :alert2 {:alerts :alert2},
-  :alert3 {:alerts :alert2}},
+  :alert3 {:alerts :alert2},
+  :alert2 {:alerts :alert2}},
  :screen-name "looking-glass-sine-wave",
  :recos-page2 0,
  :selected-tab "the-creative-process",
- :col-names nil,
  :snapshots nil,
  :alerts
  [[[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box :child "sub to :time/now-seconds"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   210
+   -1942954136]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box :child "sub to :flow-status/flow-forever>*running?"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   210
+   1461614388]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box
+       :child
+       "sub to :solver-meta/raw-custom-override1589124350>output>evald-result>value-hash"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   210
+   1618247144]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box
+       :child
+       "sub to :solver-status/wealthy-magenta-beaver-27>raw-custom-override1070344508>running?"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   210
+   681678741]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box :child "sub to :solver/raw-custom-override1070344508"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   210
+   -1357451494]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box :child "sub to :time/second"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   210
+   1815467428]
+  [[:box
+    :style
+    {:font-size "15px"}
+    :child
+    [:h-box
+     :align
+     :center
+     :style
+     {:padding-left "6px"}
+     :gap
+     "10px"
+     :children
+     [[:md-icon :style {:font-size "12px"} :md-icon-name "ri-shake-hands-fill"]
+      [:box
+       :child
+       "sub to :solver-meta/raw-custom-override1070344508>output>evald-result>value-hash"]]
+     :style
+     {:font-size "12px", :opacity nil, :text-decoration nil}]]
+   10
+   0.75
+   211
+   -1077780782]
+  [[:box
     :style
     {:font-size "15px"}
     :child
@@ -768,30 +1090,31 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   584
+   216
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries
- {:offenses -505802446,
-  :bigfoot_sightings 302026766,
-  :raw_custom_override_1159300590__block_86_clojure_new_clojure_ -1838011445,
+ {:bigfoot_sightings 302026766,
   :raw_custom_override86093687__block_86_clojure_new_clojure_ -1892756218,
-  :raw_custom_override_1731765785__block_9240_clojure_new_clojure_ -189601823,
-  :raw_custom_override1589124350__block_9240_clojure_new_clojure_ 1893543296},
+  :raw_custom_override_793100426__block_86_clojure_new_clojure_ 1038642995,
+  :client_memory -1981695802,
+  :offenses -505802446,
+  :offense_codes -1076692702,
+  :raw_custom_override1589124350__block_9240_clojure_new_clojure_ 1893543296,
+  :raw_custom_override1070344508__block_9240_clojure_new_clojure_ 1252677210},
  :user-params-hash 1355235171,
  :grid-recos? true,
- :preview-keys2 [],
- :session-hash 1367298843,
+ :session-hash 1946715033,
  :resolved-queries
  {:new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-08-31 22:21:28",
+   :_sqlized-at "2024-09-02 09:55:47",
    :_sqlized-by [:block-9240 :clojure :new-clojure],
-   :_sqlized-hash 1022913944,
-   :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_]},
-  nil {:_last-run "22:20:37"}},
+   :_sqlized-hash -733212184,
+   :from [:raw_custom_override1070344508__block_9240_clojure_new_clojure_]},
+  nil {:_last-run "09:55:45"}},
  :panels
  {:block-3341
   {:name "block-3341",
@@ -841,11 +1164,11 @@
    {:new-clojure-sqlized
     {:select [:*],
      :connection-id "cache.db",
-     :_sqlized-at "2024-08-31 22:21:28",
+     :_sqlized-at "2024-09-02 09:55:48",
      :_sqlized-by [:block-9240 :clojure :new-clojure],
      :_sqlized-hash
-     :solver-meta/raw-custom-override1589124350>output>evald-result>value-hash,
-     :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_]}},
+     :solver-meta/raw-custom-override1070344508>output>evald-result>value-hash,
+     :from [:raw_custom_override1070344508__block_9240_clojure_new_clojure_]}},
    :tab "the-creative-process",
    :views
    {:hi
@@ -919,7 +1242,7 @@
    :tab "the-creative-process",
    :root [1 12],
    :name "block-8155"},
-  nil {:queries {nil {:_last-run "22:20:37"}}},
+  nil {:queries {nil {:_last-run "09:55:45"}}},
   :block-5402
   {:h 2,
    :w 10,
@@ -1094,4 +1417,4 @@
    :editor-grid-font-color "#ffffff"},
   :ufo-sightings-drag-9 {},
   :sys {:selected-tab "the-creative-process", :selected-tab-idx 0}},
- :selected-flow "my-new-flow101"}
+ :selected-flow "my-new-flow3587"}

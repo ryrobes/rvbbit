@@ -265,6 +265,7 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 ## Caveats
 
 - Use Engelbart's beautiful invention please 🐁
+- Reccommend JDK 17+
 - Smattering of various UI jank; being worked on
 - Limited SQL DB support ATM
 	Tested with SQLite, Postgres, MySQL, SQL Server, Vertica, Clickhouse, DuckDB

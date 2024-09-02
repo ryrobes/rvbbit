@@ -658,8 +658,7 @@
 
 
 
-(defn insert-connection-data!
-  [target-db system-db this-run-id connect-meta sql-filter]
+(defn insert-connection-data! [target-db system-db this-run-id connect-meta sql-filter]
   (do (sql-exec system-db (to-sql {:delete-from [:connections] :where [:= :connection_id (get connect-meta :connection_id)]}))
       (sql-exec system-db
                 (to-sql
@@ -667,34 +666,50 @@
                    :columns     (conj (conj (conj (vec (keys connect-meta)) :run_id) :original_connection_str) :metadata_filter)
                    :values      [(conj (conj (conj (vec (vals connect-meta)) this-run-id) (str target-db)) (str sql-filter))]}))))
 
-(defn update-connection-data!
-  [system-db this-run-id connection-id]
+(defn update-connection-data! [system-db this-run-id connection-id]
   (sql-exec system-db
             (to-sql {:update [:connections]
                      :set    {:ended_at [:raw "date('now')"]}
                      :where  [:and [:= :connection_id connection-id] [:= :run_id this-run-id]]})))
 
-(defn create-target-field-vectors
-  [target-db connect-meta]
-  (let [flat-meta     (let [mm (surveyor/get-jdbc-conn-meta target-db)
-                            fm (surveyor/flatten-jdbc-conn-meta connect-meta mm)]
-                        (into {} fm))
+(defn flat-db-meta [db connect-meta]
+  (let [;connect-meta (or connect-meta (surveyor/jdbc-connect-meta db "cache.db"))
+                 ;;_ (ut/pp connect-meta)
+        duck? (= (get connect-meta :database_name) "DuckDB") ;; doesnt support jdbc meta 
+        fm (if duck?
+             (let [rrows (sql-query db (to-sql {:select [:table_name :column_name :data_type]
+                                                :from [:information_schema.columns]
+                                                :order-by [:table_name :column_name]} "DuckDB"))
+                   tables (vec (distinct (map :table_name rrows)))
+                   conn-id (str (get connect-meta :connection_id))
+                   table-rows (into {} (for [t tables] {["DuckDB" conn-id "TABLE" "none" nil t "*"]
+                                                        {:column_type "special"}}))
+                   flat (into {} (for [r rrows] {["DuckDB" conn-id "TABLE" "none" nil (get r :table_name) (get r :column_name)]
+                                                 {:column_type (get r :data_type)}}))]
+               (merge table-rows flat))
+             (into {} (surveyor/flatten-jdbc-conn-meta connect-meta (surveyor/get-jdbc-conn-meta db))))]
+    fm))
+
+(defn create-target-field-vectors [target-db connect-meta]
+  (let [;;flat-meta     (let [mm (surveyor/get-jdbc-conn-meta target-db)
+        ;;                    fm (surveyor/flatten-jdbc-conn-meta connect-meta mm)]
+        ;;                (into {} fm))
+        flat-meta     (flat-db-meta target-db connect-meta)
         field-vectors (vec (for [[k v] flat-meta]
                              (let [db-col-type        (get v :column_type)
                                    general-data-infer (general-data-type-infer db-col-type)]
-                               (conj (conj k db-col-type) general-data-infer))))] ;; TODO [eyes
+                               (conj (conj k db-col-type) general-data-infer))))]
+    ;;(ut/pp field-vectors)
     field-vectors))
 
-(defn get-latest-run-id
-  [system-db connect-meta]
+(defn get-latest-run-id [system-db connect-meta]
   (let [last-run-sql (to-sql {:select [[[:max :run_id] :last_run_id]]
                               :from   [:connections]
                               :where  [:= :connection_id (get connect-meta :connection_id)]})
         last-run-id  (sql-query-one system-db last-run-sql)]
     (if (nil? last-run-id) 1 (+ last-run-id 1))))
 
-(defn find-fields
-  [system-db context-map logic]
+(defn find-fields [system-db context-map logic]
   (let
     [connection_id (:connection_id context-map)
      db_schema (:db_schema context-map)

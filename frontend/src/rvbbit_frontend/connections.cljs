@@ -18,6 +18,8 @@
     [cljs-time.core] ;; womp[ womp]
     [websocket-fx.core       :as wfx]))
 
+(defn namespaced [x] (try (namespace x) (catch :default _ nil))) ;; yes this is a hacky override
+
 (re-frame/reg-sub ::sub-flow-incoming (fn [db [_]] (get db :sub-flow-incoming)))
 
 (re-frame/reg-event-fx
@@ -538,7 +540,7 @@
   [data]
   (cond (map? data)     (some contains-namespaced-keyword? (concat (keys data) (vals data)))
         (vector? data)  (some contains-namespaced-keyword? data)
-        (keyword? data) (boolean (namespace data))
+        (keyword? data) (boolean (namespaced data))
         :else           false))
 
 (re-frame/reg-sub ;; RESOLVE KEYPATH
@@ -610,17 +612,19 @@
 (re-frame/reg-sub
  ::runner-crosswalk-map
  (fn [_ _]
-   (let [process-key (fn [k]
+   (try 
+     (let [process-key (fn [k]
                        (let [base-k (if (vector? k) (last k) k)]
-                         (if (namespace base-k)
+                         (if (try (namespaced base-k) (catch :default _ false))
                            [base-k]
                            [base-k (keyword "data" (name base-k))])))]
      (into {}
-           (comp
+           (comp 
             (mapcat (fn [[k v]]
                       (map #(vector % v) (process-key (last k)))))
             (distinct))
-           @db/solver-fn-lookup))))
+           @db/solver-fn-lookup))
+     (catch :default _ {}))))
 
 
 
@@ -729,7 +733,7 @@
                                   (ut/postwalk-replacer logic-kps obody)))
           val0                (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
           ;ns-kw?              (and (cstr/starts-with? (str val0) ":") (cstr/includes? (str val0) "/") (keyword? val0))
-          ns-kw?              (and (keyword? val0) (namespace val0))
+          ns-kw?              (and (keyword? val0) (namespaced val0))
           val                 (cond ns-kw?      (get-in db
                                                         (let [sp (ut/splitter (str val0) "/")]
                                                           [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
@@ -1249,8 +1253,7 @@
          ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
          ;                                     :*client-name* client-name
          ;                                     :*client-name-str (pr-str client-name)} honey-modded)
-         ;_ (ut/tapp>> [:sql-run1 (str keypath) (str honey-sql)])
-         ]
+         _ (ut/tapp>> [:sql-run1 (str keypath) (str honey-sql)])]
      (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
       [::wfx/request :default
@@ -1277,7 +1280,9 @@
    (when (not (nil? (get honey-sql :refresh-every)))
      (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
 
-   (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))
+   (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql])
+   ;(swap! db/running-queries disj honey-sql)
+   )
    
   ([keypath honey-sql connection-id]
    (doall
@@ -1314,9 +1319,9 @@
            ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
            ;                                     :*client-name* client-name 
            ;                                     :*client-name-str (str client-name)} honey-modded)
-          ;;  _ (ut/tapp>> [:sql-run2 (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
+            _ (ut/tapp>> [:sql-run2 (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
            ]
-       (do (when (not (nil? refresh-every)) 
+       (do (when (not (nil? refresh-every))
              (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
            (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
            (ut/tracked-dispatch [::wfx/request :default
@@ -1342,8 +1347,10 @@
            (when (or kit-name ;; clear on deck atom
                      sniff?)
              (swap! db/sniff-deck dissoc (first keypath)))
-           
-           (ut/tracked-dispatch [::add-to-sql-history keypath orig-honey-sql]))))))
+
+           (ut/tracked-dispatch [::add-to-sql-history keypath orig-honey-sql])
+           ;(swap! db/running-queries disj honey-sql)
+           )))))
 
 
 

@@ -2,6 +2,7 @@
   (:require
    ;[rvbbit-backend.db :refer [settings-atom]]
    [rvbbit-backend.assistants :as ass]
+   [puget.printer           :as puget]
    [clojure.edn     :as edn]
    [clojure.java.io :as io]
    [clojure.string  :as cstr]))
@@ -50,7 +51,10 @@
 ;;         settings-map (merge config secrets {:openai-valid? models-valid?})]
 ;;     (reset! settings-atom settings-map)
 ;;     settings-map))
-    
+
+
+
+
 (def openai-cache (atom {:api-key nil :org-id nil :models nil}))
 
 (defn settings []
@@ -82,3 +86,33 @@
         settings-map (merge config secrets {:openai-valid? models-valid?})]
     (reset! settings-atom settings-map)
     settings-map))
+
+;; (defn pp [x] (puget/cprint x))
+
+;; (def openapi-key (get (settings) :openai-api-key))
+;; (def openapi-org-id (get (settings) :openai-org-id))
+
+;; (def test-data [{:name "Ryan1" :year 78}
+;;                {:name "Ryan2" :year "70s"}
+;;                {:name "Ryan3" :year "'78"}
+;;                {:name "Ryan4" :year 0}
+;;                {:name "Ryan5" :year 1978}
+;;                {:name "Ryan6" :year "1977-1982"}
+;;                {:name "Ryan7" :year "0078"}
+;;                {:name "Ryan8" :year "001978"}])
+
+;; data cleaner, partiion all value , data, and a clean command 
+;; (pp (ass/oai-call {:url "https://api.openai.com/v1/chat/completions"
+;;                    :method :post
+;;                    :body {:model "gpt-4o"
+;;                           :messages [{:role "system"
+;;                                       :content (str "You are a data cleaner. You are given a dataset and instructions, 
+;;                                                      you will not respond to anything, you will just clean the data and return it as valid Clojure EDN. 
+;;                                                           Do NOT send backticks or language identifiers, JUST the EDN structure please. 
+;;                                                      The instructions are: 'Fix the YEAR col - make a guess if you have to with the information given.
+;;                                                      If a range is given, pick something in the middle - just make a reasonable assumption as to what
+;;                                                      the user intended. If you CANNOT decide or there is not enough information, 
+;;                                                      use -1 as the answer for that column.'"
+;;                                                     "here is the data: " (pr-str test-data))}]}}
+;;                   (get (settings) :openai-api-key)
+;;                   (get (settings) :openai-org-id)))
