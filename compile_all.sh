@@ -100,4 +100,6 @@ echo ""
 # cd ..
 # docker build --no-cache -t rvbbit .
 # docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root:/app/ rvbbit 
+# docker pull ghcr.io/ryrobes/rvbbit:latest
+# docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root2:/app/ ghcr.io/ryrobes/rvbbit:latest
 
