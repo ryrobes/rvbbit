@@ -99,6 +99,7 @@
 
 (defonce client-metrics (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-metrics-atom.msgpack.transit")) ;;(atom {}))
 (defonce sql-metrics (atom {}))
+(defonce atom-metrics (atom {}))
 
 (defonce sys-load (atom []))
 (defonce thread-usage (atom []))
@@ -3453,7 +3454,7 @@
   (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
         _                     (swap! solvers-run inc)
         timestamp             (System/currentTimeMillis)
-        ;;_ (ut/pp  [:solver-run ui-keypath])
+        _ (ut/pp  [:solver-run ui-keypath override-map override-input])
         ]
 
   ;; (if @temp-running-elsewhere?
@@ -3512,6 +3513,7 @@
                                                    (cstr/includes? (str %) "/")
                                                    (not= % (keyword (str "solver/" (cstr/replace (str solver-name) ":" "")))))
                                              (ut/deep-flatten vdata)))
+
           solver-name           (if temp-solver-name ;; we might be passed a blank input-map, but as long as we have
                                                    ;; a temp-solver-name, we can still run it independently
                                   temp-solver-name
@@ -3522,7 +3524,7 @@
                                                  (catch Exception e
                                                    (ut/pp [:clover-lookup-error kp e])
                                                    (str "clover-param-lookup-error " kp)))}))
-
+          _ (ut/pp [:solver-clover ui-keypath vdata-clover-kps vdata-clover-walk-map vdata (get solver-map :data)])
           ;; prev-times       (get @times-atom solver-name [-1])
           ;; ship-est         (fn [client-name]
           ;;                    (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
@@ -5143,7 +5145,8 @@
                         query-ms (get honey-result :elapsed-ms)
                         honey-result (get honey-result :result)
                         query-error? (get (first honey-result) :query_error)
-                        honey-meta (get-query-metadata honey-result honey-sql (surveyor/db-typer target-db))
+                        safe-result (mapv ut/stringify-non-primitives honey-result)
+                        honey-meta (get-query-metadata safe-result honey-sql (surveyor/db-typer target-db))
                         fields (get honey-meta :fields)
                         dates (remove nil? (for [[k v] fields] (when (cstr/includes? (get v :data-type) "date") k)))
                         is-meta? (= 3 (count ui-keypath))
@@ -5210,6 +5213,7 @@
                                           (ut/pp [:post-process-fn-error res])
                                           res)))
                                  result)
+                        
                         honey-meta (if (or (get orig-honey-sql :transform-select)
                                            has-rql? ;query-error?
                                            post-process-fn
@@ -5241,7 +5245,7 @@
                         repl-output (ut/limited (get-in @literal-data-output [ui-keypath :evald-result] {}))
                         output {:kind           kind
                                 :ui-keypath     ui-keypath
-                                :result         result
+                                :result         (mapv ut/stringify-non-primitives result) ;; safe-result
                                 :result-meta    honey-meta
                                 :sql-str        honey-sql-str2
                                 :query-ms       query-ms
@@ -5258,6 +5262,8 @@
                                                   (keys fields)
                                                   (get @sql/map-orders honey-sql-str))}
                         result-hash (hash result)]
+                    
+                    (when (cstr/includes? (str ui-keypath) "advanced") (ut/pp [:output (get output :honey-meta) :!!]))
                      ;(enqueue-task-sql-meta 
 
                     (when ;;true 
@@ -5345,7 +5351,8 @@
                                                          cache-table-name
                                                          {:honey-sql honey-sql :connection-id connection-id})
                                                   (doall
-                                                   (let [resultv (vec (for [r result] (assoc r :rows 1)))] ;;; hack to
+                                                   (let [resultv (vec (for [r result] (assoc r :rows 1)))
+                                                         resultv (mapv ut/stringify-non-primitives resultv)] ;;; hack to
                                                   ;;  (when (not= (first ui-keypath) :solvers) ;; solvers have their
                                                   ;;    (if false ;snapshot-cache?
                                                   ;;      (insert-rowset-snap result
@@ -5371,6 +5378,8 @@
                                     ;;         filtered-req-hash])
                                                      ))))
                           (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql)))))
+
+                    
                     
                     (do ;(swap! sql-cache assoc req-hash output)
                       ;; (kick client-name "kick-test!" (first ui-keypath) ;; <-- adds a kick kit panel entry for each query run, but adds up fast...
@@ -5402,11 +5411,11 @@
                                                             (when (or (= page -2) (= page -3)) ;; no need to write out normal queries 
                                                               (do
                                                                 (write-transit-data modded-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
-                                                                (write-transit-data (get output :result) (first ui-keypath) client-name (ut/unkeyword cache-table-name))))
+                                                                (write-transit-data result (first ui-keypath) client-name (ut/unkeyword cache-table-name))))
                                                             (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
                                                             (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
-                                                            (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result))
-                                                            (swap! db/last-solvers-data-atom assoc (first ui-keypath) (get output :result)) ;;  :data/ ... TBD
+                                                            (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] result)
+                                                            (swap! db/last-solvers-data-atom assoc (first ui-keypath) result) ;;  :data/ ... TBD
                                                           ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                                                             (when (= page -3) ;; materialize and schedule a new solver job if not exists
                                                             ;;; insert a new solver job if not exists :materialize-query-name
@@ -5483,7 +5492,12 @@
                       
                       (when client-cache? (insert-into-cache req-hash output))
 
-                      (when (and (not (= connection-id "system-db")) 
+                      (when (and (and
+                                  (not (= connection-id "system-db"))
+                                  (not (= connection-id "history-db"))
+                                  (not (= connection-id "flow-db"))
+                                  (not (cstr/starts-with? (str ui-keypath) "[:c")) ;; condi queries
+                                  (not (cstr/includes? (str ui-keypath) "query-preview")))
                                  (get @config/settings-atom :show-query-times? false))
                         (alert! client-name
                                 [:h-box :children 
@@ -5830,15 +5844,16 @@
                    8))))
   (send-edn-success {:status "saved" :screen (first (get request :edn-params))}))
 
-
 (defn save-snap [request]
   (try (let [image       (get-in request [:edn-params :image])
              session     (get-in request [:edn-params :session])
+             ttime       (get-in request [:edn-params :ttime] (System/currentTimeMillis)) 
              client-name (get-in request [:edn-params :client-name] "unknown")
              client-name (cstr/replace (str client-name) ":" "")
-             file-path   (str "./assets/snaps/" client-name ".jpg")
-             ;ifile-path  (str "./assets/snaps/" client-name ".jpg")
-             sess-path   (str "./assets/snaps/" client-name ".edn")]
+             nname       (str client-name "-" ttime)
+             session     (assoc session :screen-name nname)
+             file-path   (str "./assets/snaps/" nname ".jpg")
+             sess-path   (str "./assets/snaps/" nname ".edn")]
          (spit sess-path session)
          (ut/save-base64-to-jpeg image file-path)
          ;(ut/save-base64-to-jpeg image ifile-path)
@@ -6389,6 +6404,14 @@
                  (conj current-segment first-elem)
                  result))))))
 
+(defn safe-percentage-change [old-val new-val]
+  (if (< (Math/abs old-val) 1e-10)
+    (if (< (Math/abs new-val) 1e-10)
+      0  ; Both values are essentially zero
+      100  ; Old value is zero, new value is not
+      )
+    (* (/ (- new-val old-val) old-val) 100)))
+
 (defn draw-bar-graph [usage-vals label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
   (try
     (let [console-width (- (if width width (- (ut/get-terminal-width) 10)) 5)
@@ -6396,7 +6419,7 @@
           border-width 2
           label-padding 4
           time-marker-interval 30
-             ;values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+          ;values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
           max-values (- console-width border-width label-padding 5)
           truncated (take-last max-values usage-vals)
           mmax (apply max truncated)
@@ -6493,38 +6516,39 @@
       (doseq [row (range (dec rows) -1 -1)]
         (println (draw-row (map #(get-bar-char % row) normalized) row)))
          ;;(ut/pp [:start-index start-index (count truncated) (for [e (split-vector-at-x @chunked-segments)] (count e))])
-      (println (let [;visible-chunks-cnt (int (Math/ceil (/ (count truncated) time-marker-interval)))
-                     chunks (vec (split-vector-at-x @chunked-segments)) ;; (partition-all time-marker-interval truncated)
-                        ;;complete-chunks chunks ;; (vec (drop-last chunks))
-                     fchunks (vec (take-last (count chunks) (partition-all time-marker-interval usage-vals)))
-                        ;;_ (ut/pp [:chunks-segs (count chunks) visible-chunks-cnt (count truncated)])
-                     value-strings (apply str (for [chunk-idx (range (count fchunks))
-                                                    :let [chunk (vec (get chunks chunk-idx))
-                                                          chunks-size (count chunk)
-                                                          final-chunk? (= chunk-idx (dec (count chunks)))
-                                                             ;last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])
-                                                          last-chunk-full (if (> chunk-idx 0) (vec (get fchunks (- chunk-idx 1))) [0])
-                                                          chunk-full (vec (get fchunks chunk-idx))]]
-                                                (let [avg-last (ut/avgf last-chunk-full)
-                                                      avg-this (ut/avgf chunk-full)
-                                                      diff-last (-  avg-this avg-last)
-                                                      vv (* (/ diff-last avg-this) 100)
-                                                      lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%"))
-                                                      lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
-                                                      lbc (count (str lb))
-                                                         ;;_ (ut/pp [:ll chunk-idx lbc chunks-size (count chunks) (count fchunks) (count chunk-full)  (apply + chunk-full)])
-                                                      ]
-                                                  (if (< lbc chunks-size)
-                                                      ;;  (if (= chunk-idx 0)
-                                                      ;;    (str lb (apply str (repeat (- (+ 2 chunks-size) lbc) " ")))
-                                                      ;;    (str lb (apply str (repeat (- 34 lbc ) " "))))
-                                                    (str lb (apply str (repeat (- (+ 1 chunks-size) lbc (if final-chunk? 2 0)) " ")))
-                                                    (apply str (repeat (+ 1 chunks-size (if final-chunk? -2 0)) " "))))))
-                     vals-line (str "│" "\u001B[1m"
-                                    (colorize value-strings)
-                                    reset-code)
-                     padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
-                 (str vals-line padding " │")))
+      (defn safe-percentage-change [old-val new-val]
+        (if (< (Math/abs old-val) 1e-10)
+          (if (< (Math/abs new-val) 1e-10)
+            0  ; Both values are essentially zero
+            100  ; Old value is zero, new value is not
+            )
+          (* (/ (- new-val old-val) old-val) 100)))
+      
+      (println
+       (let [chunks (vec (split-vector-at-x @chunked-segments))
+             fchunks (vec (take-last (count chunks) (partition-all time-marker-interval usage-vals)))
+             value-strings
+             (apply str
+                    (for [chunk-idx (range (count fchunks))
+                          :let [chunk (vec (get chunks chunk-idx))
+                                chunks-size (count chunk)
+                                final-chunk? (= chunk-idx (dec (count chunks)))
+                                last-chunk-full (if (> chunk-idx 0) (vec (get fchunks (- chunk-idx 1))) [0])
+                                chunk-full (vec (get fchunks chunk-idx))]]
+                      (let [avg-last (ut/avgf last-chunk-full)
+                            avg-this (ut/avgf chunk-full)
+                            vv (safe-percentage-change avg-last avg-this)
+                            lb (if (= chunk-idx 0)
+                                 ""
+                                 (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%"))
+                            lb (cstr/trim (str "(μ " (ut/nf avg-this) ") " lb))
+                            lbc (count (str lb))]
+                        (if (< lbc chunks-size)
+                          (str lb (apply str (repeat (- (+ 1 chunks-size) lbc (if final-chunk? 2 0)) " ")))
+                          (apply str (repeat (+ 1 chunks-size (if final-chunk? -2 0)) " "))))))
+             vals-line (str "│" "\u001B[1m" (colorize value-strings) reset-code)
+             padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
+         (str vals-line padding " │")))
       (println border-bottom)
       (println (str "\u001B[1m" (colorize legend) reset-code)))
     (catch Throwable e
@@ -6618,6 +6642,43 @@
     ;;(ut/pp [:total-pools (try (count kks) (catch Exception _ -1))])
   )
 
+(defn get-namespace-atoms [ns-sym]
+  (let [ns-vars (ns-interns ns-sym)]
+    (into {}
+          (for [[sym var] ns-vars
+                :let [str-name (str ns-sym "/" sym)
+                      str-name (-> str-name (cstr/replace "rvbbit-backend." "") (cstr/replace "websockets" "wss") (cstr/replace "evaluator" "evl"))]
+                :when (instance? clojure.lang.Atom @var)]
+            [str-name var]))))
+
+(def monitored-atoms (vec (into 
+                           (get-namespace-atoms 'rvbbit-backend.evaluator)
+                           (into (get-namespace-atoms 'rvbbit-backend.websockets)
+                                 (get-namespace-atoms 'rvbbit-backend.db)))))
+
+;;(ut/pp monitored-atoms)
+
+;; (reset! atom-metrics {})
+
+(defn get-sys-atom-sizes []
+  (let [;monitored-atoms (vec (into (get-namespace-atoms 'rvbbit-backend.websockets)
+        ;                           (get-namespace-atoms 'rvbbit-backend.db)))
+        ]
+    ;; (ut/pp [:get-atom-sizes! (count monitored-atoms)])
+    (doseq [[nn rr] monitored-atoms
+            ;:when (or (vector? @rr) (map? @rr))
+            ]
+      (swap! atom-metrics update nn
+             (fnil conj [])
+             {:size-mb (ut/calculate-atom-size-special nn rr)}))))
+
+;; (draw-client-stats nil [30] nil true 200 {:metrics-atom atom-metrics})
+;; (draw-client-stats "db" [30] nil false 200 {:metrics-atom atom-metrics})
+
+;; (get-sys-atom-sizes)
+
+;; (ut/pp @atom-metrics)
+
 
 (defn draw-client-stats [& [kks freqs stats label? width {:keys [metrics-atom force-color] :or {metrics-atom client-metrics}}]]
   (try
@@ -6630,6 +6691,9 @@
               :let [draw-it (fn [kkey sym ff color]
                               (ut/pp (let [data0 (mapv kkey (get @metrics-atom pp))
                                            data0 (mapv (fn [x] (if (nil? x) 0 x)) data0) ;; replace nil 
+                                           data0 (if false ;(= metrics-atom atom-metrics)
+                                                   (vec (mapcat #(repeat 15 %) data0))
+                                                   data0)
                                            data (vec (mapcat (fn [item] (repeat heartbeat-seconds item)) data0))]
                                        (draw-bar-graph
                                         (if (= ff 1) data (average-in-chunks data ff))
@@ -6672,6 +6736,10 @@
               {dbname {:tables (count (keys dbtables))
                        :avg-exec (ut/avgf (map last (filter #(= (first %) dbname) @sql/sql-query-log)))
                        :rows (apply + (vals dbtables))}})))
+
+
+
+
 
 ;;(ut/pp (database-sizes))
 

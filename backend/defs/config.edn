@@ -9,11 +9,12 @@
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :hide-sub-and-unsub-alerts? false
  :show-query-times? false 
+ :log-atom-sizes? false ;; expensive, only for debugging
  :default "./screens/frost-terminal2.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
  ;;    if this screen can't be read or is nil, you will get a basic blank screen with a default theme
- :harvest-on-boot? true ;;false
- ;; ^^ do a full database sniff for each connection on boot? (generally not needed)
+ :harvest-on-boot? true
+ ;; ^^ do a full database sniff for each connection on boot? No reason not to unless it is causing issues.
  :modes {:pre       [:pre
                      {:style {:color :theme/editor-outer-rim-color
                               :background-color "#00000000 "
@@ -526,7 +527,7 @@
                                                                  [:box :child "group-by dimensions to include"]
                                                                  [:v-box 
                                                                   :children 
-                                                                  (for [dimensions-chunk (partition-all 5 dimensions)]
+                                                                  (for [dimensions-chunk (partition-all 8 dimensions)]
                                                                     [:h-box
                                                                      :gap "8px"
                                                                      :size "auto"
@@ -621,7 +622,7 @@
                    :icon "images/snail-shell.svg"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
-                      :when-expr (do
+                      :when-expr (do ;; optional, but you might not want it to show up in the UI if we cant connect
                                    (require '[nrepl.core :as nrepl])
                                    (try
                                      (do
@@ -630,42 +631,8 @@
                                              (nrepl/message {:op "eval" :code "(+ 1 1)"})))
                                        true)
                                      (catch Exception _ false))) ;; connection refused will throw
-                      :modes [:text :edn :clover :data   :terminal]
+                      :modes [:text :edn :clover :data :terminal]
                       :ext ".clj"
-                ;;       :kits {:new-lundberg2 {:when-fn (fn [_ _] ;; return a vector of [:block-id :runner-type :view-id] tuple for things that are "eligible"
-                ;;                                         [[:* :* :*]]) ;;; since this is a canvas level kit, we don't need to filter by panel or view. just say everything and make sure :icon-location is :canvas
-                ;;                              :output :kit-map
-                ;;                              :icon-location :canvas
-                ;;                              :tooltip "Spawn a new view of Lundberg2."
-                ;;                              :kit-expr (let [tab-name :tab-name
-                ;;                                              panel-key-name (keyword (str "lundberg-" (rand-int 777777)))
-                ;;                                              kit-map {:push-alerts {:body [:box
-                ;;                                                                            :style {:font-size "33px"
-                ;;                                                                                    :color "orange"}
-                ;;                                                                            :child "Yeaaahhhhh... that'd be great."]
-                ;;                                                                     :w 15
-                ;;                                                                     :seconds 60}
-                ;;                                                       :push-assocs {[:panels panel-key-name]
-                ;;                                                                     {:name          "a wild lundberg appears!"
-                ;;                                                                      :w             8
-                ;;                                                                      :selected-view :yeaaahhhhh
-                ;;                                                                      :root          [10 10]
-                ;;                                                                      :h             5
-                ;;                                                                      :tab           tab-name
-                ;;                                                                      :minimized?    false
-                ;;                                                                      :views         {:yeaaahhhhh [:img {:src "https://img-cdn.inc.com/image/upload/w_600,ar_16:9,c_fill,g_auto,q_auto:best/images/panoramic/2C61CEF_533890_jojsbx.webp"
-                ;;                                                                                                         :style {:width "100%"
-                ;;                                                                                                                 :padding "5px"
-                ;;                                                                                                                 :border-radius "20px"
-                ;;                                                                                                                 :height "100%"
-                ;;                                                                                                                 :object-fit "cover"}}]}}}
-                ;;                                                       :new-lundberg {:description "please get to work..."
-                ;;                                                                      :options {:pages? true :search? false :actions? false}
-                ;;                                                                      :parameters {}
-                ;;                                                                      :mutates {}
-                ;;                                                                      :data []}}]
-                ;;                                          kit-map)
-                ;;                              :icon "ri-database-2-fill"}}
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]

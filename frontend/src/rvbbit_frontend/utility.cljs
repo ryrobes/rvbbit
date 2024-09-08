@@ -326,9 +326,25 @@
         (swap! process-key-tracker update args (fnil inc 0))
         result))))
 
-(defn process-key
-  [k] ;; WAAAAAAAY faster w/o cache....
-  (when (when (keyword? k) (namespace k)) k))
+;; (defn process-key
+;;   [k] ;; WAAAAAAAY faster w/o cache....
+;;   (when (when (keyword? k) (namespace k)) k))
+
+(re-frame/reg-sub
+ ::click-param-namespaces
+ (fn [db _]
+  ;;  (tapp>> [:click-param-namespaces (keys (get-in db [:click-param :solver]))])
+   (vec (keys (get db :click-param)))))
+
+;; (tapp>> [:click-param-namespaces @(tracked-sub ::click-param-namespaces {})])
+
+(defn process-key [k] (let [cns @(tracked-sub ::click-param-namespaces {})]
+                        (when
+                         (try
+                           (some #(= % (keyword (namespace k)))
+                                 (into cns (vec (into db/reactor-types [:theme :param]))))
+                           
+                           (catch :default _ nil)) k)))
 
 (defn purge-process-key-cache
   [percent & [hard-limit]]

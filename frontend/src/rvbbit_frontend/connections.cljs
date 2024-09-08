@@ -18,7 +18,7 @@
     [cljs-time.core] ;; womp[ womp]
     [websocket-fx.core       :as wfx]))
 
-(defn namespaced [x] (try (namespace x) (catch :default _ nil))) ;; yes this is a hacky override
+;; (defn namespaced [x] (try (namespace x) (catch :default _ nil))) ;; yes this is a hacky override
 
 (re-frame/reg-sub ::sub-flow-incoming (fn [db [_]] (get db :sub-flow-incoming)))
 
@@ -540,7 +540,7 @@
   [data]
   (cond (map? data)     (some contains-namespaced-keyword? (concat (keys data) (vals data)))
         (vector? data)  (some contains-namespaced-keyword? data)
-        (keyword? data) (boolean (namespaced data))
+        (keyword? data) (boolean (namespace data))
         :else           false))
 
 (re-frame/reg-sub ;; RESOLVE KEYPATH
@@ -612,10 +612,12 @@
 (re-frame/reg-sub
  ::runner-crosswalk-map
  (fn [_ _]
-   (try 
-     (let [process-key (fn [k]
+  ; (try 
+     (let [lkup-atom (into {}(for [[k v] @db/solver-fn-lookup ;; see comment below.... need to dissect this...
+                                   :when (not (integer? (last k)))] {k v}))
+           process-key (fn [k]
                        (let [base-k (if (vector? k) (last k) k)]
-                         (if (try (namespaced base-k) (catch :default _ false))
+                         (if (namespace base-k) ;;(try (namespace base-k) (catch :default _ false))
                            [base-k]
                            [base-k (keyword "data" (name base-k))])))]
      (into {}
@@ -623,10 +625,24 @@
             (mapcat (fn [[k v]]
                       (map #(vector % v) (process-key (last k)))))
             (distinct))
-           @db/solver-fn-lookup))
-     (catch :default _ {}))))
+           lkup-atom))
+   ;  (catch :default _ {}))
+   ))
 
-
+;; filtered out for now, but def need to deal with it. TODO - 9/4/24
+;;,throws when keypath ends in a vector idx.. Ex:
+;; {[:conns [:settings/clover-templates] :clj :body] :solver/raw-custom-override-12435591,
+;;  [:conns [:settings/runners] :clojure2 :clover-fn] :solver/raw-custom-override1704129243,
+;;  [:conns [:settings/clover-templates] :clj2 :body] :solver/raw-custom-override1244140058,
+;;  [:panels :block-10760 :new-clojure-1] :solver/raw-custom-override762115230,
+;;  [:conns [:settings/runners] :outliers :clover-fn] :solver/raw-custom-override-1437442864,
+;;  [:panels :virtual-panel :virtual-view] :solver/raw-custom-override-1733932054,
+;;  [:conns [:settings/runners] :clojure :clover-fn] :solver/raw-custom-override1538021924,
+;;  [:conns [:settings/runners] :create-image :clover-fn] :solver/raw-custom-override-551405075,
+;;  [:conns [:settings/runners] :clojure-intro :clover-fn] :solver/raw-custom-override276070878,
+;;  [:conns [:settings/clover-templates] :color-theft :body 1] :solver/get-my-colors-236804234,
+;;  [:conns [:settings/runners] :shell :clover-fn] :solver/raw-custom-override-290714520,
+;;  [:conns [:settings/runners] :fabric :clover-fn] :solver/raw-custom-override1526306838}
 
 ;;(ut/tapp>> [:modded-map @(ut/tracked-sub ::runner-crosswalk-map {})]) 
 
@@ -646,7 +662,9 @@
   ::clicked-parameter-key-alpha ;;; important, common, and likely more expensive than need be.
   (fn [db {:keys [keypath]}]
     (let [cmp                 (ut/splitter (ut/safe-name (nth keypath 0)) "/")
-          runner-crosswalk-map     @(ut/tracked-sub ::runner-crosswalk-map {})
+          runner-crosswalk-map ;(try 
+                                 @(ut/tracked-sub ::runner-crosswalk-map {}) 
+                               ;     (catch :default e (do (ut/tapp>> [:runner-crosswalk-map-error e :db/solver-fn-lookup (str @db/solver-fn-lookup)]) {})))
           kkey                (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
           ;vkey                (keyword (peek cmp))
           vkey                (keyword (last cmp))
@@ -733,7 +751,7 @@
                                   (ut/postwalk-replacer logic-kps obody)))
           val0                (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
           ;ns-kw?              (and (cstr/starts-with? (str val0) ":") (cstr/includes? (str val0) "/") (keyword? val0))
-          ns-kw?              (and (keyword? val0) (namespaced val0))
+          ns-kw?              (and (keyword? val0) (namespace val0))
           val                 (cond ns-kw?      (get-in db
                                                         (let [sp (ut/splitter (str val0) "/")]
                                                           [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
@@ -1253,7 +1271,8 @@
          ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
          ;                                     :*client-name* client-name
          ;                                     :*client-name-str (pr-str client-name)} honey-modded)
-         _ (ut/tapp>> [:sql-run1 (str keypath) (str honey-sql)])]
+         ;_ (ut/tapp>> [:sql-run1 (str keypath) (str honey-sql)])
+         ]
      (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
       [::wfx/request :default
@@ -1319,7 +1338,7 @@
            ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
            ;                                     :*client-name* client-name 
            ;                                     :*client-name-str (str client-name)} honey-modded)
-            _ (ut/tapp>> [:sql-run2 (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
+            ;_ (ut/tapp>> [:sql-run2 (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
            ]
        (do (when (not (nil? refresh-every))
              (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))

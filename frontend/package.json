@@ -8,6 +8,7 @@
 		"build-report": "npx shadow-cljs run shadow.cljs.build-report app target/build-report.html"
 	},
 	"dependencies": {
+		"@html2canvas/html2canvas": "^1.6.3",
 		"@js-joda/core": "3.2.0",
 		"@js-joda/locale_en-us": "3.1.1",
 		"@js-joda/timezone": "2.5.0",
@@ -26,8 +27,8 @@
 		"blob-util": "^2.0.2",
 		"codemirror": "^5.65.16",
 		"create-react-class": "^15.7.0",
+		"dom-to-image": "^2.6.0",
 		"highlight.js": "11.5.1",
-		"html2canvas": "^1.4.1",
 		"mapbox-gl": "^2.15.0",
 		"react": "17.0.2",
 		"react-codemirror2": "^7.3.0",
@@ -42,6 +43,6 @@
 		"vega-lite": "^5.6.0"
 	},
 	"devDependencies": {
-		"shadow-cljs": "2.28.14"
+		"shadow-cljs": "2.28.10"
 	}
 }

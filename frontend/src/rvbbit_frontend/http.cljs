@@ -617,7 +617,7 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
-          (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ") ;; gross. 
+          (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ") ;; gross. TODO
                                 (cstr/includes? (cstr/lower-case (str result)) "kit ")))
             (ut/tracked-dispatch [::refresh-kits]))
 
@@ -657,7 +657,9 @@
 
 
 
-          (when alert? ;(and alert? not-sys-stats?) ; (and alert? (string? (first (get result
+          (when (and alert? 
+                     (not (get db :alert-mute?))) 
+            ;; ^^ if they are muted, just ignore (else they create a back log, when reenabled Chrome shits)
             (let [cnt      (get-in result [:data 0 0])
                   fstr     (str cnt)
                   w        (get-in result [:data 0 1] (/ (count fstr) 3.9))
@@ -676,6 +678,8 @@
             ;;                   (assoc-in db keypath value))
             ;;                 db
             ;;                 kp-value-map))
+
+            alert? db ;; do nothing, alerts are a handled side-effect event ^^^
 
             push-assocs? (do ;; using sep event because we want it to be specifically undoable, but NOT other streams here. hack.
                            (ut/tracked-dispatch [::assoc-push-undoable (get result :status)])
@@ -924,7 +928,7 @@
 
 (re-frame/reg-event-fx
   ::save
-  (fn [{:keys [db]} [_ save-type screen-name resolved-queries]]
+  (fn [{:keys [db]} [_ save-type screen-name resolved-queries materialized-theme]]
     (let [method      :post
           url         (str url-base "/save")
           pp          (doall (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] r))
@@ -988,7 +992,11 @@
           image (assoc image :click-param (apply dissoc (get image :click-param) click-params-running))
           bogus-kw    (vec (find-bogus-keywords image))
           image       (apply dissoc image (map first bogus-kw))
-          request     {:image (assoc image :resolved-queries resolved-queries) :client-name client-name :screen-name screen-name}
+          request     {:image (-> image
+                                  (assoc :resolved-queries resolved-queries)
+                                  (assoc :materialized-theme materialized-theme)) 
+                       :client-name client-name 
+                       :screen-name screen-name}
           _ (ut/tapp>> [:saving screen-name "!" request :removed-bogus-keywords bogus-kw])
           ;clean-db (assoc-in db [:http-reqs :save-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
           ;;is-valid-edn? (ut/is-valid-edn? request) ;; TODO, invalid EDN will prevent saving... 
@@ -1060,7 +1068,8 @@
           url          (str url-base "/save-snap")
           client-name  (get db :client-name)
           compund-keys (vec (into (for [k (keys db) :when (cstr/includes? (str k) "/")] k) [:http-reqs]))
-          request      {:image image :session (ut/deselect-keys db compund-keys) :client-name client-name}]
+          sess         (-> (ut/deselect-keys db compund-keys) (dissoc :client-name))
+          request      {:image image :session sess :client-name client-name :ttime (.getTime (js/Date.))}]
       {:db         (assoc-in db [:http-reqs :save-snap] {:status "running" :url url :start-unix (.getTime (js/Date.))})
        :http-xhrio {:method          method
                     :uri             url

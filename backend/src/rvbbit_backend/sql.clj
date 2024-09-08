@@ -14,7 +14,9 @@
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.surveyor :as svy]
-   [taskpool.taskpool   :as tp]))
+   [taskpool.taskpool   :as tp])
+  (:import (java.time Instant)
+           (java.time.format DateTimeFormatter)))
 
 
 (def query-history (atom {}))
@@ -194,8 +196,8 @@
    @(pool-create ;; these tables get removed after being used, so it causes too much write thrash to put in the user-space memory db 
                  ;; (plus this is more transatiotional and SQLIte works better)
      {:jdbc-url  ;; used for ephemeral table testing / metadata sniffing. fast and doesn't need to be persistent.
-      "jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
-      ;;"jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+      ;;"jdbc:sqlite:file:./db/temp-cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
+      "jdbc:sqlite:file:./db/temp-cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
       :cache    "shared"}
      "mem-cache-db-pool")})
 
@@ -214,7 +216,7 @@
    @(pool-create
      {:jdbc-url "jdbc:duckdb:./db/cache.duck"
       :idle-timeout      600000
-      :maximum-pool-size 20
+      :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
      "cache-db-pool")})
@@ -224,7 +226,7 @@
    @(pool-create
      {:jdbc-url "jdbc:duckdb::memory:cache-db-memory" ;; named instance should use a shared cache
       :idle-timeout      600000
-      :maximum-pool-size 20
+      :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
      "cache-db-memory-pool")})
@@ -245,9 +247,23 @@
   ;; (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 400) (catch Throwable _ (str query)))})
   )
 
-(defn asort [m order]
+
+(def sql-queries-run (atom 0))
+(def sql-query-log (atom []))
+
+(defn instant->str [instant]
+  (.format (java.time.format.DateTimeFormatter/ISO_INSTANT) instant))
+
+(defn convert-value [v]
+  (cond
+    (instance? java.time.Instant v) (instant->str v)
+    (instance? java.sql.Timestamp v) (instant->str (.toInstant v))
+    (instance? java.sql.Date v) (.toString v)
+    :else v))
+
+(defn asort [m order] ;; we have to ensure the order of the keys is consistent to the query, as a SQL normie would expect (and I agree!)
   (let [order-map (apply hash-map (interleave order (range)))]
-    (conj (sorted-map-by #(compare (order-map %1) (order-map %2))) ; empty map with the desired
+    (into (sorted-map-by #(compare (order-map %1) (order-map %2)))
           (select-keys m order))))
 
 (defonce map-orders (atom {}))
@@ -255,58 +271,36 @@
 (defn wrap-maps [query arrays]
   (let [headers (first arrays)
         mm      (vec (doall (for [r (rest arrays)]
-                              (asort (into {} ;(sorted-map)
-                                           (for [i (map vector headers r)] {(first i) (last i)}))
+                              (asort (into {}
+                                           (for [i (map vector headers r)]
+                                             {(first i) (convert-value (last i))}))
                                      headers))))]
     (swap! map-orders assoc query headers)
     mm))
 
-(def sql-queries-run (atom 0))
-(def sql-query-log (atom []))
-
-;; (ut/pp (take 100 @sql-query-log))
-;; (reset! sql-query-log [])
-
-;; (defn sql-query ;; pre timing... keep 
-;;   [db-spec query & extra]
-;;   (swap! sql-queries-run inc)
-;;   (jdbc/with-db-connection ;; for connection hygiene - atomic query
-;;     [t-con db-spec]
-;;     (ut/ppln [query db-spec])
-;;     (try (wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
-;;          (catch Exception e
-;;            (do (ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
-;;                (insert-error-row! db-spec query e)
-;;                [;{:query_error (str (.getType e))}
-;;                 {:query_error (str (.getMessage e))} 
-;;                 {:query_error "(from database connection)"}
-;;                 {:query_error (subs (str db-spec) 0 50)}
-;;                 ])))))
-
 (defn sql-query
   [db-spec query & extra]
   (swap! sql-queries-run inc)
-  (let [start-time (System/nanoTime)] ;; Capture start time
+  (let [start-time (System/nanoTime)]
     (jdbc/with-db-connection [t-con db-spec]
       (ut/ppln [query db-spec])
       (try
         (let [result (wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
-              end-time (System/nanoTime) ;; Capture end time
-              execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
+              end-time (System/nanoTime)
+              execution-time-ms (/ (- end-time start-time) 1e6)]
           (swap! sql-query-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
                                      (str (try (subs (str query) 0 300)
                                                (catch Throwable _ (str query))) "-" (hash query)) execution-time-ms])
-          ;;(conj result {:execution_time_ms execution-time-ms})
-          result) ;; Return result with execution time
+          result)
         (catch Exception e
-          (let [end-time (System/nanoTime) ;; Capture end time in case of exception
-                execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
-            (do ;(ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
-              (insert-error-row! db-spec query e)
-              [{:query_error (str (.getMessage e))}
-               {:query_error "(from database connection)"}
-               {:query_error (str db-spec)}
-               {:execution_time_ms execution-time-ms}])))))))
+          (let [end-time (System/nanoTime)
+                execution-time-ms (/ (- end-time start-time) 1e6)]
+            (insert-error-row! db-spec query e)
+            [{:query_error (str (.getMessage e))}
+             {:query_error "(from database connection)"}
+             {:query_error (str db-spec)}
+             {:execution_time_ms execution-time-ms}]))))))
+
 
 
 

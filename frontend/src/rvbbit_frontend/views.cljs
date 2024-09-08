@@ -4335,22 +4335,37 @@
                    :tt ttt
                    :freq @time-freq
                    :ww w}
-                  [:box
+                  [:v-box
                    :size "none"
                    ;:style {;:zoom 0.6
                    ;        :border "3px solid pink"}
                    :height (px h)
                    :width (px w)
-                   :child [:terminal-custom
-                           [[:run-solver
-                             solver-map]
-                            (- w 60) ;(* w 1.49) ;(Math/floor (/ w 7))
-                            (- h 75) ;(* (- h 40) 1.49) ;(Math/floor (/ h 1.55))
-                            false
-                            {:id (str "DooM-MenU-" (hash solver-map))
-                             :style {:font-size "11px"
-                                     :line-height "0.9"}
-                             :px-line-height 13}]]])
+                   :children [[:terminal-custom
+                               [[:run-solver
+                                 solver-map]
+                                (- w 60) ;(* w 1.49) ;(Math/floor (/ w 7))
+                                (if (= @selected-stats-page :help) 
+                                  (- h 320) (- h 75)) ;(* (- h 40) 1.49) ;(Math/floor (/ h 1.55))
+                                false
+                                {:id (str "DooM-MenU-" (hash solver-map))
+                                 :style {:font-size "11px"
+                                         :line-height "0.9"}
+                                 :px-line-height 13}]]
+                              (when (= @selected-stats-page :help) 
+                                [:iframe
+                                 {:width "540"
+                                  :height "310"
+                                  :src
+                                  "https://www.youtube.com/embed/rxYTSI7aenI?si=q_xwABn5x2ths3RB"
+                                  :title "YouTube video player"
+                                  :frameBorder "0"
+                                  :allow
+                                  "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;  "
+                                  :referrerPolicy
+                                  "strict-origin-when-cross-origin"
+                                  :allowFullScreen true}])
+                              ]])
                  (/ w 50)
                  (/ h 50)]]]))
 
@@ -4369,7 +4384,7 @@
                           [:client-name] [:freq]
                           [:mem-mb :latency :messages-per-second :server-subs]
                           false
-                          (Math/floor (/ :ww 6.55))
+                          (Math/floor (/ :ww 5.66))
                           {:force-color :bright-cyan}))))}
 
          (= @selected-stats-page :pools)
@@ -4381,9 +4396,9 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":pool-party" :bright-cyan)
-                         (draw-stats [:pool-tasks-run+ :pool-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (draw-stats [:pool-tasks-run+ :pool-tasks] [:freq] false (Math/floor (/ :ww 5.66)) true)
                          (println "")
-                         (show-pool-sizes-report {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
+                         (show-pool-sizes-report {:width (Math/floor (/ :ww 5.66)) :color-scheme :color-map}))))}
 
          (= @selected-stats-page :sql-sizes)
          {:signal false
@@ -4394,10 +4409,10 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":sql-sizes" :bright-cyan)
-                         (draw-stats [:sql-queries :sql-exec] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (draw-stats [:sql-queries :sql-exec] [:freq] false (Math/floor (/ :ww 5.66)) true)
                          (println "")
-                         (ut/pp (get-table-sizes) {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map})
-                         (ut/pp (database-sizes) {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
+                         (ut/pp (get-table-sizes) {:width (Math/floor (/ :ww 5.66)) :color-scheme :color-map})
+                         (ut/pp (database-sizes) {:width (Math/floor (/ :ww 5.66)) :color-scheme :color-map}))))}
 
          (= @selected-stats-page :sql)
          {:signal false
@@ -4408,7 +4423,7 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":sql-stats" :bright-cyan)
-                         (draw-client-stats nil [:freq] nil true (Math/floor (/ :ww 6.55)) {:metrics-atom sql-metrics}))))}
+                         (draw-client-stats nil [:freq] nil true (Math/floor (/ :ww 5.66)) {:metrics-atom sql-metrics}))))}
 
          (= @selected-stats-page :clients)
          {:signal false
@@ -4419,7 +4434,7 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":clients" :bright-cyan)
-                         (draw-client-stats nil [:freq] [:mem-mb :latency] false (Math/floor (/ :ww 6.55))))))}
+                         (draw-client-stats nil [:freq] [:mem-mb :latency] false (Math/floor (/ :ww 5.66))))))}
 
          (= @selected-stats-page :help)
          {:signal false
@@ -4458,10 +4473,10 @@
                                                  
                                                  {:width 90})
                          
-                         (println " ")
+                         ;(println " ")
                          (rvbbit-backend.util/pp "latest docs will be on the GitHub page - linked below...")
                          
-                         (println "")
+                         ;(println "")
                          )))}
 
          (= @selected-stats-page :reactor)
@@ -4474,9 +4489,9 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":reactor" :pink)
-                         (draw-stats [:reactions  :signal-reactions :watchers :subs :subs-client :clover-params] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (draw-stats [:reactions  :signal-reactions :watchers :subs :subs-client :clover-params] [:freq] false (Math/floor (/ :ww 5.66)) true)
                          (println "")
-                         (show-reactor-sizes-report {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map}))))}
+                         (show-reactor-sizes-report {:width (Math/floor (/ :ww 5.66)) :color-scheme :color-map}))))}
 
          (= @selected-stats-page :system)
          {:signal false
@@ -4487,7 +4502,7 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":system-stats" :bright-cyan) ;; :solvers :nrepl-calls :websockets
-                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 5.66)) true)
                          ;(draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls :websockets :load] [15] false 200 true)
                          )))}
 
@@ -4500,10 +4515,10 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":queue-party" :bright-cyan)
-                         (draw-stats [:workers :queues :queue-tasks] [:freq] false (Math/floor (/ :ww 6.55)) true)
+                         (draw-stats [:workers :queues :queue-tasks] [:freq] false (Math/floor (/ :ww 5.66)) true)
                          (println "")
                          (let [ss (qp/get-queue-stats+)]
-                           (ut/pp [:queue-party-stats+ ss] {:width (Math/floor (/ :ww 6.55)) :color-scheme :color-map})))))}
+                           (ut/pp [:queue-party-stats+ ss] {:width (Math/floor (/ :ww 5.66)) :color-scheme :color-map})))))}
 
          :else {:signal false
                 :cache? false
@@ -5101,6 +5116,7 @@
         flow-watcher-subs-grouped @(ut/tracked-subscribe_ [::bricks/flow-watcher-subs-grouped])
         server-subs @(ut/tracked-subscribe_ [::bricks/all-server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
+        mouse-active?  @(ut/tracked-sub ::bricks/is-mouse-active-alpha? {:seconds 60})
         coords (if lines? ;; wicked expensive otherwise
                  (let [;;_ (ut/tapp>> [:lines!])
                        subq-mapping @(ut/tracked-sub ::bricks/subq-mapping-alpha {})
@@ -5230,9 +5246,9 @@
                                   :background-size  (str "50px 50px, 50px 50px"
                                                          (when (get custom-map :background-size) ", ")
                                                          (get custom-map :background-size))})))
-               :children [[bricks/reecatch [tab-menu]]
+               :children [(when mouse-active? [bricks/reecatch [tab-menu]])
 
-                          [bricks/reecatch [snapshot-menu]]
+                          (when mouse-active? [bricks/reecatch [snapshot-menu]])
 
                           (when @bricks/dragging-editor?
                             [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
@@ -5261,11 +5277,12 @@
 
                           [bricks/reecatch [bricks/grid]]
 
-                          [bricks/reecatch [button-panels editor? lines? peek? auto-run? external? selected-block? online?
-                                            websocket-status server-subs things-running flow-watcher-subs-grouped
-                                            client-name screen-name]]
+                          (when mouse-active?
+                            [bricks/reecatch [button-panels editor? lines? peek? auto-run? external? selected-block? online?
+                                              websocket-status server-subs things-running flow-watcher-subs-grouped
+                                              client-name screen-name]])
 
-                          [bricks/reecatch [task-bar]]
+                          (when mouse-active? [bricks/reecatch [task-bar]])
 
                           (when console? [bricks/reecatch [quake-console ww]])
 

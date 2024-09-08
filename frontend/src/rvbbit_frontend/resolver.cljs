@@ -1,19 +1,20 @@
 (ns rvbbit-frontend.resolver
   (:require
-    [clojure.edn             :as edn]
-    [clojure.string          :as cstr]
-    [clojure.walk            :as walk]
-    [day8.re-frame.undo      :as    undo
-                             :refer [undoable]]
-    [goog.i18n.NumberFormat.Format]
-    [re-frame.alpha          :as rfa]
-    [re-frame.core           :as re-frame]
-    [reagent.core            :as reagent]
-    [rvbbit-frontend.connections :as conn]
-    [rvbbit-frontend.db      :as db]
-    [rvbbit-frontend.http    :as http]
-    [rvbbit-frontend.utility :as ut]
-    [websocket-fx.core       :as wfx]))
+   [clojure.edn             :as edn]
+   [clojure.string          :as cstr]
+   [clojure.walk            :as walk]
+   [day8.re-frame.undo      :as    undo
+    :refer [undoable]]
+   [goog.i18n.NumberFormat.Format]
+   [re-frame.alpha          :as rfa]
+   [re-frame.core           :as re-frame]
+   [reagent.core            :as reagent]
+   [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.db      :as db]
+   [rvbbit-frontend.http    :as http]
+   [rvbbit-frontend.utility :as ut]
+   [rvbbit-frontend.subs    :as subs]
+   [websocket-fx.core       :as wfx]))
 
 (declare logic-and-params)
 
@@ -36,6 +37,80 @@
                                            (not (get (val %) :hidden? false))
                                            (= (get db :selected-tab) (get (val %) :tab ""))) (get db :panels)))]
           (vec (into (get v :root) [(get v :h) (get v :w)]))))))
+
+(re-frame/reg-sub ::all-roots-tab-sizes-current-root-mod
+                  (fn [db _]
+                    (let [hh @(ut/tracked-subscribe_ [::subs/h])
+                          ww @(ut/tracked-subscribe_ [::subs/w])
+                          h-blocks (or (Math/floor (/ hh 50)) 0)
+                          w-blocks (or (Math/floor (/ ww 50)) 0)]
+
+                      (vec (for [[panel-key v]
+                                 (into {} (filter #(= (get db :selected-tab)
+                                                      (get (val %) :tab ""))
+                                                  (get db :panels)))]
+                             (let [real-root (get v :root)
+                                   mod-root  @(ut/tracked-sub ::dynamic-root-mod 
+                                                              {:panel-key panel-key :h-blocks h-blocks :w-blocks w-blocks})
+                                   root      (if mod-root mod-root real-root)]
+                               (vec (into root [(get v :h) (get v :w)]))))))))
+
+(re-frame/reg-event-db
+ ::materialize-root-mod
+ (fn [db [_ panel-key root-mod]]
+   (assoc-in db [:panels panel-key :root] root-mod)))
+
+(re-frame/reg-sub
+ ::dynamic-root-mod
+ (fn [db {:keys [panel-key h-blocks w-blocks]}] ;; [_ panel-key h-blocks w-blocks]]
+   (when-let [root (get-in db [:panels panel-key :root-mod])]
+     (let [;;hh @(ut/tracked-subscribe_ [::subs/h])
+           real-root (get-in db [:panels panel-key :root])
+           [x y] real-root
+         ;;ww @(ut/tracked-subscribe_ [::subs/w])
+         ;;h-blocks (or (Math/floor (/ hh 50)) 0)
+         ;;w-blocks (or (Math/floor (/ ww 50)) 0)
+           bottom-walk     (fn [obody]
+                             (let [kps    (ut/extract-patterns obody :bottom 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ mod] v] {v (+ h-blocks mod)})))]
+                               (ut/postwalk-replacer logic-kps obody)))
+           top-walk        (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :top 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ mod] v] {v (+ 0 mod)})))]
+                               (ut/postwalk-replacer logic-kps obody)))
+           left-walk       (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :left 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ mod] v] {v (+ 0 mod)})))]
+                               (ut/postwalk-replacer logic-kps obody)))
+           middle-h-walk   (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :middle-h 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ mod] v] {v (+ (Math/floor (/  w-blocks 2)) mod)})))]
+                               (ut/postwalk-replacer logic-kps obody)))
+           middle-v-walk   (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :middle-v 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ mod] v] {v (+ (Math/floor (/  h-blocks 2)) mod)})))]
+                               (ut/postwalk-replacer logic-kps obody)))
+           right-walk      (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :right 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ mod] v] {v (+ w-blocks mod)})))]
+                               (ut/postwalk-replacer logic-kps obody)))
+           xy-statics  (fn [obody] (ut/postwalk-replacer {:x x :y y} obody))
+           has-fn? (fn [k] (some #(= % k) (ut/deep-flatten root)))
+           out-roots (cond->> root
+                       (has-fn? :x) xy-statics
+                       (has-fn? :y) xy-statics
+                       (has-fn? :middle-h) middle-h-walk
+                       (has-fn? :middle-v) middle-v-walk
+                       (has-fn? :bottom) bottom-walk
+                       (has-fn? :top) top-walk
+                       (has-fn? :left) left-walk
+                       (has-fn? :right) right-walk)
+         ;out-root (last out-root)
+         ;_ (tapp>> [:out h-blocks w-blocks (str roots) (str out-roots)])
+        ;; _ (when root (tapp>> [:mod panel-key h-blocks w-blocks (str root) (str out-roots)]))
+           ]
+       (ut/tracked-dispatch [::materialize-root-mod panel-key out-roots]) ;; kinda dirty, but very handy in practice
+       out-roots))))
 
 (defn logic-and-params
   [block-map panel-key]
@@ -107,25 +182,25 @@
                            (let [kps       (ut/extract-patterns obody :when 3)
                                  logic-kps (into {} (for [v kps] (let [[_ l this] v] {v (when l this)})))]
                              (ut/postwalk-replacer logic-kps obody)))
-          
+
           =-walk-map2 (fn [obody]
                         (let [kps       (ut/extract-patterns obody := 3)
                               logic-kps (into {} (for [v kps] (let [[_ that this] v] {v (= (str that) (str this))})))]
                           (ut/postwalk-replacer logic-kps obody)))
-          
+
           ;; string-walk (fn [num obody]
           ;;               (let [kps       (ut/extract-patterns obody :str num)
           ;;                     logic-kps (into {} (for [v kps] (let [[_ & this] v] {v (apply str this)})))]
           ;;                 (ut/postwalk-replacer logic-kps obody)))
-          
-        string-walk (fn [obody]
-                      (let [process-string3 (fn [form]
-                                              (if (and (vector? form)
-                                                       (= (first form) :str)
-                                                       (> (count form) 1))
-                                                (apply str (rest form))
-                                                form))]
-                        (walk/postwalk process-string3 obody)))
+
+          string-walk (fn [obody]
+                        (let [process-string3 (fn [form]
+                                                (if (and (vector? form)
+                                                         (= (first form) :str)
+                                                         (> (count form) 1))
+                                                  (apply str (rest form))
+                                                  form))]
+                          (walk/postwalk process-string3 obody)))
 
           case-walk (fn [obody]
                       (let [kps       (ut/extract-patterns obody :case 2)
@@ -158,6 +233,8 @@
           singles {:text   str
                    :>>     (fn [[x y]] (true? (> x y)))
                    :<<     (fn [[x y]] (true? (< x y)))
+                   ;:bottom (fn [mod] (+ h-blocks mod))
+                   ;:tester (fn [mod] mod)
                    ;:str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    ;:string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    }

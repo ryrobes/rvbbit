@@ -105,6 +105,7 @@
                                           screen-data      (read-screen f-path)
                                           screen-name      (get screen-data :screen-name "unnamed-screen!")
                                           resolved-queries (get screen-data :resolved-queries)
+                                          materialized-theme (get screen-data :materialized-theme)
                                           screen-data      (if (ut/ne? resolved-queries)
                                                              (assoc screen-data
                                                                     :panels (into {}
@@ -115,10 +116,13 @@
                                                              screen-data)
                                           theme-map        (get-in screen-data [:click-param :theme])
                                           has-theme?       (and (not (nil? theme-map)) (ut/ne? theme-map))
+                                          has-materialized-theme?       (and (not (nil? materialized-theme)) (ut/ne? materialized-theme))
                                           theme-name       (if (and has-theme? (not (nil? (get theme-map :theme-name))))
                                                              (str ", " (get theme-map :theme-name) " ")
                                                              "")
-                                          blocks           (remove nil? (conj (keys (get-in screen-data [:panels])) (when has-theme? :*theme*)))
+                                          blocks           (remove nil? (conj (keys (get-in screen-data [:panels])) 
+                                                                              (when has-theme? :*theme*)
+                                                                              (when has-materialized-theme? :*materialized-theme*)))
                                           boards           (distinct (for [[_ v] (get-in screen-data [:panels])] (get v :tab)))
                                           blocks           (into blocks boards) ; (map #(str "board/" %) boards))
                                           params           (get-in screen-data [:click-param])
@@ -141,10 +145,12 @@
                                       (sql-exec system-db
                                                 (to-sql
                                                  {:insert-into [:blocks]
-                                                  :columns     [:file_path :screen_name :block_key :block_name :views :queries :view_names :query_names :block_data
+                                                  :columns     [:file_path :screen_name :block_key :block_name :views 
+                                                                :queries :view_names :query_names :block_data
                                                                 :tab_name]
                                                   :values      (for [b blocks]
                                                                  (let [theme?     (true? (= b :*theme*))
+                                                                       materialized-theme? (true? (= b :*materialized-theme*))
                                                                        board?     (some #(= b %) boards) ;(cstr/starts-with? (str b)
                                                                        queries    (get-in screen-data [:panels b :queries])
                                                                        views      (if theme? theme-map (get-in screen-data [:panels b :views]))
@@ -155,6 +161,7 @@
                                                                     (try (str (cstr/join " " (keys views))) (catch Exception _ ""))
                                                                     (try (str (cstr/join " " (keys queries))) (catch Exception _ ""))
                                                                     (cond theme? (str theme-map)
+                                                                          materialized-theme? (str (get materialized-theme :theme))
                                                                           board? (pr-str {:panels (get board-map b) :click-param {:param (get params :param)}})
                                                                           :else  (str (get-in screen-data [:panels b])))
                                                                     (str (get-in screen-data [:panels b :tab]))]))})))
@@ -977,6 +984,13 @@
   ;;                              (conj (get @wss/sql-metrics db [])
   ;;                                    dbv))))
   ;;                  "Simple SQLite Db Stats" 60)
+
+   (when
+    (get (config/settings) :log-atom-sizes? false)
+     (wss/get-sys-atom-sizes)
+     (start-scheduler 15
+                      wss/get-sys-atom-sizes
+                      "Log Atom Sizes" 15))
 
    (start-scheduler 15
                     #(let [pst (wss/query-pool-sizes)]

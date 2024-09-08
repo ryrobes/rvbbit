@@ -2987,7 +2987,7 @@
          {:data
           {:name "us-counties",
            :url
-           "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json",
+           "assets/vega/us-10m.json",
            :format {:type "topojson", :feature "counties"}},
           :projection
           {:type "mercator",
@@ -3012,7 +3012,7 @@
          {:data
           {:name "us-states",
            :url
-           "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json",
+           "assets/vega/us-10m.json",
            :format {:type "topojson", :feature "states"}},
           :projection
           {:type "mercator",
@@ -3036,7 +3036,7 @@
          :condi/c843-country-lines?
          {:data
           {:name "world",
-           :url "https://vega.github.io/vega-datasets/data/world-110m.json",
+           :url "assets/vega/world-110m.json",
            :format {:type "topojson", :feature "countries"}},
           :mark "geoshape",
           :encoding
@@ -3534,7 +3534,7 @@
          {:data
           {:name "us-counties",
            :url
-           "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json",
+           "assets/vega/us-10m.json",
            :format {:type "topojson", :feature "counties"}},
           :projection
           {:type "mercator",
@@ -3559,7 +3559,7 @@
          {:data
           {:name "us-states",
            :url
-           "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json",
+           "assets/vega/us-10m.json",
            :format {:type "topojson", :feature "states"}},
           :projection
           {:type "mercator",
@@ -3588,7 +3588,7 @@
          :condi/c390-country-lines?
          {:data
           {:name "world",
-           :url "https://vega.github.io/vega-datasets/data/world-110m.json",
+           :url "assets/vega/world-110m.json",
            :format {:type "topojson", :feature "countries"}},
           :mark "geoshape",
           :encoding

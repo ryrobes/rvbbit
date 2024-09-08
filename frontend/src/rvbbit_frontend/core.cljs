@@ -170,6 +170,10 @@
       ;; {:interval                 3600 ;; ten mins. less? more?
       ;;  :event                    [::bricks/purge-cache-atoms]
       ;;  :dispatch-event-on-start? false}
+
+      {:interval                 120  
+       :event                    [::bricks/save-snap-periodically]
+       :dispatch-event-on-start? false}
       
       {:interval                 3600 ;; one hour. more?
        :event                    [::bricks/clear-cache-atoms]
@@ -192,9 +196,9 @@
       ;;  :event [::bricks/update-reco-previews]
       ;;  :dispatch-event-on-start? false}
 
-      {:interval 1 
-       :event [::bricks/update-conditionals] 
-       :poll-when [::bricks/visible-conditionals?]
+      {:interval                 1
+       :event                    [::bricks/update-conditionals]
+       :poll-when                [::bricks/visible-conditionals?]
        :dispatch-event-on-start? false}
       
       {:interval                 4

@@ -23,6 +23,7 @@
  :low-cardinality?       [:and [:> :distinct-count 8] [:<= :distinct-count 15]]
  :medium-cardinality?    [:and [:> :distinct-count 15] [:<= :distinct-count 30]]
  :high-cardinality?      [:>= :distinct-count 31]
+ :reasonable-cardinality? [:< :distinct-count 100]
  :is-date?               [:= :data-type "date"]
  :is-datetime?           [:= :data-type "datetime"]
  :is-integer?            [:= :data-type "integer"]

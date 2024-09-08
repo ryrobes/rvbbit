@@ -113,10 +113,13 @@
                                  2 (if (= day 12) "th" "nd")
                                  3 (if (= day 13) "th" "rd")
                                  "th")
+             formatter-day     (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "'")
+                                                                             java.util.Locale/US)
              formatter         (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mma")
                                                                              java.util.Locale/US)
              formatter-seconds (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mm:ssa")
                                                                              java.util.Locale/US)
+             now-day-str       (.format formatter-day now)
              now-str           (.format formatter now)
              now-seconds-str   (.format formatter-seconds now)]
          {:year            (.getYear now)
@@ -132,6 +135,7 @@
           :quarter         (inc (quot (.getMonthValue now) 4))
           :am-pm           (if (< (.getHour now) 12) "AM" "PM")
           :now             now-str
+          :now-day         now-day-str
           :now-seconds     now-seconds-str
           :nth             nth})
        (catch Throwable e {:time-atom-error (str "Error! " e)})))
@@ -1094,6 +1098,65 @@
                 :mb   size-mb
                 :keys (try (count (keys @a)) (catch Exception _ -1))}})
        (catch Exception e {name [:error (str e)]})))
+
+(defn round-to-decimal-places [n places]
+  (let [factor (Math/pow 10 places)]
+    (/ (Math/round (* n factor)) factor)))
+
+(defn calculate-atom-size-special
+  [name a]
+  (try
+    (let [size-bytes (-> @a
+                         pr-str
+                         .length)
+          size-mb (/ size-bytes 1048576.0)
+          ;rounded-size (round-to-decimal-places size-mb 4)
+          ]
+      size-mb)
+    (catch Exception _
+      -1)))
+
+(defn stringify-if-needed [v]
+  (cond
+    (or (string? v) (number? v) (boolean? v)) v
+    (nil? v) nil
+    :else (str v)))
+
+(defn stringify-non-primitives [m]
+  (into {} (for [[k v] m] [k (stringify-if-needed v)])))
+
+(defn primitive-or-collection? [data]
+  (or (string? data)
+      (number? data)
+      (boolean? data)
+      (decimal? data)  ;; Assuming you have a decimal? predicate, if needed
+      (coll? data)))   ;; Checks if it's a map, vector, list, set, etc.
+
+(defn stringify-non-primitives2 [data]
+  (cond
+    ;; If the data is a primitive or collection, keep it as is
+    (primitive-or-collection? data)
+    data
+
+    ;; If it's a map, recursively apply this function to its keys and values
+    (map? data)
+    (into {} (map (fn [[k v]] [k (stringify-non-primitives v)]) data))
+
+    ;; If it's a vector, recursively apply this function to each element
+    (vector? data)
+    (vec (map stringify-non-primitives data))
+
+    ;; If it's a list, recursively apply this function to each element
+    (list? data)
+    (apply list (map stringify-non-primitives data))
+
+    ;; If it's a set, recursively apply this function to each element
+    (set? data)
+    (set (map stringify-non-primitives data))
+
+    ;; For anything else (non-primitives and non-collections), stringify it
+    :else
+    (str data)))
 
 (defn cache-distribution
   [tracker-atom percent]

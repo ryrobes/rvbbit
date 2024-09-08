@@ -1,4 +1,15 @@
-{:colors-of-the-moment {:signal :signal/changed-wallpaper?
+{:materialize-bigfoot-sightings-drag-37
+   {:signal    :signal/daily-at-7am
+    :type      :sql
+    :snapshot? false
+    :data      {:select        [:alsonoticed :bfroid :class :county :date :environment :fixed_month :fixed_year
+                                :locationdetails :month :nearestroad :nearesttown :observed :otherstories
+                                :otherwitnesses :run_id :run_time :season :sketch :state :submitted :submitted_date
+                                :timeandconditions :title :url :year]
+                :from          [[:bigfoot_sightings :ii912]]
+                :page          -4
+                :connection-id "bigfoot-ufos"}}
+ :colors-of-the-moment {:signal :signal/changed-wallpaper?
                         :cache? false
                         :type   :flow
                         :data   {:flowmap "node-color-thief-js-webp"
@@ -168,6 +179,32 @@
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
+ :materialize-bigfoot-sightings-locations-drag-36
+   {:signal    :signal/daily-at-7am
+    :type      :sql
+    :snapshot? false
+    :data      {:select        [:alsonoticed :bfroid :class :county :cty_abbrev :cty_name :date :environment
+                                :fips_county_code :fips_state_code :fixed_month :fixed_year :housing_units :land_area
+                                :latitude :locationdetails :longitude :month :nearestroad :nearesttown :observed
+                                :otherstories :otherwitnesses :population :run_id :run_time :season :state :state_abbrev
+                                :state_name :submitted :submitted_date :timeandconditions :title :url :water_area :year
+                                :zip_lat :zip_long :zip_name :zipcode]
+                :from          [[:bigfoot_sightings_locations :pp646]]
+                :page          -4
+                :connection-id "bigfoot-ufos"}}
+ :materialize-bigfoot-sightings-locations-drag-40
+   {:signal    :signal/daily-at-7am
+    :type      :sql
+    :snapshot? false
+    :data      {:select        [:alsonoticed :bfroid :class :county :cty_abbrev :cty_name :date :environment
+                                :fips_county_code :fips_state_code :fixed_month :fixed_year :housing_units :land_area
+                                :latitude :locationdetails :longitude :month :nearestroad :nearesttown :observed
+                                :otherstories :otherwitnesses :population :run_id :run_time :season :state :state_abbrev
+                                :state_name :submitted :submitted_date :timeandconditions :title :url :water_area :year
+                                :zip_lat :zip_long :zip_name :zipcode]
+                :from          [[:bigfoot_sightings_locations :nn100]]
+                :page          -4
+                :connection-id "bigfoot-ufos"}}
  :materialize-offenses-drag-24 {:signal    :signal/daily-at-7am
                                 :type      :sql
                                 :snapshot? false
@@ -191,6 +228,21 @@
                        image-paths    (map (fn [x] (.getPath x)) image-files)
                        relative-paths (map (fn [x] (.substring x (count (.getPath dir)))) image-paths)]
                    (str relative-dir (when (seq relative-paths) (rand-nth relative-paths)))))}
+ :refresh-pg-date-test {:signal :signal/daily-at-9am
+                        :type   :clojure
+                        :cache? false
+                        :data   (do (ns rvbbit-backend.cruiser
+                                      (:require [rvbbit-backend.websockets :as wss]
+                                                [rvbbit-backend.pool-party :as ppy]
+                                                [rvbbit-backend.sql :as sql]))
+                                    (let [conn (get (deref wss/conn-map) "pg-date-test")]
+                                      (lets-give-it-a-whirl-no-viz "connections/pg-date-test.edn"
+                                                                   conn
+                                                                   sql/system-db
+                                                                   default-sniff-tests
+                                                                   default-field-attributes
+                                                                   default-derived-fields
+                                                                   default-viz-shapes)))}
  :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
                         :type   :clojure
                         :cache? false

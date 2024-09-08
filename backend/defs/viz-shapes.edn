@@ -1,6 +1,6 @@
 
 {:basic-h-bar-nivo {:axes {:x [:and :dimension?
-                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                               :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                ;[:or :is-string? :is-year? :is-month?]
                                ;[:and [:not :is-date?] [:not :is-datetime?]]
                                ]
@@ -44,7 +44,7 @@
                     :base-score 1}
  
  :basic-h-bar-nivo-color {:axes {:x [:and :dimension?
-                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                                  :color [:and :dimension?
@@ -93,7 +93,7 @@
                           :base-score 1}
  
  :basic-h-bar  {:axes {:x [:and :dimension?
-                           [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                           :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                            ;[:or :is-string? :is-year? :is-month?]
                            ;[:and [:not :is-date?] [:not :is-datetime?]]
                            ]
@@ -126,7 +126,7 @@
                 :base-score 1}
 
  :basic-v-bar  {:axes {:x [:and :dimension?
-                           [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                           :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                            [:or :is-string? :is-year? :is-month?]
                            [:and [:not :is-date?] [:not :is-datetime?]]]
                        :y [:measure?]}
@@ -160,7 +160,7 @@
 
 
  :basic-h-bar-avg  {:axes {:x [:and :dimension?
-                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                               :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                [:or :is-string? :is-year? :is-month?]
                                [:and [:not :is-date?] [:not :is-datetime?]]]
                            :y [:and [:measure?] [:not :is-rowcount?]]}
@@ -193,7 +193,7 @@
                     :base-score 1}
 
  :basic-v-bar-avg  {:axes {:x [:and :dimension?
-                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                               :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                [:or :is-string? :is-year? :is-month?]
                                [:and [:not :is-date?] [:not :is-datetime?]]]
                            :y [:and [:measure?] [:not :is-rowcount?]]}
@@ -227,7 +227,7 @@
 
 
  :basic-h-bar-color  {:axes {:x [:and :dimension?
-                                 [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                 :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                  [:or :is-string? :is-year? :is-month?]
                                  [:and [:not :is-date?] [:not :is-datetime?]]]
                              :color [:and :dimension?
@@ -264,7 +264,7 @@
                       :base-score 1}
 
  :basic-v-bar-color  {:axes {:x [:and :dimension?
-                                 [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                 :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                  [:or :is-string? :is-year? :is-month?]
                                  [:and [:not :is-date?] [:not :is-datetime?]]]
                              :color [:and :dimension?
@@ -300,7 +300,7 @@
 
 
  :basic-h-bar-avg-color  {:axes {:x [:and :dimension?
-                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                                  :color [:and :dimension?
@@ -337,7 +337,7 @@
                           :base-score 1}
 
  :basic-v-bar-avg-color  {:axes {:x [:and :dimension?
-                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                                  :color [:and :dimension?
@@ -421,7 +421,7 @@
                                   :color [:and :dimension?
                                           :medium-cardinality?
                                           :is-string?
-                                    ;[:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                    ;:reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                           [:and [:not :is-date?] [:not :is-datetime?]]]
                                   :y [:measure?]}
 
@@ -700,7 +700,7 @@
                   [:if :condi/us-counties?
                    {:data
                     {:name "us-counties"
-                     :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                     :url "assets/vega/us-10m.json"
                      :format {:type "topojson"
                               :feature "counties"}}
                     :projection {:type "mercator"
@@ -727,7 +727,7 @@
                   [:if :condi/us-states?
                    {:data
                     {:name "us-states"
-                     :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                     :url "assets/vega/us-10m.json"
                      :format {:type "topojson"
                               :feature "states"}}
                     :projection {:type "mercator"
@@ -754,7 +754,7 @@
                   [:if :condi/country-lines?
                    {:data
                     {:name "world"
-                     :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                     :url "assets/vega/world-110m.json"
                      :format {:type "topojson"
                               :feature "countries"}}
                     :mark "geoshape"
@@ -786,7 +786,7 @@
                            :color [:and :dimension?
                                    :medium-cardinality?
                                    :is-string?
-                                    ;[:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                    ;:reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                    [:and [:not :is-date?] [:not :is-datetime?]]]}
                     :sql-maps [{:select-distinct [:lat-field :long-field :color-field]
                                 :from [:table]}
@@ -908,7 +908,7 @@
                         [:if :condi/us-counties?
                          {:data
                           {:name "us-counties"
-                           :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                           :url "assets/vega/us-10m.json"
                            :format {:type "topojson"
                                     :feature "counties"}}
                           :projection {:type "mercator"
@@ -935,7 +935,7 @@
                         [:if :condi/us-states?
                          {:data
                           {:name "us-states"
-                           :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                           :url "assets/vega/us-10m.json"
                            :format {:type "topojson"
                                     :feature "states"}}
                           :projection {:type "mercator"
@@ -962,7 +962,7 @@
                         [:if :condi/country-lines?
                          {:data
                           {:name "world"
-                           :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                           :url "assets/vega/world-110m.json"
                            :format {:type "topojson"
                                     :feature "countries"}}
                           :mark "geoshape"
@@ -1112,7 +1112,7 @@
                       [:if :condi/us-counties?
                        {:data
                         {:name "us-counties"
-                         :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                         :url "assets/vega/us-10m.json"
                          :format {:type "topojson"
                                   :feature "counties"}}
                         :projection {:type "mercator"
@@ -1139,7 +1139,7 @@
                       [:if :condi/us-states?
                        {:data
                         {:name "us-states"
-                         :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                         :url "assets/vega/us-10m.json"
                          :format {:type "topojson"
                                   :feature "states"}}
                         :projection {:type "mercator"
@@ -1166,7 +1166,7 @@
                       [:if :condi/country-lines?
                        {:data
                         {:name "world"
-                         :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                         :url "assets/vega/world-110m.json"
                          :format {:type "topojson"
                                   :feature "countries"}}
                         :mark "geoshape"
@@ -1304,7 +1304,7 @@
                               [:if :condi/us-counties?
                                {:data
                                 {:name "us-counties"
-                                 :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                 :url "assets/vega/us-10m.json"
                                  :format {:type "topojson"
                                           :feature "counties"}}
                                 :projection {:type "mercator"
@@ -1331,7 +1331,7 @@
                               [:if :condi/us-states?
                                {:data
                                 {:name "us-states"
-                                 :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                 :url "assets/vega/us-10m.json"
                                  :format {:type "topojson"
                                           :feature "states"}}
                                 :projection {:type "mercator"
@@ -1364,7 +1364,7 @@
                               [:if :condi/country-lines?
                                {:data
                                 {:name "world"
-                                 :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                                 :url "assets/vega/world-110m.json"
                                  :format {:type "topojson"
                                           :feature "countries"}}
                                 :mark "geoshape"
@@ -1502,7 +1502,7 @@
                               [:if :condi/us-counties?
                                {:data
                                 {:name "us-counties"
-                                 :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                 :url "assets/vega/us-10m.json"
                                  :format {:type "topojson"
                                           :feature "counties"}}
                                 :projection {:type "mercator"
@@ -1529,7 +1529,7 @@
                               [:if :condi/us-states?
                                {:data
                                 {:name "us-states"
-                                 :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                 :url "assets/vega/us-10m.json"
                                  :format {:type "topojson"
                                           :feature "states"}}
                                 :projection {:type "mercator"
@@ -1562,7 +1562,7 @@
                               [:if :condi/country-lines?
                                {:data
                                 {:name "world"
-                                 :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                                 :url "assets/vega/world-110m.json"
                                  :format {:type "topojson"
                                           :feature "countries"}}
                                 :mark "geoshape"
@@ -1700,7 +1700,7 @@
                                 [:if :condi/us-counties?
                                  {:data
                                   {:name "us-counties"
-                                   :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                   :url "assets/vega/us-10m.json"
                                    :format {:type "topojson"
                                             :feature "counties"}}
                                   :projection {:type "mercator"
@@ -1733,7 +1733,7 @@
                                 [:if :condi/us-states?
                                  {:data
                                   {:name "us-states"
-                                   :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                   :url "assets/vega/us-10m.json"
                                    :format {:type "topojson"
                                             :feature "states"}}
                                   :projection {:type "mercator"
@@ -1758,7 +1758,7 @@
                                 [:if :condi/country-lines?
                                  {:data
                                   {:name "world"
-                                   :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                                   :url "assets/vega/world-110m.json"
                                    :format {:type "topojson"
                                             :feature "countries"}}
                                   :mark "geoshape"
@@ -1896,7 +1896,7 @@
                                 [:if :condi/us-counties?
                                  {:data
                                   {:name "us-counties"
-                                   :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                   :url "assets/vega/us-10m.json"
                                    :format {:type "topojson"
                                             :feature "counties"}}
                                   :projection {:type "mercator"
@@ -1929,7 +1929,7 @@
                                 [:if :condi/us-states?
                                  {:data
                                   {:name "us-states"
-                                   :url "https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json"
+                                   :url "assets/vega/us-10m.json"
                                    :format {:type "topojson"
                                             :feature "states"}}
                                   :projection {:type "mercator"
@@ -1954,7 +1954,7 @@
                                 [:if :condi/country-lines?
                                  {:data
                                   {:name "world"
-                                   :url "https://vega.github.io/vega-datasets/data/world-110m.json"
+                                   :url "assets/vega/world-110m.json"
                                    :format {:type "topojson"
                                             :feature "countries"}}
                                   :mark "geoshape"
@@ -2197,7 +2197,8 @@
 ;;                          :base-score 1}
 
  :pie-nivo {:axes {:x [:and :dimension?
-                       [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]]
+                       [:or :low-cardinality? :very-low-cardinality?  ]
+                       ]
                    :y [:measure?]}
 
             :sql-maps [{:select [[[:sum :y-field] :value]
@@ -2567,7 +2568,7 @@
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                             ;;     :x3 [:and :dimension?
-                            ;;          [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                            ;;          :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                             ;;           ;[:or :is-string? :is-year? :is-month?]
                             ;;          [:and [:not :is-date?] [:not :is-datetime?]]]
                                 :y [:measure?]}
@@ -2611,7 +2612,7 @@
 
  :drop-down-filter  {:axes {:dim [:and :dimension?
                                   :is-string?
-                                  [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                  :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                   [:and [:not :is-date?] [:not :is-datetime?]]]}
                      :h 2 :w 6
                      :sql-maps [{:select [[:dim-field :id] [:dim-field :label]]
@@ -2757,7 +2758,9 @@
  
  :recharts-h-bar {:axes {:x [:or
                              [:and :dimension?
-                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]]
+                              ;:reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              :reasonable-cardinality?
+                              ]
                              [:or :looks-like-date? :looks-like-datetime?
                               :is-date? :is-datetime?]]
                          :y [:measure?]}
@@ -2776,7 +2779,11 @@
                                             ;[:> :CartesianGrid {:strokeDasharray "3 3"}]
                                             [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
                                             ;[:> :Legend]
-                                            [:> :Tooltip]
+                                              [:> :Tooltip
+                                               {:contentStyle {:backgroundColor "#00000099"
+                                                               :border          "none"}
+                                                :itemStyle    {:color "#ecf0f1"}
+                                                :labelStyle   {:color "#3498db"}}]
                                             [:> :XAxis {:dataKey :x-field}]
                                             [:> :Bar {:dataKey :y-field :stroke "#8884d8" :fill "#8884d8" :on-click [:set-recharts-param>]}]
                                             ;[:> :Line {:type "monotone" :dataKey :uv :stroke "#82ca9d"}]
@@ -2785,7 +2792,8 @@
  
   :recharts-line {:axes {:x [:or
                              [:and :dimension?
-                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]]
+                              :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              ]
                              [:or :looks-like-date? :looks-like-datetime?
                               :is-date? :is-datetime?]]
                          :y [:measure?]}
@@ -2804,7 +2812,11 @@
                                              ;[:> :CartesianGrid {:strokeDasharray "3 3"}]
                                             [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
                                             ;[:> :Legend]
-                                            [:> :Tooltip]
+                                              [:> :Tooltip
+   {:contentStyle {:backgroundColor "#00000099"
+                   :border          "none"}
+    :itemStyle    {:color "#ecf0f1"}
+    :labelStyle   {:color "#3498db"}}]
                                             [:> :XAxis {:dataKey :x-field}]
                                             [:> :Line {:type "monotone" :dataKey :y-field :stroke "#8884d8" :activeDot {:r 8} :on-click [:set-recharts-param>]}]
                                              ;[:> :Line {:type "monotone" :dataKey :uv :stroke "#82ca9d"}]
@@ -2813,7 +2825,8 @@
  
    :recharts-area {:axes {:x [:or
                             [:and :dimension?
-                             [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]]
+                             :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                             ]
                             [:or :looks-like-date? :looks-like-datetime?
                              :is-date? :is-datetime?]]
                         :y [:measure?]}
@@ -2833,7 +2846,11 @@
                                               ;[:> :CartesianGrid {:strokeDasharray "3 3"}]
                                            [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
                                            ;[:> :Legend]
-                                           [:> :Tooltip]
+                                             [:> :Tooltip
+   {:contentStyle {:backgroundColor "#00000099"
+                   :border          "none"}
+    :itemStyle    {:color "#ecf0f1"}
+    :labelStyle   {:color "#3498db"}}]
                                            [:> :XAxis {:dataKey :x-field}]
                                            [:> :Area {:type "monotone" :dataKey :y-field :stroke "#8884d8" :activeDot {:r 8} :on-click [:set-recharts-param>]}]
                                               ;[:> :Line {:type "monotone" :dataKey :uv :stroke "#82ca9d"}]
@@ -2863,7 +2880,8 @@
 ;;                     :base-score 1}
  
  ;; claude generated
- :recharts-pie {:axes {:segment [:dimension?]
+ :recharts-pie {:axes {:segment [:and :dimension?
+                                 [:or :low-cardinality? :very-low-cardinality?  ]]
                        :value [:measure?]}
  
                 :sql-maps [{:select [[:segment-field :name] [[:sum :value-field] :value]]
@@ -2885,7 +2903,11 @@
                                                     :fill "#8884d8"
                                                     :label true
                                                     :on-click [:set-recharts-param>]}]
-                                          [:> :Tooltip]]]}
+                                            [:> :Tooltip
+   {:contentStyle {:backgroundColor "#00000099"
+                   :border          "none"}
+    :itemStyle    {:color "#ecf0f1"}
+    :labelStyle   {:color "#3498db"}}]]]}
                 :base-score 1}
  
  ;; claude generated
@@ -2907,7 +2929,11 @@
 ;;                                                   [:> :CartesianGrid {:strokeDasharray "3 3"}]
 ;;                                                   [:> :XAxis {:dataKey :x-field}]
 ;;                                                   [:> :YAxis]
-;;                                                   [:> :Tooltip]
+;;                                                     [:> :Tooltip
+;;    {:contentStyle {:backgroundColor "#00000099"
+;;                    :border          "none"}
+;;     :itemStyle    {:color "#ecf0f1"}
+;;     :labelStyle   {:color "#3498db"}}]
 ;;                                                   [:> :Legend]
 ;;                                                   [:> :Bar {:dataKey :y-field
 ;;                                                             :stackId "a"
@@ -3019,7 +3045,8 @@
                       :base-score 1}
  
  :box-plot {:axes {:x [:and :dimension?
-                       [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]]
+                       :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                       ]
                    :y [:measure?]}
  
             :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]

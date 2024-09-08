@@ -258,7 +258,11 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
     </a>
     <p style="margin-top: 10px; font-size: 21px;">Getting Started with RVBBIT ▶</p>
   </div>
-  <div style="width: 48%; text-align: center;">
+    <div style="width: 48%; text-align: center;">
+    <a href="https://www.youtube.com/embed/rxYTSI7aenI?si=ZAC0KjDlN0NM2LJZ" target="_blank">
+      <img src="docs/harezero1.jpg" alt="User Space Kits and Plug-ins" style="width: 100%;">
+    </a>
+    <p style="margin-top: 10px; font-size: 21px;">Long-form Getting Started & Overview ▶</p>
   </div>
 </div>	
 
@@ -266,11 +270,13 @@ Besides the built-in runners of SQL queries and Views (UI) - the combination of 
 
 - Use Engelbart's beautiful invention please 🐁
 - Reccommend JDK 17+
-- Smattering of various UI jank; being worked on
+- Only tested on Chrome ATM (Firefox works somewhat)
+- Various UI jank; being worked on
+- Lots of bugs and edge cases not sorted out yet
 - Limited SQL DB support ATM
 	Tested with SQLite, Postgres, MySQL, SQL Server, Vertica, Clickhouse, DuckDB
 	(with various quirks to each as I continute to smooth out the SQL engine) 
-- Have a laundry list of TODOs, will try and get them posted as issues so I can gauge interest and prioritize
+- Have a laundry list of TODOs, will try and get them posted as issues or discussions so I can gauge interest / prioritize
 - No concept of users / auth yet
 - Meant to be used interally with a team that you trust (open REPLs, open shell access, etc.)
 - Several features I had previously tweeted about and are 80% done (mostly working), but were pulled to make my (self-imposed) deadline, will def surface them discussion for priorities as well
