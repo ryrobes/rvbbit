@@ -1827,16 +1827,22 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 (defn create-attribute-sample
   [sample-table-name-str rowset & [db-type custom-fields extra-ddl-post]]
+  ;; (ut/pp [:debug :create-attribute-sample sample-table-name-str rowset db-type custom-fields extra-ddl-post])
   (try
     (let [db-type (or db-type "SQLite")
+          string-type (get-field-type db-type nil)
           sample-size 5
           sampled-rows (take sample-size (shuffle rowset))
           columns (keys (first rowset))
           inferred-field-types (into {}
                                      (for [k columns]
-                                       (let [values (map #(get % k) sampled-rows)
-                                             type (infer-column-type db-type values)]
-                                         [k type])))
+                                       (try
+                                         (let [values (map #(get % k) sampled-rows)
+                                               values (remove nil? values)
+                                               type (infer-column-type db-type values)]
+                                           [k type])
+                                         (catch Exception _ ;; likely a NULL, just use the proper string type
+                                           [k string-type]))))
           merged-field-types (merge inferred-field-types custom-fields)
           field-definitions (for [[k type] merged-field-types]
                               (let [kk (ut/unkeyword k)]
@@ -1859,7 +1865,44 @@ group by 1, 2) tt on s.client_name = tt.client_name
        (or extra-ddl-post ddl-options)  
        ";"))
     (catch Exception e
-      (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset rowset]))))
+      (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset (vec (take 5 rowset))]))))
+
+
+
+;; (ut/pp (create-attribute-sample 
+;;  "raw_custom_override178433811__block_9858_clojure_new_clojure_"
+;;  [{:brightness 60, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":14.", :light-name "Hue lightstrip plus 1", :xy "[0.5016 0.4151]"}
+;;   {:brightness 163, :hex "#ff3900", :hue 2462, :is_on true, :light-id ":27.", :light-name "Hue Bloom 2", :xy "[0.4657 0.3667]"}
+;;   {:brightness 66, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":31.", :light-name "Hue Bloom 4", :xy "[0.5016 0.4151]"}
+;;   {:brightness 66, :hex "#e4ff00", :hue 12057, :is_on true, :light-id ":18.", :light-name "Hue bloom 7", :xy "[0.502 0.4204]"}
+;;   {:brightness 163, :hex "#ff000d", :hue 64941, :is_on true, :light-id ":12.", :light-name "Hue bloom 4", :xy "[0.5322 0.3628]"}
+;;   {:brightness 163, :hex "#ff0024", :hue 63986, :is_on true, :light-id ":11.", :light-name "Hue bloom 3", :xy "[0.5071 0.3698]"}
+;;   {:brightness 254, :hex "#ffc400", :hue 8417, :is_on false, :light-id ":24.", :light-name "Hue color lamp 5", :xy "[0.4572 0.4099]"}
+;;   {:brightness 114, :hex "#bbff00", :hue 13818, :is_on true, :light-id ":10.", :light-name "Hue bloom 2", :xy "[0.4576 0.4143]"}
+;;   {:brightness nil, :hex "#00000000", :hue nil, :is_on false, :light-id ":21.", :light-name "On/Off plug 2", :xy ""}
+;;   {:brightness 254, :hex "#ffc400", :hue 8417, :is_on false, :light-id ":23.", :light-name "Hue color lamp 4", :xy "[0.4572 0.4099]"}
+;;   {:brightness 60, :hex "#e4ff00", :hue 12057, :is_on true, :light-id ":13.", :light-name "Hue bloom 5", :xy "[0.502 0.4204]"}
+;;   {:brightness 4, :hex "#ffb300", :hue 7675, :is_on false, :light-id ":30.", :light-name "Weight Room overhead", :xy "[0.5016 0.4151]"}
+;;   {:brightness 163, :hex "#ff8300", :hue 5637, :is_on true, :light-id ":26.", :light-name "Hue Bloom 1", :xy "[0.4777 0.3856]"}
+;;   {:brightness 66, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":16.", :light-name "Hue color lamp 2", :xy "[0.5016 0.4151]"}
+;;   {:brightness 60, :hex "#e4ff00", :hue 12057, :is_on true, :light-id ":7.", :light-name "Shoe Bloom", :xy "[0.502 0.4204]"}
+;;   {:brightness 60, :hex "#e4ff00", :hue 12057, :is_on true, :light-id ":8.", :light-name "Hue bloom 1", :xy "[0.502 0.4204]"}
+;;   {:brightness 108, :hex "#00000000", :hue nil, :is_on false, :light-id ":22.", :light-name "Porch Light", :xy ""}
+;;   {:brightness 60, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":25.", :light-name "Hue Go 1", :xy "[0.5016 0.4151]"}
+;;   {:brightness 60, :hex "#e4ff00", :hue 12057, :is_on true, :light-id ":9.", :light-name "Hue bloom bookshelf", :xy "[0.502 0.4204]"}
+;;   {:brightness nil, :hex "#00000000", :hue nil, :is_on false, :light-id ":20.", :light-name "On/Off plug 1", :xy ""}
+;;   {:brightness 114, :hex "#bbff00", :hue 13818, :is_on true, :light-id ":17.", :light-name "Hue bloom 6", :xy "[0.4576 0.4143]"}
+;;   {:brightness 163, :hex "#ff3900", :hue 2462, :is_on true, :light-id ":32.", :light-name "Hue Bloom 5", :xy "[0.4657 0.3667]"}
+;;   {:brightness 4, :hex "#ffb300", :hue 7675, :is_on false, :light-id ":28.", :light-name "Hue color lamp 6", :xy "[0.5016 0.4151]"}
+;;   {:brightness 4, :hex "#ffb300", :hue 7675, :is_on false, :light-id ":19.", :light-name "Hue color lamp 3", :xy "[0.5016 0.4151]"}
+;;   {:brightness 4, :hex "#c2ff00", :hue 13523, :is_on false, :light-id ":5.", :light-name "Bookshelf", :xy "[0.5017 0.4152]"}
+;;   {:brightness 136, :hex "#ff9200", :hue 6290, :is_on false, :light-id ":15.", :light-name "Hue color lamp 1", :xy "[0.5612 0.4042]"}
+;;   {:brightness 60, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":6.", :light-name "End Table", :xy "[0.5016 0.4151]"}
+;;   {:brightness 60, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":33.", :light-name "Hue Bloom 6", :xy "[0.5016 0.4151]"}
+;;   {:brightness 108, :hex "#ff9200", :hue 6290, :is_on false, :light-id ":29.", :light-name "Hue Bloom 3", :xy "[0.5612 0.4042]"}]
+;;  "DuckDB"
+;;  nil
+;;  nil))
 
 
 ;; (ut/pp (create-attribute-sample :jvm-stats [{:memory 123124124 :client-name "my client name" :timestamp (java.util.Date.)}] "MySQL" {"updated_at" "timestamp"} " bandna()"))

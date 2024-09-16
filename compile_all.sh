@@ -71,6 +71,7 @@ cp rvbbit.jar "../$DIR_NAME/"
 ## my dev repo has lots of things in gitignore - but still present locally. wont apply to fresh clones.
 rm -rf ../docker-staging
 rm -rf "../$DIR_NAME/assets/data-exports"
+rm -rf "../$DIR_NAME/assets/snaps"
 rm -rf "../$DIR_NAME/data/atoms"
 rm -rf "../$DIR_NAME/defs/backup"
 rm -f "../$DIR_NAME/defs/secrets.edn"

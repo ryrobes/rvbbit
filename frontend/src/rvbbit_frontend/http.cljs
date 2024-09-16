@@ -87,6 +87,8 @@
 (re-frame/reg-event-fx
  ::dispatch-subscriptions
  (fn [_ [_ x]]
+   (reset! db/last-mouse-activity (js/Date.)) ;; just to juice the mouse timer
+   (reset! db/running-queries #{})
    {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
                  [::update-panels-hash] ;; expensive to re-pop the server data for client panels 
                  [::wfx/request :default
@@ -100,13 +102,24 @@
 (re-frame/reg-event-fx 
  ::dispatch-unsubscriptions 
  (fn [_ _]
-   {:dispatch-n [[::wfx/unsubscribe socket-id :server-push2]]}))
+   {:dispatch-n [[::wfx/unsubscribe socket-id :server-push2]
+                 [::remove-all-running?-params]]}))
 
 
 
 (def server-http-port 8888)
 (def url-base (str (cstr/join ":" (drop-last (ut/splitter (.. js/document -location -href) #":"))) ":" server-http-port)) ;; no trailing slash
 
+(re-frame/reg-event-db
+ ::remove-all-running?-params
+ (fn [db _]
+   (let [click-param (get db :click-param)
+         keys-to-remove (filter #(cstr/ends-with? (str %) "running?]") (ut/keypaths click-param))]
+     ;;(ut/tapp>> [:removing-running?-keys keys-to-remove])
+     (reduce (fn [acc path]
+               (ut/dissoc-in acc (into [:click-param] path)))
+             db
+             keys-to-remove))))
 
 (re-frame/reg-sub
  ::url-vec
@@ -181,11 +194,15 @@
          server-params (get result :clover-params [])
          view-codes    (get result :view-keywords [])
          flow-subs     (get db :flow-subs)
+        ;;  data-keys     (vec (for [e (map last (filter #(= (count %) 3) (ut/keypaths (get db :panels))))] 
+        ;;                       (keyword (str "data/" (cstr/replace (str e) ":" "")))))
+         data-keys     (vec (for [e (map last (remove empty? (filter #(and (not (number? (last %))) (= (count %) 3)) (ut/kvpaths (get db :panels)))))]
+                              (keyword (str "data/" (cstr/replace (str e) ":" "")))))
          click-params  (vec (for [e (keys (get-in db [:click-param :param]))]
                               (keyword (str "param/" (ut/replacer (str e) ":" "")))))
          themes        (vec (for [e (keys (get-in db [:click-param :theme]))]
                               (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
-         codes         (vec (apply concat [server-params view-codes themes flow-subs click-params]))]
+         codes         (vec (apply concat [server-params view-codes themes flow-subs click-params data-keys]))]
      (reset! db/autocomplete-keywords (set (map str codes)))
      db)))
 
@@ -958,13 +975,17 @@
                           (dissoc :sessions)
                           (dissoc :status-data)
                           (dissoc :solvers-map)
+                          (dissoc :status)
                           (dissoc :flow-statuses)
+                          (dissoc :sub-flow-incoming) 
                           (dissoc :flow-subs)
+                          (dissoc :flow-runner)
                           (dissoc :flow-sub-cnts)
                           (dissoc :signals-map)
                           (dissoc :repl-output)
                           (dissoc :solver-fn)
                           (dissoc :server)
+                          ;(ut/dissoc-in [:runstreams-lookups])
                           (ut/dissoc-in [:solver-fn :runs])
                           (ut/dissoc-in [:click-param :signal-history])
                           (ut/dissoc-in [:click-param :solver-meta])
@@ -983,8 +1004,11 @@
                           (dissoc :flows) ;;; mostly ephemeral with the UI....
                           (dissoc :http-reqs)
                           (dissoc :orders)
+                          (dissoc :alerts)
+                          (dissoc :audio-data-recorded) ;;; this was it
                           (dissoc :sql-str)
-                          (ut/dissoc-in [:server :settings :runners])
+                          (dissoc :server)
+                          ;(ut/dissoc-in [:server :settings :runners])
                           (dissoc :file-changed)
                           (assoc :panels (select-keys (get db :panels) p0)))
           image (ut/replace-large-base64 image) ;; sneaky foot gun.
@@ -997,7 +1021,7 @@
                                   (assoc :materialized-theme materialized-theme)) 
                        :client-name client-name 
                        :screen-name screen-name}
-          _ (ut/tapp>> [:saving screen-name "!" request :removed-bogus-keywords bogus-kw])
+          _ (ut/tapp>> [:saving screen-name "!" image :removed-bogus-keywords bogus-kw])
           ;clean-db (assoc-in db [:http-reqs :save-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
           ;;is-valid-edn? (ut/is-valid-edn? request) ;; TODO, invalid EDN will prevent saving... 
           ]
@@ -1068,7 +1092,7 @@
           url          (str url-base "/save-snap")
           client-name  (get db :client-name)
           compund-keys (vec (into (for [k (keys db) :when (cstr/includes? (str k) "/")] k) [:http-reqs]))
-          sess         (-> (ut/deselect-keys db compund-keys) (dissoc :client-name))
+          sess         (-> (ut/deselect-keys db compund-keys) (dissoc :client-name) (dissoc :audio-data-recorded))
           request      {:image image :session sess :client-name client-name :ttime (.getTime (js/Date.))}]
       {:db         (assoc-in db [:http-reqs :save-snap] {:status "running" :url url :start-unix (.getTime (js/Date.))})
        :http-xhrio {:method          method
@@ -1085,20 +1109,22 @@
 
 
 
-(re-frame/reg-event-db ::failure-http-save-screen-snap
-                       (fn [db [_]]
-                         (let [old-status (get-in db [:http-reqs :save-screen-snap])]
-                           (ut/tapp>> [:saving-screen-snap-for (get db :client-name)])
-                           (assoc-in db
-                             [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.))})))))
+(re-frame/reg-event-db
+ ::failure-http-save-screen-snap
+ (fn [db [_]]
+   (let [old-status (get-in db [:http-reqs :save-screen-snap])]
+     (ut/tapp>> [:saving-screen-snap-for (get db :client-name)])
+     (assoc-in db
+               [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.))})))))
 
-(re-frame/reg-event-db ::success-http-save-screen-snap
-                       (fn [db [_]]
-                         (let [old-status (get-in db [:http-reqs :save-screen-snap])]
-                           (assoc-in db
-                             [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
-                             (merge old-status {:ended-unix (.getTime (js/Date.)) :status "success"})))))
+(re-frame/reg-event-db
+ ::success-http-save-screen-snap
+ (fn [db [_]]
+   (let [old-status (get-in db [:http-reqs :save-screen-snap])]
+     (assoc-in db
+               [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
+               (merge old-status {:ended-unix (.getTime (js/Date.)) :status "success"})))))
 
 (re-frame/reg-event-fx
   ::save-screen-snap
@@ -1125,19 +1151,21 @@
 
 
 
-(re-frame/reg-event-db ::failure-http-save-csv
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :save-csv])]
-                           (assoc-in db
-                             [:http-reqs :save-csv] ; comp key from ::get-http-data
-                             (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+(re-frame/reg-event-db
+ ::failure-http-save-csv
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :save-csv])]
+     (assoc-in db
+               [:http-reqs :save-csv] ; comp key from ::get-http-data
+               (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-http-save-csv
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :save-csv])]
-                           (assoc-in db
-                             [:http-reqs :save-csv] ; comp key from ::get-http-data
-                             (merge old-status {:keys (count result) :ended-unix (.getTime (js/Date.)) :status "success"})))))
+(re-frame/reg-event-db
+ ::success-http-save-csv
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :save-csv])]
+     (assoc-in db
+               [:http-reqs :save-csv] ; comp key from ::get-http-data
+               (merge old-status {:keys (count result) :ended-unix (.getTime (js/Date.)) :status "success"})))))
 
 (re-frame/reg-event-fx
   ::save-csv

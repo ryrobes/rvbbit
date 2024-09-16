@@ -1,4 +1,4 @@
-(defproject rvbbit-backend "0.1.3-alpha"
+(defproject rvbbit-backend "0.1.4-alpha"
   :description        "RVBBIT - Dynamic Datascapes, by Ryan Robitaille"
   :url                "https://github.com/ryrobes/rvbbit"
   :license            {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
@@ -35,7 +35,7 @@
                        [org.clj-commons/claypoole "1.2.2"]
                        [csv-map "0.1.2"]
                        ;;[org.duckdb/duckdb_jdbc "0.9.1"]
-                       [org.duckdb/duckdb_jdbc "1.0.0"] 
+                       [org.duckdb/duckdb_jdbc "1.1.0"] 
                        [org.clojure/math.combinatorics "0.1.6"]
                        ;[hikari-cp "3.0.1"] ;; https://github.com/tomekw/hikari-cp
                        [hikari-cp "3.1.0"] ;; https://github.com/tomekw/hikari-cp

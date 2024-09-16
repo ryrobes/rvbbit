@@ -21,7 +21,8 @@
                      :body [:box
                             :size "auto"
                             :align :center :justify :center
-                            :style {:color :theme/editor-outer-rim-color
+                            :style {:color "cyan"
+                                    :font-weight 800
                                     :font-size [:auto-size-px [:str :*input]]}
                             :child [:str :*input]]}
  :new-block-quotes-box {:args [:*input]

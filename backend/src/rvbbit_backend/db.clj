@@ -15,10 +15,14 @@
 
 (def key-depth-limit (atom 8)) 
 
+(defonce mem-usage (atom [])) ;; needs to be accessed from evaluator
+(defonce cpu-usage (atom [])) ;; needs to be accessed from evaluator
+
 (defonce kit-atom (fpop/thaw-atom {} "./data/atoms/kit-atom.msgpack.transit"))
 (defonce father-time (fpop/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
 (defonce screens-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/screens-atom.edn"))
 (defonce server-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/server-atom.edn"))
+(defonce assistant-atom (atom {}))
 (defonce flow-status (atom {}))
 (defonce kit-status (atom {}))
 
@@ -55,6 +59,7 @@
    [:master-screen-watcher  screens-atom  :screen]
    [:master-params-watcher  params-atom  :client]
    [:master-panels-watcher  panels-atom  :panel]
+   [:master-assistant-watcher  assistant-atom  :assistant]
    [:master-runstream-watcher  runstream-atom  :runstream]
    [:master-flow-watcher flow-db/results-atom  :flow]
    [:master-flow-runner-watcher flow-db/results-atom  :flow-runner] ;; * a copy, but it maintainted separately - pruned, etc.
@@ -71,10 +76,13 @@
    [:master-server-watcher server-atom :server]
    [:master-tracker-watcher flow-db/tracker :tracker]])
 
+;; (ut/pp (get @last-solvers-atom :fortunate-cubic-donkey-22))
+
 (def sharded-atoms
   (atom {:time (atom {})
          :settings (atom {})
          :screen (atom {})
+         :assistant (atom {})
          :client (atom {})
          :panel (atom {})
          :flow (atom {})
@@ -217,18 +225,8 @@
     (ppy/reset-cached-thread-pools-wildcard (cstr/replace (str cn) ":" "")))
   (reset! atoms-and-watchers {})
   (pool-cleaner!)
-  ;; (ppy/reset-cached-thread-pools-wildcard ":subscriptions")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":watchers")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":nrepl")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":flow")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":sql")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":param")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":client")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":query")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":signal")
-  ;; (ppy/reset-cached-thread-pools-wildcard ":captured")
   (reset! reactor-boot-time (System/currentTimeMillis))
-  ;; (qp/cleanup-inactive-queues 10)
+  ;; (qp/cleanup-inactive-queues 10) ;; issues with this, not really important though
   (vreset! splitter-stats  {}))
 
 (defn client-sub-latency []
@@ -288,9 +286,20 @@
 
 (defn replace-flow-key-vars
   [flow-key client-name]
-  (let [client-name-str (cstr/replace (str client-name) ":" "")]
+  (let [client-name-str (cstr/replace (str client-name) ":" "")
+        flow-key-str (str flow-key)
+        ;; flow-key-str (let [client-name-str (if (not (or (cstr/starts-with? (str flow-key) ":solver/*")
+        ;;                                            (cstr/starts-with? (str flow-key) ":solver-meta/*"))) 
+        ;;                                      "rvbbit" 
+        ;;                                      client-name-str)] 
+        ;;                   ;; ^^ this is super hacky - we need to unify the flowkey reactor types and behavior. ideally generalized and data drive with config maps.
+        ;;                   ;; this means that its an auto generated solver name which needs a client-name prefix, rather than a global solver, which needs rvbbit as the cid
+        ;;                (-> flow-key-str
+        ;;                    (cstr/replace ":solver/" (str ":solver/" client-name-str ">"))
+        ;;                    (cstr/replace ":solver-meta/" (str ":solver-meta/" client-name-str ">"))))
+        ]
     (edn/read-string ;; should always be a keyword coming in
-     (ut/replace-multiple (str flow-key) {"*client-name*" client-name-str}))))
+     (ut/replace-multiple flow-key-str {"*client-name*" client-name-str}))))
 
 (defn break-up-flow-key
   [key]
@@ -302,17 +311,13 @@
 
 (defn break-up-flow-key-ext ;;; ex :flow/flow-id>flow-block-data>0>1>key34 etc 
   [key]
-  (let [ff             (cstr/split (-> (str key)
-                                       (cstr/replace #":" ""))
-                                   #"/")
-        ff2            (cstr/split (last ff) #">")
+  (let [ff    (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
+        ff2   (cstr/split (last ff) #">")
         keyword-or-int (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s)))]
     (vec (into [(keyword (first ff)) (first ff2)] (rest (for [e ff2] (keyword-or-int e)))))))
 
 (defn client-kp
-  [flow-key keypath base-type sub-path client-param-path]
-  (let [;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
-        ]
+  [flow-key keypath base-type sub-path client-param-path client-name]
     (cond (cstr/includes? (str flow-key) "running?")  false ;; TODO, mess
           (= base-type :time)                         client-param-path
           (= base-type :signal)                       client-param-path
@@ -330,13 +335,10 @@
           (= base-type :client)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :panel)                        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           :else                                       (vec (rest sub-path)) ;;keypath ;;(vec (rest sub-path)) ;;keypath ;; assume flow
-          )))
+          ))
 
 (defn get-atom-from-keys [base-type sub-type sub-path keypath]
-  (let [;base-type (if (and (cstr/includes? (str keypath) ":*") 
-        ;                   (= base-type :flow)) :flow-status base-type)
-        ]
-    (get-atom-splitter-deep-kp base-type keypath (base-type master-reactor-atoms))))
+    (get-atom-splitter-deep-kp base-type keypath (base-type master-reactor-atoms)))
 
 (defn make-watcher
   [keypath flow-key client-name handler-fn & [no-save]]
@@ -374,6 +376,7 @@
                                          (swap! client-click-params assoc-in [client-name flow-key] new-value) ;; for diffing later
 
                                         ;;  (when (cstr/ends-with? (str flow-key) "*running?") (ut/pp [:running-push! flow-key client-name keypath new-value]))
+                                        ;; (when (cstr/includes? (str flow-key) ":solver") (ut/pp [:running-push! flow-key client-name keypath new-value]))
 
                                         ;;   (when (cstr/includes? (str client-name) "-bronze-")  (ut/pp [:running-push! flow-key client-name keypath new-value]))
                                           ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
@@ -428,7 +431,7 @@
                           ;;;true [:v]
                           signal?         (vec (rest keypath))
                           settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                          solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) 
                           kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -561,13 +564,14 @@
         ;;                                  ;;(= base-type :kit-status)
         ;;                                 (= base-type :flow)) flow-client-param-path other-client-param-path)
         client-param-path       other-client-param-path
-        client-keypath          (client-kp flow-key keypath base-type sub-path client-param-path)
+        client-keypath          (client-kp flow-key keypath base-type sub-path client-param-path client-name)
         ssp                     (break-up-flow-key-ext flow-key-orig)
         req-client-kp           (client-kp flow-key-orig
                                            (vec (break-up-flow-key flow-key-orig))
                                            base-type
                                            ssp
-                                           (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" "")))
+                                           (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" ""))
+                                           client-name)
         ;;_ (ut/pp [:flow-key flow-key vars? flow-key-sub flow-key-split flow-key-split-sub]) ;; this
         _ (when vars? (swap! param-var-mapping assoc [client-name client-keypath] req-client-kp))
         _ (when vars? (swap! param-var-crosswalk assoc-in [client-name flow-key-orig] [flow-key [client-name client-keypath]]))
@@ -576,7 +580,9 @@
                    client-name
                    (vec (distinct (conj (get @param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
         lv                      (get @last-values keypath)]
-    (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath {:sub-path sub-path}])
+    ;; (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath 
+    ;;         {:sub-path sub-path 
+    ;;          :new-path (vec (into [client-name] (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))))}])
     (cond
       ;;(cstr/includes? (str flow-key) "*running?")  false
       (= base-type :time)                         (get @father-time client-param-path)
@@ -622,33 +628,28 @@
       :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv) ;; assume flow literal 
       )))
 
-(defn get-starting-value [base-type client-param-path sub-path keypath lv]
-  (let [;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
-        ]
+(defn get-starting-value [base-type client-param-path sub-path keypath lv client-name]
     (cond
                 ;;(cstr/includes? (str flow-key) "running?")  false
       (= base-type :time)                         (get @father-time client-param-path)
                     ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
       (= base-type :data)                         (get-in @last-solvers-data-atom
-                                                          (vec (into [(keyword (second sub-path))]
-                                                                     (vec (rest (rest sub-path)))))
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :settings)                     (get-in @settings-atom
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :solver)                       (get-in @last-solvers-atom
-                                                          (vec (into [(keyword (second sub-path))]
-                                                                     (vec (rest (rest sub-path)))))
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :kit)                          (get-in @kit-atom
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
-                                                          (vec (into [(keyword (second sub-path))]
-                                                                     (vec (rest (rest sub-path)))))
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :repl-ns)                      (get-in @repl-introspection-atom
                                                           (vec (into [(keyword (second sub-path))]
@@ -679,4 +680,4 @@
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
-      :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv))))
+      :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv)))

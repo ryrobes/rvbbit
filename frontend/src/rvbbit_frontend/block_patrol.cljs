@@ -58,7 +58,7 @@
 (re-frame/reg-event-fx
  ::deal-with-changed-panels
  (fn [{:keys [db]} _]
-   (let [old-hashes (::panel-hashes db)
+   (let [old-hashes (get db :panel-hashes)
          new-panels-with-hashes @(ut/tracked-sub ::panels-with-hashes {})
          new-hashes (into {} (map (fn [[k v]] [k (:hash v)]) new-panels-with-hashes))
          changed-panels (reduce-kv
@@ -70,7 +70,7 @@
                          new-panels-with-hashes)
          is-initial-boot? (empty? old-hashes)] ;; if nothing has a hash, it's the first time - dont trigger
      (cond-> {:db (-> db 
-                      (assoc ::panel-hashes new-hashes)
+                      (assoc :panel-hashes new-hashes)
                       (assoc-in [:click-param :panel-hash] new-hashes))}
        (and (not is-initial-boot?) (seq changed-panels))
        (assoc :push-changed-panels changed-panels)))))

@@ -1,7 +1,9 @@
 (ns rvbbit-backend.config
   (:require
    ;[rvbbit-backend.db :refer [settings-atom]]
-   [rvbbit-backend.assistants :as ass]
+   ;[rvbbit-backend.assistants :as ass]
+   [cheshire.core           :as json]
+   [clj-http.client         :as client]
    [puget.printer           :as puget]
    [clojure.edn     :as edn]
    [clojure.java.io :as io]
@@ -53,7 +55,58 @@
 ;;     settings-map))
 
 
-
+(defn oai-call [req openai-api-key openai-org-id]
+  (try
+    (let [{:keys [url headers query-params method body file] :or {method :get}} req
+          http-method                                                           (case method
+                                                                                  :get     client/get
+                                                                                  :post    client/post
+                                                                                  :put     client/put
+                                                                                  :delete  client/delete
+                                                                                  :head    client/head
+                                                                                  :options client/options
+                                                                                  :patch   client/patch
+                                                                                  :GET     client/get
+                                                                                  :POST    client/post
+                                                                                  :PUT     client/put
+                                                                                  :DELETE  client/delete
+                                                                                  :HEAD    client/head
+                                                                                  :OPTIONS client/options
+                                                                                  :PATCH   client/patch
+                                                                                  (throw (IllegalArgumentException.
+                                                                                          {:error (str "Unknown http method: "
+                                                                                                       method)})))
+          headers                                                               (merge {"Authorization" (str "Bearer "
+                                                                                                             openai-api-key)
+                                                                                        "Content-Type"  "application/json"
+                                                                                        "OpenAI-Beta"   "assistants=v1"}
+                                                                                       (if (not (nil? openai-org-id))
+                                                                                         {"OpenAI-Organization" openai-org-id}
+                                                                                         {})
+                                                                                       headers)
+          body2                                                                 (if (nil? body)
+                                                                                  {:query-params query-params}
+                                                                                  (if (nil? file)
+                                                                                    {:body (json/generate-string body)}
+                                                                                    {:multipart [{:name "file"
+                                                                                                  :content (slurp file)
+                                                                                                  :filename
+                                                                                                  (last (clojure.string/split
+                                                                                                         file
+                                                                                                         #"/"))}
+                                                                                                 {:name    "purpose"
+                                                                                                  :content "assistants"}]}))
+          response                                                              (try (http-method url
+                                                                                                  (merge {:as      :json
+                                                                                                          :headers headers
+                                                                                                          :debug   false}
+                                                                                                         body2))
+                                                                                     (catch Exception e
+                                                                                       {:error {:message (.getMessage e)
+                                                                                                :msg     (str e)
+                                                                                                :class   (str (type e))}}))]
+      (if (:error response) (do (println [:error response :body-sent body2]) response) (get response :body)))
+    (catch Exception e {:error-outer {:message (.getMessage e) :msg (str e) :class (str (type e))}})))
 
 (def openai-cache (atom {:api-key nil :org-id nil :models nil}))
 
@@ -74,7 +127,7 @@
                                  (= org-id (:org-id cached-data))
                                  (some? (:models cached-data)))
                           (:models cached-data)
-                          (let [new-models (get (ass/oai-call {:url "https://api.openai.com/v1/models" :method :get}
+                          (let [new-models (get (oai-call {:url "https://api.openai.com/v1/models" :method :get}
                                                               api-key org-id) :data)]
                             (reset! openai-cache {:api-key api-key :org-id org-id :models new-models})
                             new-models))

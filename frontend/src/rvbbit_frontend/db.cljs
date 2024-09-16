@@ -3,7 +3,7 @@
     [reagent.core :as reagent]))
 
 (def brick-size 50)
-(def version "0.1.3-alpha")
+(def version "0.1.4-alpha")
 (def version-date "9/2024")
 
 (def reactor-types #{:flow :screen :time :signal :server :ext-param :solver   :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
@@ -11,7 +11,7 @@
 (def bar-hover-text (reagent/atom nil))
 (def console-voice-text (reagent/atom nil))
 
-(def running-queries (atom #{}))
+(def running-queries (atom #{})) 
 
 (def click-params-snapshot (atom nil))
 (def param-v-boxes (reagent/atom nil))

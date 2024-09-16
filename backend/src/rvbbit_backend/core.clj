@@ -28,6 +28,7 @@
    ;[puget.printer :as puget]
     [ring.adapter.jetty9 :as jetty]
     [rvbbit-backend.queue-party  :as qp]
+    [rvbbit-backend.assistants :as assistants]
    ;[rvbbit-backend.assistants :as ass]
    ;[rvbbit-backend.reactor :as rkt]
     [rvbbit-backend.config :as config]
@@ -655,7 +656,7 @@
    (println " ")
    (ut/print-ansi-art "data/nname.ans")
    (ut/print-ansi-art "data/rrvbbit.ans")
-   (ut/pp [:version 0 :august 2024 "Hi."])
+   (ut/pp [:version "0.1.4" :september 2024 "Howdy."])
    (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
    (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   ;; (println " ")
@@ -667,6 +668,7 @@
    (fpop/thaw-flow-results)
 
    (sql-exec system-db "drop table if exists jvm_stats;")
+   (sql-exec system-db "drop table if exists client_memory;")
    (sql-exec system-db "drop table if exists errors;")
    (sql-exec system-db "drop view  if exists viz_recos_vw;")
    (sql-exec system-db "drop view  if exists viz_recos_vw2;")
@@ -817,7 +819,7 @@
                     "Father Time")
 
    (start-scheduler 15
-                    wss/jvm-stats
+                    #(try (wss/jvm-stats) (catch Throwable e (ut/pp [:error-in-jvm-stats-fn-sched (.getData e)])))
                     "JVM Stats" 30)
 
    (start-scheduler 15
@@ -918,7 +920,7 @@
                          (swap! wss/watcher-usage conj (count (db/current-watchers)))
                          (swap! wss/sub-usage conj (count (db/current-subs)))
                          (swap! wss/sub-client-usage conj (count (db/current-all-subs)))
-                         (swap! wss/mem-usage conj (ut/memory-used))
+                         (swap! db/mem-usage conj (ut/memory-used))
                          (let [thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
                                thread-count (.getThreadCount thread-mx-bean)]
                            (swap! wss/thread-usage conj thread-count))
@@ -929,7 +931,7 @@
                          (swap! wss/time-usage conj (System/currentTimeMillis)) ;; in case we want to easily ref w/o generating
                         ;(qp/update-queue-stats-history) ;; moved to 15 second scheduler
                         ;(qp/update-specific-queue-stats-history [:watcher-to-client-serial :update-stat-atom-serial])
-                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
+                         (swap! db/cpu-usage conj (ut/get-jvm-cpu-usage)))
                     "Stats Keeper");;)
 
    (start-scheduler (* 3600 8) ;; 8 hours

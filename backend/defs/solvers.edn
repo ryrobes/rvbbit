@@ -78,6 +78,16 @@
        :order-by [[:rowcnt :desc]]
        :page -4
        :connection-id "boston-crime"}}
+ :materialize-offenses-drag-6 {:signal    :signal/daily-at-7am
+                               :type      :sql
+                               :snapshot? false
+                               :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
+                                                           :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
+                                                           :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                                           :SHOOTING :STREET :UCR_PART :YEAR]
+                                           :from          [[:offenses :pp251]]
+                                           :page          -4
+                                           :connection-id "boston-crime"}}
  :random-mp3
    {:signal :signal/changed-wallpaper?
     :type :clojure

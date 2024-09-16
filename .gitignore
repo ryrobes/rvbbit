@@ -60,3 +60,5 @@ backend/defs/secrets.edn
 docker-staging/
 frontend/package-lock.json
 backend/assets/snaps/*
+backend/assets/openai-images/upscaled
+tmp/

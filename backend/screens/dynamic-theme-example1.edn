@@ -1,75 +1,21 @@
 {:reco-preview "2006850921",
  :sql-source
- {:gen-viz-1022
-  {:select
-   [[[[:count 1]] :rows]
-    [[:substr :submitted_date 6 2] :by_month_sqlite_submitted_date]],
-   :from
-   [[{:select
-      [:alsonoticed
-       :bfroid
-       :class
-       :county
-       :date
-       :environment
-       :fixed_month
-       :fixed_year
-       :month
-       :run_time
-       :season
-       :state
-       :submitted
-       :submitted_date
-       :timeandconditions
-       :title
-       :url
-       :year],
-      :from [[:bigfoot_sightings :bb86]]}
-     :cc805]],
-   :group-by [[:substr :submitted_date 6 2]]},
-  :bigfoot-sightings-drag-35
-  {:select
-   [:alsonoticed
-    :bfroid
-    :class
-    :county
-    :date
-    :environment
-    :fixed_month
-    :fixed_year
-    :month
-    :run_time
-    :season
-    :state
-    :submitted
-    :submitted_date
-    :timeandconditions
-    :title
-    :url
-    :year],
-   :from [[:bigfoot_sightings :bb86]],
-   :_last-run "09:11:13"},
-  :bigfoot_sightings
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:bigfoot_sightings],
-   :limit 111},
-  :new-clojure-sqlized
+ {:new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-09-02 09:54:04",
+   :_sqlized-at "2024-09-12 11:12:25",
    :_sqlized-by [:block-86 :clojure :new-clojure],
-   :_sqlized-hash 1632173835,
-   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_]},
-  :raw_custom_override86093687__block_86_clojure_new_clojure_
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:raw_custom_override86093687__block_86_clojure_new_clojure_],
-   :limit 111},
+   :_sqlized-hash -186702887,
+   :from [:raw_custom_override341981132__block_86_clojure_new_clojure_]},
   :raw_custom_override_793100426__block_86_clojure_new_clojure_
   {:select [:*],
    :connection-id "system-db",
    :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_],
+   :limit 111},
+  :raw_custom_override341981132__block_86_clojure_new_clojure_
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:raw_custom_override341981132__block_86_clojure_new_clojure_],
    :limit 111}},
  :meta
  {nil
@@ -1154,14 +1100,14 @@
      :data-type "string",
      :commons
      {nil 1,
-      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7833407 \"HikariDataSource (system-db)\"]}"
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x563b9462 \"HikariDataSource (system-db)\"]}"
       1,
       "(from database connection)" 1},
      :distinct 4,
      :group-by? true,
      :median "(from database connection)",
      :max
-     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7833407 \"HikariDataSource (system-db)\"]}",
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x563b9462 \"HikariDataSource (system-db)\"]}",
      :avg
      "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override_793100426__block_86_clojure_new_clojure_) (non-numeric average)",
      :cardinality 100}},
@@ -1514,17 +1460,17 @@
     {:min "alice-grid3.png-q10.jpg",
      :data-type "string",
      :commons
-     {"b64-image3-87635-79921-4k.webp-q10.jpg" 1,
-      "sinisterlook4-4k.webp-q10.jpg" 1,
-      "b64-image3-2332-3524-4k.webp-q10.jpg" 1},
-     :distinct 17,
+     {"upscaled/b64-image-5760-71903-4k.webp" 1,
+      "upscaled/b64-image-13300-96466-4k.webp" 1,
+      "upscaled/b64-image-82400-73419-4k.webp" 1},
+     :distinct 500,
      :group-by? true,
-     :median "b64-image3-64351-81110-4k.webp-q10.jpg",
-     :max "sinisterlook4-4k.webp-q10.jpg",
+     :median "upscaled/b64-image-47917-53200-4k.webp",
+     :max "upscaled/b64-image-89046-89759-4k.webp",
      :avg "alice-grid3.png-q10.jpg (non-numeric average)",
      :cardinality 100}},
    :database-type "DuckDB",
-   :rowcount 17},
+   :rowcount 500},
   :rowcnt-drag-32
   {:fields
    {:query_error
@@ -1614,11 +1560,11 @@
   {:fields
    {:ffilename
     {:data-type "string",
-     :distinct 17,
+     :distinct 1880,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 17},
+   :rowcount 1880},
   :viz-shapes-sys2
   {:fields
    {:combo_edn
@@ -2749,121 +2695,93 @@
      "[SQLITE_ERROR] SQL error or missing database (no such table: Traffic_Violations) (non-numeric average)",
      :cardinality 100}},
    :database-type "SQLite",
+   :rowcount 4},
+  :raw_custom_override341981132__block_86_clojure_new_clojure_
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x563b9462 \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x563b9462 \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: raw_custom_override341981132__block_86_clojure_new_clojure_) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
    :rowcount 4}},
- :default-col-widths
- {:system-connections-list* {:connections-sys 126},
-  :system-tables-list* {:tables-sys 133},
-  :system-fields-list* {:fields-sys 170},
-  :files-list* {:files-sys 170},
-  :blocks-list* {:blocks-sys 127},
-  :block-8590 {:bigfoot-sightings-drag-35 100}},
+ :default-col-widths {:block-86 {:new-clojure-sqlized 361}},
  :runstream-drops nil,
  :tabs ["background picker"],
- :selected-cols {},
+ :selected-cols nil,
  :server {:settings nil},
  :runstreams nil,
- :editor? true,
+ :editor? false,
  :buffy? false,
  :valid-kits
  {[:clojure :export-to-csv]
-  [[nil :queries nil]
-   [:reco-preview :queries :query-preview]
-   [:block-724 :queries :gen-viz-1022]
-   [:block-86 :queries :new-clojure-sqlized]
-   [:block-9201 :queries :new-clojure-1-sqlized]
+  [[:block-86 :queries :new-clojure-sqlized]
    [:block-3284 :queries :new-clojure-2-sqlized]
-   [:block-8590 :queries :bigfoot-sightings-drag-35]],
+   [:reco-preview :queries :query-preview]],
   [:clojure :count-map-keys] [],
   [:clojure :new-lundberg] [[:* :* :*]],
   [:clojure :view-lundberg]
-  [[:block-1084 :views :hare-vw-8]
-   [:reco-preview :views :oz]
-   [:block-724 :views :reech]
-   [:block-9973 :views :hare-vw-2]
-   [:block-4733 :views :hare-vw-7]
-   [:block-4719 :views :hare-vw-3]
-   [:block-8499 :views :hare-vw]
-   [:block-482 :views :hare-vw-16]
-   [:block-9709 :views :hare-vw-17]
-   [:block-10760 :views :hare-vw-14]
-   [:block-7845 :views :hare-vw-4]
-   [:block-8806 :views :hare-vw-1]
-   [:block-1584 :views :hare-vw-6]
+  [[:block-4733 :views :hare-vw-7]
    [:block-1320 :views :hare-vw-9]
-   [:block-9482 :views :hare-vw-15]],
+   [:reco-preview :views :oz]],
   [:clojure :gen-ev] [],
   [:outliers :get-outliers]
-  [[nil :queries nil]
-   [:reco-preview :queries :query-preview]
-   [:block-724 :queries :gen-viz-1022]
-   [:block-86 :queries :new-clojure-sqlized]
-   [:block-9201 :queries :new-clojure-1-sqlized]
+  [[:block-86 :queries :new-clojure-sqlized]
    [:block-3284 :queries :new-clojure-2-sqlized]
-   [:block-8590 :queries :bigfoot-sightings-drag-35]]},
- :memory [186907918 165992878 4294705152],
- :client-name :wealthy-magenta-beaver-27,
+   [:reco-preview :queries :query-preview]]},
+ :memory [196333188 173325700 4294705152],
+ :client-name :prominent-star-shaped-elk-12,
  :flow-editor? true,
- :window {:w 2236, :h 1342},
- :implicit-rowsets {:solver [:new-clojure nil]},
+ :window {:w 2323, :h 1403},
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil :new-clojure]},
  :post-meta
- {:fields-sys
-  {:* {:rowcount 26},
-   :field_name {:distinct 26},
-   :field_type {:distinct 5},
-   :data_type {:distinct 5}},
-  :files-sys
-  {:* {:rowcount 14},
-   :file_path {:distinct 13},
-   :screen_name {:distinct 12},
-   :blocks {:distinct 10},
-   :queries {:distinct 7},
-   :ts {:distinct 2}},
-  :blocks-sys
-  {:* {:rowcount 70},
-   :block_key {:distinct 70},
-   :block_name {:distinct 61},
-   :queries {:distinct 3},
-   :views {:distinct 4},
-   :block_data {:distinct 70},
-   :view_names {:distinct 23},
-   :query_names {:distinct 27}},
-  :new-clojure-sqlized {:* {:rowcount 17}, :ffilename {:distinct 17}}},
+ {:new-clojure-sqlized {:* {:rowcount 1880}, :ffilename {:distinct 1880}}},
  :flow-estimates
- {:blocks-sys {:times 0.002, :run-id :blocks-sys},
-  :fields-sys {:times 0.001, :run-id :fields-sys},
-  :tables-sys {:times 0.018, :run-id :tables-sys},
-  :files-sys {:times 0.002, :run-id :files-sys},
-  :bigfoot-sightings-drag-35 {:times 0.022, :run-id :bigfoot-sightings-drag-35},
-  :raw-custom-override-793100426
-  {:times 0.452, :run-id :raw-custom-override-793100426},
-  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
-  :gen-viz-1022 {:times 0.011, :run-id :gen-viz-1022},
-  :raw-custom-override714264689
-  {:times 0.017, :run-id :raw-custom-override714264689},
-  :connections-sys {:times 0.001, :run-id :connections-sys}},
+ {:raw-custom-override-1785175008
+  {:times 0.017, :run-id :raw-custom-override-1785175008},
+  :raw-custom-override341981132
+  {:times 3.245, :run-id :raw-custom-override341981132},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized}},
  :status
  {:heartbeat
   {:kick
-   [:time/now-seconds
-    :solver-status/wealthy-magenta-beaver-27>raw-custom-override714264689>running?
-    :solver/get-my-colors-1790973138
-    :solver-status/wealthy-magenta-beaver-27>get-my-colors-1790973138>running?
-    :kit/kicks>wealthy-magenta-beaver-27
-    :flow-status/my-new-flow3587>*running?
-    :solver-status/wealthy-magenta-beaver-27>raw-custom-override-793100426>running?
-    :solver-meta/raw-custom-override-793100426>output>evald-result>out
-    :solver-meta/raw-custom-override-793100426>output>evald-result>value-hash
-    :solver/get-my-colors1909740824
-    :solver/raw-custom-override714264689
-    :solver/raw-custom-override-793100426
-    :flow-status/a-random-wow>*running?
-    :solver-status/wealthy-magenta-beaver-27>get-my-colors1909740824>running?]},
-  :alert1 {:alerts :alert2},
-  :alert3 {:alerts :alert2},
-  :alert2 {:alerts :alert2}},
+   [:flow-status/my-new-flow3910>*running?
+    :solver-meta/raw-custom-override341981132>output>evald-result>out
+    :repl-ns/repl-client-namespaces-map>prominent-star-shaped-elk-12
+    :solver-status/prominent-star-shaped-elk-12>get-my-colors-1728262597>running?
+    :solver-status/prominent-star-shaped-elk-12>raw-custom-override341981132>running?
+    :solver-status/prominent-star-shaped-elk-12>get-my-colors-1892653062>running?
+    :solver-meta/raw-custom-override341981132>output>evald-result>value-hash
+    :solver/raw-custom-override341981132
+    :solver/get-my-colors-1728262597
+    :repl-ns/repl-prominent-star-shaped-elk-12-raw-custom-override-1785175008>introspected
+    :repl-ns/repl-prominent-star-shaped-elk-12-raw-custom-override341981132>introspected
+    :solver/get-my-colors-1892653062
+    :kit/kicks>prominent-star-shaped-elk-12]},
+  :file-change {:file-changed :done}},
  :screen-name "dynamic-theme-example1",
+ :panel-hashes
+ {nil 1188417010,
+  :block-86 -517341544,
+  :block-3284 1345090059,
+  :block-4733 -177489701,
+  :block-1320 262899838,
+  :reco-preview 854177808},
  :recos-page2 0,
  :selected-tab "background picker",
+ :col-names nil,
  :snapshots nil,
  :alerts
  [[[:box
@@ -2877,35 +2795,42 @@
      {:font-size "12px", :opacity 0.66}]]
    11
    0.5
-   129
+   506
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
- {:bigfoot_sightings 302026766,
-  :raw_custom_override86093687__block_86_clojure_new_clojure_ -1892756218,
-  :raw_custom_override_793100426__block_86_clojure_new_clojure_ 1038642995},
- :user-params-hash -1457990439,
+ {:raw_custom_override_793100426__block_86_clojure_new_clojure_ 1038642995,
+  :raw_custom_override341981132__block_86_clojure_new_clojure_ -1859648164},
+ :user-params-hash -1899681484,
  :grid-recos? true,
- :session-hash -884273835,
+ :preview-keys2 [],
+ :session-hash 1102788219,
  :resolved-queries
- {nil {:_last-run "09:54:10"},
+ {nil {:_last-run "11:14:31"},
   :new-clojure-sqlized
   {:select [:*],
    :connection-id "cache.db",
-   :_sqlized-at "2024-09-02 09:54:04",
+   :_sqlized-at "2024-09-12 11:12:25",
    :_sqlized-by [:block-86 :clojure :new-clojure],
-   :_sqlized-hash 1632173835,
-   :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_]},
+   :_sqlized-hash -186702887,
+   :from [:raw_custom_override341981132__block_86_clojure_new_clojure_]},
   :new-clojure-2-sqlized
   {:select [:*],
    :connection-id "cache.db",
    :_sqlized-at "2024-08-28 07:45:10",
    :_sqlized-by [:block-3284 :clojure :new-clojure-2],
    :_sqlized-hash nil,
-   :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]}},
+   :from [:raw_custom_override647179980__block_3284_clojure_new_clojure_2_]},
+  :query-preview
+  {:select
+   [[[[:avg :Electric_Range]] :Electric_Range]
+    :Make
+    :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility],
+   :from [[nil :aa1]],
+   :group-by [:Make :Clean_Alternative_Fuel_Vehicle_CAFV_Eligibility]}},
  :panels
- {nil {:queries {nil {:_last-run "09:54:10"}}},
+ {nil {:queries {nil {:_last-run "11:14:31"}}},
   :block-86
   {:clojure
    {:new-clojure
@@ -2918,11 +2843,17 @@
                     (filter
                       (fn [x] (not (clojure.string/includes? (str x) "directory"))))
                     (filter
+                      (fn [x] (not (clojure.string/includes? (.getName x) "8k"))))
+                    (map
                       (fn [x]
-                        (not (clojure.string/includes? (str (.getName x)) "8k-"))))
-                    (map (fn [x] (.getName x))))]
+                        (let [full-path (.getPath x)
+                              rel-path (clojure.string/replace-first
+                                         full-path
+                                         rel-dir
+                                         "")]
+                          rel-path))))]
         (println "found " (count files) " files")
-        (vec (for [f (sort files)] {:ffilename (str f)}))))},
+        (vec (for [f (sort files)] {:ffilename f}))))},
    :name "block-86",
    :w 8,
    :selected-mode {:new-clojure :text},
@@ -2934,11 +2865,11 @@
    {:new-clojure-sqlized
     {:select [:*],
      :connection-id "cache.db",
-     :_sqlized-at "2024-09-02 09:54:04",
+     :_sqlized-at "2024-09-12 11:12:25",
      :_sqlized-by [:block-86 :clojure :new-clojure],
      :_sqlized-hash
-     :solver-meta/raw-custom-override-793100426>output>evald-result>value-hash,
-     :from [:raw_custom_override_793100426__block_86_clojure_new_clojure_]}},
+     :solver-meta/raw-custom-override341981132>output>evald-result>value-hash,
+     :from [:raw_custom_override341981132__block_86_clojure_new_clojure_]}},
    :tab "background picker",
    :views {}},
   :block-3284
@@ -2966,13 +2897,13 @@
      :justify
      :center
      :style
-     {:font-size "21px",
+     {:font-size "19px",
       :font-weight 700,
       :padding-top "6px",
       :padding-left "14px",
       :margin-top "-8px",
       :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
+      :font-family :theme/monospaced-font}
      :child
      "Note: if the colors look funky and are not changing with the image selection - make sure that inside the rvbbit-dir/extras/node-colorthieft directory you can run 'test-me.sh' to ensure you have the right deps installed in order for the 'colorthief' flow to work correctly."]},
    :queries {}},
@@ -2991,7 +2922,7 @@
      :justify
      :center
      :style
-     {:font-size "21px",
+     {:font-size "19px",
       :font-weight 700,
       :padding-top "6px",
       :padding-left "14px",
@@ -2999,8 +2930,118 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/monospaced-font}
      :child
-     "<-- switch to the \"sqlized\" tab and select an image."]},
+     "<-- once the files are 'found' - switch to the \"sqlized\" tab and select an image."]},
    :queries {}}},
+ :materialized-theme
+ {:codemirror-theme "rvbbit-dynamic",
+  :editor-param-background-color "#000000",
+  :base-block-style
+  {:background-color "#37233673",
+   :border-radius [:sticky-border-radius "24px"],
+   :backdrop-filter "blur(4px) brightness(40%)",
+   :filter nil},
+  :vega-defaults
+  {:view {:stroke "transparent"},
+   :axis
+   {:domainColor "#ffffff22",
+    :grid true,
+    :font "Lato",
+    :labelColor "#ffffff88",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelFont "Lato",
+    :domain false,
+    :gridColor "#ffffff22",
+    :tickColor "#ffffff22",
+    :axisFont "Lato"},
+   :legend
+   {:labelFont "Lato",
+    :legendFont "Lato",
+    :labelColor "#ffffff99",
+    :titleColor "#ffffff99",
+    :stroke "#ffffff99",
+    :titleFont "Lato"},
+   :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+   :mark {:font "Lato"},
+   :title
+   {:font "Lato",
+    :subtitleFont "Lato",
+    :labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99"}},
+  :grid-selected-column-css
+  {:background-color "#00000088", :filter "brightness(200%)"},
+  :base-block-color-selected "#2c3c54",
+  :block-title-font-color "#ffffff",
+  :universal-pop-color "#b9c4cb",
+  :base-block-color "#04041e82",
+  :editor-rim-color "#3a4f6c",
+  :base-block-filter-selected
+  "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+  :vega-default-color-scheme {:scheme "pastel2"},
+  :data-colors
+  {"float" "#fcfbfb",
+   "boolean" "#e0b4b4",
+   "map" "#d1c0b9",
+   "list" "#9e469b",
+   "string" "#ffffff",
+   "any" "#5155ba",
+   "vector" "#9cd4a5",
+   "keyword" "#ffffff",
+   "rabbit-code" "#6dc8a5",
+   "datetime" "#448392",
+   "integer" "#e9acdf",
+   "unknown" "#72336e",
+   "date" "#2a2e4a"},
+  :editor-grid-selected-font-color "#000000",
+  :monospaced-font "JetBrains Mono",
+  :editor-grid-selected-background-color "#dc9cb0",
+  :nivo-defaults
+  {:font-family "Instagram Sans",
+   :labels
+   {:text
+    {:fill "#ffffff",
+     :font-size "16px",
+     :font-family "Instagram Sans",
+     :font-weight 700}},
+   :tooltip
+   {:container
+    {:background "#000",
+     :color "#ffffff",
+     :text {:fill "#eeeeee"},
+     :fontSize "18px",
+     :borderRadius "4px",
+     :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+     :padding "5px 9px"},
+    :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+    :tableCell {:padding "3px 5px"}},
+   :axis
+   {:legend
+    {:text
+     {:fill "#ffffff",
+      :font-size "14px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :ticks
+    {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+   :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+  :editor-outer-rim-color "#b9c4cb",
+  :grid-selected-font-color "#000000",
+  :block-title-selected-font-color "#ffffff",
+  :grid-selected-background-color "#a3d3ff",
+  :grid-font-color "#ffffff",
+  :canvas-background-css
+  {:background-image
+   "url(assets/openai-images/b64-image3-30849-74975-4k.webp-q10.jpg)",
+   :transition "all 1.8s ease-in-out",
+   :background-blend-mode "overlay",
+   :background-size "cover",
+   :background-color "#00000088"},
+  :editor-font-color "#ffffff",
+  :base-font "Poppins",
+  :block-tab-selected-font-color "#c9d1ff",
+  :editor-background-color "#000006",
+  :editor-grid-font-color "#ffffff"},
  :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#fcfbfb",
@@ -3117,13 +3158,28 @@
   {:background-image-path [:str :param/path-dir :param/rel-image-path],
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "",
-   :selected-view-data nil,
-   :selected-view nil,
+   :selected-view-data
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "21px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/monospaced-font}
+    :child
+    "<-- switch to the \"sqlized\" tab and select an image."],
+   :selected-view [:views :hare-vw-9],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:str "assets/openai-images/" :new-clojure-sqlized/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-4733,
+   :selected-block :block-1320,
    :glass-fish-style
    {:background-color [:str :param/generated-colors>darkest 73],
     :border-radius [:sticky-border-radius "24px"],
@@ -3230,4 +3286,4 @@
    :connection_id "cache.db",
    :styler_highlight_8717ssa 0},
   :sys {:selected-tab "marvelous ape", :selected-tab-idx 0}},
- :selected-flow "my-new-flow3587"}
+ :selected-flow "my-new-flow3910"}

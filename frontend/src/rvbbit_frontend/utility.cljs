@@ -313,6 +313,7 @@
 
 
 (def clover-walk-singles-map (atom {}))
+
 (defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))        ;;; ;       
 
@@ -720,7 +721,7 @@
 
 (defn tracked-dispatch-sync [event] (re-frame.core/dispatch-sync event))
 
-
+(defn sname [x] (try (name x) (catch :default _ (str x))))
 
 
 
@@ -768,12 +769,14 @@
   (let [hours   (int (/ seconds 3600))
         minutes (int (mod (/ seconds 60) 60))
         seconds (int (mod seconds 60))
-        out     (str (when (pos? hours) (str hours " hour" (when (> hours 1) "s") ", "))
-                     (when (pos? minutes) (str minutes " minute" (when (> minutes 1) "s") ", "))
-                     seconds
-                     " second"
-                     (when (> seconds 1) "s"))]
-    (if (= out "0 second") "less than a second" out)))
+        out      (str (when (pos? hours) (str hours " hour" (when (> hours 1) "s") ", "))
+                      (when (pos? minutes) (str minutes " minute" (when (> minutes 1) "s") ", "))
+                      (if (not (zero? seconds))
+                        (str seconds " second" (when (> seconds 1) "s")) " "))
+        out (cstr/trim (if (= out " ") "less than a second" out))
+        out (if (cstr/ends-with? out ",") (subs out 0 (- (count out) 1)) out)]
+    out))
+
 
 (defn truncate-string
   "Truncates a string to a max-length and appends an ellipsis if it exceeds the length."
@@ -1498,6 +1501,85 @@
 
 
 
+;; Helper function to recursively find downstream connections
+(defn find-downstream [relations key visited]
+  (if (visited key)
+    visited
+    (reduce
+     (fn [acc downstream-key]
+       (find-downstream relations downstream-key acc))
+     (conj visited key)
+     (get relations key []))))
+
+;; Helper function to build upstream relations from downstream map
+(defn build-upstream-map [downstream-map]
+  (reduce
+   (fn [acc [parent children]]
+     (reduce (fn [inner-acc child]
+               (update inner-acc child (fnil conj #{}) parent))
+             acc children))
+   {} downstream-map))
+
+;; Recursive function to find upstream connections
+(defn find-upstream [upstream-map key visited]
+  (if (visited key)
+    visited
+    (reduce
+     (fn [acc upstream-key]
+       (find-upstream upstream-map upstream-key acc))
+     (conj visited key)
+     (get upstream-map key []))))
+
+
+;; (defn build-relations [data]
+;;   (let [upstream-map (build-upstream-map data)]
+;;     (reduce
+;;      (fn [acc key]
+;;        (assoc acc key
+;;               {:downstream (disj (find-downstream data key #{}) key)
+;;                :upstream (disj (find-upstream upstream-map key #{}) key)}))
+;;      {}
+;;      (keys data))))
+
+(def relations-cache (atom {}))
+
+(defn build-relations [data]
+  (let [data-hash (hash data)]
+    (if-let [cached-result (get @relations-cache data-hash)]
+      cached-result
+      (let [upstream-map (build-upstream-map data)
+            result (reduce
+                    (fn [acc key]
+                      (assoc acc key
+                             {:downstream (disj (find-downstream data key #{}) key)
+                              :upstream (disj (find-upstream upstream-map key #{}) key)}))
+                    {}
+                    (keys data))]
+        (swap! relations-cache assoc data-hash result)
+        result))))
+
+;; (defn invert-relations-map [downstream-map]
+;;   (reduce
+;;    (fn [acc [parent children]]
+;;      (reduce (fn [inner-acc child]
+;;                (update inner-acc child (fnil conj []) parent))
+;;              acc children))
+;;    {} downstream-map))
+
+(def invert-relations-cache (atom {}))
+
+(defn invert-relations-map [downstream-map]
+  (let [map-hash (hash downstream-map)]
+    (if-let [cached-result (get @invert-relations-cache map-hash)]
+      cached-result
+      (let [result (reduce
+                    (fn [acc [parent children]]
+                      (reduce (fn [inner-acc child]
+                                (update inner-acc child (fnil conj []) parent))
+                              acc children))
+                    {} downstream-map)]
+        (swap! invert-relations-cache assoc map-hash result)
+        result))))
 
 (def clean-sql-atom (atom {}))
 

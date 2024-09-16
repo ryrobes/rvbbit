@@ -1856,7 +1856,12 @@
 
     (if (not (and (not no-selected?) 
                   (= runner :fabric)))
-      (let [resp (insert-response-block 8 5 command runner syntax opts-map no-selected?)
+      
+      (let [resp (insert-response-block 8 5 
+                                        (if (= ttype :nrepl)
+                                          (try (edn/read-string command) (catch :default _ command))
+                                          command)
+                                        runner syntax opts-map no-selected?)
             ee (str command "(" resp ")")
             _ (ut/tapp>> (str "insert-response-block: " command " " resp))]
 
@@ -2470,6 +2475,8 @@
     [bricks/reecatch
      [(if vertical? re-com/v-box re-com/h-box)
       :size "none"
+      :attr {:on-mouse-enter #(reset! bricks/over-block? true)
+             :on-mouse-leave #(reset! bricks/over-block? false)}
       :children
 
       (if @bricks/dragging-editor?
@@ -4003,38 +4010,40 @@
                                       (str (keyword (str prefix (ut/unkeyword k)))))
                                 (str (keyword (str prefix (ut/unkeyword k)))))))))))
 
-(re-frame/reg-event-db ::update-user-params-hash
-                       (fn [db _]
-                         (let [fs                (vec (for [kk   (get db :flow-subs)
-                                                            :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
-                                                        [(keyword f1) (keyword f2)]))
-                               pp                (get db :click-param)
-                               pp-without-fs     (ut/remove-keys pp
-                                                                 (into (map first fs)
+(re-frame/reg-event-db
+ ::update-user-params-hash
+ (fn [db _]
+   (let [fs                (vec (for [kk   (get db :flow-subs)
+                                      :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
+                                  [(keyword f1) (keyword f2)]))
+         pp                (get db :click-param)
+         pp-without-fs     (ut/remove-keys pp
+                                           (into (map first fs)
                                                                       ;;  [:flow :time :server :flows-sys :client :solver :kit :runstream
                                                                       ;;   :solver-status :flow-status :data :repl-ns :kit-status 
                                                                       ;;   :signal-history :solver-meta nil]
-                                                                       (vec db/reactor-types)
-                                                                       ))
-                               click-param-autos (vec (filter #(not (cstr/includes? (str %) "function"))
-                                                              (distinct (flatten
-                                                                         (for [kk (filter (fn [x] (not (cstr/includes? (str x) "-sys")))
-                                                                                          (keys pp))]
-                                                                           (create-clover-keys-from-data (get pp-without-fs kk) (str (cstr/replace (str kk) ":" "") "/")))))))
-                               new-autocompletes (vec (into click-param-autos
-                                                            (into (create-clover-keys-from-data (get pp-without-fs :param) "param/")
-                                                                  (create-clover-keys-from-data (get pp-without-fs :theme) "theme/"))))
-                               ;;;_ (ut/tapp>> [:click-param-autos click-param-autos new-autocompletes])
-                               new-h             (hash pp-without-fs)
-                               client-name       (get db :client-name)]
-                           ;; (ut/tapp>>  [:update-user-params-hash-event (count new-autocompletes) new-autocompletes])
-                           (reset! db/autocomplete-keywords (set (into new-autocompletes @db/autocomplete-keywords))) ;; dont
-                           (ut/tracked-dispatch [::wfx/push    :default ;; just a push, no response handling
-                                                 {:kind        :sync-client-params
-                                                  :params-map  pp-without-fs ;; pp ;; why send things we
-                                                  :client-name client-name}])
-                           (reset! temp-atom pp-without-fs)
-                           (assoc db :user-params-hash new-h))))
+                                                 (vec db/reactor-types)))
+         click-param-autos (vec (filter #(not (cstr/includes? (str %) "function"))
+                                        (distinct (flatten
+                                                   (for [kk (filter (fn [x] (not (cstr/includes? (str x) "-sys")))
+                                                                    (keys pp))]
+                                                     (create-clover-keys-from-data (get pp-without-fs kk) (str (cstr/replace (str kk) ":" "") "/")))))))
+         new-autocompletes (vec (into click-param-autos
+                                      (into (create-clover-keys-from-data (get pp-without-fs :param) "param/")
+                                            (create-clover-keys-from-data (get pp-without-fs :theme) "theme/"))))
+         data-keys     (vec (for [e (map last (remove empty? (filter #(and (not (number? (last %))) (= (count %) 3)) (ut/kvpaths (get db :panels)))))]
+                              (keyword (str "data/" (cstr/replace (str e) ":" "")))))
+        ;;  _ (ut/tapp>> [:click-param-autos data-keys click-param-autos new-autocompletes])
+         new-h             (hash pp-without-fs)
+         client-name       (get db :client-name)]
+     (ut/tapp>>  [:update-user-params-hash-event (count new-autocompletes) new-autocompletes (count data-keys) data-keys])
+     (reset! db/autocomplete-keywords (set (into data-keys (into new-autocompletes @db/autocomplete-keywords)))) ;; dont
+     (ut/tracked-dispatch [::wfx/push    :default ;; just a push, no response handling
+                           {:kind        :sync-client-params
+                            :params-map  pp-without-fs ;; pp ;; why send things we
+                            :client-name client-name}])
+     (reset! temp-atom pp-without-fs)
+     (assoc db :user-params-hash new-h))))
 
 ;;(re-frame/dispatch [::update-user-params-hash])
 
@@ -5106,6 +5115,7 @@
         wssk @(ut/tracked-subscribe_ [::http/websocket-status])
         websocket-status (select-keys wssk [:status :datasets :panels :waiting])
         online? (true? (= (get websocket-status :status) :connected))
+        mouse-active?  (or @(ut/tracked-sub ::bricks/is-mouse-active-alpha? {:seconds 60}) (not online?))
         hh @(ut/tracked-subscribe_ [::subs/h])
         ww @(ut/tracked-subscribe_ [::subs/w])
         selected-block @(ut/tracked-subscribe_ [::bricks/selected-block])
@@ -5116,62 +5126,78 @@
         flow-watcher-subs-grouped @(ut/tracked-subscribe_ [::bricks/flow-watcher-subs-grouped])
         server-subs @(ut/tracked-subscribe_ [::bricks/all-server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
-        mouse-active?  @(ut/tracked-sub ::bricks/is-mouse-active-alpha? {:seconds 60})
         coords (if lines? ;; wicked expensive otherwise
                  (let [;;_ (ut/tapp>> [:lines!])
-                       subq-mapping @(ut/tracked-sub ::bricks/subq-mapping-alpha {})
+                       ;;subq-mapping @(ut/tracked-sub ::bricks/subq-mapping-alpha {})
                        ;;_ (ut/tapp>> [:subq-mapping (str subq-mapping)])
-                       dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))
-                       up-from-here (vec (ut/cached-upstream-search subq-mapping selected-block))
-                       involved (vec (distinct (into dwn-from-here up-from-here)))
-                       subq-blocks @(ut/tracked-sub ::bricks/subq-panels-alpha {:panel-id selected-block})
-                       ;subq-blocks @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
-                       smap (into {} (for [b (keys subq-mapping)] 
-                                       {b (ut/cached-downstream-search subq-mapping b)}))
-                       ;;_ (ut/tapp>> [:smap smap]) 
-                       ;;_ (ut/tapp>> [:subq-mapping subq-mapping])
+                       ;;dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))
+                       ;;up-from-here (vec (ut/cached-upstream-search subq-mapping selected-block))
+                       ;;involved (vec (distinct (into dwn-from-here up-from-here))) ;; anything on the path
+                       ;;subq-blocks @(ut/tracked-sub ::bricks/subq-panels-alpha {:panel-id selected-block}) ;; direct parent? 
+                       ;;subq-blocks @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
+                       panel-relations @(ut/tracked-sub ::bricks/panel-relations {})
+                       smap (get panel-relations :b2b)
+                       involved (vec (conj (into
+                                            (get-in panel-relations [:full-relations selected-block :downstream] [])
+                                            (get-in panel-relations [:full-relations selected-block :upstream] [])) selected-block))
+                       direct-parents (get-in panel-relations [:direct-parents selected-block] [])
+                      ;;  smap (into {} (for [b (keys subq-mapping)] 
+                      ;;                  {b (ut/cached-downstream-search subq-mapping b)}))
+                      ;;  smap @(ut/tracked-sub ::bricks/panel-relations {})
+                      ;;  _ (ut/tapp>> [:smap smap :down dwn-from-here :up up-from-here :subq-blocks subq-blocks]) 
+                      ;; _ (ut/tapp>> [:subq-mapping subq-mapping])
                        lmap
-                         (vec
-                           (distinct
-                             (apply concat
-                               (for [[k downs] smap]
-                                 (remove nil?
-                                   (for [d     downs
-                                         :when (and (not (cstr/starts-with? (str d) ":reco-preview"))
-                                                    (not (cstr/starts-with? (str k) ":reco-preview")))]
-                                     (let [src-r     @(ut/tracked-subscribe [::bricks/panel-px-root k])
-                                           src-h     @(ut/tracked-subscribe [::bricks/panel-px-height k])
-                                           src-w     @(ut/tracked-subscribe [::bricks/panel-px-width k])
-                                           dd        (if (not (cstr/starts-with? (str d) ":block"))
-                                                       @(ut/tracked-subscribe [::bricks/lookup-panel-key-by-query-key d])
-                                                       d)
-                                           involved? (some #(= % dd) involved)
-                                           dest-r    @(ut/tracked-subscribe [::bricks/panel-px-root dd])
-                                           dest-h    @(ut/tracked-subscribe [::bricks/panel-px-height dd])
-                                           dest-w    @(ut/tracked-subscribe [::bricks/panel-px-width dd])
-                                           t1        @(ut/tracked-subscribe [::bricks/what-tab k])
-                                           t2        @(ut/tracked-subscribe [::bricks/what-tab dd])
-                                           x1        (+ (first src-r) src-w)
-                                           y1        (+ (last src-r) (/ src-h 2))
-                                           x2        (first dest-r)
-                                           y2        (+ (last dest-r) (/ dest-h 2))]
-                                       (when (and (not (= src-r dest-r)) (= t1 t2 selected-tab))
-                                         (vec (flatten
-                                                [(if peek? (- x1 (* src-w 0.15)) x1) y1  ;(if peek? (* y1
+                       (vec
+                        (distinct
+                         (apply concat
+                                (for [[k downs] smap]
+                                  (remove nil?
+                                          (for [d     downs
+                                                :when (and (not (cstr/starts-with? (str d) ":reco-preview"))
+                                                           (not (cstr/starts-with? (str k) ":reco-preview")))]
+                                            (let [src-r     @(ut/tracked-subscribe [::bricks/panel-px-root k])
+                                                  src-h     @(ut/tracked-subscribe [::bricks/panel-px-height k])
+                                                  src-w     @(ut/tracked-subscribe [::bricks/panel-px-width k])
+                                                  dd        (if (not (cstr/starts-with? (str d) ":block"))
+                                                              @(ut/tracked-subscribe [::bricks/lookup-panel-key-by-query-key d])
+                                                              d)
+                                                  involved? (some #(= % dd) involved)
+                                                  dest-r    @(ut/tracked-subscribe [::bricks/panel-px-root dd])
+                                                  dest-h    @(ut/tracked-subscribe [::bricks/panel-px-height dd])
+                                                  dest-w    @(ut/tracked-subscribe [::bricks/panel-px-width dd])
+                                                  t1        @(ut/tracked-subscribe [::bricks/what-tab k])
+                                                  t2        @(ut/tracked-subscribe [::bricks/what-tab dd])
+                                                  x1        (+ (first src-r) src-w)
+                                                  y1        (+ (last src-r) (/ src-h 2))
+                                                  x2        (first dest-r)
+                                                  y2        (+ (last dest-r) (/ dest-h 2))]
+                                              (when (and (not (= src-r dest-r)) (= t1 t2 selected-tab))
+                                                (vec (flatten
+                                                      [(if peek? (- x1 (* src-w 0.15)) x1) y1  ;(if peek? (* y1
                                                                                          ;0.7) y1)
-                                                 (if peek? (+ x2 (* dest-w 0.15)) x2) y2 ;(if peek? (* y2
+                                                       (if peek? (+ x2 (* dest-w 0.15)) x2) y2 ;(if peek? (* y2
                                                                                          ;0.7) y2)
-                                                 involved?
-                                                 (cond (= dd selected-block) 
+                                                       involved?
+                                                       (cond (= dd selected-block) ;; am I me?
                                                        ;;"#9973e0"
-                                                       (theme-pull :theme/universal-pop-color "#9973e0")
-                                                       (some #(= % dd) subq-blocks) "#e6ed21" ;; parent-of-selected
-                                                       (some #(= % dd) (ut/cached-upstream-search subq-mapping selected-block))
-                                                         "#7be073" ;; upstream?
-                                                       (some #(= % dd) (ut/cached-downstream-search subq-mapping selected-block))
-                                                         "#05dfff" ;; downstream?
-                                                       :else "orange") 
-                                                 k d nil]))))))))))]
+                                                             (theme-pull :theme/universal-pop-color "#9973e0")
+
+                                                            ;; (some #(= % dd) subq-blocks) "#e6ed21" ;; direct parent-of-selected
+
+                                                            ;;  (some #(= % dd) (ut/cached-upstream-search subq-mapping selected-block))
+                                                            ;;  "#7be073" ;; upstream?
+                                                            ;;  (some #(= % dd) (ut/cached-downstream-search subq-mapping selected-block))
+                                                            ;;  "#05dfff" ;; downstream?
+
+                                                             (some #(= % dd) direct-parents) "#e6ed21" ;; direct parent-of-selected
+
+                                                             (some #(= % dd) (get-in panel-relations [:full-relations selected-block :upstream] []))
+                                                             "#7be073" ;; upstream?
+                                                             (some #(= % dd) (get-in panel-relations [:full-relations selected-block :downstream] []))
+                                                             "#05dfff" ;; downstream?
+
+                                                             :else "orange")
+                                                       k d nil]))))))))))]
                    ;;(ut/tapp>> [:lines!   lmap])
                    lmap)
                  [])]

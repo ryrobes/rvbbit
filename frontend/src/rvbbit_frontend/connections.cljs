@@ -366,7 +366,8 @@
                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
                                      unresolved-req-hash       (hash (if false ;override?
                                                                        fkp ;this 
-                                                                       [solver-name fkp client-name]))
+                                                                       ;[solver-name fkp client-name]
+                                                                       [solver-name fkp]))
                                      rtype                     (get (first this) :type :unknown)
                                      clover-kps                (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten (conj [(first this)] input-map))))
                                      resolved-input-map        (logic-and-params input-map panel-key)
