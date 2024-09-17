@@ -933,11 +933,12 @@
 
 ;;(defn deep-flatten [x] (if (coll? x) (mapcat deep-flatten x) [x]))
 
-;; (defn deep-flatten [x] (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x}))
+(defn deep-flatten [x] 
+  (vec (filter keyword? (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x}))))
 
 (def df-cache (atom {}))
 
-(defn deep-flatten [x]
+(defn deep-flatten-cached [x]
   (if-let [cached-result (@df-cache (pr-str x))]
     cached-result
     (let [result (vec (filter keyword? (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x})))]
@@ -1103,16 +1104,36 @@
   (let [factor (Math/pow 10 places)]
     (/ (Math/round (* n factor)) factor)))
 
-(defn calculate-atom-size-special
-  [name a]
+;; (defn calculate-atom-size-special
+;;   [name a]
+;;   (try
+;;     (let [size-bytes (-> @a
+;;                          pr-str
+;;                          .length)
+;;           size-mb (/ size-bytes 1048576.0)
+;;           ;rounded-size (round-to-decimal-places size-mb 4)
+;;           ]
+;;       size-mb)
+;;     (catch Exception _
+;;       -1)))
+
+(defn calculate-atom-size-special [name a]
   (try
-    (let [size-bytes (-> @a
-                         pr-str
-                         .length)
-          size-mb (/ size-bytes 1048576.0)
-          ;rounded-size (round-to-decimal-places size-mb 4)
-          ]
-      size-mb)
+    (let [deref-atom @a
+          size-bytes (atom 0)
+          add-size! (fn [s] (swap! size-bytes + (.length (pr-str s))))
+          process-value (fn [v]
+                          (if (instance? clojure.lang.IDeref v)
+                            (add-size! @v)
+                            (add-size! v)))]
+     ;; try to get first layer of atoms derefed is exist
+      (if (map? deref-atom)
+        (doseq [[k v] deref-atom]
+          (add-size! k)
+          (process-value v))
+        (add-size! deref-atom))
+
+      (/ @size-bytes 1048576.0))  ; Convert to MB
     (catch Exception _
       -1)))
 

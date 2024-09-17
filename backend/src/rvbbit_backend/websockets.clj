@@ -3471,6 +3471,8 @@
        ;; ^^ is it running from another client?
        ))
 
+;; (reset! solvers-cache-atom {})
+
 (defn run-solver
   [solver-name client-name & [override-map override-input temp-solver-name ui-keypath]]
   (let [temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
@@ -6705,9 +6707,7 @@
                            (into (get-namespace-atoms 'rvbbit-backend.websockets)
                                  (get-namespace-atoms 'rvbbit-backend.db)))))
 
-;;(ut/pp monitored-atoms)
 
-;; (reset! atom-metrics {})
 
 (defn get-sys-atom-sizes []
   (let [;monitored-atoms (vec (into (get-namespace-atoms 'rvbbit-backend.websockets)
@@ -6722,6 +6722,35 @@
                (fnil conj [])
                {:size-mb (ut/calculate-atom-size-special nn rr)})
         (catch Exception e (ut/pp [:error-in-get-sys-atom-sizes-loop nn e]))))))
+
+;;(ut/pp monitored-atoms)
+
+;; (reset! atom-metrics {})
+
+;; (mapv first (take 10 (sort-by second > (for [[k v] (deref atom-metrics)] [k (get (last v) :size-mb)]))))
+
+;; (ns rvbbit-backend.websockets)
+;; rvbbit block slice  
+;; (let [top (mapv first
+;;                 (take
+;;                  10
+;;                  (sort-by
+;;                   second
+;;                   >
+;;                   (for [[k v] (deref
+;;                                atom-metrics)]
+;;                     [k
+;;                      (get (last v) :size-mb)]))))]
+;;   (fig-render "< rvbbit sys atoms sizes >")
+;;   (println
+;;    "(only if enabled in config.edn, very expensive - only for debugging)")
+;;   (draw-client-stats top
+;;                      [30]
+;;                      nil
+;;                      true
+;;                      (+ 30 :col-width)
+;;                      {:metrics-atom
+;;                       atom-metrics}))
 
 ;; (draw-client-stats nil [30] nil true 200 {:metrics-atom atom-metrics})
 ;; (draw-client-stats "db" [30] nil false 200 {:metrics-atom atom-metrics})
@@ -7378,15 +7407,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
 (defn execute-websocket-task [f]
   (.execute @ppy/websocket-thread-pool-atom f))
 
@@ -7489,17 +7509,23 @@
 (def common-interceptors [(body-params/body-params) http/html-body])
 
 (def routes
-  #{["/" :get (conj common-interceptors `static-root)] 
+  #{["/" :get (conj common-interceptors `static-root)]
     ["/save" :post (conj common-interceptors `save)]
     ["/assets/*" :get (conj common-interceptors `serve-user-asset)]
-    ["/save-flow" :post (conj common-interceptors `save-flow)] 
+    ["/save-flow" :post (conj common-interceptors `save-flow)]
     ["/save-snap" :post (conj common-interceptors `save-snap)]
     ["/save-screen-snap" :post (conj common-interceptors `save-screen-snap)]
-    ["/save-csv" :post (conj common-interceptors `save-csv)] 
+    ["/save-csv" :post (conj common-interceptors `save-csv)]
     ["/load" :get (conj common-interceptors `load-screen)]
-    ["/audio" :post (conj common-interceptors `get-audio)] 
+    ["/audio" :post (conj common-interceptors `get-audio)]
     ["/load-flow" :get (conj common-interceptors `load-flow)]
-    ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]})
+    ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]
+    ["/reactor/:type-keyword/:keypath-keyword" :get `db/get-reactor-value :route-name :get-reactor-value]
+    ["/reactor/:type-keyword/:keypath-keyword" :put `db/put-reactor-value :route-name :put-reactor-value]
+    ["/reactor-hook/:type-keyword/:keypath-keyword" :post `db/manage-hook :route-name :manage-reactor-hook]
+    })
+
+
 
 (def web-server-port 8888)
 

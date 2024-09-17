@@ -9,6 +9,12 @@
 
 ![alt text](docs/rvbbit-dev-mosiac.jpg)	
 
+# but first, a brief interlude...
+
+<a href="https://www.youtube.com/watch?v=Rpt5yitiz1c" target="_blank">
+  <img src="docs/video-orev.jpg" alt="RVBBIT Dynamic Datascapes">
+</a>
+
 ## "If you want to build a ship, don't drum up people to collect wood and don't assign them tasks and work, but rather teach them to long for the endless immensity of the sea." — Antoine de Saint-Exupéry
 
 As a long-time dashboard builder, data engineer, and UI hacker - I've always wanted something in-between Tableau & building bespoke web data products to ship answers to my users. The tools were too rigid at times, and building everything from scratch can be tiresome. The eternal push/pull of DE and SWE approaches, as many who work in BI can attest to. How could I have the flexibility & re-usability of code, but the compositional freedom & direct manipulation of a builder tool? 
@@ -89,6 +95,10 @@ While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, kn
 	+ A unified SQL cache layer allows joining of arbitrary queries, no matter what database they come from (or if they came from a Clojure REPL value, any other place)
 
 <br/>
+
+# "A Game Engine for Data"
+
+<br/>
 <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
   <div style="width: 48%; text-align: center;">
     <a href="https://www.youtube.com/watch?v=IhqEOnrv38E" target="_blank">
@@ -104,7 +114,9 @@ While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, kn
   </div>
 </div>	
 
-## A 'Data Desktop'
+
+
+## The Data Desktop
 
 ### The Canvas
 - Minimize cards, pin them to all tabs, turn then into docked customizable icons.

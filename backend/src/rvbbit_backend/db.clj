@@ -3,8 +3,11 @@
    [rvbbit-backend.util       :as ut :refer [ne?]]
    [clojure.string            :as cstr]
    [clojure.edn               :as edn]
+   [clojure.data.json         :as json]
    [clojure.set               :as cset]
    [clojure.walk              :as walk]
+   [clj-http.client           :as http]
+   [io.pedestal.http          :as phttp]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.freezepop :as fpop]
    ;[rvbbit-backend.queue-party  :as qp]
@@ -41,6 +44,7 @@
 (defonce last-solvers-history-counts-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-history-counts-atom.msgpack.transit"))
 (defonce last-signals-atom (fpop/thaw-atom {} "./data/atoms/last-signals-atom.msgpack.transit"))
 (defonce repl-introspection-atom (fpop/thaw-atom {} "./data/atoms/repl-introspection-atom.msgpack.transit"))
+(defonce incoming-atom (fpop/thaw-atom {} "./data/atoms/incoming-atom.msgpack.transit"))
 (defonce splitter-stats (volatile! {}))
 (defonce atoms-and-watchers (atom {}))
 (defonce watcher-log (atom {}))
@@ -55,6 +59,7 @@
 
 (def master-atom-map
   [[:master-time-watcher  father-time  :time]
+   [:master-incoming-watcher  incoming-atom  :incoming]
    [:master-settings-watcher  settings-atom  :settings]
    [:master-screen-watcher  screens-atom  :screen]
    [:master-params-watcher  params-atom  :client]
@@ -76,12 +81,16 @@
    [:master-server-watcher server-atom :server]
    [:master-tracker-watcher flow-db/tracker :tracker]])
 
+(defn get-master-atom [name-keyword]
+  (second (first (filter #(= (last %) name-keyword) master-atom-map))))
+
 ;; (ut/pp (get @last-solvers-atom :fortunate-cubic-donkey-22))
 
 (def sharded-atoms
   (atom {:time (atom {})
          :settings (atom {})
          :screen (atom {})
+         :incoming (atom {})
          :assistant (atom {})
          :client (atom {})
          :panel (atom {})
@@ -100,6 +109,8 @@
          :signal-history (atom {})
          :server (atom {})
          :tracker (atom {})}))
+
+(def type-keys (keys @sharded-atoms))
 
 ;; (ut/pp @kit-atom)
 
@@ -325,6 +336,7 @@
           (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :kit)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :incoming)                     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :repl-ns)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver-status)                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :flow-status)                  keypath ;;(vec (rest sub-path)) ;;keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -339,6 +351,8 @@
 
 (defn get-atom-from-keys [base-type sub-type sub-path keypath]
     (get-atom-splitter-deep-kp base-type keypath (base-type master-reactor-atoms)))
+
+(declare trigger-hooks)
 
 (defn make-watcher
   [keypath flow-key client-name handler-fn & [no-save]]
@@ -372,6 +386,9 @@
                                                                 (System/currentTimeMillis))
                                                       (assoc-in [client-name flow-key :last-push]
                                                                 (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
+                                         
+                                         (ppy/execute-in-thread-pools :trigger-hooks (fn [] (trigger-hooks flow-key new-value))) 
+                                         ;; push to any subbed REST endpoints
 
                                          (swap! client-click-params assoc-in [client-name flow-key] new-value) ;; for diffing later
 
@@ -411,6 +428,7 @@
         screen?         (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?           (= base-type :time)
         signal?         (= base-type :signal)
+        incoming?       (= base-type :incoming)
         settings?       (= base-type :settings)
         solver?         (= base-type :solver)
         kit?            (= base-type :kit)
@@ -434,6 +452,7 @@
                           solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) 
                           kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          incoming?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -488,6 +507,7 @@
           signal? (= base-type :signal)
           settings? (= base-type :settings)
           solver? (= base-type :solver)
+          incoming? (= base-type :incoming)
           kit? (= base-type :kit)
           flow-status? (= base-type :flow-status)
           kit-status? (= base-type :kit-status)
@@ -508,6 +528,7 @@
                     solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    incoming?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -597,6 +618,9 @@
       (= base-type :solver)                       (get-in @last-solvers-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
+      (= base-type :incoming)                     (get-in @incoming-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :kit)                          (get-in @kit-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -648,6 +672,9 @@
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
+      (= base-type :incoming)                     (get-in @incoming-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -681,3 +708,173 @@
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
       :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv)))
+
+
+
+;; Reactor REST hooks, get, set.
+
+(defn send-edn-success [content] 
+  (assoc (phttp/edn-response content) :headers {"Content-Type" "application/edn"}))  ;"text/plain"
+
+(defn get-value [namespaced-key client-name]
+  (let [vv (clover-lookup client-name namespaced-key)]
+    (ut/pp [:reactor-REST-get-value! namespaced-key :from client-name :value vv])
+    vv))
+
+(defn set-value! [namespaced-key value client-name]
+  (try 
+    (let [nms (parse-coded-keypath namespaced-key)
+        ttype (first nms)
+        matom (get-master-atom ttype)
+        _ (ut/pp [:reactor-REST-put-value! nms namespaced-key value])
+        _ (swap! matom assoc-in (vec (rest nms)) value)]
+      :done!)
+    (catch Exception e
+      (ut/pp [:reactor-REST-put-value-error! namespaced-key value e])
+      {:error (str "Error setting value: " (.getMessage e))})))
+  
+
+(def allowed-type-keywords (set (for [k type-keys] (name k))))
+
+(defn parse-keyword [s]
+  (if (cstr/starts-with? s ":")
+    (keyword (subs s 1))
+    (keyword s)))
+
+(defn construct-namespaced-keyword [type keypath]
+  (keyword (name type) (name keypath)))
+
+(defn parse-body [content-type body]
+  (case content-type
+    "application/edn"  (edn/read-string body)
+    "application/json" (json/read-str body :key-fn keyword)
+    body))
+
+(defn get-reactor-value [request]
+  (let [type-str   (get-in request [:path-params :type-keyword])
+        keypath-str (get-in request [:path-params :keypath-keyword])
+        caller-ip    (or (get-in request [:headers "x-forwarded-for"])
+                         (:remote-addr request))
+        client-name   (if (nil? caller-ip) :rvbbit-rest (keyword (str "rvbbit-rest-"caller-ip)))]
+    (if (or (cstr/blank? type-str) (cstr/blank? keypath-str))
+      (send-edn-success {:error "Both type and keypath must be provided"})
+      (let [type-keyword    (parse-keyword type-str)
+            keypath-keyword (parse-keyword keypath-str)
+            namespaced-key  (construct-namespaced-keyword type-keyword keypath-keyword)
+            value (get-value namespaced-key client-name)]
+        ;; We don't validate type-keyword for GET requests. it'd just return nil
+        (ut/ppln [:get-reactor-value namespaced-key :from client-name])
+        (send-edn-success {:value value})))))
+
+(defn put-reactor-value [request]
+  (let [type-str    (get-in request [:path-params :type-keyword])
+        keypath-str (get-in request [:path-params :keypath-keyword])
+        caller-ip    (or (get-in request [:headers "x-forwarded-for"])
+                         (:remote-addr request))
+        client-name   (if (nil? caller-ip) :rvbbit-rest (keyword (str "rvbbit-rest-" caller-ip)))]
+    (if (or (cstr/blank? type-str) (cstr/blank? keypath-str))
+      (send-edn-success {:error "Both type and keypath must be provided"})
+      (let [type-keyword (parse-keyword type-str)]
+        ;; Validate the type keyword against the allowed set
+        ;; This is crucial as it determines the data source
+        (if-not (contains? allowed-type-keywords (name type-keyword))
+          (send-edn-success {:error (str "Invalid data source: " type-keyword)})
+          (let [keypath-keyword (parse-keyword keypath-str)
+                namespaced-key  (construct-namespaced-keyword type-keyword keypath-keyword)
+                content-type    (get-in request [:headers "content-type"])
+                body            (slurp (:body request))
+                value           (try
+                                  (parse-body content-type body)
+                                  (catch Exception e
+                                    (send-edn-success {:error (str "Error parsing request body: " (.getMessage e))})))
+                _ (set-value! namespaced-key value client-name)]
+            (ut/ppln [:put-reactor-value namespaced-key value])
+            (send-edn-success {:status "success"})))))))
+
+
+  ;; Example: Get a value or set a value, causing any reactions assoc'd with the value to fire, just like a normal param change.
+  ;; curl -X GET "http://localhost:8888/reactor/time/minute"
+  ;; curl -X PUT "http://localhost:8888/reactor/client/surprising-wide-turkey-1>stats>last-seen" -d 'Nice!'
+  ;; curl -X PUT "http://localhost:8888/reactor/:client/:surprising-wide-turkey-1" -H "Content-Type: application/json" -d '{"stats": {"last-seen": "Nice!!"}}'
+  ;; curl -X PUT "http://localhost:8888/reactor/:client/surprising-wide-turkey-1" -H "Content-Type: application/edn" -d '{:stats {:last-seen "Nice!!!!"}}'
+
+  
+;;; hooks
+;; (def subscriptions (atom {}))
+;; ;;  (fpop/thaw-atom {} "./defs/rest-subscriptions.edn")
+
+;; (defn subscribe-hook [type-keyword keypath-keyword callback-url]
+;;   (let [kkey (keyword (cstr/replace (str type-keyword "/" keypath-keyword) ":" ""))]
+;;     (swap! subscriptions update kkey (fnil conj #{}) callback-url)
+;;     (ut/ppln [:subscribed kkey callback-url])))
+
+;; (defn unsubscribe-hook [type-keyword keypath-keyword callback-url]
+;;   (let [kkey (keyword (cstr/replace (str type-keyword "/" keypath-keyword) ":" ""))]
+;;     (swap! subscriptions update kkey disj callback-url)
+;;     (ut/ppln [:unsubscribed kkey callback-url])))
+
+(def subscriptions (fpop/thaw-atom {} "./defs/rest-subscriptions.edn"))
+
+(defn trigger-hooks [key new-value]
+  (when-let [callbacks (get @subscriptions key)]
+    (doseq [callback-url callbacks]
+      (future
+        (try
+          (http/post callback-url
+                     {:body (json/write-str {:reactor-key key
+                                             :value new-value})
+                      :content-type :json})
+          (ut/ppln [:hook-triggered callback-url])
+          (catch Exception e
+            (ut/ppln [:hook-error callback-url (.getMessage e)])))))))
+
+(defn subscribe-hook [type-keyword keypath-keyword callback-url client-name]
+  (let [kkey (keyword (cstr/replace (str type-keyword "/" keypath-keyword) ":" ""))]
+    (swap! subscriptions update kkey
+           (fn [urls]
+             (vec (distinct (conj (or urls []) callback-url)))))
+    (trigger-hooks kkey (get-value kkey client-name)) ;; kick it for initial value
+    (ut/ppln [:REST-subscribed kkey callback-url :from client-name])))
+
+(defn unsubscribe-hook [type-keyword keypath-keyword callback-url client-name]
+  (let [kkey (keyword (cstr/replace (str type-keyword "/" keypath-keyword) ":" ""))]
+    (swap! subscriptions update kkey
+           (fn [urls]
+             (vec (remove #(= % callback-url) (or urls [])))))
+    (ut/ppln [:REST-unsubscribed kkey callback-url :from client-name])))
+
+(defn manage-hook [request]
+  (let [type-str    (get-in request [:path-params :type-keyword])
+        keypath-str (get-in request [:path-params :keypath-keyword])
+        body        (parse-body (get-in request [:headers "content-type"])
+                                (slurp (:body request)))
+        caller-ip    (or (get-in request [:headers "x-forwarded-for"])
+                         (:remote-addr request))
+        client-name   (if (nil? caller-ip) :rvbbit-rest (keyword (str "rvbbit-rest-" caller-ip)))
+        callback-url (:callback-url body)
+        unsubscribe  (:unsubscribe body)]
+    (if (or (cstr/blank? type-str) (cstr/blank? keypath-str) (cstr/blank? callback-url))
+      (send-edn-success {:error "Type, keypath, and callback URL must be provided"})
+      (let [type-keyword    (parse-keyword type-str)
+            keypath-keyword (parse-keyword keypath-str)]
+        (if unsubscribe
+          (do (unsubscribe-hook type-keyword keypath-keyword callback-url client-name)
+              (send-edn-success {:status "unsubscribed"}))
+          (do (subscribe-hook type-keyword keypath-keyword callback-url client-name)
+              (send-edn-success {:status "subscribed"})))))))
+
+;; (ut/pp [:hooks @subscriptions]) ;; persist? 
+;; (ut/pp [:hooks @atoms-and-watchers])
+
+  ;; Example: Subscribe to changes
+  ;; curl -X POST "http://localhost:8888/reactor-hook/time/second"  -H "Content-Type: application/json" -d '{"callback-url": "http://localhost:8500"}'
+  ;; curl -X POST "http://localhost:8888/reactor-hook/time/second"  -H "Content-Type: application/json" -d '{"callback-url": "http://localhost:8500", "unsubscribe": true}'
+
+  ;; curl -X POST "http://localhost:8888/reactor-hook/:client/surprising-wide-turkey-1>stats>last-seen"  -H "Content-Type: application/json" -d '{"callback-url": "http://localhost:8500"}'
+  ;; curl -X POST "http://localhost:8888/reactor-hook/:client/surprising-wide-turkey-1>stats>last-seen"  -H "Content-Type: application/json" -d '{"callback-url": "http://localhost:8500", "unsubscribe": true}'
+
+;;  :client/surprising-wide-turkey-1>stats>last-seen
+    
+
+
+

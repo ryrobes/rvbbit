@@ -11040,14 +11040,14 @@
         console-style (merge
                        {:font-family "Fixedsys-Excelsior, monospace" ;;(theme-pull :theme/monospaced-font nil)
                         :font-size "15px"
-                        :line-height "0.95"
+                        ;:line-height "0.9"
                         :padding "15px"
                         ;:color "inherit"
                           ;:color (theme-pull :theme/editor-font-color nil)
                         :white-space "pre"
                         :text-shadow "#00000088 1px 0 10px"} style)
         text-boxes (vec (for [t decoded-lines]
-                          [width (or px-line-height 20)
+                          [width (or px-line-height 15)
                            [:div {:style console-style
                                   :dangerouslySetInnerHTML
                                   {:__html t}}]]))

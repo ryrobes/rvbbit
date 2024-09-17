@@ -934,7 +934,7 @@
                          (swap! db/cpu-usage conj (ut/get-jvm-cpu-usage)))
                     "Stats Keeper");;)
 
-   (start-scheduler (* 3600 8) ;; 8 hours
+   (start-scheduler (* 3600 1) ;; 1 hours
                     #(do
                        (ut/pp [:CLEARING-OUT-DEEP-FLATTEN-CACHE]) ;; (ut/pp (ut/calculate-atom-size :current-size wss/solvers-cache-atom)) ;; super expensive on big atoms 
                       ;(ut/pp (sql-exec system-db "delete from client_memory where 1=1;"))
@@ -942,9 +942,10 @@
                        (reset! wss/solvers-cache-hits-atom {})
                        (reset! wss/solvers-cache-atom {})
                        (reset! sql/sql-query-log [])
-                      ;;(reset! sql/errors {}) ;; just for now
+                       (reset! sql/errors {}) ;; just for now
                        (reset! wss/agg-cache {}) ;; <--- bigggger
-                       (reset! ut/df-cache {}))  ;; <--- big boy
+                       ;(reset! ut/df-cache {})
+                       )
                     "Purge Solver & Deep-Flatten Cache" (* 3600 8))
 
   ;; (ut/calculate-atom-size :current-size ut/df-cache)
