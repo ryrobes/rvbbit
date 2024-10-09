@@ -20,6 +20,7 @@
    [talltale.core     :as tales]
    [rvbbit-frontend.db :as db]
    [talltale.core     :as tales]
+   [goog.date :as gdate]
    [zprint.core       :as zp]
    [goog.string       :as gstring]
    [websocket-fx.core :as wfx]
@@ -29,7 +30,7 @@
    [goog.i18n.NumberFormat Format]
    [goog.events            EventType]))
 
-     
+(defonce allowed-set #{:_id :_valid_from :_valid_to}) ;; allowed underscore keys - mostly for temporal SQL fields like in XTDB
 
 (defn apply-assoc-ins [target-map kv-map] (reduce (fn [acc [k v]] (assoc-in acc k v)) target-map kv-map))
 
@@ -69,6 +70,9 @@
 (defn tapp>>
   [data] ;; doubletap!
   ;;(re-frame/dispatch [::write-tap-to-db data]) 
+  (js/console.info (clj->js (stringify-keywords data))))
+
+(defn pp [data] ;; to stay consistent with the CLJ side
   (js/console.info (clj->js (stringify-keywords data))))
 
 ;; (tapp>> [:yo-fucko 123])
@@ -226,6 +230,16 @@
 ;;     (into #{} (filter keyword? (mapcat deep-flatten-real x)))
 ;;     (if (keyword? x) #{x} #{})))
 
+(declare extract-patterns postwalk-replacer)
+
+(defn or!-to-cloverkey [obody] ;; since or! somewhat shadows the idea that a cloverkey is in there...
+  (let [kps       (extract-patterns obody :or! 3)
+        logic-kps (into {} (for [v kps]
+                             (let [[_ pkey _] v
+                                   [panel-key pkey] (if (vector? pkey) pkey [:*this-block* pkey])]
+                               {v [:or! (keyword (cstr/replace (str panel-key "/" pkey) ":" ""))]})))]
+    (postwalk-replacer logic-kps obody)))
+
 (defn deep-flatten-real
   "Efficiently extracts all keywords from a nested collection."
   [x]
@@ -236,6 +250,18 @@
                 (coll? item) (run! collect! item)))]
       (collect! x)
       (persistent! result))))
+
+;; (defn deep-flatten-real
+;;   "Efficiently extracts all keywords from a nested collection, processing or! patterns first."
+;;   [x]
+;;   (let [processed-x (or!-to-cloverkey x)
+;;         result (transient #{})]
+;;     (letfn [(collect! [item]
+;;               (cond
+;;                 (keyword? item) (conj! result item)
+;;                 (coll? item) (run! collect! item)))]
+;;       (collect! processed-x)
+;;       (persistent! result))))
 
 (defn deep-flatten*
   [x]
@@ -552,6 +578,31 @@
       [])))
 
 
+(defn mouse-active-recently?
+  [seconds]
+  (let [now           (js/Date.)
+        last-activity @db/last-mouse-activity
+        difference    (- now last-activity)
+        threshold     (* seconds 1000)] ;; Convert seconds to milliseconds
+    (< difference threshold)))
+
+(re-frame/reg-sub
+ ::is-mouse-active-alpha?
+ (fn [_ {:keys [seconds]}]
+   (let [;fs           (vec (for [kk   (get db :flow-subs)
+         ;                        :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
+         ;                    [(keyword f1) (keyword f2)]))
+         ;session-hash (hash [(ut/remove-underscored (get db :panels))
+         ;                    (ut/remove-keys (get db :click-param)
+         ;                                    (into (map first fs)
+         ;                                          [:flow :time :server :flows-sys :client :solver :repl-ns
+         ;                                           :signal-history :data :solver-meta nil]))])]
+         ]
+    ;;  (and (not= session-hash (get db :session-hash)) 
+    ;;       (not (true? (mouse-active-recently? seconds))))
+     (true? (mouse-active-recently? seconds)))))
+
+
 
 (defonce safe-name-cache (atom {}))
 
@@ -726,8 +777,20 @@
 
 
 
-
-
+(defn format-timestamp [timestamp]
+  (let [date (js/Date. (js/parseInt timestamp))  ; No need to multiply by 1000
+        month (inc (.getMonth date))
+        day (.getDate date)
+        year (.getFullYear date)  ; Use getFullYear instead of getYear
+        hours (.getHours date)
+        minutes (.getMinutes date)
+        ampm (if (>= hours 12) "PM" "AM")
+        hours (mod (if (zero? hours) 12 hours) 12)
+        fins (gstring/format "%02d/%02d/%02d %02d:%02d%s"
+                             month day (mod year 100) hours minutes ampm)]
+    (-> fins
+        (cstr/replace " 00:" " 12:")
+        (cstr/replace " 0" " "))))
 
 (defn drop-last-char [s] (subs s 0 (dec (count s))))
 
@@ -930,6 +993,10 @@
     (dotimes [i len] (aset bytes i (.charCodeAt binary-string i)))
     bytes))
 
+(defn pad-zero [n]
+  (if (< n 10)
+    (str "0" n)
+    (str n)))
 
 (defn ne? [x] (if (seqable? x) (boolean (seq x)) true))
 
@@ -1148,7 +1215,9 @@
   [m] ;; used for temp keys and UI keys in queries and such
   (into {}
         (for [[k v] m
-              :when (not (and (keyword? k) (cstr/starts-with? (name k) "_")))]
+              :when (not (and (keyword? k) 
+                              (not (contains? allowed-set k))
+                              (cstr/starts-with? (name k) "_")))]
           (if (map? v) [k (remove-underscored v)] [k v]))))
 
 
@@ -1159,7 +1228,9 @@
         (for [[k v] m
               :when (not (and (keyword? k)
                               (or (= k :h) (= k :root) (= k :w)
-                                  (cstr/starts-with? (name k) "_"))))]
+                                  (and 
+                                   (not (contains? allowed-set k))
+                                   (cstr/starts-with? (name k) "_")))))]
           [k (if (map? v) (remove-underscored-plus-dims v) v)])))
 
 
@@ -1390,6 +1461,25 @@
           (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
           :else          data)))
 
+;; (defn deep-remove-underscore-keys
+;;   [data]
+;;   (cond
+;;     (map? data)
+;;     (persistent!
+;;      (reduce-kv
+;;       (fn [acc k v]
+;;         (if (and (keyword? k) (cstr/starts-with? (name k) "_"))
+;;           acc
+;;           (assoc! acc k (deep-remove-underscore-keys v))))
+;;       (transient {})
+;;       data))
+
+;;     (vector? data)
+;;     (mapv deep-remove-underscore-keys data)
+
+;;     :else
+;;     data))
+
 (defn deep-remove-underscore-keys
   [data]
   (cond
@@ -1397,17 +1487,47 @@
     (persistent!
      (reduce-kv
       (fn [acc k v]
-        (if (and (keyword? k) (cstr/starts-with? (name k) "_"))
+        (if (and (keyword? k)
+                 (cstr/starts-with? (name k) "_")
+                 (not (contains? allowed-set k)))
           acc
           (assoc! acc k (deep-remove-underscore-keys v))))
       (transient {})
       data))
-
+  
     (vector? data)
-    (mapv deep-remove-underscore-keys data)
-
+    (mapv #(deep-remove-underscore-keys %) data)
+  
     :else
     data))
+
+(re-frame/reg-event-fx
+ :rvbbit-frontend.utility/promise-chain
+ (fn [_ [_ promise]]
+   {:fx [[:dispatch [:rvbbit-frontend.utility/handle-promise-result (promise)]]]}))
+
+(re-frame/reg-event-fx
+ :rvbbit-frontend.utility/handle-promise-result
+ (fn [_ [_ result]]
+   (when result
+     {:dispatch [:rvbbit-frontend.utility/render-result result]})))
+
+(re-frame/reg-event-fx
+ :rvbbit-frontend.utility/render-component
+ (fn [_ [_ component]]
+   {:fx [[:render component]]}))
+
+(declare tapp>>)
+
+(defn parse-json-string [s]
+  (try
+    (-> s
+        js/JSON.parse
+        (js->clj :keywordize-keys true)
+        walk/keywordize-keys)
+    (catch :default e
+      (tapp>> ["Error parsing JSON:" e])
+      s)))
 
 ;; (defn deep-remove-keys
 ;;   "Recursively removes specified keys and keys starting with '_' from nested data structures."
@@ -1447,6 +1567,17 @@
                                :refresh-every :page :connection-id :deep-meta? :_last-run
                                :clicked-row-height :style-rules])]
     res))
+
+(defn proper-case
+  "Converts a string to proper case (capitalizes the first letter of each word)."
+  [s]
+  (if (string? s)
+    (->> (cstr/split (cstr/lower-case s) #"\b")
+         (map #(if (re-find #"\w" %)
+                 (str (cstr/upper-case (first %)) (subs % 1))
+                 %))
+         (cstr/join))
+    s))
 
 (defn update-nested-tabs
   [m old new]
@@ -1976,6 +2107,25 @@
                m)))
 
 
+(defn str->goog-date [date-str]
+  (try 
+    (when (and date-str (string? date-str))
+    (let [[year month day] (cstr/split date-str #"-")
+          year (js/parseInt year)
+          month (js/parseInt month) 
+          day (js/parseInt day)]
+      (when (and year month day)
+        (gdate/Date. year (dec month) day))))
+    (catch :default _ (str->goog-date "2024-01-01"))))
+
+
+(defn goog-date->str [goog-date]
+  (try 
+    (str (.getYear goog-date) "-"
+       (pad-zero (inc (.getMonth goog-date))) "-"
+       (pad-zero (.getDate goog-date)))
+    (catch :default _ "2024-01-01")))
+
 
 
 
@@ -1990,7 +2140,7 @@
       :else item)))
 
 (defn namespaced-swapper
-  [source-ns target-ns data] ;; back here for ->> usage in honeycomb
+  [source-ns target-ns data] ;; back here for ->> usage in clover
   (walk/postwalk (partial replace-namespaced-keyv source-ns target-ns) data))
 
 (defn keywordify ;; same as server

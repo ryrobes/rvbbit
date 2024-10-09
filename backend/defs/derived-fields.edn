@@ -1,28 +1,29 @@
-{:by-year           {:when [:and
-                            [:not :is-sqlite?]
-                            [:or :is-date? :looks-like-date? :looks-like-datetime?]]
-                     ;:data-type "integer" ;; optional ? or maybe we do a quick test to "taste" the field before we make the vector
-                     :calc  [:year :field]} ;; DERIVED fields def...
+{
+;;  :by-year           {:when [:and
+;;                             [:not :is-sqlite?]
+;;                             [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+;;                      ;:data-type "integer" ;; optional ? or maybe we do a quick test to "taste" the field before we make the vector
+;;                      :calc  [:year :field]} ;; DERIVED fields def...
 
- :by-month           {:when [:and
-                             [:not :is-sqlite?]
-                             [:or :is-date? :looks-like-date? :looks-like-datetime?]]
-                      :calc  [:month :field]}
+;;  :by-month           {:when [:and
+;;                              [:not :is-sqlite?]
+;;                              [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+;;                       :calc  [:month :field]}
 
- :by-year-sqlite           {:when [:and
-                                   :is-sqlite?
-                                   [:or :is-date? :looks-like-date? :looks-like-datetime?]]
-                            :calc  [:substr :field 0 5]}
+;;  :by-year-sqlite           {:when [:and
+;;                                    :is-sqlite?
+;;                                    [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+;;                             :calc  [:substr :field 0 5]}
 
- :by-month-sqlite           {:when [:and
-                                    :is-sqlite?
-                                    [:or :is-date? :looks-like-date? :looks-like-datetime?]]
-                             :calc  [:substr :field 6 2]}
+;;  :by-month-sqlite           {:when [:and
+;;                                     :is-sqlite?
+;;                                     [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+;;                              :calc  [:substr :field 6 2]}
 
- :day-sqlite           {:when [:and
-                               :is-sqlite?
-                               [:or :is-date? :looks-like-date? :looks-like-datetime?]]
-                        :calc  [:substr :field 0 11]}
+;;  :day-sqlite           {:when [:and
+;;                                :is-sqlite?
+;;                                [:or :is-date? :looks-like-date? :looks-like-datetime?]]
+;;                         :calc  [:substr :field 0 11]}
 
 ;;  :agg-sum            {:when [:or :is-integer? :is-float?]
 ;;                       :calc  [:sum :field]}

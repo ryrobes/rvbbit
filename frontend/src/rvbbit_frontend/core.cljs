@@ -51,9 +51,10 @@
                              [[::bricks/esc-unselect-current] [{:keyCode 27}]] ; ESC
                              [[::bricks/redo-one] [{:keyCode 90 :ctrlKey true :shiftKey true}]] ; Z
                              [[::bricks/undo-one] [{:keyCode 90 :ctrlKey true :shiftKey false}]]
-                             [[::bricks/toggle-buffy] [{:keyCode 32 :shiftKey true :ctrlKey false}]] ; space
+                             [[::bricks/toggle-buffy] [{:keyCode 32 :shiftKey true :ctrlKey false}]] ; shift-space
+                             [[::bricks/toggle-ai-worker] [{:keyCode 67 :shiftKey true :ctrlKey false}]] ; shift-c
                              [[::bricks/toggle-editor] [{:keyCode 32 :shiftKey false :ctrlKey false}]] ; space
-                             [[::bricks/toggle-flow] [{:keyCode 32 :shiftKey false :ctrlKey true}]] ; space
+                             [[::bricks/toggle-flow] [{:keyCode 32 :shiftKey false :ctrlKey true}]] ; ctrl-space
                              [[::bricks/next-panel] [{:keyCode 9}]] ; tab
                              [[::bricks/toggle-kick-alert] [{:keyCode 75}]] ; k
                              [[::bricks/toggle-alert-mute] [{:keyCode 77}]] ; m
@@ -125,67 +126,72 @@
 (defn dispatch-poller-rules []
   (ut/tracked-dispatch
     [::poll/set-rules
-     [{:interval                 10 
+     [{:interval                 10
        :event                    [::bricks/dispatch-auto-queries]
        :poll-when                [::bricks/auto-run-and-connected?]
        :dispatch-event-on-start? false}
-      
+
       {:interval                 5
        :event                    [::bricks/update-flow-statuses]
        :poll-when                [::bricks/update-flow-statuses?]
-       :dispatch-event-on-start? true} 
-      
-      {:interval                 3600 
-       :event                    [::bricks/clean-up-reco-previews] 
-       :dispatch-event-on-start? false}
-      
-      {:interval                 5 
-       :event                    [::bricks/prune-alerts] 
+       :dispatch-event-on-start? true}
+
+      {:interval                 3600
+       :event                    [::bricks/clean-up-reco-previews]
        :dispatch-event-on-start? false}
 
-      {:interval                 7 
-       :event                    [::bricks/get-memory-usage] 
+      {:interval                 5
+       :event                    [::bricks/prune-alerts]
+       :dispatch-event-on-start? false}
+
+      {:interval                 7
+       :event                    [::bricks/get-memory-usage]
        :dispatch-event-on-start? false}
 
       ;; {:interval                 1 ;;; test
       ;;  :event                    [::bricks/highlight-panel-code]
       ;;  :poll-when                [::bricks/panel-code-up?]
       ;;  :dispatch-event-on-start? false}
-      
+
       ;; {:interval                 2 ;; push sample data to runstream when running ?
       ;;  :event                    [::bricks/refresh-runstreams]
       ;;  :poll-when                [::bricks/runstream-running?]
       ;;  :dispatch-event-on-start? false}
-      
+
       {:interval                 1 ;; subscribe to server data from flows if we see it
        :event                    [::bricks/sub-to-flows]
        :poll-when                [::bricks/new-flow-subs?]
        :dispatch-event-on-start? false}
-    
+
       {:interval                 60 ;; 5 ;; unsubscribe to server data
        :event                    [::bricks/unsub-to-flows]
        :poll-when                [::bricks/stale-flow-subs?]
        :dispatch-event-on-start? false}
-                                       
+
       ;; {:interval                 3600 ;; ten mins. less? more?
       ;;  :event                    [::bricks/purge-cache-atoms]
       ;;  :dispatch-event-on-start? false}
 
-      {:interval                 300  
+      {:interval                 60 ;;300  
        :event                    [::bricks/save-snap-periodically]
        :dispatch-event-on-start? false}
-      
+
       {:interval                 3600 ;; one hour. more?
        :event                    [::bricks/clear-cache-atoms]
        :dispatch-event-on-start? false}
-      
+
       {:interval                 3600 ;; expensive, testing
        :event                    [::http/get-autocomplete-values]
        :dispatch-event-on-start? true}
-      
-      {:interval                 5
+
+      {:interval                 8 ;5
        :event                    [::bp/deal-with-changed-panels]
        :poll-when                [::bp/panels-changed?]
+       :dispatch-event-on-start? false}
+
+      {:interval                 15
+       :event                    [::bricks/update-user-params-hash]
+       :poll-when                [::bricks/user-params-hash-changed?]
        :dispatch-event-on-start? false}
 
       ;; {:interval 1000 
@@ -196,11 +202,11 @@
       ;;  :event [::bricks/update-reco-previews]
       ;;  :dispatch-event-on-start? false}
 
-      {:interval                 1
-       :event                    [::bricks/update-conditionals]
-       :poll-when                [::bricks/visible-conditionals?]
-       :dispatch-event-on-start? false}
-      
+      ;; {:interval                 600
+      ;;  :event                    [::bricks/update-conditionals]
+      ;;  :poll-when                [::bricks/visible-conditionals?]
+      ;;  :dispatch-event-on-start? false}
+
       {:interval                 4
        :event                    [::bricks/refresh-status]
        :poll-when                [::bricks/bg-status?] ;; @db/editor-mode
@@ -254,7 +260,7 @@
      :timeout 15000}])
   (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
         base-dir "./screens/"]
-    (if (>= (count url-vec) 1) ;; if we have a url with a flowset, load that, oitherwise load
+    (if (>= (count url-vec) 1) ;; if we have a url with a screen, load that, oitherwise load default screen
       (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
       (ut/tracked-dispatch [::wfx/request :default ;; load default boot flowset
                             {:message     {:kind :get-settings :client-name client-name}

@@ -1,21 +1,24 @@
 (ns rvbbit-frontend.audio
   (:require
-    ["blob-util"             :as blob-util]
-    [ajax.core               :as ajax]
-    [ajax.protocols          :as pr]
-    [clojure.string          :as cstr]
-    [clojure.walk            :as walk]
-    [day8.re-frame.http-fx]
-    [day8.re-frame.undo      :as    undo
-                             :refer [undoable]]
-    [goog.dom                :as dom]
-    [re-frame.core           :as re-frame]
-    [rvbbit-frontend.connections :as conn]
-    [rvbbit-frontend.db      :as db]
-    [rvbbit-frontend.http    :as http]
-    [rvbbit-frontend.resolver :as resolver]
-    [rvbbit-frontend.utility :as ut]
-    [websocket-fx.core       :as wfx]))
+   ["blob-util"             :as blob-util]
+   [ajax.core               :as ajax]
+   [ajax.protocols          :as pr]
+   [clojure.string          :as cstr]
+   [clojure.walk            :as walk]
+   [reagent.core :as reagent]
+   ;[ajax.core :as ajax]
+   ;[ajax.protocols :as pr]
+   [day8.re-frame.http-fx]
+   [day8.re-frame.undo      :as    undo
+    :refer [undoable]]
+   [goog.dom                :as dom]
+   [re-frame.core           :as re-frame]
+   [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.db      :as db]
+   [rvbbit-frontend.http    :as http]
+   [rvbbit-frontend.resolver :as resolver]
+   [rvbbit-frontend.utility :as ut]
+   [websocket-fx.core       :as wfx]))
 
 (def google-token "")
 (defonce listening-block (reagent.core/atom nil))
@@ -209,6 +212,7 @@
       (ut/tracked-dispatch [::wfx/request :default
                             {:message {:kind :voice-trigger :client-name client-name :voice-text lines} :timeout 500000}])
       (when quake-open? (reset! db/console-voice-text lines))
+      (reset! db/chat-audio-text lines)
       (-> db
           (assoc-in [:incoming-voice] lines)
           (assoc-in [:click-param :param :voice] lines)
@@ -268,45 +272,57 @@
     (.append form-data "audio" blob)
     form-data))
 
-(re-frame/reg-event-db ::audio-started (fn [db _] (assoc db :audio-playing? true)))
+(re-frame/reg-event-db
+ ::audio-started
+ (fn [db _] (assoc db :audio-playing? true)))
 
-(re-frame/reg-event-db ::audio-ended (fn [db _] (assoc db :audio-playing? false)))
+(re-frame/reg-event-db 
+ ::audio-ended 
+ (fn [db _] (assoc db :audio-playing? false)))
 
-(re-frame/reg-sub ::audio-playing? (fn [db _] (get db :audio-playing? false)))
+(re-frame/reg-sub
+ ::audio-playing?
+ (fn [db _] (get db :audio-playing? false)))
 
-(re-frame/reg-sub ::get-voice-id
-                  (fn [db [_ voice-name]]
-                    (let [voice-map (into {}
-                                          (for [{:keys [name voice_id]}
-                                                  (get-in db [:http-reqs "elevenlabs-test" "elevenlabs-test" :message :voices])]
-                                            {name voice_id}))]
-                      (get voice-map voice-name))))
+(re-frame/reg-sub
+ ::get-voice-id
+ (fn [db [_ voice-name]]
+   (let [voice-map (into {}
+                         (for [{:keys [name voice_id]}
+                               (get-in db [:http-reqs "elevenlabs-test" "elevenlabs-test" :message :voices])]
+                           {name voice_id}))]
+     (get voice-map voice-name))))
+
+(re-frame/reg-sub
+ ::voices-enabled?
+ (fn [db _] 
+   (ut/ne? (get-in db [:http-reqs "elevenlabs-test" "elevenlabs-test" :message :voices] {}))))
 
 
 (def playing? (reagent.core/atom false)) ;; only used here for perf reasons instead of subs
 
 
-(defn draw
-  [analyser block-id]
-  (let [buffer-length (.-frequencyBinCount analyser)
-        data-array    (js/Uint8Array. buffer-length)]
-    (letfn [(frame []
-              (do (when @playing?
-                    (.getByteTimeDomainData analyser data-array)
-                    (let [rms  (->> (range buffer-length)
-                                    (map #(- (aget data-array %) 128))
-                                    (map #(* % %))
-                                    (reduce +)
-                                    (/ buffer-length)
-                                    (js/Math.sqrt))
-                          rms  (if (js/isFinite rms) rms 0)
-                          peak (->> (range buffer-length)
-                                    (map #(js/Math.abs (- (aget data-array %) 128)))
-                                    (reduce max))]
-                      (swap! db/audio-data2 assoc block-id peak)
-                      (swap! db/audio-data assoc block-id rms))
-                    (js/requestAnimationFrame frame))))]
-      (frame))))
+;; (defn draw
+;;   [analyser block-id]
+;;   (let [buffer-length (.-frequencyBinCount analyser)
+;;         data-array    (js/Uint8Array. buffer-length)]
+;;     (letfn [(frame []
+;;               (when @playing?
+;;                 (.getByteTimeDomainData analyser data-array)
+;;                 (let [rms  (->> (range buffer-length)
+;;                                 (map #(- (aget data-array %) 128))
+;;                                 (map #(* % %))
+;;                                 (reduce +)
+;;                                 (/ buffer-length)
+;;                                 (js/Math.sqrt))
+;;                       rms  (if (js/isFinite rms) rms 0)
+;;                       peak (->> (range buffer-length)
+;;                                 (map #(js/Math.abs (- (aget data-array %) 128)))
+;;                                 (reduce max))]
+;;                   (swap! db/audio-data2 assoc block-id peak)
+;;                   (swap! db/audio-data assoc block-id rms))
+;;                 (js/requestAnimationFrame frame)))]
+;;       (frame))))
 
 ;; (defn play-audio-blob
 ;;   [audio-data block-id]
@@ -332,38 +348,128 @@
 ;;     (.play audio-element)
 ;;     (draw analyser block-id)))
 
+;; (def current-audio-context (atom nil))
+;; (def current-audio-element (atom nil))
+
+;; (defn play-audio-blob [audio-data block-id]
+;;   (reset! playing? true)
+;;   (ut/tracked-dispatch [::audio-started])
+;;   (reset! db/speaking block-id)
+;;   (when @current-audio-context
+;;     (.close @current-audio-context))
+;;   (when @current-audio-element
+;;     (.pause @current-audio-element))
+;;   (let [audio-context (js/AudioContext.)
+;;         url           (js/URL.createObjectURL audio-data)
+;;         audio-element (js/document.createElement "audio")
+;;         source-node   (.createMediaElementSource audio-context audio-element)
+;;         analyser      (.createAnalyser audio-context)]
+;;     (reset! current-audio-context audio-context)
+;;     (reset! current-audio-element audio-element)
+;;     (set! (.-src audio-element) url)
+;;     (.addEventListener audio-element
+;;                        "ended"
+;;                        (fn [e]
+;;                          (ut/tracked-dispatch [::audio-ended])
+;;                          (swap! db/audio-data dissoc block-id)
+;;                          (swap! db/audio-data2 dissoc block-id)
+;;                          (reset! playing? false)))
+;;     (set! (.-fftSize analyser) 2048)
+;;     (.connect source-node analyser)
+;;     (.connect analyser (.-destination audio-context))
+;;     (.play audio-element)
+;;     (draw analyser block-id)))
+
+;; (defn stop-audio []
+;;   (when @current-audio-element
+;;     (.pause @current-audio-element)
+;;     (set! (.-currentTime @current-audio-element) 0))
+;;   (when @current-audio-context
+;;     (.close @current-audio-context))
+;;   (reset! current-audio-element nil)
+;;   (reset! current-audio-context nil)
+;;   (reset! playing? false)
+;;   (ut/tracked-dispatch [::audio-ended])
+;;   (swap! db/audio-data empty)
+;;   (swap! db/audio-data2 empty)
+;;   (reset! db/speaking nil))
+
 (def current-audio-context (atom nil))
 (def current-audio-element (atom nil))
+(def audio-queue (atom []))
+(def analyser-data (atom {}))
+;; (def playing? (reagent.core/atom false))
+(def current-playing-text (reagent/atom nil))
 
-(defn play-audio-blob
-  [audio-data block-id]
-  (reset! playing? true)
-  (ut/tracked-dispatch [::audio-started])
-  (reset! db/speaking block-id)
-  (when @current-audio-context
-    (.close @current-audio-context))
-  (when @current-audio-element
-    (.pause @current-audio-element))
-  (let [audio-context (js/AudioContext.)
-        url           (js/URL.createObjectURL audio-data)
-        audio-element (js/document.createElement "audio")
-        source-node   (.createMediaElementSource audio-context audio-element)
-        analyser      (.createAnalyser audio-context)]
-    (reset! current-audio-context audio-context)
-    (reset! current-audio-element audio-element)
-    (set! (.-src audio-element) url)
-    (.addEventListener audio-element
-                       "ended"
-                       (fn [e]
-                         (do (ut/tracked-dispatch [::audio-ended])
+(defn clear-analyser-data []
+  (reset! analyser-data {}))
+
+(declare play-audio-blob draw)
+
+(defn play-next-audio []
+  (when-let [next-audio (first (sort-by :sequence @audio-queue))]
+    (swap! audio-queue (fn [queue] (vec (remove #(= (:sequence %) (:sequence next-audio)) queue))))
+    (let [{:keys [audio block-id text]} next-audio]
+      (reset! current-playing-text {:block-id block-id :text text})
+      (js/setTimeout #(play-audio-blob audio block-id) 500))))
+
+(defn play-audio-blob [audio-data block-id]
+  (if @playing?
+    (swap! audio-queue conj {:audio audio-data :block-id block-id})
+    (do
+      (reset! playing? true)
+      (ut/tracked-dispatch [::audio-started])
+      (reset! db/speaking block-id)
+      (when @current-audio-context
+        (.close @current-audio-context))
+      (when @current-audio-element
+        (.pause @current-audio-element))
+      (clear-analyser-data)
+      (let [audio-context (js/AudioContext.)
+            url           (js/URL.createObjectURL audio-data)
+            audio-element (js/document.createElement "audio")
+            source-node   (.createMediaElementSource audio-context audio-element)
+            analyser      (.createAnalyser audio-context)]
+        (reset! current-audio-context audio-context)
+        (reset! current-audio-element audio-element)
+        (set! (.-src audio-element) url)
+        (.addEventListener audio-element
+                           "ended"
+                           (fn [e]
+                             (ut/tracked-dispatch [::audio-ended])
                              (swap! db/audio-data dissoc block-id)
                              (swap! db/audio-data2 dissoc block-id)
-                             (reset! playing? false))))
-    (set! (.-fftSize analyser) 2048)
-    (.connect source-node analyser)
-    (.connect analyser (.-destination audio-context))
-    (.play audio-element)
-    (draw analyser block-id)))
+                             (reset! playing? false)
+                             (reset! current-playing-text nil)
+                             (clear-analyser-data)
+                             (play-next-audio)))
+        (set! (.-fftSize analyser) 2048)
+        (.connect source-node analyser)
+        (.connect analyser (.-destination audio-context))
+        (.play audio-element)
+        (draw analyser block-id)))))
+
+(defn draw [analyser block-id]
+  (let [buffer-length (.-frequencyBinCount analyser)
+        data-array    (js/Uint8Array. buffer-length)]
+    (letfn [(frame []
+              (when @playing?
+                (.getByteTimeDomainData analyser data-array)
+                (let [rms  (->> (range buffer-length)
+                                (map #(- (aget data-array %) 128))
+                                (map #(* % %))
+                                (reduce +)
+                                (/ buffer-length)
+                                (js/Math.sqrt))
+                      rms  (if (js/isFinite rms) rms 0)
+                      peak (->> (range buffer-length)
+                                (map #(js/Math.abs (- (aget data-array %) 128)))
+                                (reduce max))]
+                  (swap! analyser-data assoc block-id {:rms rms :peak peak})
+                  (swap! db/audio-data assoc block-id rms)
+                  (swap! db/audio-data2 assoc block-id peak))
+                (js/requestAnimationFrame frame)))]
+      (frame))))
 
 (defn stop-audio []
   (when @current-audio-element
@@ -377,9 +483,14 @@
   (ut/tracked-dispatch [::audio-ended])
   (swap! db/audio-data empty)
   (swap! db/audio-data2 empty)
-  (reset! db/speaking nil))
+  (reset! db/speaking nil)
+  (reset! current-playing-text nil)
+  (clear-analyser-data)
+  (play-next-audio))
 
-(re-frame/reg-event-db ::save-recording-data (fn [db [_ audio-map]] (assoc db :audio-data-recorded audio-map)))
+(re-frame/reg-event-db 
+ ::save-recording-data 
+ (fn [db [_ audio-map]] (assoc db :audio-data-recorded audio-map)))
 
 (defn blob-to-base64
   [blob]
@@ -399,50 +510,60 @@
                          (blob-to-base64 audio-data)
                          (ut/tracked-dispatch [::save-recording-data {:form form-data :raw audio-data}])))))
 
-(re-frame/reg-event-db ::recorder-created (fn [db [_ recorder]] (assoc db :recorder recorder)))
+(re-frame/reg-event-db 
+ ::recorder-created 
+ (fn [db [_ recorder]] (assoc db :recorder recorder)))
 
-(re-frame/reg-event-fx ::start-recording (fn [_ _] {::start-recording nil}))
+(re-frame/reg-event-fx 
+ ::start-recording 
+ (fn [_ _] {::start-recording nil}))
 
-(re-frame/reg-sub ::kits ;; dupe from canvas
-                  (fn [db [_ block-id]]
-                    (vec (remove nil? (for [[k v] (get db :blocks)] (when (= (get v :kit-parent) block-id) k))))))
+(re-frame/reg-sub
+ ::kits ;; dupe from canvas
+ (fn [db [_ block-id]]
+   (vec (remove nil? (for [[k v] (get db :blocks)] (when (= (get v :kit-parent) block-id) k))))))
 
-(re-frame/reg-sub ::face-block ;; modded dupe from canvas
-                  (fn [db [_ block-id]]
-                    (if (= (get-in db [:blocks block-id :block-type]) "kit")
-                      (let [kits  @(ut/tracked-subscribe [::kits block-id])
-                            fb-id (get-in db [:blocks block-id :face-block-id] (first kits))]
-                        fb-id)
-                      block-id)))
+(re-frame/reg-sub
+ ::face-block ;; modded dupe from canvas
+ (fn [db [_ block-id]]
+   (if (= (get-in db [:blocks block-id :block-type]) "kit")
+     (let [kits  @(ut/tracked-subscribe [::kits block-id])
+           fb-id (get-in db [:blocks block-id :face-block-id] (first kits))]
+       fb-id)
+     block-id)))
 
-(re-frame/reg-fx ::start-recording
-                 (fn []
-                   (let [stream-promise (get-audio-stream)
-                         face-block-id  "face"] ;; @(ut/tracked-subscribe [::face-block
+(re-frame/reg-fx
+ ::start-recording
+ (fn []
+   (let [stream-promise (get-audio-stream)
+         face-block-id  "face"] ;; @(ut/tracked-subscribe [::face-block
                                                 ;; @db/hovered-block])
-                     (reset! listening-block face-block-id)
-                     (.then stream-promise
-                            (fn [stream]
-                              (let [recorder (create-media-recorder stream)]
-                                (on-data-available recorder
-                                                   (fn [audio-data]
-                                                     (let [form-data (create-form-data audio-data)]
-                                                       (ut/tapp>> [:call-back-data-inner (count (str form-data))]))))
-                                (ut/tracked-dispatch [::recorder-created recorder])
-                                (start-recording recorder)))))))
+     (reset! listening-block face-block-id)
+     (.then stream-promise
+            (fn [stream]
+              (let [recorder (create-media-recorder stream)]
+                (on-data-available recorder
+                                   (fn [audio-data]
+                                     (let [form-data (create-form-data audio-data)]
+                                       (ut/tapp>> [:call-back-data-inner (count (str form-data))]))))
+                (ut/tracked-dispatch [::recorder-created recorder])
+                (start-recording recorder)))))))
 
 
-(re-frame/reg-event-db ::stop-recording
-                       (fn [db _]
-                         (let [recorder (:recorder db)] ;(or (:recorder db) (:webcam-feed db))
-                           (ut/tapp>> ["Attempting to stop recording..."])
-                           (ut/tapp>> ["state:" (.-state recorder)])
-                           (.stop recorder)
-                           (stop-recording recorder)
-                           (-> db
-                               (dissoc :recorder)))))
+(re-frame/reg-event-db
+ ::stop-recording
+ (fn [db _]
+   (let [recorder (:recorder db)] ;(or (:recorder db) (:webcam-feed db))
+     (ut/tapp>> ["Attempting to stop recording..."])
+     (ut/tapp>> ["state:" (.-state recorder)])
+     (.stop recorder)
+     (stop-recording recorder)
+     (-> db
+         (dissoc :recorder)))))
 
-(re-frame/reg-sub ::latest-audio (fn [db _] (get db :thumper-speaks)))
+(re-frame/reg-sub 
+ ::latest-audio 
+ (fn [db _] (get db :thumper-speaks)))
 
 (defn speak-last
   []
@@ -453,80 +574,259 @@
 
 
 
-(re-frame/reg-event-db
-  ::failure-text-to-speech11
-  (fn [db [_ block-type block-id result]]
-    (let [old-status (get-in db [:http-reqs block-type block-id])]
-      (assoc-in db
-        [:http-reqs block-type block-id]
-        (merge old-status
-               {:status "failed" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result})))))
+(def tts-queue (atom []))
 
-(re-frame/reg-event-db
-  ::success-text-to-speech11
-  (fn [db [_ block-type block-id voices? result]]
-    (ut/tapp>> [:speak? block-type block-id voices?])
-    (if voices?
-      (let [old-status (get-in db [:http-reqs block-type block-id])]
-        (-> db
-            (assoc-in [:http-reqs block-type block-id]
-                      (merge
-                        old-status
-                        {:status "success" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result}))))
-      (let [old-status (get-in db [:http-reqs block-type block-id])
-            byte-nums  result ;; This is already a vector of byte values
-            byte-array (js/Uint8Array. byte-nums)
-            blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})]
-        (play-audio-blob blob block-id)
-        (-> db
-            (assoc-in [:http-reqs block-type block-id]
-                      (merge old-status
-                             {:status     "success"
-                              :ended      (ut/get-time-format-str)
-                              :ended-unix (.getTime (js/Date.))
-                              :message    {:audio-blob blob}})))))))
+(re-frame/reg-fx
+ :process-tts-queue
+ (fn [_]
+   (when-let [next-item (first @tts-queue)]
+     (swap! tts-queue rest)
+     (re-frame/dispatch next-item))))
 
 (re-frame/reg-event-fx
-  ::text-to-speech11
-  (fn [{:keys [db]} [_ block-id block-type text-to-speak & [audio-file?]]]
-    (let [voices?    (nil? text-to-speak)
-          xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
-          method     (if voices? :GET :POST)
-          voice-key  (get-in db [:server :settings :eleven-labs-default-voice-name] "Not OG Buffy") ;; "Not
-          vname      (get-in db [:blocks block-id :req :voice_name] voice-key)
-          vid        (first (remove nil?
-                              (for [v (get-in db [:http-reqs :elevenlabs :audio :message :voices])]
-                                (when (= (get v :name) vname) (get v :voice_id)))))
-          url        (if voices?
-                       "https://api.elevenlabs.io/v1/voices" ;; just get voice map
-                       (str "https://api.elevenlabs.io/v1/text-to-speech/" vid)) ;; "/stream"
-          aturl      (let [protocol          (.-protocol js/window.location)
-                           host              (.-host js/window.location)
-                           host-without-port (cstr/replace host #":\d+$" "")
-                           new-port          "8888"]
-                       (str protocol "//" host-without-port ":" new-port "/audio"))
-          url        (if audio-file?
-                       aturl ;;"http://localhost:8888/audio"
-                       url)
-          header     {"xi-api-key" xi-api-key}
-          data       (if audio-file?
-                       {:path text-to-speak}
-                       (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
-      (ut/tapp>> [method url data voices? vname vid])
-      {:db         (assoc-in db
-                     [:http-reqs block-type block-id]
-                     {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
-       :http-xhrio {:method          method
-                    :uri             url
-                    :params          data
-                    :timeout         280000
-                    :headers         header
-                    :format          (ajax/json-request-format {:keywords? true})
-                    :response-format (if voices?
-                                       (ajax/json-response-format {:keywords? true})
-                                       {:read pr/-body :description "rawww" :type :arraybuffer :content-type "audio/mpeg"})
-                    :on-success      [::success-text-to-speech11 block-type block-id voices?]
-                    :on-failure      [::failure-text-to-speech11 block-type block-id]}})))
+ ::text-to-speech11
+ (fn [{:keys [db]} [_ block-id block-type text-to-speak & [audio-file? voice-name sequence-number]]]
+   (ut/tapp>> [:text-to-speech11 block-id block-type (count text-to-speak)])
+   (let [voices?    (nil? text-to-speak)
+         xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
+         method     (if voices? :GET :POST)
+         voice-key  (or voice-name (get-in db [:server :settings :eleven-labs-default-voice-name] "Not OG Buffy"))
+         vname      (get-in db [:blocks block-id :req :voice_name] voice-key)
+         vid        (first (remove nil?
+                                   (for [v (get-in db [:http-reqs :elevenlabs :audio :message :voices])]
+                                     (when (= (get v :name) vname) (get v :voice_id)))))
+         url        (if voices?
+                      "https://api.elevenlabs.io/v1/voices"
+                      (str "https://api.elevenlabs.io/v1/text-to-speech/" vid))
+         header     {"xi-api-key" xi-api-key}
+         data       (if audio-file?
+                      {:path text-to-speak}
+                      (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
+     {:db         (assoc-in db
+                            [:http-reqs block-type block-id]
+                            {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
+      :http-xhrio {:method          method
+                   :uri             url
+                   :params          data
+                   :timeout         280000
+                   :headers         header
+                   :format          (ajax/json-request-format {:keywords? true})
+                   :response-format (if voices?
+                                      (ajax/json-response-format {:keywords? true})
+                                      {:read pr/-body :description "rawww" :type :arraybuffer :content-type "audio/mpeg"})
+                   :on-success      [::success-text-to-speech11 block-type block-id voices? text-to-speak sequence-number]
+                   :on-failure      [::failure-text-to-speech11 block-type block-id]}})))
+
+(re-frame/reg-event-fx
+ ::success-text-to-speech11
+ (fn [{:keys [db]} [_ block-type block-id voices? text-to-speak sequence-number result]]
+   (ut/tapp>> [:success-text-to-speech11 block-type block-id voices?])
+   (let [updated-db
+         (if voices?
+           (update-in db [:http-reqs block-type block-id] merge
+                      {:status "success"
+                       :ended (ut/get-time-format-str)
+                       :ended-unix (.getTime (js/Date.))
+                       :message result})
+           (let [byte-nums  result
+                 byte-array (js/Uint8Array. byte-nums)
+                 blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})
+                 queue-item {:audio blob
+                             :block-id block-id
+                             :sequence (or sequence-number (count @audio-queue))
+                             :text text-to-speak}]
+             (swap! audio-queue conj queue-item)
+             (when (= 1 (count @audio-queue))
+               (play-next-audio))
+             (update-in db [:http-reqs block-type block-id] merge
+                        {:status     "success"
+                         :ended      (ut/get-time-format-str)
+                         :ended-unix (.getTime (js/Date.))
+                         :message    {:audio-blob blob}})))]
+     {:db updated-db
+      :process-tts-queue nil})))
+
+(re-frame/reg-event-fx
+ ::failure-text-to-speech11
+ (fn [{:keys [db]} [_ block-type block-id result]]
+   (ut/tapp>> [:failure-text-to-speech11 block-type block-id])
+   (let [updated-db (update-in db [:http-reqs block-type block-id] merge
+                               {:status "failed"
+                                :ended (ut/get-time-format-str)
+                                :ended-unix (.getTime (js/Date.))
+                                :message result})]
+     {:db updated-db
+      :process-tts-queue nil})))
+
+(defn dispatch-serial [event]
+  (ut/tapp>> [:dispatch-serial (str event)])
+  (swap! tts-queue conj event)
+  (reset! tts-queue (vec (sort-by last @tts-queue)))
+  (when (= 1 (count @tts-queue))
+    (re-frame/dispatch [:process-tts-queue])))
+
+(re-frame/reg-event-fx
+ :process-tts-queue
+ (fn [_ _]
+   {:process-tts-queue nil}))
+
+
+
+
+
+
+
+
+
+;; (re-frame/reg-event-fx
+;;  ::text-to-speech11
+;;  (fn [{:keys [db]} [_ block-id block-type text-to-speak & [audio-file? voice-name sequence-number]]]
+;;    (let [voices?    (nil? text-to-speak)
+;;          xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
+;;          method     (if voices? :GET :POST)
+;;          voice-key  (or voice-name (get-in db [:server :settings :eleven-labs-default-voice-name] "Not OG Buffy"))
+;;          vname      (get-in db [:blocks block-id :req :voice_name] voice-key)
+;;          vid        (first (remove nil?
+;;                                    (for [v (get-in db [:http-reqs :elevenlabs :audio :message :voices])]
+;;                                      (when (= (get v :name) vname) (get v :voice_id)))))
+;;          url        (if voices?
+;;                       "https://api.elevenlabs.io/v1/voices"
+;;                       (str "https://api.elevenlabs.io/v1/text-to-speech/" vid))
+;;          header     {"xi-api-key" xi-api-key}
+;;          data       (if audio-file?
+;;                       {:path text-to-speak}
+;;                       (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
+;;      {:db         (assoc-in db
+;;                             [:http-reqs block-type block-id]
+;;                             {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
+;;       :http-xhrio {:method          method
+;;                    :uri             url
+;;                    :params          data
+;;                    :timeout         280000
+;;                    :headers         header
+;;                    :format          (ajax/json-request-format {:keywords? true})
+;;                    :response-format (if voices?
+;;                                       (ajax/json-response-format {:keywords? true})
+;;                                       {:read pr/-body :description "rawww" :type :arraybuffer :content-type "audio/mpeg"})
+;;                    :on-success      [::success-text-to-speech11 block-type block-id voices? text-to-speak sequence-number]
+;;                    :on-failure      [::failure-text-to-speech11 block-type block-id]}})))
+
+;; (re-frame/reg-event-db
+;;  ::success-text-to-speech11
+;;  (fn [db [_ block-type block-id voices? text-to-speak sequence-number result]]
+;;    (if voices?
+;;      (let [old-status (get-in db [:http-reqs block-type block-id])]
+;;        (-> db
+;;            (assoc-in [:http-reqs block-type block-id]
+;;                      (merge
+;;                       old-status
+;;                       {:status "success" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result}))))
+;;      (let [old-status (get-in db [:http-reqs block-type block-id])
+;;            byte-nums  result
+;;            byte-array (js/Uint8Array. byte-nums)
+;;            blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})
+;;            queue-item {:audio blob
+;;                        :block-id block-id
+;;                        :sequence (or sequence-number (count @audio-queue))
+;;                        :text text-to-speak}]
+;;        (swap! audio-queue conj queue-item)
+;;        (when (= 1 (count @audio-queue))
+;;          (play-next-audio))
+;;        (-> db
+;;            (assoc-in [:http-reqs block-type block-id]
+;;                      (merge old-status
+;;                             {:status     "success"
+;;                              :ended      (ut/get-time-format-str)
+;;                              :ended-unix (.getTime (js/Date.))
+;;                              :message    {:audio-blob blob}})))))))
+
+;; (re-frame/reg-event-db
+;;  ::failure-text-to-speech11
+;;  (fn [db [_ block-type block-id result]]
+;;    (let [old-status (get-in db [:http-reqs block-type block-id])]
+;;      (assoc-in db
+;;                [:http-reqs block-type block-id]
+;;                (merge old-status
+;;                       {:status "failed" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result})))))
+
+
+
+
+
+;; (re-frame/reg-event-db
+;;   ::failure-text-to-speech11
+;;   (fn [db [_ block-type block-id result]]
+;;     (let [old-status (get-in db [:http-reqs block-type block-id])]
+;;       (assoc-in db
+;;         [:http-reqs block-type block-id]
+;;         (merge old-status
+;;                {:status "failed" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result})))))
+
+;; (re-frame/reg-event-db
+;;   ::success-text-to-speech11
+;;   (fn [db [_ block-type block-id voices? result]]
+;;     (ut/tapp>> [:speak? block-type block-id voices?])
+;;     (if voices?
+;;       (let [old-status (get-in db [:http-reqs block-type block-id])]
+;;         (-> db
+;;             (assoc-in [:http-reqs block-type block-id]
+;;                       (merge
+;;                         old-status
+;;                         {:status "success" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result}))))
+;;       (let [old-status (get-in db [:http-reqs block-type block-id])
+;;             byte-nums  result ;; This is already a vector of byte values
+;;             byte-array (js/Uint8Array. byte-nums)
+;;             blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})]
+;;         (play-audio-blob blob block-id)
+;;         (-> db
+;;             (assoc-in [:http-reqs block-type block-id]
+;;                       (merge old-status
+;;                              {:status     "success"
+;;                               :ended      (ut/get-time-format-str)
+;;                               :ended-unix (.getTime (js/Date.))
+;;                               :message    {:audio-blob blob}})))))))
+
+;; (re-frame/reg-event-fx
+;;   ::text-to-speech11
+;;   (fn [{:keys [db]} [_ block-id block-type text-to-speak & [audio-file? voice-name]]]
+;;     (let [voices?    (nil? text-to-speak)
+;;           xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
+;;           method     (if voices? :GET :POST)
+;;           voice-key  (or voice-name (get-in db [:server :settings :eleven-labs-default-voice-name] "Not OG Buffy"))
+;;           vname      (get-in db [:blocks block-id :req :voice_name] voice-key)
+;;           vid        (first (remove nil?
+;;                               (for [v (get-in db [:http-reqs :elevenlabs :audio :message :voices])]
+;;                                 (when (= (get v :name) vname) (get v :voice_id)))))
+;;           url        (if voices?
+;;                        "https://api.elevenlabs.io/v1/voices" ;; just get voice map
+;;                        (str "https://api.elevenlabs.io/v1/text-to-speech/" vid)) ;; "/stream"
+;;           aturl      (let [protocol          (.-protocol js/window.location)
+;;                            host              (.-host js/window.location)
+;;                            host-without-port (cstr/replace host #":\d+$" "")
+;;                            new-port          "8888"]
+;;                        (str protocol "//" host-without-port ":" new-port "/audio"))
+;;           url        (if audio-file?
+;;                        aturl ;;"http://localhost:8888/audio"
+;;                        url)
+;;           header     {"xi-api-key" xi-api-key}
+;;           data       (if audio-file?
+;;                        {:path text-to-speak}
+;;                        (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
+;;       (ut/tapp>> [method url data voices? vname vid])
+;;       {:db         (assoc-in db
+;;                      [:http-reqs block-type block-id]
+;;                      {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
+;;        :http-xhrio {:method          method
+;;                     :uri             url
+;;                     :params          data
+;;                     :timeout         280000
+;;                     :headers         header
+;;                     :format          (ajax/json-request-format {:keywords? true})
+;;                     :response-format (if voices?
+;;                                        (ajax/json-response-format {:keywords? true})
+;;                                        {:read pr/-body :description "rawww" :type :arraybuffer :content-type "audio/mpeg"})
+;;                     :on-success      [::success-text-to-speech11 block-type block-id voices?]
+;;                     :on-failure      [::failure-text-to-speech11 block-type block-id]}})))
 
 
 

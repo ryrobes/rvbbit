@@ -15,6 +15,14 @@
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
+ :materialize-albums-drag-42 {:signal    :signal/daily-at-7am
+                              :type      :sql
+                              :snapshot? false
+                              :data      {:select        [:album_href :album_name :img_300 :img_64 :img_640 :popularity
+                                                          :release_date :ts]
+                                          :from          [[:albums :uu754]]
+                                          :page          -4
+                                          :connection-id "met-on-tour"}}
  :materialize-offenses-drag-4 {:signal    :signal/daily-at-7am
                                :type      :sql
                                :snapshot? false
@@ -225,6 +233,31 @@
                                             :from          [[:offenses :ww131]]
                                             :page          -4
                                             :connection-id "boston-crime"}}
+ :materialize-offenses-drag-26 {:signal    :signal/daily-at-7am
+                                :type      :sql
+                                :snapshot? false
+                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
+                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
+                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
+                                                            :SHOOTING :STREET :UCR_PART :YEAR]
+                                            :from          [[:offenses :oo871]]
+                                            :page          -4
+                                            :connection-id "boston-crime"}}
+ :refresh-xtdb-pg {:signal :signal/daily-at-9am
+                   :type   :clojure
+                   :cache? false
+                   :data   (do (ns rvbbit-backend.cruiser
+                                 (:require [rvbbit-backend.websockets :as wss]
+                                           [rvbbit-backend.pool-party :as ppy]
+                                           [rvbbit-backend.sql :as sql]))
+                               (let [conn (get (deref wss/conn-map) "xtdb-pg")]
+                                 (lets-give-it-a-whirl-no-viz "connections/xtdb-pg.edn"
+                                                              conn
+                                                              sql/system-db
+                                                              default-sniff-tests
+                                                              default-field-attributes
+                                                              default-derived-fields
+                                                              default-viz-shapes)))}
  :wallpaper-of-the-moment
    {:signal  :signal/every-5-minutes
     :type    :clojure

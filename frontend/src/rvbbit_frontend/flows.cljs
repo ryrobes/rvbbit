@@ -2789,7 +2789,7 @@
 
 (defn flow-details-block
   [cch ccw id fmap show-output?]
-  (let [;honeycomb? (try (and (keyword? (first body)) (vector? body)) (catch :default _ false))
+  (let [;clover? (try (and (keyword? (first body)) (vector? body)) (catch :default _ false))
         react-hacks     [@scroll-id]
         type            (cond (= (get-in fmap [:data :source-panel]) :flow-fn-list*) :flow-part
                               :else                                                  (get-in fmap [:data :drag-meta :type]))
@@ -5057,13 +5057,17 @@
               unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
-    [re-com/modal-panel :style {:z-index 999 :padding "0px"} :parts
+    [re-com/modal-panel 
+     :style {:z-index 999 :padding "0px"}
+     :parts
      {:child-container {:style {:left      left
                                 :transform "scale(1.5)"
                                 :top       top
                                 :font-size "8px"
                                 :border    (str "5px solid " (theme-pull :theme/editor-outer-rim-color nil))
-                                :position  "fixed"}}} :backdrop-opacity 0.63 :backdrop-on-click #(reset! lookup-modal? false)
+                                :position  "fixed"}}} 
+     :backdrop-opacity 0.63 
+     :backdrop-on-click #(reset! lookup-modal? false)
      :child
      [re-com/h-box :justify :between :align :center :gap "10px" :style {:color "#000000" :font-size "18px"} :children
       [;[re-com/box :child "topper"]
@@ -5093,7 +5097,7 @@
                           (every? (fn [word]
                                     (or (matches-word category word) (matches-word name word) (matches-word description word)))
                                   words)))
-                flow-parts))))]
+                      flow-parts))))]
        [re-com/box :child
         [re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :style
          {;:color (theme-pull :theme/editor-outer-rim-color nil)
@@ -5141,7 +5145,6 @@
 (re-frame/reg-sub ::flow-drop-down? (fn [db _] (get db :flow-drop-down? false)))
 
 (re-frame/reg-event-db ::toggle-flow-drop-down (fn [db _] (assoc db :flow-drop-down? (not (get db :flow-drop-down? false)))))
-
 
 (re-frame/reg-sub ::zoom-unlocked? (fn [db _] (get db :alt-key-held? false)))
 

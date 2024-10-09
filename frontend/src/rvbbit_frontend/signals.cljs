@@ -1056,7 +1056,7 @@
                                        (if sql-solver?
                                          [re-com/box
                                           :align :center :justify :center
-                                          :child [bricks/honeycomb-fragments vv 11 hb]]
+                                          :child [bricks/clover-fragments vv 11 hb]]
                                          [re-com/box
                                           :child [bricks/map-boxes2 vv nil :solver-meta [] [hb 12] nil false]]))
 

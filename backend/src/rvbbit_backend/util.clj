@@ -1027,6 +1027,24 @@
           (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
           :else          data)))
 
+(defn deep-remove-underscore-keys [data]
+  (cond
+    (map? data)
+    (persistent!
+     (reduce-kv
+      (fn [acc k v]
+        (if (and (keyword? k) (cstr/starts-with? (name k) "_"))
+          acc
+          (assoc! acc k (deep-remove-underscore-keys v))))
+      (transient {})
+      data))
+
+    (vector? data)
+    (mapv deep-remove-underscore-keys data)
+
+    :else
+    data))
+
 (defn clean-sql-from-ui-keys
   [query]
   (let [res (deep-remove-keys query
@@ -1073,6 +1091,47 @@
                                                                                       (catch Exception _ x))
                     :else                                                        x))]
       (limited-helper x))))
+
+
+
+(defn try-parse-form [form]
+  (try
+    (edn/read-string form)
+    nil  ; Return nil if parsing succeeds
+    (catch Exception e
+      (.getMessage e))))  ; Return error message if parsing fails
+
+(defn locate-edn-errors [file-path]
+  (with-open [rdr (java.io.PushbackReader. (clojure.java.io/reader file-path))]
+    (loop [line-number 1
+           form-start-line 1
+           current-form ""
+           errors []]
+      (let [current-char (.read rdr)]
+        (if (= current-char -1)
+          (do
+            (println "Finished parsing file.")
+            (doseq [error errors]
+              (println error)))
+          (let [updated-form (str current-form (char current-char))
+                error-msg (when (or (= current-char (int \newline))
+                                    (= current-char (int \,)))
+                            (try-parse-form updated-form))]
+            (cond
+              error-msg
+              (let [new-error (str "Error near line " form-start-line ":\n"
+                                   "Problematic form: " updated-form "\n"
+                                   "Error message: " error-msg "\n")]
+                (recur line-number line-number "" (conj errors new-error)))
+
+              (= current-char (int \newline))
+              (recur (inc line-number) form-start-line updated-form errors)
+
+              :else
+              (recur line-number form-start-line updated-form errors))))))))
+
+
+
 
 (defn greeting
   [name]
@@ -1315,6 +1374,15 @@
           (with-out-str (clojure.pprint/write collection :dispatch clojure.pprint/code-dispatch :right-margin width)))))
 
 (defn copy-file [src dest] (with-open [in-file (io/reader src) out-file (io/writer dest)] (io/copy in-file out-file)))
+
+(defn estimate-size-kb
+  "Estimates the size of a Clojure data structure in kilobytes, rounded to one decimal place."
+  [data]
+  (let [baos (java.io.ByteArrayOutputStream.)
+        oos  (java.io.ObjectOutputStream. baos)]
+    (.writeObject oos data)
+    (.flush oos)
+    (/ (Math/round (/ (.size baos) 102.4)) 10.0)))
 
 (defn get-file-vectors-simple
   "returns a vector of filenames/folders in the X folder relative to the jar (packaged by default)

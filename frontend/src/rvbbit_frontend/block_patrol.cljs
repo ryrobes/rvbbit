@@ -33,8 +33,39 @@
 (re-frame/reg-event-fx
  ::push-panels-to-server
  (fn [{:keys [db]} [_ panels]]
-   (let [client-name (get db :client-name)]
-     (ut/tapp>> [:pushing-panels-to-server (count (keys panels))])
+   (let [client-name (get db :client-name)
+         runners   (keys (get-in db [:server :settings :runners]))
+        ;;  panels (into {}
+        ;;               (for [[k v] panels
+        ;;                     :let [ds-keys (vec (apply concat (for [r runners
+        ;;                                                            :when (get v r)
+        ;;                                                            :let [vkeys (keys (get v r))]]
+        ;;                                                        (for [v vkeys] [r v]))))
+        ;;                           implicit-rowsets (vec (into (get-in db [:implicit-rowsets :clover] [])
+        ;;                                                       (get-in db [:implicit-rowsets :solver] [])))
+        ;;                           implied? (fn [data-keypath] (let [data-keypath (last data-keypath)]
+        ;;                                                         (some #(= % (first data-keypath)) implicit-rowsets)))
+        ;;                           ;implied-ds (filterv (fn [x] @(ut/tracked-sub ::bricks/is-implied-rowset? {:data-keypath [(last x)]})) ds-keys)
+        ;;                           implied-ds (filterv implied? ds-keys)
+        ;;                           ;; _ (ut/tapp>> [:implied-db k (str ds-keys) (str implied-ds)])
+        ;;                           ]]
+        ;;                 {k (assoc v :implied-rowsets implied-ds)}))
+         panels (reduce-kv
+                 (fn [acc k v]
+                   (let [ds-keys (into []
+                                       (comp
+                                        (filter #(get v %))
+                                        (mapcat #(map (fn [vk] [% vk]) (keys (get v %)))))
+                                       runners)
+                         implicit-rowsets (into (get-in db [:implicit-rowsets :clover] [])
+                                                (get-in db [:implicit-rowsets :solver] []))
+                         implied-ds (filterv #(some (fn [x] (= x (last %))) implicit-rowsets) ds-keys)
+                         ;_ (ut/tapp>> [:ds-keys k (str implied-ds) (str ds-keys) (str implicit-rowsets)])
+                         ]
+                     (assoc acc k (assoc v :implied-rowsets implied-ds))))
+                 {}
+                 panels)]
+     (ut/tapp>> [:pushing-panels-to-server (count (keys panels)) (str (keys panels))])
      {:dispatch-later
       [;{:ms 800
        ; :dispatch [::http/insert-alert [:box :child (str "Sending " (keys panels) " panels to server")] 12 1 5]}
@@ -44,6 +75,7 @@
       [::wfx/push :default
        {:kind :current-panels
         :panels panels
+        :timeout    50000
         :materialized-panels {} ;; ppm
         :resolved-panels {} ;; ppr
         :client-name client-name}]})))
@@ -52,8 +84,12 @@
 (re-frame/reg-fx
  :push-changed-panels
  (fn [changed-panels]
-   (ut/tapp>> [:pushing-changed-panels (str (keys changed-panels))])
-   (re-frame/dispatch [::push-panels-to-server changed-panels])))
+   (let [changed-panels-keys (filterv #(not (cstr/starts-with? (str %) ":reco-preview")) (keys changed-panels))
+         changed-panels (select-keys changed-panels changed-panels-keys)]
+    ;;  (doseq [panel-key changed-panels-keys]
+    ;;    (ut/tracked-dispatch [::bricks/save-snap-block panel-key]))
+     (ut/tapp>> [:pushing-changed-panels (str changed-panels-keys)])
+     (re-frame/dispatch [::push-panels-to-server changed-panels]))))
 
 (re-frame/reg-event-fx
  ::deal-with-changed-panels

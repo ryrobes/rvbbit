@@ -33,6 +33,7 @@ ext/
 *.Identifier
 large/
 flow-blocks/
+endpoints/dash8
 reaction-logs/
 shutdown-logs/
 tracker-logs/
@@ -62,3 +63,7 @@ frontend/package-lock.json
 backend/assets/snaps/*
 backend/assets/openai-images/upscaled
 tmp/
+backend/assets.zip 
+dash8
+
+

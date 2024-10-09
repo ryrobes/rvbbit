@@ -49,7 +49,7 @@
 
 (defonce dyn-pools (atom {}))
 (defonce pool-exec-times (atom {}))
-(defonce thread-pool-timing? true)
+(defonce thread-pool-timing? false) ;; fills up pool-exec-times, but can get costly, memory wise
 
 ;; (defn create-cached-thread-pool [name]
 ;;   (cond

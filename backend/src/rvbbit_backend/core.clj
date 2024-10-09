@@ -1,73 +1,159 @@
 (ns rvbbit-backend.core
-   (:require
-    [clj-http.client :as client]
-    [clj-time.coerce :as tcc]
-    [clj-time.core :as t]
-    [clj-time.format :as f]
-    [clj-time.jdbc]
-    [clojure.core.async :as    async :refer [<! <!! >! >!! chan go]]
-    [clojure.core.async :refer [<! timeout]]
-    [clojure.data :as data]
-    [clojure.edn :as edn]
-    [clojure.java.io :as io]
-    [clojure.java.jdbc :as jdbc]
-    [clojure.java.shell :as shell]
+  (:require
+   [clj-http.client :as client]
+   [clj-time.coerce :as tcc]
+   [clj-time.core :as t]
+   [clj-time.format :as f]
+  ;;  [clj-time.jdbc]
+   [clojure.core.async :as    async :refer [<! <!! >! >!! chan go]]
+   [clojure.core.async :refer [<! timeout]]
+   [clojure.data :as data]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [clojure.java.jdbc :as jdbc]
+   [clojure.java.shell :as shell]
    ;[clojure.math.combinatorics :as combo]
-    [rvbbit-backend.pool-party :as ppy]
-    [clojure.pprint :as ppt]
-    [clojure.set :as cset]
-    [clojure.string :as cstr]
-    [clojure.walk :as walk]
-    [flowmaps.core :as flow]
-    [flowmaps.db :as flow-db]
-    [flowmaps.examples.simple-flows :as fex]
-    [flowmaps.web :as flow-web]
-    [hikari-cp.core :as hik]
-   ;[honey.sql :as honey]
-    [nextjournal.beholder :as beholder]
-   ;[puget.printer :as puget]
-    [ring.adapter.jetty9 :as jetty]
-    [rvbbit-backend.queue-party  :as qp]
-    [rvbbit-backend.assistants :as assistants]
-   ;[rvbbit-backend.assistants :as ass]
-   ;[rvbbit-backend.reactor :as rkt]
-    [rvbbit-backend.config :as config]
-    [rvbbit-backend.db :as db]
-    [rvbbit-backend.freezepop :as fpop]
-    [rvbbit-backend.cruiser :as cruiser]
+   [rvbbit-backend.pool-party :as ppy]
+   [clojure.pprint :as ppt]
+   [clojure.set :as cset]
+   [clojure.string :as cstr]
+   [clojure.walk :as walk]
+   [flowmaps.core :as flow]
+   [flowmaps.db :as flow-db]
+    ;[flowmaps.examples.simple-flows :as fex]
+    ;[flowmaps.web :as flow-web]
+   [hikari-cp.core :as hik]
+   [nextjournal.beholder :as beholder]
+   [ring.adapter.jetty9 :as jetty]
+   [rvbbit-backend.realms :as realms]
+   [rvbbit-backend.queue-party  :as qp]
+   [rvbbit-backend.assistants :as assistants]
+   [rvbbit-backend.config :as config]
+   [rvbbit-backend.db :as db]
+   [rvbbit-backend.freezepop :as fpop]
+   [rvbbit-backend.cruiser :as cruiser]
    ;[rvbbit-backend.embeddings :as em]
-    [rvbbit-backend.evaluator :as evl]
-    [rvbbit-backend.external :as ext]
-    [rvbbit-backend.sql :as    sql
-     :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db cache-db cache-db-memory history-db
-             to-sql]]
-   ;[rvbbit-backend.surveyor :as surveyor]
-   ;[rvbbit-backend.transform :as ts]
-    [rvbbit-backend.util :as    ut
-     :refer [ne?]]
-    [rvbbit-backend.websockets :as wss]
-   ;[cognitect.transit :as transit]
-    [shutdown.core :as shutdown]
-   ;[taskpool.taskpool :as tp]
-    [websocket-layer.core      :as wl])
-   (:import
-    [java.util Date]
-   ;;[java.util.concurrent Executors TimeUnit]
-    [java.io ByteArrayInputStream ByteArrayOutputStream]
-    [java.util.concurrent Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ThreadPoolExecutor$CallerRunsPolicy]
-    java.nio.file.Files
-    java.nio.file.Paths
-    java.nio.file.attribute.FileTime
-    java.nio.file.LinkOption
-    java.time.format.DateTimeFormatter
-    java.time.ZoneId)
-   (:gen-class))
+   [rvbbit-backend.evaluator :as evl]
+   [rvbbit-backend.external :as ext]
+   [rvbbit-backend.sql :as    sql
+    :refer [flows-db pool-create sql-exec sql-query metrics-kpi-db
+            system-db cache-db cache-db-memory history-db realms-db
+            system-reporting-db to-sql]]
+   [rvbbit-backend.util :as    ut
+    :refer [ne?]]
+   [rvbbit-backend.websockets :as wss]
+   [shutdown.core :as shutdown]
+   [websocket-layer.core      :as wl])
+  (:import
+   [java.util.concurrent TimeUnit]
+   java.nio.file.Files
+   java.nio.file.Paths
+    ;java.nio.file.attribute.FileTime
+   java.nio.file.LinkOption
+   java.time.format.DateTimeFormatter
+   java.time.ZoneId)
+  (:gen-class))
 
 ;; =======================================================================================================================================
 ;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
 ;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
 ;; Note to readers: lots of refactoring, namespace, mess cleanup to do, I just came out of a very long "move fast and break things" season
 ;; =======================================================================================================================================
+ 
+;;  ............................................................................................................................................................................
+;;  .....................................................................................:-.....................................................................................
+;;  .......................................................................................=..................................-.................................................
+;;  ........................................................................................*...............=.....:............:................................................
+;;  .......................:.:......:..........................................-.............+:.........*....:.....:...........=.......-...............:*@@.....................
+;;  ......................:::-:::::::.:.........................................::............=+.........*........:-...........=.......-.............#@@@@=.....................
+;;  ..................-:-=++*+*=+-------:.................................:....................-%.............-...=:+.-....:+..-:.................+@@@@@@%#.....................
+;;  ...................-%@=...-#@@@%**+==:-:::::.:.:.:.....................:.:...................#=..:.........:...--=.-........=.........:@......#@@@@%@@+.....................
+;;  .................::+@=..........:+%@@@%#+=-:::............................:...................*#.:=.....+...:..:+=.:........*.................*.-................==.........
+;;  .................::-*@........--=+=:.-#*%@@%#=--..::.......................::..................*@+:-.....+:..:..+++.+....-..=-........:................:....................
+;;  ...................-=%@.......:.:-+++**+.-*@*@*==:--.:.......................-:........:........=@@=*.....*:..:.:++-.:...*@=.*.......:+...............::..........:.........
+;;  ...........:....::--:=#@+........:-=+*###*=:.=@@++-:::::...................:...-:................=@@#=:.....:-::.-**:-...:@@%#.......::......-.......:-.:.......:-...:......
+;;  ............:...:...:-+*@%........:-=+*###%#-=-@@#==::::.......=#-.:............:=:.:.............:@@#:=......+-..**+::..:@@@@:......::..:..-*-.....-=.:.....-:+:..::....-..
+;;  ......:::::::..::::.:::=#%@:........:==+*#%#%#=:@@%*+--.......:.%@@+..........-:..:=..-...:........:%@@=+......=-:.#*--...%@@@=....*#:...:-.:.:....=-::.....-:+..=:........:
+;;  ::::-*@@@@@@%#%%#*=+=-:=+*#@=.........:-=+*#%##+.=@%*+==-::...::+%@@=.....-#::.:-:..-=...+::....-*...+@@:+.:...---.=#*.:.:..=@*.-::-@@-..:........=*=.....:.+..=-.....-..=+.
+;;  *@@@*:--:....:#@*:#@@@%#***%@@-........:-==+*#%#=.@@%*+-:::::-::......:.....%@%=.:-=:.-+:.....::::....:@@+=-:::.*=-.*%+-::::..:.---:%@@..:.::.:::++:+#...=-+.:=:.......*=...
+;;  ...-***#@@@@@@@#=--.:#@@@%##+%@=.........:--+*#%%*=:@#*--::..:--:::.:.....:..:::...::-::+=..:::-*=:-:.::@@#=+=-:-*-::%%+-::::-::=-:.+#%:-..*=--=%*=.....=+=.=:=....:-*-.....
+;;  ##%%%@@@@@@@@@@@@@@@@%@*..@@@%%@@=.........-.+#%*.+-@@%%*+=:----::........::....:::---:=::==-:::..:--=:::#@@=++=-**--=@#+-:::==-+==-:.:=-::%=%@%%=-:-:-+#.+:--.::--#=.......
+;;  *#########*#%%@@@@@@@@@@@@::-@@@@@@#.......:+..%@#:@@@@@%*++-+----::---:....::.:..::=-++:+--==-::..:=-*+::=@@=**+=%#--#@**=-:+%*#+=+=-+*+-=#*@@**==-:=*+++*+-::=+#+.........
+;;  .............:--+*#%@@@@@@@@%++@@%@@@@@=..%#=@@%+*%@%=:*@@#*+=-----::--:....:.:::::-----++-=-++=-.::-==+%=--@@++#++@*::%%*#*=+%##*++#**#+**#@@@++*+=+%*##@#+--=%*:..........
+;;  ...................=*#%%@@@@@@%:%@*%+..:+%@@@@@@@@%=:..=%@@@%*+=---:::-:........::-====---#*=-=*+=-=--:--*#-=@@#+%*#@*+*@@%###%%%%%%*%%##%@@@#%%#**#@%%@%**+*%*+-:::........
+;;  ::--:..................=*#%%%@@@=.:++*#@@@@@@@@@@@%@@@@%%:.*@@%==--=:=:-::-.::-.----===-=---*%+:+##===-==+=%+=@@@*@%@@**@@-*=@@@%@@%-+@@%@@@@#@@%@@@@@@@%##@%##*==.......:#=
+;;  ...:=++====-::............:+##%%@%**#%@@@@@@@@@@@@@@@@@@@@%:==@@%++-==--------:-:::--=-++=====*%#=#%#=++==%*%#+%@@@@@@@%%@@-#@@@@@@@-%@@@@@@@@@@%*#*%@@@@@@@%%#%+=-::.:#@@+.
+;;  :......:-=**+++-:::..........=*##%%%%@@@@@@@@@@@@@@@@@@@@@@@#@:-%%*+==++:+#*+=---:===-===+++++++#@*=%%**%*=%%@@#@@@@@@@@@%@@@@@@@@#*+=-----+#%%@@@-@@@+:.-%@@@@%#*+-:+%+....
+;;  @@@@@#.......:-=---..:--:....:+**#%%%%@@@@@@@@@@@@@@@@@@@@@@@@#.%@#++===:-:#@@@@=---==+=-==+***#**%@#+#@@@@@%%@@@@-%%@@@+#+:..=*@@@@=#@@@@@@==@@%*@@@@#*#@=..-@@@%#=:.:-....
+;;  :-=*%@@@@%#*#=...=..........:.:-=*%%@@@@@%%@@@@@@@@@@@@@@@@@@@..@@@#*=+-=..+%@@@@@#-=-:-+%**##%%%%@@@@#+%@@@@@@@@@#:@+@@@@*=@@*%#@@@#+@@@@%@@@@@@@@@@@####+=##*..*@#+-:.....
+;;  :.--::-=**#@@@@@*+#@@@@@*=-....+##%%###*-..:#@@@@@@@@@#%@##@@=...@@#**++++---::.....:-=*##*#%@@%%@@@@@@@=*=-=#%@@@@%.%#@@@*..-+@#@@@@@@@@#*@%@@@@@@@%@####++####*.%@*=:.....
+;;  .:-:--::-===-=*######%%@@%.....=*#####=.......#@@@@@@#+#%**%*.-*..@@%%#*+++**===-=+++**##%%#@@@@@%*=--+#@@##@@@@@@@@%=@#@@=+:%.+-@%*=*--:.:.::=@@@@@@@***#+*#%##*.@@#+:.....
+;;  ..--==-::-=--===-=*###@@@-...:-+*##%##::.%@@*...*%%**:%@@@@*....-.%@@@%**#*++++*#=++=++###@@@=.:*@@@@@@@@@@@%**@%*%@@@@@#*+=.-=..:.-.+........-@@@@@@@==**+%####*.@@#+:-....
+;;  ...:-::-=--=-:--==+#%%@@=-.....:**#####:+@@-........=%@@%%#*=..=-+-:-%@@%#+**+===-+###*#%%@@-+@@@@@@@=+#@@@@#*@+-=.:=-..##..=.#*...:.-..:.....%%%.@@@%*##%+%##%%+.@@#+--:...
+;;  .:.::----=+=-::-=+**%%@@*.....:=+***###=:@@:......:****@@@@@@#-:@@@@#:.*@@#+*+**+=++++*#%@@@.#%%@@@@@@#=#=:....--.....=+.-%..-.@:.-.::.#..:..+*@+@@@#*####+%%###=.@@#+::....
+;;  ....-----==++=-:-+#%@@@@%....:--.:-+#***-:@@-.....*@@@@@%@@@@%%%+@@@@@:%@@%%#***+#******#%@@.#%%@+:......-.......*..=..#@.-%...=@.=.::=.....**+.@@@@@#####*#####+.@@%+=-....
+;;  :--====-:=++++==++#@@@+.......-*##%@@@@@@%+:..=@%@@@@@@@@%...@@@*@@@@@..=@%#***##%@%#*#%@@@%.%@@@==........*..=....*...=@@@*@:.+*%..-.+.....*.:@@@*@%#*%##+##@%#-.@@#*=---:.
+;;  .::==+*==+++++++++#@@@@#...:-+**%@@@@@@@@@@@@@@@@@@@@@@@@@@*#@@@+@@@@#=+%@@###****##%%%@@@@*:@@@#-=...==....:-..#=.:.-..+@@+*@*:=@:.+:-.......-*@@@%+:=*##+%%###-:@@@#*=--::
+;;  .:.=+===+++++****#@@@%......-+*%%@@@@@@@@@@@@@@@@*-*#@@@@@+.:%#==@@@%*..@@####*#:+**%@@@@@@*=*%@#++.......=...+*..++-..:..%@-.#@@@@.%@:.:-...:++@@-@@*=:-*+%%%%#:.:@@@%*+-:-
+;;  ::..==+--+*******#@@*.:#....:-+**%%@@@@@@@@@@@@@@@:.......%-@..%@@@#-=-=@@%**#%%++%@@@==%@@++%##-==+=.....+-...*##..*#..-*.:@#.+@@-%@-:..=--..:+.:@@@@#%=--%%%%#:.:.+@@##++=
+;;  :::=+*++++****###%@@@@@=......=+*+#%@@@@@@@@@@@@@@-......@@=#-%@#*=-..-@@%%%##@@*-*#%@**.@@=*@@@-+==#+-=...-=..=@@@@-...#%:=@@@*:%.=.+.%@#@@#.=..*@@@@####=-####..+*=.@@@%#*
+;;  :-:++++++==**##**##@@@@........::+#%##*%@@@@@@@@@#.........:##*+....:@@@@%%%%%%%@#.=*%==@@@-%%%%=+=..:::*@=..:...=+%@@@%=..++-+::::=%@@@%@@#-%=@@@@@@%####+%%###..*##*::@@%%
+;;  :--=******==*#%%*+*@@@@:@.-.....::----=*#%%%@%%%%*.:=.....-@+=....+@@@@@@%%%@%%%%%@-..#@@@@-%%%#=+-..:..:%@@@#:.-:......==-=.-.:-%@@@@+@+=#.-=@#*@@@@%*###+#####..*#####.-@@
+;;  --::=*#*#*++*#%###%@@@@@@=.........::.-*+=+=+-++*@+-##=%:=@#...:%@@@@@@@@@@@@@%@%%@@@@@@@-..-+@#=+:.....:.+++..:*@%-......=..+%@@@@@-@*=%%@@#..-@@@@@**##*+#####..**######.:
+;;  ----+**#*##**%%%%%%@@@@#:............:.......:.:+@@@:.:.#@#.....:-:=:.--.--:+@@@@@@%%#%@@@@-*%-=+=:...-::-**-:::::....++:.+%@@@@@@=##+=#**##=:..%-*@@*###**%####..#####***##
+;;  -==:-+*#####%%%%%@@@@@+..........................-#@@@@@%-....-*+:-*%##%%@@@%#--@@@%%%@@@@%-#+===+:..:-..........:...=.=@@@@@@@@##@@+==+++*--..-:+*-#-###+*#####..####******
+;;  --+-:=+#####%%@@@@@@@*.....................................:++=.-##%@@@#+:+%#%-*.@@@@%%%@@%-%%%+##+:.............--:-@@@@@@@@@@#@##*-+===+=...*@%@..+*###-######..######****
+;;  *:-*+==*###%%@@@@@@:....:=+##%%#+++=-:..-..:.::........::*@+*..@@#.+@@*...+.:.=-=.@@@@-=-@%=%%%+++.........:......@@@@@@@@@@@*@@@@@**++==-=.*-@@@@@@@#..--#####*.:#*********
+;;  ==-*#*+=#%%%@@@@@@=...:-+*#%@@@%@@%%##*+-+%@@##*%*=-:+#@#@@@-:@@%.:@...#-+.#-+.*..#@@@@@@@*=%%%++=..........*-.%@@@@@@@@@@@%%@@@@@*%#%##*:..:=-@@@@@@***+=-####*.:###*******
+;;  =+-+#%#*%@@@@@@%-...-+##%@@@%%@%%@%%#%#*+@@@@@@@%@%@%@@@@@@#.##%@#.:#%*.#%=.*::--.%@@@@@@@*=%%#=+=....:+.-.:*@@@@@@@@@@@@@*%@@@@@@*%##*:=....@@@@@@@@****+++###+.-###*******
+;;  ==--#%%*#@@@@@:...-+#%%%%@@@%%%%@***###-@@@%@@@@@@@@@@@@@@@+.=.=%%+.*:+.==@+=...*.@@@%@@@@*=##%-++....-:-=@@@@@@@@@@@@@@@@@@@@@%@%%%+..=#=...@@@@@@@%****=*####=.=##*#******
+;;  ++*##*%%%@@@@:..:-+*#%#**#%@#%#*%*-+*+-+=-:@@@@@@@@@@@@@@%#+....-##.:@-=.#..:.=.=-@@@@@@@@*-###==+..+::@@@@@@@@@@@@@@@@@@@@@@@@%%*.-=%=*..-%-@@@@@@@#****-####*-.=**********
+;;  ***####%@@@==...:+**#%%%%#*+#**+-=.::=..=-%@@@@@@@@@@@@#%-.#@@#-.=++.@=:.@:::=:.#:@@@@%*@@%:###.+-.-#@@@@@@@@@@@#@@@@@@@@%@@@@#-...#@=@.=....--@+%@@%****-##***:.=****+*****
+;;  ##*##**%@@@#...:=+##%%#@@@@@@=:-....==*#+:.=@@@@#@@@@@%*::@@%+:..:::.+#..@=+%#-..+@@@@@@@@@-**..+:@@@@@@@@@@@@@%@@@@@@@@@%@%*.+...:@@.#%.::.+@@.@@@@%****-##***..+****+++++*
+;;  *###%%%@@@@....::+*#%%@@@@@@@@#+.....+*+.::=@%@@#-@@#%*=:@@%=........-@@=.......:@@@@@@@@=-:.=.*@@@@@@@@@@@@@#%@@@@@@@@@@#:-...*.@@@@:.+-..**@@@%#@@#****-*#***..+*****+++*+
+;;  #**%@@%@@@%....::=*#%%%@@@@@@@@@=...-++**#-:*.@**-=@-#=.%@%+.#%@@@@@.#-.........@@@@@%+@@=.::@@@@@@@@@@@@@@@%%@@@@@@@%%::=....*.-*.@@@......+#@@@@@@#****+*****..+******++++
+;;  %##%@@@@@@*+....:-+*##%%@@@@@@@@@#..-=+**#-.-.+=*+.+:=.+@@*::#%@%@#--*........:@@@@@@::=.:+@@@#@@@@@@@@@@@@#@@@@@@@#+=.-.....=..-..@%-..+...#@##@@@@****+*****+..++++*++++++
+;;  +##@@@@@@@@@.....:==++##%@%@@@@@@@@#..-=+*+*+-:+++-:==.@%%+....==.::+.....-#%#*%@+@@*.:.%@@@@%@@@@@@@@@@@@%@@@@@@*.*.......%*....-.+=....#..#@@%@@@@****=*****+..++++++++=+=
+;;  %%%@@@@@@@@@%.....:-:-**#%@%@@@@@@@@@@@@+.=++=+=+==+*-=@#*:.@@+...+:-.:%=..::..:%:.=.-@@@@@@#@@@@@@@@@@@@@@@@@%..-.:-....*@:.....=....-...=.#@@@@@+*++**=*****+..++++++++=++
+;;  %@@@@@@%@@@@@%......::-***##%%%@@@@@@@@@@@-.=+=-==..=.#**+..:.*-:=:*...=#+.......-.+@@@@@@@%@@@@@@@@@@@@@@@#:*...........-.#=...=#...--:...=#@@@@@@@=::*=*****=..++==-=++++=
+;;  @@@@@@#:@#@@@@@.........-=++*##%%@@@@@@@@%#=.--..#@@%.@*+*.:.%-+-....+-.:%@@@=.+:#@@@@@@@@#@@@@%@@@%%@@@%+.=..-=......:.-..=.........-.*....@@@@@@@@+*+--+****=..==-====+===
+;;  @@@@:-@:--..*@=...........-:=***%%%@@@%%##+...%@@@@@:-@+*..=.@....+:.:@@@@@@@@%.#@@@@@@@@#@@@@@@@@@%%@=:#..-........-..=.........+..........@@%@@@@%=***.-****=..=++=+++===.
+;;  @@-:#::::-:--................-=***##%%#+=:.+@@@@#*#*.@#+=.-..-....-@@@@@@@@@@@@@-:%@@@@%*%%%%%@@@%%----:.................::....=...:-:---=:=%@@@@+%#+=++=*:***-..==+=====--.
+;;  %.-.::::.......................:==*+**+..#@@@####*#==@++:.-..-.-@@@@%*%@@@@@#++%@#.*%@%%%%%%%%@%==.............+++@+@@@@.::-+@%@@@%@@@@@@@@@@%@@@@@*=+++=**++*-..-==-::.....
+;;  @...:::....:....................:--==+..@@%#*+*****.%*=#....:@@@@@@%%%%@@%.......@@.+%%%%%@%#+.................-%#@@@@@-%@@:@@*#@@@@@@@%%@+@@@@@@@@*++++-+***+:........:*@@@
+;;  @...................................:..%#*+++*+***-.@++-..=@@@%@@@%@%@@@*...@@@..#@=:#%%%%=.*...............:=##%%@@-*%@@@*#@@@%+@@@@@@=%@#@@@@##@@+=++*-++*++:....-%@@@%@%%
+;;  @-........:...:-=++++=-:..............=%*-=+**:.=*.*#=+..%@@%%%%%@%@@@@@+...:=-.:@@@.+#:....+..............:*+%#*#@@@@@@@@@@@@@@@@@@@@@@@#.@@@@@*%@=++++:++++=.-@@@@@@%%#%%%
+;;  -*......:....:==+#%@@%%#+-............:@+==-=*:+++.@==-.:@%%%%%%%%%@%%%%@=--:.=@@#@@+....@@@@*:............-+**##%%%%%@%%@@@@@@@@@@@@@@@@*..#%@@@%+-=+++:+++=-.#@@%%%%%####%
+;;  :...........:-*#%%@@@@@@@%*=:..........:%*..=+*++:=#-+..#%%%%%%%%%%*%@%%%@@@@@@@@%%@-.:@@@@@@@@@@@@@@@@@@#**+-:.............................................:+@@@@@#%%#*###%
+;;  @+......-.:.=+#%%@@@@@@@@@@#+-..........:@**+++++.%=-*..@%%%%%%#*%%@%#%%%%%%@@%%%%*...*@@@@@@@@@@@@@@@@@@@@@@@@@@.........................-..........@@@@@@@@@@@%@%@%%%##%%@
+;;  @@%:......:-*##@@@#@@@@@@@@%#*:.......#+..#*+++=..#-+:.=@%%####%%%%%%#%%%@@%%%%+.....*@@@@@@@@@@@@@@@@@@@@@@=:........::--------:.......................=@@@@@@@@@@@@@@@@@@@
+;;  @@@@@*...:=+*#%%*#@@@@@@@@%%#=-.....+@@#-.:*=::=.=+-+..@%*#%%%%%#%%%%#*=%%@%+......:%@@@@@@@@@@@@@@@%%#*+==...:-*%@@@@@@@@@@@@@%##**#**#*+==:....................-=+**##%@@@
+;;  @@@@@@%...:+*####%%%@%%%%%%##=-....@@###*-..#*...@==-.:@#%%%%%#%%%%%%%%@%:......=@@@@@@-...........................:-=**%%@@%=+*%@@@%##*##+=-:................-=**##***#%@@@
+;;  %%@@@+....-=+***###%%%%###*++-...%@%%#*#*+:..+#*.#=+..=%%##%%#*%#=%%%+......-%@@@@@@@:...........:-+%%@@@@@@%%%%%@%@%%@@@++=::=***######%%@@%%%%@@@@@@+=@@@@@@@@@@%#*+++====
+;;  @@@@*-....--=****#*#####**+=-..+@####**:......##:..:..*#%%##*%%%-*-.........@@@@@@@@@-............-=##%*@@@%@@@@@%@@@@@@-*#@@@@@@@@@%@@@@@@@@+%@@%%###+==++++*++++++++++=--:
+;;  @%@@@......-====++******+=--.:@##*#**.........-@+:....%%**#+#%+............=@@@@@@@@@-...........:-:+#########%%%%%%%%%%:.#%%##*%@%%-*%#%@#=+=-******+*-+++++=+:=.=::=:=.::.
+;;  %%@@@-......::-:-=+=++==-:..%%###*=............:#::...%*+-=......:........=@@@@@@#@@@-...........-=-+=###+###%%%%%%%%%%%#=#%%%%%%%%%@%@%%%#+++-***-=:+:*.+.-:.-.=.-::=.=.::.
+;;  %%@@@@.........::---=:=::.:@#**+................*=-...=*:................+@@@@@@@#@@@-........:-=+++==+##*##%#*-....:--=+*##%%%%@@@@%%%%%%#+++-**+:-.+.+:=.-:.-.-.=::-.=.::.
+;;  %%@@@@*..........::...:..:@##=.................+@::..............=.....+@@@@@@@@@@@@@-........:-=====+-*+####*#*-+....................*@@@#+++-+*+::.+:+.=.-..-.-.-::=.=.:..
+;;  **%#@=....................%@*-.............:#@@#+=....*@@@%..................+@@@@@@@=.........:--=++*+--****##%@@@##*++=+%#@:#@@@#*+=*%%%#+++-*+=-:.+.+.+.-..-.-.=.:-.-.:..
+;;  ***#@@*....................%@#=.........=@@@#+...*@@@@@@@@@%.....................%@@@#.......::-====++*-=-*+**####**####%%##%+=%%%%##@%%###+=+-+++-..=.+.+.-..-.-.-:::.-.:..
+;;  ...-%#......................#@#+.....=@@@*-..+@@@@%=-....:=-.:++.:-:...............%@%....:::::-+++=+++=++************#######*-%%%%%%%%##+#===:+++:..-.+.=.:..:.-.-..:.-.:..
+;;  ..:+..:.-+#####**==..........*@@@#*@@#+:..#@+:...............:+.-#*.%@==@@-*@%.*#:.:-:...:--====+++++++++++++++=***+.:-****###.+=.+=.*%##*#===:=++:..-.=.-.:..:.::#%.:.-::--
+;;  .+..=#++@%@@@@-%@@%%*::.......+####-..*=..............:++:#*#@*%@@-%%=.........+-.%@#.%@@-.@@@=-#+.:..:==++***++*+*=+:.*+=*=+*=.=#..*.*##**==-.===-..:.=.=:=-:=@@@-.:-------
+;;  ...+#:=#@@@@@-@@@@@%#+............-:....:.......=+-+=-@#*%%=*#*.:-:.:.+%=#@@-@@#:%%+.:.....:=..*%:.@@%.+@@@--**=.++-:.:-=+++***=.#:-*.####*=--.===-:--==-.-*%@@@%%..::::....
+;;  ..:-+.=%@@@#=+@@%@%#*::...................+*.*##:%@@**+=::...:.+#-+@*@@#*#+::....--:##%:.-@@*-%#=.......:-.=@@#:.=@@@@@@@-:*+*++*-::=#####*=--.=--======:.-*@@%%*......:-==*
+;;  ..:::.:*###*.+%#%##=..................*@@@@@%=:...::..:-:=*=*@@@@#=.....-.:%%*@@#*@@*.........-+.+@@@##+==**-....+%@@#:.::.+++++**+.+*****+---.---------:........=###%#%%%%%
+;;  -.......--:........=@@@#+%%@@@@%*+++=::=----::=#@@@@@@@@%+:....::-::-*%@@@%:::.......-=@@@-#@@+=@@%.-*#=-:.::#@@@#.::----=.........=:-+****--:.......:==#%#%%=..=+*#%#**####
+;;  @@@@@@%%#@@@@@@@@@@%@@@@@@@@=#@@@#%@@@=-.....:-===---:===+%@@@@@@%#*=:...:..-+*..+%@=*#*+=......:.+*=....*@@@#=:::::-..-#%*#@@@@%*:.:=:.....-+*#@@@@@%@%@@@#-...:-=#%%#*=-==
+;;  #%%*#%%%@@@@@@@@%+%#-#@@@@@@@@+%@@@@%%%%%@@@@@@*+-....::-----::::-*%@@@@@@@%#+=....-.:-=-.:+%##=:...:+@@@%=:-::::::.=@@@.-=@@@@@@@@@%.:%@@@@@@@@@@+:=#@+#@@@@@@@@@@@%%#%###%
+;;  #%%%%%%%@@@@@@:++:.+%@@@@#-*:%@@@=.###*-.-@@%+#@++@@@@@@@#-.....:==--===--..=#@@@@@@@@@%+:.......*@@@%-::::.::::..+@@@@@@@@@@@@@#**+++=.*@@@@@@@@@@@*@@@*@@@@#*##+***###****
+;;  ####%%%@%%@@@@###%@@@@@@@:...-*@@#..:-+#%@@@@@@@@@%@@@@@@@@@@@@@#*##*+:...:.-===-:--::-=*@@@@@@@@%=:::::::.....-.+@@%@@@@@@@@#*+-........--*%@@@@@@@@@@@@%%%%@@%%%%%#%#***+*
+;;  *#####**++====+*#####*##*####%%@@@@@@%#*@@@#=@@@@.+%*###@@@=-.-+=-#@@@@@@@@@**=::.....:--=-:::.:--::....-*%@@@@@..=+*%%%%##*+:.:...............:-=++*#%%%@@@@%%**+++====-=+=
+;;  -::--+****####*+=-=*######%##%%%%%#%###%@@%*%@@@%:.-=:...@@@@@@@@@@@@-%@@@+.:..%@@@@@@@%*=.......:*@@@@@@@@@@@@@#..::.......:.........+%@@@@@@@@#=:....:-=-::-+++***+++=====
+;;  ::-+++-.:-=+***++**+++++**###******++****#####%##+..-+#%@@@%%%@%@@@@%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-........:=%@@@@@@@%%@@%%#%%%#***####*#*=:...:==:.......
+;;  .....::---=-------=====++**+=:.-=++*****+=-:-=**#**###*+=-+**++###*++****########%%%####*******#*##%%#*****+***#**#%%@@@@@@%%#%%%%#***##**++*+++++=+++++====+======-:.......
+;;  .............::::-:--:::..:-=::.:----==+*+=-:-==-====+++++==+++++=+====+++=+++***++*++++++++***+++=+=+-=========--=====+======-====---======--:.:-::::::-:....:::.:::.......
+;;  ...................:..::..:--......:.:......-:-------:--..:-==-----:........:-:--:-----::-..::....:::::::::-...::.::.:......:::--.....::...-:...............................
 
  (def harvest-on-boot? (get (config/settings) :harvest-on-boot? true))
 
@@ -231,6 +317,64 @@
                           (ut/pp [:flow-change! f-op f-path])
                           (update-flow-meta f-path)))
                      file-path)))
+ 
+(defn get-ai-workers []
+  (try
+    (let [workers-dir (io/file "./ai-workers")
+          worker-folders (filter #(.isDirectory %) (.listFiles workers-dir))
+          workers-map (into {}
+                            (for [folder worker-folders
+                                  :let [folder-name (.getName folder)
+                                        config-file (io/file folder "config.edn")
+                                        system-prompt-file (io/file folder "system-prompt.txt")
+                                        personality-file (io/file folder "personality.txt")]]
+                              (when (.exists config-file)
+                                (try
+                                  (let [config (edn/read-string (slurp config-file))
+                                        system-prompt (if (.exists system-prompt-file)
+                                                        (slurp system-prompt-file)
+                                                        "")
+                                        personality (if (.exists personality-file)
+                                                      (slurp personality-file)
+                                                      "")]
+                                    {folder-name (assoc config
+                                                        :system [{:type "text"
+                                                                  :text personality}
+                                                                 {:text system-prompt
+                                                                  :type "text"
+                                                                  :cache_control {:type "ephemeral"}}])})
+                                  (catch Exception e
+                                    (ut/pp [:error-reading-ai-worker-files folder-name (.getMessage e)])
+                                    nil)))))
+          trunc-workers-map (ut/deep-remove-keys workers-map [:system :tools])]
+      (try
+        (reset! db/model-costs (edn/read-string (slurp "./ai-workers/model-costs.edn")))
+        (catch Exception e (ut/pp [:error-reading-model-costs.edn! (str e)])))
+
+      (when (seq workers-map)
+        (swap! db/ai-worker-atom assoc-in [:config :server] workers-map)
+        (swap! db/ai-worker-atom assoc-in [:config :client] trunc-workers-map))
+      true) ; true if successful
+    (catch Exception e
+      (ut/pp [:error-in-get-ai-workers (.getMessage e)])
+      false)))
+
+;; (ut/pp  (get-ai-workers))
+
+(defn watch-ai-workers-folder []
+  (let [file-path "./ai-workers/"]
+    (beholder/watch
+     (fn [event]
+       (when (and (= (:type event) :modify)
+                  (or (cstr/ends-with? (str (:path event)) ".edn")
+                      (cstr/ends-with? (str (:path event)) ".txt")
+                      (cstr/ends-with? (str (:path event)) ".clj")))
+         (let [f-path (str (:path event))
+               f-op (:type event)]
+           (ut/pp [:ai-worker-change! f-op f-path])
+           (when (get-ai-workers)
+             (ut/pp [:ai-workers-updated-successfully])))))
+     file-path)))
 
  (defn watch-screens-folder []
    (let [file-path "./screens/"]
@@ -379,6 +523,64 @@
                                         5)
                             (wss/kick d [:settings] (wss/package-settings-for-client :rvbbit) 1 :none (str "file updated " (get % :path))))))
                      file-path)))
+ 
+(defn process-snap-file [file-path]
+  ;(ut/pp [:processing-file file-path])
+  (let [file-name (-> file-path io/file .getName)
+        [_ base-name timestamp extension] (re-find #"^(.+)-(\d+)\.(\w+)$" file-name)]
+    (when (and base-name timestamp)
+      (let [full-name (str base-name "-" timestamp)]
+        ;(ut/pp [:processed-file base-name full-name])
+        {(keyword base-name) #{full-name}}))))
+
+(defn update-macro-undo-map [file-path]
+  ;(ut/pp [:updating-atom-for file-path])
+  (when-let [processed-file (process-snap-file file-path)]
+    (swap! db/params-atom
+           (fn [current-state]
+             (let [new-state (update current-state :macro-undo-map #(merge-with into % processed-file))]
+               ;(ut/pp [:atom-updated (:macro-undo-map new-state)])
+               new-state)))))
+
+(defn process-existing-files [dir-path]
+  ;(ut/pp [:processing-existing-files dir-path])
+  (let [dir (io/file dir-path)]
+    (if (.exists dir)
+      (if (.isDirectory dir)
+        (let [files (file-seq dir)]
+          ;(ut/pp [:found-files (count files)])
+          (doseq [file files
+                  :when (.isFile file)
+                  :let [file-path (.getPath file)]
+                  :when (or (cstr/ends-with? file-path ".edn")
+                            (cstr/ends-with? file-path ".jpg"))]
+            (update-macro-undo-map file-path)
+            ;(ut/pp [:existing-file-processed file-path])
+            ))
+        (ut/pp [:error-not-a-directory dir-path]))
+      (ut/pp [:error-directory-not-found dir-path]))))
+
+(defn watch-macro-undos []
+  ;(ut/pp [:starting-watch-macro-undos])
+  (let [relative-path "assets/snaps/"
+        file-path (-> relative-path io/file .getAbsolutePath)]
+    ;(ut/pp [:watching-directory file-path])
+    (process-existing-files file-path)
+    ;(ut/pp [:initial-macro-undo-map (get @db/params-atom :macro-undo-map)])
+    (beholder/watch
+     (fn [event]
+       ;(ut/pp [:beholder-event event])
+       (let [changed-path (str (:path event))]
+         (when (or (cstr/ends-with? changed-path ".edn")
+                   (cstr/ends-with? changed-path ".jpg"))
+           (update-macro-undo-map changed-path)
+           ;(ut/pp [:macro-undo-map-updated (get @db/params-atom :macro-undo-map)])
+           )))
+     file-path)))
+
+;; :client/macro-undo-map>client-name
+;; (ut/pp [:watch-macro-undos (get @db/params-atom :macro-undo-map)])
+;; (ut/pp [:watch-macro-undos (keys @db/params-atom )])
 
  (defn watch-solver-files []
    (let [file-path "./defs/"]
@@ -417,7 +619,8 @@
    (wss/reload-solver-subs) ;; run once on boot (needs nrepl(s) to start first...)
    (wss/create-web-server!)
    (let [flows (vec (filter #(not (cstr/includes? (str %) "-solver-flow-")) (keys @flow-db/results-atom)))]
-     (reset! flow-db/results-atom (select-keys (ut/replace-large-base64 @flow-db/results-atom) flows))))
+     (reset! flow-db/results-atom (select-keys (ut/replace-large-base64 @flow-db/results-atom) flows)))
+   )
 
  (defonce scheduled-tasks (atom {}))
 
@@ -474,6 +677,8 @@
 
  (def last-look (atom {}))
  (def saved-uids (atom []))
+
+;;  (sql-exec cache-db "drop table if exists jvm_stats;")
 
  (defn update-stat-atom [kks]
    (qp/serial-slot-queue :update-stat-atom-serial :serial
@@ -656,13 +861,14 @@
    (println " ")
    (ut/print-ansi-art "data/nname.ans")
    (ut/print-ansi-art "data/rrvbbit.ans")
-   (ut/pp [:version "0.1.4" :september 2024 "Howdy."])
+   (ut/pp [:version "0.1.7" :october 2024 "Howdy."])
    (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
    (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   ;; (println " ")
   ;; (wss/fig-render "Curiouser and curiouser!" :pink)
 
    (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+   (get-ai-workers) ;; just in case for the cold boot atom has no
 
    (qp/create-slot-queue-system)
    (fpop/thaw-flow-results)
@@ -677,6 +883,7 @@
 
    (cruiser/create-sqlite-sys-tables-if-needed! system-db)
    (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
+   (cruiser/create-system-reporting-tables-if-needed! system-reporting-db)
 
    (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest1)
    (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest2)
@@ -697,10 +904,12 @@
    (defonce start-solver-watcher (watch-solver-files))
    #_{:clj-kondo/ignore [:inline-def]}
    (defonce session-file-watcher (wss/subscribe-to-session-changes))
+   #_{:clj-kondo/ignore [:inline-def]}
+   (defonce macro-undo-watcher (watch-macro-undos))
+   #_{:clj-kondo/ignore [:inline-def]}
+   (defonce start-ai-workers-watcher (watch-ai-workers-folder))
 
-
-
-  ;; create dirs for various artifacts, if not already present
+   ;; create dirs for various artifacts, if not already present
    (doseq [dir ["assets" "assets/snaps" "assets/screen-snaps" "defs/backup"
                 "flow-logs" "flow-blocks" "flow-history" "fabric-sessions" "live"]]
      (ext/create-dirs dir))
@@ -764,6 +973,15 @@
     cruiser/default-derived-fields
     cruiser/default-viz-shapes)
 
+   (cruiser/lets-give-it-a-whirl-no-viz
+    "metrics-kpi-db"
+    metrics-kpi-db
+    system-db
+    cruiser/default-sniff-tests
+    cruiser/default-field-attributes
+    cruiser/default-derived-fields
+    cruiser/default-viz-shapes)
+
    (cruiser/clean-up-db-metadata "cache.db")
    (cruiser/lets-give-it-a-whirl-no-viz
     "cache.db"
@@ -785,8 +1003,26 @@
     cruiser/default-viz-shapes)
 
    (cruiser/lets-give-it-a-whirl-no-viz
+    "realms-db"
+    realms-db
+    system-db
+    cruiser/default-sniff-tests
+    cruiser/default-field-attributes
+    cruiser/default-derived-fields
+    cruiser/default-viz-shapes)
+
+   (cruiser/lets-give-it-a-whirl-no-viz
     "history-db"
     history-db
+    system-db
+    cruiser/default-sniff-tests
+    cruiser/default-field-attributes
+    cruiser/default-derived-fields
+    cruiser/default-viz-shapes)
+
+   (cruiser/lets-give-it-a-whirl-no-viz
+    "system-reporting-db"
+    system-reporting-db
     system-db
     cruiser/default-sniff-tests
     cruiser/default-field-attributes
@@ -822,6 +1058,10 @@
                     #(try (wss/jvm-stats) (catch Throwable e (ut/pp [:error-in-jvm-stats-fn-sched (.getData e)])))
                     "JVM Stats" 30)
 
+   (start-scheduler 600
+                    realms/load-realm-maps
+                    "Rebuild the Realms!" 45)
+
    (start-scheduler 15
                     #(wss/flow-statuses true)
                     "Flow Stats & Watchdog" 15)
@@ -841,10 +1081,10 @@
                         (wss/param-sql-sync)))
                     "Parameter Sync" 30)
 
-  ;; (start-scheduler 45
-  ;;                  #(when (> (count (wss/client-subs-late-delivery 30000)) 0)
-  ;;                     (wss/sync-client-subs))
-  ;;                  "Sync Client Subs" 120)
+  (start-scheduler 45
+                   #(when (> (count (db/client-subs-late-delivery 30000)) 0)
+                      (wss/sync-client-subs))
+                   "Sync Client Subs" 120)
 
   ;; (start-scheduler 30
   ;;                  #(doseq [[name conn] @sql/client-db-pools]
@@ -875,9 +1115,9 @@
     ;;                     cruiser/default-viz-shapes)))
     ;;                "(Re)Sniff Cache SQL DB" 30)
 
-  ;; (start-scheduler 600 ;; sketch for little gain?
-  ;;                  db/clean-up-reactor
-  ;;                  "Remove unneeded watchers from Reactor" 120)
+  (start-scheduler 600 ;; sketch for little gain?
+                   db/clean-up-reactor
+                   "Remove unneeded watchers from Reactor" 120)
 
    (start-scheduler 300 ;; was 5
                     #(ppy/execute-in-thread-pools
@@ -928,7 +1168,7 @@
                          (swap! wss/pool-tasks conj (wss/pool-tasks-count))
                          (swap! wss/sys-load conj (ut/get-system-load-average))
                          (swap! wss/non-heap-mem-usage conj (ut/get-non-heap-memory-usage))
-                         (swap! wss/time-usage conj (System/currentTimeMillis)) ;; in case we want to easily ref w/o generating
+                         ;(swap! wss/time-usage conj (System/currentTimeMillis)) ;; in case we want to easily ref w/o generating
                         ;(qp/update-queue-stats-history) ;; moved to 15 second scheduler
                         ;(qp/update-specific-queue-stats-history [:watcher-to-client-serial :update-stat-atom-serial])
                          (swap! db/cpu-usage conj (ut/get-jvm-cpu-usage)))
@@ -942,11 +1182,12 @@
                        (reset! wss/solvers-cache-hits-atom {})
                        (reset! wss/solvers-cache-atom {})
                        (reset! sql/sql-query-log [])
-                       (reset! sql/errors {}) ;; just for now
-                       (reset! wss/agg-cache {}) ;; <--- bigggger
+                       (reset! sql/sql-exec-log [])
+                       (reset! sql/errors [])
+                       (reset! wss/agg-cache {})
                        ;(reset! ut/df-cache {})
                        )
-                    "Purge Solver & Deep-Flatten Cache" (* 3600 8))
+                    "Purge Solver & Deep-Flatten Cache" (* 3600 1))
 
   ;; (ut/calculate-atom-size :current-size ut/df-cache)
 
@@ -1052,8 +1293,8 @@
 
    (shutdown/add-hook! ::the-pool-is-now-closing
                        #(do (reset! wss/shutting-down? true)
-                            (doseq [electric-eye [start-conn-watcher start-screen-watcher start-flow-watcher
-                                                  start-settings-watcher start-solver-watcher session-file-watcher]]
+                            (doseq [electric-eye [start-conn-watcher start-screen-watcher start-flow-watcher macro-undo-watcher
+                                                  start-ai-workers-watcher start-settings-watcher start-solver-watcher session-file-watcher]]
                               (do
                                 (ut/pp [:stopping-beholder-watch (str electric-eye)])
                                 (beholder/stop electric-eye)))
@@ -1086,12 +1327,6 @@
                           ;;                  5)))
                            ;;  (Thread/sleep 2000)
                             (wss/destroy-websocket-server!)
-                           ;;(tt/stop!)
-                           ;(wss/stop-worker)
-                           ;(wss/stop-worker2)
-                           ;(wss/stop-worker3)
-                           ;(wss/stop-workers4)
-                           ;(wss/stop-workers5)
                             (Thread/sleep 2000)
                             (wss/destroy-websocket-server!)))
 
@@ -1105,6 +1340,10 @@
                           (doseq [[conn-name conn] @sql/client-db-pools]
                             (ut/ppa [:shutting-down-client-connection-pool (cstr/replace (str conn-name) ":" "") conn])
                             (sql/close-pool conn))))
+
+   (shutdown/add-hook! ::cleaning-up-after-ai-workers
+                       #(do (ut/pp [:cleaning-up-after-ai-workers])
+                            (assistants/clean-up-threads-and-assistants)))
 
    (shutdown/add-hook! ::close-system-pools
                        #(do (wss/destroy-websocket-server!)

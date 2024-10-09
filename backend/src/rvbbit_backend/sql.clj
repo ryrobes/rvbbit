@@ -2,13 +2,14 @@
   (:require
    [clj-time.coerce     :as tc]
    [clj-time.core       :as time]
-   [clj-time.jdbc]
+  ;;  [clj-time.jdbc]
    [clojure.edn         :as edn]
    [clojure.java.jdbc   :as jdbc]
    [clojure.string      :as cstr]
    [clojure.walk        :as walk]
    [hikari-cp.core      :as hik]
    [honey.sql           :as honey]
+   [honey.sql.helpers :as helpers]
    [rvbbit-backend.util :as ut]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
@@ -45,7 +46,7 @@
                                    (cstr/replace (str db-name) ":" "")
                                    ".db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL")
                     :idle-timeout      600000
-                    :maximum-pool-size 20
+                    :maximum-pool-size 1
                     :max-lifetime      1800000
                     :cache             "shared"}
                    (cstr/replace (str db-name) ":" ""))]
@@ -59,18 +60,18 @@
       (close-pool pool)
       (swap! client-db-pools dissoc db-key))))
 
-
+;; (ut/pp (filterv #(cstr/includes? (str %) "-") (mapv #(cstr/replace (str %) ":" "") (keys @client-db-pools))))
 
 (def system-db
   {:datasource
    @(pool-create
      {:jdbc-url
-      ;;;;;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
+      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
-           ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
+      ;;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
+      ;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
       :idle-timeout      600000
-      :maximum-pool-size 20
+      :maximum-pool-size 5 ;20
       :max-lifetime      1800000
       :cache             "shared"}
      "system-db")})
@@ -201,14 +202,34 @@
       :cache    "shared"}
      "mem-cache-db-pool")})
 
-;; (def cache-db
+(def realms-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url
+      "jdbc:sqlite:file:./db/realms.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
+      ;;"jdbc:sqlite:file:./db/realms.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+      :cache    "shared"}
+     "realms-db-pool")})
+
+;; (def realms-db
 ;;   {:datasource
 ;;    @(pool-create
-;;      {:jdbc-url
-;;       ;;"jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
-;;       "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
-;;       :cache    "shared"}
-;;      "cache-db-pool")})
+;;      {:jdbc-url "jdbc:duckdb:./db/realms.duck"
+;;       :idle-timeout      600000
+;;       :maximum-pool-size 200
+;;       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+;;       :max-lifetime      1800000}
+;;      "realms-db-pool")})
+
+(def system-reporting-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url "jdbc:duckdb:./db/system-reporting.duck"
+      :idle-timeout      600000
+      :maximum-pool-size 200
+      ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+      :max-lifetime      1800000}
+     "system-reporting-db-pool")})
 
 ;;(def default-schema "base")
 (def cache-db
@@ -220,6 +241,16 @@
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
      "cache-db-pool")})
+
+(def metrics-kpi-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url "jdbc:duckdb:./db/metrics-kpi.duck"
+      :idle-timeout      600000
+      :maximum-pool-size 200
+      ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+      :max-lifetime      1800000}
+     "metrics-kpi-db-pool")})
 
 (def cache-db-memory 
   {:datasource
@@ -244,9 +275,16 @@
 
 (defn insert-error-row! [error-db-conn query error]
   (swap! errors conj [(str error) (str error-db-conn) query])
-  ;; (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 400) (catch Throwable _ (str query)))})
+  (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 400) (catch Throwable _ (str query)))})
   )
 
+(defn get-connection-string-info [db-spec]
+  (when-let [datasource (:datasource db-spec)]
+    (when (instance? com.zaxxer.hikari.HikariDataSource datasource)
+      (let [config (.getHikariConfigMXBean datasource)]
+        (str "HikariCP connection: "
+             "jdbc:" (.getJdbcUrl config)
+             " (pool: " (.getPoolName config) ")")))))
 
 (def sql-queries-run (atom 0))
 (def sql-query-log (atom []))
@@ -278,6 +316,8 @@
     (swap! map-orders assoc query headers)
     mm))
 
+
+
 (defn sql-query
   [db-spec query & extra]
   (swap! sql-queries-run inc)
@@ -296,12 +336,48 @@
           (let [end-time (System/nanoTime)
                 execution-time-ms (/ (- end-time start-time) 1e6)]
             (insert-error-row! db-spec query e)
-            [{:query_error (str (.getMessage e))}
-             {:query_error "(from database connection)"}
-             {:query_error (str db-spec)}
+            [{:database_says (str (.getMessage e))}
+             {:database_says "(from database connection)"}
+             {:database_says (get-connection-string-info db-spec)}
              {:execution_time_ms execution-time-ms}]))))))
 
 
+
+
+(defn sql-query-one
+  [db-spec query & extra]
+  (swap! sql-queries-run inc)
+  (let [start-time (System/nanoTime)]
+    (jdbc/with-db-connection [t-con db-spec]
+      (ut/ppln [query db-spec])
+      (try
+        (let [result (wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
+              result (first (vals (first result)))
+              end-time (System/nanoTime)
+              execution-time-ms (/ (- end-time start-time) 1e6)]
+          (swap! sql-query-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
+                                     (str (try (subs (str query) 0 300)
+                                               (catch Throwable _ (str query))) "-" (hash query)) execution-time-ms])
+          result)
+        (catch Exception e
+          (let [end-time (System/nanoTime)
+                execution-time-ms (/ (- end-time start-time) 1e6)]
+            (ut/pp {:sql-query-one-fn-error e :db (-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword) :query query :extra (when extra extra)})
+            (insert-error-row! db-spec query e)
+            [{:database_says (str (.getMessage e))}
+             {:database_says "(from database connection)"}
+             {:database_says (get-connection-string-info db-spec)}
+             {:execution_time_ms execution-time-ms}]))))))
+
+
+;; (defn sql-query-one
+;;   [db-spec query & extra]
+;;   (jdbc/with-db-connection ;; for connection hygiene - atomic query
+;;     [t-con db-spec]
+;;     (ut/ppln [query db-spec])
+;;     (try (first (vals (first (jdbc/query t-con query {:identifiers keyword}))))
+;;          (catch Exception e
+;;            (do (ut/pp {:sql-query-one-fn-error e :query query :extra (when extra extra)}) (insert-error-row! db-spec query e))))))
 
 
 (defn sql-query-meta
@@ -310,14 +386,7 @@
     [t-con db-spec]
     (jdbc/metadata-result (.getMetaData (jdbc/query t-con query {:identifiers keyword})))));)
 
-(defn sql-query-one
-  [db-spec query & extra]
-  (jdbc/with-db-connection ;; for connection hygiene - atomic query
-    [t-con db-spec]
-    (ut/ppln [query db-spec])
-    (try (first (vals (first (jdbc/query t-con query {:identifiers keyword}))))
-         (catch Exception e
-           (do (ut/pp {:sql-query-one-fn-error e :query query :extra (when extra extra)}) (insert-error-row! db-spec query e))))))
+
 
 
 
@@ -418,7 +487,7 @@
   (let [;queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)
         db-kw (-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)]
      ;(qp/serial-slot-queue :sql-serial :sql
-    (ppy/execute-in-thread-pools-but-deliver :sqlite-serial-writes
+    (ppy/execute-in-thread-pools-but-deliver (keyword (str "sqlite-serial-writes" (hash (str db-spec)))) ;; :sqlite-serial-writes
      ;(keyword (str "sql-serial/" (cstr/replace (str db-kw) ":" ""))) ;; :sql-serial db-kw ;; (str db-spec) ;; queue-name
                                              (fn []
                                                (swap! sql-exec-run inc)
@@ -492,10 +561,6 @@
 
 
 
-
-
-
-
 (defn lookup-value
   [key-vector lookup-key system-db]
   (let [db-type       (nth key-vector 0)
@@ -538,7 +603,6 @@
                             (= src-table :sample)     (keyword lookup-value)
                             :else                     lookup-value)]
     val))
-
 
 
 (defn to-sql
@@ -586,8 +650,8 @@
          (catch Exception e
            (do (ut/pp [:honey-format-err (str e) :input honey-map])
                (insert-error-row! :honey-format honey-map e)
-               (to-sql {:union-all [{:select [[(str (.getMessage e)) :query_error]]}
-                                    {:select [["(from HoneySQL formatter)" :query_error]]}]}))))))
+               (to-sql {:union-all [{:select [[(str (.getMessage e)) :database_says]]}
+                                    {:select [["(from HoneySQL formatter)" :database_says]]}]}))))))
 
 ;; (ut/pp 
 ;;  ;(to-sql {:select [:*] :from [:tests] :limit 123} )

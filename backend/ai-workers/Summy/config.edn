@@ -1,0 +1,11 @@
+{:description "Summy is a bot that summarizes threads. It has no personality."
+ :name-style {:font-family "Pastor of Muppets"
+              :color "#ffffff"}
+; :image "assets/ai-workers/Samuel.jpg"
+ :elevenlabs-voice "Denzel"
+ :model "claude-3-haiku"
+ :platform "Anthropic"
+ :chat-style {:font-size "33px"}}
+
+
+

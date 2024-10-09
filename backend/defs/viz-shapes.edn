@@ -35,8 +35,8 @@
                                    :legendOffset 40
                                      ;:legend ":season"
                                    }
-                      :enableGridX true
-                      :enableGridY true
+                      :enableGridX false ;true
+                      :enableGridY false ;true
                       :enableLabel false
                       :padding 0.1
                       :inner-padding 0
@@ -84,8 +84,8 @@
                                          :legendOffset 40
                                                                ;:legend ":season"
                                          }
-                            :enableGridX true
-                            :enableGridY true
+                            :enableGridX false ;true
+                            :enableGridY false ;true
                             :enableLabel true
                             :padding 0.1
                             :inner-padding 0
@@ -474,109 +474,109 @@
 ;;                    :style {:font-size "40px" :color "orange"}]
 ;;                   :base-score 1}
 
- :compound-trend-1  {:axes {:x [:and :dimension?
-                                [:or :looks-like-date? :looks-like-datetime?
-                                 :is-date? :is-datetime?]]
-                            :y [:measure?]}
-                     :w 8
-                     :h 6
-                     :sql-maps [{:select [[[[:sum :y-field]] :agg] :x-field]
-                                 :from [:table]
-                                 :order-by [[:x-field :desc]]
-                                 :group-by [:x-field]}
-                                {:select
-                                 [[[:max [:round
-                                          [:raw
-                                           ["(100 * ((" :query-preview/agg.0
-                                            ".0 - " :query-preview/agg.1
-                                            ".0) / " :query-preview/agg.0
-                                            ".0))"]] 2]] :diff]]}]
+;;  :compound-trend-1  {:axes {:x [:and :dimension?
+;;                                 [:or :looks-like-date? :looks-like-datetime?
+;;                                  :is-date? :is-datetime?]]
+;;                             :y [:measure?]}
+;;                      :w 8
+;;                      :h 6
+;;                      :sql-maps [{:select [[[[:sum :y-field]] :agg] :x-field]
+;;                                  :from [:table]
+;;                                  :order-by [[:x-field :desc]]
+;;                                  :group-by [:x-field]}
+;;                                 {:select
+;;                                  [[[:max [:round
+;;                                           [:raw
+;;                                            ["(100 * ((" :query-preview/agg.0
+;;                                             ".0 - " :query-preview/agg.1
+;;                                             ".0) / " :query-preview/agg.0
+;;                                             ".0))"]] 2]] :diff]]}]
 
-                     :conditionals {:up-or-down?
-                                    [:> :query-preview/agg.0
-                                     :query-preview/agg.1]}
+;;                      :conditionals {:up-or-down?
+;;                                     [:> :query-preview/agg.0
+;;                                      :query-preview/agg.1]}
 
-                     :library-shapes
-                     [:v-box :size "auto" :height :half-panel-height-px
-                      :style {:padding-left "8px" :padding-right "8px"}
-                      :children
-                      [[:h-box :justify :between :children
-                        [[:box :padding "16px" :child
-                          [:number :query-preview/agg.0] :style
-                          {:font-size "39px" :color "#ffffff"}]
-                         [:h-box :padding "13px" :size "auto" :children
-                          [[:icon :md-icon-name
-                            [:if :condi/up-or-down? "zmdi-chevron-up"
-                             "zmdi-chevron-down"] :style
-                            {:font-size "55px"
-                             :color [:if :condi/up-or-down? "#20f323" "#f36464"]
-                             :opacity 0.5
-                             :margin-top "8px"}]
-                           [:box :child [:percent :query-preview-2/diff.0] :style
-                            {:font-size "25px" :padding "15px"}]]]]]
-                       [:box :style {:margin-top "-10px"} :size "auto"
-                        :child
-                        [:vega-lite
-                         {:layer [{:encoding
-                                   {:x {:field :x-field
-                                        :type "temporal"
-                                        :title nil
-                                        :sort "x"}
-                                    :y {:aggregate "sum"
-                                        :field :agg
-                                        :title nil
-                                        :scale {:zero false}
-                                        :type "quantitative"}
-                                    :row {:field nil :legend nil}
-                                    :size {:legend nil}
-                                    :shape {:legend nil}
-                                    :column {:field nil :legend nil}
-                                    :color {:scale {:scheme "purples"}
-                                            :legend nil
-                                            :field 1
-                                            :type "ordinal"}}
-                                   :mark {:type "line"
-                                          :interpolate "monotone"
-                                          :line true
-                                          :point true
-                                          :tooltip {:content "encoding"}}}]
-                          :data {:values :query-preview}
-                          :config {:view {:stroke "transparent"}
-                                   :line {:strokeWidth 3}
-                                   :axis {:domainColor "#ffffff22"
-                                          :grid true
-                                          :font "Lato"
-                                          :labelColor "#afafaf"
-                                          :titleFont "Lato"
-                                          :titleColor "#282828"
-                                          :labelFont "Lato"
-                                          :domain false
-                                          :gridColor "#ffffff22"
-                                          :tickColor "#ffffff22"
-                                          :axisFont "Lato"}
-                                   :legend {:labelFont "Lato"
-                                            :legendFont "Lato"
-                                            :labelColor "#ffffff99"
-                                            :titleColor "#ffffff99"
-                                            :stroke "#ffffff99"
-                                            :titleFont "Lato"}
-                                   :header {:labelFont "Lato"
-                                            :titleFont "Lato"
-                                            :titleColor "#ffffff99"}
-                                   :mark {:font "Lato"}
-                                   :title {:font "Lato"
-                                           :subtitleFont "Lato"
-                                           :labelFont "Lato"
-                                           :titleFont "Lato"
-                                           :titleColor "#ffffff99"}}
-                          :width :panel-width
-                          :height :half-panel-height
-                          :padding 4
-                          :background "transparent"} {:actions false}]]
-                       [:box :align :center :justify :center :style
-                        {:padding-top "133px" :font-size "20px"} :child
-                        [:string [:x-field " vs " :y-field]]]]]
-                     :base-score 1}
+;;                      :library-shapes
+;;                      [:v-box :size "auto" :height :half-panel-height-px
+;;                       :style {:padding-left "8px" :padding-right "8px"}
+;;                       :children
+;;                       [[:h-box :justify :between :children
+;;                         [[:box :padding "16px" :child
+;;                           [:number :query-preview/agg.0] :style
+;;                           {:font-size "39px" :color "#ffffff"}]
+;;                          [:h-box :padding "13px" :size "auto" :children
+;;                           [[:icon :md-icon-name
+;;                             [:if :condi/up-or-down? "zmdi-chevron-up"
+;;                              "zmdi-chevron-down"] :style
+;;                             {:font-size "55px"
+;;                              :color [:if :condi/up-or-down? "#20f323" "#f36464"]
+;;                              :opacity 0.5
+;;                              :margin-top "8px"}]
+;;                            [:box :child [:percent :query-preview-2/diff.0] :style
+;;                             {:font-size "25px" :padding "15px"}]]]]]
+;;                        [:box :style {:margin-top "-10px"} :size "auto"
+;;                         :child
+;;                         [:vega-lite
+;;                          {:layer [{:encoding
+;;                                    {:x {:field :x-field
+;;                                         :type "temporal"
+;;                                         :title nil
+;;                                         :sort "x"}
+;;                                     :y {:aggregate "sum"
+;;                                         :field :agg
+;;                                         :title nil
+;;                                         :scale {:zero false}
+;;                                         :type "quantitative"}
+;;                                     :row {:field nil :legend nil}
+;;                                     :size {:legend nil}
+;;                                     :shape {:legend nil}
+;;                                     :column {:field nil :legend nil}
+;;                                     :color {:scale {:scheme "purples"}
+;;                                             :legend nil
+;;                                             :field 1
+;;                                             :type "ordinal"}}
+;;                                    :mark {:type "line"
+;;                                           :interpolate "monotone"
+;;                                           :line true
+;;                                           :point true
+;;                                           :tooltip {:content "encoding"}}}]
+;;                           :data {:values :query-preview}
+;;                           :config {:view {:stroke "transparent"}
+;;                                    :line {:strokeWidth 3}
+;;                                    :axis {:domainColor "#ffffff22"
+;;                                           :grid true
+;;                                           :font "Lato"
+;;                                           :labelColor "#afafaf"
+;;                                           :titleFont "Lato"
+;;                                           :titleColor "#282828"
+;;                                           :labelFont "Lato"
+;;                                           :domain false
+;;                                           :gridColor "#ffffff22"
+;;                                           :tickColor "#ffffff22"
+;;                                           :axisFont "Lato"}
+;;                                    :legend {:labelFont "Lato"
+;;                                             :legendFont "Lato"
+;;                                             :labelColor "#ffffff99"
+;;                                             :titleColor "#ffffff99"
+;;                                             :stroke "#ffffff99"
+;;                                             :titleFont "Lato"}
+;;                                    :header {:labelFont "Lato"
+;;                                             :titleFont "Lato"
+;;                                             :titleColor "#ffffff99"}
+;;                                    :mark {:font "Lato"}
+;;                                    :title {:font "Lato"
+;;                                            :subtitleFont "Lato"
+;;                                            :labelFont "Lato"
+;;                                            :titleFont "Lato"
+;;                                            :titleColor "#ffffff99"}}
+;;                           :width :panel-width
+;;                           :height :half-panel-height
+;;                           :padding 4
+;;                           :background "transparent"} {:actions false}]]
+;;                        [:box :align :center :justify :center :style
+;;                         {:padding-top "133px" :font-size "20px"} :child
+;;                         [:string [:x-field " vs " :y-field]]]]]
+;;                      :base-score 1}
 
  :point-map  {:axes {:lat [:geo-lat?]
                      :long [:geo-long?]}
@@ -1980,70 +1980,70 @@
                               {:actions false}]]
                             :base-score 1}
 
- :v-param-buttons  {:axes {:dim [:and :dimension?
-                                 :is-string?
-                                 [:or :low-cardinality? :very-low-cardinality?]]}
-                    :sql-maps [{:select [:dim-field]
-                                :from [:table]
-                                :group-by [:dim-field]
-                                :order-by [:dim-field]}
-                               {:vselect
-                                [:box :size "auto"
-                                 :width :panel-width+70-px
-                                 :align :center
-                                 :justify :center :attr
-                                 {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style
-                                 {:border [:if [:= :dim-field :panel-key/dim-field]
-                                           "4px solid orange" "4px solid #ffffff04"]
-                                  :color [:if [:= :dim-field :panel-key/dim-field]
-                                          "#ffffff" "inherit"]
-                                  :cursor "pointer"
-                                  :font-size "33px"}
-                                 :child [:string :dim-field]]
-                                :from :query-preview}]
+;;  :v-param-buttons  {:axes {:dim [:and :dimension?
+;;                                  :is-string?
+;;                                  [:or :low-cardinality? :very-low-cardinality?]]}
+;;                     :sql-maps [{:select [:dim-field]
+;;                                 :from [:table]
+;;                                 :group-by [:dim-field]
+;;                                 :order-by [:dim-field]}
+;;                                {:vselect
+;;                                 [:box :size "auto"
+;;                                  :width :panel-width+70-px
+;;                                  :align :center
+;;                                  :justify :center :attr
+;;                                  {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style
+;;                                  {:border [:if [:= :dim-field :panel-key/dim-field]
+;;                                            "4px solid orange" "4px solid #ffffff04"]
+;;                                   :color [:if [:= :dim-field :panel-key/dim-field]
+;;                                           "#ffffff" "inherit"]
+;;                                   :cursor "pointer"
+;;                                   :font-size "33px"}
+;;                                  :child [:string :dim-field]]
+;;                                 :from :query-preview}]
 
-                    :conditionals {:true? [:= 1 1]}
+;;                     :conditionals {:true? [:= 1 1]}
 
-                    :library-shapes
-                    [:v-box :size "auto" :align :center :justify :center
-                     :height :panel-height+50-px
-                     :gap "10px" :children :query-preview-2]
-                    :base-score 1}
+;;                     :library-shapes
+;;                     [:v-box :size "auto" :align :center :justify :center
+;;                      :height :panel-height+50-px
+;;                      :gap "10px" :children :query-preview-2]
+;;                     :base-score 1}
 
- :h-param-buttons  {:axes {:dim [:and :dimension?
-                                 :is-string?
-                                 [:or :low-cardinality? :very-low-cardinality?]
-                                ;[:and [:not :is-date?] [:not :is-datetime?]]
-                                 ]}
-                    :sql-maps [{:select [:dim-field]
-                                :from [:table]
-                                :group-by [:dim-field]
-                                :order-by [:dim-field]}
-                               {:vselect
-                                [:box :size "auto"
-                                 ;:height :panel-height-px 
-                                 :height :panel-height+50-px
-                                 :align :center
-                                 :justify :center
-                                 :attr
-                                 {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style
-                                 {:border [:if [:= :dim-field :panel-key/dim-field]
-                                           "4px solid orange" "4px solid #ffffff04"]
-                                  :color [:if [:= :dim-field :panel-key/dim-field]
-                                          "#ffffff" "inherit"]
-                                  :cursor "pointer"
-                                  :font-size "33px"}
-                                 :child [:string :dim-field]]
-                                :from :query-preview}]
+;;  :h-param-buttons  {:axes {:dim [:and :dimension?
+;;                                  :is-string?
+;;                                  [:or :low-cardinality? :very-low-cardinality?]
+;;                                 ;[:and [:not :is-date?] [:not :is-datetime?]]
+;;                                  ]}
+;;                     :sql-maps [{:select [:dim-field]
+;;                                 :from [:table]
+;;                                 :group-by [:dim-field]
+;;                                 :order-by [:dim-field]}
+;;                                {:vselect
+;;                                 [:box :size "auto"
+;;                                  ;:height :panel-height-px 
+;;                                  :height :panel-height+50-px
+;;                                  :align :center
+;;                                  :justify :center
+;;                                  :attr
+;;                                  {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style
+;;                                  {:border [:if [:= :dim-field :panel-key/dim-field]
+;;                                            "4px solid orange" "4px solid #ffffff04"]
+;;                                   :color [:if [:= :dim-field :panel-key/dim-field]
+;;                                           "#ffffff" "inherit"]
+;;                                   :cursor "pointer"
+;;                                   :font-size "33px"}
+;;                                  :child [:string :dim-field]]
+;;                                 :from :query-preview}]
 
-                   ;:conditionals {:testcc [:= 1 1]}
+;;                    ;:conditionals {:testcc [:= 1 1]}
 
-                    :library-shapes
-                    [:h-box :size "auto" :align :center :justify :center
-                     ;:width :panel-width-px
-                     :width :panel-width+80-px
-                     :gap "10px" :children :query-preview-2]
-                    :base-score 1}
+;;                     :library-shapes
+;;                     [:h-box :size "auto" :align :center :justify :center
+;;                      ;:width :panel-width-px
+;;                      :width :panel-width+80-px
+;;                      :gap "10px" :children :query-preview-2]
+;;                     :base-score 1}
 
  :nivo-calendar-sum {:axes {:x [:or :is-date? :looks-like-date?]
                             :y [:measure?]}
@@ -2657,104 +2657,104 @@
  
 
 
- :compound-trend-2 {:axes {:x [:and :dimension?
-                               [:or :looks-like-date? :looks-like-datetime?
-                                :is-date? :is-datetime?]]
-                           :y [:measure?]}
-                    :w 8
-                    :h 6
-                    :selected-view :grid
-                    :sql-maps [{:select [[[[:sum :y-field]] :agg] :x-field]
-                                :from [:table]
-                                :order-by [[:x-field :desc]]
-                                :group-by [:x-field]}
-                               {:select [[[:max [:round
-                                                 [:raw
-                                                  ["(100 * ((" :query-preview/agg.0
-                                                   ".0 - " :query-preview/agg.1
-                                                   ".0) / " :query-preview/agg.0
-                                                   ".0))"]] 2]] :diff]]}]
+;;  :compound-trend-2 {:axes {:x [:and :dimension?
+;;                                [:or :looks-like-date? :looks-like-datetime?
+;;                                 :is-date? :is-datetime?]]
+;;                            :y [:measure?]}
+;;                     :w 8
+;;                     :h 6
+;;                     :selected-view :grid
+;;                     :sql-maps [{:select [[[[:sum :y-field]] :agg] :x-field]
+;;                                 :from [:table]
+;;                                 :order-by [[:x-field :desc]]
+;;                                 :group-by [:x-field]}
+;;                                {:select [[[:max [:round
+;;                                                  [:raw
+;;                                                   ["(100 * ((" :query-preview/agg.0
+;;                                                    ".0 - " :query-preview/agg.1
+;;                                                    ".0) / " :query-preview/agg.0
+;;                                                    ".0))"]] 2]] :diff]]}]
 
-                    :conditionals {:up-or-down?
-                                   [:> :query-preview/agg.0
-                                    :query-preview/agg.1]}
+;;                     :conditionals {:up-or-down?
+;;                                    [:> :query-preview/agg.0
+;;                                     :query-preview/agg.1]}
 
-                    :library-shapes {:lines [:vega-lite
-                                             {:layer [{:encoding
-                                                       {:x {:field :x-field
-                                                            :type "temporal"
-                                                            :title nil
-                                                            :sort "x"}
-                                                        :y {:aggregate "sum"
-                                                            :field :agg
-                                                            :title nil
-                                                            :scale {:zero false}
-                                                            :type "quantitative"}
-                                                        :row {:field nil :legend nil}
-                                                        :size {:legend nil}
-                                                        :shape {:legend nil}
-                                                        :column {:field nil :legend nil}
-                                                        :color {:scale {:scheme "purples"}
-                                                                :legend nil
-                                                                :field 1
-                                                                :type "ordinal"}}
-                                                       :mark {:type "line"
-                                                              :interpolate "monotone"
-                                                              :line true
-                                                              :point true
-                                                              :tooltip {:content "encoding"}}}]
-                                              :data {:values :query-preview}
-                                              :config {:view {:stroke "transparent"}
-                                                       :line {:strokeWidth 3}
-                                                       :axis {:domainColor "#ffffff22"
-                                                              :grid true
-                                                              :font "Lato"
-                                                              :labelColor "#afafaf"
-                                                              :titleFont "Lato"
-                                                              :titleColor "#282828"
-                                                              :labelFont "Lato"
-                                                              :domain false
-                                                              :gridColor "#ffffff22"
-                                                              :tickColor "#ffffff22"
-                                                              :axisFont "Lato"}
-                                                       :legend {:labelFont "Lato"
-                                                                :legendFont "Lato"
-                                                                :labelColor "#ffffff99"
-                                                                :titleColor "#ffffff99"
-                                                                :stroke "#ffffff99"
-                                                                :titleFont "Lato"}
-                                                       :header {:labelFont "Lato"
-                                                                :titleFont "Lato"
-                                                                :titleColor "#ffffff99"}
-                                                       :mark {:font "Lato"}
-                                                       :title {:font "Lato"
-                                                               :subtitleFont "Lato"
-                                                               :labelFont "Lato"
-                                                               :titleFont "Lato"
-                                                               :titleColor "#ffffff99"}}
-                                              :width :panel-width
-                                              :height :half-panel-height
-                                              :padding 4
-                                              :background "transparent"} {:actions false}]
-                                     :grid [:layout
-                                            {:panels
-                                             {:view/*this-block*.lines
-                                              {:h 0.5 :w 0.99 :root [0 0.5]}
-                                              :view/*this-block*.hi2
-                                              {:h 0.5 :w 0.5 :root [0 0]}
-                                              :empty-h-730
-                                              {:h 0.5 :w 0.5 :root [0.5 0]}}}]
-                                     :hi2 [:box :align :center :justify :center :style
-                                           {:font-size    "106px"
-                                            :font-weight  700
-                                            :padding-top  "6px"
-                                            :padding-left "14px"
-                                            :margin-top   "-8px"
-                                            :color        :theme/editor-outer-rim-color
-                                            :font-family  :theme/base-font} :child
-                                           "hi!"]}
+;;                     :library-shapes {:lines [:vega-lite
+;;                                              {:layer [{:encoding
+;;                                                        {:x {:field :x-field
+;;                                                             :type "temporal"
+;;                                                             :title nil
+;;                                                             :sort "x"}
+;;                                                         :y {:aggregate "sum"
+;;                                                             :field :agg
+;;                                                             :title nil
+;;                                                             :scale {:zero false}
+;;                                                             :type "quantitative"}
+;;                                                         :row {:field nil :legend nil}
+;;                                                         :size {:legend nil}
+;;                                                         :shape {:legend nil}
+;;                                                         :column {:field nil :legend nil}
+;;                                                         :color {:scale {:scheme "purples"}
+;;                                                                 :legend nil
+;;                                                                 :field 1
+;;                                                                 :type "ordinal"}}
+;;                                                        :mark {:type "line"
+;;                                                               :interpolate "monotone"
+;;                                                               :line true
+;;                                                               :point true
+;;                                                               :tooltip {:content "encoding"}}}]
+;;                                               :data {:values :query-preview}
+;;                                               :config {:view {:stroke "transparent"}
+;;                                                        :line {:strokeWidth 3}
+;;                                                        :axis {:domainColor "#ffffff22"
+;;                                                               :grid true
+;;                                                               :font "Lato"
+;;                                                               :labelColor "#afafaf"
+;;                                                               :titleFont "Lato"
+;;                                                               :titleColor "#282828"
+;;                                                               :labelFont "Lato"
+;;                                                               :domain false
+;;                                                               :gridColor "#ffffff22"
+;;                                                               :tickColor "#ffffff22"
+;;                                                               :axisFont "Lato"}
+;;                                                        :legend {:labelFont "Lato"
+;;                                                                 :legendFont "Lato"
+;;                                                                 :labelColor "#ffffff99"
+;;                                                                 :titleColor "#ffffff99"
+;;                                                                 :stroke "#ffffff99"
+;;                                                                 :titleFont "Lato"}
+;;                                                        :header {:labelFont "Lato"
+;;                                                                 :titleFont "Lato"
+;;                                                                 :titleColor "#ffffff99"}
+;;                                                        :mark {:font "Lato"}
+;;                                                        :title {:font "Lato"
+;;                                                                :subtitleFont "Lato"
+;;                                                                :labelFont "Lato"
+;;                                                                :titleFont "Lato"
+;;                                                                :titleColor "#ffffff99"}}
+;;                                               :width :panel-width
+;;                                               :height :half-panel-height
+;;                                               :padding 4
+;;                                               :background "transparent"} {:actions false}]
+;;                                      :grid [:layout
+;;                                             {:panels
+;;                                              {:view/*this-block*.lines
+;;                                               {:h 0.5 :w 0.99 :root [0 0.5]}
+;;                                               :view/*this-block*.hi2
+;;                                               {:h 0.5 :w 0.5 :root [0 0]}
+;;                                               :empty-h-730
+;;                                               {:h 0.5 :w 0.5 :root [0.5 0]}}}]
+;;                                      :hi2 [:box :align :center :justify :center :style
+;;                                            {:font-size    "106px"
+;;                                             :font-weight  700
+;;                                             :padding-top  "6px"
+;;                                             :padding-left "14px"
+;;                                             :margin-top   "-8px"
+;;                                             :color        :theme/editor-outer-rim-color
+;;                                             :font-family  :theme/base-font} :child
+;;                                            "hi!"]}
 
-                    :base-score 1}
+;;                     :base-score 1}
  
  :recharts-h-bar {:axes {:x [:or
                              [:and :dimension?
@@ -3044,28 +3044,36 @@
                         :data {:values :table}} {:actions false}]
                       :base-score 1}
  
- :box-plot {:axes {:x [:and :dimension?
-                       :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
-                       ]
-                   :y [:measure?]}
+;;  :box-plot {:axes {:x [:and :dimension?
+;;                        :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+;;                        ]
+;;                    :y [:measure?]}
  
-            :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
-                        :from [:table]
-                        :group-by [:x-field]}]
+;;             :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+;;                         :from [:table]
+;;                         :group-by [:x-field]}]
  
-            :library-shapes
-            [:vega-lite
-             {:layer
-              [{:encoding
-                {:x {:field :x-field :type "ordinal"}
-                 :y {:field :y-field :type "quantitative"}
-                 :color {:field :x-field :type "nominal"}}
-                :mark {:type "boxplot"
-                       :extent "min-max"
-                       :tooltip {:content "encoding"}}}]
-              :data {:values :table}} {:actions false}]
-            :base-score 1}
+;;             :library-shapes
+;;             [:vega-lite
+;;              {:layer
+;;               [{:encoding
+;;                 {:x {:field :x-field :type "ordinal"}
+;;                  :y {:field :y-field :type "quantitative"}
+;;                  :color {:field :x-field :type "nominal"}}
+;;                 :mark {:type "boxplot"
+;;                        :extent "min-max"
+;;                        :tooltip {:content "encoding"}}}]
+;;               :data {:values :table}} {:actions false}]
+;;             :base-score 1}
  
+;;  :code-test {:axes {:x :true?}
+            
+;;              :sql-maps []
+;;              :runner :clojure
+            
+;;              :library-shapes
+;;              (str :x-field (rand-int 123) "!")
+;;              :base-score 1}
 
 
  }

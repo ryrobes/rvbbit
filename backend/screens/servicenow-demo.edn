@@ -1,0 +1,725 @@
+{:reco-preview nil,
+ :audio-playing? false,
+ :annotate? false,
+ :default-col-widths
+ {:block-414 {:combos-drag-8 ##Inf},
+  :block-sightings-by-month {:sightings-by-month 280},
+  :block-9240 {:new-clojure-sqlized 230},
+  :block-3108 {:client-memory-drag-36 151},
+  :block-1 {:sightings-by-season 730},
+  :block-sightings-by-class-year {:sightings-by-class-recent-years 237},
+  :block-10883 {:trades-drag-20 ##Inf},
+  :block-4443 {:bigfoot-sightings-drag-43 100},
+  :block-top-10-counties {:top-10-counties 280},
+  :block-5320 {:rowcnt-drag-21 161},
+  :block-sightings-by-season-state {:sightings-by-season-state 237},
+  :system-connections-list* {:connections-sys 126},
+  :block-3366 {:country-drag-43 180},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-2618 {:client-stats-drag-36 114},
+  :block-1850 {:txs-drag-31 ##Inf},
+  :block-4795 {:ufo-sightings-drag-31 108},
+  :files-list* {:files-sys 170},
+  :block-2656 {:txs-drag-20 ##Inf},
+  :blocks-list* {:blocks-sys 127},
+  :block-723 {:viz-recos-vw2-drag-21 ##Inf},
+  :system-tables-list* {:tables-sys 133},
+  :block-11671 {:ufo-sightings-drag-42 108}},
+ :runstream-drops nil,
+ :tabs ["start page - incident manager" "bulbous swallow" "plum frog"],
+ :selected-cols {},
+ :server nil,
+ :runstreams nil,
+ :editor? false,
+ :buffy? false,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[nil :queries nil]
+   [:block-414 :queries :combos-drag-8]
+   [:block-sightings-by-month :queries :sightings-by-month]
+   [:block-9240 :queries :new-clojure-sqlized]
+   [:block-3108 :queries :client-memory-drag-36]
+   [:block-1 :queries :sightings-by-season]
+   [:block-1 :queries :sightings-by-class]
+   [:block-1 :queries :sightings-by-state]
+   [:block-1 :queries :sightings-by-state-full]
+   [:block-sightings-by-class-year :queries :sightings-by-class-recent-years]
+   [:block-10883 :queries :trades-drag-20]
+   [:block-4443 :queries :bigfoot-sightings-drag-43]
+   [:block-937 :queries :gen-viz-80]
+   [:block-top-10-counties :queries :top-10-counties]
+   [:block-sightings-by-season-state :queries :sightings-by-season-state]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:block-12050 :queries :gen-viz-516]
+   [:block-2618 :queries :client-stats-drag-36]
+   [:block-1850 :queries :txs-drag-31]
+   [:block-2178 :queries :new-query]
+   [:block-2656 :queries :txs-drag-20]
+   [:block-723 :queries :viz-recos-vw2-drag-21]
+   [:block-11671 :queries :ufo-sightings-drag-42]],
+  [:outliers :get-outliers]
+  [[nil :queries nil]
+   [:block-414 :queries :combos-drag-8]
+   [:block-sightings-by-month :queries :sightings-by-month]
+   [:block-9240 :queries :new-clojure-sqlized]
+   [:block-3108 :queries :client-memory-drag-36]
+   [:block-1 :queries :sightings-by-season]
+   [:block-1 :queries :sightings-by-class]
+   [:block-1 :queries :sightings-by-state]
+   [:block-1 :queries :sightings-by-state-full]
+   [:block-sightings-by-class-year :queries :sightings-by-class-recent-years]
+   [:block-10883 :queries :trades-drag-20]
+   [:block-4443 :queries :bigfoot-sightings-drag-43]
+   [:block-937 :queries :gen-viz-80]
+   [:block-top-10-counties :queries :top-10-counties]
+   [:block-sightings-by-season-state :queries :sightings-by-season-state]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:block-12050 :queries :gen-viz-516]
+   [:block-2618 :queries :client-stats-drag-36]
+   [:block-1850 :queries :txs-drag-31]
+   [:block-2178 :queries :new-query]
+   [:block-2656 :queries :txs-drag-20]
+   [:block-723 :queries :viz-recos-vw2-drag-21]
+   [:block-11671 :queries :ufo-sightings-drag-42]]},
+ :memory [149089591 110538583 4294705152],
+ :sched
+ {:client-memory-drag-36 44,
+  :gen-viz-516 59,
+  :client-stats-drag-36 34,
+  :new-query 34},
+ :client-name :accomplished-spherical-bird-43,
+ :flow-editor? true,
+ :window {:w 2115, :h 1243},
+ :ai-worker? false,
+ :implicit-rowsets {:solver [nil :new-raw-sql-1], :clover [:pulled-val]},
+ :post-meta
+ {:blocks-sys
+  {:* {:rowcount 14},
+   :block_key {:distinct 14},
+   :block_name {:distinct 14},
+   :queries {:distinct 2},
+   :views {:distinct 3},
+   :block_data {:distinct 14},
+   :view_names {:distinct 7},
+   :query_names {:distinct 4}},
+  :fields-sys {:* {:rowcount 0}},
+  :bigfoot-sightings-drag-43
+  {:nearestroad {:distinct 3771},
+   :date {:distinct 1161},
+   :* {:rowcount 5035},
+   :locationdetails {:distinct 4205},
+   :submitted_date {:distinct 3521},
+   :sketch {:distinct 1},
+   :bfroid {:distinct 5035},
+   :otherwitnesses {:distinct 3704},
+   :run_id {:distinct 1},
+   :nearesttown {:distinct 3800},
+   :timeandconditions {:distinct 4477},
+   :month {:distinct 12},
+   :county {:distinct 1039},
+   :state {:distinct 49},
+   :fixed_month {:distinct 12},
+   :submitted {:distinct 3522},
+   :title {:distinct 5031},
+   :otherstories {:distinct 2939},
+   :year {:distinct 430},
+   :season {:distinct 5},
+   :class {:distinct 3},
+   :alsonoticed {:distinct 2964},
+   :url {:distinct 5035},
+   :observed {:distinct 4997},
+   :environment {:distinct 4677},
+   :fixed_year {:distinct 132},
+   :run_time {:distinct 2121}},
+  :new-query {:* {:rowcount 1}, :mem_used {:distinct 1}, :ts_hour {:distinct 1}},
+  :files-sys
+  {:* {:rowcount 22},
+   :file_path {:distinct 22},
+   :screen_name {:distinct 21},
+   :blocks {:distinct 18},
+   :queries {:distinct 13},
+   :ts {:distinct 2}},
+  :new-clojure-sqlized
+  {:* {:rowcount 69}, :step_int {:distinct 69}, :step_val {:distinct 60}},
+  :rowcnt-drag-21 {:* {:rowcount 1}, :rowcnt_sum {:distinct 1}},
+  :ufo-sightings-drag-42
+  {:* {:rowcount 80332},
+   :duration_seconds_int {:distinct 536},
+   :comments {:distinct 79997},
+   :city {:distinct 19898},
+   :date_posted {:distinct 317},
+   :longitude {:distinct 19455},
+   :state {:distinct 67},
+   :duration_seconds {:distinct 537},
+   :duration_hours {:distinct 8349},
+   :id {:distinct 80332},
+   :shape {:distinct 29},
+   :datetime {:distinct 69434},
+   :latitude {:distinct 18445},
+   :country {:distinct 5}},
+  :sightings-by-state-full
+  {:* {:rowcount 49}, :state {:distinct 49}, :count {:distinct 44}},
+  :viz_recos_vw2 {:* {:rowcount 0}},
+  :ufo_sightings
+  {:* {:rowcount 111},
+   :duration_seconds_int {:distinct 26},
+   :comments {:distinct 111},
+   :city {:distinct 102},
+   :date_posted {:distinct 69},
+   :longitude {:distinct 103},
+   :state {:distinct 37},
+   :duration_seconds {:distinct 26},
+   :duration_hours {:distinct 76},
+   :id {:distinct 111},
+   :shape {:distinct 18},
+   :datetime {:distinct 103},
+   :latitude {:distinct 103},
+   :country {:distinct 4}},
+  :gen-viz-516 {:* {:rowcount 0}}},
+ :flow-estimates
+ {:blocks-sys {:times 0.002, :run-id :blocks-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :client_memory {:times 0.006, :run-id :client_memory},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :combos {:times 0.003, :run-id :combos},
+  :bigfoot-sightings-drag-43 {:times 0.025, :run-id :bigfoot-sightings-drag-43},
+  :block-4635-new-pivot {:times 0.009, :run-id :block-4635-new-pivot},
+  :sightings-by-state {:times 0.009, :run-id :sightings-by-state},
+  :new-query {:times 0.019, :run-id :new-query},
+  :block-10760-new-clojure-1 {:times 0.017, :run-id :block-10760-new-clojure-1},
+  :block-7170-hare-vw-19 {:times 0.006, :run-id :block-7170-hare-vw-19},
+  :sightings-by-season-state {:times 0.009, :run-id :sightings-by-season-state},
+  :block-777-hare-vw-9 {:times 0.006, :run-id :block-777-hare-vw-9},
+  :trades-drag-20 {:times 0.007, :run-id :trades-drag-20},
+  :files-sys {:times 0.002, :run-id :files-sys},
+  :txs-drag-20 {:times 0.007, :run-id :txs-drag-20},
+  :block-12101-hare-vw-13 {:times 0.005, :run-id :block-12101-hare-vw-13},
+  :client-stats-drag-36 {:times 0.002, :run-id :client-stats-drag-36},
+  :block-8000-new-clojure {:times 13.155, :run-id :block-8000-new-clojure},
+  :new-clojure-sqlized {:times 0.001, :run-id :new-clojure-sqlized},
+  :block-4010-hare-vw-7 {:times 0.004, :run-id :block-4010-hare-vw-7},
+  :viz-recos-vw2-drag-21 {:times 0.003, :run-id :viz-recos-vw2-drag-21},
+  :combos-drag-8 {:times 0.009, :run-id :combos-drag-8},
+  :rowcnt-drag-21 {:times 0.033, :run-id :rowcnt-drag-21},
+  :ufo-sightings-drag-42 {:times 0.017, :run-id :ufo-sightings-drag-42},
+  :sightings-by-state-full {:times 0.005, :run-id :sightings-by-state-full},
+  :client_stats {:times 0.002, :run-id :client_stats},
+  :sightings-by-season {:times 0.007, :run-id :sightings-by-season},
+  :txs-drag-31 {:times 0.005, :run-id :txs-drag-31},
+  :sightings-by-class-recent-years
+  {:times 0.005, :run-id :sightings-by-class-recent-years},
+  :viz_recos_vw2 {:times 0.002, :run-id :viz_recos_vw2},
+  :block-9240-new-clojure {:times 0.077, :run-id :block-9240-new-clojure},
+  :top-10-counties {:times 0.006, :run-id :top-10-counties},
+  :bigfoot_sightings {:times 0.011, :run-id :bigfoot_sightings},
+  :block-8762-hare-vw-12 {:times 0.004, :run-id :block-8762-hare-vw-12},
+  :ufo_sightings {:times 0.006, :run-id :ufo_sightings},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :block-5863-hare-vw-10 {:times 0.005, :run-id :block-5863-hare-vw-10},
+  :sightings-by-month {:times 0.005, :run-id :sightings-by-month},
+  :block-7472-hare-vw-18 {:times 0.005, :run-id :block-7472-hare-vw-18},
+  :block-10715-new-raw-sql-1 {:times 0.019, :run-id :block-10715-new-raw-sql-1},
+  :sightings-by-class {:times 0.007, :run-id :sightings-by-class},
+  :block-6295-clojure-hop-1 {:times 0.005, :run-id :block-6295-clojure-hop-1},
+  :block-7725-hare-vw-11 {:times 0.005, :run-id :block-7725-hare-vw-11},
+  :ufo-sightings-drag-31 {:times 0.017, :run-id :ufo-sightings-drag-31},
+  :client-memory-drag-36 {:times 0.005, :run-id :client-memory-drag-36},
+  :gen-viz-516 {:times 0.003, :run-id :gen-viz-516},
+  :country-drag-43 {:times 0.048, :run-id :country-drag-43},
+  :block-11798-new-raw-sql {:times 0.069, :run-id :block-11798-new-raw-sql},
+  :block-4420-clojure-hop {:times 0.006, :run-id :block-4420-clojure-hop}},
+ :screen-name "servicenow-demo",
+ :panel-hashes
+ {nil 1188417010,
+  :block-7598 885977986,
+  :block-3628 -1587737191,
+  :block-5568 347493397,
+  :block-10151 136578467,
+  :block-1772 40808674,
+  :block-11671 1253192412},
+ :recos-page2 0,
+ :selected-tab "start page - incident manager",
+ :snapshots nil,
+ :valid-grid-actions
+ {:xtdb-temporal-sql-scrubbers nil,
+  :field-masters!
+  {[:block-2178 :queries :new-query]
+   [{:body [:speak "11wow... epic. i'm joking. lame. ugh, lets go to the mall."],
+     :field :diff,
+     :runner :views,
+     :action-type :draggable,
+     :target :field,
+     :style-override {:background-color "pink"},
+     :icon "zmdi-shape",
+     :tooltip "111wow."}]}},
+ :recos-page 0,
+ :rs-overrides-hashmap {},
+ :user-params-hash -2023983923,
+ :grid-recos? true,
+ :session-hash 623860861,
+ :resolved-queries {nil {:_last-run "10:27:04"}},
+ :panels
+ {nil {:queries {nil {:_last-run "10:27:04"}}},
+  :block-7598
+  {:name "block-7598",
+   :w 20,
+   :selected-view :hare-vw-3,
+   :root [11 12],
+   :h 3,
+   :queries {},
+   :tab "start page - incident manager",
+   :root-mod [[:middle-h -10] [:bottom -13]],
+   :views
+   {:hare-vw-3
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "55px",
+      :font-weight 700,
+      :margin-top "10px",
+      :color :theme/pop-3,
+      :font-family :theme/monospaced-font}
+     :child
+     [:str :time/now-day]]}},
+  :block-3628
+  {:name "block-3628",
+   :w 7,
+   :selected-view :hare-vw-20,
+   :root [18 15],
+   :h 5,
+   :queries {},
+   :tab "start page - incident manager",
+   :root-mod [[:middle-h -3] [:bottom -10]],
+   :views
+   {:hare-vw-20
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "200px",
+      :font-weight 700,
+      :margin-top "-40px",
+      :color :theme/pop-3,
+      :font-family :theme/monospaced-font}
+     :child
+     [:left-pad [:time/minute 2]]]}},
+  :block-5568
+  {:name "block-5568",
+   :w 6,
+   :selected-view :hare-vw-21,
+   :root [25 15],
+   :h 5,
+   :queries {},
+   :tab "start page - incident manager",
+   :root-mod [[:middle-h 4] [:bottom -10]],
+   :views
+   {:hare-vw-21
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "200px",
+      :font-weight 700,
+      :margin-top "-40px",
+      :color :theme/pop-3,
+      :font-family :theme/monospaced-font}
+     :child
+     [:left-pad [:time/second 2]]]}},
+  :block-10151
+  {:name "block-10151",
+   :w 7,
+   :selected-view :hare-vw-19,
+   :root [11 15],
+   :h 5,
+   :queries {},
+   :tab "start page - incident manager",
+   :root-mod [[:middle-h -10] [:bottom -10]],
+   :views
+   {:hare-vw-19
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "200px",
+      :font-weight 700,
+      :margin-top "-40px",
+      :color :theme/pop-3,
+      :font-family :theme/monospaced-font}
+     :child
+     [:left-pad [:time/hour 2]]]}},
+  :block-1772
+  {:name "greetings",
+   :w 10,
+   :selected-view :hare-vw,
+   :root [7 3],
+   :h 3,
+   :queries {},
+   :tab "start page - incident manager",
+   :minimized? true,
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak
+      "Good Morning, Dave - there are no new incidents since last night. Would you like to review the high priority ones still open?"]]}}},
+ :materialized-theme
+ {:codemirror-theme "rvbbit-dynamic",
+  :editor-param-background-color "#000000",
+  :pop-2 "#3bd6c9",
+  :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+  :vega-defaults
+  {:view {:stroke "transparent"},
+   :axis
+   {:domainColor "#ffffff22",
+    :grid true,
+    :font "Lato",
+    :labelColor "#ffffff88",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelFont "Lato",
+    :domain false,
+    :gridColor "#ffffff22",
+    :tickColor "#ffffff22",
+    :axisFont "Lato"},
+   :legend
+   {:labelFont "Lato",
+    :legendFont "Lato",
+    :labelColor "#ffffff99",
+    :titleColor "#ffffff99",
+    :stroke "#ffffff99",
+    :titleFont "Lato"},
+   :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+   :mark {:font "Lato"},
+   :title
+   {:font "Lato",
+    :subtitleFont "Lato",
+    :labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99"}},
+  :grid-selected-column-css
+  {:background-color "#00000088", :filter "brightness(200%)"},
+  :base-block-color-selected "#0A2439",
+  :block-title-font-color "#ffffff",
+  :universal-pop-color "#FF9500",
+  :base-block-color "#0A243980",
+  :pop-3 "#B8EDBF",
+  :editor-rim-color "#0A2439",
+  :base-block-filter-selected
+  "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+  :vega-default-color-scheme {:scheme "pastel2"},
+  :data-colors
+  {"float" "#2c728e",
+   "boolean" "#f386bf",
+   "map" "#00FFFF",
+   "list" "#c32148",
+   "string" "#7de8b9",
+   "rowset" "#DAF7A6",
+   "any" "#c3ec52",
+   "vector" "#008080",
+   "keyword" "#add8e6",
+   "rabbit-code" "#FC0FC0",
+   "datetime" "#472d7b",
+   "integer" "#12e3ff",
+   "unknown" "#ffcf99",
+   "date" "#3b528b",
+   "rabbitsql" "#FC0FC0",
+   "nil" "#eeeeee"},
+  :editor-grid-selected-font-color "#000000",
+  :monospaced-font "Fira Code",
+  :editor-grid-selected-background-color "#8879bc",
+  :nivo-defaults
+  {:font-family "Montserrat",
+   :labels
+   {:text
+    {:fill "#ffffff",
+     :font-size "16px",
+     :font-family "Montserrat",
+     :font-weight 700}},
+   :tooltip
+   {:container
+    {:background "#000",
+     :color "#ffffff",
+     :text {:fill "#eeeeee"},
+     :fontSize "18px",
+     :borderRadius "4px",
+     :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+     :padding "5px 9px"},
+    :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+    :tableCell {:padding "3px 5px"}},
+   :axis
+   {:legend
+    {:text
+     {:fill "#ffffff",
+      :font-size "14px",
+      :font-family "Montserrat",
+      :font-weight 700}},
+    :ticks
+    {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+   :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+  :editor-outer-rim-color "#4CD964",
+  :grid-selected-font-color "#000000",
+  :block-title-selected-font-color "#ffffff",
+  :grid-selected-background-color "#a3d3ff",
+  :grid-font-color "#ffffff",
+  :canvas-background-css
+  {:background-image "url(images/fake-brick4.png)",
+   :transition "all 0.6s ease-in-out",
+   :background-blend-mode "normal",
+   :background-color "#424f57"},
+  :editor-font-color "#ffffff",
+  :base-font "Montserrat",
+  :block-tab-selected-font-color "#c9d1ff",
+  :editor-background-color "#000006",
+  :editor-grid-font-color "#ffffff",
+  :pop-1 "#1f2d48"},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#7de8b9",
+  "rowset" "#DAF7A6",
+  "any" "#c3ec52",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#12e3ff",
+  "unknown" "#ffcf99",
+  "date" "#3b528b",
+  "rabbitsql" "#FC0FC0",
+  "nil" "#eeeeee"},
+ :solver-fn nil,
+ :click-param
+ {:blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#091536\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b0f2180\", :editor-rim-color \"#2b4270\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de8b9\", \"rowset\" \"#DAF7A6\", \"any\" \"#c3ec52\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#12e3ff\", \"unknown\" \"#ffcf99\", \"date\" \"#3b528b\", \"rabbitsql\" \"#FC0FC0\", \"nil\" \"#eeeeee\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#40d6ff\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/fake-brick4.png)\", :transition \"all 0.6s ease-in-out\", :background-blend-mode \"normal\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :db-conn-drag-13.* {:db_conn [":honey-format"]},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "bigfoot-ufos",
+   :schema_cat nil,
+   :table_name "ufo_sightings",
+   :fields 14},
+  :new-query-1
+  {:queries_run 75638,
+   :recent_messages_per_second 31.59,
+   :uptime_seconds 3750,
+   :queries_per_second 23,
+   :sql_cache_size 19,
+   :ts "2024-05-21 20:18:36",
+   :subscriptions 167,
+   :messages_per_second 710.32,
+   :messages 2663696,
+   :sniffs_run 7593,
+   :sys_load 9.41,
+   :unix_ms 1716337116868,
+   :used_memory_mb 6283,
+   :styler_heatmap_7696 1,
+   :recent_queries_run 26,
+   :thread_count 231,
+   :internal_queries_run 10856,
+   :open_flow_channels 11,
+   :ws_peers 11,
+   :recent_messages 2663222,
+   :recent_queries_per_second 1.73,
+   :seconds_since_last_update 15},
+  :error-str-drag-13.* {},
+  :query-4704 {:test_name "total_rows", :rowcnt 77},
+  :jvm-stats-drag-40
+  {:ts1 "2024-07-09 23:59:14",
+   :queries_run 9,
+   :recent_messages_per_second -707,
+   :sql_cache_size 0,
+   :ts "2024-07-09 23:5",
+   :messages 715,
+   :sniffs_run 1,
+   :sys_load 2.68,
+   :recent_batches_per_second -47,
+   :batches 47,
+   :used_memory_mb 2109,
+   :thread_count 351,
+   :internal_queries_run 0,
+   :open_flow_channels 11,
+   :ws_peers 10,
+   :recent_queries_per_second -9},
+  :flows-sys
+  {:flow_id "node-color-thief-js-webp",
+   :file_path "./flows/node-color-thief-js-webp.edn",
+   :last_modified "2024-08-29 10:19:50"},
+  :files-sys
+  {:file_path "./screens/winter-theme.edn",
+   :screen_name "winter-theme",
+   :blocks 5,
+   :queries 1,
+   :ts "2024-09-18 19:22:28"},
+  :viz-tables-sys2 {:table_name :ufo-sightings-drag-42},
+  :fields-drag-16.* {:table_name ["db_conn_drag_13" "error_str_drag_13"]},
+  :param
+  {:_theme-color1 :solver/colors-of-the-moment>brightest,
+   :theme-color3 :param/theme-tetrads>2,
+   :theme-color1 :param/theme-tetrads>0,
+   :refresh-timer 45,
+   :_theme-color2 :solver/colors-of-the-moment>colors>0,
+   :theme-color2 :param/theme-tetrads>1,
+   :theme-dark :solver/colors-of-the-moment>darkest,
+   :theme-split-complement
+   [:split-complements :solver/colors-of-the-moment>dominant],
+   :selected-view-data nil,
+   :tt :solver/colors-of-the-moment>data-colors,
+   :selected-view nil,
+   :theme-color4 :param/theme-tetrads>3,
+   :_theme-color4 :solver/colors-of-the-moment>colors>1,
+   :theme-tetrads [:tetrads :solver/colors-of-the-moment>brightest],
+   :_theme-color3 :solver/colors-of-the-moment>dominant,
+   :selected-block :block-1772},
+  :theme
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :pop-2 :solver/colors-of-the-moment>colors>2,
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#0A2439",
+   :block-title-font-color "#ffffff",
+   :universal-pop-color "#FF9500",
+   :base-block-color "#0A243980",
+   :pop-3 "#B8EDBF",
+   :editor-rim-color "#0A2439",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#7de8b9",
+    "rowset" "#DAF7A6",
+    "any" "#c3ec52",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#12e3ff",
+    "unknown" "#ffcf99",
+    "date" "#3b528b",
+    "rabbitsql" "#FC0FC0",
+    "nil" "#eeeeee"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "Fira Code",
+   :editor-grid-selected-background-color "#8879bc",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#4CD964",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/fake-brick4.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Montserrat",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff",
+   :pop-1 :solver/colors-of-the-moment>colors>1},
+  :query-11325 {:table_name "nypd_arrest_data_drag_16", :rowcnt 20},
+  :flow-runner nil,
+  :connections-sys
+  {:database_name "SQLite",
+   :connection_id "bigfoot-ufos",
+   :styler_highlight_8717ssa 0},
+  :query-6018 {:attribute_name "is_sqlite?", :rowcnt 1618},
+  :sys {:selected-tab "start page - incident manager", :selected-tab-idx 0},
+  :tracker nil},
+ :selected-flow "my-new-flow6670"}

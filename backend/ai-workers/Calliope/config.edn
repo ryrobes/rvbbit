@@ -1,0 +1,43 @@
+{:description "Calliope is a generalist RVBBIT assistant. She can do just about anything on the canvas, but prefers to farm out tasks for more refined results."
+ :name-style {:font-family "Homemade Apple"
+              :color "#FC0FC0"
+              :margin-top "2px"}
+ :elevenlabs-voice "Not OG Buffy"
+ :image "assets/ai-workers/Calliope.jpg"
+ :tools [{:name "rvbbit-backend__websockets_rabbit-edit"
+          :description "Create or modify an block on the Rabbit canvas. This might be an entire new block, or modifying a sub key of a block instead. 
+                               Examples:
+                               block-keypath = [:panels :block-3689]
+                               block-body =   {:h 19,
+                                               :w 8,
+                                               :connection-id \"imported\",
+                                               :name \"select-all-deniro\",
+                                               :queries {:deniro-drag-796 {:select [:Score :Title], :from [[:deniro :cc738]]}},
+                                               :root [6 1],
+                                               :tab \"deniro.csv\"}
+                               This would create or overwrite this block in as a whole.
+                               But:
+                               block-keypath = [:panels :block-3689 :queries :deniro-drag-796]
+                               block-body =   {:select [:Score :Title], :from [[:deniro :cc738]] :order-by [[1 :asc]]}
+                               This would modify only the query in an existing block. The same applies for :views and :clojure code in blocks, just with different data and keypaths.
+                               Now if you only wanted to change the height, width or coords of a block you could call it like this:
+                              block-keypath = [:panels :block-3689 :h]
+                              block-body = 22
+                              to change just the height and leave the rest of thet data intact, or perhaps:
+                              block-keypath = [:panels :block-3689 :root]
+                              block-body = [10 2]
+                              to change the position of the block, but leave the rest of the data intact.
+                        "
+          :input_schema {:type "object"
+                         :properties {:block-keypath {:type "string"
+                                                      :description "The stringified EDN keypath of keywords for the block or block key, ex \"[:panels :block-3689 :queries :deniro-drag-796]\" "}
+                                      :block-body {:type "string"
+                                                   :description "The stringified EDN body of the block data in question."}}
+                         :required ["block-keypath" "block-body"]}
+          :cache_control {:type "ephemeral"}}]
+ :model "claude-3-5-sonnet-20240620"
+ :platform "Anthropic"
+ :chat-style {}}
+
+
+

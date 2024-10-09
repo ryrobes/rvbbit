@@ -17,10 +17,11 @@
    [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party  :as ppy]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db  
+    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db realms-db
             insert-error-row! to-sql pool-create]]
    [clojure.math.combinatorics :as combo]
-   [clj-time.jdbc]) ;; enables joda time returns
+  ;;  [clj-time.jdbc] ;; enables joda time returns
+   ) 
   (:import
     [java.util Date UUID]))
 
@@ -127,9 +128,13 @@
                                    {k (read-string (cstr/replace (str k) #"-" "_"))})))
                          honey-map))
 
+(defn create-system-reporting-tables-if-needed! [db-name]
+  (ut/pp [:creating-system-reporting-tables])
+  (sql-exec db-name sqlite-ddl/create-jvm-stats-duck)
+  (sql-exec db-name sqlite-ddl/create-client-stats-duck)
+  (sql-exec db-name sqlite-ddl/create-llm-log-duck))
 
-(defn create-sqlite-sys-tables-if-needed!
-  [system-db] ;; db-type
+(defn create-sqlite-sys-tables-if-needed! [system-db] ;; db-type
   (ut/pp [:creating-sys-tables])
   (let [] ; [ddl-ns (if (= db-type :clickhouse) clickhouse-ddl sqlite-ddl )]
     (sql-exec system-db sqlite-ddl/create-jvm-stats)
@@ -150,13 +155,11 @@
     (sql-exec system-db sqlite-ddl/create-rules-table2)
     (sql-exec system-db sqlite-ddl/create-rules-table3)
     (sql-exec system-db sqlite-ddl/create-flow-functions)
-
     (sql-exec history-db sqlite-ddl/create-panel-history)
     (sql-exec history-db sqlite-ddl/create-panel-resolved-history)
     (sql-exec history-db sqlite-ddl/create-panel-materialized-history)
-
     (sql-exec autocomplete-db sqlite-ddl/create-client-items)
-
+    (sql-exec realms-db sqlite-ddl/create-realms)
     (sql-exec system-db sqlite-ddl/create-board-history)
     (sql-exec system-db sqlite-ddl/create-errors)
     (sql-exec system-db sqlite-ddl/create-reco-vw)
@@ -165,17 +168,15 @@
     (sql-exec system-db sqlite-ddl/create-client-memory)
     (sql-exec system-db sqlite-ddl/create-status-vw)))
 
-(defn create-sqlite-flow-sys-tables-if-needed!
-  [flows-db] ;; db-type
+(defn create-sqlite-flow-sys-tables-if-needed! [flows-db] ;; db-type
   (ut/pp [:creating-flow-sys-tables])
-  (let []
-    (sql-exec flows-db sqlite-ddl/create-flow-results)
-    (sql-exec flows-db sqlite-ddl/create-flow-schedules)
-    (sql-exec flows-db sqlite-ddl/create-flows)
-    (sql-exec flows-db sqlite-ddl/create-flow-history)
-    (sql-exec flows-db sqlite-ddl/create-live-schedules)
-    (sql-exec flows-db sqlite-ddl/create-channel-history)
-    (sql-exec flows-db sqlite-ddl/create-fn-history)))
+  (sql-exec flows-db sqlite-ddl/create-flow-results)
+  (sql-exec flows-db sqlite-ddl/create-flow-schedules)
+  (sql-exec flows-db sqlite-ddl/create-flows)
+  (sql-exec flows-db sqlite-ddl/create-flow-history)
+  (sql-exec flows-db sqlite-ddl/create-live-schedules)
+  (sql-exec flows-db sqlite-ddl/create-channel-history)
+  (sql-exec flows-db sqlite-ddl/create-fn-history))
 
 (defn create-sniff-tests-for
   [system-db key-vector sniff-tests-map] ;; gets run once for each key-vector being processed
@@ -498,6 +499,20 @@
                                                     :attribute_value attribute?})]
                       key-map-w-attributes)))))))))))
 
+(defn slread
+  [file]
+  (try (edn/read-string (slurp file)) ;; just in case the file is empty or can't parse as EDN
+       (catch Exception _ {})))
+
+(def default-flow-functions (slread "./defs/flow-functions.edn"))
+(def default-sniff-tests (slread "./defs/sniff-tests.edn"))
+(def default-field-attributes (slread "./defs/field-attributes.edn"))
+(def default-derived-fields (slread "./defs/derived-fields.edn"))
+(def default-viz-shapes (slread "./defs/viz-shapes.edn"))
+
+;; (ut/pp (keys default-sniff-tests))
+;; (ut/pp (keys default-field-attributes))
+
 
 (defn insert-attribute-flag-results!
   [system-db attribute-flag-results this-run-id]
@@ -558,71 +573,79 @@
                          calc-field (get v :calc)
                          available-attributes-sql (to-sql {:select-distinct [:attribute_name] ;; add another set
                                                            :from            [:attributes]
-                                                           :where           [:and [:= :connection_id connection_id]
-                                                                             [:= :table_name table_name] [:= :db_schema db_schema]
+                                                           :where           [:and
+                                                                             [:= :connection_id connection_id]
+                                                                             [:= :table_name table_name]
+                                                                             [:= :db_schema db_schema]
                                                                              [:= :field_name field_name]]})
                          available-single-value-tests-sql
-                           (to-sql {:select-distinct [:test_name]
-                                    :from            [:tests]
-                                    :where           [:and [:= :connection_id connection_id] [:= :table_name table_name]
-                                                      [:= :db_schema db_schema] [:= :field_name field_name] [:= :is_sample 0]]})
+                         (to-sql {:select-distinct [:test_name]
+                                  :from            [:tests]
+                                  :where           [:and [:= :connection_id connection_id] [:= :table_name table_name]
+                                                    [:= :db_schema db_schema] [:= :field_name field_name] [:= :is_sample 0]]})
                          available-single-value-types-sql
-                           (to-sql
-                             {:select-distinct
-                                [:test_name
-                                 [[:raw
-                                   "case when test_val_string is not null then 'test_val_string' 
+                         (to-sql
+                          {:select-distinct
+                           [:test_name
+                            [[:raw
+                              "case when test_val_string is not null then 'test_val_string' 
                                                                                                                    when test_val_integer is not null then 'test_val_integer' 
                                                                                                                    when test_val_float is not null then 'test_val_float' 
                                                                                                                    else test_val_string end"]
-                                  :type]]
-                              :from [:tests]
-                              :where [:and [:= :connection_id connection_id] [:= :table_name table_name] [:= :db_schema db_schema]
-                                      [:= :field_name field_name] [:= :is_sample 0]]})
+                             :type]]
+                           :from [:tests]
+                           :where [:and [:= :connection_id connection_id] [:= :table_name table_name] [:= :db_schema db_schema]
+                                   [:= :field_name field_name] [:= :is_sample 0]]})
                          available-single-value-types (into {}
                                                             (for [r (sql-query system-db available-single-value-types-sql)]
                                                               {(keyword (get r :test_name)) (keyword (get r :type))}))
                          available-field-tests [:db_type :table_type :table_name :field_name :field_type :data_type]
                          available-connection-tests [:database_name :database_version :user_name]
+
                          available-single-value-tests (vec (for [r (sql-query system-db available-single-value-tests-sql)]
                                                              (keyword (get r :test_name))))
                          available-attributes (vec (for [r (sql-query system-db available-attributes-sql)]
                                                      (keyword (get r :attribute_name))))
+
+                        ;;  available-single-value-tests (vec (keys default-sniff-tests))
+                        ;;  available-attributes (vec (keys default-field-attributes))
+
+
                          merged-join
-                           (read-string
-                             (str "[" ;; weird workaround for honeysql not allowing a vector of
-                                  (cstr/join
-                                    ""
-                                    (drop-last
-                                      (subs (str
-                                              (merge
-                                                (into {}
-                                                      (for [f available-single-value-tests]
-                                                        (let [sub-q-alias   (str "tmp_" (ut/unkeyword f))
-                                                              test-val-type (get available-single-value-types f :test_raw_val)]
-                                                          {[{:select [[test-val-type :v]]
-                                                             :from   :tests
-                                                             :where  [[:and [:= :connection_id connection_id]
-                                                                       [:= :table_name table_name] [:= :db_schema db_schema]
-                                                                       [:= :field_name field_name]
-                                                                       [:= :test_name (ut/unkeyword f)] [:= :is_sample 0]]]
-                                                             :limit  1} (keyword sub-q-alias)]
-                                                             [:= 1 1] ;; a ""real join"" is really
-                                                          })))
-                                                (into {}
-                                                      (for [f available-attributes]
-                                                        (let [sub-q-alias (cstr/replace (str "tmp_" (ut/unkeyword f)) "?" "")]
-                                                          {[{:select [[:attribute_value :v]]
-                                                             :from   :attributes
-                                                             :where  [[:and [:= :connection_id connection_id]
-                                                                       [:= :table_name table_name] [:= :db_schema db_schema]
-                                                                       [:= :field_name field_name]
-                                                                       [:= :attribute_name (ut/unkeyword f)]]]
-                                                             :limit  1} (keyword sub-q-alias)]
-                                                             [:= 1 1] ;; a ""real join"" is really
-                                                          })))))
-                                            1)))
-                                  "]"))
+                         (read-string
+                          (str "[" ;; weird workaround for honeysql not allowing a vector of
+                               (cstr/join
+                                ""
+                                (drop-last
+                                 (subs (str
+                                        (merge
+                                         (into {}
+                                               (for [f available-single-value-tests]
+                                                 (let [sub-q-alias   (str "tmp_" (ut/unkeyword f))
+                                                       test-val-type (get available-single-value-types f :test_raw_val)]
+                                                   {[{:select [[test-val-type :v]]
+                                                      :from   :tests
+                                                      :where  [[:and [:= :connection_id connection_id]
+                                                                [:= :table_name table_name] [:= :db_schema db_schema]
+                                                                [:= :field_name field_name]
+                                                                [:= :test_name (ut/unkeyword f)] [:= :is_sample 0]]]
+                                                      :limit  1} (keyword sub-q-alias)]
+                                                    [:= 1 1] ;; a ""real join"" is really
+                                                    })))
+                                         (into {}
+                                               (for [f available-attributes]
+                                                 (let [sub-q-alias (cstr/replace (str "tmp_" (ut/unkeyword f)) "?" "")]
+                                                   {[{:select [[:attribute_value :v]]
+                                                      :from   :attributes
+                                                      :where  [[:and [:= :connection_id connection_id]
+                                                                [:= :table_name table_name] [:= :db_schema db_schema]
+                                                                [:= :field_name field_name]
+                                                                [:= :attribute_name (ut/unkeyword f)]]]
+                                                      :limit  1} (keyword sub-q-alias)]
+                                                    [:= 1 1] ;; a ""real join"" is really
+                                                    })))))
+                                       1)))
+                               "]"))
                          single-value-tests-select-aliases (vec (for [f available-single-value-tests]
                                                                   [(keyword (str "tmp_" (ut/unkeyword f) ".v")) f]))
                          attributes-select-aliases (vec (for [f available-attributes]
@@ -814,16 +837,9 @@
     (sql-exec system-db remove-old-rows)
     (sql-exec system-db rowset-insert)))
 
-(defn slread
-  [file]
-  (try (edn/read-string (slurp file)) ;; just in case the file is empty or can't parse as EDN
-       (catch Exception _ {})))
 
-(def default-flow-functions (slread "./defs/flow-functions.edn"))
-(def default-sniff-tests (slread "./defs/sniff-tests.edn"))
-(def default-field-attributes (slread "./defs/field-attributes.edn"))
-(def default-derived-fields (slread "./defs/derived-fields.edn"))
-(def default-viz-shapes (slread "./defs/viz-shapes.edn"))
+
+
 
 (defn insert-field-vectors!
   [field-vectors system-db & sql-filter]
@@ -921,7 +937,8 @@
                                  sniff-tests-map
                                  field-attributes-map
                                  derived-field-map
-                                 true))))))
+                                 true
+                                 ))))))
 
 (def task-pool (tp/create-pool "field-processing-pool" 8))
 
@@ -1137,6 +1154,7 @@
                                 condis (get-in viz-shape [(rekey shape-name) :conditionals])
                                 h (get-in viz-shape [(rekey shape-name) :h])
                                 w (get-in viz-shape [(rekey shape-name) :w])
+                                runner (str (get-in viz-shape [(rekey shape-name) :runner] :views))
                                 viz-map (walk/postwalk-replace query-replacement-map2
                                                                (get-in viz-shape [(rekey shape-name) :library-shapes]))
                                 combo-hash (hash [shape-name (pr-str c) ctx connection_id])
@@ -1154,6 +1172,7 @@
                                    :key-hashes-hash (str (hash (pr-str (into {} (sort-by key c)))))
                                    :h               h
                                    :w               w
+                                   :runner          runner
                                    :selected-view   (str (get-in viz-shape [(rekey shape-name) :selected-view]))
                                    :combo-edn       (pr-str (cstr/join
                                                               ", "
@@ -1341,21 +1360,25 @@
                                  sql-filter)
         (ut/pp [:processing-field-vectors (count field-vectors)])
         (dorun (for [f field-vectors] ;(partition-all 10 field-vectors)]
-                 (tp/add-task task-pool
-                              (process-field-vectors system-db
+                 (tp/add-task task-pool ;; tests - removed. 9/28. went with out general (unbounded) task pools instead
+                 ;(ppy/execute-in-thread-pools :serial-give-it-a-whirl            
+                              ;(fn [] 
+                                (process-field-vectors system-db
                                                      target-db
                                                      [f]
                                                      this-run-id
                                                      sniff-tests-map
                                                      field-attributes-map
-                                                     derived-field-map))))
+                                                     derived-field-map))));)
         (if (and sql-filter #_{:clj-kondo/ignore [:not-empty?]} (not (empty? sql-filter)))
           (find-all-viz-fields! system-db viz-shape-map connection_id [:and [:= :connection-id connection_id] (first sql-filter)])
           (find-all-viz-fields! system-db viz-shape-map connection_id [:= :connection-id connection_id]))
         (if (and sql-filter #_{:clj-kondo/ignore [:not-empty?]} (not (empty? sql-filter)))
           (find-all-viz-combos! system-db viz-shape-map connection_id [:and [:= :connection-id connection_id] (first sql-filter)])
           (find-all-viz-combos! system-db viz-shape-map connection_id [:= :connection-id connection_id]))
-        (update-connection-data! system-db this-run-id connection_id))
+        (update-connection-data! system-db this-run-id connection_id)
+        (when (not (cstr/includes? connection_id "mem-cache"))
+          (ut/pp [:db-metadata-with-viz-success! :fields (count field-vectors) connection_id])))
       (catch Exception e
         (let [sw (java.io.StringWriter.)
               pw (java.io.PrintWriter. sw)]
@@ -1363,7 +1386,7 @@
           (ut/pp [:error-running-whirl-full f-path sql-filter target-db (str e) (.toString sw)]))))))
 
 (defn lets-give-it-a-whirl-no-viz
-  [f-path target-db system-db _ _ _ _ & sql-filter]
+  [f-path target-db system-db sniff-tests-map field-attributes-map derived-field-map _ & sql-filter]
   (doall
     (try
       (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
@@ -1398,6 +1421,18 @@
                                  this-run-id
                                  connect-meta
                                  sql-filter)
+        ;; (ut/pp [:processing-field-vectors :quick-path (count field-vectors) sql-filter])
+        ;; (dorun (for [f field-vectors] ;; ADDED TO QUICK PATH 9/28 for attribute harvesting
+        ;;         (tp/add-task task-pool ;; tests - removed. 9/28. went with out general (unbounded) task pools instead
+        ;;         ; (ppy/execute-in-thread-pools :serial-give-it-a-whirl
+        ;;                                       ;(fn [] 
+        ;;                                         (process-field-vectors system-db
+        ;;                                                                     target-db
+        ;;                                                                     [f]
+        ;;                                                                     this-run-id
+        ;;                                                                     sniff-tests-map
+        ;;                                                                     field-attributes-map
+        ;;                                                                     derived-field-map))));)
         (update-connection-data! system-db this-run-id connection_id)
         (when (not (cstr/includes? connection_id "mem-cache"))
           (ut/pp [:db-metadata-without-viz-success! :fields (count field-vectors) connection_id]))
@@ -1531,7 +1566,9 @@
            ;_ (when res? (create-sqlite-sys-tables-if-needed! dest))
            src-conn (if res? tmp-src src-conn)]
        (when res? (insert-rowset resultset (last sql-filter) src-conn cols)) ;; if passed
-       ((if quick? lets-give-it-a-whirl-no-viz lets-give-it-a-whirl)
+       ((if quick?
+          lets-give-it-a-whirl-no-viz
+          lets-give-it-a-whirl)
         src-conn-id
         src-conn
         dest

@@ -1,25 +1,27 @@
 (ns rvbbit-frontend.scrubbers
   (:require
-    ["react-codemirror2"     :as cm]
-    ["react-colorful"        :as react-colorful]
-    ["react-drag-and-drop"   :as rdnd]
-    [cljs.tools.reader       :refer [read-string]]
-    [clojure.string          :as cstr]
-    [clojure.walk            :as walk]
-    [day8.re-frame.undo      :as    undo
-                             :refer [undoable]]
-    [garden.color            :as    c
-                             :refer [analogous color? complement hex->hsl hex? hsl hsl->hex hsla invert mix rgb->hex rgb->hsl
-                                     shades split-complement tetrad triad]]
-    [re-com.core             :as    re-com
-                             :refer [at]]
-    [re-com.util             :refer [px]]
-    [re-frame.core           :as re-frame]
-    [reagent.core            :as reagent]
-    [rvbbit-frontend.connections :as conn]
-    [rvbbit-frontend.db      :as db]
-    [rvbbit-frontend.shapes  :as shape]
-    [rvbbit-frontend.utility :as ut]))
+   ["react-codemirror2"     :as cm]
+   ["react-colorful"        :as react-colorful]
+   ["react-drag-and-drop"   :as rdnd]
+   [cljs.tools.reader       :refer [read-string]]
+   [clojure.string          :as cstr]
+   [clojure.walk            :as walk]
+   [day8.re-frame.undo      :as    undo
+    :refer [undoable]]
+   [garden.color            :as    c
+    :refer [analogous color? complement hex->hsl hex? hsl hsl->hex hsla invert mix rgb->hex rgb->hsl
+            shades split-complement tetrad triad]]
+   [re-com.core             :as    re-com
+    :refer [at]]
+   [re-com.util             :refer [px]]
+   [re-frame.core           :as re-frame]
+   [reagent.core            :as reagent]
+   [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.db      :as db]
+   [cljs-time.core :as t]
+   [cljs-time.format :as tf]
+   [rvbbit-frontend.shapes  :as shape]
+   [rvbbit-frontend.utility :as ut]))
 
 
 (defn theme-pull
@@ -412,10 +414,6 @@
 
 ;; (inject-slider-styles "#ffffff" (theme-pull :theme/editor-outer-rim-color nil))
 
-
-;; Call `apply-custom-slider-style` wherever your themes are set or updated
-
-
 (defn custom-slider-style [track-color thumb-color]
   {:appearance "none"
    :-webkit-appearance "none"
@@ -505,6 +503,56 @@
         :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" 
                 :padding "0px" :margin-top "-11px"
                 }]]])])
+
+
+(defn date-slider
+  [kp v view-key type-key & [[start-date end-date]]]
+  [re-com/box :src (at) :child
+   (let [formatter (tf/formatter "yyyy-MM-dd")
+         start-date (if start-date (tf/parse formatter start-date) (t/date-time 2000 1 1))
+         end-date (if end-date (tf/parse formatter end-date) (t/date-time 2030 12 31))
+         days-between (t/in-days (t/interval start-date end-date))
+         current-date (if (string? v) (tf/parse formatter v) start-date)
+         current-value (t/in-days (t/interval start-date current-date))
+
+         date-to-string #(tf/unparse formatter %)
+         int-to-date #(t/plus start-date (t/days %))
+
+         on-change (fn [new-value]
+                     (let [new-date (int-to-date new-value)]
+                       (ut/tracked-dispatch [::scrubber-view-update kp (date-to-string new-date) view-key type-key])))]
+
+     [re-com/v-box :src (at) :gap "5px"
+      :children
+      [[re-com/h-box :src (at) :size "auto" :justify :between
+        :children
+        [[re-com/md-icon-button
+          :md-icon-name "zmdi-caret-left"
+          :on-click #(on-change (max 0 (dec current-value)))
+          :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff"
+                  :padding "0px" :margin-top "-11px"}]
+
+         [re-com/slider
+          :src (at)
+          :model current-value
+          :min 0
+          :max days-between
+          :step 1
+          :style (custom-slider-style "#ffffff" "#ffffff")
+          :width "210px"
+          :on-change on-change
+          :disabled? false]
+
+         [re-com/md-icon-button
+          :md-icon-name "zmdi-caret-right"
+          :on-click #(on-change (min days-between (inc current-value)))
+          :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff"
+                  :padding "0px" :margin-top "-11px"}]]]
+
+       [re-com/label
+        :label (str "Selected date: " (date-to-string (int-to-date current-value)))
+        :style {:font-size "12px" :color "#ffffff77"}]]])])
+
 
 
 (defn options-col

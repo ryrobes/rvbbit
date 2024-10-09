@@ -3,15 +3,25 @@
     [reagent.core :as reagent]))
 
 (def brick-size 50)
-(def version "0.1.4-alpha")
-(def version-date "9/2024")
+(def version "0.1.7-alpha")
+(def version-date "10/2024")
 
-(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver   :solver-status :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
+(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data :incoming :solver-status :ai-worker 
+                     :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
 
 (def bar-hover-text (reagent/atom nil))
 (def console-voice-text (reagent/atom nil))
+(def macro-undo? (reagent/atom false))
+(defonce seq-atom (atom 0))
+(def show-overlay (reagent/atom true))
+
+(def hide-annotate? (reagent/atom false))
 
 (def running-queries (atom #{})) 
+
+(defonce chat-audio-text (reagent/atom nil))
+(defonce chat-image (reagent/atom nil))
+(defonce custom-clover-drawers (reagent/atom {}))
 
 (def click-params-snapshot (atom nil))
 (def param-v-boxes (reagent/atom nil))
@@ -35,7 +45,7 @@
                  ;:used?     false
                  }))
 (def pause-alerts (reagent/atom false))
-(def speech-log (reagent/atom []))
+(defonce speech-log (reagent/atom []))
 (def last-mouse-activity (atom nil))
 (def snap-to-grid 25)
 
@@ -108,7 +118,7 @@
 
 (defonce active-flow-scrubbers (reagent/atom {}))
 (defonce scrubbers (reagent/atom {}))
-(defonce structured-editor (reagent/atom {}))  
+(defonce honeycomb-builder (reagent/atom {}))  
 (defonce data-browser-query (reagent/atom {}))
 (defonce data-browser-query-con (reagent/atom {}))
 (defonce kit-browser (reagent/atom {}))
@@ -292,17 +302,17 @@
   {:reco-preview       nil
    :editor?            false
    :buffy?             false
+   :ai-worker?         false
    :flow-editor?       true
+   :annotate?          false
    :grid-recos?        true
    :selected-flow      (str "my-new-flow" (rand-int 7564))
    :selected-cols      {}
+   ;:annotations        {}
    :recos-page         0
    :recos-page2        0
    :selected-tab       "snowshoe hare"
    :tabs               ["snowshoe hare"]
-   :click-param        {;:conn-list {:connection_id "-1245280001", :database_name "Microsoft
-                        :theme base-theme ;; start off default with base values
-                       } ;; temp
-   :panels             {;;     :tester123 {:h 2
-                       }
+   :click-param        {:theme base-theme}
+   :panels             {}
    :window             {:w (.-innerWidth js/window) :h (.-innerHeight js/window)}})

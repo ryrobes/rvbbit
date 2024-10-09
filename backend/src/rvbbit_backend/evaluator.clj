@@ -613,8 +613,16 @@
 
 (defn repl-eval [code repl-host repl-port client-name id ui-keypath]
   (let [_           (swap! nrepls-run inc)
-        ;; _ (ut/pp [:repl-eval-start client-name id ui-keypath])
+        ;;  _ (ut/pp [:repl-eval-start client-name id ui-keypath])
         output-atom (atom [])
+        code        (if (and (string? code)
+                             (re-matches #"^(?:\.{1,2}/)?[\w/.-]+\.\w+$" code)
+                             (.exists (java.io.File. code)))
+                      (try
+                        (slurp code)
+                        (catch Exception e
+                          (str "Error reading file: " code "\n" (.getMessage e))))
+                      code)
         e (try
             (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
               (let [user-fn-str   (try (slurp "./user.clj") (catch Exception _ ""))
@@ -628,6 +636,7 @@
                                           (-> (str id)
                                               (cstr/replace  "_" "-")
                                               (cstr/replace  "--" "-")))) ":" "")
+                    ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end-1  client-name id ui-keypath code]))
                     user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
                                     (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
                     s             (str user-fn-str "\n" code)
@@ -663,26 +672,36 @@
                                       ;(println "Real-time error:" err)
                                       )
                                     msg)
+                    raw-sql?  (cstr/includes? (str s) "rvbbit-backend.websockets/run-raw-sql")
+                   ;; _ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end0 raw-sql? client-name id ui-keypath]))
 
                     ; Send the eval message and process each response
                     responses     (doall (map process-msg
                                               (nrepl/message client
                                                              {:op "eval"
                                                               :timeout 10000
-                                                              :max-memory-diff 50
-                                                              :max-cpu-diff 20
+                                                              ;:max-memory-diff 50
+                                                              ;:max-cpu-diff 20
                                                               :code s})))
 
+                    ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end00 responses raw-sql? client-name id ui-keypath]))
+                    r-vals (try (nrepl/response-values responses) (catch Throwable e (ut/pp {:decoding-response-values-error (str e)})))
                     rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
-                                               (nrepl/response-values responses)))
+                                               r-vals))
+                   ;; _ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end000 raw-sql? client-name id ui-keypath]))
                     rsp           (nrepl/combine-responses responses)
                     msg-out       @output-atom
+                    ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end0000 raw-sql? client-name id ui-keypath]))
                     merged-values rsp-read ;; "merged" as in a vector of values, but currently we are forcing a single value via DO blocks...
-                    sampled-values (try
-                                     (safe-sample-with-description (first rsp-read))
-                                     (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
-                    _ (push-to-console-clover (cstr/join "" @output-atom) :out)
                     is-rowset?    (rowset? (first merged-values))
+                    sqlize? (and (not raw-sql?) is-rowset?)
+                    sampled-values (when (not sqlize?) ;; sqlize only
+                                     (try
+                                       (safe-sample-with-description (first rsp-read))
+                                       (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {}))))
+                    ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end00000 raw-sql? client-name id ui-keypath]))
+                    _ (push-to-console-clover (cstr/join "" @output-atom) :out)
+                    
                     sqlized       (atom nil)
                     output        {:evald-result
                                    (-> rsp
@@ -695,43 +714,66 @@
                                    :sampled sampled-values}
                     ns-str (get-in output [:evald-result :ns] "user")]
 
+                ;; (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end1 client-name id ui-keypath output]))
+
                 (swap! db/repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
                        (vec (distinct (conj (get-in @db/repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
 
                 (when (and false ;;;(cstr/includes? (str code) ":introspect!")
-                       (or (cstr/includes? (str code) "(def ")
-                           (cstr/includes? (str code) "(defonce ")
-                           (cstr/includes? (str code) "(atom "))
-                       (not= client-name :rvbbit)
-                       (not (nil? client-name))
-                       (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
+                           (or (cstr/includes? (str code) "(def ")
+                               (cstr/includes? (str code) "(defonce ")
+                               (cstr/includes? (str code) "(atom "))
+                           (not= client-name :rvbbit)
+                           (not (nil? client-name))
+                           (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
+
                   (qp/serial-slot-queue :nrepl-introspection client-name
                                         (fn [] (update-namespace-state-async repl-host repl-port client-name id code ns-str))))
 
+                (when sqlize?
 
-                (when is-rowset? (let [table-name (ut/keypath-munger [id ui-keypath])
-                                       query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
-                                   (reset! sqlized [query-name {:select [:*]
-                                                                :connection-id "cache.db" ;;client-name
-                                                                :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
-                                                                :_sqlized-by ui-keypath
-                                                                :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
-                                                                :from [(keyword table-name)]}])
+                  (let [table-name (ut/keypath-munger [id ui-keypath])
+                        query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
+                    (reset! sqlized [query-name {:select [:*]
+                                                 :connection-id "cache.db" ;;client-name
+                                                 :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
+                                                 :_sqlized-by ui-keypath
+                                                 :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
+                                                 :from [(keyword table-name)]}])
                                     ;(qp/serial-slot-queue :sqlize-repl-rowset client-name
-                                   (ppy/execute-in-thread-pools-but-deliver
-                                    :sqlize-repl-rowset
-                                    (fn [] (insert-rowset (first merged-values)
-                                                          table-name
-                                                          nil
-                                                          nil
-                                                          (keys (first (first merged-values)))
-                                                          cache-db ;;(sql/create-or-get-client-db-pool client-name)
-                                                          client-name)))
-                                   (ut/pp [:sqlized-repl-output! @sqlized])))
+                    (ppy/execute-in-thread-pools-but-deliver
+                     :sqlize-repl-rowset
+                     (fn [] (insert-rowset (first merged-values)
+                                           table-name
+                                           nil
+                                           nil
+                                           (keys (first (first merged-values)))
+                                           cache-db ;;(sql/create-or-get-client-db-pool client-name)
+                                           client-name)))
+                    ;; (ut/pp [:sqlized-repl-output! @sqlized])
+                    ))
 
                 (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] (get output :value))
 
-                (merge output (when is-rowset? {:sqlized @sqlized}))))
+                ;;(when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end client-name id ui-keypath output]))
+
+                (let [oo (merge output
+                                (when sqlize?
+                                  {:sqlized @sqlized}))
+                      
+                      oo (if sqlize? ;; test. rely on sqlize? param it?
+                           ;(ut/dissoc-in oo [:evald-result :value])
+                           (assoc-in oo [:evald-result :value] 
+                                     (conj (vec (cstr/split (cstr/join (ut/strip-ansi msg-out)) #"\n")) 
+                                           [[:rowset-detected :sqlized-to (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]])
+                                     ;(vec (cstr/split-lines (ut/strip-ansi msg-out)))
+                                     ;(str (ut/strip-ansi (cstr/join msg-out)))
+                                     )
+                           oo)]
+                  
+                  oo)
+                
+                ))
 
             (catch Exception ee
               (let [error-msg (ex-message ee)
@@ -747,6 +789,10 @@
                                        :cause      (str (ex-cause ee))
                                        :err-data   (str (ex-data ee))
                                        :error      (ex-message ee)}
+                                      (when (cstr/includes? (str code) "rvbbit-backend.websockets/run-raw-sql") ;raw-sql?
+                                        {:value [{:database_says (str (ex-cause ee))}
+                                                 {:database_says (str (ex-data ee))}
+                                                 {:database_says (str (ex-message ee))}]})
                                       (when (not (nil? added-errors))
                                         {:rabbit-added added-errors}))})))]
     e))

@@ -1,0 +1,346 @@
+{
+;;  :test-action1
+;;  {:description "test grid action yo"
+;;   :build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+;;                      (into {}
+;;                            (apply concat (for [[k v] client-panels
+;;                                                :when (get v :queries)]
+;;                                            (for [kk (keys (get v :queries))
+;;                                               ;;   :let [panel (get-in client-panels [k :queries kk])
+;;                                               ;;         panel-data (get-in client-data [k :queries kk])]
+;;                                                  ]
+;;                                              {[k :queries kk] [{:draggable-clover [:speak "wow... epic. i'm joking. lame. ugh, lets go to the mall."]
+;;                                                                 :target :query
+;;                                                                 :icon "zmdi-pizza"
+;;                                                                 :tooltip "wow."}]})))))}
+;;  :test-action22
+;;  {:description "test grid action yo1"
+;;   :build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+;;                      (into {}
+;;                            (apply concat (for [[k v] client-panels
+;;                                                :when (or (get v :queries)
+;;                                                          (not (empty? (get v :implied-rowsets))))]
+;;                                            (for [[tt kk] (into (get v :implied-rowsets)
+;;                                                                (mapv (fn [x] [:queries x]) (keys (get v :queries))))
+;;                                                ;;   :let [panel (get-in client-panels [k :queries kk])
+;;                                                ;;         panel-data (get-in client-data [k :queries kk])]
+;;                                                  ]
+;;                                              {[k tt kk] [{:body [:speak "more clover here."]
+;;                                                           :runner :views
+;;                                                           :action-type :draggable
+;;                                                           :target :query
+;;                                                           :block-id :talky-tiffany
+;;                                                           :view-id :yoyoyo
+;;                                                           :h 2 :w 5
+;;                                                           :style-override {}
+;;                                                           :icon "assets/head2.jpg"
+;;                                                           :tooltip "411-wow."}]})))))}
+ 
+;;  :owen-wilson-drawer
+;;   {:description "test grid action yo1"
+;;   :build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+;;                      (into {}
+;;                            (apply concat (for [[k v] client-panels
+;;                                                :when (or (get v :queries)
+;;                                                          (not (empty? (get v :implied-rowsets))))]
+;;                                            (for [[tt kk] (into (get v :implied-rowsets)
+;;                                                                (mapv (fn [x] [:queries x]) (keys (get v :queries))))
+;;                                                 ;;   :let [panel (get-in client-panels [k :queries kk])
+;;                                                 ;;         panel-data (get-in client-data [k :queries kk])]
+;;                                                  ]
+;;                                              {[k tt kk] [{:body [:box 
+;;                                                                  :style {:color "darkcyan"}
+;;                                                                  :child [:box :child "hey, clover"]]
+;;                                                           :runner :views
+;;                                                           :action-type :clover-drawer
+;;                                                           :target :query
+;;                                                           :block-id :wow333
+;;                                                           :view-id :wow
+;;                                                           :size 8
+;;                                                           :position :bottom 
+;;                                                           :style-override {}
+;;                                                           :icon "assets/head1.jpg"
+;;                                                           :tooltip "Owen Wilson button drawer"}]})))))}
+ 
+ 
+;;  :pie-pop-up
+;;  {:build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+;;                      (into {}
+;;                            (apply concat (for [[k v] client-panels
+;;                                                :when (or (get v :queries)
+;;                                                          (not (empty? (get v :implied-rowsets))))]
+;;                                            (for [[tt kk] (into (get v :implied-rowsets)
+;;                                                                (mapv (fn [x] [:queries x]) (keys (get v :queries))))
+;;                                                  ;;   :let [panel (get-in client-panels [k :queries kk])
+;;                                                  ;;         panel-data (get-in client-data [k :queries kk])]
+;;                                                  ]
+;;                                              {[k tt kk] [{:body [:box :size "auto"
+;;                                                                  ;:width :panel-width+50-px
+;;                                                                  :height :panel-height+50-px
+;;                                                                  :align :center :justify :center 
+;;                                                                  :style {:color "red" :font-size "35px" :border "1px solid green"}
+;;                                                                  :child [:speak "hold yer horses"]]
+;;                                                           :runner :views
+;;                                                           :title "bad moon risin', rage an' ruin!"
+;;                                                           :action-type :clover-drawer
+;;                                                           :target :query
+;;                                                           :block-id :wow333
+;;                                                           :view-id :wow
+;;                                                           :size 5
+;;                                                           :position :bottom
+;;                                                           :style-override {}
+;;                                                           :icon "ri-pie-chart-2-fill"
+;;                                                           :tooltip "Bad moon is risin'"}]})))))}
+ 
+;;  :fart-fax
+;;  {:description "test grid action yo"
+;;   :build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+;;                      (into {}
+;;                            (apply concat (for [[k v] client-panels
+;;                                                :when (get v :queries)]
+;;                                            (for [[kk vv] (get v :queries)
+;;                                                  ;:when (cstr/includes? (str vv) "fart-fax")
+;;                                                  ]
+;;                                              {[k :queries kk] [{:body [:box :size "auto"
+;;                                                                        :attr {:on-click [:set-parameter [:*this-block* :fart-fax222] "END"]}
+;;                                                                      ;:width :panel-width+50-px
+;;                                                                      :height :panel-height+50-px
+;;                                                                      :align :center :justify :center
+;;                                                                      :style {:color "orange" 
+;;                                                                              :font-weight 800
+;;                                                                              :font-size "35px" 
+;;                                                                              :border "1px solid green" 
+;;                                                                              :cursor "pointer"}
+;;                                                                      :child [:str "set me?" " "  [:or! [:*this-block* :fart-fax222] "START"]]]
+;;                                                               :runner :views
+;;                                                               :title "fart fax as your service"
+;;                                                               :action-type :clover-drawer
+;;                                                               :target :query
+;;                                                               :block-id :wow333
+;;                                                               :view-id :wow
+;;                                                               :size 3
+;;                                                               :position :bottom
+;;                                                               :style-override {:color "orange"}
+;;                                                               :icon "ri-customer-service-line"
+;;                                                               :tooltip "Bad moon is risin'"}]})))))}
+ 
+ :xtdb-temporal-sql-scrubbers
+ {:description "when using XTDB we can add scrubbers to the table to timetravel - both VALID_TIME or SYSTEM_TIME"
+  :build-clover-fn (fn [client-panels client-data client-metadata] 
+                     ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+                     (let [today (java.time.LocalDate/now)
+                           key-seed (rand-int 555)
+                           k1 (str "xtdb-val-scrub-" key-seed)
+                           k2 (str "xtdb-sys-scrub-" key-seed)
+                           kkw1 (keyword (str k1 "/" "valid-date-slider"))
+                           kkw2 (keyword (str k2 "/" "system-date-slider"))
+                           kw1 (keyword k1)
+                           kw2 (keyword k2)
+                           today-str-date (.format today (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd"))]
+                       (into {}
+                             (doall (apply concat (for [[k v] client-panels
+                                                 :when (get v :queries)] ;; only interested in queries
+                                             (for [[tt kk] (mapv (fn [x] [:queries x]) (keys (get v :queries)))
+                                                 ;; we have all this at our disposal to validate and use to build dynamic clover ui
+                                                   :let [panel (get-in client-panels [k :queries kk]) ;; the literal panel def
+                                                         panel-metadata (get-in client-metadata [k :queries kk]) ;; query metadata for this def (onyl valid for queries, obvs)
+                                                         panel-data (get-in client-data [k :queries kk])
+                                                         ;;_ (clojure.pprint/pprint panel)
+                                                         ] ;; the data output of the panel def (query, repl, solver, etc)
+                                                   :when (and (clojure.string/includes? (clojure.string/lower-case (get panel-metadata :connection-id "")) "xtdb")
+                                                              (not= kk :bounds) ;; dont want to circular examine our generated artifacts 
+                                                              (= (get panel-metadata :database-type) "PostgreSQL"))] ;; ^ until we have a better way to identify, since it pgsql wire protocol
+                                               (try
+                                                 {[k tt kk] [{:body [:box
+                                                                     :align
+                                                                     :center
+                                                                     :justify
+                                                                     :center
+                                                                     :style {:font-size    "21px"
+                                                                             :font-weight  700
+                                                                             :padding-top  "6px"
+                                                                             :margin-top   "-8px"
+                                                                             :color        :theme/editor-outer-rim-color
+                                                                             :font-family  :theme/base-font}
+                                                                     :child [:date-slider
+                                                                             :valid-date-slider
+                                                                             :bounds/vmin.0  ;"2023-01-01"
+                                                                             :bounds/mmax.0  ;"2023-12-31"
+                                                                             1
+                                                                             250
+                                                                             ;;:xtdb-scrub/valid-date-slider
+                                                                             [:or! [kw1 :valid-date-slider] today-str-date]
+                                                                             "yyyy-MM-dd"
+                                                                             "MMM dd, yyyy"
+                                                                             ":valid-time :as-of-date"]]
+                                                              :block-id kw1
+                                                              :view-id :valid-time-scrub
+                                                              :runner :views
+                                                              :drop-mutate {[:panels k tt kk] ;; fully qualified keypath
+                                                                            (let [f-part (get-in panel [:from 0])
+                                                                                  j-part [:for :valid-time :as-of-date kkw1]
+                                                                                  fclause (vec (flatten [f-part j-part]))]
+                                                                              (assoc panel :from [fclause])
+                                                                              )
+                                                                            [:click-param :bounds :go!] :done
+                                                                            [:panels k :queries :bounds]
+                                                                            {:select [:vmin :smin [[:raw "CURRENT_DATE"] :mmax]]
+                                                                             :from
+                                                                             [[{:select [[[:raw "min(_valid_from::date)"] :vmin]
+                                                                                         [[:raw "min(_system_from::date)"] :smin]]
+                                                                                :from   [[(get-in panel [:from 0 0]) :ss1 :for :all
+                                                                                          :valid_time]]} :tt45]]}
+                                                                            [:panels k :selected-view] kk}
+                                                              :action-type :draggable
+                                                              :target :query
+                                                              :h 2 :w 6
+                                                              :style-override {}
+                                                              :icon "ri-time-line"
+                                                              :tooltip "add date scrubber for :as-of-date VALID_TIME"}
+                                                             {:body [:box
+                                                                     :align
+                                                                     :center
+                                                                     :justify
+                                                                     :center
+                                                                     :style {:font-size    "21px"
+                                                                             :font-weight  700
+                                                                             :padding-top  "6px"
+                                                                             :margin-top   "-8px"
+                                                                             :color        :theme/editor-outer-rim-color
+                                                                             :font-family  :theme/base-font}
+                                                                     :child [:date-slider
+                                                                             :system-date-slider
+                                                                             :bounds/smin.0 ;"2024-01-01"
+                                                                             :bounds/mmax.0 ;"2024-12-31"
+                                                                             1
+                                                                             250
+                                                                         ;:xtdb-scrub1/system-date-slider
+                                                                             [:or! [kw2 :system-date-slider] today-str-date]
+                                                                             "yyyy-MM-dd"
+                                                                             "MMM dd, yyyy"
+                                                                             ":system-time :as-of-date"]]
+                                                              :block-id kw2
+                                                              :view-id :system-time-scrub
+                                                              :runner :views
+                                                        ;;     :drop-mutate {[:panels k tt kk] ;; fully qualified keypath
+                                                        ;;                   (assoc panel :from
+                                                        ;;                          [(vec (into (vec (get-in panel [:from 0]))
+                                                        ;;                                      [:for :system-time :as-of-date
+                                                        ;;                                       kkw2]))])
+                                                        ;;                   [:click-param :bounds :go!] :done
+                                                        ;;                   [:panels k :queries :bounds]
+                                                        ;;                   {:select [:vmin :smin [[:raw "CURRENT_DATE"] :mmax]]
+                                                        ;;                    :from
+                                                        ;;                    [[{:select [[[:raw "min(_valid_from::date)"] :vmin]
+                                                        ;;                                [[:raw "min(_system_from::date)"] :smin]]
+                                                        ;;                       :from   [[(get-in panel [:from 0 0]) :ss1 :for :all
+                                                        ;;                                 :valid_time]]} :tt45]]}
+                                                        ;;                   [:panels k :selected-view] kk}
+                                                              :drop-mutate {[:panels k tt kk] ;; fully qualified keypath
+                                                                            (let [f-part (get-in panel [:from 0])
+                                                                                  j-part [:for :system-time :as-of-date kkw2]
+                                                                                  fclause (vec (flatten [f-part j-part]))]
+                                                                              (assoc panel :from [fclause])
+                                                                              )
+                                                                            [:click-param :bounds :go!] :done
+                                                                            [:panels k :queries :bounds]
+                                                                            {:select [:vmin :smin [[:raw "CURRENT_DATE"] :mmax]]
+                                                                             :from
+                                                                             [[{:select [[[:raw "min(_valid_from::date)"] :vmin]
+                                                                                         [[:raw "min(_system_from::date)"] :smin]]
+                                                                                :from   [[(get-in panel [:from 0 0]) :ss1 :for :all
+                                                                                          :valid_time]]} :tt45]]}
+                                                                            [:panels k :selected-view] kk}
+                                                              :action-type :draggable
+                                                              :target :query
+                                                              :h 2 :w 6
+                                                              :style-override {}
+                                                              :icon "ri-history-line"
+                                                              :tooltip "add date scrubber for :as-of-date SYSTEM_TIME"}]}
+                                                              (catch Throwable e (do (clojure.pprint/pprint [:issue-with [k tt kk] (str e)]) {}))
+                                                              ))))))))}
+
+ :field-masters!
+ {:description "test grid action yo1"
+  :build-clover-fn (fn [client-panels client-data client-metadata] 
+                     ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions vector as a value
+                     (into {}
+                           (apply concat (for [[k v] client-panels
+                                               :when (or (get v :queries)
+                                                         (not (empty? (get v :implied-rowsets))))]
+                                           (for [[tt kk] (into (get v :implied-rowsets)
+                                                               (mapv (fn [x] [:queries x]) (keys (get v :queries))))
+                                                 :let [panel (get-in client-panels [k tt kk])
+                                                       panel-data (get-in client-data [k tt kk])
+                                                       fields (try (keys (select-keys (first panel-data) [:network :tarp :ue])) (catch Exception _ []))]
+                                                 :when (not (empty? fields))]
+                                             {[k tt kk] (vec (for [f fields]
+                                                               {:body [:speak "11wow... epic. i'm joking. lame. ugh, lets go to the mall."]
+                                                                :field f
+                                                                :runner :views
+                                                                :action-type :draggable
+                                                                :target :field
+                                                                :style-override {:background-color "pink"}
+                                                                :icon "zmdi-shape"
+                                                                :tooltip "111wow."}))})))))}}
+ 
+
+;;  _______ _     _ _______ _______  _____  _______       ______  ______ _____ ______       _______ _______ _______ _____  _____  __   _ _______
+;;  |       |     | |______    |    |     | |  |  |      |  ____ |_____/   |   |     \      |_____| |          |      |   |     | | \  | |______
+;;  |_____  |_____| ______|    |    |_____| |  |  |      |_____| |    \_ __|__ |_____/      |     | |_____     |    __|__ |_____| |  \_| ______|
+
+;; comment docs (or is it a design doc? you'll never know)
+
+;; Every time a client receives a heartbeat (15 seconds) the server-side copies of it's panel defs and data can be run through a function:
+;; 1 - determine if it's a block/view that is of interest by viewing its data 
+;; 2 - access the data to create relevant custom grid UI as Clover 
+
+;; Currently there are 3 types of custom UI elements
+
+;; -----------------------------------------------------------------------------------------------
+;; type 1 - a draggable icon that becomes a new clover on the canvas (or any runner type)
+
+;; {:body [:speak "wow... epic... a new block. that talks. so clever..."] ;; clover body - dynamically crafted w access to the block def and data.
+;;  :runner :views ;; runner to use
+;;  :h 3 ;; optional
+;;  :w 3 ;; optional
+;;  :block-id :my-block-123 ;; optional
+;;  :view-id  :scrubber-123 ;; optional
+;;  :action-type :draggable 
+;;  :target :query ;; :query - targets the bottom bar of the data grid block view
+;;  :style-override {} ;; gets applied to the icon itself 
+;;  :icon "zmdi-shape" ;; icon. can be an image url, zmdi-* material design (https://zavoloklom.github.io/material-design-iconic-font/icons.html), or remix icons ri-* def https://remixicon.com/
+;;  :tooltip "111wow."} ;; tooltip for hovering on the icon. Note, since these are dynamically created based on the data every 15 seconds, tooltips and css could be used as a kind of low key alert.
+
+;; -----------------------------------------------------------------------------------------------
+;; type 2 - override the draggable field header(s) - to create new drag into and drag out actions - WIP
+
+;; {:new-canvas-body [:speak "wow... epic... a new block. that talks. so clever..."] ;; clover body - dynamically crafted w access to the block def and data.
+;;  :existing-canvas-body [...] ;; complicated here since we need to read the blocks in the moment and supply different outcomes. WIP**
+;;                    *literally provide for each block/view visible - map of [panel-key view-name] {:action-name [:new-view-body ...]} - including self
+;;  :runner :views ;; runner to use
+;;  :h 3 ;; optional (for new)
+;;  :w 3 ;; optional
+;;  :action-type :draggable-pill 
+;;  :target :field
+;;  :style-override {} ;; gets applied to the icon itself 
+;;  :icon "zmdi-shape" ;; icon. can be an image url, zmdi-* material design (https://zavoloklom.github.io/material-design-iconic-font/icons.html), or remix icons ri-* def https://remixicon.com/
+;;  :tooltip "111wow."} ;; tooltip for hovering on the icon. Note, since these are dynamically created based on the data every 15 seconds, tooltips and css could be used as a kind of low key alert.
+
+;; -----------------------------------------------------------------------------------------------
+;; type 3 - add an icon to run a solver event (flow or solver) or a mutate event - just a clover event that runs on-click
+
+;; {}
+
+;; -----------------------------------------------------------------------------------------------
+;; type 4 - add a small, togglable clover view to an expandable panel inside
+
+;; {:body [:speak "wow... epic... a new block. that talks. so clever..."] ;; clover body - dynamically crafted w access to the block def and data.
+;;  :runner :views ;; runner to use
+;;  :size 3 ;; how many blocks to extend (will obscure the grid)
+;;  :side :bottom ;; :left :right (top not allowed)
+;;  :action-type :clover-drawer
+;;  :target :query ;; location - only one avail now is :query, which targets the bottom bar of the data grid block view
+;;  :style-override {} ;; gets applied to the icon itself 
+;;  :icon "zmdi-shape" ;; icon. can be an image url, zmdi-* material design (https://zavoloklom.github.io/material-design-iconic-font/icons.html), or remix icons ri-* def https://remixicon.com/
+;;  :tooltip "111wow."} ;; tooltip for hovering on the icon. Note, since these are dynamically created based on the data every 15 seconds, tooltips and css could be used as a kind of low key alert.

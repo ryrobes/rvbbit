@@ -238,6 +238,12 @@
                    ;:str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    ;:string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    }
+          join-walk-map2 (fn [obody]
+                           (let [kps       (ut/extract-patterns obody :join 3)
+                                 logic-kps (into {} (for [v kps]
+                                                      (let [[_ that this] v]
+                                                        {v (str (cstr/join that this))})))]
+                             (ut/postwalk-replacer logic-kps obody)))
           obody-key-set (ut/deep-flatten block-map)
           client-name @(ut/tracked-sub ::client-name {})
           solver-clover-walk
@@ -262,6 +268,7 @@
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
                                      new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                      sub-param                 (keyword (str "solver/" new-solver-name))
+                                     resolved-input-map        (assoc resolved-input-map :*solver-name (keyword new-solver-name))
                                      req-map                   (merge
                                                                 {:kind             :run-solver-custom
                                                                  :solver-name      solver-name
@@ -315,6 +322,7 @@
                           (has-fn? :if)             if-walk-map2
                           (has-fn? :when)           when-walk-map2
                           (has-fn? :into)           into-walk-map2
+                          (has-fn? :join)           join-walk-map2
                           (has-fn? :invert-hex-color) invert-hex-color-walk
                           (has-fn? :tetrads)        tetrads-walk
                           (has-fn? :complements)    complements-walk
@@ -325,7 +333,7 @@
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/") (ut/deep-template-find out-block-map))) ;; ignore
                                                                                                                     ;; non
           templates? (ut/ne? templated-strings-vals)
-          _ (when templates? (ut/tapp>> [:replacing-string-templates... templated-strings-vals out-block-map]))
+          _ (when templates? (ut/tapp>> [:replacing-string-templates-resolver... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
                                    (ut/postwalk-replacer {nil ""}
                                                          (into {}

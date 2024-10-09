@@ -34,6 +34,7 @@ npx shadow-cljs release app
 draw_bordered_text "UI compiled. copying to server resources"
 cd ..
 rm -rf backend/resources/public/
+rm frontend/resources/public/assets
 cp -r frontend/resources/public backend/resources/public
 rm -rf backend/resources/public/images/gen/
 rm -rf backend/resources/public/images/large/
@@ -60,6 +61,7 @@ cp -r connections "../$DIR_NAME/connections"
 cp -r data "../$DIR_NAME/data"
 mkdir -p "../$DIR_NAME/db"
 cp -r defs "../$DIR_NAME/defs"
+mv "../$DIR_NAME/defs/empty-secrets.edn" "../$DIR_NAME/defs/secrets.edn"
 cp -r flows "../$DIR_NAME/flows"
 cp -r extras "../$DIR_NAME/extras"
 cp -r resources "../$DIR_NAME/resources"

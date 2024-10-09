@@ -407,7 +407,7 @@
                           (count (get-in kits [:kits kit-name kit-context-name curr-narrative :data])))
         console-mode? (get @console-or-kit-mode? kp false)
         narrative-item (get @kit-pages kp 0)
-        ai-assignments ;; calliope mock ui test honeycomb
+        ai-assignments ;; calliope mock ui test clover
           {:select [:*]
            :order-by [[:need-feedback :desc]]
            :style-rules {[:* :highlight-3109s] {:logic [:= :need-feedback "true"]
@@ -590,8 +590,8 @@
                   (try [re-com/box :size "none" :child
                         (if (cstr/includes? s ":select")
                           (let [tmp-key (keyword (str (ut/replacer (last kp) #":" "") "-hist-" (hash s)))]
-                            [bricks/honeycomb (first kp) tmp-key 6 11 nil {tmp-key (edn/read-string (str s))}])
-                          [bricks/honeycomb (first kp) (last kp) 6 9 {(last kp) (edn/read-string (str s))} nil])]
+                            [bricks/clover (first kp) tmp-key 6 11 nil {tmp-key (edn/read-string (str s))}])
+                          [bricks/clover (first kp) (last kp) 6 9 {(last kp) (edn/read-string (str s))} nil])]
                        (catch :default e
                          [re-com/v-box :gap "10px" :children
                           [[re-com/box :size "auto" :padding "10px" :style {:border "1px solid red" :color "red"} :child
@@ -1562,7 +1562,7 @@
    (true? (= params (get db :click-param {})))))
 
 (defn render-honey-comb-fragments
-  [c & [w h sys-name]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
+  [c & [w h sys-name]] ;; TODO REPLACE WITH bricks/clover-fragments
   (let [;panel-key :virtual-panel ;:block-4752 ;:hello-there-brother
         [panel-key key]       [(keyword (str "prando" (rand-int 123))) (keyword (str "vrando" (rand-int 123)))]
         panel-key (if (cstr/ends-with? (str sys-name) "-sys*") :virtual-panel panel-key)
@@ -1576,7 +1576,7 @@
     (cond (= type :view)  (let [view {key data_d}
                                 w (or w 11)
                                 h (or h 9)]
-                            [bricks/honeycomb panel-key key w h view nil])
+                            [bricks/clover panel-key key w h view nil])
           (= type :query) (let [temp-key (get data_d :_query-id (keyword (if sys-name (str sys-name) (str "kick-" (hash c)))))
                                 query    {temp-key (-> data_d ;(get data_d :queries)
                                                        (dissoc :cache?)
@@ -1585,7 +1585,7 @@
                                 w        (get data_d :_w (or w 10))]
                             [re-com/box :size "none" :width (px (* w db/brick-size)) 
                              :height (px (- (* h db/brick-size) 30)) 
-                             :child [bricks/honeycomb panel-key temp-key h w nil query]])
+                             :child [bricks/clover panel-key temp-key h w nil query]])
           (= type :both)  (let [queries (get data_d :queries)
                                 qkeys   (into {}
                                               (for [q (keys queries)]
@@ -1595,11 +1595,11 @@
                                 ndata   (ut/postwalk-replacer qkeys data_d)
                                 h       (get data_d :_h (or h 11))
                                 w       (get data_d :_w (or w 9))]
-                            [bricks/honeycomb panel-key key ;:view ;(get data_d :selected-view)
+                            [bricks/clover panel-key key ;:view ;(get data_d :selected-view)
                              h w {key (get ndata :view)} ;views ;(ut/postwalk-replacer qkeys views)
                              (get ndata :queries) ;(ut/postwalk-replacer qkeys queries)
                             ])
-          :else           [bricks/honeycomb panel-key key 11 9])))
+          :else           [bricks/clover panel-key key 11 9])))
 
 
 
@@ -1909,7 +1909,7 @@
                       ;;                           :margin-bottom "20px"
                       ;;                           :font-size     "19px"}]])
                       ;;      [re-com/box :child
-                      ;;       [bricks/honeycomb temp-panel-key :virtual-view 8 8 {:virtual-view c} nil runner-src curr-view-mode clover-fn opts-map]
+                      ;;       [bricks/clover temp-panel-key :virtual-view 8 8 {:virtual-view c} nil runner-src curr-view-mode clover-fn opts-map]
                       ;;     ;;[render-honey-comb-fragments c]
                       ;;       ]]])
 
@@ -2167,7 +2167,7 @@
                               (cond ;has-flow-drop?      ""
                                     (= type ":views")
                                     (let [view {key data_d}] 
-                                      [bricks/honeycomb panel_key key 11 8 view nil])
+                                      [bricks/clover panel_key key 11 8 view nil])
 
                                     ;(= type ":clojure")
                                     (some #(= % typek) block-runners)
@@ -2176,12 +2176,12 @@
                                           opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key panel_key :data-key key})
                                           clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key panel_key :data-key key})
                                           temp-panel-key (keyword (cstr/replace (str "hist-" panel_key key "-" (hash updated)) ":" ""))]
-                                      [bricks/honeycomb temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map])
+                                      [bricks/clover temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map])
 
                                     (= type ":queries") (let [query {temp-key (-> data_d ;(get data_d :queries)
                                                                                   (dissoc :cache?)
                                                                                   (dissoc :refresh-every))}]
-                                                          [bricks/honeycomb panel_key temp-key 8 11 nil query]
+                                                          [bricks/clover panel_key temp-key 8 11 nil query]
                                                           )
                                     (= type ":base")    (let [queries (get data_d :queries)
                                                               views   (get data_d :views)
@@ -2192,11 +2192,11 @@
                                                                                                (rand-int 123)
                                                                                                (hash data_d)))}))
                                                               ndata   (ut/postwalk-replacer qkeys data_d)]
-                                                          [bricks/honeycomb panel_key
+                                                          [bricks/clover panel_key
                                                            (get data_d :selected-view) 11 8
                                                            (get ndata :views)
                                                            (get ndata :queries)])
-                                    :else               [bricks/honeycomb panel_key key 11 8])]
+                                    :else               [bricks/clover panel_key key 11 8])]
                              [code-box 575 diff-height diff]
                              [re-com/gap :size "10px"]]]]))))}]]))
 

@@ -10,7 +10,6 @@
    [io.pedestal.http          :as phttp]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.freezepop :as fpop]
-   ;[rvbbit-backend.queue-party  :as qp]
    [rvbbit-backend.config  :refer [settings-atom]]
    [flowmaps.db               :as flow-db]])
 
@@ -21,14 +20,24 @@
 (defonce mem-usage (atom [])) ;; needs to be accessed from evaluator
 (defonce cpu-usage (atom [])) ;; needs to be accessed from evaluator
 
+(defonce realm-atom (atom {}))
+
 (defonce kit-atom (fpop/thaw-atom {} "./data/atoms/kit-atom.msgpack.transit"))
 (defonce father-time (fpop/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
 (defonce screens-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/screens-atom.edn"))
 (defonce server-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/server-atom.edn"))
-(defonce assistant-atom (atom {}))
+(defonce ai-worker-atom (fpop/thaw-atom {} "./data/atoms/ai-worker-atom.msgpack.transit"))
 (defonce flow-status (atom {}))
 (defonce kit-status (atom {}))
 
+(defonce model-costs (fpop/thaw-atom {"Anthropic"
+                                      {"claude-3-5-sonnet"  {:per-mtok-input 3.0 :per-mtok-output 15.0}
+                                       "claude-3-opus"      {:per-mtok-input 15.0 :per-mtok-output 75.00}
+                                       "claude-3-haiku"     {:per-mtok-input 0.25 :per-mtok-output 1.25}}} 
+                                     "./ai-workers/model-costs.edn"))
+
+(defonce kpi-atom (fpop/thaw-atom {} "./data/atoms/kpi-atom.msgpack.transit"))
+(defonce metric-atom (fpop/thaw-atom {} "./data/atoms/metric-atom.msgpack.transit"))
 (defonce runstream-atom (atom {}))
 (defonce params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
 (defonce panels-atom (fpop/thaw-atom {} "./data/atoms/panels-atom.msgpack.transit"))
@@ -57,14 +66,19 @@
 (defonce param-var-crosswalk (atom {}))
 (defonce param-var-key-mapping (atom {}))
 
+(def clover-sql-training-atom (fpop/thaw-atom {} "./data/training/clover-sql-training-atom.edn"))
+(def clover-sql-enriched-training-atom (fpop/thaw-atom {} "./data/training/clover-sql-enriched-training-atom.edn"))
+
 (def master-atom-map
   [[:master-time-watcher  father-time  :time]
    [:master-incoming-watcher  incoming-atom  :incoming]
    [:master-settings-watcher  settings-atom  :settings]
+   [:master-kpi-watcher  kpi-atom  :kpi]
+   [:master-metric-watcher  metric-atom  :metric]
    [:master-screen-watcher  screens-atom  :screen]
    [:master-params-watcher  params-atom  :client]
    [:master-panels-watcher  panels-atom  :panel]
-   [:master-assistant-watcher  assistant-atom  :assistant]
+   [:master-assistant-watcher  ai-worker-atom  :ai-worker]
    [:master-runstream-watcher  runstream-atom  :runstream]
    [:master-flow-watcher flow-db/results-atom  :flow]
    [:master-flow-runner-watcher flow-db/results-atom  :flow-runner] ;; * a copy, but it maintainted separately - pruned, etc.
@@ -91,8 +105,10 @@
          :settings (atom {})
          :screen (atom {})
          :incoming (atom {})
-         :assistant (atom {})
+         :ai-worker (atom {})
          :client (atom {})
+         :kpi (atom {})
+         :metric (atom {})
          :panel (atom {})
          :flow (atom {})
          :flow-runner (atom {})
@@ -110,9 +126,7 @@
          :server (atom {})
          :tracker (atom {})}))
 
-(def type-keys (keys @sharded-atoms))
-
-;; (ut/pp @kit-atom)
+(def type-keys (conj (keys @sharded-atoms) :*data))
 
 (defn current-watchers [] 
   (set (apply concat (for [[_ v] @sharded-atoms] (keys @v)))))
@@ -144,6 +158,8 @@
            parsed-path (if (or (= master-type :flow)
                                (= master-type :runstream)
                                (= master-type :flow-runner)
+                              ;;  (and (= master-type :ai-worker)
+                              ;;       (not (cstr/includes? (str coded-keypath) "threads-for")))
                                (= master-type :tracker)
                                (= master-type :flow-status))
                          (cons (str (second parts))
@@ -151,6 +167,32 @@
                          (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) path))
            limited-path (take @key-depth-limit parsed-path)]
        (into [master-type] limited-path)))))
+
+;; (def parse-coded-keypath
+;;   (memoize
+;;    (fn [coded-keypath]
+;;      (let [parts (cstr/split (ut/safe-name coded-keypath) #"[/>]")
+;;            master-type (keyword (first (cstr/split (cstr/replace (str coded-keypath) ":" "") #"/")))
+;;            path (rest parts)
+;;            parsed-path (cond
+;;                          (and (= master-type :ai-worker)
+;;                               (not (cstr/includes? (str coded-keypath) "threads-for")))
+;;                          (cons (str (second parts))
+;;                                (cons (str (nth parts 2))
+;;                                      (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) (drop 3 parts))))
+
+;;                          (or (= master-type :flow)
+;;                              (= master-type :runstream)
+;;                              (= master-type :flow-runner)
+;;                              (= master-type :tracker)
+;;                              (= master-type :flow-status))
+;;                          (cons (str (second parts))
+;;                                (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) (drop 2 parts)))
+
+;;                          :else
+;;                          (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) path))
+;;            limited-path (take @key-depth-limit parsed-path)]
+;;        (into [master-type] limited-path)))))
 
 (def create-coded-keypath
   (memoize
@@ -171,6 +213,7 @@
         ;                coded-keypath)
         parsed-keypath (parse-coded-keypath coded-keypath)
         [master-type & rest-path] parsed-keypath
+        master-type (if (= master-type :*data) :data master-type)
         limited-path (take @key-depth-limit rest-path)
         limited-coded-keypath (create-coded-keypath master-type limited-path)
         namespace-key (keyword (cstr/replace (name master-type) ":" ""))
@@ -333,7 +376,10 @@
           (= base-type :time)                         client-param-path
           (= base-type :signal)                       client-param-path
           (= base-type :settings)                     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :kpi)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :metric)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :ai-worker)                    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :kit)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :incoming)                     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -350,7 +396,8 @@
           ))
 
 (defn get-atom-from-keys [base-type sub-type sub-path keypath]
-    (get-atom-splitter-deep-kp base-type keypath (base-type master-reactor-atoms)))
+    (let [base-type (if (= base-type :*data) :data base-type)]
+      (get-atom-splitter-deep-kp base-type keypath (base-type master-reactor-atoms))))
 
 (declare trigger-hooks)
 
@@ -362,7 +409,7 @@
           new-value          (get-in new-state keypath)
           sub-path           (break-up-flow-key-ext flow-key)
           base-type          (first sub-path)
-          last-value         (get-in @last-values-per [client-name keypath])
+          ;last-value         (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c     (keys @atoms-and-watchers)
                                    :when (some #(= % (cstr/replace (str flow-key) ":" ""))
                                           ;; normalizes since old clients had keyword colons at weird places 
@@ -420,19 +467,23 @@
         sub-path        (break-up-flow-key-ext flow-key)
         watch-key       (str :all "-" (str keypath) "-" sub-type "-" flow-key)
         base-type       (first sub-path)
-        tracker?        (= sub-type :tracker)
-        flow?           (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+        ;tracker?        (= sub-type :tracker)
+        ;flow?           (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
         ;status?         (and (cstr/includes? (str keypath) ":*") flow?)
         client?         (= base-type :client)
         panel?          (= base-type :panel)
         screen?         (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?           (= base-type :time)
         signal?         (= base-type :signal)
+        kpi?            (= base-type :kpi)
+        metric?         (= base-type :metric)
         incoming?       (= base-type :incoming)
+        ai-worker?      (= base-type :ai-worker)
         settings?       (= base-type :settings)
         solver?         (= base-type :solver)
         kit?            (= base-type :kit)
-        data?           (= base-type :data)
+        data?           (or (= base-type :data) 
+                            (= base-type :*data))
         solver-meta?    (= base-type :solver-meta)
         repl-ns?        (= base-type :repl-ns)
         solver-status?  (= base-type :solver-status)
@@ -450,7 +501,10 @@
                           signal?         (vec (rest keypath))
                           settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) 
+                          kpi?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          metric?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          ai-worker?      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           incoming?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -468,6 +522,7 @@
                           )
         ;;keypath             (if flow? keypath (vec (rest keypath)))
         ;flow-key          (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key) 
+        base-type         (if (= base-type :*data) :data base-type)
         watcher          (make-watcher keypath flow-key :all fn (= sub-type :tracker))
         atom-to-watch    (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))]
 
@@ -508,10 +563,13 @@
           settings? (= base-type :settings)
           solver? (= base-type :solver)
           incoming? (= base-type :incoming)
+          kpi? (= base-type :kpi)
+          metric? (= base-type :metric)
+          ai-worker? (= base-type :ai-worker)
           kit? (= base-type :kit)
           flow-status? (= base-type :flow-status)
           kit-status? (= base-type :kit-status)
-          data? (= base-type :data)
+          data? (or (= base-type :data) (= base-type :*data))
           solver-meta? (= base-type :solver-meta)
           repl-ns?        (= base-type :repl-ns)
           solver-status?  (= base-type :solver-status)
@@ -529,6 +587,9 @@
                     settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     incoming?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    ai-worker?      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    kpi?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    metric?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -542,6 +603,7 @@
                     client?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     :else           (vec (rest sub-path)) ;;keypath
                     )
+          base-type         (if (= base-type :*data) :data base-type)
           atom-to-watch      (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))
           all-other-watchers (dissoc (into {} (for [[k v] @atoms-and-watchers] {k (vec (for [[_ v] v] (get v :watch-key)))})) client-name)
           ;; all-other-watch-keys (set
@@ -612,13 +674,23 @@
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :settings)                     (get @settings-atom client-param-path)
-      (= base-type :data)                         (get-in @last-solvers-data-atom
+      (or (= base-type :data) 
+          (= base-type :*data))                         (get-in @last-solvers-data-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :solver)                       (get-in @last-solvers-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :incoming)                     (get-in @incoming-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :kpi)                          (get-in @kpi-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :ai-worker)                    (get-in @ai-worker-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :metric)                       (get-in @metric-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :kit)                          (get-in @kit-atom
@@ -658,9 +730,10 @@
       (= base-type :time)                         (get @father-time client-param-path)
                     ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
-      (= base-type :data)                         (get-in @last-solvers-data-atom
-                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                                                          lv)
+      (or (= base-type :data)
+          (= base-type :*data))                         (get-in @last-solvers-data-atom
+                                                                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                                lv)
       (= base-type :settings)                     (get-in @settings-atom
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
@@ -672,10 +745,19 @@
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
+      (= base-type :kpi)                          (get-in @kpi-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :metric)                       (get-in @metric-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :incoming)                     (get-in @incoming-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :ai-worker)                    (get-in @ai-worker-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :repl-ns)                      (get-in @repl-introspection-atom

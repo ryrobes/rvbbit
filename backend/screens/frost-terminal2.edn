@@ -1,15 +1,41 @@
 {:reco-preview nil,
  :flow? false,
+ :sql-source
+ {:searches-types-sys
+  {:select [:item_type],
+   :connection-id "autocomplete-db",
+   :where
+   [:and
+    [:not [:like :item_sub_type "%preview%"]]
+    [:not [:= :item_type "saved-block"]]],
+   :from [:client_items],
+   :group-by [1]},
+  :searches-sub-types-sys
+  {:select [:item_key :is_live [[:count 1] :items]],
+   :connection-id "autocomplete-db",
+   :where
+   [:and
+    [:not [:= :item_key "trusting-square-penguin-13"]]
+    [:not [:like :item_sub_type "%preview%"]]
+    [:not [:= :item_type "saved-block"]]
+    [:= :item_type "incoming"]],
+   :style-rules
+   {[:* :highlight-4018a]
+    {:logic [:= :is_live 1],
+     :style {:background-color "#c167be34", :color "#c167be"}}},
+   :from [:client_items],
+   :group-by [1 2]}},
+ :doom-modal? false,
  :meta
  {nil
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 1,
+     :distinct 12,
      :group-by? true,
      :commons {},
      :cardinality 100}},
-   :rowcount 1},
+   :rowcount 12},
   :flow-fn-sys
   {:fields
    {:name
@@ -117,86 +143,89 @@
    {:block_key
     {:min "",
      :data-type "string",
-     :commons {":block-1285" 1, ":block-9240" 1, ":block-8155" 1},
-     :distinct 9,
+     :commons {":block-6232" 1, ":block-8394" 1, "color test" 1},
+     :distinct 14,
      :group-by? true,
-     :median ":block-3904",
-     :max "the-creative-process",
+     :median ":block-6697",
+     :max "remarkable hyena",
      :avg ":*theme* (non-numeric average)",
      :cardinality 100},
     :block_name
     {:min "(meta: this screen's theme)",
      :data-type "string",
-     :commons {"block-5402" 1, "block-9240" 1, "block-1285" 1},
-     :distinct 9,
+     :commons
+     {":param/theme-split-complement" 1,
+      "board: remarkable hyena" 1,
+      "block-1650" 1},
+     :distinct 14,
      :group-by? true,
-     :median "block-5402",
-     :max "board: the-creative-process",
+     :median "block-397",
+     :max "board: remarkable hyena",
      :avg "(meta: this screen's theme) (non-numeric average)",
      :cardinality 100},
     :queries
     {:min 0,
      :data-type "integer",
-     :commons {0 7, 1 2},
+     :commons {0 13, 2 1},
      :distinct 2,
      :group-by? true,
      :median 0,
-     :max 1,
-     :avg 0.2222222222222222,
-     :cardinality 22},
+     :max 2,
+     :avg 0.14285714285714285,
+     :cardinality 14},
     :views
     {:min 0,
      :data-type "integer",
-     :commons {1 5, 0 2, 2 1},
-     :distinct 4,
+     :commons {1 10, 0 3, 29 1},
+     :distinct 3,
      :group-by? true,
      :median 1,
-     :max 27,
-     :avg 3.7777777777777777,
-     :cardinality 44},
+     :max 29,
+     :avg 2.7857142857142856,
+     :cardinality 21},
     :block_data
     {:min
-     "{:clojure {:new-clojure (do (mapv (fn [n] {:step_int n, :step_val (Math/sin (* (* n (/ Math/PI :param/suffering-flux)) :time/second))}) (range :param/length-of-suffering)))}, :name \"block-9240\", :w 10, :selected-mode {:new-clojure :terminal, :* :terminal}, :selected-view :new-clojure, :root [23 1], :h 12, :connection-id nil, :queries {:new-clojure-sqlized {:select [:*], :connection-id \"cache.db\", :_sqlized-at \"2024-08-31 22:21:28\", :_sqlized-by [:block-9240 :clojure :new-clojure], :_sqlized-hash 1022913944, :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_]}}, :tab \"the-creative-process\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-9240.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}",
+     "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\", :border-radius [:sticky-border-radius \"12px\"], :filter \"brightness(120%)\", :backdrop-filter \"brightness(35%)\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color [:str :param/theme-dark 82], :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-blend-mode \"hard-light\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
      :data-type "string",
      :commons
-     {"{:clojure {:new-clojure (do (mapv (fn [n] {:step_int n, :step_val (Math/sin (* (* n (/ Math/PI :param/suffering-flux)) :time/second))}) (range :param/length-of-suffering)))}, :name \"block-9240\", :w 10, :selected-mode {:new-clojure :terminal, :* :terminal}, :selected-view :new-clojure, :root [23 1], :h 12, :connection-id nil, :queries {:new-clojure-sqlized {:select [:*], :connection-id \"cache.db\", :_sqlized-at \"2024-08-31 22:21:28\", :_sqlized-by [:block-9240 :clojure :new-clojure], :_sqlized-hash 1022913944, :from [:raw_custom_override1589124350__block_9240_clojure_new_clojure_]}}, :tab \"the-creative-process\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-9240.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
+     {"{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\", :border-radius [:sticky-border-radius \"12px\"], :filter \"brightness(120%)\", :backdrop-filter \"brightness(35%)\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color [:str :param/theme-dark 82], :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-blend-mode \"hard-light\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}"
       1,
-      "{:h 2, :w 10, :root [23 13], :tab \"the-creative-process\", :selected-view :hare-vw, :name \"block-5402\", :views {:hare-vw [:box :align :center :justify :center :style {:font-size \"21px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:str :time/second]]}, :queries {}}"
+      "{:h 5, :w 8, :root [5 7], :tab \"color test\", :selected-view :hi, :name \"block-7665\", :views {:hi [:data-viewer [:tetrads :solver/colors-of-the-moment>brightest]]}, :queries {}}"
       1,
-      "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style {:border-radius [:sticky-border-radius \"20px\"], :backdrop-filter \"blur(2px) brightness(32%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#1b0d1282\", :editor-rim-color \"#c167be\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#E7EBC4\", \"boolean\" \"#46436C\", \"map\" \"#716182\", \"list\" \"#3A315C\", \"string\" \"#C1E0C2\", \"vector\" \"#55476F\", \"keyword\" \"#158165E2\", \"rabbit-code\" \"#1951A8F0\", \"datetime\" \"#A8A1AA\", \"integer\" \"#B4B4B4\", \"unknown\" \"#777490\", \"date\" \"#221F4A\", \"nil\" \"#11E125D4\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#d6d3f0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#c167be\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(assets/openai-images/b64-image3-2332-3524-4k.webp-q10.jpg)\", :transition \"all 0.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Alata\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}"
+      "{:h 4, :w 5, :root [17 2], :tab \"color test\", :selected-view :hi, :name \"block-1242\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-1242.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child :param/theme-tetrads>0]}, :queries {}}"
       1},
-     :distinct 9,
+     :distinct 14,
      :group-by? true,
      :median
-     "{:name \"block-1285\", :w 10, :selected-view :poised-maroon-fly, :root [13 12], :h 3, :queries {}, :tab \"the-creative-process\", :drag-meta {:type :open-input}, :views {:poised-maroon-fly [:box :style {:font-size \"24px\"} :child [:scrubber [:param :length-of-suffering]]]}}",
+     "{:h 4, :w 5, :root [17 2], :tab \"color test\", :selected-view :hi, :name \"block-1242\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-1242.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child :param/theme-tetrads>0]}, :queries {}}",
      :max
-     "{:panels {nil {:queries {nil {:_last-run \"22:20:37\"}}}}, :click-param {:param {:suffering-flux 80, :length-of-suffering 69, :selected-view nil, :selected-view-data nil, :selected-block :block-3904}}}",
+     "{:panels {nil {:queries {nil {:_last-run \"09:57:02\"}, :flows-sys {:_last-run \"12:47:44\"}}}}, :click-param {:param {:_theme-color1 :solver/colors-of-the-moment>brightest, :theme-color3 :param/theme-tetrads>2, :theme-color1 :param/theme-tetrads>0, :refresh-timer 45, :_theme-color2 :solver/colors-of-the-moment>colors>0, :theme-color2 :param/theme-tetrads>1, :theme-dark :solver/colors-of-the-moment>darkest, :theme-split-complement [:split-complements :solver/colors-of-the-moment>dominant], :selected-view-data nil, :tt :solver/colors-of-the-moment>data-colors, :selected-view nil, :theme-color4 :param/theme-tetrads>3, :_theme-color4 :solver/colors-of-the-moment>colors>1, :theme-tetrads [:tetrads :solver/colors-of-the-moment>brightest], :_theme-color3 :solver/colors-of-the-moment>dominant, :selected-block :block-7098}}}",
      :avg
-     "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :base-block-style {:border-radius [:sticky-border-radius \"20px\"], :backdrop-filter \"blur(2px) brightness(32%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#1b0d1282\", :editor-rim-color \"#c167be\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#E7EBC4\", \"boolean\" \"#46436C\", \"map\" \"#716182\", \"list\" \"#3A315C\", \"string\" \"#C1E0C2\", \"vector\" \"#55476F\", \"keyword\" \"#158165E2\", \"rabbit-code\" \"#1951A8F0\", \"datetime\" \"#A8A1AA\", \"integer\" \"#B4B4B4\", \"unknown\" \"#777490\", \"date\" \"#221F4A\", \"nil\" \"#11E125D4\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#d6d3f0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#c167be\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(assets/openai-images/b64-image3-2332-3524-4k.webp-q10.jpg)\", :transition \"all 0.8s ease-in-out\", :background-blend-mode \"overlay\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Alata\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"} (non-numeric average)",
+     "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\", :border-radius [:sticky-border-radius \"12px\"], :filter \"brightness(120%)\", :backdrop-filter \"brightness(35%)\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color [:str :param/theme-dark 82], :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-blend-mode \"hard-light\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1} (non-numeric average)",
      :cardinality 100},
     :view_names
     {:min "",
      :data-type "string",
-     :commons {"" 2, ":hi :stack" 1, ":genius-plum-coyote" 1},
-     :distinct 8,
+     :commons {":hi" 4, "" 3, ":param-val" 3},
+     :distinct 7,
      :group-by? true,
-     :median ":hare-vw",
-     :max ":reech",
+     :median ":hare-vw-2",
+     :max ":param-val",
      :avg
-     ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color (non-numeric average)",
-     :cardinality 88},
+     ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1 (non-numeric average)",
+     :cardinality 50},
     :query_names
     {:min "",
      :data-type "string",
-     :commons {"" 8, ":new-clojure-sqlized" 1},
+     :commons {"" 13, " :flows-sys" 1},
      :distinct 2,
      :group-by? true,
      :median "",
-     :max ":new-clojure-sqlized",
+     :max " :flows-sys",
      :avg " (non-numeric average)",
-     :cardinality 22}},
+     :cardinality 14}},
    :database-type "SQLite",
-   :rowcount 9},
+   :rowcount 14},
   :fields-sys
   {:fields
    {:field_name
@@ -301,97 +330,194 @@
     {:min "a-random-wow",
      :data-type "string",
      :commons
-     {"simple-python-exec" 1, "node-color-thief-js-webp" 1, "counting-loop" 1},
-     :distinct 6,
+     {"hue-lights-api" 1, "hue-change-group-color" 1, "gpt35-color-parser" 1},
+     :distinct 11,
      :group-by? true,
-     :median "game-of-life-test1",
+     :median "gpt35-color-parser",
      :max "simple-python-exec",
-     :avg "game-of-life-test1 (non-numeric average)",
+     :avg "gpt35-color-parser (non-numeric average)",
      :cardinality 100},
     :file_path
     {:min "./flows/a-random-wow.edn",
      :data-type "string",
      :commons
-     {"./flows/simple-python-exec.edn" 1,
-      "./flows/node-color-thief-js-webp.edn" 1,
-      "./flows/counting-loop.edn" 1},
-     :distinct 6,
+     {"./flows/buffy-color-comment.edn" 1,
+      "./flows/hue-change-group-color.edn" 1,
+      "./flows/simple-python-exec.edn" 1},
+     :distinct 11,
      :group-by? true,
-     :median "./flows/game-of-life-test1.edn",
+     :median "./flows/gpt35-color-parser.edn",
      :max "./flows/simple-python-exec.edn",
-     :avg "./flows/game-of-life-test1.edn (non-numeric average)",
+     :avg "./flows/gpt35-color-parser.edn (non-numeric average)",
      :cardinality 100},
     :last_modified
     {:min "2024-08-31 19:10:15",
      :data-type "string",
      :commons
      {"2024-08-31 19:10:15" 4, "2024-09-02 05:18:05" 1, "2024-09-02 08:25:12" 1},
-     :distinct 3,
+     :distinct 8,
      :group-by? true,
-     :median "2024-08-31 19:10:15",
-     :max "2024-09-02 08:25:12",
-     :avg "2024-09-02 08:25:12 (non-numeric average)",
-     :cardinality 50}},
+     :median "2024-09-02 08:25:12",
+     :max "2024-09-12 15:01:54",
+     :avg "2024-09-12 15:01:54 (non-numeric average)",
+     :cardinality 72}},
    :database-type "SQLite",
-   :rowcount 6},
+   :rowcount 11},
   :files-sys
   {:fields
    {:file_path
-    {:min "./screens/dynamic-theme-example1.edn",
+    {:min "./screens/basic-client-stats.edn",
      :data-type "string",
      :commons
-     {"./screens/dynamic-theme-example1.edn" 1,
-      "/home/ryanr/rvbbit/backend/./screens/frost-terminal2.edn" 1,
+     {"./screens/hue-board.edn" 1,
+      "./screens/dynamic-theme-example1.edn" 1,
       "./screens/looking-glass-sine-wave.edn" 1},
-     :distinct 10,
+     :distinct 16,
      :group-by? true,
-     :median "./screens/nice-car-choom.edn",
-     :max "/home/ryanr/rvbbit/backend/./screens/random-collection.edn",
-     :avg "./screens/dynamic-theme-example1.edn (non-numeric average)",
+     :median "./screens/hue-board.edn",
+     :max "./screens/winter-theme.edn",
+     :avg "./screens/basic-client-stats.edn (non-numeric average)",
      :cardinality 100},
     :screen_name
-    {:min "dynamic-theme-example1",
+    {:min "basic-client-stats",
      :data-type "string",
-     :commons {"random-collection" 2, "frost-terminal2" 2, "winter-theme" 1},
-     :distinct 8,
+     :commons {"random-collection" 1, "light-theme" 1, "game-of-life" 1},
+     :distinct 16,
      :group-by? true,
-     :median "looking-glass-sine-wave",
+     :median "hue-board",
      :max "winter-theme",
-     :avg "dynamic-theme-example1 (non-numeric average)",
-     :cardinality 80},
+     :avg "basic-client-stats (non-numeric average)",
+     :cardinality 100},
     :blocks
-    {:min 4,
+    {:min 5,
      :data-type "integer",
-     :commons {6 2, 37 1, 16 1},
-     :distinct 9,
+     :commons {6 2, 15 2, 8 1},
+     :distinct 14,
      :group-by? true,
-     :median 26,
-     :max 48,
-     :avg 18.4,
-     :cardinality 89},
+     :median 25,
+     :max 57,
+     :avg 17.25,
+     :cardinality 87},
     :queries
     {:min 1,
      :data-type "integer",
-     :commons {2 3, 1 3, 17 1},
-     :distinct 6,
+     :commons {2 4, 1 3, 17 2},
+     :distinct 10,
      :group-by? true,
-     :median 9.5,
-     :max 22,
-     :avg 6.7,
-     :cardinality 60},
+     :median 2,
+     :max 17,
+     :avg 5.625,
+     :cardinality 62},
     :ts
-    {:min "2024-09-01 23:04:42",
+    {:min "2024-09-18 19:22:28",
      :data-type "string",
-     :commons
-     {"2024-09-01 23:04:42" 8, "2024-09-02 01:03:30" 1, "2024-09-02 05:58:03" 1},
-     :distinct 3,
+     :commons {"2024-09-18 19:22:28" 16},
+     :distinct 1,
      :group-by? true,
-     :median "2024-09-01 23:04:42",
-     :max "2024-09-02 05:58:03",
-     :avg "2024-09-01 23:04:42 (non-numeric average)",
-     :cardinality 30}},
+     :median "2024-09-18 19:22:28",
+     :max "2024-09-18 19:22:28",
+     :avg "2024-09-18 19:22:28 (non-numeric average)",
+     :cardinality 6}},
    :database-type "SQLite",
-   :rowcount 10},
+   :rowcount 16},
+  :searches-types-sys
+  {:fields
+   {:item_type
+    {:min "client-params",
+     :data-type "string",
+     :commons {"solvers" 1, "signals" 1, "saved-views" 1},
+     :distinct 7,
+     :group-by? true,
+     :median "saved-queries",
+     :max "solvers",
+     :avg "client-params (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 7},
+  :searches-rows-sys
+  {:fields
+   {:item_sub_type
+    {:min "",
+     :data-type "string",
+     :commons {"" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 100},
+    :item_type
+    {:min "incoming",
+     :data-type "string",
+     :commons {"incoming" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "incoming",
+     :max "incoming",
+     :avg "incoming (non-numeric average)",
+     :cardinality 100},
+    :item_key
+    {:min "farts",
+     :data-type "string",
+     :commons {"farts" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "farts",
+     :max "farts",
+     :avg "farts (non-numeric average)",
+     :cardinality 100},
+    :display_name
+    {:min "",
+     :data-type "string",
+     :commons {"" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 100},
+    :sample
+    {:min "farts!",
+     :data-type "string",
+     :commons {"farts!" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "farts!",
+     :max "farts!",
+     :avg "farts! (non-numeric average)",
+     :cardinality 100},
+    :value
+    {:min ":incoming/farts",
+     :data-type "string",
+     :commons {":incoming/farts" 1},
+     :distinct 1,
+     :group-by? true,
+     :median ":incoming/farts",
+     :max ":incoming/farts",
+     :avg ":incoming/farts (non-numeric average)",
+     :cardinality 100},
+    :is_live
+    {:min 0,
+     :data-type "integer",
+     :commons {0 1},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 100},
+    :block_meta
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 1},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
   :flow-fn-categories-sys
   {:fields
    {:category
@@ -411,35 +537,35 @@
    {:database_name
     {:min "*cache-db*",
      :data-type "string",
-     :commons {"*cache-db*" 5, "SQLite" 3},
+     :commons {"*cache-db*" 4, "SQLite" 3},
      :distinct 2,
      :group-by? true,
      :median "*cache-db*",
      :max "SQLite",
      :avg "*cache-db* (non-numeric average)",
-     :cardinality 25},
+     :cardinality 28},
     :connection_id
     {:min "bigfoot-ufos",
      :data-type "string",
-     :commons {"cache.db" 1, "cache.db.memory" 1, "bigfoot-ufos" 1},
-     :distinct 8,
+     :commons {"cache.db" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
+     :distinct 7,
      :group-by? true,
-     :median "cache.db.memory",
+     :median "flows-db",
      :max "system-db",
      :avg "system-db (non-numeric average)",
      :cardinality 100},
     :styler_highlight_8717ssa
     {:min 0,
      :data-type "integer",
-     :commons {0 8},
+     :commons {0 7},
      :distinct 1,
      :group-by? true,
      :median 0,
      :max 0,
      :avg 0,
-     :cardinality 12}},
+     :cardinality 14}},
    :database-type "SQLite",
-   :rowcount 8},
+   :rowcount 7},
   :new-clojure-1-sqlized
   {:fields
    {:step_int
@@ -464,6 +590,50 @@
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 25},
+  :searches-sub-types-sys
+  {:fields
+   {:item_key
+    {:min "farts",
+     :data-type "string",
+     :commons {"farts" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "farts",
+     :max "farts",
+     :avg "farts (non-numeric average)",
+     :cardinality 100},
+    :is_live
+    {:min 0,
+     :data-type "integer",
+     :commons {0 1},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 100},
+    :items
+    {:min 1,
+     :data-type "integer",
+     :commons {1 1},
+     :distinct 1,
+     :group-by? false,
+     :median 1,
+     :max 1,
+     :avg 1,
+     :cardinality 100},
+    :styler_highlight_4018a
+    {:min 0,
+     :data-type "integer",
+     :commons {0 1},
+     :distinct 1,
+     :group-by? false,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
   :reco-counts {:fields {}, :rowcount 0},
   :flow-fn-all-sys
   {:fields
@@ -479,62 +649,162 @@
      :cardinality 100}},
    :database-type "SQLite",
    :rowcount 34}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys 170},
+  :searches-types-list* {:searches-types-sys 100},
+  :searches-sub-types-sys-list* {:searches-sub-types-sys 186},
+  :searches-rows-sys-list* {:searches-rows-sys 170},
+  :files-list* {:files-sys 170},
+  :blocks-list* {:blocks-sys 127}},
  :runstream-drops nil,
  :zoom-start [149.21 -219.97 0.565],
- :tabs ["the cold grey machine whirred to life"],
+ :tabs
+ ["the cold grey machine whirred to life" "quiet dinosaur" "circus-blocks-test"],
  :selected-cols nil,
- :server {:settings nil},
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
+ :lines? false,
  :editor? false,
  :buffy? false,
- :valid-kits nil,
- :flow-drop-down? true,
- :memory [511659352 482970172 4294705152],
- :client-name :awesome-fat-raven-33,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[nil :queries nil] [:block-9201 :queries :new-clojure-1-sqlized]],
+  [:clojure :count-map-keys] [],
+  [:clojure :new-lundberg] [[:* :* :*]],
+  [:clojure :view-lundberg]
+  [[:block-1084 :views :hare-vw-8]
+   [:block-1682 :views :sub-34]
+   [:block-7634 :views :hare-vw-17]
+   [:block-9973 :views :hare-vw-2]
+   [:block-11414 :views :hare-vw-16]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:block-140 :views :hare-vw-5]
+   [:block-10760 :views :hare-vw-14]
+   [:block-7845 :views :hare-vw-4]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-10951 :views :hare-vw-21]
+   [:block-2276 :views :hare-vw-20]
+   [:block-3882 :views :editor-block-6295-clojure-hop-1]
+   [:block-9482 :views :hare-vw-15]],
+  [:clojure :gen-ev] [],
+  [:outliers :get-outliers]
+  [[nil :queries nil] [:block-9201 :queries :new-clojure-1-sqlized]]},
+ :flow-drop-down? false,
+ :memory [297596303 236269259 4294705152],
+ :client-name :trusting-square-penguin-13,
  :flow-editor? true,
- :window {:w 2368, :h 1193},
+ :window {:w 1922, :h 1323},
  :quake-console? false,
+ :implicit-rowsets {:solver [nil]},
  :post-meta
- {:flows-sys
-  {:* {:rowcount 6},
-   :flow_id {:distinct 6},
-   :file_path {:distinct 6},
-   :last_modified {:distinct 3}}},
+ {:fields-sys
+  {:* {:rowcount 26},
+   :field_name {:distinct 26},
+   :field_type {:distinct 5},
+   :data_type {:distinct 5}},
+  :connections-sys
+  {:* {:rowcount 7},
+   :database_name {:distinct 2},
+   :connection_id {:distinct 7},
+   :styler_highlight_8717ssa {:distinct 1}},
+  :searches-types-sys {:* {:rowcount 7}, :item_type {:distinct 7}},
+  :searches-sub-types-sys
+  {:* {:rowcount 1},
+   :item_key {:distinct 1},
+   :is_live {:distinct 1},
+   :items {:distinct 1},
+   :styler_highlight_4018a {:distinct 1}},
+  :searches-rows-sys
+  {:* {:rowcount 1},
+   :is_live {:distinct 1},
+   :value {:distinct 1},
+   :item_type {:distinct 1},
+   :sample {:distinct 1},
+   :item_sub_type {:distinct 1},
+   :display_name {:distinct 1},
+   :item_key {:distinct 1},
+   :block_meta {:distinct 0}},
+  :flows-sys
+  {:* {:rowcount 11},
+   :flow_id {:distinct 11},
+   :file_path {:distinct 11},
+   :last_modified {:distinct 8}},
+  :blocks-sys
+  {:* {:rowcount 14},
+   :block_key {:distinct 14},
+   :block_name {:distinct 14},
+   :queries {:distinct 2},
+   :views {:distinct 3},
+   :block_data {:distinct 14},
+   :view_names {:distinct 7},
+   :query_names {:distinct 2}}},
  :flow-estimates
- {:raw-custom-override1568563466
-  {:times 0.017, :run-id :raw-custom-override1568563466},
-  :flow-fn-categories-sys {:times 0.003, :run-id :flow-fn-categories-sys},
+ {:flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
+  :blocks-sys {:times 0.002, :run-id :blocks-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :block-10760-new-clojure-1 {:times 0.017, :run-id :block-10760-new-clojure-1},
+  :block-7170-hare-vw-19 {:times 0.006, :run-id :block-7170-hare-vw-19},
+  :block-777-hare-vw-9 {:times 0.006, :run-id :block-777-hare-vw-9},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :files-sys {:times 0.002, :run-id :files-sys},
+  :block-12101-hare-vw-13 {:times 0.005, :run-id :block-12101-hare-vw-13},
+  :searches-types-sys {:times 0.006, :run-id :searches-types-sys},
+  :virtual-panel-virtual-view {:times 0.011, :run-id :virtual-panel-virtual-view},
+  :searches-rows-sys {:times 0.004, :run-id :searches-rows-sys},
+  :block-4010-hare-vw-7 {:times 0.004, :run-id :block-4010-hare-vw-7},
+  :block-8762-hare-vw-12 {:times 0.004, :run-id :block-8762-hare-vw-12},
+  :flow-fn-categories-sys {:times 0.004, :run-id :flow-fn-categories-sys},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :block-5863-hare-vw-10 {:times 0.006, :run-id :block-5863-hare-vw-10},
+  :block-7472-hare-vw-18 {:times 0.005, :run-id :block-7472-hare-vw-18},
+  :searches-sub-types-sys {:times 0.004, :run-id :searches-sub-types-sys},
+  :block-6295-clojure-hop-1 {:times 0.005, :run-id :block-6295-clojure-hop-1},
+  :block-7725-hare-vw-11 {:times 0.005, :run-id :block-7725-hare-vw-11},
   :flow-fn-all-sys {:times 0.003, :run-id :flow-fn-all-sys},
-  :flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
-  :flows-sys {:times 0.001, :run-id :flows-sys}},
- :status {:heartbeat {:kick nil}},
+  :block-4420-clojure-hop {:times 0.005, :run-id :block-4420-clojure-hop}},
  :screen-name "frost-terminal2",
+ :panel-hashes
+ {nil 1188417010,
+  :block-5863 535508258,
+  :block-1084 557130596,
+  :block-777 1142683844,
+  :block-9973 846436816,
+  :block-4010 1329041480,
+  :block-11414 -2021206066,
+  :block-4420 910618546,
+  :block-4719 -1748572342,
+  :block-8499 -276800833,
+  :block-9201 903224869,
+  :block-140 -1784570893,
+  :block-7170 -2005715177,
+  :block-10760 -1255814447,
+  :block-7845 -220613714,
+  :block-12101 -605959595,
+  :block-8806 -1522062546,
+  :block-7472 -1215405842,
+  :block-1584 1369448590,
+  :block-10951 77761649,
+  :block-6295 363124510,
+  :block-2276 -1636111877,
+  :block-7725 530824321,
+  :block-8762 953657437,
+  :block-3882 -1348934254,
+  :block-9482 -816805384},
  :recos-page2 0,
  :selected-tab "the cold grey machine whirred to life",
  :col-names nil,
  :snapshots {:params {}},
- :alerts
- [[[:box
-    :style
-    {:font-size "15px"}
-    :child
-    [:box
-     :child
-     "sent screen save request to server... Please wait."
-     :style
-     {:font-size "12px", :opacity 0.66}]]
-   11
-   0.5
-   214
-   -1247625457]],
  :recos-page 0,
- :flow-runner nil,
  :rs-overrides-hashmap {"a-random-wow" nil},
- :user-params-hash 1806357648,
+ :user-params-hash -568532183,
  :grid-recos? true,
- :session-hash 1555239349,
+ :session-hash -599599806,
  :resolved-queries
- {nil {:_last-run "16:57:37"},
+ {nil {:_last-run "20:46:00"},
   :new-clojure-1-sqlized
   {:select [:*],
    :connection-id "cache.db",
@@ -543,7 +813,21 @@
    :_sqlized-hash nil,
    :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]}},
  :panels
- {nil {:queries {nil {:_last-run "16:57:37"}}},
+ {nil {:queries {nil {:_last-run "20:46:00"}}},
+  :block-5863
+  {:h 3,
+   :w 6,
+   :tab "quiet dinosaur",
+   :root [25 4],
+   :name "block-5863",
+   :selected-view :hare-vw-10,
+   :clojure
+   {:hare-vw-10
+    (do
+      (let [tt 122312
+            deps [:solver-meta/block-777-hare-vw-9>output>evald-result>value-hash]]
+        :data/hare-vw-9))},
+   :queries {}},
   :block-1084
   {:h 9,
    :w 15,
@@ -563,6 +847,18 @@
       "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;  ",
       :referrerPolicy "strict-origin-when-cross-origin",
       :allowFullScreen true}]},
+   :queries {}},
+  :block-777
+  {:h 3,
+   :w 6,
+   :tab "quiet dinosaur",
+   :root [18 4],
+   :name "block-777",
+   :selected-view :hare-vw-9,
+   :clojure
+   {:hare-vw-9
+    (let [deps [:solver-meta/block-4010-hare-vw-7>output>evald-result>value-hash]]
+      :data/hare-vw-7)},
    :queries {}},
   :block-9973
   {:h 4,
@@ -592,6 +888,54 @@
      :child
      "At long last it finally comes out. A huge labor of love that has taken far more time & toll on me than I had ever anticipated. In some ways it's a culmination of my entire career as an artist & a 'data person'. If you're seeing this, no matter if you love it or not - thank you."]},
    :queries {}},
+  :block-4010
+  {:h 3,
+   :w 6,
+   :tab "quiet dinosaur",
+   :root [11 4],
+   :name "block-4010",
+   :selected-view :hare-vw-7,
+   :clojure
+   {:hare-vw-7
+    (do
+      (let [deps [:solver-meta/block-4420-clojure-hop>output>evald-result>value-hash
+                  12432423]]
+        :data/clojure-hop))},
+   :queries {}},
+  :block-11414
+  {:h 4,
+   :w 18,
+   :root [20 8],
+   :tab "circus-blocks-test",
+   :selected-view :hare-vw-16,
+   :name "block-11414",
+   :views
+   {:hare-vw-16
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size [:str :*data/hare-vw-18 "px"],
+      :font-weight 700,
+      :padding-left "14px",
+      :margin-top "-26px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :*data/hare-vw-11]]},
+   :queries {}},
+  :block-4420
+  {:clojure {:clojure-hop (do (+ 9 4422 1234 12 7))},
+   :name "clojure-block-4420",
+   :w 8,
+   :selected-view :clojure-hop,
+   :root [2 3],
+   :h 5,
+   :opts {:clojure-hop {}},
+   :tab "quiet dinosaur",
+   :minimized? false},
   :block-4719
   {:h 3,
    :w 23,
@@ -679,6 +1023,24 @@
      :child
      "This video does a long overview of getting started and building something from scratch, while explaining things fully."]},
    :queries {}},
+  :block-7170
+  {:clojure
+   {:hare-vw-19
+    (do
+      (+
+        (rand-int 100)
+        (*
+          14
+          (let [deps [:solver-meta/block-7472-hare-vw-18>output>evald-result>value-hash]]
+            :data/hare-vw-18))))},
+   :name "block-7170",
+   :w 3,
+   :style {:transform [:str "rotate(" :*data/hare-vw-18 "deg)"]},
+   :selected-view :hare-vw-19,
+   :root [19 17],
+   :h 3,
+   :queries {},
+   :tab "circus-blocks-test"},
   :block-10760
   {:clojure
    {:new-clojure-1
@@ -797,6 +1159,18 @@
      :child
      "If you get lost, hit escape a couple times - a help screen will be in reach that has the keybindings (and will eventually have full documentation)"]},
    :queries {}},
+  :block-12101
+  {:h 2,
+   :w 5,
+   :tab "circus-blocks-test",
+   :root [27 5],
+   :name "block-12101",
+   :selected-view :hare-vw-13,
+   :clojure
+   {:hare-vw-13
+    (let [deps [:solver-meta/block-8762-hare-vw-12>output>evald-result>value-hash]]
+      :data/hare-vw-12)},
+   :queries {}},
   :block-8806
   {:h 10,
    :w 10,
@@ -821,6 +1195,24 @@
       :font-family :theme/base-font}
      :child
      [:img {:width "100%", :src "images/rvbbit-logo-no-bkgrnd.png"}]]},
+   :queries {}},
+  :block-7472
+  {:h 2,
+   :w 5,
+   :tab "circus-blocks-test",
+   :root [12 11],
+   :name "block-7472",
+   :selected-view :hare-vw-18,
+   :clojure
+   {:hare-vw-18
+    (do
+      (Math/ceil
+        (+
+          :time/second
+          (/
+            (let [deps [:solver-meta/block-6295-clojure-hop-1>output>evald-result>value-hash]]
+              :data/clojure-hop-1)
+            6))))},
    :queries {}},
   :block-1584
   {:h 2,
@@ -847,6 +1239,109 @@
      :child
      [:str :time/now-seconds]]},
    :queries {}},
+  :block-10951
+  {:name "block-10951",
+   :w 10,
+   :selected-view :hare-vw-21,
+   :root [24 13],
+   :h 6,
+   :queries {},
+   :tab "circus-blocks-test",
+   :views
+   {:hare-vw-21
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:transform [:str "rotate(" :*data/hare-vw-18 "deg)"],
+      :color :theme/editor-outer-rim-color,
+      :font-size "88px",
+      :transition "all 0.6s ease-in-out",
+      :font-weight 700,
+      :margin-top "36px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :font-family :theme/base-font}
+     :child
+     [:str :*data/hare-vw-19]]}},
+  :block-6295
+  {:clojure {:clojure-hop-1 (do (+ 119 228 212 :time/second))},
+   :name "clojure-block-6295",
+   :w 5,
+   :selected-view :clojure-hop-1,
+   :root [5 8],
+   :h 3,
+   :opts {:clojure-hop-1 {}},
+   :tab "circus-blocks-test",
+   :minimized? false},
+  :block-2276
+  {:h 3,
+   :w 4,
+   :root [6 4],
+   :tab "circus-blocks-test",
+   :selected-view :hare-vw-20,
+   :name "block-2276",
+   :views
+   {:hare-vw-20
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "71px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :time/second]]},
+   :queries {}},
+  :block-7725
+  {:h 3,
+   :w 6,
+   :tab "circus-blocks-test",
+   :root [12 6],
+   :name "block-7725",
+   :selected-view :hare-vw-11,
+   :clojure
+   {:hare-vw-11
+    (do
+      (Math/ceil
+        (/
+          (let [deps [:solver-meta/block-6295-clojure-hop-1>output>evald-result>value-hash
+                      2]]
+            :data/clojure-hop-1)
+          1.21)))},
+   :queries {}},
+  :block-8762
+  {:h 3,
+   :w 5,
+   :tab "circus-blocks-test",
+   :root [20 3],
+   :name "block-8762",
+   :selected-view :hare-vw-12,
+   :clojure
+   {:hare-vw-12
+    (do
+      (+
+        1234
+        (let [deps [:solver-meta/block-7725-hare-vw-11>output>evald-result>value-hash]]
+          :data/hare-vw-11)))},
+   :queries {}},
+  :block-3882
+  {:h 4,
+   :w 5,
+   :views
+   {:editor-block-6295-clojure-hop-1
+    [:editor [:block-6295 :clojure :clojure-hop-1]]},
+   :name "editor-block-6295-clojure-hop-1",
+   :root [5 11],
+   :tab "circus-blocks-test"},
   :block-9482
   {:h 3,
    :w 8,
@@ -882,9 +1377,12 @@
  :materialized-theme
  {:codemirror-theme "rvbbit-dynamic",
   :editor-param-background-color "#000000",
+  :pop-2 "#1b0a29",
   :base-block-style
-  {:border-radius "20px 20px 20px 20px",
-   :backdrop-filter "blur(2px) brightness(32%) "},
+  {:text-shadow "4px 4px 4px #00000088",
+   :border-radius "12px 12px 12px 12px",
+   :filter "brightness(120%)",
+   :backdrop-filter "brightness(35%)"},
   :vega-defaults
   {:view {:stroke "transparent"},
    :axis
@@ -919,28 +1417,28 @@
   {:background-color "#00000088", :filter "brightness(200%)"},
   :base-block-color-selected "#00030a",
   :block-title-font-color "#ffffff",
-  :base-block-color "#1b0d1282",
-  :editor-rim-color "#c167be",
+  :base-block-color "82",
+  :editor-rim-color "#0fb3da99",
   :base-block-filter-selected
   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
   :vega-default-color-scheme {:scheme "pastel2"},
   :data-colors
-  {"float" "#E7EBC4",
-   "boolean" "#46436C",
-   "map" "#716182",
-   "list" "#3A315C",
-   "string" "#C1E0C2",
-   "vector" "#55476F",
-   "keyword" "#158165E2",
-   "rabbit-code" "#1951A8F0",
-   "datetime" "#A8A1AA",
-   "integer" "#B4B4B4",
-   "unknown" "#777490",
-   "date" "#221F4A",
-   "nil" "#11E125D4"},
+  {"float" "#d89174",
+   "boolean" "#ff2f8e",
+   "map" "#4504ff",
+   "list" "#a61587",
+   "string" "#ffffff",
+   "any" "#d0b700",
+   "vector" "#0fda7c",
+   "keyword" "#d5eca4",
+   "rabbit-code" "#8b00e7",
+   "datetime" "#a59311",
+   "integer" "#4f82e8",
+   "unknown" "#0c902c",
+   "date" "#08390b"},
   :editor-grid-selected-font-color "#000000",
   :monospaced-font "JetBrains Mono",
-  :editor-grid-selected-background-color "#d6d3f0",
+  :editor-grid-selected-background-color "#dc9cb0",
   :nivo-defaults
   {:font-family "Instagram Sans",
    :labels
@@ -970,38 +1468,40 @@
     :ticks
     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-  :editor-outer-rim-color "#c167be",
+  :editor-outer-rim-color "#0fb3da",
   :grid-selected-font-color "#000000",
   :block-title-selected-font-color "#ffffff",
   :grid-selected-background-color "#a3d3ff",
   :grid-font-color "#ffffff",
   :canvas-background-css
   {:background-image
-   "url(assets/openai-images/b64-image3-2332-3524-4k.webp-q10.jpg)",
+   "url(assets/openai-images/b64-image3-66502-83873-4k.webp-q10.jpg)",
    :transition "all 0.8s ease-in-out",
-   :background-blend-mode "overlay",
    :background-size "cover",
+   :background-blend-mode "hard-light",
+   :background-position "center",
    :background-color "#424f57"},
   :editor-font-color "#ffffff",
-  :base-font "Alata",
+  :base-font "Poppins",
   :block-tab-selected-font-color "#c9d1ff",
   :editor-background-color "#000006",
-  :editor-grid-font-color "#ffffff"},
- :selected-block "none!",
+  :editor-grid-font-color "#ffffff",
+  :pop-1 "#122a67"},
+ :selected-block :block-6295,
  :theme-colors-hashmap
- {"float" "#E7EBC4",
-  "boolean" "#46436C",
-  "map" "#716182",
-  "list" "#3A315C",
-  "string" "#C1E0C2",
-  "vector" "#55476F",
-  "keyword" "#158165E2",
-  "rabbit-code" "#1951A8F0",
-  "datetime" "#A8A1AA",
-  "integer" "#B4B4B4",
-  "unknown" "#777490",
-  "date" "#221F4A",
-  "nil" "#11E125D4"},
+ {"float" "#d89174",
+  "boolean" "#ff2f8e",
+  "map" "#4504ff",
+  "list" "#a61587",
+  "string" "#ffffff",
+  "any" "#d0b700",
+  "vector" "#0fda7c",
+  "keyword" "#d5eca4",
+  "rabbit-code" "#8b00e7",
+  "datetime" "#a59311",
+  "integer" "#4f82e8",
+  "unknown" "#0c902c",
+  "date" "#08390b"},
  :solver-fn nil,
  :click-param
  {:flow-fn-sys
@@ -1018,11 +1518,11 @@
   {:block_key ":*theme*",
    :block_name "(meta: this screen's theme)",
    :queries 0,
-   :views 27,
+   :views 29,
    :block_data
-   "{:codemirror-theme \"the-matrix\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#091536\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b0f2180\", :editor-rim-color \"#2b4270\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de883\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#d6e367\", \"unknown\" \"#c7005d\", \"date\" \"#3b528b\", \"nil\" \"#ff2147\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#40d6ff\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/vap66-huge.png)\", :transition \"all 0.6s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\", :border-radius [:sticky-border-radius \"12px\"], :filter \"brightness(120%)\", :backdrop-filter \"brightness(35%)\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color [:str :param/theme-dark 82], :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-blend-mode \"hard-light\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
    :view_names
-   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1",
    :query_names ""},
   :tables-sys
   {:db_schema "none",
@@ -1036,47 +1536,45 @@
    :file_path "./flows/node-color-thief-js-webp.edn",
    :last_modified "2024-08-29 12:47:41"},
   :files-sys
-  {:file_path "./screens/looking-glass-sine-wave.edn",
-   :screen_name "looking-glass-sine-wave",
-   :blocks 9,
+  {:file_path "./screens/rotating-theme-blank.edn",
+   :screen_name "rotating-theme-blank",
+   :blocks 14,
    :queries 2,
-   :ts "2024-09-01 23:04:42"},
+   :ts "2024-09-18 19:22:28"},
   :chat-drag-23 {},
   :offenses-drag-17 {:SHOOTING nil},
   :viz-tables-sys2 {:table_name :OFFENSE-CODE-GROUP-drag-40},
+  :searches-types-sys {:item_type "incoming"},
+  :searches-rows-sys
+  {:item_sub_type "",
+   :item_type "incoming",
+   :item_key "farts",
+   :display_name "",
+   :sample "farts!",
+   :value ":incoming/farts",
+   :is_live 0,
+   :block_meta nil},
   :STREET-drag-11 {},
   :ufo-sightings-drag-22 {},
   :param
   {:nutritious-periwinkle-sheep "hello from a data board!",
    :float 324.444,
    :string "this is string",
-   :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :style
-    {:font-size "21px",
-     :font-weight 700,
-     :padding-top "6px",
-     :padding-left "14px",
-     :margin-top "-8px",
-     :color :theme/editor-outer-rim-color,
-     :font-family :theme/base-font}
-    :child
-    "The world is full of obvious things which nobody by any chance ever observes."],
-   :selected-view [:views :hare-vw-5],
+   :selected-view-data nil,
+   :selected-view [nil nil],
    :keys 123,
    :bools true,
    :keys2 [3 4 5],
-   :selected-block :block-7845},
+   :selected-block :block-6295},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
+   :pop-2 :solver/colors-of-the-moment>colors>2,
    :base-block-style
-   {:border-radius [:sticky-border-radius "20px"],
-    :backdrop-filter "blur(2px) brightness(32%) "},
+   {:text-shadow "4px 4px 4px #00000088",
+    :border-radius [:sticky-border-radius "12px"],
+    :filter "brightness(120%)",
+    :backdrop-filter "brightness(35%)"},
    :vega-defaults
    {:view {:stroke "transparent"},
     :axis
@@ -1111,28 +1609,15 @@
    {:background-color "#00000088", :filter "brightness(200%)"},
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
-   :base-block-color "#1b0d1282",
-   :editor-rim-color "#c167be",
+   :base-block-color [:str :param/theme-dark 82],
+   :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99],
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
    :vega-default-color-scheme {:scheme "pastel2"},
-   :data-colors
-   {"float" "#E7EBC4",
-    "boolean" "#46436C",
-    "map" "#716182",
-    "list" "#3A315C",
-    "string" "#C1E0C2",
-    "vector" "#55476F",
-    "keyword" "#158165E2",
-    "rabbit-code" "#1951A8F0",
-    "datetime" "#A8A1AA",
-    "integer" "#B4B4B4",
-    "unknown" "#777490",
-    "date" "#221F4A",
-    "nil" "#11E125D4"},
+   :data-colors :solver/colors-of-the-moment>data-colors,
    :editor-grid-selected-font-color "#000000",
    :monospaced-font "JetBrains Mono",
-   :editor-grid-selected-background-color "#d6d3f0",
+   :editor-grid-selected-background-color "#dc9cb0",
    :nivo-defaults
    {:font-family "Instagram Sans",
     :labels
@@ -1162,27 +1647,30 @@
      :ticks
      {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
     :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-   :editor-outer-rim-color "#c167be",
+   :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest,
    :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image
-    "url(assets/openai-images/b64-image3-2332-3524-4k.webp-q10.jpg)",
+   {:background-image [:str "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
-    :background-blend-mode "overlay",
     :background-size "cover",
+    :background-blend-mode "hard-light",
+    :background-position "center",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
-   :base-font "Alata",
+   :base-font "Poppins",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
-   :editor-grid-font-color "#ffffff"},
+   :editor-grid-font-color "#ffffff",
+   :pop-1 :solver/colors-of-the-moment>colors>1},
   :ufo-sightings-drag-22.* {},
   :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
   :narratives {},
-  :sys {:selected-tab "winter-wonder-lands", :selected-tab-idx 0},
+  :sys {:selected-tab "the cold grey machine whirred to life", :selected-tab-idx 0},
+  :searches-sub-types-sys
+  {:item_key "farts", :is_live 0, :items 1, :styler_highlight_4018a 0},
   :kits-sys
   {:enabled
    [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]}},

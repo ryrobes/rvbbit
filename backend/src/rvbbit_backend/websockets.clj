@@ -10,11 +10,14 @@
    [nextjournal.beholder      :as beholder]
    [io.pedestal.http          :as http]
    [clojure.java.shell        :as shell]
-   
+   [clojure.java.jdbc         :as jdbc]
    [flowmaps.db               :as flow-db]
    [clojure.data              :as data]
    [rvbbit-backend.external   :as ext]
+   [rvbbit-backend.endpoints   :as edp]
    [rvbbit-backend.db         :as db]
+   [rvbbit-backend.nested-pivot :as npiv]
+   [rvbbit-backend.assistants :as assistants]
    [rvbbit-backend.evaluator  :as evl]
    [io.pedestal.http.body-params :as body-params]
    [chime.core                :as chime]
@@ -34,6 +37,7 @@
    [hikari-cp.core            :as hik]
    [clojure.string            :as cstr]
    [rvbbit-backend.surveyor   :as surveyor]
+   [rvbbit-backend.realms     :as realms]
    [rvbbit-backend.freezepop  :as fpop]
    [rvbbit-backend.surveyor   :as svy]
    [rvbbit-backend.queue-party :as qp]
@@ -41,7 +45,7 @@
    [puget.printer             :as puget]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db
+    :refer [sql-exec sql-query   sql-query-one system-db history-db autocomplete-db system-reporting-db realms-db
             cache-db cache-db-memory ghost-db flows-db insert-error-row! to-sql pool-create]]
    [clojure.data.csv          :as csv]
    [csv-map.core              :as ccsv]
@@ -105,7 +109,7 @@
 (defonce thread-usage (atom []))
 
 (defonce non-heap-mem-usage (atom []))
-(defonce time-usage (atom []))
+;(defonce time-usage (atom []))
 (defonce scheduler-atom (atom {}))
 
 (defonce conn-map (atom {}))
@@ -126,7 +130,7 @@
 (defonce quick-sniff-hash (atom {}))
 (defonce honey-echo (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/honey-echo-atom.msgpack.transit"))
 
-(def heartbeat-seconds 15)
+(def heartbeat-seconds 15) ;; 15
 
 ;;(def num-groups 8) ;; atom segments to split solvers master atom into
 (def num-groups 64) ;; eyes emoji
@@ -195,8 +199,7 @@
 ;; (def param-var-crosswalk (atom {}))
 ;; (def param-var-key-mapping (atom {}))
 
-;; (def clover-sql-training-atom (fpop/thaw-atom {} "./data/training/clover-sql-training-atom.msgpack.transit"))
-;; (def clover-sql-enriched-training-atom (fpop/thaw-atom {} "./data/training/clover-sql-enriched-training-atom.msgpack.transit"))
+
 
 
 
@@ -509,6 +512,7 @@
 (def running-user-queries -1)  ;;(counter instrument/metric-registry ["queries" "counters" "running-user-queries"]))
 
 (defonce deep-run-list (atom []))
+(defonce auto-viz-runs (atom []))
 (defonce q-calls (atom 0))
 (defonce q-calls2 (atom 0))
 (defonce literal-data-map (atom {}))
@@ -694,6 +698,7 @@
                                    (assoc :recent-messages-per-second msgs-per-recent)
                                    (assoc :messages-per-second msgs)
                                    (assoc :mem_used_mb mem-mb))]}]
+    (ut/pp [:hb-ackd client-name])
     (sql-exec system-db (to-sql ins-sql) {:queue :client-memory}))
   (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
@@ -800,14 +805,16 @@
 ;;     (adjust-thread-pool-size custom-watcher-thread-pool watcher-core watcher-max)
 ;;     (adjust-thread-pool-size websocket-thread-pool ws-core ws-max)))
 
-(defn new-client
-  [client-name]
+(defn new-client [client-name]
   (ut/pp [:new-client-is-alive! client-name :opening (count client-queue-atoms) :websocket-queues])
   ;(client-sized-pools)
+  ;; (assistants/runstream-boot-agent "Calliope" client-name) ;;; TEMP TESTING!!
   (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
-  ;; (sql/create-or-get-client-db-pool client-name) ;; disable for now since we have REPL intropsection disabled ATM
+;;  (sql/create-or-get-client-db-pool client-name)
+  (cruiser/create-sqlite-sys-tables-if-needed! (sql/create-or-get-client-db-pool client-name))
   (doseq [cq client-queue-atoms]
-    (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)] (swap! cq assoc client-name new-queue-atom))))
+    (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)] 
+      (swap! cq assoc client-name new-queue-atom))))
 
 (def client-batches (atom {}))
 
@@ -815,7 +822,7 @@
                     :kit :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
 (def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :kit-status :solver-status ;;:solver
-                    :estimate [:estimate] :tracker :condis [:tracker] :alert :alerts :alert1 :alert2 :alert3}) ;; to not skip old dupes
+                    :estimate [:estimate] :tracker :condis [:tracker] :alert :alerts :alert1 :alert2 :alert3 :reco :reco-status}) ;; to not skip old dupes
 
 (defn sub-push-loop ;; legacy, but flawed?
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -1215,8 +1222,9 @@
 
 (defmethod wl/handle-push :current-panels
   [{:keys [panels client-name resolved-panels materialized-panels everything?]}]
-  (ut/pp [:panels-push! client-name (count (keys panels))])
-  (let [panels (ut/deep-remove-keys panels [:_last-run])
+  (let [panels-size-kb (ut/estimate-size-kb panels)
+        _ (ut/pp [:panels-push! client-name (count (keys panels)) :panels panels-size-kb :total-kb :is-everything? everything?])
+        panels (ut/deep-remove-keys panels [:_last-run])
         panels (if everything? panels
                    (merge (get @client-panels client-name) panels))]
     
@@ -1322,13 +1330,13 @@
 (defn package-settings-for-client [& [client-name]]
   (let [settings (config/settings)
         valid-runners-map (ppy/execute-in-thread-pools-but-deliver
-                       :serial-runner-when-expr-checks
-                       (fn [] (into {}
-                                    (for [[k v] (get settings :runners)
-                                          :let [oo (evl/repl-eval (get v :when-expr true)
-                                                                  "127.0.0.1" 8181
-                                                                  :rvbbit (keyword (str "config-when-runner" (cstr/replace (str k) ":" ""))) [])]]
-                                      {k (get-in oo [:evald-result :value 0] (get-in oo [:evald-result :out]))}))))
+                           :serial-runner-when-expr-checks
+                           (fn [] (into {}
+                                        (for [[k v] (get settings :runners)
+                                              :let [oo (evl/repl-eval (get v :when-expr true)
+                                                                      "127.0.0.1" 8181
+                                                                      :rvbbit (keyword (str "config-when-runner" (cstr/replace (str k) ":" ""))) [])]]
+                                          {k (get-in oo [:evald-result :value 0] (get-in oo [:evald-result :out]))}))))
         valid-runners (vec (keys (filter #(last %) valid-runners-map)))
         ;; _ (when true ;(= client-name :rvbbit)
         ;;     (ut/pp [valid-runners-map valid-runners]))
@@ -1626,6 +1634,10 @@
 
 (defonce kit-when-fn-cache (atom {}))
 
+(ut/pp [:client-panels (get @client-panels :vigorous-round-serval-32)])
+(ut/pp [:client-panels-data (get @client-panels-data :vigorous-round-serval-32)])
+(ut/pp [:client-panels-metadata (get @client-panels-metadata :vigorous-round-serval-32)])
+
 (defn kick [client-name task-id sub-task thread-id thread-desc message-name & args]
   (let [ui-keypath   [:kick] ;;; ^ sub-task is the UI item-key in push ops
         payload      (vec args)
@@ -1647,19 +1659,35 @@
                              subbed-subs   (vec (distinct (get @db/param-var-key-mapping cid [])))
                              sss-map       (into {} (for [[orig subbb] subbed-subs] {subbb orig}))
                              runners       (get (config/settings) :runners)
-                             valid-kits    (into {} (for [[k v] runners
-                                                         :when (get v :kits)]
+                             grid-actions  (try (edn/read-string (slurp "./defs/custom-grid-actions.edn"))
+                                                (catch Exception _ (do (ut/pp [:custom-grid-actions :read-error]) {})))
+                             valid-grid-actions    ;(try
                                                      (into {}
-                                                           (for [[kit-name {:keys [when-fn]}] (get v :kits)]
-                                                             {[k kit-name]
+                                                           (for [[action-name {:keys [build-clover-fn]}] grid-actions]
+                                                             {action-name
                                                               (try
-                                                                (let [res ((eval when-fn) (get @client-panels cid)
-                                                                                          (get @client-panels-data cid))]
-                                                                  ;; not worth to cache given the moving parts needed to be hashed? revisit.
+                                                                (let [res ((eval build-clover-fn)
+                                                                           (get @client-panels cid)
+                                                                           (get @client-panels-data cid)
+                                                                           (get @client-panels-metadata cid))]
                                                                   res)
-                                                                (catch Exception e (ut/pp [:when-fn-error k kit-name cid (str e)])))}))))
+                                                                (catch Exception e (ut/pp [:build-clover-fn-error-grid-actions action-name cid (str e)])))}))
+                                                    ; (catch Exception _ {}))
+                             valid-kits    (try
+                                             (into {} (for [[k v] runners
+                                                            :when (get v :kits)]
+                                                        (into {}
+                                                              (for [[kit-name {:keys [when-fn]}] (get v :kits)]
+                                                                {[k kit-name]
+                                                                 (try
+                                                                   (let [res ((eval when-fn) (get @client-panels cid)
+                                                                                             (get @client-panels-data cid))]
+                                                                  ;; not worth to cache given the moving parts needed to be hashed? revisit.
+                                                                     res)
+                                                                   (catch Exception e (ut/pp [:when-fn-error-kits k kit-name cid (str e)])))}))))
+                                             (catch Exception _ {}))
 
-                             
+
                              replaced-subs (walk/postwalk-replace sss-map ssubs)
                             ;;  replaced-subs (vec (distinct (for [s replaced-subs]
                             ;;                                 (if (or (cstr/starts-with? (str s) ":solver/")
@@ -1670,12 +1698,14 @@
                             ;;                                                            (str (cstr/replace (str cid) ":" "") ">") "") ":" "")
                             ;;                                             (cstr/replace "rvbbit>rvbbit>" "rvbbit>"))) ;; phantom client-name
                             ;;                                   s))))
-                              ;;  _ (ut/pp [:hb-boomerang cid replaced-subs])
+                            ;;  _ (ut/pp [:hb-boomerang cid replaced-subs])
                              ]
                          {:subs replaced-subs 
+                          :grid-actions valid-grid-actions
                           :kits valid-kits})
                        sub-task)]
-        (when hb? (swap! ping-ts assoc cid (System/currentTimeMillis)))
+        (when hb? (swap! ping-ts assoc cid (System/currentTimeMillis))
+              (ut/pp [:hb-sent cid]))
         (push-to-client ui-keypath data cid queue-id task-id sub-task)))
     :sent!))
 
@@ -2103,11 +2133,11 @@
                                                              (if (and error? restarts-left?) 1.5 1.35)
                                                              (if error? 25 9))
                                                      (when (and error? restarts-left?)
-                                                       (async/thread
+                                                       ;(async/thread ;; lets try blocking, we are already in a pool exec context
                                                          (do (Thread/sleep 2000)
                                                              (flow-statuses) ;; make sure the statuses are up to date.
-                                                             (Thread/sleep 10000)
-                                                             (flow! client-name orig-flowmap file-image flow-id opts))))
+                                                             (Thread/sleep 12000)
+                                                             (flow! client-name orig-flowmap file-image flow-id opts)));)
                                                      (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on
                                                      (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
                                                            (swap! latest-run-id assoc flow-id run-id)
@@ -2236,6 +2266,30 @@
                                                              (if (some #(= % :*) outs) :* (first outs))])}}))]
     {:flow-id flow-id :description desc :open-inputs flow-inputs :blocks blocks-types :found? (true? (ut/ne? raw))}))
 
+(defmethod wl/handle-push :start-conversation 
+  [{:keys [assistant-name client-name]}]
+  (ut/pp [:ai-worker-conversation-started! client-name assistant-name])
+  (ppy/execute-in-thread-pools
+   :ai-workers
+   (fn [] (let [thread-id (assistants/start-conversation client-name assistant-name)]
+            (push-to-client [:new-conversation] [assistant-name (str thread-id)] client-name -1 [:ai-worker] 
+                            [assistant-name (str thread-id)])))))
+
+(defmethod wl/handle-push :send-basic-message
+  [{:keys [assistant-name client-name thread-id message image-path]}]
+  (let [image-path (when image-path (get (assistants/analyze-image-path image-path) :absolute-path))]
+    (ut/pp [:ai-worker-send-basic-message! client-name assistant-name])
+    (ppy/execute-in-thread-pools
+     :ai-workers
+     (fn [] (assistants/send-message client-name assistant-name thread-id message image-path)))))
+
+(defmethod wl/handle-push :delete-thread
+  [{:keys [assistant-name client-name thread-id]}]
+  (ut/pp [:ai-worker-delete-thread! client-name assistant-name])
+  (ppy/execute-in-thread-pools
+   :ai-workers
+   (fn [] (assistants/delete-worker-thread client-name assistant-name thread-id))))
+
 (defmethod wl/handle-request :get-flow-open-ports
   [{:keys [client-name flowmap flow-id]}]
   (get-flow-open-ports flowmap flow-id client-name))
@@ -2255,6 +2309,17 @@
     (flow! client-name flowmap file-image flow-id opts true)
      ;                      ))
     ))
+
+(defn rabbit-edit [{:keys [block-keypath block-body client-name]}]
+  (try
+    (let [block-keypath (edn/read-string block-keypath)
+          block-body (edn/read-string block-body)]
+      (ut/pp [:rabbit-edit-trying {block-keypath block-body} :for client-name])
+      (push-to-client (vec (rest block-keypath)) [] client-name 1 :push-assocs {block-keypath block-body})
+      (str "Canvas modified successfully - " block-keypath))
+    (catch Exception e
+      (ut/pp [:rabbit-edit-error (.getMessage e)])
+      (str "Error modifying canvas - " (.getMessage e)))))
 
 (declare ship-estimate query-runstream)
 
@@ -3291,6 +3356,7 @@
              output                      (if is-fabric? (first output) output)
              _                           (write-transit-data output (last ui-keypath) client-name (ut/unkeyword (last ui-keypath))) ;; for :data/usage
              _                           (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] output)
+             ;;_ (when (cstr/includes? (str client-name) "square") (ut/pp [:writing-nrepl-data [(last ui-keypath)] output]))
 
              ;;_ (when is-fabric? (ut/pp [:fabric fabric-opts-map output]))
              output-full                 (-> output-full
@@ -3320,7 +3386,7 @@
                  (ppy/execute-in-thread-pools :sqlize-repl-rowset-push ;; dont want to delay the natural value returns
                                               (fn [] (let [query-map (get result :sqlized)]
                                                        (ut/pp [:sqlized (get result :sqlized)])
-                                                       (ut/delay-execution 2000
+                                                       (ut/delay-execution 6000
                                                                            (do (ut/pp [:sqlized query-map])
                                                                                (push-to-client ui-keypath [] client-name 2 :new-slice (into [:queries] query-map))))))))
 
@@ -3527,11 +3593,12 @@
           input-map             (get solver-map :input-map {})
           input-map             (if (ut/ne? override-input) (merge input-map override-input) input-map)
           is-history?           (true? (get solver-map :history? false))
-          ;;use-cache?            (or is-history? (true? (get solver-map :cache? false)))
-          use-cache?            (true?
-                                 (or is-history?
-                                     (true? (not (nil? temp-solver-name))) ;; temp test
-                                     (true? (get solver-map :cache? false))))
+          use-cache?            (or is-history? (true? (get solver-map :cache? false)))
+          ;; use-cache?            (true?
+          ;;                        (or is-history?
+          ;;                            (true? (not (nil? temp-solver-name))) ;; temp test
+          ;;                            (true? (get solver-map :cache? false))))
+          ;; use-cache? false 
           vdata                 (walk/postwalk-replace input-map (get solver-map :data))
           vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on
                                                               ;; it
@@ -3548,27 +3615,31 @@
           runner-type           (get runner-map :type runner-name)
           vdata-clover-walk-map (into {}
                                       (for [kp vdata-clover-kps]
-                                        {kp (if (= runner-type :nrepl)
+                                        {kp (if (and (= runner-type :nrepl)
+                                                     (cstr/starts-with? (str kp) ":data/"))
                                               (try
                                                 (let [pkp (db/parse-coded-keypath kp)
                                                       extra-kp (vec (drop 2 pkp))
-                                                      base-query-key (get pkp 1) ;;(keyword (cstr/replace (str kp) ":data/" ""))
+                                                      base-query-key (get pkp 1)
                                                       t-file (get-in @transit-file-mapping [client-name base-query-key :file])
-                                                      raw-val (get-in @db/last-solvers-data-atom [(last ui-keypath)])
+                                                      raw-val (get-in @db/last-solvers-data-atom [base-query-key])
                                                       raw-val-str (pr-str raw-val)
                                                       raw-val-size (count raw-val-str)
                                                       size-threshold 1000 ;; chars
-                                                      ccode (if false ;(<= raw-val-size size-threshold)
-                                                                    ;; If raw-val is small enough, use it directly
-                                                              raw-val ;;`(get-in ~raw-val ~extra-kp)
+                                                      ;;_ (ut/pp [:vdata-sub :raw-val-size raw-val-size :kp kp :extra-kp extra-kp :base-query-key base-query-key :raw-val-str raw-val-str])
+                                                      ccode (cond (<= raw-val-size size-threshold) ;; If raw-val is small enough, use it directly
+                                                                  raw-val
 
-                                                                    ;; otherwise, load it from disk in user-code
-                                                              `(do (println ~t-file (System/currentTimeMillis))
-                                                                   (get-in (cognitect.transit/read
-                                                                            (cognitect.transit/reader
-                                                                             (clojure.java.io/input-stream
-                                                                              ~t-file)
-                                                                             :msgpack)) ~extra-kp)))]
+                                                                  (= (get-in runner-map [:runner :port]) 8181) ;; if not small, but we are in the same repl, send the atom deref
+                                                                  `(get-in @rvbbit-backend.db/last-solvers-data-atom [~base-query-key])
+
+                                                                    ;; otherwise, load it from local disk 
+                                                                  :else `(do (println ~t-file (System/currentTimeMillis))
+                                                                             (get-in (cognitect.transit/read
+                                                                                      (cognitect.transit/reader
+                                                                                       (clojure.java.io/input-stream
+                                                                                        ~t-file)
+                                                                                       :msgpack)) ~extra-kp)))]
                                                   ;; (ut/pp [:t-file t-file ui-keypath kp base-query-key ccode pkp])
                                                   ccode)
                                                 (catch Exception e
@@ -3594,7 +3665,7 @@
 
           ;;cache-key             (pr-str [solver-name vdata runner-name])
           sanitized-req         (ut/deep-remove-keys ;; only for cache uniqueness 
-                                 (ut/lists-to-vectors [solver-map input-map])
+                                 (ut/lists-to-vectors [solver-map input-map vdata runner-name])
                                  [:id :history? :cache?])
           cache-key             (hash sanitized-req) ;; mostly for fabric and history cache forcing
           _ (when (cstr/includes? (str client-name) "powerful") (ut/pp [solver-name client-name cache-key sanitized-req]))
@@ -3632,7 +3703,9 @@
                     ;;  (ut/pp [:cached-solver-hit! solver-name])
                      (swap! db/last-solvers-atom assoc-in [solver-name] output)
                      (swap! db/last-solvers-atom-meta assoc-in [solver-name]
-                            (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
+                            (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" 
+                                               :output (ut/limit-sample output-full)
+                                               }))
                      (swap! db/last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
                      (swap! db/last-solvers-history-counts-atom update solver-name (fnil inc 0))
                     ;;  (ut/pp [:*cacheddd!!! client-name :for temp-solver-name vdata-ref])
@@ -3682,7 +3755,9 @@
             (swap! db/last-solvers-atom assoc-in [solver-name] test-query-sql)
             ;(swap! last-solvers-data-atom assoc solver-name output) ;; full data can be clover
             (swap! db/last-solvers-atom-meta assoc-in [solver-name]
-                   (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
+                   (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" 
+                                      :output (ut/limit-sample output-full)
+                                      }))
             (swap! db/last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
             (swap! db/last-solvers-history-counts-atom update solver-name (fnil inc 0))
             (when (not error?) ;(and use-cache? (not error?))
@@ -3758,7 +3833,9 @@
             (do
               (swap! db/last-solvers-atom assoc-in [solver-name] output-val)
               (swap! db/last-solvers-atom-meta assoc-in [solver-name]
-                     (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
+                     (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" 
+                                        :output (ut/limit-sample output-full)
+                                        }))
               (swap! db/last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
               (swap! db/last-solvers-history-counts-atom update solver-name (fnil inc 0))
 
@@ -3803,7 +3880,9 @@
           (ut/pp [:solver-static solver-name vdata])
           (swap! db/last-solvers-atom assoc-in [solver-name] vdata)
           (swap! db/last-solvers-atom-meta assoc-in [solver-name]
-                 (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
+                 (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" 
+                                    :output (ut/limit-sample output-full)
+                                    }))
           (swap! db/last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
           (swap! db/last-solvers-history-counts-atom update solver-name (fnil inc 0))
           ;(swap! solvers-running assoc-in [client-name solver-name] false)
@@ -3994,24 +4073,25 @@
               :when                           (or (= last-seen-seconds -1)
                                                   (> last-seen-seconds 600))]
       ; unsub from all watchers before atom cleanup - or else the pools will keep getting created via reactions!
-        (ut/pp [:dead-client :cleaning-up k])
-        (swap! client-metrics dissoc k)
-        (doseq [s subs]
-          (ut/pp [:trying-to-unsub k s])
-          (unsub-value k s))
-        (doseq [p (filter #(cstr/includes? (str %) (cstr/replace (str k) ":" "")) (keys @ppy/dyn-pools))]
-          (ppy/close-cached-thread-pool p))
-        (let [conn (get @conn-map k)
-              cn (get conn :datasource)]
-          (ut/ppa [:shutting-down-connection-pool k cn])
-          (sql/close-pool cn))
-        (swap! db/atoms-and-watchers dissoc k) ;; remove client from watchers atom (should already be empty from unsub, but just in case)
-        (swap! client-queues dissoc k)
-        (swap! client-panels dissoc k)
-        (swap! client-panels-data dissoc k)
-        (swap! client-panels-metadata dissoc k)
-        (swap! client-panels-history dissoc k)
-        (swap! ack-scoreboard dissoc k)))
+        (ut/pp [:dead-client :cleaning-up k :last-seen-seconds last-seen-seconds])
+        ;; (swap! client-metrics dissoc k)
+        ;; (doseq [s subs]
+        ;;   (ut/pp [:trying-to-unsub k s])
+        ;;   (unsub-value k s))
+        ;; (doseq [p (filter #(cstr/includes? (str %) (cstr/replace (str k) ":" "")) (keys @ppy/dyn-pools))]
+        ;;   (ppy/close-cached-thread-pool p))
+        ;; (let [conn (get @conn-map k)
+        ;;       cn (get conn :datasource)]
+        ;;   (ut/ppa [:shutting-down-connection-pool k cn])
+        ;;   (sql/close-pool cn))
+        ;; (swap! db/atoms-and-watchers dissoc k) ;; remove client from watchers atom (should already be empty from unsub, but just in case)
+        ;; (swap! client-queues dissoc k)
+        ;; (swap! client-panels dissoc k)
+        ;; (swap! client-panels-data dissoc k)
+        ;; (swap! client-panels-metadata dissoc k)
+        ;; (swap! client-panels-history dissoc k)
+        ;; (swap! ack-scoreboard dissoc k)
+        ))
     (catch Exception e (ut/pp [:purge-client-queues-error e]))))
 
 (defn unsub-all-client-watchers [client-name]
@@ -4539,7 +4619,7 @@
     (catch Exception _
       {:min nil, :max nil, :median nil, :avg nil})))
 
-(defn get-query-metadata [rowset query dbtype]
+(defn get-query-metadata [rowset query dbtype connection-id]
   (let [sample                rowset ;(repeatedly 100 (fn [] (rand-nth rowset)))
         sample-size           (count sample)
         selects               (get query :select)
@@ -4605,6 +4685,7 @@
                                                            commons)
                                             :cardinality (int (* 100 (float (/ distinct-samples sample-size))))})}))]
     {:fields field-data 
+     :connection-id connection-id
      :database-type (str dbtype)
      :rowcount (count sample)}))
 
@@ -4632,7 +4713,7 @@
                 honey-sql     (if page-num (assoc (dissoc honey-sql :page) :offset (* page-num per-page-limit)) honey-sql)
                 honey-sql-str (to-sql honey-sql)
                 honey-result  (sql-query system-db honey-sql-str ui-keypath)
-                honey-meta    (get-query-metadata honey-result honey-sql (surveyor/db-typer system-db))
+                honey-meta    (get-query-metadata honey-result honey-sql (surveyor/db-typer system-db) "system-db")
                 fields        (get honey-meta :fields)
                 dates         (remove nil? (for [[k v] fields] (when (cstr/includes? (get v :data-type) "date") k)))
                 result        (if (empty? dates)
@@ -4895,8 +4976,7 @@
 
 (defn get-all-from [m] (if (map? m) (into [] (concat (when-let [where (:from m)] [where]) (mapcat get-all-from (vals m)))) []))
 
-(defn group-by-field-name
-  [data]
+(defn group-by-field-name [data]
   (into {}
         (for [[table-key records] data]
           [table-key
@@ -4905,25 +4985,25 @@
                    [(keyword field-key)
                     (first (map #(dissoc % :connection_id :table_name :db_type :field_name) grouped-records))]))])))
 
-;; (defn get-clover-sql-training
-;;   [clover-sql honey-sql-str2]
-;;   (try (let [clover-sql          (ut/deep-remove-keys2 clover-sql [:_last-run :connection-id])
-;;              connection-id       (get clover-sql :connection-id)
-;;              data-dict-honey-sql {:select [:db_type :table_name :field_name :connection_id :field_type :data_type]
-;;                                   :where  [:and [:= :connection_id connection-id] [:<> :field_name "*"]]
-;;                                   :from   [[:fields :ee473as]]}
-;;              sql-str             (to-sql data-dict-honey-sql)
-;;              res                 (sql-query system-db sql-str [:data-dict-for-training-clover-sql])
-;;              group-res           (group-by-field-name (group-by (comp keyword :table_name) res))
-;;              tables              (filter keyword? (ut/deep-flatten (get-all-from clover-sql)))
-;;              metadata            (select-keys group-res tables)
-;;              data-map            (merge (get @clover-sql-training-atom clover-sql) ;; in case we
-;;                                         {:sql-string     honey-sql-str2
-;;                                          :db-type        (get-in res [0 :db_type])
-;;                                          :clover-sql     clover-sql
-;;                                          :table-metadata metadata})]
-;;          (swap! clover-sql-training-atom assoc clover-sql data-map))
-;;        (catch Throwable e (ut/pp [:error-in-clover-sql-training-harvest! (str e)]))))
+(defn get-clover-sql-training
+  [clover-sql honey-sql-str2]
+  (try (let [clover-sql          (ut/deep-remove-keys2 clover-sql [:_last-run :connection-id])
+             connection-id       (get clover-sql :connection-id)
+             data-dict-honey-sql {:select [:db_type :table_name :field_name :connection_id :field_type :data_type]
+                                  :where  [:and [:= :connection_id connection-id] [:<> :field_name "*"]]
+                                  :from   [[:fields :ee473as]]}
+             sql-str             (to-sql data-dict-honey-sql)
+             res                 (sql-query system-db sql-str [:data-dict-for-training-clover-sql])
+             group-res           (group-by-field-name (group-by (comp keyword :table_name) res))
+             tables              (filter keyword? (ut/deep-flatten (get-all-from clover-sql)))
+             metadata            (select-keys group-res tables)
+             data-map            (merge (get @db/clover-sql-training-atom clover-sql)
+                                        {:sql-string     honey-sql-str2
+                                         :db-type        (get-in res [0 :db_type])
+                                         :clover-sql     clover-sql
+                                         :table-metadata metadata})]
+         (swap! db/clover-sql-training-atom assoc clover-sql data-map))
+       (catch Throwable e (ut/pp [:error-in-clover-sql-training-harvest! (str e)]))))
 
 
 (defn wait-for-value
@@ -4962,6 +5042,121 @@
 
 ;; (wait-for-value 100 (fn [] 50))
 
+(defn api-call-wrapper [{:keys [input client-name solver-name ui-keypath]}]
+  (ut/pp [:api-call-wrapper input client-name solver-name ui-keypath] {:width 50})
+  (try
+    (let [output (edp/api-query input)
+          rowset? (try (and (vector? output) (map? (first output))) (catch Exception _ false))]
+      output)
+    (catch Exception e
+      (let [data (ex-data e)
+            error-message (str (.getMessage e) " " (get data :cause))
+            error-lines (concat
+                         (for [i (range 0 (count error-message) 60)]
+                           (subs error-message i (min (+ i 90) (count error-message))))
+                         [(str input)])
+            error-rows (vec (for [e error-lines] {:database_says (str e)}))]
+        (ut/pp [:api-query-wrapper-error error-message data] {:width 50})
+        (swap! db/last-solvers-atom assoc-in [solver-name] error-rows)
+        error-rows))))
+
+(defn sql-query-raw
+  [db-spec query ui-keypath client-name solver-name & extra]
+  (swap! sql/sql-queries-run inc)
+  (let [start-time (System/nanoTime)]
+    (jdbc/with-db-connection [t-con db-spec]
+      (ut/pp [query db-spec])
+      (try
+        (let [result (sql/wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
+              end-time (System/nanoTime)
+              execution-time-ms (/ (- end-time start-time) 1e6)]
+          (swap! sql/sql-query-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
+                                     (str (try (subs (str query) 0 300)
+                                               (catch Throwable _ (str query))) "-" (hash query)) execution-time-ms])
+          (ut/pp [:query-success (count result) :rows execution-time-ms :ms])
+          result) 
+        (catch Exception e
+          (let [end-time (System/nanoTime)
+                execution-time-ms (/ (- end-time start-time) 1e6)
+                error-message (str (.getMessage e))
+                error-lines (concat
+                             (for [i (range 0 (count error-message) 60)]
+                               (subs error-message i (min (+ i 90) (count error-message))))
+                             [(sql/get-connection-string-info db-spec)])
+                error-rows (vec (for [e error-lines] {:database_says (str e)}))]
+            (ut/pp [:database_says query db-spec (.getMessage e) execution-time-ms :ms])
+            (swap! db/last-solvers-atom assoc-in [solver-name] error-rows)
+            (insert-error-row! db-spec query e)
+            error-rows))))))
+
+(defn run-raw-sql [{:keys [input client-name connection-id ui-keypath solver-name]}]
+  (let [sys-connections ["system-db" "flows-db" "autocomplete-db"
+                         "history-db" "system-reporting-db" "cache.db.memory"
+                         "cache.db"]
+        user-connections (vec (keys @conn-map))
+        conn-string-names (vec (into sys-connections user-connections))
+        comment-lines (filter #(cstr/starts-with? (cstr/trim (str %)) "--") (cstr/split-lines input))
+        first-connection (cstr/join " " comment-lines)
+        connection-id (or
+                       (first (filter #(cstr/includes? first-connection %) conn-string-names))
+                       connection-id)
+        ;; connection-type (cond
+        ;;                   (some #(= parsed-connection-id %) sys-connections) :system
+        ;;                   (some #(= parsed-connection-id %) user-connections) :user
+        ;;                   :else :unknown)
+        _ (ut/pp [:parsed-db connection-id ui-keypath solver-name])
+        ;;formatted-sql (sql-formatter input)
+        ;;formatted-sql-vec (vec (rest (cstr/split formatted-sql #"\\n")))
+        ;_ (ut/pp formatted-sql-vec)
+        ;;_ (ut/pp [:formatted-sql (vec  (rest formatted-sql-vec))])
+        ;;_ (push-to-client ui-keypath [] client-name 1 :push-assocs {ui-keypath formatted-sql-vec})
+        ;; connection-id (try
+        ;;                     (case connection-type
+        ;;                       :system (symbol parsed-connection-id)
+        ;;                       :user (or (try (get-connection-string parsed-connection-id) (catch Exception _ 'system-db)) 'system-db)
+        ;;                       'system-db)
+        ;;                     (catch Exception e
+        ;;                       (do (ut/pp [:parsed-db-error parsed-connection-id connection-type (str e)])
+        ;;                           'system-db)))
+        target-db (cond ;;query-meta-subq? system-db ;; override for sidecar meta queries
+                    (keyword? connection-id)           (sql/create-or-get-client-db-pool client-name)
+                    (or (nil? connection-id)
+                        (nil? empty?))                  system-db
+                    (= connection-id "realms-db")       realms-db
+                    (= connection-id "system-db")       system-db
+                    (= connection-id "flows-db")        flows-db
+                    (= connection-id "autocomplete-db") autocomplete-db
+                    (= connection-id "history-db")      history-db
+                    (= connection-id "system")          system-db
+                    (= connection-id "system-reporting-db") system-reporting-db
+                    (= connection-id "cache.db.memory") cache-db-memory
+                    (or (= connection-id :cache)
+                        (= connection-id "cache.db")
+                        (nil? connection-id))           cache-db
+                    :else (get-connection-string connection-id))
+        target-db (or target-db system-db) ;; if nil
+        _ (ut/pp [:parsed-db target-db])]
+    (sql-query-raw
+     target-db
+     input
+     ui-keypath
+     client-name
+     solver-name
+     {:client-name client-name
+      :input input
+      :connection-id target-db
+      :parsed-connection-id connection-id})))
+
+(defn get-nested-grid [{:keys [input client-name connection-id ui-keypath solver-name] :as mmap}]
+  (let [{:keys [grid data]} (npiv/get-grid-data mmap)
+        pivot-data-kw (keyword (cstr/replace (str (last ui-keypath) "-pivot") ":" ""))
+        reaction-clover (get grid :reaction-clover)]
+    (ut/pp [:pivot-data data])
+    (push-to-client (vec (rest ui-keypath)) [] client-name 1 :push-assocs {(vec (conj ui-keypath :reaction-clover)) reaction-clover
+                                                                           (vec (conj ui-keypath :pivot-data-kw)) pivot-data-kw
+                                                                           [:data pivot-data-kw] data}) ;; push pivoted data to client...
+
+    grid))
 
 (defn query-runstream
   [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache?]
@@ -4979,7 +5174,7 @@
          honey-sql (ut/deep-remove-keys honey-sql [:post-process-fn]) ;; disregard if we have
          has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql)))
                        (catch Exception _ false))
-         data-call? false ; (true? (and (not has-rql?) (ut/ne? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))))))
+         data-call? (true? (and (not has-rql?) (ut/ne? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))))))
          runstream
          (fn []
            (try
@@ -5006,9 +5201,9 @@
                                                     (ut/ne? (filter #(= (last %) :data) (ut/kvpaths honey-sql)))
                                                     (not has-rql?)) ;; <-- look into, clashing
                     data-literals [:nope] ;(or (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))) [:nope])
-                    data-literal-code? false ;(false? (when (or literal-data? post-sniffed-literal-data?)
-                                              ;   (let [dl (get-in honey-sql data-literals)]
-                                              ;     (and (vector? dl) (map? (first dl))))))
+                    data-literal-code? (false? (when (or literal-data? post-sniffed-literal-data?) ;; TODO REVIST - DEPRECATED DUE TO RAW REPL?
+                                          (let [dl (get-in honey-sql data-literals)]
+                                            (and (vector? dl) (map? (first dl))))))
                     data-literals-data (get-in honey-sql data-literals)
                     honey-sql (cond post-sniffed-literal-data?                      (walk/postwalk-replace @literal-data-map
                                                                                                            orig-honey-sql)
@@ -5019,13 +5214,19 @@
                                     :else                                           orig-honey-sql)
                     honey-sql (if has-rql? (extract-rql ui-keypath honey-sql rql-holder) honey-sql)
                     honey-sql (replace-pre-sql honey-sql) ;; runs a subset of clover replacements
+                    client-db-strs (filterv #(cstr/includes? (str %) "-") 
+                                            (mapv #(cstr/replace (str %) ":" "") 
+                                                  (keys @sql/client-db-pools)))
                     target-db (cond query-meta-subq? system-db ;; override for sidecar meta queries
                                     (keyword? connection-id)           (sql/create-or-get-client-db-pool client-name)
+                                    (some #(= % connection-id) client-db-strs) (sql/create-or-get-client-db-pool (keyword connection-id))
+                                    (= connection-id "realms-db")       realms-db
                                     (= connection-id "system-db")       system-db
                                     (= connection-id "flows-db")        flows-db
                                     (= connection-id "autocomplete-db") autocomplete-db
                                     (= connection-id "history-db")      history-db
                                     (= connection-id "system")          system-db
+                                    (= connection-id "system-reporting-db") system-reporting-db
                                     (= connection-id "cache.db.memory") cache-db-memory
                                     (or (= connection-id :cache)
                                         (= connection-id "cache.db")
@@ -5074,85 +5275,83 @@
                             (not (= target-db system-db)))
                     cache-table-name ;(if (or post-sniffed-literal-data? literal-data?)
                     (ut/keypath-munger ui-keypath)
-                    ;completion-channel (async/chan) ;; moved to outer
+                    completion-channel (async/chan) ;; moved to outer
                     data-literal-insert-error (atom nil)
-                    ;; honey-sql
-                    ;; (if (or post-sniffed-literal-data? literal-data?) ;; 8/11/23 - ALL this logic is deprecated. double-check.
-                    ;;   (let [;_ (ut/pp [:last-let? honey-sql])
-                    ;;         cache-table cache-table-name ;(str (ut/keypath-munger ui-keypath)
-                    ;;         honey-sql   (if data-literal-code? honey-sql (ut/lists-to-vectors honey-sql))
-                    ;;         literals    (if data-literal-code?
-                    ;;                       data-literals-data
-                    ;;                       (get-in honey-sql
-                    ;;                               (or (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))) [:nope])))
-                    ;;         cached?     (if (not client-cache?)
-                    ;;                       false
-                    ;;                       (try (ut/ne? (get @literal-data-map {:data literals}))
-                    ;;                            (catch Exception _ false)))]
-                    ;;     (if (and (not cached?) (or (list? literals) (vector? literals))) ;(and (not
-                    ;;                                                                            ;cached?)
-                    ;;                                                                            ;(not
-                    ;;                                                                            ;post-sniffed-literal-data?))
-                    ;;       (do (if data-literal-code?
-                    ;;             ;(enqueue-task
-                    ;;             (qp/serial-slot-queue :serial-data-literal-code client-name ;:general
-                    ;;             ;(ppy/execute-in-thread-pools :general-serial                     
-                    ;;                                   (fn []
-                    ;;                                     (let [;output (evl/run literals) ;; (and repl-host repl-port)
-                    ;;                                           literals    (walk/postwalk-replace
-                    ;;                                                        {'cie-to-hex     'rvbbit-backend.util/cie-to-hex
-                    ;;                                                         'hue-to-hex     'rvbbit-backend.util/hue-to-hex
-                    ;;                                                         'hex-to-cie     'rvbbit-backend.util/hex-to-cie
-                    ;;                                                         'hex-to-hue-sat 'rvbbit-backend.util/hex-to-hue-sat
-                    ;;                                                         'http-call      'rvbbit-backend.websockets/http-call
-                    ;;                                                         'flatten-map    'rvbbit-backend.websockets/flatten-map}
-                    ;;                                                        literals)
-                    ;;                                           output-full (evl/repl-eval literals repl-host repl-port client-name (keyword (str "honey-literal-" (hash honey-sql))) ui-keypath)
-                    ;;                                           output      (last (get-in output-full [:evald-result :value]))
-                    ;;                                           output-full (-> output-full
-                    ;;                                                           (assoc-in [:evald-result :output-lines]
-                    ;;                                                                     (try (count (remove empty?
-                    ;;                                                                                         (get-in output-full
-                    ;;                                                                                                 [:evald-result :out])))
-                    ;;                                                                          (catch Exception _ 0)))
-                    ;;                                                           (assoc-in [:evald-result :values]
-                    ;;                                                                     (try (count (last (get-in output-full
-                    ;;                                                                                               [:evald-result :value])))
-                    ;;                                                                          (catch Exception _ 0))))]
-                    ;;                                       (swap! literal-data-output assoc ui-keypath output-full)
-                    ;;                                       (try (insert-rowset output
-                    ;;                                                           cache-table
-                    ;;                                                           (first ui-keypath)
-                    ;;                                                           client-name
-                    ;;                                                           (keys (first output))
-                    ;;                                                           (sql/create-or-get-client-db-pool client-name)
-                    ;;                                                           client-name)
-                    ;;                                            (catch Exception e
-                    ;;                                              (do (reset! data-literal-insert-error
-                    ;;                                                          ["Data struct not a proper 'rowset', see console log ^" e])
-                    ;;                                                  nil)))
-                    ;;                                       (async/>!! completion-channel true) ;; unblock
-                    ;;                                       )))
-                    ;;             ;(enqueue-task 
-                    ;;             (qp/serial-slot-queue :serial-data-literal client-name ;:general
-                    ;;             ;(ppy/execute-in-thread-pools :general-serial                      
-                    ;;                                   (fn []
-                    ;;                                     (insert-rowset literals
-                    ;;                                                    cache-table
-                    ;;                                                    (first ui-keypath)
-                    ;;                                                    client-name
-                    ;;                                                    (keys (first literals))
-                    ;;                                                    (sql/create-or-get-client-db-pool client-name)
-                    ;;                                                    client-name)
-                    ;;                                     (async/>!! completion-channel true) ;; unblock
-                    ;;                                     )))
-                    ;;           (async/<!! completion-channel) ;; BLOCK until our threaded job is
-                    ;;           (swap! literal-data-map assoc {:data literals} cache-table)
-                    ;;           (walk/postwalk-replace @literal-data-map honey-sql))
-                    ;;       (walk/postwalk-replace @literal-data-map honey-sql))
+                    ;; data literal might NOT be deprecated... REVISIT 10/2/23
+                    honey-sql
+                    (if (or post-sniffed-literal-data? literal-data?) ;; 8/11/23 - ALL this logic is deprecated. double-check.
+                      (let [;_ (ut/pp [:last-let? honey-sql])
+                            cache-table cache-table-name ;(str (ut/keypath-munger ui-keypath)
+                            honey-sql   (if data-literal-code? honey-sql (ut/lists-to-vectors honey-sql))
+                            literals    (if data-literal-code?
+                                          data-literals-data
+                                          (get-in honey-sql
+                                                  (or (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))) [:nope])))
+                            cached?     (if (not client-cache?)
+                                          false
+                                          (try (ut/ne? (get @literal-data-map {:data literals}))
+                                               (catch Exception _ false)))]
+                        (if (and (not cached?) (or (list? literals) (vector? literals))) 
+                          (do (if data-literal-code?
+                                ;(enqueue-task
+                                (qp/serial-slot-queue :serial-data-literal-code client-name ;:general
+                                ;(ppy/execute-in-thread-pools :general-serial                     
+                                                      (fn []
+                                                        (let [;output (evl/run literals) ;; (and repl-host repl-port)
+                                                              literals    (walk/postwalk-replace
+                                                                           {'cie-to-hex     'rvbbit-backend.util/cie-to-hex
+                                                                            'hue-to-hex     'rvbbit-backend.util/hue-to-hex
+                                                                            'hex-to-cie     'rvbbit-backend.util/hex-to-cie
+                                                                            'hex-to-hue-sat 'rvbbit-backend.util/hex-to-hue-sat
+                                                                            'http-call      'rvbbit-backend.websockets/http-call
+                                                                            'flatten-map    'rvbbit-backend.websockets/flatten-map}
+                                                                           literals)
+                                                              output-full (evl/repl-eval literals repl-host repl-port client-name (keyword (str "honey-literal-" (hash honey-sql))) ui-keypath)
+                                                              output      (last (get-in output-full [:evald-result :value]))
+                                                              output-full (-> output-full
+                                                                              (assoc-in [:evald-result :output-lines]
+                                                                                        (try (count (remove empty?
+                                                                                                            (get-in output-full
+                                                                                                                    [:evald-result :out])))
+                                                                                             (catch Exception _ 0)))
+                                                                              (assoc-in [:evald-result :values]
+                                                                                        (try (count (last (get-in output-full
+                                                                                                                  [:evald-result :value])))
+                                                                                             (catch Exception _ 0))))]
+                                                          (swap! literal-data-output assoc ui-keypath output-full)
+                                                          (try (insert-rowset output
+                                                                              cache-table
+                                                                              (first ui-keypath)
+                                                                              client-name
+                                                                              (keys (first output))
+                                                                              (sql/create-or-get-client-db-pool client-name)
+                                                                              client-name)
+                                                               (catch Exception e
+                                                                 (do (reset! data-literal-insert-error
+                                                                             ["Data struct not a proper 'rowset', see console log ^" e])
+                                                                     nil)))
+                                                          (async/>!! completion-channel true) ;; unblock
+                                                          )))
+                                ;(enqueue-task 
+                                (qp/serial-slot-queue :serial-data-literal client-name ;:general
+                                ;(ppy/execute-in-thread-pools :general-serial                      
+                                                      (fn []
+                                                        (insert-rowset literals
+                                                                       cache-table
+                                                                       (first ui-keypath)
+                                                                       client-name
+                                                                       (keys (first literals))
+                                                                       (sql/create-or-get-client-db-pool client-name)
+                                                                       client-name)
+                                                        (async/>!! completion-channel true) ;; unblock
+                                                        )))
+                              (async/<!! completion-channel) ;; BLOCK until our threaded job is
+                              (swap! literal-data-map assoc {:data literals} cache-table)
+                              (walk/postwalk-replace @literal-data-map honey-sql))
+                          (walk/postwalk-replace @literal-data-map honey-sql))
                           
-                    ;;       )
-                    ;;   honey-sql)
+                          )
+                      honey-sql)
                       ]
                 (if (and (not (= :styles (last ui-keypath))) (not sniff?) cache? client-cache?)
                   (do (ut/pp [:*cache-hit @q-calls kind ui-keypath connection-id client-name] ;:honey-sql
@@ -5189,15 +5388,16 @@
                                           (to-sql honey-sql target-db-type)
                                           (to-sql (assoc honey-sql :limit (if (cstr/includes? (str ui-keypath) "-hist-") 50 500)) target-db-type)))
                         honey-sql-str2 (first honey-sql-str)
-                        ;;;_ (async/thread (get-clover-sql-training clover-sql honey-sql-str2)) ;; ONLY
+                        ;;;_ (async/thread (get-clover-sql-training clover-sql honey-sql-str2))
+                        _ (ppy/execute-in-thread-pools :harvest-clover-training (fn [] (get-clover-sql-training clover-sql honey-sql-str2)))
                         honey-result (timed-expr (if literal-data?
                                                    honey-sql ;; which in this case IS the
                                                    (sql-query target-db honey-sql-str ui-keypath)))
                         query-ms (get honey-result :elapsed-ms)
                         honey-result (get honey-result :result)
-                        query-error? (get (first honey-result) :query_error)
+                        query-error? (get (first honey-result) :database_says)
                         safe-result (mapv ut/stringify-non-primitives honey-result)
-                        honey-meta (get-query-metadata safe-result honey-sql (surveyor/db-typer target-db))
+                        honey-meta (get-query-metadata safe-result honey-sql (surveyor/db-typer target-db) connection-id)
                         fields (get honey-meta :fields)
                         dates (remove nil? (for [[k v] fields] (when (cstr/includes? (get v :data-type) "date") k)))
                         is-meta? (= 3 (count ui-keypath))
@@ -5208,8 +5408,8 @@
                                         (into {} (for [[k v] r] (if (some #(= % k) dates) {k (str v)} {k v}))))))
                         result (if (and query-error? @data-literal-insert-error)
                                  (vec (into result
-                                            [{:query_error (str (first @data-literal-insert-error))}
-                                             {:query_error (str (last @data-literal-insert-error))}]))
+                                            [{:database_says (str (first @data-literal-insert-error))}
+                                             {:database_says (str (last @data-literal-insert-error))}]))
                                  result) ;; add extra error data from code evaL
                         result (if (get orig-honey-sql :transform-select)
                                  (do (ut/pp [:transform (assoc orig-honey-sql :from [:data])])
@@ -5269,7 +5469,7 @@
                                            has-rql? ;query-error?
                                            post-process-fn
                                            (get orig-honey-sql :data)) ;; TODO< this is ugly
-                                     (get-query-metadata result honey-sql (surveyor/db-typer target-db)) ;; get new meta on
+                                     (get-query-metadata result honey-sql (surveyor/db-typer target-db) connection-id) ;; get new meta on
                                      honey-meta)
                         fields (get honey-meta :fields) ;; lol, refactor, this is cheesy (will
                         sniff-worthy? (and (not is-meta?)
@@ -5317,72 +5517,70 @@
                     (when (cstr/includes? (str ui-keypath) "advanced") (ut/pp [:output (get output :honey-meta) :!!]))
                      ;(enqueue-task-sql-meta 
 
-                    (when ;;true 
-                     (or deep-meta?
-                        (and (not (= client-name :rvbbit))
-                                 ;;  (not= (hash honey-sql)
-                                 ;;        (get-in @sniff-meta-guard [ui-keypath client-name]))
-                        )) ;; sniff & push meta only on new sql construct
+                    (when true 
+                    ;;  (or deep-meta?
+                    ;;     (and (not (= client-name :rvbbit))
+                    ;;              ;;  (not= (hash honey-sql)
+                    ;;              ;;        (get-in @sniff-meta-guard [ui-keypath client-name]))
+                    ;;     )) ;; sniff & push meta only on new sql construct
                       ;; (ut/pp [:sniff-meta! ui-keypath client-name])
                       (qp/slot-queue :sql-meta client-name
                                      (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name connection-id deep-meta?))))
 
-                    (if (and 
-                         ;(not (some #(= % filtered-req-hash) @deep-run-list))
-                         sniffable?) ;; aka reco check. need to rename since it's hella confusing with all the 'sniffing'.
-                      (doall
-                       (do
-                         (swap! deep-run-list conj filtered-req-hash) ;; mark this as run
-                         ;(enqueue-task
-                         ;(qp/serial-slot-queue :general-serial :general
-                         (ppy/execute-in-thread-pools :general-serial                      
-                                               (fn []
-                                                 (ut/pp :kick-sniff)
-                                                 (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :started)
-                                                 (swap! sql/query-history assoc cache-table-name {:honey-sql honey-sql :connection-id connection-id})
-                                                 (let [result (vec (for [r result] (assoc r :rows 1)))] ;;; hack
-                                                   ;(insert-rowset result cache-table-name (first ui-keypath) client-name (keys (first result)))
-                                                   ;(write-transit-data honey-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
-                                                   ;)
-                                                 (doall
-                                                  (do
-                                                    (do (ut/pp [[:recos-started-for (first ui-keypath)] :via client-name ui-keypath filtered-req-hash])
-                                                        (push-to-client ui-keypath
-                                                                        [:reco-status (first ui-keypath)]
-                                                                        client-name
-                                                                        1
-                                                                        :reco
-                                                                        :started))
-                                                    (doall
-                                                     ;;; captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
-                                                     (let [run-it         (timed-expr (cruiser/captured-sniff "cache.db"
-                                                                                                              connection-id
-                                                                                                              target-db
-                                                                                                              cache-db
-                                                                                                              result-hash
-                                                                                                              [:= :table-name cache-table-name]
-                                                                                                              false ;nil
-                                                                                                              result ;;nil
-                                                                                                              client-name))
-                                                           reco-count-sql {:select [[[:count 1] :cnt]]
-                                                                           :from   [:combos]
-                                                                           :where  [:= :table-name cache-table-name]}
-                                                           reco-count     (get-in (sql-query system-db
-                                                                                             (to-sql reco-count-sql)
-                                                                                             [:reco-count :client-status])
-                                                                                  [0 :cnt])]
+                    ;;(if sniffable? ;; aka reco check. need to rename since it's hella confusing with all the 'sniffing'.
+                      ;; (doall
+                      ;;  (do
+                      ;;    (swap! deep-run-list conj filtered-req-hash) ;; mark this as run
+                      ;;    ;(enqueue-task
+                      ;;    ;(qp/serial-slot-queue :general-serial :general
+                      ;;    (ppy/execute-in-thread-pools :general-serial                      
+                      ;;                          (fn []
+                      ;;                            (ut/pp :kick-sniff)
+                      ;;                            (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :started)
+                      ;;                            (swap! sql/query-history assoc cache-table-name {:honey-sql honey-sql :connection-id connection-id})
+                      ;;                            (let [result (vec (for [r result] (assoc r :rows 1)))] ;;; hack
+                      ;;                              ;(insert-rowset result cache-table-name (first ui-keypath) client-name (keys (first result)))
+                      ;;                              ;(write-transit-data honey-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                      ;;                              ;)
+                      ;;                            (doall
+                      ;;                             (do
+                      ;;                               (do (ut/pp [[:recos-started-for (first ui-keypath)] :via client-name ui-keypath filtered-req-hash])
+                      ;;                                   (push-to-client ui-keypath
+                      ;;                                                   [:reco-status (first ui-keypath)]
+                      ;;                                                   client-name
+                      ;;                                                   1
+                      ;;                                                   :reco
+                      ;;                                                   :started))
+                      ;;                               (doall
+                      ;;                                ;;; captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
+                      ;;                                (let [run-it         (timed-expr (cruiser/captured-sniff "cache.db"
+                      ;;                                                                                         connection-id
+                      ;;                                                                                         target-db
+                      ;;                                                                                         cache-db
+                      ;;                                                                                         result-hash
+                      ;;                                                                                         [:= :table-name cache-table-name]
+                      ;;                                                                                         false ;nil
+                      ;;                                                                                         result ;;nil
+                      ;;                                                                                         client-name))
+                      ;;                                      reco-count-sql {:select [[[:count 1] :cnt]]
+                      ;;                                                      :from   [:combos]
+                      ;;                                                      :where  [:= :table-name cache-table-name]}
+                      ;;                                      reco-count     (get-in (sql-query system-db
+                      ;;                                                                        (to-sql reco-count-sql)
+                      ;;                                                                        [:reco-count :client-status])
+                      ;;                                                             [0 :cnt])]
                                                        
-                                                       (ut/pp [[:recos-finished-for (first ui-keypath)] :via client-name ui-keypath filtered-req-hash  reco-count
-                                                                                                                                                       (get run-it :elapsed-ms)])
-                                                       (push-to-client ui-keypath
-                                                                       [:reco-status (first ui-keypath)]
-                                                                       client-name
-                                                                       1
-                                                                       :reco
-                                                                       :done
-                                                                       reco-count
-                                                                       (get run-it :elapsed-ms))))))) ;; vertica
-                                                 ))))
+                      ;;                                  (ut/pp [[:recos-finished-for (first ui-keypath)] :via client-name ui-keypath filtered-req-hash  reco-count
+                      ;;                                                                                                                                  (get run-it :elapsed-ms)])
+                      ;;                                  (push-to-client ui-keypath
+                      ;;                                                  [:reco-status (first ui-keypath)]
+                      ;;                                                  client-name
+                      ;;                                                  1
+                      ;;                                                  :reco
+                      ;;                                                  :done
+                      ;;                                                  reco-count
+                      ;;                                                  (get run-it :elapsed-ms))))))) ;; vertica
+                      ;;                            ))))
                       
                       ;(ut/pp [:sniff-worthy? sniff-worthy?  :ui-keypath ui-keypath :client-name client-name])
 
@@ -5428,7 +5626,9 @@
                                     ;; (ut/pp [[:quick-sniff-for (first ui-keypath)] :via client-name ui-keypath
                                     ;;         filtered-req-hash])
                                                      ))))
-                          (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql)))))
+                          (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql))))
+                          
+                          ;)
 
                     
                     
@@ -5453,20 +5653,24 @@
                                                                 materialize-solver-name (keyword (str "materialize-" (cstr/replace (str (first ui-keypath)) ":" "")))
                                                                 cli-cache-table-name (keyword (cstr/replace (str "cached-" (ut/unkeyword cache-table-name)) "_" "-"))
                                                                 resultv (vec (for [r result] (assoc r :rows 1)))
-                                                                db-dest (if (= dest :memory) 
+                                                                db-dest (if (= dest :memory)
                                                                           ["cache.db.memory" cache-db-memory]
                                                                           ["cache.db" cache-db])
                                                                 db-cn (last db-dest)
                                                                 db-str (first db-dest)]
                                                             (swap! db/query-metadata assoc-in [client-name (first ui-keypath)] modded-meta)
-                                                            (when true ;(or (= page -2) (= page -3)) ;; no need to write out normal queries 
-                                                              (do
+                                                            (try
+                                                              (when true ;(or (= page -2) (= page -3)) ;; no need to write out normal queries 
                                                                 (write-transit-data modded-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
-                                                                (write-transit-data result (first ui-keypath) client-name (ut/unkeyword cache-table-name))))
-                                                            (when (not query-error?) (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
+                                                                (write-transit-data result (first ui-keypath) client-name (ut/unkeyword cache-table-name)))
+                                                              (catch Exception e (ut/pp [:error-writing-transit-file ui-keypath client-name (str e)])))
+                                                            (when (not query-error?) 
+                                                              (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
                                                             (swap! client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
                                                             (swap! client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] result)
-                                                            (swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] result) ;;  :data/ ... TBD
+                                                            (swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] result)
+                                                            (swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] result)
+                                                            (swap! db/solver-status assoc-in [:metadata (first ui-keypath)] (hash (get output :result-meta)))
                                                           ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                                                             (when (= page -3) ;; materialize and schedule a new solver job if not exists
                                                             ;;; insert a new solver job if not exists :materialize-query-name
@@ -5530,11 +5734,70 @@
                                                                                                    cruiser/default-viz-shapes
                                                                                                    ;[:= :table-name table-name-str]
                                                                                                    )
+
                                                               (alert! client-name
                                                                       [:box :child (str "Materializing " (ut/nf (count resultv)) " rows done for " cache-table-name " into " db-str "...")]
                                                                       16
                                                                       2.1
-                                                                      8)))
+                                                                      8))
+
+                                                            ;; _  _ _ ___     ___  ____ ____ ___ _   _    ____ ____ ____    ____ _    _    __.
+                                                            ;; |  | |   /     |__] |__| |__/  |   \_/     |___ |  | |__/    |__| |    |     _]
+                                                            ;;  \/  |  /__    |    |  | |  \  |    |      |    |__| |  \    |  | |___ |___  .
+
+                                                            ;;; every table gets client cache insert and viz reco'd 
+                                                            (when (or sniffable?
+                                                                      (and false
+                                                                           (not= connection-id "system-db")
+                                                                           (not= connection-id client-name)
+                                                                           (not (cstr/includes? (str cache-table-name) "query_preview"))
+                                                                           (not (cstr/includes? (str cache-table-name) "query-preview"))
+                                                                           (not (cstr/starts-with? (str cache-table-name) "kick"))
+                                                                           (not= connection-id (cstr/replace (str client-name) ":" ""))
+                                                                           (not (some #(= % [client-name (hash (select-keys honey-sql [:select :group-by]))]) @auto-viz-runs))))
+                                                              
+                                                              (let [_ (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :started)
+                                                                    _ (ut/pp [[:*recos-started-for (first ui-keypath)] :via client-name ui-keypath filtered-req-hash])
+                                                                    resultv (vec (for [r result] (assoc r :rows 1)))]
+                                                                ;;(ut/pp [:client-db! cache-table-name client-name])
+                                                                (insert-rowset resultv
+                                                                               cache-table-name
+                                                                               (first ui-keypath)
+                                                                               client-name
+                                                                               (keys (first resultv))
+                                                                               (sql/create-or-get-client-db-pool client-name)
+                                                                               client-name)
+                                                                (cruiser/lets-give-it-a-whirl (str client-name) ;; doesnt actually matter, is meant for JDBC filepaths
+                                                                                              (sql/create-or-get-client-db-pool client-name)
+                                                                                              (sql/create-or-get-client-db-pool client-name) ;;system-db
+                                                                                              cruiser/default-sniff-tests
+                                                                                              cruiser/default-field-attributes
+                                                                                              cruiser/default-derived-fields
+                                                                                              cruiser/default-viz-shapes
+                                                                                              [:= :table-name cache-table-name])
+                                                                (let [reco-count-sql {:select [[[:count 1] :cnt]]
+                                                                                      :from   [:combos]
+                                                                                      :where  [:= :table-name cache-table-name]}
+                                                                      reco-count     (get-in (sql-query (sql/create-or-get-client-db-pool client-name)
+                                                                                                        (to-sql reco-count-sql)
+                                                                                                        [:reco-count :client-status])
+                                                                                             [0 :cnt])]
+                                                                  (ut/pp [[:*recos-finished-for (first ui-keypath)] :via client-name ui-keypath filtered-req-hash reco-count])
+                                                                  (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0))
+                                                                (swap! auto-viz-runs conj [client-name (hash (select-keys honey-sql [:select :group-by]))]))
+                                                              
+
+                                                              
+
+
+
+
+
+
+
+                                                              )
+                                                                
+                                                            )
                                                           (catch Exception e 
                                                             ;(ut/pp [:data-ops-inner-loop-exception e])
                                                             (println "Error :data-ops-inner-loop" (.getMessage e))
@@ -5576,7 +5839,7 @@
                (do (ut/pp [:honeyx-OUTER-LOOP-EXCEPTION (str e) :connection-id connection-id ui-keypath (str honey-sql)])
                    {:kind        kind
                     :ui-keypath  ui-keypath
-                    :result      [{:query_error "execution error"} {:query_error (str e)}]
+                    :result      [{:database_says "execution error"} {:database_says (str e)}]
                     :result-meta {}
                     :sql-str     ""
                     :query-ms    nil
@@ -5898,7 +6161,7 @@
 (defn save-snap [request]
   (try (let [image       (get-in request [:edn-params :image])
              session     (get-in request [:edn-params :session])
-             ttime       (get-in request [:edn-params :ttime] (System/currentTimeMillis)) 
+             ttime       (get-in request [:edn-params :ttime] (System/currentTimeMillis))
              client-name (get-in request [:edn-params :client-name] "unknown")
              client-name (cstr/replace (str client-name) ":" "")
              nname       (str client-name "-" ttime)
@@ -5906,23 +6169,31 @@
              file-path   (str "./assets/snaps/" nname ".jpg")
              sess-path   (str "./assets/snaps/" nname ".edn")]
          (spit sess-path session)
-         (ut/save-base64-to-jpeg image file-path)
-         ;(ut/save-base64-to-jpeg image ifile-path)
-         ) ;)
+         (ut/save-base64-to-jpeg image file-path))
        (catch Exception e (ut/pp [:save-snap-error e])))
-  (send-edn-success {:status "snap-saved" :flow (first (get request :edn-params))}))
+  (send-edn-success {:status "snap-saved" }))
+
+(defn save-snap-block [request]
+  (try (let [image       (get-in request [:edn-params :image])
+             panel-key   (get-in request [:edn-params :panel-key])
+             client-name (get-in request [:edn-params :client-name] "unknown")
+             client-name (cstr/replace (str client-name) ":" "")
+             panel-key   (cstr/replace (str panel-key) ":" "")
+             nname       (str panel-key)
+             folder-path (str "./assets/snaps/" client-name "/")
+             file-path   (str folder-path nname ".jpg")]
+         (ext/create-dirs folder-path)
+         (ut/save-base64-to-jpeg image file-path))
+       (catch Exception e (ut/pp [:save-snap-error e])))
+  (send-edn-success {:status "snap-saved"}))
 
 (defn save-screen-snap [request]
   (try (let [image       (get-in request [:edn-params :image])
              screen-name (get-in request [:edn-params :screen-name] "unknown")
-             file-path   (str "./assets/screen-snaps/" screen-name ".jpg")
-             ;ifile-path  (str "./assets/screen-snaps/" screen-name ".jpg")
-             ]
-         (ut/save-base64-to-jpeg image file-path)
-         ;(ut/save-base64-to-jpeg image ifile-path)
-         ) ;)
+             file-path   (str "./assets/screen-snaps/" screen-name ".jpg")]
+         (ut/save-base64-to-jpeg image file-path))
        (catch Exception e (ut/pp [:save-snap-error e])))
-  (send-edn-success {:status "screen-snap-saved" :flow (first (get request :edn-params))}))
+  (send-edn-success {:status "screen-snap-saved" }))
 
 (defn save-flow [request]
   (time (do (let [screen-name    (get-in request [:edn-params :flow-id]) ;(ut/generate-name) ;
@@ -6033,12 +6304,28 @@
                        [(cstr/replace (str (first e)) ":" "") "client-params" (cstr/replace (str (second e)) ":" "")
                         (str ":client/" (cstr/replace (cstr/join ">" e) ":" "")) (true? (some #(= (first e) %) live-clients))
                         (strunc (ut/replace-large-base64 (get-in @db/params-atom e))) (display-name e) nil])
+
+        incoming-rows  (ut/keypaths2 @db/incoming-atom)
+        incoming-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) incoming-rows)))
+        incoming-rows  (for [e incoming-rows]
+                         [(cstr/replace (str (first e)) ":" "") "incoming" (cstr/replace (str (second e)) ":" "")
+                          (str ":incoming/" (cstr/replace (cstr/join ">" e) ":" "")) false
+                          (strunc (ut/replace-large-base64 (get-in @db/incoming-atom e))) (display-name e) nil])
+
+        data-rows  (ut/keypaths2 @db/last-solvers-data-atom)
+        data-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) data-rows)))
+        data-rows  (for [e data-rows]
+                       [(cstr/replace (str (first e)) ":" "") "data" (cstr/replace (str (second e)) ":" "")
+                        (str ":data/" (cstr/replace (cstr/join ">" e) ":" "")) false
+                        (strunc (ut/replace-large-base64 (get-in @db/last-solvers-data-atom e))) (display-name e) nil])
+
         solver-rows  (ut/keypaths2 @db/last-solvers-atom)
         solver-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) solver-rows)))
         solver-rows  (for [e solver-rows]
                        [(cstr/replace (str (first e)) ":" "") "solvers" (cstr/replace (str (second e)) ":" "")
                         (str ":solver/" (cstr/replace (cstr/join ">" e) ":" "")) false
                         (strunc (ut/replace-large-base64 (get-in @db/last-solvers-atom e))) (display-name e) nil])
+
         signal-rows  (ut/keypaths2 (into {} (filter (fn [[k _]] (keyword? k)) @db/last-signals-atom)))
         signal-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) signal-rows)))
         signal-rows  (for [e signal-rows]
@@ -6092,7 +6379,7 @@
                                       ":"
                                       "") (str ":screen/" (cstr/replace (cstr/join ">" e) ":" "")) nil
                         (strunc (ut/replace-large-base64 (get-in @db/screens-atom e))) (display-name e) (str sample)])
-        prows        (vec (apply concat [param-rows flow-rows block-rows panel-rows solver-rows signal-rows]))
+        prows        (vec (apply concat [param-rows flow-rows block-rows panel-rows solver-rows signal-rows incoming-rows data-rows]))
         _ (reset! param-sql-sync-rows (count prows)) ;; so we can add to stats logger and keep an eye on this easier than SQL querying it
         rows         (vec (for [r prows]
                             (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :block_meta] r)))
@@ -6702,10 +6989,18 @@
                 :when (instance? clojure.lang.Atom @var)]
             [str-name var]))))
 
-(def monitored-atoms (vec (into 
-                           (get-namespace-atoms 'rvbbit-backend.evaluator)
-                           (into (get-namespace-atoms 'rvbbit-backend.websockets)
-                                 (get-namespace-atoms 'rvbbit-backend.db)))))
+(def monitored-atoms
+  (vec
+   (reduce into {}
+           (map get-namespace-atoms
+                ['rvbbit-backend.cruiser
+                 'rvbbit-backend.sql
+                 'rvbbit-backend.util
+                 'rvbbit-backend.evaluator
+                 'rvbbit-backend.pool-party
+                 'rvbbit-backend.queue-party
+                 'rvbbit-backend.websockets
+                 'rvbbit-backend.db]))))
 
 
 
@@ -7255,8 +7550,8 @@
                        :jvm-stats
                        {;:*cached-queries              (count @sql-cache)
 
-                        ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
-                        ;:clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
+                        :clover-sql-training-queries  (count (keys @db/clover-sql-training-atom))
+                        ;:clover-sql-training-enriched (count (keys @db/clover-sql-enriched-training-atom))
                         :schedulers-last-run          @scheduler-atom
                         :ws-peers                     (do ;(reset! peer-usage (vec (take-last 600 @peer-usage)))
                                                         peers)
@@ -7278,7 +7573,7 @@
                         :*current-threads             thread-count}]))
              (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
 
-        ;; (ut/pp [:latency-adaptations @dynamic-timeouts])
+        (ut/pp [:latency-adaptations @dynamic-timeouts])
 
                   ;; [kks & [freqs label? width limit?]]
         (draw-stats [:cpu :mem :threads :clients] [15] false nil true)
@@ -7514,6 +7809,7 @@
     ["/assets/*" :get (conj common-interceptors `serve-user-asset)]
     ["/save-flow" :post (conj common-interceptors `save-flow)]
     ["/save-snap" :post (conj common-interceptors `save-snap)]
+    ["/save-snap-block" :post (conj common-interceptors `save-snap-block)]
     ["/save-screen-snap" :post (conj common-interceptors `save-screen-snap)]
     ["/save-csv" :post (conj common-interceptors `save-csv)]
     ["/load" :get (conj common-interceptors `load-screen)]

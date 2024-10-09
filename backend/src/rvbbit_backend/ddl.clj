@@ -23,7 +23,7 @@
 (def create-reco-vw
   "create view viz_recos_vw as 
    select distinct c.context_hash, c.combo_hash, c.connection_id, c.shape_name, c.query_map, c.query_map_str,
-       c.viz_map, c.combo_edn, c.selected_view, c2.table_name as table_name, c.conditionals as condis, c.h as h, c.w as w, c.score as score   
+       c.viz_map, c.combo_edn, c.selected_view, c2.table_name as table_name, c.conditionals as condis, c.h as h, c.w as w, c.runner as runner, c.score as score   
 from combos c left join (select distinct connection_id, table_name, context_hash from found_fields) c2
 on c.connection_id = c2.connection_id and c.context_hash = c2.context_hash
 ;")
@@ -45,6 +45,7 @@ WITH RankedCombos AS (
         c.conditionals as condis, 
         c.h as h, 
         c.w as w, 
+        c.runner as runner, 
         c.score as score,
         ROW_NUMBER() OVER(PARTITION BY c2.table_name, c.shape_name ORDER BY c.score DESC) AS rn
     FROM 
@@ -69,6 +70,7 @@ SELECT distinct
     condis, 
     h, 
     w, 
+    runner,
     score
 FROM 
     RankedCombos
@@ -88,6 +90,81 @@ from status
 group by 1, 2) tt on s.client_name = tt.client_name
                          and s.op_name = tt.op_name
                          and s.ts = tt.max_ts ;")
+
+(def create-realms
+  "create table if not exists realms 
+  (realm_name text NULL, 
+   file_path text NULL, 
+   block_name text NULL,
+   block_key text NULL,
+   block_type text NULL,
+   block_data text NULL,
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ) ;")
+
+(def create-llm-log-duck ;;; duck 
+  "create table if not exists llm_log 
+  (client_name varchar NULL,
+   assistant_name varchar NULL,
+   thread_id varchar NULL,
+   model_id varchar NULL,
+   platform varchar NULL,
+   input_tokens bigint NULL,
+   output_tokens bigint NULL,
+   input_cost float NULL,
+   output_cost float NULL,
+   ts varchar DEFAULT CURRENT_TIMESTAMP
+   ) ;")
+
+(def create-client-stats-duck
+  "CREATE TABLE IF NOT EXISTS client_stats (
+    client_name VARCHAR,
+    ack INTEGER,
+    client_latency INTEGER,
+    client_subs INTEGER,
+    last_seen VARCHAR,
+    memory VARCHAR,
+    push INTEGER,
+    queue_size INTEGER,
+    server_subs INTEGER,     
+    last_seen_seconds INTEGER,
+    booted_ts BIGINT,
+    queue_distro VARCHAR,
+    uptime_seconds INTEGER,
+    uptime VARCHAR,
+    messages_per_second DOUBLE,
+    recent_messages_per_second DOUBLE,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );")
+
+(def create-jvm-stats-duck
+  "CREATE TABLE IF NOT EXISTS jvm_stats (
+    used_memory_mb INTEGER, 
+    thread_count INTEGER, 
+    messages BIGINT,
+    batches BIGINT,
+    recent_batches INTEGER,
+    recent_batches_per_second DOUBLE,
+    batches_per_second DOUBLE,
+    unix_ms BIGINT,
+    messages_per_second DOUBLE,
+    recent_messages INTEGER,
+    recent_messages_per_second DOUBLE,
+    recent_queries_run INTEGER,
+    recent_queries_per_second DOUBLE,
+    queries_per_second DOUBLE,
+    sql_cache_size INTEGER, 
+    ws_peers INTEGER,
+    subscriptions INTEGER,
+    open_flow_channels INTEGER,
+    uptime_seconds INTEGER,
+    seconds_since_last_update INTEGER,
+    queries_run BIGINT,
+    internal_queries_run BIGINT,
+    sniffs_run BIGINT,
+    sys_load DOUBLE,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );")
 
 (def create-status
   "create table if not exists status 
@@ -261,6 +338,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    key_hashes_hash text NULL,
    h integer NULL,
    w integer NULL,
+   runner text NULL,
    score real NULL,
    combo_edn text NULL) ;")
 

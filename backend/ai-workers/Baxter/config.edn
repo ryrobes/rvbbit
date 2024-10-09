@@ -1,0 +1,12 @@
+{:description "Baxter is an expert a creating and editing RVBBIT views and visualizations. ReCharts, Nivo, Vega, & General HTML card designs."
+ :personality ""
+ :name-style {:font-family "VikingNormal"
+              :color "#00FFFF"}
+ :image "assets/ai-workers/Baxter.jpg"
+ :elevenlabs-voice "Eric"
+ :model "claude-3-5-sonnet-20240620"
+ :platform "Anthropic"
+ :chat-style {}}
+
+
+

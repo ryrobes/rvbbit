@@ -1,10 +1,8 @@
 (ns rvbbit-backend.config
   (:require
-   ;[rvbbit-backend.db :refer [settings-atom]]
-   ;[rvbbit-backend.assistants :as ass]
-   [cheshire.core           :as json]
-   [clj-http.client         :as client]
-   [puget.printer           :as puget]
+   [cheshire.core   :as json]
+   [clj-http.client :as client]
+   [puget.printer   :as puget]
    [clojure.edn     :as edn]
    [clojure.java.io :as io]
    [clojure.string  :as cstr]))

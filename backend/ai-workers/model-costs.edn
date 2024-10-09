@@ -1,0 +1,1 @@
+{"Anthropic" {"claude-3-5-sonnet" {:per-mtok-input 3.0, :per-mtok-output 15.0}, "claude-3-opus" {:per-mtok-input 15.0, :per-mtok-output 75.0}, "claude-3-haiku" {:per-mtok-input 0.25, :per-mtok-output 1.25}}}

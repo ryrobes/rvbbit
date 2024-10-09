@@ -2,6 +2,7 @@
   (:require [reagent.core                   :as reagent]
             [re-frame.core                  :as re-frame]
             [rvbbit-frontend.utility        :as ut]
+            [rvbbit-frontend.http           :as http]
             [rvbbit-frontend.db             :as db]
             [rvbbit-frontend.connections    :as conn]
             ;[reagent.dom                    :as rdom]
@@ -108,6 +109,10 @@
 (defn virtualized-v-box [{:keys [children style width height id follow?] :as props}]
   (let [;node-ref (reagent/atom nil)
         is-at-bottom (reagent/atom true)  ; Initialize as true
+        wssk @(ut/tracked-subscribe_ [::http/websocket-status])
+        websocket-status (select-keys wssk [:status :datasets :panels :waiting])
+        online? (true? (= (get websocket-status :status) :connected))
+        mouse-active?  (or @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 60}) (not online?))
         update-visible-range (fn [container-height scroll-top]
                                (let [{:keys [cumulative-heights max-height total-height]} (get @scroll-state id)
                                      start (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
@@ -206,7 +211,7 @@
                       true
                     (inc end) end) ;; get an extra block for history...
               visible-children (safe-subvec children start end)
-              v-box-style (merge {:overflow-y "auto"
+              v-box-style (merge {:overflow-y (if mouse-active? "auto" "hidden")
                                   :overflow-x "hidden"}
                                  style
                                  scrollbar-stylev)]

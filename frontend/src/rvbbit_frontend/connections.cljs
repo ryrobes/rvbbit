@@ -353,6 +353,12 @@
                    ;:str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    ;:string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    }
+          join-walk-map2 (fn [obody]
+                           (let [kps       (ut/extract-patterns obody :join 3)
+                                 logic-kps (into {} (for [v kps]
+                                                      (let [[_ that this] v]
+                                                        {v (str (cstr/join that this))})))]
+                             (ut/postwalk-replacer logic-kps obody)))
           solver-clover-walk
           (fn [obody]
             (let [;kps       (ut/extract-patterns obody :run-solver 2)
@@ -375,6 +381,7 @@
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
                                      new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                      sub-param                 (keyword (str "solver/" new-solver-name))
+                                     resolved-input-map        (assoc resolved-input-map :*solver-name (keyword new-solver-name))
                                      req-map                   (merge
                                                                 {:kind             :run-solver-custom
                                                                  :solver-name      solver-name
@@ -427,6 +434,7 @@
                           (has-fn? :if)             if-walk-map2
                           (has-fn? :when)           when-walk-map2
                           (has-fn? :into)           into-walk-map2
+                          (has-fn? :join)           join-walk-map2
                           (has-fn? :invert-hex-color) invert-hex-color-walk
                           (has-fn? :tetrads)        tetrads-walk
                           (has-fn? :complements)    complements-walk
@@ -434,10 +442,9 @@
                           (has-fn? :triads)          triads-walk
                           (ut/ne? singles)          (ut/postwalk-replacer singles)
                           (has-fn? :case)           case-walk)
-          templated-strings-vals (vec (filter #(cstr/includes? (str %) "/") (ut/deep-template-find out-block-map))) ;; ignore
-                                                                                                                    ;; non
+          templated-strings-vals (vec (filter #(cstr/includes? (str %) "/") (ut/deep-template-find out-block-map)))
           templates? (ut/ne? templated-strings-vals)
-          _ (when templates? (ut/tapp>> [:replacing-string-templates... templated-strings-vals out-block-map]))
+          _ (when templates? (ut/tapp>> [:replacing-string-templates-connections... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
                                    (ut/postwalk-replacer {nil ""}
                                                          (into {}
@@ -618,7 +625,7 @@
                                    :when (not (integer? (last k)))] {k v}))
            process-key (fn [k]
                        (let [base-k (if (vector? k) (last k) k)]
-                         (if (namespace base-k) ;;(try (namespace base-k) (catch :default _ false))
+                         (if (try (namespace base-k) (catch :default _ false)) ;;(try (namespace base-k) (catch :default _ false))
                            [base-k]
                            [base-k (keyword "data" (name base-k))])))]
      (into {}
@@ -662,7 +669,8 @@
 (re-frame/reg-sub ;; RESOLVE KEYPATH TEMP FOR TESTING
   ::clicked-parameter-key-alpha ;;; important, common, and likely more expensive than need be.
   (fn [db {:keys [keypath]}]
-    (let [cmp                 (ut/splitter (ut/safe-name (nth keypath 0)) "/")
+    (let [keypath             (if (vector? keypath) keypath [keypath])
+          cmp                 (ut/splitter (ut/safe-name (nth keypath 0)) "/")
           runner-crosswalk-map ;(try 
                                  @(ut/tracked-sub ::runner-crosswalk-map {}) 
                                ;     (catch :default e (do (ut/tapp>> [:runner-crosswalk-map-error e :db/solver-fn-lookup (str @db/solver-fn-lookup)]) {})))
@@ -804,6 +812,11 @@
                (if (and (not (= (first keypath) :param)) (= cc value))
                  nil
                  value)))))
+
+(re-frame/reg-event-db
+ ::click-parameter-no-unclick
+ (fn [db [_ keypath value]]
+   (assoc-in db (cons :click-param keypath) value)))
 
 (re-frame/reg-event-db 
  ::declick-parameter 
@@ -1272,7 +1285,7 @@
          ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
          ;                                     :*client-name* client-name
          ;                                     :*client-name-str (pr-str client-name)} honey-modded)
-         ;_ (ut/tapp>> [:sql-run1 (str keypath) (str honey-sql)])
+        ;;  _ (ut/tapp>> [:sql-run-wo-conn-id (str keypath) (str honey-sql)])
          ]
      (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
@@ -1339,7 +1352,7 @@
            ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
            ;                                     :*client-name* client-name 
            ;                                     :*client-name-str (str client-name)} honey-modded)
-            ;_ (ut/tapp>> [:sql-run2 (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
+            ;; _ (ut/tapp>> [:sql-run-w-conn-id (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
            ]
        (do (when (not (nil? refresh-every))
              (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
@@ -1359,7 +1372,7 @@
                                                 :client-name   client-name}
                                   :on-response [::http/socket-response]
                                   :on-timeout  [::http/timeout-response [keypath honey-sql]]
-                                  :timeout     50000}])
+                                  :timeout     120000}])
            (when deep-meta?
              ;(reset! db/running-deep-meta-on (vec (remove #(= % (first keypath)) @db/running-deep-meta-on)))
              (reset! deep-meta-on-deck nil))

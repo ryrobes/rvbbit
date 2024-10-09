@@ -1,0 +1,3431 @@
+{:reco-preview nil,
+ :flow? false,
+ :sql-source
+ {:gen-viz-80
+  {:select [[[:count 1] :value] [:price :id]],
+   :from
+   [[{:select [:_id :price],
+      :from [[:trades :for :valid-time :as-of-timestamp "2020-01-07 19:00:00"]]}
+     :zz101]],
+   :group-by [:price]},
+  :date {:select [:*], :connection-id "system-db", :from [:date], :limit 111},
+  :trades-drag-20
+  {:select [:_id :price],
+   :from [[:trades :for :valid-time :as-of-timestamp "2020-01-07 19:00:00"]],
+   :_last-run "04:28:09"},
+  :txs-drag-20
+  {:select [:_id :committed :error :system_time],
+   :from [[:txs :yy835]],
+   :_last-run "03:40:11"},
+  :valid-time
+  {:select [:*], :connection-id "system-db", :from [:valid-time], :limit 111},
+  :txs {:select [:*], :connection-id "system-db", :from [:txs], :limit 111},
+  :all {:select [:*], :connection-id "system-db", :from [:all], :limit 111},
+  :txs-drag-31
+  {:select [:_id :committed :error :system_time],
+   :from [[:txs :vv193]],
+   :_last-run "03:47:35"},
+  :for {:select [:*], :connection-id "system-db", :from [:for], :limit 111},
+  :as-of {:select [:*], :connection-id "system-db", :from [:as-of], :limit 111},
+  :system-time
+  {:select [:*], :connection-id "system-db", :from [:system-time], :limit 111},
+  :timestamp
+  {:select [:*], :connection-id "system-db", :from [:timestamp], :limit 111},
+  :trades {:select [:*], :connection-id "system-db", :from [:trades], :limit 111},
+  :as-of-timestamp
+  {:select [:*], :connection-id "system-db", :from [:as-of-timestamp], :limit 111}},
+ :annotate? false,
+ :meta
+ {nil
+  {:fields
+   {:vec-val
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 5},
+  :flow-fn-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 34,
+     :group-by? true,
+     :median ":get-colors",
+     :max ":write-file",
+     :avg ":alert! (non-numeric average)",
+     :cardinality 100},
+    :description
+    {:min "Basic HTTP call primitive",
+     :data-type "string",
+     :commons
+     {"Basic HTTP call primitive" 2,
+      "Clojure subtract function." 2,
+      "Get top 50 color frequencies from an image in hex form." 1},
+     :distinct 32,
+     :group-by? true,
+     :median "Clojure true? function.",
+     :max "Write you own Clojure function! Godspeed!",
+     :avg
+     "Send a pop-up notification to a client (or :all clients) (non-numeric average)",
+     :cardinality 94},
+    :full_map
+    {:min
+     "{:description \"Basic HTTP call primitive\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs [:req-map], :expandable? false, :required [:req-map]}",
+     :data-type "string",
+     :commons
+     {"{:description \"Clojure add function.\", :fn (fn [& args] (apply + args)), :inputs [:args], :icon \"zmdi-plus\", :types {:args [:integer :float], :out [:integer :float]}}"
+      1,
+      "{:description \"Convert a JSON string to Clojure EDN\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}}"
+      1,
+      "{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1},
+     :distinct 34,
+     :group-by? true,
+     :median
+     "{:description \"Clojure true? function.\", :fn true?, :inputs [:value], :icon \"zmdi-pizza\", :types {:value :boolean, :out :boolean}}",
+     :max
+     "{:file-path \"./flows/node-color-thief-js.edn\", :icon \"zmdi-gradient\", :description \"Take an image local path and generate a color palette map from it.\"}",
+     :avg
+     "{:description \"Send a pop-up notification to a client (or :all clients)\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :inputs [:destination :content :w :h :duration], :icon \"zmdi-alert-polygon\", :style {:color \"#FDFD96\"}, :selected-style {:color \"#FDFD96\"}, :defaults {:destination :client-name, :content \"Alert!\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}} (non-numeric average)",
+     :cardinality 100},
+    :inputs
+    {:min "",
+     :data-type "string",
+     :commons
+     {"[:value1 :value2]" 7,
+      "[:value]" 6,
+      "[:destination :content :w :h :duration]" 3},
+     :distinct 20,
+     :group-by? true,
+     :median "[:query]",
+     :max "[:value]",
+     :avg "[:destination :content :w :h :duration] (non-numeric average)",
+     :cardinality 58},
+    :icon
+    {:min "fa-solid fa-terminal",
+     :data-type "string",
+     :commons {"zmdi-pizza" 3, "zmdi-file-text" 3, "zmdi-alert-polygon" 3},
+     :distinct 20,
+     :group-by? true,
+     :median "zmdi-functions",
+     :max "zmdi-washing-machine",
+     :avg "zmdi-alert-polygon (non-numeric average)",
+     :cardinality 58},
+    :input_types
+    {:min "[:any :any]",
+     :data-type "string",
+     :commons
+     {"[[:integer :float] [:integer :float]]" 6, "[:string]" 6, "[:any]" 3},
+     :distinct 17,
+     :group-by? true,
+     :median "[:string :string]",
+     :max "[]",
+     :avg "[:keyword :any :integer :integer :integer] (non-numeric average)",
+     :cardinality 50},
+    :output_types
+    {:min "",
+     :data-type "string",
+     :commons {":any" 12, ":boolean" 11, ":string" 4},
+     :distinct 8,
+     :group-by? true,
+     :median ":boolean",
+     :max "[:integer :float]",
+     :avg ":any (non-numeric average)",
+     :cardinality 23},
+    :category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 18, ":clojure-base" 16},
+     :distinct 2,
+     :group-by? true,
+     :median ":rabbit-base",
+     :max ":rabbit-base",
+     :avg ":rabbit-base (non-numeric average)",
+     :cardinality 5}},
+   :database-type "SQLite",
+   :rowcount 34},
+  :new-raw-sql
+  {:fields
+   {:one
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:min "_id",
+     :data-type "string",
+     :commons {"system_time" 1, "error" 1, "committed" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "committed",
+     :max "system_time",
+     :avg "_id (non-numeric average)",
+     :cardinality 100},
+    :field_type
+    {:min "bool",
+     :data-type "string",
+     :commons {"timestamptz" 1, "json" 1, "bool" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "int8",
+     :max "timestamptz",
+     :avg "int8 (non-numeric average)",
+     :cardinality 100},
+    :data_type
+    {:min "boolean",
+     :data-type "string",
+     :commons {"datetime" 1, "unknown" 1, "boolean" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "datetime",
+     :max "unknown",
+     :avg "integer (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :gen-viz-80
+  {:fields
+   {:value
+    {:min 1,
+     :data-type "integer",
+     :commons {1 4, 2 1},
+     :distinct 2,
+     :group-by? false,
+     :median 1,
+     :max 2,
+     :avg 1.2,
+     :cardinality 40},
+    :id
+    {:min 100,
+     :data-type "integer",
+     :commons {250 1, 100 1, 230 1},
+     :distinct 5,
+     :group-by? false,
+     :median 230,
+     :max 1110,
+     :avg 508,
+     :cardinality 100}},
+   :database-type "PostgreSQL",
+   :rowcount 5},
+  :date
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: date) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:min "public",
+     :data-type "string",
+     :commons {"public" 2},
+     :distinct 1,
+     :group-by? true,
+     :median "public",
+     :max "public",
+     :avg "public (non-numeric average)",
+     :cardinality 50},
+    :db_catalog
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 2},
+     :distinct 1,
+     :group-by? true,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 50},
+    :connection_id
+    {:min "xtdb-pg",
+     :data-type "string",
+     :commons {"xtdb-pg" 2},
+     :distinct 1,
+     :group-by? true,
+     :median "xtdb-pg",
+     :max "xtdb-pg",
+     :avg "xtdb-pg (non-numeric average)",
+     :cardinality 50},
+    :schema_cat
+    {:min "",
+     :data-type "unknown",
+     :commons {nil 2},
+     :distinct 1,
+     :group-by? false,
+     :median "",
+     :max "",
+     :avg " (non-numeric average)",
+     :cardinality 50},
+    :table_name
+    {:min "trades",
+     :data-type "string",
+     :commons {"txs" 1, "trades" 1},
+     :distinct 2,
+     :group-by? true,
+     :median "trades",
+     :max "txs",
+     :avg "trades (non-numeric average)",
+     :cardinality 100},
+    :fields
+    {:min 3,
+     :data-type "integer",
+     :commons {5 1, 3 1},
+     :distinct 2,
+     :group-by? false,
+     :median 4,
+     :max 5,
+     :avg 4,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 2},
+  :bigfoot-sightings-drag-43
+  {:fields
+   {:nearestroad
+    {:min "",
+     :data-type "string",
+     :commons {nil 81, "Highway 108" 11, "285" 5},
+     :distinct 373,
+     :group-by? true,
+     :median "Highway 299",
+     :max "zion or old downieville hwy",
+     :avg "Forest Road 80 (non-numeric average)",
+     :cardinality 74},
+    :date
+    {:min "",
+     :data-type "string",
+     :commons {nil 188, "1" 16, "15" 11},
+     :distinct 165,
+     :group-by? true,
+     :median "13",
+     :max "weekend",
+     :avg " (non-numeric average)",
+     :cardinality 33},
+    :locationdetails
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 69,
+      "Take Highway 108 to Cold Springs." 2,
+      "It was about 50 yards north-west of the Giant Forest Museum and about 20 yards north of the Bear Hill Trail."
+      1},
+     :distinct 431,
+     :group-by? true,
+     :median
+     "It was at the desert Hot Springs condominium complex approx.10 miles north of Palm Springs",
+     :max
+     "we were near the confluence of the sisquac and manzanita rivers in the wilderness area where access is only made by horseback or on foot; we were on foot.",
+     :avg
+     "Occurred on Forest Road 80, on the road to Lake Florence, about 10 miles north of Huntington Lake. (non-numeric average)",
+     :cardinality 86},
+    :submitted_date
+    {:min "1989-07-22",
+     :data-type "string",
+     :commons {"2001-02-04" 3, "2001-01-02" 3, "2004-01-15" 3},
+     :distinct 455,
+     :group-by? true,
+     :median "2003-11-05",
+     :max "2022-02-04",
+     :avg "2000-12-06 (non-numeric average)",
+     :cardinality 91},
+    :sketch
+    {:min 0,
+     :data-type "integer",
+     :commons {0 500},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 0},
+    :bfroid
+    {:min 83,
+     :data-type "integer",
+     :commons {33088 1, 65566 1, 2199 1},
+     :distinct 500,
+     :group-by? true,
+     :median 2844.5,
+     :max 72175,
+     :avg 14840.75,
+     :cardinality 100},
+    :otherwitnesses
+    {:min "",
+     :data-type "string",
+     :commons {nil 65, "No" 6, "no" 5},
+     :distinct 412,
+     :group-by? true,
+     :median
+     "My parents were only witness to my extreme excitedness and my dog''s hystericalness.",
+     :max
+     "yes. my sister-29, my girlfriend-21, my two sons 5 & 9, our dog, which really flipped out and cried and howled at the area were the tree was right after i pushed it almost as if one of us fell inj and she was trying to help or something, and then myself - 30",
+     :avg " (non-numeric average)",
+     :cardinality 82},
+    :run_id
+    {:min 34,
+     :data-type "integer",
+     :commons {34 500},
+     :distinct 1,
+     :group-by? true,
+     :median 34,
+     :max 34,
+     :avg 34,
+     :cardinality 0},
+    :nearesttown
+    {:min "",
+     :data-type "string",
+     :commons {nil 56, "Strawberry" 9, "Leadville" 5},
+     :distinct 377,
+     :group-by? true,
+     :median "Lake City",
+     :max "woodland park",
+     :avg "huntington lake CA. (non-numeric average)",
+     :cardinality 75},
+    :timeandconditions
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 55, "late night" 2, "Please see above report for complete details" 1},
+     :distinct 445,
+     :group-by? true,
+     :median
+     "Fall or spring. It was in evergreen forest so i can''t remember which. It was 930pm or later. It was very dark except for my headlights. The night was clear.",
+     :max "very dark, a little light from the stars",
+     :avg "night time, but right in the headlights. (non-numeric average)",
+     :cardinality 88},
+    :month
+    {:min "",
+     :data-type "string",
+     :commons {"0001-08-01" 89, nil 64, "0001-09-01" 60},
+     :distinct 13,
+     :group-by? true,
+     :median "0001-07-01",
+     :max "0001-12-01",
+     :avg "0001-12-01 (non-numeric average)",
+     :cardinality 2},
+    :county
+    {:min "Alachua County",
+     :data-type "string",
+     :commons {"Humboldt County" 42, "Tuolumne County" 35, "Siskiyou County" 31},
+     :distinct 88,
+     :group-by? true,
+     :median "Nevada County",
+     :max "Yuba County",
+     :avg "Fresno County (non-numeric average)",
+     :cardinality 17},
+    :state
+    {:min "California",
+     :data-type "string",
+     :commons {"California" 328, "Colorado" 125, "Florida" 21},
+     :distinct 7,
+     :group-by? true,
+     :median "California",
+     :max "Michigan",
+     :avg "California (non-numeric average)",
+     :cardinality 1},
+    :fixed_month
+    {:min "",
+     :data-type "string",
+     :commons {"0001-08-01" 89, "0001-07-01" 81, "0001-09-01" 73},
+     :distinct 13,
+     :group-by? true,
+     :median "0001-08-01",
+     :max "0001-12-01",
+     :avg "0001-12-01 (non-numeric average)",
+     :cardinality 2},
+    :submitted
+    {:min "1989-07-22 00:00:00.000000",
+     :data-type "string",
+     :commons
+     {"2003-09-26 00:00:00.000000" 3,
+      "2000-10-28 00:00:00.000000" 3,
+      "2001-02-04 00:00:00.000000" 3},
+     :distinct 455,
+     :group-by? true,
+     :median "2003-11-05 00:00:00.000000",
+     :max "2022-02-04 00:00:00.000000",
+     :avg "2000-12-06 00:00:00.000000 (non-numeric average)",
+     :cardinality 91},
+    :title
+    {:min
+     "\"Unknown\" Vocalization Sounds Heard and Broadcasted by a Group of Six Hikers, While Camping Overnight at Lake Shore Forest Service Campground",
+     :data-type "string",
+     :commons
+     {"Sightings by hunting guide in Pike National Forest" 1,
+      "Couple Has Frightening Encounter Near Lake Shasta" 1,
+      "Motorist daylight sighting between Redding and Lassen National Forest" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "Loud Howling Sounds Heard",
+     :max
+     "witness saw man-like creature covered with dark red hair while hiking in the extreme eastern part of Dinosaur National Monument.",
+     :avg
+     "Two 4-wheelers have night sighting above Huntington Lake (non-numeric average)",
+     :cardinality 100},
+    :otherstories
+    {:min "",
+     :data-type "string",
+     :commons {nil 180, "No" 24, "no" 19},
+     :distinct 258,
+     :group-by? true,
+     :median
+     "I''m not from there but JG has not heard anything like that in that specific area.",
+     :max
+     "yes, i had heard of sightings on the tobbaco lake trail which is about six or so miles south of here. at lake fork.",
+     :avg " (non-numeric average)",
+     :cardinality 51},
+    :year
+    {:min "''96",
+     :data-type "string",
+     :commons {"2001" 29, "2000" 25, "1998" 20},
+     :distinct 104,
+     :group-by? true,
+     :median "1998",
+     :max "late 70''s",
+     :avg "1997 (non-numeric average)",
+     :cardinality 20},
+    :season
+    {:min "Fall",
+     :data-type "string",
+     :commons {"Summer" 221, "Fall" 129, "Spring" 85},
+     :distinct 5,
+     :group-by? true,
+     :median "Summer",
+     :max "Winter",
+     :avg "Winter (non-numeric average)",
+     :cardinality 0},
+    :class
+    {:min "Class A",
+     :data-type "string",
+     :commons {"Class B" 257, "Class A" 238, "Class C" 5},
+     :distinct 3,
+     :group-by? true,
+     :median "Class B",
+     :max "Class C",
+     :avg "Class A (non-numeric average)",
+     :cardinality 0},
+    :alsonoticed
+    {:min "",
+     :data-type "string",
+     :commons {nil 202, "no" 7, "No" 4},
+     :distinct 285,
+     :group-by? true,
+     :median
+     "Heavy foot steps that stopped right outside our tent. I had bears walk up on while camping. They are usually more stealthy. In this case the presence of something huge outside our tent was evident.",
+     :max
+     "yes we heard sounds that sounds like child making sounds, chattering, so we went to investigate",
+     :avg " (non-numeric average)",
+     :cardinality 56},
+    :url
+    {:min "http://www.bfro.net/GDB/show_report.asp?id=10265&PrinterFriendly=True",
+     :data-type "string",
+     :commons
+     {"http://www.bfro.net/GDB/show_report.asp?id=27966&PrinterFriendly=True" 1,
+      "http://www.bfro.net/GDB/show_report.asp?id=596&PrinterFriendly=True" 1,
+      "http://www.bfro.net/GDB/show_report.asp?id=1367&PrinterFriendly=True" 1},
+     :distinct 500,
+     :group-by? true,
+     :median "http://www.bfro.net/GDB/show_report.asp?id=2844&PrinterFriendly=True",
+     :max "http://www.bfro.net/GDB/show_report.asp?id=97&PrinterFriendly=True",
+     :avg
+     "http://www.bfro.net/GDB/show_report.asp?id=865&PrinterFriendly=True (non-numeric average)",
+     :cardinality 100},
+    :observed
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 5,
+      " My uncle and I were elk hunting near Fossil Ridge northeast of Gunnison, CO when this incident ocurred.  It was late afternoon when we noticed a strong odor that we thought might be elk so we headed east toward a small ridge hoping to find one on the other side.  As we got closer we heard the noise of rocks being banged together.  As we topped the ridge we saw a large dark brown animal squatting at the edge of a dry creek bed with it''s back toward us. It was banging 2 rocks together with it''s \"hands\" and making a grunting/growling noise each time the  rocks hit.<BR><BR>It seemed to sense our presence almost immediately and turned around and looked at us.  Then it quickly stood up and jumped across the creek in one motion.  I remember thinking \"nothing can move like that!\".  It ran up the slope on the north side of the creek bed at an angle and disappeared into the pine and aspen trees farther up the hill.  We could see it for about 50 feet before it was gone from sight.  It moved real quietly for something that big.<BR><BR>I estimate it''s height as 6''5''''.  It was covered with long dark brown hair that made me think of a yak.  It had a strong smell, at least there was a strong smell in the area that was like elk urine.<BR><BR>After we calmed down a bit, we went into the creek bed and found the 2 rocks which were chipped and broken.  We looked for other signs in that place but couldn''t find anything else."
+      1,
+      " I was working in the northern part of New Mexico training to be a Wildland Fire Fighter. In September 2003 (maybe the second week of that month) I was dispatched with 22 other people to the Del Loma Fire in the Shasta/Trinity Forest area, the Northern part of California. Each Crew had about 20 people, our plane that left Albuquerque held 2 crews. For almost the whole two weeks, we were all on standby. On the 4th to the last day of our 2 weeks of Fire call, we were setting up camp close to a river, about 5-10 miles out from the original forest fire. It was close to sun down when, a couple of guys were amazed at something. I heard them from inside my tent, but just ignored the whole thing until one of my crew members came and pulled me out of my tent. <BR><BR>I had no idea what I was supposed to be looking at or for. He pointed across the river and I was in shock when he pointed out the biggest, hairiest mammal I had ever seen just walking along the river side minding his own business. It stopped and looked at us. The way he stood on his hind legs was like an ordinary human. He had dark, long hair and stood about 7ft tall with a muscular build. <BR><BR>At this point I was the 4th person standing there in amazement. Maybe about 5 minutes of watching him watch us, with more people coming out with flashlights (because the sun was still going down) he darted in to the trees. He was running, taking long strides, and was gone in about 3 seconds.....and was literally pushing trees out of his way (not breaking them, but  pushing them out of his way). The trees behind him on his path up the mountain were swaying back and forth. I was surprised to see to these trees moving because they are thick in width and very tall. <BR><BR>By this time it was dark but lit enough to see which way he was headed. Up the mountain a little, there was a clearing, where we spotted him again before he disappeared for good. He made no noise, no yelling or screaming. He was just as timid as can be.<BR><BR>I have heard many stories about Bigfoot, and known that they are real but when seeing one in real life....you get a sense of respect for them and just have that feeling that there is more to life than you know. <BR><BR><BR><BR>"
+      1},
+     :distinct 496,
+     :group-by? true,
+     :median
+     " In November 2001, I was guiding for a husband and wife team and was also accompanied by my own wife during a elk hunt. That morning we had located a herd of elk in some remote country and had stalked to their location to find that it was only cows. Since we had bull tag only we did not pursue but instead went out on the point of a mountain to glass for any potential bulls. As our party was sitting and glassing I called periodically hoping for a response from a bull. To my surprise (all of our surprise) we heard a low guttural moan. At first I thought it to be a bull bedded down but the second time I realized that it was no bull at all and could not possibly be a bear. I immediately went toward the noise to confirm what ever had made it and found no animals, no elk, deer, bear, etc. <BR><BR>Shortly after hearing and investigating the sound I moved the party up the mountain to a aspen grove where I knew mid-day bulls would visit to eat. Shortly after positioning the hunters my wife and I took a position higher up the mountain to get a better view and for calling. After sitting in the grove for less than an hour we heard logs being hit together. Not like two bulls fighting but more like someone taking a sizeable log and hitting against another. The end of the day came and we returned to the camp and the hunt was over. <BR><BR>That night two inches of snow fell and I went back to the same location and found a dead cow elk with only her chest cavity being open and from what I could tell having most of her internal organs. I am of course no expert in zoology or cryptolgy [sic] but from my best guess and knowing what I have seen from the past I think that my hunting party and I disturbed a bigfoot while hunting that morning.<BR><BR>I did find tracks but due to the sun melt the tracks were very large with no distinguishable marks. This took place only 8 to 10 miles from the previous sightings.",
+     :max
+     " this report is for my daughter who today thinks she saw two big creatures that looked like the  creature called bigfoot. She was pretty shook up about it.  She was so scared that she did not stop. She said the creatures were walking in a pond between Orick and Trinadad off of hwy. 101 this morning about 10:30. She said they were very close. She saw the big ones face. She said it looked like a monkey face. The other one was stooped over so she could not see him very good.<BR>",
+     :avg
+     " I was sitting here listening to you on coast to coast and thought I''d tell you about an insident that happened in dec of 97.  the location was in the sierra navada mountains about ten miles above huntington lake which is about 60 miles above fresno in central CA.  Myself and a frind were fourwheeling on light, snow covered roads at about two am. we came around a corner and we both saw something run across the road.  it had very long, shagy red hair and it was running on all fours.  something like a gorilla would when charging.  we only observed it cross the road when we apperently spooked it.  we are both outdoorsman and have seen bears and the like befor.  when it happened, we both simultaneously looked at each other said \"what the hell was that?\" and then said \"we better not tell anyone or they''ll think were crazy!\"  I can''t swear to what it was, but I''ll swear it wasn''t a bear.  this thing was the wrong color to be any kind of cat and it was to thin through the torso as compared to its overall size to be a bear and i suspect bears would have already been in hybernation.  the hair looked like it could have been 18 inches long, very shagy.  its body shape was like a giant human, not a cat or bear.  unfortunately the animal never turned its face toward us at all. (non-numeric average)",
+     :cardinality 99},
+    :environment
+    {:min "",
+     :data-type "string",
+     :commons {nil 41, "Pine forest" 6, "Forest" 3},
+     :distinct 449,
+     :group-by? true,
+     :median "Pine Forest",
+     :max "woods, oaks, manzanita, poisen oak, etc.",
+     :avg " (non-numeric average)",
+     :cardinality 89},
+    :fixed_year
+    {:min "''96",
+     :data-type "string",
+     :commons {"2001" 30, "2000" 25, "1998" 23},
+     :distinct 77,
+     :group-by? true,
+     :median "1998",
+     :max "circ",
+     :avg "1997 (non-numeric average)",
+     :cardinality 15},
+    :run_time
+    {:min "2022-05-20 16:14:20.000000",
+     :data-type "string",
+     :commons
+     {"2022-05-20 16:15:54.000000" 4,
+      "2022-05-20 16:15:30.000000" 4,
+      "2022-05-20 16:14:33.000000" 4},
+     :distinct 187,
+     :group-by? true,
+     :median "2022-05-20 16:15:54.000000",
+     :max "2022-05-20 16:29:11.000000",
+     :avg "2022-05-20 16:14:20.000000 (non-numeric average)",
+     :cardinality 37}},
+   :database-type "SQLite",
+   :rowcount 500},
+  :sightings-by-state
+  {:fields
+   {:state
+    {:min "California",
+     :data-type "string",
+     :commons {"Florida" 1, "Texas" 1, "Missouri" 1},
+     :distinct 10,
+     :group-by? true,
+     :median "Michigan",
+     :max "Washington",
+     :avg "Washington (non-numeric average)",
+     :cardinality 100},
+    :count
+    {:min 128,
+     :data-type "integer",
+     :commons {158 1, 230 1, 236 1},
+     :distinct 10,
+     :group-by? true,
+     :median 242.5,
+     :max 604,
+     :avg 284.9,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 10},
+  :viz-shapes0-sys2
+  {:fields
+   {:shape
+    {:min "basic_h_bar",
+     :data-type "string",
+     :commons {"basic_h_bar_nivo" 1, "recharts_line" 1, "recharts_area" 1},
+     :distinct 9,
+     :group-by? false,
+     :median "pie_nivo",
+     :max "recharts_pie",
+     :avg "basic_h_bar (non-numeric average)",
+     :cardinality 100},
+    :recos
+    {:min 1,
+     :data-type "integer",
+     :commons {1 8, 4 1},
+     :distinct 2,
+     :group-by? false,
+     :median 1,
+     :max 4,
+     :avg 1.3333333333333333,
+     :cardinality 22}},
+   :database-type "SQLite",
+   :rowcount 9},
+  :sightings-by-season-state
+  {:fields
+   {:season
+    {:min "Fall",
+     :data-type "string",
+     :commons {"Summer" 49, "Winter" 48, "Fall" 48},
+     :distinct 5,
+     :group-by? true,
+     :median "Summer",
+     :max "Winter",
+     :avg "Summer (non-numeric average)",
+     :cardinality 2},
+    :state
+    {:min "Alabama",
+     :data-type "string",
+     :commons {"Maine" 5, "Arkansas" 5, "Florida" 5},
+     :distinct 49,
+     :group-by? true,
+     :median "Missouri",
+     :max "Wyoming",
+     :avg "Washington (non-numeric average)",
+     :cardinality 22},
+    :count
+    {:min 1,
+     :data-type "integer",
+     :commons {1 21, 2 17, 7 12},
+     :distinct 66,
+     :group-by? false,
+     :median 28,
+     :max 236,
+     :avg 22.782805429864254,
+     :cardinality 29}},
+   :database-type "SQLite",
+   :rowcount 221},
+  :new-raw-sql-1
+  {:fields
+   {:_id
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? true,
+     :commons {},
+     :cardinality 100},
+    :price
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? true,
+     :commons {},
+     :cardinality 83},
+    :four
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {},
+     :cardinality 16}},
+   :rowcount 6},
+  :trades-drag-20
+  {:fields
+   {:_id
+    {:min 1,
+     :data-type "integer",
+     :commons {3 1, 4 1, 1 1},
+     :distinct 6,
+     :group-by? true,
+     :median 3.5,
+     :max 6,
+     :avg 3.5,
+     :cardinality 100},
+    :price
+    {:min 100,
+     :data-type "integer",
+     :commons {230 2, 250 1, 100 1},
+     :distinct 5,
+     :group-by? true,
+     :median 230,
+     :max 1110,
+     :avg 461.6666666666667,
+     :cardinality 83}},
+   :database-type "PostgreSQL",
+   :rowcount 6},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:min "a-random-wow",
+     :data-type "string",
+     :commons
+     {"hue-lights-api" 1, "hue-change-group-color" 1, "gpt35-color-parser" 1},
+     :distinct 11,
+     :group-by? true,
+     :median "gpt35-color-parser",
+     :max "simple-python-exec",
+     :avg "gpt35-color-parser (non-numeric average)",
+     :cardinality 100},
+    :file_path
+    {:min "./flows/a-random-wow.edn",
+     :data-type "string",
+     :commons
+     {"./flows/buffy-color-comment.edn" 1,
+      "./flows/hue-change-group-color.edn" 1,
+      "./flows/simple-python-exec.edn" 1},
+     :distinct 11,
+     :group-by? true,
+     :median "./flows/gpt35-color-parser.edn",
+     :max "./flows/simple-python-exec.edn",
+     :avg "./flows/gpt35-color-parser.edn (non-numeric average)",
+     :cardinality 100},
+    :last_modified
+    {:min "2024-08-31 19:10:15",
+     :data-type "string",
+     :commons
+     {"2024-08-31 19:10:15" 4, "2024-09-02 05:18:05" 1, "2024-09-02 08:25:12" 1},
+     :distinct 8,
+     :group-by? true,
+     :median "2024-09-02 08:25:12",
+     :max "2024-09-12 15:01:54",
+     :avg "2024-09-12 15:01:54 (non-numeric average)",
+     :cardinality 72}},
+   :database-type "SQLite",
+   :rowcount 11},
+  :txs-drag-20 {:fields {}, :database-type "PostgreSQL", :rowcount 0},
+  :valid-time
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: valid_time) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :viz-tables-sys2
+  {:fields
+   {:table_name
+    {:min "trades_drag_20",
+     :data-type "string",
+     :commons {"trades_drag_20" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "trades_drag_20",
+     :max "trades_drag_20",
+     :avg "trades_drag_20 (non-numeric average)",
+     :cardinality 100},
+    :recos
+    {:min 12,
+     :data-type "integer",
+     :commons {12 1},
+     :distinct 1,
+     :group-by? false,
+     :median 12,
+     :max 12,
+     :avg 12,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
+  :txs
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x71c7075c \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x71c7075c \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: txs) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :all
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (near \"all\": syntax error) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :sightings-by-state-full
+  {:fields
+   {:state
+    {:min "Alabama",
+     :data-type "string",
+     :commons {"West Virginia" 1, "South Carolina" 1, "Alaska" 1},
+     :distinct 49,
+     :group-by? true,
+     :median "Montana",
+     :max "Wyoming",
+     :avg "Washington (non-numeric average)",
+     :cardinality 100},
+    :count
+    {:min 4,
+     :data-type "integer",
+     :commons {41 3, 96 2, 5 2},
+     :distinct 44,
+     :group-by? false,
+     :median 33,
+     :max 604,
+     :avg 102.75510204081633,
+     :cardinality 89}},
+   :database-type "SQLite",
+   :rowcount 49},
+  :viz-shapes-sys2
+  {:fields
+   {:combo_edn
+    {:min "\"*\"",
+     :data-type "string",
+     :commons {"\"rows\"" 1, "\"price, rows\"" 1, "\"price\"" 1},
+     :distinct 5,
+     :group-by? true,
+     :median "\"price\"",
+     :max "\"rows\"",
+     :avg "\"*\" (non-numeric average)",
+     :cardinality 100},
+    :recos
+    {:min 1,
+     :data-type "integer",
+     :commons {1 4, 8 1},
+     :distinct 2,
+     :group-by? false,
+     :median 1,
+     :max 8,
+     :avg 2.4,
+     :cardinality 40}},
+   :database-type "SQLite",
+   :rowcount 5},
+  :sightings-by-season
+  {:fields
+   {:season
+    {:min "Fall",
+     :data-type "string",
+     :commons {"Unknown" 1, "Winter" 1, "Spring" 1},
+     :distinct 5,
+     :group-by? true,
+     :median "Summer",
+     :max "Winter",
+     :avg "Summer (non-numeric average)",
+     :cardinality 100},
+    :count
+    {:min 92,
+     :data-type "integer",
+     :commons {92 1, 753 1, 826 1},
+     :distinct 5,
+     :group-by? false,
+     :median 753,
+     :max 1868,
+     :avg 1007,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 5},
+  :txs-drag-31 {:fields {}, :database-type "PostgreSQL", :rowcount 0},
+  :sightings-by-class-recent-years
+  {:fields
+   {:class
+    {:min "Class A",
+     :data-type "string",
+     :commons {"Class A" 56, "Class B" 52},
+     :distinct 2,
+     :group-by? true,
+     :median "Class A",
+     :max "Class B",
+     :avg "Class A (non-numeric average)",
+     :cardinality 1},
+    :year
+    {:min "2012-2015",
+     :data-type "string",
+     :commons {"2020" 2, "Early 70''s" 2, "about 1980" 2},
+     :distinct 92,
+     :group-by? true,
+     :median "99 or 2000",
+     :max "~1970",
+     :avg "2012-2015 (non-numeric average)",
+     :cardinality 85},
+    :count
+    {:min 1,
+     :data-type "integer",
+     :commons {1 88, 40 3, 14 2},
+     :distinct 17,
+     :group-by? false,
+     :median 1,
+     :max 97,
+     :avg 7.148148148148148,
+     :cardinality 15}},
+   :database-type "SQLite",
+   :rowcount 108},
+  :for
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: for) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :as-of
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: as_of) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :top-10-counties
+  {:fields
+   {:county
+    {:min "Humboldt County",
+     :data-type "string",
+     :commons {"Pierce County" 1, "Skamania County" 1, "Snohomish County" 1},
+     :distinct 10,
+     :group-by? true,
+     :median "Lewis County",
+     :max "Washington County",
+     :avg "Pierce County (non-numeric average)",
+     :cardinality 100},
+    :count
+    {:min 41,
+     :data-type "integer",
+     :commons {47 2, 51 2, 41 1},
+     :distinct 8,
+     :group-by? true,
+     :median 50.5,
+     :max 77,
+     :avg 51.6,
+     :cardinality 80}},
+   :database-type "SQLite",
+   :rowcount 10},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:min ":clojure-base",
+     :data-type "string",
+     :commons {":rabbit-base" 1, ":clojure-base" 1},
+     :distinct 2,
+     :group-by? true,
+     :median ":clojure-base",
+     :max ":rabbit-base",
+     :avg ":clojure-base (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 2},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:min "*cache-db*",
+     :data-type "string",
+     :commons {"*cache-db*" 4, "SQLite" 3, "PostgreSQL" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "*cache-db*",
+     :max "SQLite",
+     :avg "*cache-db* (non-numeric average)",
+     :cardinality 37},
+    :connection_id
+    {:min "bigfoot-ufos",
+     :data-type "string",
+     :commons {"cache.db" 1, "xtdb-pg" 1, "bigfoot-ufos" 1},
+     :distinct 8,
+     :group-by? true,
+     :median "flows-db",
+     :max "xtdb-pg",
+     :avg "system-db (non-numeric average)",
+     :cardinality 100},
+    :styler_highlight_8717ssa
+    {:min 0,
+     :data-type "integer",
+     :commons {0 8},
+     :distinct 1,
+     :group-by? true,
+     :median 0,
+     :max 0,
+     :avg 0,
+     :cardinality 12}},
+   :database-type "SQLite",
+   :rowcount 8},
+  :sightings-by-month
+  {:fields
+   {:fixed_month
+    {:min "",
+     :data-type "string",
+     :commons {"0001-01-01" 1, "0001-11-01" 1, "0001-04-01" 1},
+     :distinct 13,
+     :group-by? true,
+     :median "0001-06-01",
+     :max "0001-12-01",
+     :avg " (non-numeric average)",
+     :cardinality 100},
+    :count
+    {:min 85,
+     :data-type "integer",
+     :commons {509 1, 346 1, 283 1},
+     :distinct 13,
+     :group-by? false,
+     :median 442,
+     :max 802,
+     :avg 387.3076923076923,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 13},
+  :system-time
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: system_time) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :new-clojure-1-sqlized
+  {:fields
+   {:step_int
+    {:min 0,
+     :data-type "integer",
+     :commons {8 1, 18 1, 10 1},
+     :distinct 25,
+     :group-by? true,
+     :median 2,
+     :max 24,
+     :avg 12,
+     :cardinality 100},
+    :step_val
+    {:min -0.9898214418809329,
+     :data-type "float",
+     :commons {-0.2817325568414294 1, 0.9096319953545179 1, 0.7557495743542582 1},
+     :distinct 25,
+     :group-by? true,
+     :median 0.28173255684142906,
+     :max 0.989821441880933,
+     :avg 0.06982284064940751,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 25},
+  :timestamp
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: timestamp) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:min "trades_drag_20",
+     :data-type "string",
+     :commons {"trades_drag_20" 1},
+     :distinct 1,
+     :group-by? true,
+     :median "trades_drag_20",
+     :max "trades_drag_20",
+     :avg "trades_drag_20 (non-numeric average)",
+     :cardinality 100},
+    :cnt
+    {:min 12,
+     :data-type "integer",
+     :commons {12 1},
+     :distinct 1,
+     :group-by? false,
+     :median 12,
+     :max 12,
+     :avg 12,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 1},
+  :trades
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: trades) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :sightings-by-class
+  {:fields
+   {:class
+    {:min "Class A",
+     :data-type "string",
+     :commons {"Class C" 1, "Class A" 1, "Class B" 1},
+     :distinct 3,
+     :group-by? true,
+     :median "Class B",
+     :max "Class C",
+     :avg "Class B (non-numeric average)",
+     :cardinality 100},
+    :count
+    {:min 30,
+     :data-type "integer",
+     :commons {30 1, 2486 1, 2519 1},
+     :distinct 3,
+     :group-by? false,
+     :median 2519,
+     :max 2519,
+     :avg 1678.3333333333333,
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 3},
+  :as-of-timestamp
+  {:fields
+   {:query_error
+    {:min "",
+     :data-type "string",
+     :commons
+     {nil 1,
+      "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}"
+      1,
+      "(from database connection)" 1},
+     :distinct 4,
+     :group-by? true,
+     :median "(from database connection)",
+     :max
+     "{:datasource #object[com.zaxxer.hikari.HikariDataSource 0x7dc26ace \"HikariDataSource (system-db)\"]}",
+     :avg
+     "[SQLITE_ERROR] SQL error or missing database (no such table: as_of_timestamp) (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 4},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:min ":*",
+     :data-type "string",
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :distinct 34,
+     :group-by? true,
+     :median ":get-colors",
+     :max ":write-file",
+     :avg ":* (non-numeric average)",
+     :cardinality 100}},
+   :database-type "SQLite",
+   :rowcount 34}},
+ :default-col-widths
+ {:virtual-panel
+  {:kick--1630071692 511, :kick-1317199870 511, :kick--1306400869 511},
+  :block-10883 {:trades-drag-20 230},
+  :block-937 {:gen-viz-80 394},
+  :system-connections-list* {:connections-sys 209},
+  :system-fields-list* {:fields-sys 262},
+  :block-11798 {:new-raw-sql 411},
+  :block-1850 {:txs-drag-31 ##Inf},
+  :block-2656 {:txs-drag-20 ##Inf},
+  :block-10715 {:new-raw-sql-1 153},
+  :system-tables-list* {:tables-sys 207}},
+ :runstream-drops nil,
+ :zoom-start [149.21 -219.97 0.565],
+ :data-hash -1290872832,
+ :tabs
+ ["the cold grey machine whirred to life"
+  "quiet dinosaur"
+  "circus-blocks-test"
+  "pyramidal raccoon"
+  "motivating eagle"
+  "moving koala"],
+ :selected-cols nil,
+ :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
+ :editor? true,
+ :buffy? false,
+ :valid-kits
+ {[:clojure :export-to-csv]
+  [[nil :queries nil]
+   [nil :queries :new-raw-sql-1]
+   [:reco-preview-1631306491 :queries :query-preview-1631306491]
+   [:block-sightings-by-month :queries :sightings-by-month]
+   [:block-1 :queries :sightings-by-season]
+   [:block-1 :queries :sightings-by-class]
+   [:block-1 :queries :sightings-by-state]
+   [:block-1 :queries :sightings-by-state-full]
+   [:block-sightings-by-class-year :queries :sightings-by-class-recent-years]
+   [:block-10883 :queries :trades-drag-20]
+   [:reco-preview-166227074 :queries :query-preview-166227074]
+   [:block-4443 :queries :bigfoot-sightings-drag-43]
+   [:block-937 :queries :gen-viz-80]
+   [:block-top-10-counties :queries :top-10-counties]
+   [:block-sightings-by-season-state :queries :sightings-by-season-state]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:reco-preview-332235849 :queries :query-preview-332235849]
+   [:block-1850 :queries :txs-drag-31]
+   [:block-2656 :queries :txs-drag-20]],
+  [:clojure :count-map-keys] [],
+  [:clojure :new-lundberg] [[:* :* :*]],
+  [:clojure :view-lundberg]
+  [[:block-rabbit :views :rabbit-view]
+   [:block-1084 :views :hare-vw-8]
+   [:block-sun :views :sun-view]
+   [:reco-preview-1631306491 :views :oz]
+   [:block-rabbit-family1 :views :rabbit-family1-view]
+   [:block-grass :views :grass-view]
+   [:block-4 :views :recharts]
+   [:block-beehive :views :beehive-view]
+   [:block-mama-bear :views :mama-bear-view]
+   [:block-mushrooms :views :mushrooms-view]
+   [:block-squirrel :views :squirrel-view]
+   [:block-butterfly :views :butterfly-view]
+   [:block-honey :views :honey-view]
+   [:block-title :views :title-view]
+   [:block-baby-rabbits :views :baby-rabbits-view]
+   [:block-tree :views :tree-view]
+   [:block-9711 :views :truthful-ivory-squirrel]
+   [:block-9973 :views :hare-vw-2]
+   [:reco-preview-166227074 :views :oz]
+   [:block-937 :views :oz]
+   [:block-baby-bear :views :baby-bear-view]
+   [:block-11414 :views :hare-vw-16]
+   [:block-deer :views :deer-view]
+   [:block-4719 :views :hare-vw-3]
+   [:block-8499 :views :hare-vw]
+   [:block-140 :views :hare-vw-5]
+   [:reco-preview-332235849 :views :oz]
+   [:block-6 :views :vegalite]
+   [:block-11798 :views :hare-vw-17]
+   [:block-5 :views :bigfoot-facts]
+   [:block-clouds :views :clouds-view]
+   [:block-signature :views :signature-view]
+   [:block-10760 :views :hare-vw-14]
+   [:block-7845 :views :hare-vw-4]
+   [:block-flowers :views :flowers-view]
+   [:block-pond :views :pond-view]
+   [:block-birds :views :birds-view]
+   [:block-more-birds :views :more-birds-view]
+   [:block-8806 :views :hare-vw-1]
+   [:block-1584 :views :hare-vw-6]
+   [:block-10951 :views :hare-vw-21]
+   [:block-playful-rabbit :views :playful-rabbit-view]
+   [:block-2276 :views :hare-vw-20]
+   [:block-3 :views :recharts]
+   [:block-10715 :views :hare-vw-22]
+   [:block-3882 :views :editor-block-6295-clojure-hop-1]
+   [:block-2 :views :recharts]
+   [:block-more-trees :views :trees-view]
+   [:block-rainbow :views :rainbow-view]
+   [:block-9482 :views :hare-vw-15]],
+  [:clojure :gen-ev] [],
+  [:outliers :get-outliers]
+  [[nil :queries nil]
+   [nil :queries :new-raw-sql-1]
+   [:reco-preview-1631306491 :queries :query-preview-1631306491]
+   [:block-sightings-by-month :queries :sightings-by-month]
+   [:block-1 :queries :sightings-by-season]
+   [:block-1 :queries :sightings-by-class]
+   [:block-1 :queries :sightings-by-state]
+   [:block-1 :queries :sightings-by-state-full]
+   [:block-sightings-by-class-year :queries :sightings-by-class-recent-years]
+   [:block-10883 :queries :trades-drag-20]
+   [:reco-preview-166227074 :queries :query-preview-166227074]
+   [:block-4443 :queries :bigfoot-sightings-drag-43]
+   [:block-937 :queries :gen-viz-80]
+   [:block-top-10-counties :queries :top-10-counties]
+   [:block-sightings-by-season-state :queries :sightings-by-season-state]
+   [:block-9201 :queries :new-clojure-1-sqlized]
+   [:reco-preview-332235849 :queries :query-preview-332235849]
+   [:block-1850 :queries :txs-drag-31]
+   [:block-2656 :queries :txs-drag-20]]},
+ :flow-drop-down? true,
+ :memory [421978283 355404843 4294705152],
+ :client-name :fit-chartreuse-rhinoceros-43,
+ :flow-editor? true,
+ :window {:w 2788, :h 1350},
+ :ai-worker? false,
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil :new-raw-sql :new-raw-sql-1]},
+ :post-meta
+ {:flow-fn-sys
+  {:description {:distinct 32},
+   :category {:distinct 2},
+   :* {:rowcount 34},
+   :name {:distinct 34},
+   :icon {:distinct 20},
+   :input_types {:distinct 17},
+   :inputs {:distinct 20},
+   :output_types {:distinct 8},
+   :full_map {:distinct 34}},
+  :fields-sys
+  {:* {:rowcount 4},
+   :field_name {:distinct 4},
+   :field_type {:distinct 4},
+   :data_type {:distinct 4}},
+  :gen-viz-80 {:* {:rowcount 5}, :value {:distinct 2}, :id {:distinct 5}},
+  :tables-sys
+  {:* {:rowcount 1},
+   :db_schema {:distinct 1},
+   :db_catalog {:distinct 0},
+   :connection_id {:distinct 1},
+   :schema_cat {:distinct 0},
+   :table_name {:distinct 1},
+   :fields {:distinct 1}},
+  :trades-drag-20 {:* {:rowcount 6}, :_id {:distinct 6}, :price {:distinct 5}},
+  :flows-sys
+  {:* {:rowcount 11},
+   :flow_id {:distinct 11},
+   :file_path {:distinct 11},
+   :last_modified {:distinct 8}},
+  :txs-drag-20 {:* {:rowcount 0}},
+  :all {},
+  :txs-drag-31 {:* {:rowcount 0}},
+  :connections-sys
+  {:* {:rowcount 8},
+   :database_name {:distinct 3},
+   :connection_id {:distinct 8},
+   :styler_highlight_8717ssa {:distinct 1}},
+  :reco-counts {:* {:rowcount 1}, :table_name {:distinct 1}, :cnt {:distinct 1}}},
+ :flow-estimates
+ {:flow-fn-sys {:times 0.001, :run-id :flow-fn-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :gen-viz-80 {:times 0.005, :run-id :gen-viz-80},
+  :tables-sys {:times 0.018, :run-id :tables-sys},
+  :recos-sys2 {:times 0.052, :run-id :recos-sys2},
+  :viz-shapes0-sys2 {:times 0.038, :run-id :viz-shapes0-sys2},
+  :block-777-hare-vw-9 {:times 0.006, :run-id :block-777-hare-vw-9},
+  :trades-drag-20 {:times 0.007, :run-id :trades-drag-20},
+  :flows-sys {:times 0.001, :run-id :flows-sys},
+  :txs-drag-20 {:times 0.008, :run-id :txs-drag-20},
+  :viz-tables-sys2 {:times 0.031, :run-id :viz-tables-sys2},
+  :query-preview-1631306491 {:times 0.01, :run-id :query-preview-1631306491},
+  :block-4010-hare-vw-7 {:times 0.004, :run-id :block-4010-hare-vw-7},
+  :viz-shapes-sys2 {:times 0.117, :run-id :viz-shapes-sys2},
+  :txs-drag-31 {:times 0.006, :run-id :txs-drag-31},
+  :viz-shapes {:times 0.002, :run-id :viz-shapes},
+  :flow-fn-categories-sys {:times 0.005, :run-id :flow-fn-categories-sys},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :block-5863-hare-vw-10 {:times 0.005, :run-id :block-5863-hare-vw-10},
+  :block-10715-new-raw-sql-1 {:times 0.019, :run-id :block-10715-new-raw-sql-1},
+  :reco-counts {:times 0.011, :run-id :reco-counts},
+  :block-11798-new-raw-sql {:times 0.048, :run-id :block-11798-new-raw-sql},
+  :flow-fn-all-sys {:times 0.003, :run-id :flow-fn-all-sys},
+  :block-4420-clojure-hop {:times 0.006, :run-id :block-4420-clojure-hop}},
+ :screen-name "calliope-art",
+ :panel-hashes
+ {:block-5863 535508258,
+  :block-rabbit 996773857,
+  :block-1084 557130596,
+  :block-sun 2111621755,
+  :block-777 1142683844,
+  :block-rabbit-family1 -174865271,
+  :block-grass -169276775,
+  :block-4 -2119897197,
+  :block-beehive -386400755,
+  :block-sightings-by-month 1264253404,
+  :block-mama-bear -1723171399,
+  :block-mushrooms 1439376390,
+  :block-squirrel 1169165663,
+  :block-butterfly 1426156160,
+  :block-honey -984912839,
+  :block-title 1225367166,
+  :block-baby-rabbits 1958481168,
+  :block-1 1362756533,
+  :block-tree 2133277379,
+  :block-sightings-by-class-year -1251404244,
+  :block-9711 -2003140535,
+  :block-10883 -1644377279,
+  :block-9973 846436816,
+  :block-4010 1329041480,
+  :block-4443 -211255489,
+  :block-937 -1099569516,
+  :block-baby-bear 1651189188,
+  :block-11414 -2021206066,
+  :block-top-10-counties -1444428652,
+  :block-4420 910618546,
+  :block-deer -1192241615,
+  :block-sightings-by-season-state -246572205,
+  :block-4719 -1748572342,
+  :block-8499 -276800833,
+  :block-9201 903224869,
+  :block-140 -1784570893,
+  :block-7170 -2005715177,
+  :block-6 -163459007,
+  :block-11798 -307958170,
+  :block-5 648138791,
+  :block-1850 -70373215,
+  :block-clouds 1023116772,
+  :block-signature 1151159336,
+  :block-10760 -1255814447,
+  :block-7845 -220613714,
+  :block-12101 -605959595,
+  :block-flowers 1900793203,
+  :block-pond -999000994,
+  :block-birds -1255003118,
+  :block-2656 2138110328,
+  :block-more-birds 678369275,
+  :block-8806 -1522062546,
+  :block-7472 -1215405842,
+  :block-1584 1369448590,
+  :block-10951 77761649,
+  :block-6295 363124510,
+  :block-playful-rabbit -28952124,
+  :block-2276 -1636111877,
+  :block-7725 530824321,
+  :block-3 -1728083107,
+  :block-10715 459133653,
+  :block-8762 953657437,
+  :block-3882 -1348934254,
+  :block-2 1750821714,
+  :block-more-trees 470417193,
+  :block-rainbow -27913780,
+  :block-9482 -816805384},
+ :recos-page2 4,
+ :selected-tab "quiet dinosaur",
+ :col-names nil,
+ :snapshots {:params {}},
+ :recos-page 0,
+ :rs-overrides-hashmap {"a-random-wow" nil},
+ :base-sniff-queries
+ {:date -1717588768,
+  :valid-time 826042550,
+  :txs -686905176,
+  :all -837606336,
+  :for 1545718537,
+  :as-of -1212323720,
+  :system-time -515098618,
+  :timestamp 214666131,
+  :trades -1561673476,
+  :as-of-timestamp -140634867},
+ :user-params-hash 1681165588,
+ :grid-recos? true,
+ :preview-keys2 [],
+ :session-hash 1933459843,
+ :resolved-queries
+ {:gen-viz-80
+  {:select [[[:count 1] :value] [:price :id]],
+   :from
+   [[{:select [:_id :price],
+      :from [[:trades :for :valid-time :as-of-timestamp "2020-01-07 19:00:00"]]}
+     :zz101]],
+   :group-by [:price]},
+  :bigfoot-sightings-drag-43
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :locationdetails
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :run_id
+    :run_time
+    :season
+    :sketch
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :pp472]]},
+  :sightings-by-state
+  {:select [:state [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:state],
+   :order-by [[:count :desc]],
+   :limit 10},
+  :sightings-by-season-state
+  {:select [:season :state [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:season :state],
+   :order-by [[:count :desc]]},
+  :trades-drag-20
+  {:select [:_id :price],
+   :from [[:trades :for :valid-time :as-of-timestamp "2020-01-07 19:00:00"]],
+   :_last-run "04:28:09"},
+  :txs-drag-20
+  {:select [:_id :committed :error :system_time],
+   :from [[:txs :yy835]],
+   :_last-run "03:40:11"},
+  :sightings-by-state-full
+  {:select [:state [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:state],
+   :order-by [[:count :desc]]},
+  :sightings-by-season
+  {:select [:season [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:season],
+   :order-by [[:count :desc]]},
+  :txs-drag-31
+  {:select [:_id :committed :error :system_time],
+   :from [[:txs :vv193]],
+   :_last-run "03:47:35"},
+  :sightings-by-class-recent-years
+  {:select [:class :year [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :where [:> :year "2012"],
+   :group-by [:class :year],
+   :order-by [:year :class]},
+  :top-10-counties
+  {:select [:county [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:county],
+   :order-by [[:count :desc]],
+   :limit 10},
+  :sightings-by-month
+  {:select [:fixed_month [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:fixed_month],
+   :order-by [:fixed_month]},
+  :new-clojure-1-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-31 18:42:16",
+   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+   :_sqlized-hash nil,
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]},
+  :sightings-by-class
+  {:select [:class [[:count 1] :count]],
+   :from [[:bigfoot_sightings :bs]],
+   :group-by [:class],
+   :order-by [[:count :desc]]}},
+ :panels
+ {:block-5863
+  {:h 3,
+   :w 6,
+   :tab "quiet dinosaur",
+   :root [25 4],
+   :name "block-5863",
+   :selected-view :hare-vw-10,
+   :clojure
+   {:hare-vw-10
+    (do
+      (let [tt 122312
+            deps [:solver-meta/block-777-hare-vw-9>output>evald-result>value-hash]]
+        :data/hare-vw-9))},
+   :queries {}},
+  :block-rabbit
+  {:name "Cute Rabbit",
+   :w 6,
+   :h 5,
+   :root [18 13],
+   :tab "Fun Drawing",
+   :views
+   {:rabbit-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "100px"} :child "🐰"]]}},
+  :block-1084
+  {:h 9,
+   :w 15,
+   :root [2 14],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-8,
+   :name "block-1084",
+   :views
+   {:hare-vw-8
+    [:iframe
+     {:width "720",
+      :height "410",
+      :src "https://www.youtube.com/embed/rxYTSI7aenI?si=q_xwABn5x2ths3RB",
+      :title "YouTube video player",
+      :frameBorder "0",
+      :allow
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;  ",
+      :referrerPolicy "strict-origin-when-cross-origin",
+      :allowFullScreen true}]},
+   :queries {}},
+  :block-sun
+  {:name "Sunny Sun",
+   :w 9,
+   :h 4,
+   :root [1 2],
+   :tab "Fun Drawing",
+   :views
+   {:sun-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:background-color "#FFD700",
+      :border-radius "50%",
+      :width "100%",
+      :height "100%"}
+     :child
+     [:box :style {:font-size "80px"} :child "☀️"]]}},
+  :block-777
+  {:h 3,
+   :w 6,
+   :tab "quiet dinosaur",
+   :root [18 4],
+   :name "block-777",
+   :selected-view :hare-vw-9,
+   :clojure
+   {:hare-vw-9
+    (let [deps [:solver-meta/block-4010-hare-vw-7>output>evald-result>value-hash]]
+      :data/hare-vw-7)},
+   :queries {}},
+  :block-rabbit-family1
+  {:name "Rabbit Family 1",
+   :w 5,
+   :h 4,
+   :root [5 11],
+   :tab "Fun Drawing",
+   :views
+   {:rabbit-family1-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "70px"} :child "🐰"]
+      [:box :style {:font-size "70px", :margin-left "-10px"} :child "🐰"]]]}},
+  :block-grass
+  {:name "Green Grass",
+   :w 38,
+   :h 2,
+   :root [0 18],
+   :tab "Fun Drawing",
+   :views
+   {:grass-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:background-color "#90EE90", :width "100%", :height "100%"}
+     :children
+     (repeat 20 [:box :style {:font-size "20px"} :child "🌿"])]}},
+  :block-4
+  {:h 12,
+   :w 30,
+   :connection-id "bigfoot-ufos",
+   :name "bigfoot-sightings-by-state",
+   :views
+   {:recharts
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height}
+     [:>
+      :BarChart
+      {:data :sightings-by-state,
+       :layout "vertical",
+       :margin {:top 5, :right 30, :left 20, :bottom 5}}
+      [:> :CartesianGrid {:strokeDasharray "3 3"}]
+      [:> :XAxis {:type "number"}]
+      [:> :YAxis {:type "category", :dataKey :state}]
+      [:> :Tooltip]
+      [:> :Legend]
+      [:> :Bar {:dataKey :count, :fill "#ffc658"}]]]},
+   :root [1 19],
+   :tab "bigfoot-analysis"},
+  :block-beehive
+  {:name "Buzzing Beehive",
+   :w 4,
+   :h 4,
+   :root [27 9],
+   :tab "Fun Drawing",
+   :views
+   {:beehive-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:v-box
+      :children
+      [[:box :style {:font-size "60px"} :child "🐝"]
+       [:box :style {:font-size "60px", :margin-top "-20px"} :child "🍯"]]]]}},
+  :block-sightings-by-month
+  {:h 6,
+   :w 12,
+   :connection-id "bigfoot-ufos",
+   :name "Sightings by Month",
+   :queries
+   {:sightings-by-month
+    {:select [:fixed_month [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:fixed_month],
+     :order-by [:fixed_month]}},
+   :root [17 15],
+   :tab "motivating eagle"},
+  :block-mama-bear
+  {:name "Mama Bear",
+   :w 5,
+   :h 5,
+   :root [35 7],
+   :tab "Fun Drawing",
+   :views
+   {:mama-bear-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "100px"} :child "🐻"]]}},
+  :block-mushrooms
+  {:name "Magical Mushrooms",
+   :w 4,
+   :h 3,
+   :root [8 15],
+   :tab "Fun Drawing",
+   :views
+   {:mushrooms-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "40px"} :child "🍄"]
+      [:box :style {:font-size "50px", :margin-left "-10px"} :child "🍄"]
+      [:box :style {:font-size "35px", :margin-left "-5px"} :child "🍄"]]]}},
+  :block-squirrel
+  {:name "Friendly Squirrel",
+   :w 4,
+   :h 4,
+   :root [30 14],
+   :tab "Fun Drawing",
+   :views
+   {:squirrel-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "70px"} :child "🐿️"]]}},
+  :block-butterfly
+  {:name "Flutter Butterfly",
+   :w 4,
+   :h 4,
+   :root [9 8],
+   :tab "Fun Drawing",
+   :views
+   {:butterfly-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "70px"} :child "🦋"]]}},
+  :block-honey
+  {:name "Bear's Honey",
+   :w 3,
+   :h 3,
+   :root [38 11],
+   :tab "Fun Drawing",
+   :views
+   {:honey-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "60px"} :child "🍯"]]}},
+  :block-title
+  {:name "Fun Drawing Title",
+   :w 20,
+   :h 3,
+   :root [10 2],
+   :tab "Fun Drawing",
+   :views
+   {:title-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "56px", :font-weight "bold", :color "#4A90E2"}
+     :child
+     "A Sunny Day with Rabbit"]},
+   :selected-mode {:title-view :clover}},
+  :block-baby-rabbits
+  {:name "Baby Rabbits",
+   :w 6,
+   :h 3,
+   :root [11 16],
+   :tab "Fun Drawing",
+   :views
+   {:baby-rabbits-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "40px"} :child "🐰"]
+      [:box :style {:font-size "35px", :margin-left "-5px"} :child "🐰"]
+      [:box :style {:font-size "30px", :margin-left "-5px"} :child "🐰"]]]}},
+  :block-1
+  {:h 7,
+   :w 30,
+   :connection-id "bigfoot-ufos",
+   :name "bigfoot-sightings-queries",
+   :queries
+   {:sightings-by-season
+    {:select [:season [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:season],
+     :order-by [[:count :desc]]},
+    :sightings-by-class
+    {:select [:class [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:class],
+     :order-by [[:count :desc]]},
+    :sightings-by-state
+    {:select [:state [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:state],
+     :order-by [[:count :desc]],
+     :limit 10},
+    :sightings-by-state-full
+    {:select [:state [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:state],
+     :order-by [[:count :desc]]}},
+   :root [1 1],
+   :tab "bigfoot-analysis",
+   :selected-view :sightings-by-season},
+  :block-tree
+  {:name "Happy Tree",
+   :w 6,
+   :h 5,
+   :root [12 13],
+   :tab "Fun Drawing",
+   :views
+   {:tree-view
+    [:box
+     :align
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:v-box
+      :children
+      [[:box :style {:font-size "100px"} :child "🌳"]
+       [:box :style {:font-size "30px", :margin-top "-20px"} :child "🌼🌼🌼"]]]]}},
+  :block-sightings-by-class-year
+  {:h 6,
+   :w 15,
+   :connection-id "bigfoot-ufos",
+   :name "Sightings by Class and Year (Last 10 Years)",
+   :queries
+   {:sightings-by-class-recent-years
+    {:select [:class :year [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :where [:> :year "2012"],
+     :group-by [:class :year],
+     :order-by [:year :class]}},
+   :root [2 15],
+   :tab "motivating eagle"},
+  :block-9711
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :truthful-ivory-squirrel,
+   :h 2,
+   :views
+   {:truthful-ivory-squirrel
+    [:open-input
+     {:kp [:param :truthful-ivory-squirrel],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "clojure"}]},
+   :tab "quiet dinosaur",
+   :root [25 8],
+   :name "block-9711"},
+  :block-10883
+  {:h 6,
+   :w 10,
+   :connection-id "xtdb-pg",
+   :name "select-all-trades",
+   :queries
+   {:trades-drag-20
+    {:select [:_id :price],
+     :from [[:trades :for :valid-time :as-of-timestamp "2020-01-07 19:00:00"]],
+     :_last-run "04:28:09"}},
+   :root [43 2],
+   :tab "quiet dinosaur",
+   :selected-view :trades-drag-20},
+  :block-9973
+  {:h 4,
+   :w 23,
+   :root [2 6],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-2,
+   :name "block-9973",
+   :views
+   {:hare-vw-2
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:color :theme/editor-outer-rim-color,
+      :text-align "justify",
+      :font-size "27px",
+      :font-weight 200,
+      :margin-top "-8px",
+      :padding-right "50px",
+      :padding-top "6px",
+      :padding-left "34px",
+      :text-shadow "4px 4px 4px #00000099",
+      :font-family :theme/base-font}
+     :child
+     "At long last it finally comes out. A huge labor of love that has taken far more time & toll on me than I had ever anticipated. In some ways it's a culmination of my entire career as an artist & a 'data person'. If you're seeing this, no matter if you love it or not - thank you."]},
+   :queries {}},
+  :block-4010
+  {:h 3,
+   :w 6,
+   :tab "quiet dinosaur",
+   :root [11 4],
+   :name "block-4010",
+   :selected-view :hare-vw-7,
+   :clojure
+   {:hare-vw-7
+    (do
+      (let [deps [:solver-meta/block-4420-clojure-hop>output>evald-result>value-hash
+                  12432423]]
+        :data/clojure-hop))},
+   :queries {}},
+  :block-4443
+  {:h 7,
+   :w 27,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-bigfoot_sightings",
+   :queries
+   {:bigfoot-sightings-drag-43
+    {:select
+     [:alsonoticed
+      :bfroid
+      :class
+      :county
+      :date
+      :environment
+      :fixed_month
+      :fixed_year
+      :locationdetails
+      :month
+      :nearestroad
+      :nearesttown
+      :observed
+      :otherstories
+      :otherwitnesses
+      :run_id
+      :run_time
+      :season
+      :sketch
+      :state
+      :submitted
+      :submitted_date
+      :timeandconditions
+      :title
+      :url
+      :year],
+     :from [[:bigfoot_sightings :pp472]]}},
+   :root [2 2],
+   :tab "motivating eagle"},
+  :block-937
+  {:mad-libs-combo-hash ["-1631306491" "trades_drag_20"],
+   :name "pie_nivo - \"price, rows\" - 530",
+   :w 9,
+   :root [44 16],
+   :h 9,
+   :connection-id "xtdb-pg",
+   :queries
+   {:gen-viz-80
+    {:select [[[:count 1] :value] [:price :id]],
+     :from [[:query/trades-drag-20 :zz101]],
+     :group-by [:price]}},
+   :tab "quiet dinosaur",
+   :conditionals nil,
+   :views
+   {:oz
+    [:nivo-pie-chart
+     {:padAngle 0.7,
+      :innerRadius 0.5,
+      :width :panel-width+70,
+      :arcLinkLabelsThickness 4,
+      :borderWidth 2,
+      :cornerRadius 3,
+      :activeOuterRadiusOffset 8,
+      :theme :theme/nivo-defaults,
+      :arcLinkLabelsSkipAngle 10,
+      :click {:c :price, :y :rows},
+      :arcLabelsSkipAngle 10,
+      :height :panel-height+50,
+      :margin {:top 50, :right 50, :bottom 50, :left 45},
+      :data :gen-viz-80,
+      :arcLinkLabelsTextColor "#ffffff"}]}},
+  :block-baby-bear
+  {:name "Baby Bear",
+   :w 3,
+   :h 3,
+   :root [32 8],
+   :tab "Fun Drawing",
+   :views
+   {:baby-bear-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "60px"} :child "🧸"]]}},
+  :block-11414
+  {:h 4,
+   :w 18,
+   :root [20 8],
+   :tab "circus-blocks-test",
+   :selected-view :hare-vw-16,
+   :name "block-11414",
+   :views
+   {:hare-vw-16
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size [:str :*data/hare-vw-18 "px"],
+      :font-weight 700,
+      :padding-left "14px",
+      :margin-top "-26px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :*data/hare-vw-11]]},
+   :queries {}},
+  :block-top-10-counties
+  {:h 6,
+   :w 12,
+   :connection-id "bigfoot-ufos",
+   :name "Top 10 Counties with Most Sightings",
+   :queries
+   {:top-10-counties
+    {:select [:county [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:county],
+     :order-by [[:count :desc]],
+     :limit 10}},
+   :root [17 9],
+   :tab "motivating eagle"},
+  :block-4420
+  {:clojure {:clojure-hop (do (+ 9 4422 1234 12 7))},
+   :name "clojure-block-4420",
+   :w 8,
+   :selected-view :clojure-hop,
+   :root [2 3],
+   :h 5,
+   :opts {:clojure-hop {}},
+   :tab "quiet dinosaur",
+   :minimized? false},
+  :block-deer
+  {:name "Graceful Deer",
+   :w 4,
+   :h 4,
+   :root [34 13],
+   :tab "Fun Drawing",
+   :views
+   {:deer-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "90px"} :child "🦌"]]}},
+  :block-sightings-by-season-state
+  {:h 6,
+   :w 15,
+   :connection-id "bigfoot-ufos",
+   :name "Sightings by Season and State",
+   :queries
+   {:sightings-by-season-state
+    {:select [:season :state [[:count 1] :count]],
+     :from [[:bigfoot_sightings :bs]],
+     :group-by [:season :state],
+     :order-by [[:count :desc]]}},
+   :root [2 9],
+   :tab "motivating eagle"},
+  :block-4719
+  {:h 3,
+   :w 23,
+   :root [2 10],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-3,
+   :name "block-4719",
+   :views
+   {:hare-vw-3
+    [:box
+     :align
+     :end
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :padding-top "16px",
+      :padding-right "50px",
+      :text-shadow "4px 4px 4px #00000099",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family "Homemade Apple"}
+     :child
+     "Ryan Robitaille"]},
+   :queries {}},
+  :block-8499
+  {:h 3,
+   :w 23,
+   :root [2 3],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw,
+   :name "block-8499",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "61px",
+      :font-weight 700,
+      :text-shadow "4px 4px 4px #00000099",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Welcome to RⱯBBIT 0.1.0 Alpha! 🍀 "]},
+   :queries {}},
+  :block-9201
+  {:queries
+   {:new-clojure-1-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-31 18:42:16",
+     :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override1571289185>output>evald-result>value-hash,
+     :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]}}},
+  :block-140
+  {:h 3,
+   :w 9,
+   :root [17 16],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-5,
+   :name "block-140",
+   :views
+   {:hare-vw-5
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "This video does a long overview of getting started and building something from scratch, while explaining things fully."]},
+   :queries {}},
+  :block-7170
+  {:clojure
+   {:hare-vw-19
+    (do
+      (+
+        (rand-int 100)
+        (*
+          14
+          (let [deps [:solver-meta/block-7472-hare-vw-18>output>evald-result>value-hash]]
+            :data/hare-vw-18))))},
+   :name "block-7170",
+   :w 3,
+   :style {:transform [:str "rotate(" :*data/hare-vw-18 "deg)"]},
+   :selected-view :hare-vw-19,
+   :root [19 17],
+   :h 3,
+   :queries {},
+   :tab "circus-blocks-test"},
+  :block-6
+  {:h 15,
+   :w 30,
+   :connection-id "bigfoot-ufos",
+   :name "bigfoot-sightings-us-map",
+   :views
+   {:vegalite
+    [:vega-lite
+     {:encoding
+      {:color
+       {:field "count",
+        :type "quantitative",
+        :scale {:scheme "greenblue"},
+        :legend {:title "Bigfoot Sightings"}},
+       :tooltip
+       [{:field "state", :type "nominal", :title "State"}
+        {:field "count", :type "quantitative", :title "Sightings"}]},
+      :transform
+      [{:lookup "id",
+        :from {:data {:name "sightings-data"}, :key "id", :fields ["count"]}}],
+      :config {:view {:stroke null}},
+      :mark "geoshape",
+      :width "container",
+      :layer
+      [{:mark {:type "geoshape", :fill "lightgray", :stroke "white"}}
+       {:data {:name "sightings-data", :values :sightings-by-state-full},
+        :transform
+        [{:lookup "state",
+          :from
+          {:data
+           {:url
+            "https://gist.githubusercontent.com/mbostock/4090846/raw/07e73f3c2d21558489604a0bc434b3a5cf41a867/us-state-names.tsv"},
+           :key "name",
+           :fields ["id"]}}],
+        :mark "geoshape"}],
+      :projection {:type "albersUsa"},
+      :height :panel-height,
+      :data
+      {:url "https://vega.github.io/vega-datasets/data/us-10m.json",
+       :format {:type "topojson", :feature "states"}}}
+     {:actions false}]},
+   :root [1 2],
+   :tab "bigfoot-analysis",
+   :minimized? true},
+  :block-11798
+  {:raw-sql
+   {:new-raw-sql
+    ["-- xtdb-pg"
+     "INSERT INTO trades (_id, price, _valid_from)"
+     "VALUES (2, 230, DATE '2020-01-02');"
+     ""
+     "INSERT INTO trades (_id, price, _valid_from)"
+     "VALUES (3, 230, DATE '2020-01-03');"
+     ""
+     "INSERT INTO trades (_id, price, _valid_from)"
+     "VALUES (4, 250, DATE '2020-01-04');"
+     ""
+     "INSERT INTO trades (_id, price, _valid_from)"
+     "VALUES (5, 850, DATE '2020-01-05');"
+     ""
+     "INSERT INTO trades (_id, price, _valid_from)"
+     "VALUES (6, 1110, DATE '2020-01-06');"
+     ""]},
+   :name "block-11798",
+   :w 9,
+   :selected-mode {:new-raw-sql :terminal},
+   :selected-view :new-raw-sql,
+   :root [33 2],
+   :h 7,
+   :display {:new-raw-sql :value},
+   :queries {},
+   :tab "quiet dinosaur",
+   :views
+   {:hare-vw-17
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Imagination is the only weapon in the war against reality."]}},
+  :block-5
+  {:h 7,
+   :w 15,
+   :name "bigfoot-fun-facts",
+   :views
+   {:bigfoot-facts
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:background-color "#f0e6d2",
+      :border "3px solid #8b4513",
+      :border-radius "10px",
+      :padding "20px",
+      :font-family "Arial, sans-serif"}
+     :child
+     [:v-box
+      :gap
+      "10px"
+      :children
+      [[:h2 {:style {:color "#8b4513"}} "Bigfoot Fun Facts"]
+       [:ul
+        {:style {:text-align "left"}}
+        [:li "Bigfoot is also known as Sasquatch"]
+        [:li "Average height: 6-10 feet tall"]
+        [:li "Estimated weight: 500-1000 pounds"]
+        [:li "Footprint size: 16-24 inches long"]
+        [:li "First modern sighting: 1958 in California"]]]]]},
+   :root [31 1],
+   :tab "bigfoot-analysis"},
+  :block-1850
+  {:h 3,
+   :w 13,
+   :connection-id "xtdb-pg",
+   :name "select-all-txs",
+   :queries
+   {:txs-drag-31
+    {:select [:_id :committed :error :system_time],
+     :from [[:txs :vv193]],
+     :_last-run "03:47:35"}},
+   :root [2 8],
+   :tab "quiet dinosaur"},
+  :block-clouds
+  {:name "Fluffy Clouds",
+   :w 7,
+   :h 4,
+   :root [30 2],
+   :tab "Fun Drawing",
+   :views
+   {:clouds-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "50px"} :child "☁️"]
+      [:box :style {:font-size "60px", :margin-left "-20px"} :child "☁️"]
+      [:box :style {:font-size "40px", :margin-left "-15px"} :child "☁️"]]]}},
+  :block-signature
+  {:name "Calliope's Signature",
+   :w 12,
+   :h 2,
+   :root [6 20],
+   :tab "Fun Drawing",
+   :views
+   {:signature-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box
+      :style
+      {:font-family "cursive, 'Brush Script MT', 'Homemade Apple', sans-serif",
+       :font-size "28px",
+       :color "#4A4A4A",
+       :text-shadow "1px 1px 2px rgba(0,0,0,0.3)",
+       :transform "rotate(-5deg)"}
+      :child
+      "~ Calliope ~"]]}},
+  :block-10760
+  {:clojure
+   {:new-clojure-1
+    (do
+      (let [screens2 ["frost-terminal2"
+                      "ecto-cooler-shade"
+                      "winter-theme"
+                      "dynamic-theme-example1"
+                      "random-collection"
+                      "looking-glass-sine-wave"
+                      "light-theme"]
+            screens (vec
+                      (sort
+                        (remove
+                          (fn [x] (= x "unnamed-screen!"))
+                          (keys (deref rvbbit-backend.db/screens-atom)))))]
+        [:box
+         :size
+         "none"
+         :height
+         :panel-height+80-px
+         :style
+         {:overflow "auto"}
+         :child
+         [:v-box
+          :gap
+          "9px"
+          :children
+          (for
+            [s screens]
+            [:v-box
+             :padding
+             "9px"
+             :style
+             {:_border [:str "2px solid " :theme/editor-outer-rim-color],
+              :font-size "22px",
+              :border-radius "11px",
+              :background-color [:str :theme/editor-outer-rim-color "08"]}
+             :children
+             [[:box
+               :child
+               (str s)
+               :padding
+               "6px"
+               :style
+               {:color :theme/editor-outer-rim-color,
+                :font-weight 700,
+                :font-size "27px"}]
+              [:spacer :size "5px"]
+              [:h-box
+               :justify
+               :between
+               :children
+               [[:v-box
+                 :style
+                 {:padding-left "15px", :color :theme/editor-outer-rim-color}
+                 :children
+                 [[:box :child [:load-screen-button [s "open"]]]
+                  [:box :child [:load-theme-button [s "theme"]]]]]
+                [:box
+                 :padding
+                 "6px"
+                 :child
+                 [:img
+                  {:height "100px",
+                   :style {:border-radius "11px"},
+                   :src (str "assets/screen-snaps/" s ".jpg")}]]]]]])]]))},
+   :name "block-10760",
+   :w 8,
+   :selected-mode {:new-clojure-1 :clover},
+   :selected-view :new-clojure-1,
+   :root [36 4],
+   :h 19,
+   :queries {},
+   :tab "the cold grey machine whirred to life",
+   :views
+   {:hare-vw-14
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "How long is forever? Sometimes, just one second."]}},
+  :block-7845
+  {:h 2,
+   :w 18,
+   :root [17 14],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-4,
+   :name "block-7845",
+   :views
+   {:hare-vw-4
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :opacity 0.4,
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "If you get lost, hit escape a couple times - a help screen will be in reach that has the keybindings (and will eventually have full documentation)"]},
+   :queries {}},
+  :block-12101
+  {:h 2,
+   :w 5,
+   :tab "circus-blocks-test",
+   :root [27 5],
+   :name "block-12101",
+   :selected-view :hare-vw-13,
+   :clojure
+   {:hare-vw-13
+    (let [deps [:solver-meta/block-8762-hare-vw-12>output>evald-result>value-hash]]
+      :data/hare-vw-12)},
+   :queries {}},
+  :block-flowers
+  {:name "Beautiful Flowers",
+   :w 6,
+   :h 3,
+   :root [24 15],
+   :tab "Fun Drawing",
+   :views
+   {:flowers-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "40px"} :child "🌻"]
+      [:box :style {:font-size "40px"} :child "🌷"]
+      [:box :style {:font-size "40px"} :child "🌼"]
+      [:box :style {:font-size "40px"} :child "🌹"]]]}},
+  :block-pond
+  {:name "Little Pond",
+   :w 6,
+   :h 2,
+   :root [2 16],
+   :tab "Fun Drawing",
+   :views
+   {:pond-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:background-color "#87CEFA",
+      :border-radius "50%",
+      :width "100%",
+      :height "100%"}
+     :child
+     [:h-box
+      :align
+      :center
+      :justify
+      :center
+      :children
+      [[:box :style {:font-size "30px"} :child "🌊"]
+       [:box :style {:font-size "30px"} :child "🐠"]
+       [:box :style {:font-size "30px"} :child "🌊"]]]]}},
+  :block-birds
+  {:name "Flying Birds",
+   :w 8,
+   :h 3,
+   :root [14 6],
+   :tab "Fun Drawing",
+   :views
+   {:birds-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "30px"} :child "🕊️"]
+      [:box :style {:font-size "25px", :margin-top "15px"} :child "🐦"]
+      [:box :style {:font-size "35px", :margin-left "10px"} :child "🦅"]]]}},
+  :block-2656
+  {:h 7,
+   :w 9,
+   :connection-id "xtdb-pg",
+   :name "select-all-txs",
+   :queries
+   {:txs-drag-20
+    {:select [:_id :committed :error :system_time],
+     :from [[:txs :yy835]],
+     :_last-run "03:40:11"}},
+   :root [26 16],
+   :tab "quiet dinosaur"},
+  :block-more-birds
+  {:name "More Flying Birds",
+   :w 7,
+   :h 3,
+   :root [23 6],
+   :tab "Fun Drawing",
+   :views
+   {:more-birds-view
+    [:h-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :children
+     [[:box :style {:font-size "25px", :margin-top "10px"} :child "🐦"]
+      [:box :style {:font-size "30px", :margin-left "15px"} :child "🕊️"]
+      [:box
+       :style
+       {:font-size "20px", :margin-top "20px", :margin-left "10px"}
+       :child
+       "🐤"]
+      [:box :style {:font-size "28px", :margin-left "5px"} :child "🦜"]]]}},
+  :block-8806
+  {:h 10,
+   :w 10,
+   :root [25 3],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-1,
+   :name "block-8806",
+   :views
+   {:hare-vw-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:img {:width "100%", :src "images/rvbbit-logo-no-bkgrnd.png"}]]},
+   :queries {}},
+  :block-7472
+  {:h 2,
+   :w 5,
+   :tab "circus-blocks-test",
+   :root [12 11],
+   :name "block-7472",
+   :selected-view :hare-vw-18,
+   :clojure
+   {:hare-vw-18
+    (do
+      (Math/ceil
+        (+
+          :time/second
+          (/
+            (let [deps [:solver-meta/block-6295-clojure-hop-1>output>evald-result>value-hash]]
+              :data/clojure-hop-1)
+            6))))},
+   :queries {}},
+  :block-1584
+  {:h 2,
+   :w 16,
+   :root [19 1],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-6,
+   :name "block-1584",
+   :views
+   {:hare-vw-6
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "33px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/monospaced-font}
+     :child
+     [:str :time/now-seconds]]},
+   :queries {}},
+  :block-10951
+  {:name "block-10951",
+   :w 10,
+   :selected-view :hare-vw-21,
+   :root [24 13],
+   :h 6,
+   :queries {},
+   :tab "circus-blocks-test",
+   :views
+   {:hare-vw-21
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:transform [:str "rotate(" :*data/hare-vw-18 "deg)"],
+      :color :theme/editor-outer-rim-color,
+      :font-size "88px",
+      :transition "all 0.6s ease-in-out",
+      :font-weight 700,
+      :margin-top "36px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :font-family :theme/base-font}
+     :child
+     [:str :*data/hare-vw-19]]}},
+  :block-6295
+  {:clojure {:clojure-hop-1 (do (+ 119 228 212 :time/second))},
+   :name "clojure-block-6295",
+   :w 5,
+   :selected-view :clojure-hop-1,
+   :root [5 8],
+   :h 3,
+   :opts {:clojure-hop-1 {}},
+   :tab "circus-blocks-test",
+   :minimized? false},
+  :block-playful-rabbit
+  {:name "Playful Rabbit",
+   :w 3,
+   :h 3,
+   :root [23 13],
+   :tab "Fun Drawing",
+   :views
+   {:playful-rabbit-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "60px", :transform "rotate(45deg)"} :child "🐇"]]}},
+  :block-2276
+  {:h 3,
+   :w 4,
+   :root [6 4],
+   :tab "circus-blocks-test",
+   :selected-view :hare-vw-20,
+   :name "block-2276",
+   :views
+   {:hare-vw-20
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "71px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :time/second]]},
+   :queries {}},
+  :block-7725
+  {:h 3,
+   :w 6,
+   :tab "circus-blocks-test",
+   :root [12 6],
+   :name "block-7725",
+   :selected-view :hare-vw-11,
+   :clojure
+   {:hare-vw-11
+    (do
+      (Math/ceil
+        (/
+          (let [deps [:solver-meta/block-6295-clojure-hop-1>output>evald-result>value-hash
+                      2]]
+            :data/clojure-hop-1)
+          1.21)))},
+   :queries {}},
+  :block-3
+  {:h 11,
+   :w 15,
+   :connection-id "bigfoot-ufos",
+   :name "bigfoot-sightings-by-class",
+   :views
+   {:recharts
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height}
+     [:>
+      :PieChart
+      {:margin {:top 20, :right 30, :left 20, :bottom 5}}
+      [:>
+       :Pie
+       {:data :sightings-by-class,
+        :dataKey :count,
+        :nameKey :class,
+        :cx "50%",
+        :cy "50%",
+        :outerRadius "70%",
+        :fill "#82ca9d",
+        :label true}]
+      [:> :Tooltip]
+      [:> :Legend]]]},
+   :root [16 8],
+   :tab "bigfoot-analysis"},
+  :block-10715
+  {:raw-sql
+   {:new-raw-sql-1
+    ["-- xtdb-pg"
+     "SELECT _id, price, 4 as four"
+     "FROM trades "
+     "FOR VALID_TIME AS OF TIMESTAMP '2020-01-07 19:00:00'"
+     "--FOR SYSTEM_TIME AS OF DATE '2020-01-31'"
+     "limit 500"
+     ""
+     "            "
+     "            "]},
+   :name "block-10715",
+   :w 10,
+   :selected-mode {:new-raw-sql-1 :rowset},
+   :selected-view :new-raw-sql-1,
+   :root [41 11],
+   :h 5,
+   :display {:new-raw-sql-1 :value},
+   :queries {},
+   :tab "quiet dinosaur",
+   :views
+   {:hare-vw-22
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "If everybody minded their own business, the world would go around a great deal faster than it does."]}},
+  :block-8762
+  {:h 3,
+   :w 5,
+   :tab "circus-blocks-test",
+   :root [20 3],
+   :name "block-8762",
+   :selected-view :hare-vw-12,
+   :clojure
+   {:hare-vw-12
+    (do
+      (+
+        1234
+        (let [deps [:solver-meta/block-7725-hare-vw-11>output>evald-result>value-hash]]
+          :data/hare-vw-11)))},
+   :queries {}},
+  :block-3882
+  {:h 4,
+   :w 5,
+   :views
+   {:editor-block-6295-clojure-hop-1
+    [:editor [:block-6295 :clojure :clojure-hop-1]]},
+   :name "editor-block-6295-clojure-hop-1",
+   :root [5 11],
+   :tab "circus-blocks-test"},
+  :block-2
+  {:h 11,
+   :w 15,
+   :connection-id "bigfoot-ufos",
+   :name "bigfoot-sightings-by-season",
+   :views
+   {:recharts
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height}
+     [:>
+      :BarChart
+      {:data :sightings-by-season,
+       :margin {:top 20, :right 30, :left 20, :bottom 5}}
+      [:> :CartesianGrid {:strokeDasharray "3 3"}]
+      [:> :XAxis {:dataKey :season}]
+      [:> :YAxis]
+      [:> :Tooltip]
+      [:> :Legend]
+      [:> :Bar {:dataKey :count, :fill "#8884d8"}]]]},
+   :root [1 8],
+   :tab "bigfoot-analysis"},
+  :block-more-trees
+  {:name "Forest Trees",
+   :w 6,
+   :h 5,
+   :root [17 9],
+   :tab "Fun Drawing",
+   :views
+   {:trees-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:v-box
+      :children
+      [[:h-box
+        :children
+        [[:box :style {:font-size "70px"} :child "🌲"]
+         [:box :style {:font-size "80px", :margin-left "-10px"} :child "🌳"]]]
+       [:h-box
+        :style
+        {:margin-top "-20px"}
+        :children
+        [[:box :style {:font-size "75px", :margin-left "10px"} :child "🌴"]
+         [:box :style {:font-size "65px"} :child "🌲"]]]]]]}},
+  :block-rainbow
+  {:name "Magical Rainbow",
+   :w 6,
+   :h 6,
+   :root [1 6],
+   :tab "Fun Drawing",
+   :views
+   {:rainbow-view
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:height "100%"}
+     :child
+     [:box :style {:font-size "150px", :transform "rotate(-20deg)"} :child "🌈"]]}},
+  :block-9482
+  {:h 3,
+   :w 8,
+   :root [36 1],
+   :tab "the cold grey machine whirred to life",
+   :selected-view :hare-vw-15,
+   :name "block-9482",
+   :views
+   {:hare-vw-15
+    [:v-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :gap
+     "5px"
+     :children
+     [[:box :child "Open example screens or 'steal' their themes."]
+      [:box
+       :style
+       {:font-size "13px"}
+       :child
+       "(note: some themes might not work properly since they require specfic params and subs unqiue to that screen)"]]]},
+   :queries {}}},
+ :materialized-theme
+ {:codemirror-theme "rvbbit-dynamic",
+  :editor-param-background-color "#000000",
+  :pop-2 "#27345d",
+  :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+  :vega-defaults
+  {:view {:stroke "transparent"},
+   :axis
+   {:domainColor "#ffffff22",
+    :grid true,
+    :font "Lato",
+    :labelColor "#ffffff88",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelFont "Lato",
+    :domain false,
+    :gridColor "#ffffff22",
+    :tickColor "#ffffff22",
+    :axisFont "Lato"},
+   :legend
+   {:labelFont "Lato",
+    :legendFont "Lato",
+    :labelColor "#ffffff99",
+    :titleColor "#ffffff99",
+    :stroke "#ffffff99",
+    :titleFont "Lato"},
+   :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+   :mark {:font "Lato"},
+   :title
+   {:font "Lato",
+    :subtitleFont "Lato",
+    :labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99"}},
+  :nivo-colors {:scheme "purpleRed_green"},
+  :grid-selected-column-css
+  {:background-color "#00000088", :filter "brightness(200%)"},
+  :base-block-color-selected "#0A2439",
+  :block-title-font-color "#ffffff",
+  :universal-pop-color "#FF9500",
+  :base-block-color "#0A243980",
+  :pop-3 "#B8EDBF",
+  :editor-rim-color "#0A2439",
+  :base-block-filter-selected
+  "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+  :vega-default-color-scheme {:scheme "pastel2"},
+  :data-colors
+  {"float" "#2c728e",
+   "boolean" "#f386bf",
+   "map" "#00FFFF",
+   "list" "#c32148",
+   "string" "#7de8b9",
+   "rowset" "#DAF7A6",
+   "any" "#c3ec52",
+   "vector" "#008080",
+   "keyword" "#add8e6",
+   "rabbit-code" "#FC0FC0",
+   "datetime" "#472d7b",
+   "integer" "#12e3ff",
+   "unknown" "#ffcf99",
+   "date" "#3b528b",
+   "rabbitsql" "#FC0FC0",
+   "nil" "#eeeeee"},
+  :editor-grid-selected-font-color "#000000",
+  :monospaced-font "Fira Code",
+  :editor-grid-selected-background-color "#8879bc",
+  :nivo-defaults
+  {:font-family "Montserrat",
+   :labels
+   {:text
+    {:fill "#ffffff",
+     :font-size "16px",
+     :font-family "Montserrat",
+     :font-weight 700}},
+   :tooltip
+   {:container
+    {:background "#000",
+     :color "#ffffff",
+     :text {:fill "#eeeeee"},
+     :fontSize "18px",
+     :borderRadius "4px",
+     :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+     :padding "5px 9px"},
+    :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+    :tableCell {:padding "3px 5px"}},
+   :axis
+   {:legend
+    {:text
+     {:fill "#ffffff",
+      :font-size "14px",
+      :font-family "Montserrat",
+      :font-weight 700}},
+    :ticks
+    {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+   :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+  :editor-outer-rim-color "#4CD964",
+  :grid-selected-font-color "#000000",
+  :block-title-selected-font-color "#ffffff",
+  :grid-selected-background-color "#a3d3ff",
+  :grid-font-color "#ffffff",
+  :canvas-background-css
+  {:background-image "url(images/fake-brick4.png)",
+   :transition "all 0.6s ease-in-out",
+   :background-blend-mode "normal",
+   :background-color "#424f57"},
+  :editor-font-color "#ffffff",
+  :base-font "Montserrat",
+  :block-tab-selected-font-color "#c9d1ff",
+  :editor-background-color "#000006",
+  :editor-grid-font-color "#ffffff",
+  :pop-1 "#52cadf"},
+ :selected-block :block-10883,
+ :theme-colors-hashmap
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#7de8b9",
+  "rowset" "#DAF7A6",
+  "any" "#c3ec52",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#12e3ff",
+  "unknown" "#ffcf99",
+  "date" "#3b528b",
+  "rabbitsql" "#FC0FC0",
+  "nil" "#eeeeee"},
+ :solver-fn nil,
+ :click-param
+ {:flow-fn-sys
+  {:name ":clojure-string-join",
+   :full_map
+   "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+   :description "Clojure.string's join function.",
+   :inputs "[:delimiter]",
+   :icon "zmdi-group",
+   :input_types "[:string]",
+   :output_types ":string",
+   :category ":clojure-base"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 31,
+   :block_data
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#0A2439\", :block-title-font-color \"#ffffff\", :universal-pop-color \"#FF9500\", :base-block-color \"#0A243980\", :pop-3 \"#B8EDBF\", :editor-rim-color \"#0A2439\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de8b9\", \"rowset\" \"#DAF7A6\", \"any\" \"#c3ec52\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#12e3ff\", \"unknown\" \"#ffcf99\", \"date\" \"#3b528b\", \"rabbitsql\" \"#FC0FC0\", \"nil\" \"#eeeeee\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"Fira Code\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#4CD964\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/fake-brick4.png)\", :transition \"all 0.6s ease-in-out\", :background-blend-mode \"normal\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Montserrat\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :universal-pop-color :base-block-color :pop-3 :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1",
+   :query_names ""},
+  :tables-sys
+  {:db_schema "public",
+   :db_catalog nil,
+   :connection_id "xtdb-pg",
+   :schema_cat nil,
+   :table_name "txs",
+   :fields 5},
+  :flows-sys
+  {:flow_id "node-color-thief-js-webp",
+   :file_path "./flows/node-color-thief-js-webp.edn",
+   :last_modified "2024-08-29 12:47:41"},
+  :files-sys
+  {:file_path "./screens/servicenow-demo.edn",
+   :screen_name "servicenow-demo",
+   :blocks 14,
+   :queries 4,
+   :ts "2024-09-27 17:57:27"},
+  :chat-drag-23 {},
+  :offenses-drag-17 {:SHOOTING nil},
+  :viz-tables-sys2 {:table_name :trades-drag-20},
+  :searches-types-sys {:item_type "incoming"},
+  :searches-rows-sys
+  {:item_sub_type "",
+   :item_type "incoming",
+   :item_key "farts",
+   :display_name "",
+   :sample "farts!",
+   :value ":incoming/farts",
+   :is_live 0,
+   :block_meta nil},
+  :STREET-drag-11 {},
+  :ufo-sightings-drag-22 {},
+  :param
+  {:nutritious-periwinkle-sheep "hello from a data board!",
+   :float 324.444,
+   :voice
+   "Very cool, thank you. Let's try to do a map. Maybe a VegaLite map of states for sightings, possibly?",
+   :truthful-ivory-squirrel "new parameter value!",
+   :string "this is string",
+   :selected-view-data
+   {:select [:_id :price],
+    :from [[:trades :for :valid-time :as-of-timestamp "2020-01-07 19:00:00"]],
+    :_last-run "04:28:09"},
+   :selected-view [:queries :trades-drag-20],
+   :keys 123,
+   :bools true,
+   :keys2 [3 4 5],
+   :selected-block :block-10883},
+  :theme
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :pop-2 :solver/colors-of-the-moment>colors>2,
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :nivo-colors {:scheme "purpleRed_green"},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#0A2439",
+   :block-title-font-color "#ffffff",
+   :universal-pop-color "#FF9500",
+   :base-block-color "#0A243980",
+   :pop-3 "#B8EDBF",
+   :editor-rim-color "#0A2439",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#7de8b9",
+    "rowset" "#DAF7A6",
+    "any" "#c3ec52",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#12e3ff",
+    "unknown" "#ffcf99",
+    "date" "#3b528b",
+    "rabbitsql" "#FC0FC0",
+    "nil" "#eeeeee"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "Fira Code",
+   :editor-grid-selected-background-color "#8879bc",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#4CD964",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/fake-brick4.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Montserrat",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff",
+   :pop-1 :solver/colors-of-the-moment>colors>1},
+  :ufo-sightings-drag-22.* {},
+  :connections-sys
+  {:database_name "PostgreSQL",
+   :connection_id "xtdb-pg",
+   :styler_highlight_8717ssa 0},
+  :narratives {},
+  :sys {:selected-tab "quiet dinosaur", :selected-tab-idx 1},
+  :searches-sub-types-sys
+  {:item_key "farts", :is_live 0, :items 1, :styler_highlight_4018a 0},
+  :kits-sys
+  {:enabled
+   [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]}},
+ :selected-flow "node-color-thief-js-webp"}
