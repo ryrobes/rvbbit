@@ -652,7 +652,7 @@
 
 (defn splitter
   [s delimiter] ;; param based
-  (if true ;cache? ;(true? @(rfa/sub ::param-lookup {:kk :splitter-cache?}))
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :splitter-cache?}))
     (splitter* s delimiter)
     (cstr/split s delimiter)))
 
@@ -752,46 +752,48 @@
 (defonce subscription-counts-alpha (atom {}))
 (defonce simple-subscription-counts (atom []))
 
- (pp [:subscription-counts-alpha (take 20 (reverse (sort-by last (vec @subscription-counts-alpha))))])
- (pp [:subscription-counts (take 20 (reverse (sort-by last (vec @subscription-counts))))])
+;;  (pp [:subscription-counts-alpha (take 20 (reverse (sort-by last (vec @subscription-counts-alpha))))])
+;;  (pp [:subscription-counts (take 20 (reverse (sort-by last (vec @subscription-counts))))])
 
 (defn tracked-sub
   [sub-key sub-map] ;;; hack to track subscriptions for debugging, easy freq
-  (swap! subscription-counts-alpha update sub-key (fnil inc 0))
+  ;(swap! subscription-counts-alpha update sub-key (fnil inc 0))
   (rfa/sub sub-key sub-map))
 
 (defn tracked-subscribe_ [query]
-  (swap! subscription-counts update (first query) (fnil inc 0))
+  ;(swap! subscription-counts update (first query) (fnil inc 0))
   (rfa/sub (first query) {}))
 
-(defn tracked-subscribe
-  [query] ;;; hack to track subscriptions for debugging, easy freq
-  (swap! subscription-counts update (first query) (fnil inc 0))
-  (cond
-    ;;(and (cstr/includes? (str (first query)) "/")
-    ;;     (= (count query) 1))
-    ;;(rfa/sub (first query) {})
-    (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
-    (do ;(tapp>> [:cpk! (last query)])
-      (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
-    (cstr/ends-with? (str (first query)) "conn/data-colors") (rfa/sub :rvbbit-frontend.connections/data-colors {})
-    (cstr/ends-with? (str (first query)) "conn/sql-metadata") (rfa/sub :rvbbit-frontend.connections/sql-metadata-alpha
-                                                                       {:keypath (last query)})
-    (cstr/ends-with? (str (first query)) "bricks/all-drops-of") (rfa/sub :rvbbit-frontend.bricks/all-drops-of-alpha
-                                                                         {:ttype (last query)})
-    (cstr/ends-with? (str (first query)) "bricks/subq-mapping") (rfa/sub :rvbbit-frontend.bricks/subq-mapping-alpha {})
-    (cstr/ends-with? (str (first query)) "bricks/subq-panels") (rfa/sub :rvbbit-frontend.bricks/subq-panels-alpha
-                                                                        {:panel-id (last query)})
-    (cstr/ends-with? (str (first query)) "bricks/workspace") (rfa/sub :rvbbit-frontend.bricks/workspace-alpha
-                                                                      {:keypath (last query)})
-    (cstr/ends-with? (str (first query)) "bricks/selected-block") (rfa/sub :rvbbit-frontend.bricks/selected-block {})
-    (cstr/ends-with? (str (first query)) "bricks/editor-panel-selected-view")
-    (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
-    (cstr/ends-with? (str (first query)) "bricks/client-name") (rfa/sub :rvbbit-frontend.bricks/client-name {})
-    (cstr/ends-with? (str (first query)) "connections/client-name") (rfa/sub :rvbbit-frontend.connections/client-name {})
-    (cstr/ends-with? (str (first query)) "signals/selected-warren-item")
-    (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
-    :else (re-frame.core/subscribe query)))
+(defn tracked-subscribe [query] (re-frame.core/subscribe query))
+
+;; (defn tracked-subscribe
+;;   [query] ;;; hack to track subscriptions for debugging, easy freq
+;;   ;(swap! subscription-counts update (first query) (fnil inc 0))
+;;   (cond
+;;     ;;(and (cstr/includes? (str (first query)) "/")
+;;     ;;     (= (count query) 1))
+;;     ;;(rfa/sub (first query) {})
+;;     (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
+;;     (do ;(tapp>> [:cpk! (last query)])
+;;       (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
+;;     (cstr/ends-with? (str (first query)) "conn/data-colors") (rfa/sub :rvbbit-frontend.connections/data-colors {})
+;;     (cstr/ends-with? (str (first query)) "conn/sql-metadata") (rfa/sub :rvbbit-frontend.connections/sql-metadata-alpha
+;;                                                                        {:keypath (last query)})
+;;     (cstr/ends-with? (str (first query)) "bricks/all-drops-of") (rfa/sub :rvbbit-frontend.bricks/all-drops-of-alpha
+;;                                                                          {:ttype (last query)})
+;;     (cstr/ends-with? (str (first query)) "bricks/subq-mapping") (rfa/sub :rvbbit-frontend.bricks/subq-mapping-alpha {})
+;;     (cstr/ends-with? (str (first query)) "bricks/subq-panels") (rfa/sub :rvbbit-frontend.bricks/subq-panels-alpha
+;;                                                                         {:panel-id (last query)})
+;;     (cstr/ends-with? (str (first query)) "bricks/workspace") (rfa/sub :rvbbit-frontend.bricks/workspace-alpha
+;;                                                                       {:keypath (last query)})
+;;     (cstr/ends-with? (str (first query)) "bricks/selected-block") (rfa/sub :rvbbit-frontend.bricks/selected-block {})
+;;     (cstr/ends-with? (str (first query)) "bricks/editor-panel-selected-view")
+;;     (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
+;;     (cstr/ends-with? (str (first query)) "bricks/client-name") (rfa/sub :rvbbit-frontend.bricks/client-name {})
+;;     (cstr/ends-with? (str (first query)) "connections/client-name") (rfa/sub :rvbbit-frontend.connections/client-name {})
+;;     (cstr/ends-with? (str (first query)) "signals/selected-warren-item")
+;;     (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
+;;     :else (re-frame.core/subscribe query)))
 
 (defonce dispatch-counts (atom {}))
 (defonce simple-dispatch-counts (atom []))

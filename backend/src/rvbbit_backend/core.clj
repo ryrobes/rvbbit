@@ -393,6 +393,20 @@
                          (update-screen-meta f-path)))
                     file-path)))
 
+(defn shape-rotation-run [f-path]
+  (let [connection-id (rota/get-connection-id f-path)
+        _ (ut/pp ["🎁" :running-full-shape-rotation-job (str f-path)])
+        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] (System/currentTimeMillis))
+        res (rota/get-field-maps {:f-path f-path
+                                  :shape-test-defs cruiser/default-sniff-tests
+                                  :shape-attributes-defs cruiser/default-field-attributes
+                                  :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
+                                  :pre-filter-fn nil})
+        combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)
+        _ (ut/pp ["🎁" :shape-rotator-fields [:fields (count res) :viz (count combo-viz)]])
+        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
+        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
+
 (defn db-sniff-solver-default [f-path conn-name]
   {:signal :signal/daily-at-9am
    :type   :clojure
@@ -409,32 +423,20 @@
                  ;(ppy/execute-in-thread-pools
                  ; :conn-schema-sniff-serial
                  ; (fn []
-                 (lets-give-it-a-whirl-no-viz
-                  :f-path
-                  conn
-                  sql/system-db
-                  default-sniff-tests
-                  default-field-attributes
-                  default-derived-fields
-                  default-viz-shapes))))})
+                ;;  (lets-give-it-a-whirl-no-viz
+                ;;   :f-path
+                ;;   conn
+                ;;   sql/system-db
+                ;;   default-sniff-tests
+                ;;   default-field-attributes
+                ;;   default-derived-fields
+                ;;   default-viz-shapes)
+                 (shape-rotation-run :f-path)
+                 )))})
 
 ;; (ut/pp (db-sniff-solver-default "./connections/postgres.edn" "postgres"))
 ;; (ut/pp (keys @db/conn-map))
 ;; (ut/pp @db/shape-rotation-status)
-
-(defn shape-rotation-run [f-path]
-  (let [connection-id (rota/get-connection-id f-path)
-        _ (ut/pp ["🎁" :running-full-shape-rotation-job (str f-path)])
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] (System/currentTimeMillis))
-        res (rota/get-field-maps {:f-path f-path
-                                  :shape-test-defs cruiser/default-sniff-tests
-                                  :shape-attributes-defs cruiser/default-field-attributes
-                                  :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
-                                  :pre-filter-fn nil})
-        combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)
-        _ (ut/pp ["🎁" :shape-rotator-fields [:fields (count res) :viz (count combo-viz)]])
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
 
 (defn update-all-conn-meta []
   (let [prefix "connections/"

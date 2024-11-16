@@ -682,7 +682,6 @@
          click-hash (hash (dissoc (get db :click-param) :panel-hash))]
      [data-hash click-hash])))
 
-
 (re-frame/reg-sub ;; RESOLVE KEYPATH TEMP FOR TESTING
  ::clicked-parameter-key-alpha ;;; important, common, and likely more expensive than need be.
  (fn [db {:keys [keypath skip?]}]

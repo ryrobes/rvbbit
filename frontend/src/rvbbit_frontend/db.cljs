@@ -1,7 +1,7 @@
 (ns rvbbit-frontend.db
   (:require
    [reagent.core :as reagent]
-   [talltale.core     :as tales]
+   [talltale.core :as tales]
    [clojure.string :as cstr]))
 
 (defn gen-client-name []
@@ -94,7 +94,7 @@
 (defonce chunk-chart (reagent/atom :server/cpu-chart))
 (def chunk-charts [:server/cpu-chart :server/mem-chart :server/threads-chart :server/nrepl-chart :server/solvers-chart :server/flows-chart])
 
-;;(defonce incidental-rowsets (atom []))
+(defonce incidental-rowsets (atom []))
 
 (def virtualized-debug-msg (reagent/atom {}))
 
@@ -340,6 +340,7 @@
    :editor?            false
    :buffy?             false
    :ai-worker?         false
+   :client-name        client-name
    :flow-editor?       true
    :annotate?          false
    :grid-recos?        true

@@ -30,7 +30,7 @@
    [re-frame.core           :as re-frame]
    [reagent.core            :as reagent]
    [rvbbit-frontend.audio   :as audio]
-   [rvbbit-frontend.pillbox :as pbx]
+   ;[rvbbit-frontend.pillbox :as pbx]
    [rvbbit-frontend.bricks  :as    bricks
     :refer [theme-pull]]
    [rvbbit-frontend.buffy   :as buffy]
@@ -7047,9 +7047,14 @@
                                      )
 
                                    ]]
-
                            ]))
 
+
+(defn main-panel2 []
+     (let [_ (ut/pp [:mount-rooddddtd?])]
+       [re-com/box :child "fart fax!"]
+       )
+  )
 
 (defn main-panel []
   (let [editor? (and @(ut/tracked-subscribe_ [::bricks/editor?])
@@ -7084,7 +7089,7 @@
         server-subs @(ut/tracked-subscribe_ [::bricks/all-server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
         ;line-transform (str "scale(" @db/canvas-scale ") translate(0%, " (* (Math/floor (* @db/canvas-scale 100)) -1) "%)")
-        line-transform (str "scale(" @db/canvas-scale ")")
+        ;line-transform (str "scale(" @db/canvas-scale ")")
         ;;_ (ut/pp [:zoomies line-transform])
         coords (if lines? ;; wicked expensive otherwise
                  (let [;;_ (ut/tapp>> [:lines!])
@@ -7309,7 +7314,7 @@
                                       ;:transform      line-transform
                                       ;:transform      (str "scale(" @db/canvas-scale ")")
                                       ;(str "scale(0.5) translate(0%, -50%)")
-                     ;:pointer-events "none"
+                                       ;:pointer-events "none"
                                       :z-index        8}}
                              (bricks/draw-lines coords)])
 

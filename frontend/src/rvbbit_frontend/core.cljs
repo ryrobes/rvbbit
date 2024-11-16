@@ -88,11 +88,11 @@
 (defn dispatch-keyup-rules []
   (ut/tracked-dispatch-sync [::rp/set-keyup-rules {:event-keys [[[::alt-key-up] [{:keyCode 67}]]]}]))
 
-(re-frame/reg-sub
- ::memory-usage-breached-threshold?
- (fn [db _]
-   (let [{:keys [_ used ttl-heap]} (get db :memory)]
-     (> (/ used ttl-heap) 0.75))))
+;; (re-frame/reg-sub
+;;  ::memory-usage-breached-threshold?
+;;  (fn [db _]
+;;    (let [{:keys [_ used ttl-heap]} (get db :memory)]
+;;      (> (/ used ttl-heap) 0.75))))
 
 (defonce root-key
   (reagent/atom (cljs.core/random-uuid)))
@@ -108,18 +108,18 @@
     (rdom/unmount-component-at-node root-el)
     (rdom/render [root] root-el)))
 
-(re-frame/reg-event-db
- ::purge-sub-cache!
- (fn [db]
-   (let [;client-name       (get db :client-name)
-         [total used heap] (get db :memory)]
-     (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:"
-                 (ut/bytes-to-mb heap)])
-     (let [pct-used     (/ used total)
-           pct-used-str (str (.. pct-used (toFixed 1)) "%")]
-       (ut/tapp>> [:purging-sub-cache-for! db/client-name :pct-used pct-used-str])
-       (clear-cache-and-reload!)
-       db))))
+;; (re-frame/reg-event-db
+;;  ::purge-sub-cache!
+;;  (fn [db]
+;;    (let [;client-name       (get db :client-name)
+;;          [total used heap] (get db :memory)]
+;;      (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:"
+;;                  (ut/bytes-to-mb heap)])
+;;      (let [pct-used     (/ used total)
+;;            pct-used-str (str (.. pct-used (toFixed 1)) "%")]
+;;        (ut/tapp>> [:purging-sub-cache-for! db/client-name :pct-used pct-used-str])
+;;        (clear-cache-and-reload!)
+;;        db))))
 
 (defn dispatch-poller-rules []
   (ut/tracked-dispatch
@@ -252,15 +252,15 @@
   (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
                       :reinstate-fn (fn [ratom value] (swap! ratom merge value))})
   (track-mouse-activity)
-  (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
-                     (when (and (= (.-keyCode event) 71) (not @g-key-down?))
-                       (reset! g-key-down? true)
-                       (reset! flows/drop-toggle? (not @flows/drop-toggle?))))
-        release-fn (fn [event] (when (= (.-keyCode event) 71)
-                                 (reset! g-key-down? false)
-                                 (reset! flows/drop-toggle? false)))]
-    (.addEventListener js/window "keydown" press-fn)
-    (.addEventListener js/window "keyup" release-fn))
+  ;; (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
+  ;;                    (when (and (= (.-keyCode event) 71) (not @g-key-down?))
+  ;;                      (reset! g-key-down? true)
+  ;;                      (reset! flows/drop-toggle? (not @flows/drop-toggle?))))
+  ;;       release-fn (fn [event] (when (= (.-keyCode event) 71)
+  ;;                                (reset! g-key-down? false)
+  ;;                                (reset! flows/drop-toggle? false)))]
+  ;;   (.addEventListener js/window "keydown" press-fn)
+  ;;   (.addEventListener js/window "keyup" release-fn))
   (ut/tracked-dispatch
    [::wfx/request :default
     {:message {:kind :session-snaps
@@ -279,7 +279,7 @@
   (http/start-listening-to-url-changes)
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])
-  (ut/tracked-dispatch-sync [::poll/init])
+  (ut/tracked-dispatch [::poll/init])
   (ut/tracked-dispatch [::subs/window-fx-watcher])
   (ut/dispatch-delay 7000 [::audio/text-to-speech11 :audio :elevenlabs nil])
   ;; ^^ get voices if avail, but wait to make sure we have the api key from the server first
