@@ -1,104 +1,1195 @@
 {:reco-preview nil,
+ :doom-modal? false,
  :annotate? false,
+ :leaf-preview
+ {[:sql :new-group-by]
+  {[[:block-3266 :queries :all-bigfoot-sightings :field :month]
+    [:canvas :canvas :canvas]]
+   {:h 4,
+    :w 6,
+    :connection-id "bigfoot-ufos",
+    :selected-view :grouped-all-bigfoot-sightings,
+    :queries
+    {:grouped-all-bigfoot-sightings
+     {:select [:month [[:count 1] :rowcnt]],
+      :from [[:query/all-bigfoot-sightings :ssb65]],
+      :group-by [:month]}},
+    :leaf-drop [:sql :new-group-by]}},
+  [:sql :count-distinct]
+  {[[:block-3266 :queries :all-bigfoot-sightings :field :month]
+    [:canvas :canvas :canvas]]
+   {:h 4,
+    :w 6,
+    :connection-id "bigfoot-ufos",
+    :selected-view :countd-all-bigfoot-sightings,
+    :queries
+    {:countd-all-bigfoot-sightings
+     {:select [[[:count [:distinct :month]] :month]],
+      :from [[:query/all-bigfoot-sightings :ssb39]]}},
+    :leaf-drop [:sql :count-distinct]}},
+  [:filter :new-drop-down]
+  {[[:block-3266 :queries :all-bigfoot-sightings :field :month]
+    [:canvas :canvas :canvas]]
+   {:h 2,
+    :w 6,
+    :selected-view :dropdown1,
+    :connection-id "bigfoot-ufos",
+    :drop-mutate
+    {[:panels :block-3266 :queries :all-bigfoot-sightings :where]
+     [:and
+      [:*if :query1/*.clicked [:*all= :query1/*.clicked [:state]] [:= 1 1]]
+      [:*when :*this-block*/month [:= :*this-block*/month :month]]]},
+    :views
+    {:dropdown1
+     [:dropdown
+      {:choices :query1,
+       :width :panel-width+80-px,
+       :style {:padding-top "8px", :font-size "19px"},
+       :ref :query/all-bigfoot-sightings,
+       :model :*this-block*/month,
+       :field :month}]},
+    :queries
+    {:query1
+     {:select [[:month :label] [:month :id]],
+      :from [[:bigfoot_sightings :ddr24]],
+      :group-by [:month],
+      :order-by [[:month :asc]]}},
+    :leaf-drop [:filter :new-drop-down]}},
+  [:filter :click-table]
+  {[[:block-3266 :queries :all-bigfoot-sightings :field :month]
+    [:canvas :canvas :canvas]]
+   {:h 6,
+    :w 6,
+    :selected-view :query1,
+    :connection-id "bigfoot-ufos",
+    :drop-mutate
+    {[:panels :block-3266 :queries :all-bigfoot-sightings :where]
+     [:and
+      [:*if :query1/*.clicked [:*all= :query1/*.clicked [:state]] [:= 1 1]]
+      [:*if :query1/*.clicked [:*all= :query1/*.clicked [:month]] [:= 1 1]]]},
+    :queries
+    {:query1
+     {:select [:month [[:count 1] :rowcnt]],
+      :from [[:bigfoot_sightings :ctr38]],
+      :group-by [:month],
+      :order-by [[:month :asc]]}},
+    :leaf-drop [:filter :click-table]}}},
  :default-col-widths
- {:block-4795 {:ufo-sightings-drag-31 108},
-  :block-3366 {:country-drag-43 180},
-  :block-5320 {:rowcnt-drag-21 161}},
+ {:block-12316 {:query1 130},
+  :virtual-panel
+  {:kick-frag--744805599 143,
+   :kick-frag--961494193 143,
+   :kick-frag--14960920 143,
+   :kick-frag-718627794 286,
+   :kick-frag-27621796 286,
+   :kick-frag--78423746 143},
+  :block-100 {:grouped-all-bigfoot-sightings-2 130},
+  :block-2623 {:grouped-all-bigfoot-sightings-1 130},
+  :block-11189 {:agg-grouped-all-bigfoot-sightings-3 261},
+  :system-connections-list* {:connections-sys 126},
+  :system-fields-list* {:fields-sys 170},
+  :block-7530 {:countd-grouped-all-bigfoot-sightings 261},
+  :block-2994 {:grouped-all-bigfoot-sightings-3 130},
+  :block-8506 {:grouped-all-bigfoot-sightings 130},
+  :block-2412 {:all-all-bigfoot-sightings-5 ##Inf},
+  :block-1760 {:countd-all-bigfoot-sightings 261},
+  :block-5602 {:agg-grouped-all-bigfoot-sightings 261},
+  :block-3266 {:all-bigfoot-sightings 100},
+  :system-tables-list* {:tables-sys 133}},
  :runstream-drops nil,
- :tabs ["refreshing dinosaur" "crimson llama"],
+ :tabs ["refreshing dinosaur" "crimson llama" "slate-gray spider"],
  :selected-cols nil,
  :server nil,
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :valid-kits
- {[:clojure :export-to-csv]
-  [[:block-9201 :queries :new-clojure-1-sqlized]
-   [:block-4795 :queries :ufo-sightings-drag-31]
-   [:block-3366 :queries :country-drag-43]
-   [:block-5320 :queries :rowcnt-drag-21]
-   [nil :queries nil]],
-  [:outliers :get-outliers]
-  [[:block-9201 :queries :new-clojure-1-sqlized]
-   [:block-4795 :queries :ufo-sightings-drag-31]
-   [:block-3366 :queries :country-drag-43]
-   [:block-5320 :queries :rowcnt-drag-21]
-   [nil :queries nil]]},
- :memory [539180489 513494525 4294705152],
- :client-name :growing-spherical-hornet-24,
+ :memory [859533072 836726864 4294705152],
+ :client-name :green-diamond-codfish-42,
+ :server-panels
+ [:block-4635
+  :block-12316
+  :block-8192
+  :block-5946
+  :block-4192
+  :block-9638
+  :block-2432
+  :block-10949
+  :block-100
+  :block-2623
+  :block-5320
+  :block-9373
+  :block-299
+  :block-930
+  :block-10353
+  :block-9942
+  :block-11189
+  :block-9201
+  :block-3286
+  :block-3366
+  :block-7530
+  :block-4795
+  :block-2994
+  :block-7179
+  :block-8506
+  :block-10012
+  :block-828
+  :block-1760
+  :block-5602
+  :block-3266
+  :block-532
+  :block-7312
+  :block-1437],
  :flow-editor? true,
- :window {:w 2232, :h 985},
+ :window {:w 1751, :h 1314},
  :ai-worker? false,
+ :quake-console? false,
  :implicit-rowsets {:solver [nil]},
  :post-meta
- {:ufo_sightings
-  {:* {:rowcount 111},
-   :duration_seconds_int {:distinct 26},
-   :comments {:distinct 111},
-   :city {:distinct 102},
-   :date_posted {:distinct 69},
-   :longitude {:distinct 103},
-   :state {:distinct 37},
-   :duration_seconds {:distinct 26},
-   :duration_hours {:distinct 76},
-   :id {:distinct 111},
-   :shape {:distinct 18},
-   :datetime {:distinct 103},
-   :latitude {:distinct 103},
-   :country {:distinct 4}},
-  :rowcnt-drag-21 {:* {:rowcount 1}, :rowcnt_sum {:distinct 1}}},
+ {:fields-sys
+  {:field_name {:distinct 26},
+   :* {:rowcount 26},
+   :field_type {:distinct 5},
+   :data_type {:distinct 5},
+   :rrows {:distinct nil}},
+  :gen-viz-960 {:rrows {:distinct nil}, :* {:rowcount 3}, :class {:distinct 3}},
+  :countd-grouped-all-bigfoot-sightings
+  {:class {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :agg-grouped-all-bigfoot-sightings-3
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :gen-viz-947 {:rrows {:distinct nil}, :* {:rowcount 13}, :month {:distinct 12}},
+  :all-bigfoot-sightings
+  {:nearestroad {:distinct 1212},
+   :date {:distinct 399},
+   :* {:rowcount 1556},
+   :locationdetails {:distinct 1320},
+   :submitted_date {:distinct 1322},
+   :sketch {:distinct 1},
+   :bfroid {:distinct 1556},
+   :otherwitnesses {:distinct 1181},
+   :run_id {:distinct 1},
+   :nearesttown {:distinct 1196},
+   :timeandconditions {:distinct 1403},
+   :month {:distinct 12},
+   :rrows {:distinct nil},
+   :county {:distinct 351},
+   :state {:distinct 9},
+   :fixed_month {:distinct 12},
+   :submitted {:distinct 1322},
+   :title {:distinct 1556},
+   :otherstories {:distinct 889},
+   :year {:distinct 190},
+   :season {:distinct 5},
+   :class {:distinct 3},
+   :alsonoticed {:distinct 883},
+   :url {:distinct 1556},
+   :observed {:distinct 1542},
+   :environment {:distinct 1429},
+   :fixed_year {:distinct 94},
+   :run_time {:distinct 649}},
+  :gen-viz-985
+  {:rrows {:distinct nil}, :* {:rowcount 306}, :county {:distinct 306}},
+  :agg-grouped-all-bigfoot-sightings
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :countd-all-bigfoot-sightings
+  {:environment {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :grouped-all-bigfoot-sightings-2
+  {:county {:distinct 240},
+   :* {:rowcount 240},
+   :rowcnt {:distinct 21},
+   :rrows {:distinct nil}},
+  :grouped-all-bigfoot-sightings
+  {:class {:distinct 3},
+   :* {:rowcount 3},
+   :rowcnt {:distinct 3},
+   :rrows {:distinct nil}},
+  :grouped-all-bigfoot-sightings-1
+  {:fixed_year {:distinct 94},
+   :* {:rowcount 94},
+   :rowcnt {:distinct 35},
+   :rrows {:distinct nil}},
+  :grouped-all-bigfoot-sightings-3
+  {:county {:distinct 351},
+   :* {:rowcount 351},
+   :rowcnt {:distinct 28},
+   :rrows {:distinct nil}}},
  :flow-estimates
- {:country-drag-43 {:times 0.056, :run-id :country-drag-43},
-  :rowcnt-drag-21 {:times 0.033, :run-id :rowcnt-drag-21},
-  :ufo-sightings-drag-31 {:times 0.017, :run-id :ufo-sightings-drag-31},
-  :block-4635-new-pivot {:times 0.009, :run-id :block-4635-new-pivot},
-  :ufo_sightings {:times 0.006, :run-id :ufo_sightings}},
+ {:fields-sys {:times 0.001, :run-id :fields-sys},
+  :gen-viz-960 {:times 0.008, :run-id :gen-viz-960},
+  :countd-grouped-all-bigfoot-sightings
+  {:times 0.007, :run-id :countd-grouped-all-bigfoot-sightings},
+  :tables-sys {:times 0.001, :run-id :tables-sys},
+  :agg-grouped-all-bigfoot-sightings-3
+  {:times 0.008, :run-id :agg-grouped-all-bigfoot-sightings-3},
+  :gen-viz-947 {:times 0.008, :run-id :gen-viz-947},
+  :recos-sys2 {:times 0.003, :run-id :recos-sys2},
+  :viz-shapes0-sys2 {:times 0.003, :run-id :viz-shapes0-sys2},
+  :all-bigfoot-sightings {:times 0.045, :run-id :all-bigfoot-sightings},
+  :viz-tables-sys2 {:times 0.003, :run-id :viz-tables-sys2},
+  :virtual-panel-virtual-view {:times 0.014, :run-id :virtual-panel-virtual-view},
+  :gen-viz-985 {:times 0.013, :run-id :gen-viz-985},
+  :agg-grouped-all-bigfoot-sightings
+  {:times 0.007, :run-id :agg-grouped-all-bigfoot-sightings},
+  :countd-all-bigfoot-sightings
+  {:times 0.014, :run-id :countd-all-bigfoot-sightings},
+  :all-all-bigfoot-sightings-5 {:times 0.009, :run-id :all-all-bigfoot-sightings-5},
+  :viz-shapes-sys2 {:times 0.002, :run-id :viz-shapes-sys2},
+  :grouped-all-bigfoot-sightings-2
+  {:times 0.01, :run-id :grouped-all-bigfoot-sightings-2},
+  :bigfoot_sightings {:times 0.009, :run-id :bigfoot_sightings},
+  :connections-sys {:times 0.001, :run-id :connections-sys},
+  :grouped-all-bigfoot-sightings
+  {:times 0.007, :run-id :grouped-all-bigfoot-sightings},
+  :grouped-all-bigfoot-sightings-1
+  {:times 0.01, :run-id :grouped-all-bigfoot-sightings-1},
+  :grouped-all-bigfoot-sightings-3
+  {:times 0.009, :run-id :grouped-all-bigfoot-sightings-3},
+  :query1 {:times 0.027, :run-id :query1}},
  :screen-name "winter-info-economy",
  :panel-hashes
- {:block-9201 903224869,
-  :block-4635 -1684491056,
-  :block-4795 1908390669,
-  :block-7312 -1962737434,
-  :block-3366 -10231962,
+ {:block-4635 -1308575203,
+  :block-12316 1922212021,
+  :block-8192 1881619522,
+  :reco-preview -916789024,
+  :block-5946 1666226337,
+  :block-4192 -169323266,
+  :reco-preview-1073099381 1345103436,
+  :reco-preview-228230262 -1812772011,
+  :block-9638 -1414475891,
+  :block-2432 1298928015,
+  :block-10949 28493177,
+  :block-100 294717173,
+  :reco-preview726727097 1183590620,
+  :reco-preview-1275553369 -529205338,
+  :block-2623 252820667,
+  :reco-preview-450089911 -30500204,
   :block-5320 1563057335,
-  nil 1188417010},
+  :block-9373 -1227832322,
+  :block-299 1105785615,
+  :block-930 1404745640,
+  :block-10353 884818132,
+  :block-9942 1317493058,
+  :block-11189 -2034692050,
+  :block-9201 903224869,
+  :block-3286 -1052306186,
+  :block-3366 -10231962,
+  :reco-preview2094644313 100160605,
+  :block-7530 1699303625,
+  :reco-preview2046802243 317454650,
+  :reco-preview-2039685970 -750296761,
+  :reco-preview1376172333 -1618021511,
+  :block-4795 -1076071275,
+  :block-2994 51992871,
+  :block-7179 -102075196,
+  :block-8506 -1378626473,
+  :block-10012 67004376,
+  :block-828 1868287800,
+  :block-1760 -1330350243,
+  :reco-preview1720799548 1360884787,
+  :reco-preview-180463908 467024259,
+  :block-5602 246157014,
+  :block-3266 657186590,
+  :block-532 -1206703224,
+  :block-7312 -1962737434,
+  :reco-preview1925286084 428669760,
+  :block-1437 -223978162},
  :recos-page2 0,
- :selected-tab "refreshing dinosaur",
+ :selected-tab "slate-gray spider",
+ :col-names nil,
  :snapshots {:params {}},
- :valid-grid-actions
- {:dash8-api-basics {}, :xtdb-temporal-sql-scrubbers {}, :field-masters! {}},
  :recos-page 0,
  :rs-overrides-hashmap {"a-random-wow" nil},
- :user-params-hash -489653155,
+ :user-params-hash -1631174090,
  :grid-recos? true,
- :session-hash 1428351449,
+ :preview-keys2 [nil nil nil nil],
+ :session-hash -1137783741,
  :resolved-queries
- {:new-clojure-1-sqlized
-  {:select [:*],
-   :connection-id "cache.db",
-   :_sqlized-at "2024-08-31 18:42:16",
-   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
-   :_sqlized-hash nil,
-   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]},
-  :ufo-sightings-drag-31
+ {:city-drag-15
+  {:select [:city [[:count 1] :rowcnt] :country :shape],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ff796]]}
+     :ee271]],
+   :group-by [:city :country :shape],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-4
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ff796]]}
+     :nn704]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]},
+  :gen-viz-960
+  {:select [[[[:count 1]] :rrows] :class],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :jj102]],
+   :group-by [:class]},
+  :countd-grouped-all-bigfoot-sightings
+  {:select [[[:count [:distinct :class]] :class]],
+   :from
+   [[{:select [:class [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb69]],
+      :group-by [:class]}
+     :ssb30]]},
+  :query-preview726727097
+  {:select [[[:count 1] :rrows] :month],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:month]},
+  :agg-grouped-all-bigfoot-sightings-3
+  {:select [[[:sum :rowcnt] :rowcnt]],
+   :from
+   [[{:select [:county [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb60]],
+      :group-by [:county]}
+     :ssb47]]},
+  :gen-viz-947
+  {:select [[[:count 1] :rrows] :month],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:month]},
+  :shape-drag-36
+  {:select [:shape [[:count 1] :rowcnt] :state],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ff796]]}
+     :gg913]],
+   :group-by [:shape :state],
+   :order-by [[:rowcnt :desc]]},
+  :query-preview-228230262
+  {:select [[[:count 1] :rrows] :class],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:class]},
+  :all-bigfoot-sightings
   {:select
-   [:city
-    :comments
-    :country
-    :date_posted
-    :datetime
-    :duration_hours
-    :duration_seconds
-    :duration_seconds_int
-    :id
-    :latitude
-    :longitude
-    :shape
-    :state],
-   :from [[:ufo_sightings :mm798]],
-   :_last-run "06:21:46"},
-  :country-drag-43
-  {:select [:country [[:count 1] :rowcnt]],
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :locationdetails
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :run_id
+    :run_time
+    :season
+    :sketch
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :ssb72]],
+   :where
+   [:*if
+    {:state
+     ["Alabama"
+      "Florida"
+      "Georgia"
+      "Illinois"
+      "Colorado"
+      "California"
+      "Arkansas"
+      "Kentucky"
+      "Maryland"]}
+    [:*all=
+     {:state
+      ["Alabama"
+       "Florida"
+       "Georgia"
+       "Illinois"
+       "Colorado"
+       "California"
+       "Arkansas"
+       "Kentucky"
+       "Maryland"]}
+     [:state]]
+    [:= 1 1]]},
+  :shape-drag-26
+  {:select [:shape [[:count 1] :rowcnt] :country],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ff796]]}
+     :ff970]],
+   :group-by [:shape :country],
+   :order-by [[:rowcnt :desc]]},
+  :query-preview2094644313
+  {:select [[[:count 1] :rrows] :month],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:month]},
+  :query-preview-180463908
+  {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+   :from
+   [[{:select [:county [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb60]],
+      :group-by [:county]}
+     :subq1]],
+   :group-by [:x-field]},
+  :query-preview-1275553369
+  {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+   :from
+   [[{:select [:county [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb60]],
+      :group-by [:county]}
+     :subq1]],
+   :group-by [:x-field]},
+  :query-preview1925286084
+  {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+   :from
+   [[{:select [:county [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb60]],
+      :group-by [:county]}
+     :subq1]],
+   :group-by [:segment-field]},
+  :gen-viz-985
+  {:select [[[[:count 1]] :rrows] :county],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :uu215]],
+   :group-by [:county]},
+  :agg-grouped-all-bigfoot-sightings
+  {:select [[[:sum :rowcnt] :rowcnt]],
+   :from
+   [[{:select [:class [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb69]],
+      :group-by [:class]}
+     :ssb86]]},
+  :rowcnt-drag-8
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:shape [[:count 1] :rowcnt]],
+      :from
+      [[{:select [:shape [[:count 1] :rowcnt] :country],
+         :from
+         [[{:select
+            [:city
+             :comments
+             :country
+             :date_posted
+             :datetime
+             :duration_hours
+             :duration_seconds
+             :duration_seconds_int
+             :id
+             :latitude
+             :longitude
+             :shape
+             :state],
+            :from [[:ufo_sightings :ff796]]}
+           :ff970]],
+         :group-by [:shape :country],
+         :order-by [[:rowcnt :desc]]}
+        :gg418]],
+      :group-by [:shape],
+      :order-by [[:rowcnt :desc]]}
+     :qq730]]},
+  :crosstab-1-flat
+  {:select [:country :state [[:count :*] :rowcnt]],
+   :connection-id "bigfoot-ufos",
    :from
    [[{:select
       [:city
@@ -115,9 +1206,82 @@
        :shape
        :state],
       :from [[:ufo_sightings :mm798]]}
-     :kk88]],
-   :group-by [:country],
-   :order-by [[:rowcnt :desc]]},
+     :agg45]],
+   :group-by [:country :state]},
+  :countd-all-bigfoot-sightings
+  {:select [[[:count [:distinct :environment]] :environment]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb46]]},
+  :ufo-sightings-drag-22
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :ff796]],
+   :_last-run "00:31:47"},
   :rowcnt-drag-21
   {:select [[[:sum :rowcnt] :rowcnt_sum]],
    :from
@@ -142,34 +1306,775 @@
       :group-by [:country],
       :order-by [[:rowcnt :desc]]}
      :ss823]]},
-  nil {:_last-run "08:27:14"}},
+  :query-preview2046802243
+  {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+   :from
+   [[{:select [:county [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:alsonoticed
+          :bfroid
+          :class
+          :county
+          :date
+          :environment
+          :fixed_month
+          :fixed_year
+          :locationdetails
+          :month
+          :nearestroad
+          :nearesttown
+          :observed
+          :otherstories
+          :otherwitnesses
+          :run_id
+          :run_time
+          :season
+          :sketch
+          :state
+          :submitted
+          :submitted_date
+          :timeandconditions
+          :title
+          :url
+          :year],
+         :from [[:bigfoot_sightings :ssb72]],
+         :where
+         [:*if
+          {:state
+           ["Alabama"
+            "Florida"
+            "Georgia"
+            "Illinois"
+            "Colorado"
+            "California"
+            "Arkansas"
+            "Kentucky"
+            "Maryland"]}
+          [:*all=
+           {:state
+            ["Alabama"
+             "Florida"
+             "Georgia"
+             "Illinois"
+             "Colorado"
+             "California"
+             "Arkansas"
+             "Kentucky"
+             "Maryland"]}
+           [:state]]
+          [:= 1 1]]}
+        :ssb60]],
+      :group-by [:county]}
+     :subq1]],
+   :group-by [:x-field]},
+  :query-preview-450089911
+  {:select [[:month :segment] [[:count 1] :value]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:month]},
+  :query-preview1376172333
+  {:select [[:class :segment] [[:count 1] :value]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:class]},
+  :grouped-all-bigfoot-sightings-2
+  {:select [:county [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb8]],
+   :group-by [:county]},
+  :shape-drag-30
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:shape [[:count 1] :rowcnt] :country],
+      :from
+      [[{:select
+         [:city
+          :comments
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :id
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :ff796]]}
+        :ff970]],
+      :group-by [:shape :country],
+      :order-by [[:rowcnt :desc]]}
+     :gg418]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]},
+  :country-drag-37
+  {:select [:country [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ff796]]}
+     :ee625]],
+   :group-by [:country],
+   :order-by [[:rowcnt :desc]]},
+  :comments-drag-29
+  {:select [:comments [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ff796]]}
+     :ee496]],
+   :group-by [:comments],
+   :order-by [[:rowcnt :desc]]},
+  :query-preview-2039685970
+  {:select [[[:count 1] :rrows] :class],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:class]},
+  :new-clojure-1-sqlized
+  {:select [:*],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-08-31 18:42:16",
+   :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+   :_sqlized-hash nil,
+   :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]},
+  :grouped-all-bigfoot-sightings
+  {:select [:class [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb69]],
+   :group-by [:class]},
+  :query-preview1720799548
+  {:select [[[:count 1] :rrows] :class],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:class]},
+  :rowcnt-drag-35
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:shape [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :comments
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :id
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :ff796]]}
+        :nn704]],
+      :group-by [:shape],
+      :order-by [[:rowcnt :desc]]}
+     :yy271]]},
+  :grouped-all-bigfoot-sightings-1
+  {:select [:fixed_year [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb53]],
+   :group-by [:fixed_year]},
+  :ufo-sightings-drag-31
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :mm798]],
+   :_last-run "06:21:46"},
+  :grouped-all-bigfoot-sightings-3
+  {:select [:county [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb60]],
+   :group-by [:county]},
+  :query-preview-1073099381
+  {:select [[[:count 1] :rrows] :month],
+   :from
+   [[{:select
+      [:alsonoticed
+       :bfroid
+       :class
+       :county
+       :date
+       :environment
+       :fixed_month
+       :fixed_year
+       :locationdetails
+       :month
+       :nearestroad
+       :nearesttown
+       :observed
+       :otherstories
+       :otherwitnesses
+       :run_id
+       :run_time
+       :season
+       :sketch
+       :state
+       :submitted
+       :submitted_date
+       :timeandconditions
+       :title
+       :url
+       :year],
+      :from [[:bigfoot_sightings :ssb72]],
+      :where
+      [:*if
+       {:state
+        ["Alabama"
+         "Florida"
+         "Georgia"
+         "Illinois"
+         "Colorado"
+         "California"
+         "Arkansas"
+         "Kentucky"
+         "Maryland"]}
+       [:*all=
+        {:state
+         ["Alabama"
+          "Florida"
+          "Georgia"
+          "Illinois"
+          "Colorado"
+          "California"
+          "Arkansas"
+          "Kentucky"
+          "Maryland"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:month]},
+  :new-pivot-flat
+  {:select [:shape :country [[:count :id] :sightings] [[:count :*] :rowcnt]],
+   :connection-id "bigfoot-ufos",
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :mm798]]}
+     :agg45]],
+   :group-by [:shape :country]},
+  :country-drag-43
+  {:select [:country [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :mm798]]}
+     :kk88]],
+   :group-by [:country],
+   :order-by [[:rowcnt :desc]]},
+  :query1
+  {:select [:state [[:count 1] :rowcnt]],
+   :from [[:bigfoot_sightings :ctr2]],
+   :group-by [:state],
+   :order-by [[:state :asc]]}},
  :panels
- {:block-9201
-  {:queries
-   {:new-clojure-1-sqlized
-    {:select [:*],
-     :connection-id "cache.db",
-     :_sqlized-at "2024-08-31 18:42:16",
-     :_sqlized-by [:block-9201 :clojure :new-clojure-1],
-     :_sqlized-hash
-     :solver-meta/raw-custom-override1571289185>output>evald-result>value-hash,
-     :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]}}},
-  :block-4635
+ {:block-4635
   {:name "block-4635",
    :w 11,
    :selected-mode {:new-pivot :clover},
    :selected-view :new-pivot,
    :root [2 1],
-   :h 18,
+   :h 16,
    :pivot
    {:new-pivot
     {:rowset-keypath [:ufo-sightings-drag-31],
-     :row-keys [:country],
-     :column-keys [:shape :country],
-     :agg-specs [[:sightings :count 0 :id]],
+     :row-keys [:shape],
+     :column-keys [:country],
+     :agg-specs [[:sightings :count 2 :id]],
      :reaction-clover :solver-status/metadata>ufo-sightings-drag-31,
      :pivot-data-kw :new-pivot-pivot}},
-   :queries {},
+   :queries
+   {:new-pivot-flat
+    {:select [:shape :country [[:count :id] :sightings] [[:count :*] :rowcnt]],
+     :connection-id "bigfoot-ufos",
+     :from [[:query/ufo-sightings-drag-31 :agg45]],
+     :group-by [:shape :country]}},
    :tab "refreshing dinosaur",
    :views
    {:hare-vw-17
@@ -188,9 +2093,364 @@
       :font-family :theme/base-font}
      :child
      "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."]}},
+  :block-12316
+  {:leaf-drop [:filter :click-table],
+   :name "block-12316",
+   :w 6,
+   :selected-view :query1,
+   :root [25 11],
+   :h 12,
+   :drop-mutate
+   {[:panels :block-3266 :queries :all-bigfoot-sightings :where]
+    [:*if :query1/*.clicked [:*all= :query1/*.clicked [:state]] [:= 1 1]]},
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:query1
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:bigfoot_sightings :ctr2]],
+     :group-by [:state],
+     :order-by [[:state :asc]]}},
+   :tab "slate-gray spider"},
+  :block-8192
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:comments-drag-29
+    {:select [:comments [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-22 :ee496]],
+     :group-by [:comments],
+     :order-by [[:rowcnt :desc]]}},
+   :root [16 8],
+   :tab "crimson llama"},
+  :block-5946
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-4
+    {:select [:shape [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-22 :nn704]],
+     :group-by [:shape],
+     :order-by [[:rowcnt :desc]]}},
+   :root [24 8],
+   :tab "crimson llama"},
+  :block-4192
+  {:h 5,
+   :w 7,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:country-drag-37
+    {:select [:country [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-22 :ee625]],
+     :group-by [:country],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 13],
+   :tab "crimson llama"},
+  :block-9638
+  {:h 5,
+   :w 7,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-36
+    {:select [:shape [[:count 1] :rowcnt] :state],
+     :from [[:query/ufo-sightings-drag-22 :gg913]],
+     :group-by [:shape :state],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 8],
+   :tab "crimson llama",
+   :selected-view :shape-drag-36},
+  :block-2432
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:city-drag-15
+    {:select [:city [[:count 1] :rowcnt] :country :shape],
+     :from [[:query/ufo-sightings-drag-22 :ee271]],
+     :group-by [:city :country :shape],
+     :order-by [[:rowcnt :desc]]}},
+   :root [8 8],
+   :tab "crimson llama"},
+  :block-10949
+  {:h 4,
+   :w 6,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-30
+    {:select [:shape [[:count 1] :rowcnt]],
+     :from [[:query/shape-drag-26 :gg418]],
+     :group-by [:shape],
+     :order-by [[:rowcnt :desc]]}},
+   :root [30 1],
+   :tab "crimson llama"},
+  :block-100
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-100",
+   :w 6,
+   :selected-view :grouped-all-bigfoot-sightings-2,
+   :root [25 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:grouped-all-bigfoot-sightings-2
+    {:select [:county [[:count 1] :rowcnt]],
+     :from [[:query/all-bigfoot-sightings :ssb8]],
+     :group-by [:county]}},
+   :tab "slate-gray spider"},
+  :block-2623
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-2623",
+   :w 6,
+   :selected-view :grouped-all-bigfoot-sightings-1,
+   :root [19 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:grouped-all-bigfoot-sightings-1
+    {:select [:fixed_year [[:count 1] :rowcnt]],
+     :from [[:query/all-bigfoot-sightings :ssb53]],
+     :group-by [:fixed_year]}},
+   :tab "slate-gray spider"},
+  :block-5320
+  {:h 4,
+   :w 4,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-drag-from-select-all-ufo_sightings",
+   :queries
+   {:rowcnt-drag-21
+    {:select [[[:sum :rowcnt] :rowcnt_sum]],
+     :from [[:query/country-drag-43 :ss823]]}},
+   :root [26 14],
+   :tab "refreshing dinosaur"},
+  :block-9373
+  {:h 5,
+   :w 7,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-26
+    {:select [:shape [[:count 1] :rowcnt] :country],
+     :from [[:query/ufo-sightings-drag-22 :ff970]],
+     :group-by [:shape :country],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 18],
+   :tab "crimson llama"},
+  :block-299
+  {:shape-rotator
+   {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+    :shape-name :recharts-line,
+    :axes {:y "rrows", :x "month"}},
+   :name "rrows, month",
+   :w 18,
+   :selected-view :reech-3-1,
+   :root [1 16],
+   :h 7,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-947
+    {:select [[[:count 1] :rrows] :month],
+     :from [[:query/all-bigfoot-sightings :subq1]],
+     :group-by [:month]}},
+   :tab "slate-gray spider",
+   :views
+   {:reech-3-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-947,
+        :dataKey :rrows,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-947,
+        :dataKey :rrows,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-299},
+  :block-930
+  {:mad-libs-combo-hash ["312959235" "ufo_sightings_drag_22"],
+   :name "recharts_h_bar - \"class, rrows\" - 799",
+   :w 9,
+   :selected-view :reech,
+   :root [10 11],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-960
+    {:select [[[[:count 1]] :rrows] :class],
+     :from [[:query/all-bigfoot-sightings :jj102]],
+     :group-by [:class]}},
+   :tab "slate-gray spider",
+   :conditionals nil,
+   :views
+   {:reech
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :rrows,
+        :isAnimationActive false,
+        :data :gen-viz-960,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]}},
+  :block-10353
+  {:name "crosstab pivot for ufo-sightings-drag-31",
+   :w 9,
+   :root [14 8],
+   :h 5,
+   :drop-mutate nil,
+   :pivot
+   {:crosstab-1
+    {:rowset-keypath [:ufo-sightings-drag-31],
+     :rowset-query [:query/ufo-sightings-drag-31],
+     :row-keys [:country],
+     :column-keys [:state],
+     :agg-specs [],
+     :reaction-clover :solver-status/metadata>ufo-sightings-drag-31,
+     :pivot-data-kw :crosstab-1-pivot}},
+   :queries
+   {:crosstab-1-flat
+    {:select [:country :state [[:count :*] :rowcnt]],
+     :connection-id "bigfoot-ufos",
+     :from [[:query/ufo-sightings-drag-31 :agg45]],
+     :group-by [:country :state]}},
+   :tab "refreshing dinosaur",
+   :bid nil},
+  :block-9942
+  {:clojure
+   {:new-clojure
+    (let [clojure-version (clojure-version)
+          jvm-version (System/getProperty "java.version")]
+      (str
+        "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+        clojure-version
+        " on "
+        jvm-version
+        " JVM tech"
+        " 🥕🐇"))},
+   :name "block-9942",
+   :w 5,
+   :selected-view :new-clojure,
+   :root [34 17],
+   :h 4,
+   :queries {},
+   :tab "crimson llama",
+   :views
+   {:hare-vw-2
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "The world is full of obvious things which nobody by any chance ever observes."]}},
+  :block-11189
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-11189",
+   :w 6,
+   :selected-view :agg-grouped-all-bigfoot-sightings-3,
+   :root [19 19],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:agg-grouped-all-bigfoot-sightings-3
+    {:select [[[:sum :rowcnt] :rowcnt]],
+     :from [[:query/grouped-all-bigfoot-sightings-3 :ssb47]]}},
+   :tab "slate-gray spider"},
+  :block-9201
+  {:queries
+   {:new-clojure-1-sqlized
+    {:select [:*],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-08-31 18:42:16",
+     :_sqlized-by [:block-9201 :clojure :new-clojure-1],
+     :_sqlized-hash
+     :solver-meta/raw-custom-override1571289185>output>evald-result>value-hash,
+     :from [:raw_custom_override1571289185__block_9201_clojure_new_clojure_1_]}}},
+  :block-3286
+  {:name "views-block-3286",
+   :w 25,
+   :selected-mode {:clover-hop :edn},
+   :z 3,
+   :selected-view :clover-hop,
+   :root [9 4],
+   :h 22,
+   :opts {:clover-hop {}},
+   :tab "crimson llama",
+   :minimized? false,
+   :views {:clover-hop [:app-db [:click-param :leaf]]}},
+  :block-3366
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:country-drag-43
+    {:select [:country [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-31 :kk88]],
+     :group-by [:country],
+     :order-by [[:rowcnt :desc]]}},
+   :root [26 9],
+   :tab "refreshing dinosaur"},
+  :block-7530
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-7530",
+   :w 6,
+   :selected-view :countd-grouped-all-bigfoot-sightings,
+   :root [13 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:countd-grouped-all-bigfoot-sightings
+    {:select [[[:count [:distinct :class]] :class]],
+     :from [[:query/grouped-all-bigfoot-sightings :ssb30]]}},
+   :tab "slate-gray spider"},
   :block-4795
   {:h 7,
-   :w 29,
+   :w 23,
    :connection-id "bigfoot-ufos",
    :name "select-all-ufo_sightings",
    :queries
@@ -213,6 +2473,200 @@
      :_last-run "06:21:46"}},
    :root [14 0],
    :tab "refreshing dinosaur"},
+  :block-2994
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-2994",
+   :w 6,
+   :selected-view :grouped-all-bigfoot-sightings-3,
+   :root [19 15],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:grouped-all-bigfoot-sightings-3
+    {:select [:county [[:count 1] :rowcnt]],
+     :from [[:query/all-bigfoot-sightings :ssb60]],
+     :group-by [:county]}},
+   :tab "slate-gray spider"},
+  :block-7179
+  {:h 7,
+   :w 29,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-ufo_sightings",
+   :queries
+   {:ufo-sightings-drag-22
+    {:select
+     [:city
+      :comments
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :id
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :ff796]],
+     :_last-run "00:31:47"}},
+   :root [1 1],
+   :tab "crimson llama",
+   :selected-view :ufo-sightings-drag-22},
+  :block-8506
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-8506",
+   :w 6,
+   :selected-view :grouped-all-bigfoot-sightings,
+   :root [1 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:grouped-all-bigfoot-sightings
+    {:select [:class [[:count 1] :rowcnt]],
+     :from [[:query/all-bigfoot-sightings :ssb69]],
+     :group-by [:class]}},
+   :tab "slate-gray spider"},
+  :block-10012
+  {:h 5,
+   :w 4,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-drag-from-drag-from-select-all-ufo_sightings",
+   :queries
+   {:rowcnt-drag-8
+    {:select [[[:sum :rowcnt] :rowcnt_sum]],
+     :from [[:query/shape-drag-30 :qq730]]}},
+   :root [32 8],
+   :tab "crimson llama"},
+  :block-828
+  {:h 4,
+   :w 4,
+   :root [34 13],
+   :tab "crimson llama",
+   :selected-view :hare-vw-1,
+   :name "block-828",
+   :views
+   {:hare-vw-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:str :leaf/*client-name*>debug>dragging-kp]]},
+   :queries {}},
+  :block-1760
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-1760",
+   :w 6,
+   :selected-view :countd-all-bigfoot-sightings,
+   :root [19 11],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:countd-all-bigfoot-sightings
+    {:select [[[:count [:distinct :environment]] :environment]],
+     :from [[:query/all-bigfoot-sightings :ssb46]]}},
+   :tab "slate-gray spider"},
+  :block-5602
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-5602",
+   :w 6,
+   :selected-view :agg-grouped-all-bigfoot-sightings,
+   :root [7 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:agg-grouped-all-bigfoot-sightings
+    {:select [[[:sum :rowcnt] :rowcnt]],
+     :from [[:query/grouped-all-bigfoot-sightings :ssb86]]}},
+   :tab "slate-gray spider"},
+  :block-3266
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-3266",
+   :w 30,
+   :selected-view :all-bigfoot-sightings,
+   :root [1 1],
+   :h 6,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:all-bigfoot-sightings
+    {:select
+     [:alsonoticed
+      :bfroid
+      :class
+      :county
+      :date
+      :environment
+      :fixed_month
+      :fixed_year
+      :locationdetails
+      :month
+      :nearestroad
+      :nearesttown
+      :observed
+      :otherstories
+      :otherwitnesses
+      :run_id
+      :run_time
+      :season
+      :sketch
+      :state
+      :submitted
+      :submitted_date
+      :timeandconditions
+      :title
+      :url
+      :year],
+     :from [[:bigfoot_sightings :ssb72]],
+     :where [:*if :query1/*.clicked [:*all= :query1/*.clicked [:state]] [:= 1 1]]}},
+   :tab "slate-gray spider"},
+  :block-532
+  {:mad-libs-combo-hash ["207266341" "ufo_sightings_drag_22"],
+   :name "recharts_h_bar - \"county, rrows\" - 1120",
+   :w 9,
+   :selected-view :reech,
+   :root [1 11],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-985
+    {:select [[[[:count 1]] :rrows] :county],
+     :from [[:query/all-bigfoot-sightings :uu215]],
+     :group-by [:county]}},
+   :tab "slate-gray spider",
+   :conditionals nil,
+   :views
+   {:reech
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :county, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :rrows,
+        :isAnimationActive false,
+        :data :gen-viz-985,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]}},
   :block-7312
   {:h 4,
    :w 5,
@@ -238,35 +2692,20 @@
      :child
      [:str :solver-status/metadata>ufo-sightings-drag-31]]},
    :queries {}},
-  :block-3366
-  {:h 5,
-   :w 8,
-   :connection-id "bigfoot-ufos",
-   :name "drag-from-select-all-ufo_sightings",
-   :queries
-   {:country-drag-43
-    {:select [:country [[:count 1] :rowcnt]],
-     :from [[:query/ufo-sightings-drag-31 :kk88]],
-     :group-by [:country],
-     :order-by [[:rowcnt :desc]]}},
-   :root [26 9],
-   :tab "refreshing dinosaur"},
-  :block-5320
-  {:h 4,
-   :w 4,
+  :block-1437
+  {:h 3,
+   :w 6,
    :connection-id "bigfoot-ufos",
    :name "drag-from-drag-from-select-all-ufo_sightings",
    :queries
-   {:rowcnt-drag-21
-    {:select [[[:sum :rowcnt] :rowcnt_sum]],
-     :from [[:query/country-drag-43 :ss823]]}},
-   :root [26 14],
-   :tab "refreshing dinosaur"},
-  nil {:queries {nil {:_last-run "08:27:14"}}}},
+   {:rowcnt-drag-35
+    {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/shape-drag-4 :yy271]]}},
+   :root [30 5],
+   :tab "crimson llama"}},
  :materialized-theme
  {:codemirror-theme "rvbbit-dynamic",
   :editor-param-background-color "#000000",
-  :pop-2 "#7ea9c6",
+  :pop-2 "#5f1f51",
   :base-block-style
   {:border-radius "20px 20px 20px 20px",
    :backdrop-filter "blur(2px) brightness(32%) "},
@@ -372,8 +2811,8 @@
   :block-tab-selected-font-color "#c9d1ff",
   :editor-background-color "#000006",
   :editor-grid-font-color "#ffffff",
-  :pop-1 "#b9b3d1"},
- :selected-block :block-4635,
+  :pop-1 "#c44c8e"},
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#E7EBC4",
   "boolean" "#46436C",
@@ -400,6 +2839,7 @@
    :input_types "[:string]",
    :output_types ":string",
    :category ":clojure-base"},
+  :block-4635 {:click-matrix nil},
   :blocks-sys
   {:block_key ":*theme*",
    :block_name "(meta: this screen's theme)",
@@ -415,8 +2855,9 @@
    :db_catalog nil,
    :connection_id "bigfoot-ufos",
    :schema_cat nil,
-   :table_name "ufo_sightings",
-   :fields 14},
+   :table_name "bigfoot_sightings",
+   :fields 27},
+  :all-bigfoot-sightings nil,
   :flows-sys
   {:flow_id "node-color-thief-js-webp",
    :file_path "./flows/node-color-thief-js-webp.edn",
@@ -429,7 +2870,7 @@
    :ts "2024-10-08 06:32:56"},
   :chat-drag-23 {},
   :offenses-drag-17 {:SHOOTING nil},
-  :viz-tables-sys2 {:table_name :OFFENSE-CODE-GROUP-drag-40},
+  :viz-tables-sys2 {:table_name :ufo-sightings-drag-22},
   :searches-types-sys {:item_type "incoming"},
   :searches-rows-sys
   {:item_sub_type "",
@@ -446,18 +2887,12 @@
   {:nutritious-periwinkle-sheep "hello from a data board!",
    :float 324.444,
    :string "this is string",
-   :selected-view-data
-   {:rowset-keypath [:ufo-sightings-drag-31],
-    :row-keys [:country],
-    :column-keys [:shape],
-    :agg-specs [[:sightings :count 2 :id]],
-    :reaction-clover :solver-status/metadata>ufo-sightings-drag-31,
-    :pivot-data-kw :new-pivot-pivot},
-   :selected-view [:pivot :new-pivot],
+   :selected-view-data nil,
+   :selected-view nil,
    :keys 123,
    :bools true,
    :keys2 [3 4 5],
-   :selected-block :block-4635},
+   :selected-block :block-3266},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -574,11 +3009,3214 @@
    :connection_id "bigfoot-ufos",
    :styler_highlight_8717ssa 0},
   :narratives {},
-  :sys {:selected-tab "refreshing dinosaur", :selected-tab-idx 0},
+  :sys {:selected-tab "slate-gray spider", :selected-tab-idx 2},
+  :grouped-all-bigfoot-sightings {:class "Class B", :rowcnt 2519},
   :searches-sub-types-sys
   {:item_key "farts", :is_live 0, :items 1, :styler_highlight_4018a 0},
   :kits-sys
   {:enabled
    [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]},
-  :ufo-sightings-drag-31 nil},
- :selected-flow "my-new-flow5108"}
+  :ufo-sightings-drag-31 nil,
+  :query1.*
+  {:state
+   ["Alabama"
+    "Florida"
+    "Georgia"
+    "Illinois"
+    "Colorado"
+    "California"
+    "Arkansas"
+    "Kentucky"
+    "Maryland"]}},
+ :selected-flow "my-new-flow1042",
+ :shapes
+ {nil
+  {:bigfoot_sightings
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :season, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "bigfoot_sightings"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows", :x "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :season],
+       :from [[:query/bigfoot_sightings :subq1]],
+       :group-by [:season]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :season, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "bigfoot_sightings"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows", :x "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :season],
+       :from [[:query/bigfoot_sightings :subq1]],
+       :group-by [:season]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :season, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "bigfoot_sightings"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows", :x "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :season],
+       :from [[:query/bigfoot_sightings :subq1]],
+       :group-by [:season]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "bigfoot_sightings"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows", :segment "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[:season :segment] [[:count 1] :value]],
+       :from [[:query/bigfoot_sightings :subq1]],
+       :group-by [:season]}}}]},
+  [:block-3266 :queries :all-bigfoot-sightings :field :state] [],
+  :block-12316
+  {:query1
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "query1"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/query1 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "query1"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/query1 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "query1"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/query1 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "query1"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/query1 :subq1]],
+       :group-by [:segment-field]}}}]},
+  :block-100
+  {:grouped-all-bigfoot-sightings-2
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-2"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-2 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-2"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-2 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-2"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-2 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-2"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/grouped-all-bigfoot-sightings-2 :subq1]],
+       :group-by [:segment-field]}}}]},
+  :block-2623
+  {:grouped-all-bigfoot-sightings-1
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-1"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-1 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-1"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-1 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-1"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-1 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-1"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/grouped-all-bigfoot-sightings-1 :subq1]],
+       :group-by [:segment-field]}}}]},
+  :block-299
+  {:gen-viz-947
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-947"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows", :x "month"}},
+     :name "rrows, month",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :month],
+       :from [[:query/gen-viz-947 :subq1]],
+       :group-by [:month]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-947"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows", :x "month"}},
+     :name "rrows, month",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :month],
+       :from [[:query/gen-viz-947 :subq1]],
+       :group-by [:month]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-947"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows", :x "month"}},
+     :name "rrows, month",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :month],
+       :from [[:query/gen-viz-947 :subq1]],
+       :group-by [:month]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-947"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows", :segment "month"}},
+     :name "rrows, month",
+     :queries
+     {:query-preview
+      {:select [[:month :segment] [[:count 1] :value]],
+       :from [[:query/gen-viz-947 :subq1]],
+       :group-by [:month]}}}]},
+  :block-930
+  {:gen-viz-960
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-960"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows", :x "class"}},
+     :name "rrows, class",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :class],
+       :from [[:query/gen-viz-960 :subq1]],
+       :group-by [:class]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-960"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows", :x "class"}},
+     :name "rrows, class",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :class],
+       :from [[:query/gen-viz-960 :subq1]],
+       :group-by [:class]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-960"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows", :x "class"}},
+     :name "rrows, class",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :class],
+       :from [[:query/gen-viz-960 :subq1]],
+       :group-by [:class]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-960"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows", :segment "class"}},
+     :name "rrows, class",
+     :queries
+     {:query-preview
+      {:select [[:class :segment] [[:count 1] :value]],
+       :from [[:query/gen-viz-960 :subq1]],
+       :group-by [:class]}}}]},
+  :block-11189
+  {:agg-grouped-all-bigfoot-sightings-3
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/agg-grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/agg-grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/agg-grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/agg-grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:segment-field]}}}]},
+  [:block-3266 :queries :all-bigfoot-sightings :field :county] [],
+  :block-7530
+  {:countd-grouped-all-bigfoot-sightings
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :class,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "class"}},
+     :name "class",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :class]] :class] :x-field],
+       :from [[:query/countd-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :class,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :class,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-line,
+      :axes {:y "class"}},
+     :name "class",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :class]] :class] :x-field],
+       :from [[:query/countd-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :class,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :class,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-area,
+      :axes {:y "class"}},
+     :name "class",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :class]] :class] :x-field],
+       :from [[:query/countd-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-pie,
+      :axes {:value "class"}},
+     :name "class",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :class] :value]],
+       :from [[:query/countd-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:segment-field]}}}]},
+  [:block-2994 :queries :grouped-all-bigfoot-sightings-3 :field :rowcnt]
+  [{:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+       [:>
+        :Bar
+        {:dataKey :rowcnt,
+         :isAnimationActive false,
+         :data :query-preview,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+     :shape-name :recharts-h-bar,
+     :axes {:y "rowcnt"}},
+    :name "rowcnt",
+    :queries
+    {:query-preview
+     {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+      :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+      :group-by [:x-field]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+       [:>
+        :Line
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rowcnt,
+         :stroke :theme/editor-outer-rim-color,
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :dataKey :rowcnt,
+         :isAnimationActive false,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+     :shape-name :recharts-line,
+     :axes {:y "rowcnt"}},
+    :name "rowcnt",
+    :queries
+    {:query-preview
+     {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+      :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+      :group-by [:x-field]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+       [:>
+        :Area
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rowcnt,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :isAnimationActive false,
+         :dataKey :rowcnt,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+     :shape-name :recharts-area,
+     :axes {:y "rowcnt"}},
+    :name "rowcnt",
+    :queries
+    {:query-preview
+     {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+      :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+      :group-by [:x-field]}}}
+   {:h 5,
+    :w 5,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :PieChart
+       {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+       [:>
+        :Pie
+        {:stroke :theme/editor-outer-rim-color,
+         :nameKey :segment,
+         :innerRadius :quarter-panel-width,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>],
+         :outerRadius 80,
+         :dataKey :value,
+         :label true,
+         :isAnimationActive false,
+         :data :query-preview}]
+       [:> :Legend {}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+     :shape-name :recharts-pie,
+     :axes {:value "rowcnt"}},
+    :name "rowcnt",
+    :queries
+    {:query-preview
+     {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+      :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+      :group-by [:segment-field]}}}],
+  :block-2994
+  {:grouped-all-bigfoot-sightings-3
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings-3"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/grouped-all-bigfoot-sightings-3 :subq1]],
+       :group-by [:segment-field]}}}]},
+  :block-8506
+  {:grouped-all-bigfoot-sightings
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt", :x "class"}},
+     :name "rowcnt, class",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :class],
+       :from [[:query/grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:class]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt", :x "class"}},
+     :name "rowcnt, class",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :class],
+       :from [[:query/grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:class]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt", :x "class"}},
+     :name "rowcnt, class",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :class],
+       :from [[:query/grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:class]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt", :segment "class"}},
+     :name "rowcnt, class",
+     :queries
+     {:query-preview
+      {:select [[:class :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:class]}}}]},
+  :block-2412
+  {:all-all-bigfoot-sightings-5
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :url, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-all-bigfoot-sightings-5"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows", :x "url"}},
+     :name "rrows, url",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :url],
+       :from [[:query/all-all-bigfoot-sightings-5 :subq1]],
+       :group-by [:url]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :url, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-all-bigfoot-sightings-5"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows", :x "url"}},
+     :name "rrows, url",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :url],
+       :from [[:query/all-all-bigfoot-sightings-5 :subq1]],
+       :group-by [:url]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :url, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-all-bigfoot-sightings-5"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows", :x "url"}},
+     :name "rrows, url",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :url],
+       :from [[:query/all-all-bigfoot-sightings-5 :subq1]],
+       :group-by [:url]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-all-bigfoot-sightings-5"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows", :segment "url"}},
+     :name "rrows, url",
+     :queries
+     {:query-preview
+      {:select [[:url :segment] [[:count 1] :value]],
+       :from [[:query/all-all-bigfoot-sightings-5 :subq1]],
+       :group-by [:url]}}}]},
+  :block-1760
+  {:countd-all-bigfoot-sightings
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-all-bigfoot-sightings"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :x-field],
+       :from [[:query/countd-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-all-bigfoot-sightings"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :x-field],
+       :from [[:query/countd-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-all-bigfoot-sightings"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :x-field],
+       :from [[:query/countd-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "countd-all-bigfoot-sightings"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:count 1] :value]],
+       :from [[:query/countd-all-bigfoot-sightings :subq1]],
+       :group-by [:segment-field]}}}]},
+  :block-5602
+  {:agg-grouped-all-bigfoot-sightings
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rowcnt,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/agg-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rowcnt,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-line,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/agg-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rowcnt,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rowcnt,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-area,
+      :axes {:y "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[[[:sum :rowcnt]] :rowcnt] :x-field],
+       :from [[:query/agg-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "agg-grouped-all-bigfoot-sightings"],
+      :shape-name :recharts-pie,
+      :axes {:value "rowcnt"}},
+     :name "rowcnt",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:sum :rowcnt] :value]],
+       :from [[:query/agg-grouped-all-bigfoot-sightings :subq1]],
+       :group-by [:segment-field]}}}]},
+  :block-3266
+  {:all-bigfoot-sightings
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :season, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows", :x "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :season],
+       :from [[:query/all-bigfoot-sightings :subq1]],
+       :group-by [:season]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :season, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows", :x "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :season],
+       :from [[:query/all-bigfoot-sightings :subq1]],
+       :group-by [:season]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :season, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows", :x "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :season],
+       :from [[:query/all-bigfoot-sightings :subq1]],
+       :group-by [:season]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows", :segment "season"}},
+     :name "rrows, season",
+     :queries
+     {:query-preview
+      {:select [[:season :segment] [[:count 1] :value]],
+       :from [[:query/all-bigfoot-sightings :subq1]],
+       :group-by [:season]}}}]},
+  :block-532
+  {:gen-viz-985
+   [{:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Bar
+         {:dataKey :rrows,
+          :isAnimationActive false,
+          :data :query-preview,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-985"],
+      :shape-name :recharts-h-bar,
+      :axes {:y "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :x-field],
+       :from [[:query/gen-viz-985 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Line
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :dataKey :rrows,
+          :isAnimationActive false,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-985"],
+      :shape-name :recharts-line,
+      :axes {:y "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :x-field],
+       :from [[:query/gen-viz-985 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 9,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]
+        [:> :XAxis {:dataKey :x-field, :allowDuplicatedCategory false}]
+        [:>
+         :Area
+         {:type "monotone",
+          :isAnimationActive false,
+          :data :query-preview,
+          :dataKey :rrows,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :activeDot {:r 8}}]
+        [:>
+         :Scatter
+         {:data :query-preview,
+          :isAnimationActive false,
+          :dataKey :rrows,
+          :fill :theme/editor-outer-rim-color,
+          :onClick [:set-recharts-param>]}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-985"],
+      :shape-name :recharts-area,
+      :axes {:y "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[[:count 1] :rrows] :x-field],
+       :from [[:query/gen-viz-985 :subq1]],
+       :group-by [:x-field]}}}
+    {:h 5,
+     :w 5,
+     :selected-view :reech,
+     :views
+     {:reech
+      [:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :PieChart
+        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+        [:>
+         :Pie
+         {:stroke :theme/editor-outer-rim-color,
+          :nameKey :segment,
+          :innerRadius :quarter-panel-width,
+          :fill [:str :theme/editor-outer-rim-color "33"],
+          :on-click [:set-recharts-param>],
+          :outerRadius 80,
+          :dataKey :value,
+          :label true,
+          :isAnimationActive false,
+          :data :query-preview}]
+        [:> :Legend {}]
+        [:>
+         :Tooltip
+         {:contentStyle {:backgroundColor "#00000099", :border "none"},
+          :itemStyle {:color "#ecf0f1"},
+          :labelStyle {:color "#3498db"}}]]]},
+     :connection-id "bigfoot-ufos",
+     :shape-rotator
+     {:context ["bigfoot-ufos" nil nil "gen-viz-985"],
+      :shape-name :recharts-pie,
+      :axes {:value "rrows"}},
+     :name "rrows",
+     :queries
+     {:query-preview
+      {:select [[:segment-field :segment] [[:count 1] :value]],
+       :from [[:query/gen-viz-985 :subq1]],
+       :group-by [:segment-field]}}}]},
+  [:block-3266 :queries :all-bigfoot-sightings :field :class]
+  [{:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+       [:>
+        :Bar
+        {:dataKey :rrows,
+         :isAnimationActive false,
+         :data :query-preview,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-h-bar,
+     :axes {:y "rrows", :x "class"}},
+    :name "rrows, class",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :class],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:class]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+       [:>
+        :Line
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :dataKey :rrows,
+         :isAnimationActive false,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-line,
+     :axes {:y "rrows", :x "class"}},
+    :name "rrows, class",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :class],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:class]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :class, :allowDuplicatedCategory false}]
+       [:>
+        :Area
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :isAnimationActive false,
+         :dataKey :rrows,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-area,
+     :axes {:y "rrows", :x "class"}},
+    :name "rrows, class",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :class],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:class]}}}
+   {:h 5,
+    :w 5,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :PieChart
+       {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+       [:>
+        :Pie
+        {:stroke :theme/editor-outer-rim-color,
+         :nameKey :segment,
+         :innerRadius :quarter-panel-width,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>],
+         :outerRadius 80,
+         :dataKey :value,
+         :label true,
+         :isAnimationActive false,
+         :data :query-preview}]
+       [:> :Legend {}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-pie,
+     :axes {:value "rrows", :segment "class"}},
+    :name "rrows, class",
+    :queries
+    {:query-preview
+     {:select [[:class :segment] [[:count 1] :value]],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:class]}}}],
+  [:block-3266 :queries :all-bigfoot-sightings :field :month]
+  [{:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+       [:>
+        :Bar
+        {:dataKey :rrows,
+         :isAnimationActive false,
+         :data :query-preview,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-h-bar,
+     :axes {:y "rrows", :x "month"}},
+    :name "rrows, month",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :month],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:month]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+       [:>
+        :Line
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :dataKey :rrows,
+         :isAnimationActive false,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-line,
+     :axes {:y "rrows", :x "month"}},
+    :name "rrows, month",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :month],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:month]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :month, :allowDuplicatedCategory false}]
+       [:>
+        :Area
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :isAnimationActive false,
+         :dataKey :rrows,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-area,
+     :axes {:y "rrows", :x "month"}},
+    :name "rrows, month",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :month],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:month]}}}
+   {:h 5,
+    :w 5,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :PieChart
+       {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+       [:>
+        :Pie
+        {:stroke :theme/editor-outer-rim-color,
+         :nameKey :segment,
+         :innerRadius :quarter-panel-width,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>],
+         :outerRadius 80,
+         :dataKey :value,
+         :label true,
+         :isAnimationActive false,
+         :data :query-preview}]
+       [:> :Legend {}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-pie,
+     :axes {:value "rrows", :segment "month"}},
+    :name "rrows, month",
+    :queries
+    {:query-preview
+     {:select [[:month :segment] [[:count 1] :value]],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:month]}}}],
+  [:block-3266 :queries :all-bigfoot-sightings :field :fixed_month]
+  [{:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :fixed_month, :allowDuplicatedCategory false}]
+       [:>
+        :Bar
+        {:dataKey :rrows,
+         :isAnimationActive false,
+         :data :query-preview,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-h-bar,
+     :axes {:y "rrows", :x "fixed_month"}},
+    :name "rrows, fixed_month",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :fixed_month],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:fixed_month]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :fixed_month, :allowDuplicatedCategory false}]
+       [:>
+        :Line
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :dataKey :rrows,
+         :isAnimationActive false,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-line,
+     :axes {:y "rrows", :x "fixed_month"}},
+    :name "rrows, fixed_month",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :fixed_month],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:fixed_month]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]
+       [:> :XAxis {:dataKey :fixed_month, :allowDuplicatedCategory false}]
+       [:>
+        :Area
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :isAnimationActive false,
+         :dataKey :rrows,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-area,
+     :axes {:y "rrows", :x "fixed_month"}},
+    :name "rrows, fixed_month",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :fixed_month],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:fixed_month]}}}
+   {:h 5,
+    :w 5,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
+      [:>
+       :PieChart
+       {:margin {:top 20, :right 20, :bottom 20, :left 20}}
+       [:>
+        :Pie
+        {:stroke :theme/editor-outer-rim-color,
+         :nameKey :segment,
+         :innerRadius :quarter-panel-width,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>],
+         :outerRadius 80,
+         :dataKey :value,
+         :label true,
+         :isAnimationActive false,
+         :data :query-preview}]
+       [:> :Legend {}]
+       [:>
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color "#3498db"}}]]]},
+    :connection-id "bigfoot-ufos",
+    :shape-rotator
+    {:context ["bigfoot-ufos" nil nil "all-bigfoot-sightings"],
+     :shape-name :recharts-pie,
+     :axes {:value "rrows", :segment "fixed_month"}},
+    :name "rrows, fixed_month",
+    :queries
+    {:query-preview
+     {:select [[:fixed_month :segment] [[:count 1] :value]],
+      :from [[:query/all-bigfoot-sightings :subq1]],
+      :group-by [:fixed_month]}}}]}}

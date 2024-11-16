@@ -1,23 +1,58 @@
 (ns rvbbit-frontend.db
   (:require
-    [reagent.core :as reagent]))
+   [reagent.core :as reagent]
+   [talltale.core     :as tales]
+   [clojure.string :as cstr]))
+
+(defn gen-client-name []
+  (let [names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal)]]
+    (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (def brick-size 50)
-(def version "0.1.7-alpha")
+(def version "0.2.0-alpha")
 (def version-date "10/2024")
 
-(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data :incoming :solver-status :ai-worker 
+(defonce client-name (gen-client-name))
+
+(def rabbit-search-input (reagent/atom nil))
+(def clover-leaf-previews (reagent/atom {}))
+(def sockets [:query1 :query2 :query3])
+(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data :incoming :solver-status :ai-worker :clover-gen :leaf :actions
                      :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
+
+(def drag-body-map (atom {}))
+
+(def honey-comb-cache (atom {}))
+(def clicked-parameter-key-cache (atom {}))
+(def theme-pull-cache (atom {}))
+(def data-colors-cache (atom {}))
+(def runner-crosswalk-map-cache (atom {}))
+(def view-type-cache (atom {}))
+
+(def temp-viz-reco-panel-keys (reagent/atom {}))
 
 (def bar-hover-text (reagent/atom nil))
 (def console-voice-text (reagent/atom nil))
 (def macro-undo? (reagent/atom false))
 (defonce seq-atom (atom 0))
 (def show-overlay (reagent/atom true))
+(defonce dragged-kp (atom [:canvas :canvas :canvas]))
+(defonce last-modal-viz-field (reagent/atom nil))
+
+(defonce fresh-spawn-modal? (reagent/atom false))
+(defonce drop-spawn-modal? (reagent/atom false))
+(defonce drop-spawn-package (reagent/atom {}))
+
+(defonce clover-cache-atom (reagent/atom {}))
+(defonce rel-kw-cache-atom (atom {}))
+
+(def canvas-scale (reagent/atom 0.7))
+;; (defn svg-scale [] (str "scale(" @canvas-scale ") translate(0%, " (* (* @canvas-scale 10) -1) ")"))
+;; "scale(0.5) translate(0%, -50%)"
 
 (def hide-annotate? (reagent/atom false))
 
-(def running-queries (atom #{})) 
+(def running-queries (atom #{}))
 
 (defonce chat-audio-text (reagent/atom nil))
 (defonce chat-image (reagent/atom nil))
@@ -27,7 +62,7 @@
 (def param-v-boxes (reagent/atom nil))
 (def solver-view-mode (reagent/atom "return value"))
 (def signals-searcher-atom (reagent/atom nil))
-(def params-or-meta-atom (reagent/atom :params)) 
+(def params-or-meta-atom (reagent/atom :params))
 ;; (def running-deep-meta-on (reagent/atom []))
 
 (defonce cm-instance-runstream-code-box (atom {}))
@@ -51,7 +86,7 @@
 
 (defonce cm-focused? (reagent/atom false))
 (defonce last-focused (reagent/atom nil))
-(defonce  kit-run-ids (atom {}))  
+(defonce  kit-run-ids (atom {}))
 
 (defonce unsafe-keys (atom #{}))
 
@@ -62,6 +97,8 @@
 ;;(defonce incidental-rowsets (atom []))
 
 (def virtualized-debug-msg (reagent/atom {}))
+
+(defonce shape-rotator (reagent/atom {}))
 
 (defonce value-spy (reagent/atom {}))
 (defonce value-spy-hashes (reagent/atom {}))
@@ -75,8 +112,8 @@
 
 (def param-code-hover (atom nil))
 
-(defonce solver-fn-runs (atom {}))    
-(defonce solver-fn-lookup (atom {}))           
+(defonce solver-fn-runs (atom {}))
+(defonce solver-fn-lookup (atom {}))
 (defonce kit-fn-lookup (atom {}))
 ;(def solver-fn-lookup-vec (atom {}))
 
@@ -118,7 +155,7 @@
 
 (defonce active-flow-scrubbers (reagent/atom {}))
 (defonce scrubbers (reagent/atom {}))
-(defonce honeycomb-builder (reagent/atom {}))  
+(defonce honeycomb-builder (reagent/atom {}))
 (defonce data-browser-query (reagent/atom {}))
 (defonce data-browser-query-con (reagent/atom {}))
 (defonce kit-browser (reagent/atom {}))

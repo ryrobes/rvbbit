@@ -19,7 +19,7 @@
    [reagent.core      :as reagent]
    [talltale.core     :as tales]
    [rvbbit-frontend.db :as db]
-   [talltale.core     :as tales]
+
    [goog.date :as gdate]
    [zprint.core       :as zp]
    [goog.string       :as gstring]
@@ -33,6 +33,15 @@
 (defonce allowed-set #{:_id :_valid_from :_valid_to}) ;; allowed underscore keys - mostly for temporal SQL fields like in XTDB
 
 (defn apply-assoc-ins [target-map kv-map] (reduce (fn [acc [k v]] (assoc-in acc k v)) target-map kv-map))
+
+(defn n-k [x] (keyword (cstr/replace (str x) ":" "")))
+
+(defn n- [x] (cstr/replace (str x) ":" ""))
+
+(defn strip-hex-alpha [full-color]
+  (if (> (count full-color) 7)
+    (subs full-color 0 7)
+    full-color))
 
 (re-frame/reg-sub ;; for benchmarks
  ::client-name
@@ -69,7 +78,7 @@
 
 (defn tapp>>
   [data] ;; doubletap!
-  ;;(re-frame/dispatch [::write-tap-to-db data]) 
+  ;;(re-frame/dispatch [::write-tap-to-db data])
   (js/console.info (clj->js (stringify-keywords data))))
 
 (defn pp [data] ;; to stay consistent with the CLJ side
@@ -79,6 +88,8 @@
 
 (def t> tapp>>)
 
+(def walk-map-sizes-cache (atom {}))
+
 (def map-boxes-cache (atom {}))
 (def map-boxes-cache-hits (atom {}))
 (declare tracked-sub)
@@ -86,9 +97,9 @@
 
 (def first-connect-nrepl (atom {}))
 
-(re-frame/reg-sub 
- ::runner-icon 
- (fn [db {:keys [rtype]}] 
+(re-frame/reg-sub
+ ::runner-icon
+ (fn [db {:keys [rtype]}]
    (get-in db [:server :settings :runners rtype :icon] "zmdi-pizza")))
 
 (re-frame/reg-sub
@@ -127,7 +138,7 @@
                 [:v-box
                  :children [[:h-box
                              :gap "7px"
-                             
+
                              :children [[:box
                                          :style {:opacity 0.55}
                                          :child (str "Connected to named nREPL ")]
@@ -137,7 +148,7 @@
                              ]
                             [:box
                              :child (str (get nrepl-details :host) ":" (get nrepl-details :port))
-                             :style {;:font-size "12px" 
+                             :style {;:font-size "12px"
                                      :font-weight 700
                                      :opacity 0.8}]]]]]))
 
@@ -161,14 +172,14 @@
                              :children [[:box
                                          :style {:opacity 0.55}
                                          :child "running"]
-                                        [:box 
+                                        [:box
                                          :child (str (cstr/join " " (rest fkp)) " " rtype)]]
                              :style {:font-size "14px"}]
                             (when (ne? clover-kps)
                               [:box :child (if (> (count (str clover-kps)) string-limit)
                                              (str (subs (str clover-kps) 0 string-limit) "...") (str clover-kps))
                                :style {:font-size "12px"}])
-                            [:box 
+                            [:box
                              :child (str "(via " type-label " @ " (.toLocaleString (js/Date.)) ")")
                              :style {:font-size "12px" :opacity 0.6}]]]
       ;(clover-render-icon icon)
@@ -247,6 +258,16 @@
     (letfn [(collect! [item]
               (cond
                 (keyword? item) (conj! result item)
+                (coll? item) (run! collect! item)))]
+      (collect! x)
+      (persistent! result))))
+
+(defn deep-flatten-strings
+  [x]
+  (let [result (transient #{})]
+    (letfn [(collect! [item]
+              (cond
+                (string? item) (conj! result item)
                 (coll? item) (run! collect! item)))]
       (collect! x)
       (persistent! result))))
@@ -341,9 +362,9 @@
 (def clover-walk-singles-map (atom {}))
 
 (defonce process-key-cache (atom {}))
-(defonce process-key-tracker (atom {}))        ;;; ;       
+(defonce process-key-tracker (atom {}))        ;;; ;
 
-(defn process-key2
+(defn process-key
   [k]
   (let [args (str k)]
     (if-let [result (@process-key-cache args)]
@@ -360,17 +381,22 @@
 (re-frame/reg-sub
  ::click-param-namespaces
  (fn [db _]
-  ;;  (tapp>> [:click-param-namespaces (keys (get-in db [:click-param :solver]))])
    (vec (keys (get db :click-param)))))
 
-;; (tapp>> [:click-param-namespaces @(tracked-sub ::click-param-namespaces {})])
+;; (defn process-key [k]
+;;   (let [cns @(tracked-sub ::click-param-namespaces {})
+;;         combined-set (into (set cns) (conj db/reactor-types :theme :param))]
+;;     (when
+;;      (try
+;;        (contains? combined-set (keyword (namespace k)))
+;;        (catch :default _ nil))
+;;       k)))
 
-(defn process-key [k] (let [cns @(tracked-sub ::click-param-namespaces {})]
+(defn process-key2 [k] (let [cns @(tracked-sub ::click-param-namespaces {})]
                         (when
                          (try
                            (some #(= % (keyword (namespace k)))
                                  (into cns (vec (into db/reactor-types [:theme :param]))))
-                           
                            (catch :default _ nil)) k)))
 
 (defn purge-process-key-cache
@@ -449,9 +475,9 @@
 (defonce extract-patterns-data (atom {}))
 (defonce extract-patterns-cache (atom {}))
 
-(defn matches-pattern? 
-  [item kw num] 
-  (and (vector? item) 
+(defn matches-pattern?
+  [item kw num]
+  (and (vector? item)
        (= (count item) num)
        (= (first item) kw)))
 
@@ -525,8 +551,8 @@
 ;;        (= (count item) num)
 ;;        (= (first item) kw)))
 
-;; (defn matches-pattern2-orig? 
-;;   [item kw num] 
+;; (defn matches-pattern2-orig?
+;;   [item kw num]
 ;;   (and (vector? item)
 ;;        (= (count item) num)
 ;;        (= (first item) kw)))
@@ -598,7 +624,7 @@
          ;                                          [:flow :time :server :flows-sys :client :solver :repl-ns
          ;                                           :signal-history :data :solver-meta nil]))])]
          ]
-    ;;  (and (not= session-hash (get db :session-hash)) 
+    ;;  (and (not= session-hash (get db :session-hash))
     ;;       (not (true? (mouse-active-recently? seconds))))
      (true? (mouse-active-recently? seconds)))))
 
@@ -626,7 +652,7 @@
 
 (defn splitter
   [s delimiter] ;; param based
-  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :splitter-cache?}))
+  (if true ;cache? ;(true? @(rfa/sub ::param-lookup {:kk :splitter-cache?}))
     (splitter* s delimiter)
     (cstr/split s delimiter)))
 
@@ -644,7 +670,7 @@
 
 (defn postwalk-replacer*
   [walk-map target]
-  (let [hash-key (hash [walk-map target])] 
+  (let [hash-key (hash [walk-map target])]
     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
     (or (@postwalk-replace-data-cache hash-key)
         (let [result (walk/postwalk-replace walk-map target)]
@@ -726,22 +752,24 @@
 (defonce subscription-counts-alpha (atom {}))
 (defonce simple-subscription-counts (atom []))
 
+ (pp [:subscription-counts-alpha (take 20 (reverse (sort-by last (vec @subscription-counts-alpha))))])
+ (pp [:subscription-counts (take 20 (reverse (sort-by last (vec @subscription-counts))))])
 
 (defn tracked-sub
   [sub-key sub-map] ;;; hack to track subscriptions for debugging, easy freq
-  ;(swap! subscription-counts-alpha update sub-key (fnil inc 0))
+  (swap! subscription-counts-alpha update sub-key (fnil inc 0))
   (rfa/sub sub-key sub-map))
 
 (defn tracked-subscribe_ [query]
-  ;(swap! subscription-counts update (first query) (fnil inc 0))
+  (swap! subscription-counts update (first query) (fnil inc 0))
   (rfa/sub (first query) {}))
 
 (defn tracked-subscribe
   [query] ;;; hack to track subscriptions for debugging, easy freq
-  ;(swap! subscription-counts update (first query) (fnil inc 0))
+  (swap! subscription-counts update (first query) (fnil inc 0))
   (cond
     ;;(and (cstr/includes? (str (first query)) "/")
-    ;;     (= (count query) 1)) 
+    ;;     (= (count query) 1))
     ;;(rfa/sub (first query) {})
     (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
     (do ;(tapp>> [:cpk! (last query)])
@@ -926,7 +954,7 @@
 
 (defn unique-block-id
   [proposed existing-keys reserved-names]
-  (let [all-names (set (concat existing-keys reserved-names))] 
+  (let [all-names (set (concat existing-keys reserved-names))]
     (unique-block-id-helper proposed 0 all-names)))
 
 (defn hex-to-rgb [hex] (mapv #(js/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)]))
@@ -935,8 +963,8 @@
   [rgb]
   (let [[r g b] (mapv #(double (/ % 255.0)) rgb) luminance (+ (* 0.2126 r) (* 0.7152 g) (* 0.0722 b))] luminance))
 
-;; (defn choose-text-color [hex] 
-;;   (let [rgb (hex-to-rgb hex) luma (luminance rgb)] 
+;; (defn choose-text-color [hex]
+;;   (let [rgb (hex-to-rgb hex) luma (luminance rgb)]
 ;;     (if (> luma 0.5) "#000000" "#ffffff")))
 
 (def choose-text-color
@@ -945,13 +973,13 @@
      (let [rgb (hex-to-rgb hex) luma (luminance rgb)]
        (if (> luma 0.5) "#000000" "#ffffff")))))
 
-(defn find-next [v k] 
+(defn find-next [v k]
   (second (drop-while #(not= % k) v)))
 
-(defn select-keypaths [m keys] 
+(defn select-keypaths [m keys]
   (into {} (for [k keys] [k (get-in m k)])))
 
-(defn sort-map-by-key [m] 
+(defn sort-map-by-key [m]
   (sort-by first (into [] m)))
 
 (re-frame/reg-sub
@@ -1054,7 +1082,7 @@
 ;;         deep))))
 
 
-;; (def border-cache (atom {})) 
+;; (def border-cache (atom {}))
 
 ;; (defn edge-flush? [edge1 edge2]
 ;;   (= edge1 edge2))
@@ -1107,7 +1135,7 @@
 ;;   (sticky-style radius selected-block other-blocks true))
 
 
-(def border-radius-cache (atom {}))  
+(def border-radius-cache (atom {}))
 
 (defn generate-occupied-coords [blocks]
   (reduce (fn [occupied [bx by bh bw]]
@@ -1150,7 +1178,7 @@
         result))))
 
 
- 
+
 
 
 
@@ -1215,7 +1243,7 @@
   [m] ;; used for temp keys and UI keys in queries and such
   (into {}
         (for [[k v] m
-              :when (not (and (keyword? k) 
+              :when (not (and (keyword? k)
                               (not (contains? allowed-set k))
                               (cstr/starts-with? (name k) "_")))]
           (if (map? v) [k (remove-underscored v)] [k v]))))
@@ -1228,7 +1256,7 @@
         (for [[k v] m
               :when (not (and (keyword? k)
                               (or (= k :h) (= k :root) (= k :w)
-                                  (and 
+                                  (and
                                    (not (contains? allowed-set k))
                                    (cstr/starts-with? (name k) "_")))))]
           [k (if (map? v) (remove-underscored-plus-dims v) v)])))
@@ -1494,10 +1522,10 @@
           (assoc! acc k (deep-remove-underscore-keys v))))
       (transient {})
       data))
-  
+
     (vector? data)
     (mapv #(deep-remove-underscore-keys %) data)
-  
+
     :else
     data))
 
@@ -1563,7 +1591,7 @@
 (defn clean-sql-from-ui-keys-fn
   [query]
   (let [res (deep-remove-keys query
-                              [:cache? :col-widths :row-height :render-all? 
+                              [:cache? :col-widths :row-height :render-all?
                                :refresh-every :page :connection-id :deep-meta? :_last-run
                                :clicked-row-height :style-rules])]
     res))
@@ -1995,7 +2023,7 @@
                                  ;:map           {:comma? false :sort? false}
                                  :parse         {:interpose "\n\n"}})]
         (swap! format-map-atom assoc cache-key o)
-        o)))) 
+        o))))
 
 
 
@@ -2108,11 +2136,11 @@
 
 
 (defn str->goog-date [date-str]
-  (try 
+  (try
     (when (and date-str (string? date-str))
     (let [[year month day] (cstr/split date-str #"-")
           year (js/parseInt year)
-          month (js/parseInt month) 
+          month (js/parseInt month)
           day (js/parseInt day)]
       (when (and year month day)
         (gdate/Date. year (dec month) day))))
@@ -2120,7 +2148,7 @@
 
 
 (defn goog-date->str [goog-date]
-  (try 
+  (try
     (str (.getYear goog-date) "-"
        (pad-zero (inc (.getMonth goog-date))) "-"
        (pad-zero (.getDate goog-date)))

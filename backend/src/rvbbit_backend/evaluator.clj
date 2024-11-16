@@ -381,9 +381,9 @@
                                                       _ (when (try
                                                                 (and (vector? value-data) (map? (first value-data)))
                                                                 (catch Exception _ false))
-                                                          (swap! sqlized assoc table-name {:select [:*]
+                                                          (swap! sqlized assoc table-name {:select (vec (keys (first value-data))) ;;[:*]
                                                                                            :connection-id client-name
-                                                                                           :from [(keyword table-name)]})
+                                                                                           :from [[(keyword table-name) (ut/gen-sql-sql-alias)]]})
                                                           (qp/serial-slot-queue :serial-data-literal-code-intro client-name
                                                                                 (fn []
                                                                                   (insert-rowset value-data
@@ -413,7 +413,9 @@
             ]
         ;;(ut/pp [:repl {:introspected-repl-session introspection}])
           ;;(swap! repl-introspection-atom assoc-in split-ns introspection) ;; host and port for later?
+
         (swap! db/repl-introspection-atom assoc-in [client-name ns-str] introspection) ;; host and port for later?
+
           ;; (logger (str (ut/keypath-munger [ns-str host port client-name id]) "-intro")
           ;;         {:orig-code code
           ;;          :introspection introspection})
@@ -532,8 +534,8 @@
 
 (defn create-nrepl-server! []
   (ut/pp [:starting-local-nrepl :port repl-port])
-  (reset! repl-server (nrepl-server/start-server 
-                       :port repl-port 
+  (reset! repl-server (nrepl-server/start-server
+                       :port repl-port
                        ;:handler (nrepl.server/default-handler #'wrap-flexible-safety)
                        :bind "127.0.0.1")))
 
@@ -701,7 +703,7 @@
                                        (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {}))))
                     ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end00000 raw-sql? client-name id ui-keypath]))
                     _ (push-to-console-clover (cstr/join "" @output-atom) :out)
-                    
+
                     sqlized       (atom nil)
                     output        {:evald-result
                                    (-> rsp
@@ -716,8 +718,8 @@
 
                 ;; (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end1 client-name id ui-keypath output]))
 
-                (swap! db/repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
-                       (vec (distinct (conj (get-in @db/repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
+                ;; (swap! db/repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
+                ;;        (vec (distinct (conj (get-in @db/repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
 
                 (when (and false ;;;(cstr/includes? (str code) ":introspect!")
                            (or (cstr/includes? (str code) "(def ")
@@ -734,12 +736,12 @@
 
                   (let [table-name (ut/keypath-munger [id ui-keypath])
                         query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
-                    (reset! sqlized [query-name {:select [:*]
+                    (reset! sqlized [query-name {:select (vec (keys (first (first merged-values)))) ;; [:*]
                                                  :connection-id "cache.db" ;;client-name
                                                  :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
                                                  :_sqlized-by ui-keypath
                                                  :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
-                                                 :from [(keyword table-name)]}])
+                                                 :from [[(keyword table-name) (ut/gen-sql-sql-alias)]]}])
                                     ;(qp/serial-slot-queue :sqlize-repl-rowset client-name
                     (ppy/execute-in-thread-pools-but-deliver
                      :sqlize-repl-rowset
@@ -760,19 +762,19 @@
                 (let [oo (merge output
                                 (when sqlize?
                                   {:sqlized @sqlized}))
-                      
+
                       oo (if sqlize? ;; test. rely on sqlize? param it?
                            ;(ut/dissoc-in oo [:evald-result :value])
-                           (assoc-in oo [:evald-result :value] 
-                                     (conj (vec (cstr/split (cstr/join (ut/strip-ansi msg-out)) #"\n")) 
+                           (assoc-in oo [:evald-result :value]
+                                     (conj (vec (cstr/split (cstr/join (ut/strip-ansi msg-out)) #"\n"))
                                            [[:rowset-detected :sqlized-to (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]])
                                      ;(vec (cstr/split-lines (ut/strip-ansi msg-out)))
                                      ;(str (ut/strip-ansi (cstr/join msg-out)))
                                      )
                            oo)]
-                  
+
                   oo)
-                
+
                 ))
 
             (catch Exception ee
@@ -780,8 +782,8 @@
                     added-errors
                     (if (cstr/includes? error-msg "Could not read response value")
                       (str
-                       "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str. 
-                        (Rabbit cares about 'values' first, not printing, so you may have to be 
+                       "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str.
+                        (Rabbit cares about 'values' first, not printing, so you may have to be
                         explicit about what you want, output-wise). Tags don't cross the CLJ/CLJS 'blood-brain barrier' easily..."
                        "\n")
                       nil)]

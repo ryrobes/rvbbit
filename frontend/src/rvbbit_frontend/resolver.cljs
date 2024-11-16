@@ -26,11 +26,11 @@
     [(get-in db [:panels panel-key :h])
      (get-in db [:panels panel-key :w])])))
 
-(re-frame/reg-sub ;; dupe from bricks, consolidate to more category focused namespace for all subs and events 
- ::client-name 
+(re-frame/reg-sub ;; dupe from bricks, consolidate to more category focused namespace for all subs and events
+ ::client-name
  (fn [db] (get db :client-name)))
 
-(re-frame/reg-sub ;; dupe from bricks, consolidate to more category focused namespace for all subs and events 
+(re-frame/reg-sub ;; dupe from bricks, consolidate to more category focused namespace for all subs and events
  ::all-roots-tab-sizes-current
  (fn [db _]
    (vec (for [[_ v] (into {} (filter #(and (not (get (val %) :minimized? false))
@@ -50,7 +50,7 @@
                                                       (get (val %) :tab ""))
                                                   (get db :panels)))]
                              (let [real-root (get v :root)
-                                   mod-root  @(ut/tracked-sub ::dynamic-root-mod 
+                                   mod-root  @(ut/tracked-sub ::dynamic-root-mod
                                                               {:panel-key panel-key :h-blocks h-blocks :w-blocks w-blocks})
                                    root      (if mod-root mod-root real-root)]
                                (vec (into root [(get v :h) (get v :w)]))))))))
@@ -177,7 +177,7 @@
           ;;                                           {v (let [sbr (ut/sticky-border px-val sel-size sizes)]
           ;;                                                ;(ut/tapp>> [:panel-key panel-key :sizes (str sizes) :sel-size (str sel-size) :sbr (str sbr)])
           ;;                                                sbr)})))]
-          ;;                (ut/postwalk-replacer logic-kps obody)))          
+          ;;                (ut/postwalk-replacer logic-kps obody)))
           when-walk-map2 (fn [obody]
                            (let [kps       (ut/extract-patterns obody :when 3)
                                  logic-kps (into {} (for [v kps] (let [[_ l this] v] {v (when l this)})))]
@@ -245,7 +245,7 @@
                                                         {v (str (cstr/join that this))})))]
                              (ut/postwalk-replacer logic-kps obody)))
           obody-key-set (ut/deep-flatten block-map)
-          client-name @(ut/tracked-sub ::client-name {})
+          client-name db/client-name
           solver-clover-walk
           (fn [obody]
             (let [;kps       (ut/extract-patterns obody :run-solver 2)
@@ -258,7 +258,7 @@
                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
                                      unresolved-req-hash       (hash (if false ;override?
-                                                                       fkp ;this 
+                                                                       fkp ;this
                                                                        ;[solver-name fkp client-name]
                                                                        [solver-name fkp]))
                                      rtype                     (get (first this) :type :unknown)

@@ -1,0 +1,4 @@
+{:jdbc-url "jdbc:sqlite:db/import.db"
+ ;:idle-timeout       600000
+ ;:max-lifetime       1800000
+ :cache "shared"}

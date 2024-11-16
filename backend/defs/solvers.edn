@@ -143,6 +143,21 @@
                    :cache?    true
                    :input-map {:some-string "HEYa!" :some-number 123}
                    :data      (str :some-string (+ 123 :some-number))}
+ :refresh-superstore {:signal :signal/daily-at-9am
+                      :type   :clojure
+                      :cache? false
+                      :data   (do (ns rvbbit-backend.cruiser
+                                    (:require [rvbbit-backend.websockets :as wss]
+                                              [rvbbit-backend.pool-party :as ppy]
+                                              [rvbbit-backend.sql :as sql]))
+                                  (let [conn (get (deref wss/conn-map) "superstore")]
+                                    (lets-give-it-a-whirl-no-viz "connections/superstore.edn"
+                                                                 conn
+                                                                 sql/system-db
+                                                                 default-sniff-tests
+                                                                 default-field-attributes
+                                                                 default-derived-fields
+                                                                 default-viz-shapes)))}
  :sql-solver-1
    {:signal :signal/every-5-minutes
     :type :sql
@@ -315,4 +330,19 @@
        :group-by [:OFFENSE_CODE_GROUP]
        :page -4
        :connection-id "boston-crime"}}
- :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}}
+ :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}
+ :refresh-imported {:signal :signal/daily-at-9am
+                    :type   :clojure
+                    :cache? false
+                    :data   (do (ns rvbbit-backend.cruiser
+                                  (:require [rvbbit-backend.websockets :as wss]
+                                            [rvbbit-backend.pool-party :as ppy]
+                                            [rvbbit-backend.sql :as sql]))
+                                (let [conn (get (deref wss/conn-map) "imported")]
+                                  (lets-give-it-a-whirl-no-viz "connections/imported.edn"
+                                                               conn
+                                                               sql/system-db
+                                                               default-sniff-tests
+                                                               default-field-attributes
+                                                               default-derived-fields
+                                                               default-viz-shapes)))}}

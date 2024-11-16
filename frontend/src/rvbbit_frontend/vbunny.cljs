@@ -2,7 +2,7 @@
   (:require [reagent.core                   :as reagent]
             [re-frame.core                  :as re-frame]
             [rvbbit-frontend.utility        :as ut]
-            [rvbbit-frontend.http           :as http]
+            ;[rvbbit-frontend.http           :as http]
             [rvbbit-frontend.db             :as db]
             [rvbbit-frontend.connections    :as conn]
             ;[reagent.dom                    :as rdom]
@@ -12,41 +12,40 @@
             [rvbbit-frontend.resolver       :as resolver]
             [react]))
 
-(comment "custom virtualized v-box/h-box used for terminal and other things - data-viewer, etc") 
+(comment "custom virtualized v-box/h-box used for terminal and other things - data-viewer, etc")
 
 ;;; so many dupes of this, theme stuff needs to be its own namespace that gets refed by all (currently depends too heavily on conn & resolver)
-(defn theme-pull-fn
+(defn theme-pull
   [cmp-key fallback & test-fn]
-  (let [v                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [cmp-key]})
-        t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
-        t1                  (keyword (first t0))
-        t2                  (keyword (last t0))
-        self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
-        self-ref-pairs (reduce (fn [acc k]
-                                 (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
-                                   (if-let [value (get db/base-theme bk)]
-                                     (assoc acc k value)
-                                     acc)))
-                               {}
-                               self-ref-keys)
-        resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
-        base-theme-keys     (keys resolved-base-theme)
-        theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
-        fallback0           (if theme-key? (get resolved-base-theme t2) fallback)
-        rs                  (fn [edn] (resolver/logic-and-params edn :theme-pull))]
-    (rs (if (not (nil? v)) v fallback0))))
+  (let [wh @(ut/tracked-sub ::conn/world-hash {})]
+    (if (contains? @db/theme-pull-cache [cmp-key fallback wh])
 
+      (let [cache (get @db/theme-pull-cache [cmp-key fallback wh])]
+        ;(ut/pp [:theme-pull-cache (str cmp-key)])
+        cache)
+      ;; cache
+      (let [res (let [v                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [cmp-key]})
+                      t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
+                      t1                  (keyword (first t0))
+                      t2                  (keyword (last t0))
+                      self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
+                      self-ref-pairs (reduce (fn [acc k]
+                                               (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
+                                                 (if-let [value (get db/base-theme bk)]
+                                                   (assoc acc k value)
+                                                   acc)))
+                                             {}
+                                             self-ref-keys)
+                      resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
+                      base-theme-keys     (keys resolved-base-theme)
+                      theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
+                      fallback0           (if theme-key? (get resolved-base-theme t2) fallback)
+                      rs                  (fn [edn] (resolver/logic-and-params edn :theme-pull))]
+                  (rs (if (not (nil? v)) v fallback0)))]
+        (swap! db/theme-pull-cache assoc [cmp-key fallback wh] res)
+        ;(ut/pp [:theme-pull-NON-cache (str cmp-key) (str res)])
+        res))))
 
-(re-frame/reg-sub 
- ::theme-pull-sub 
- (fn [_ {:keys [cmp-key fallback test-fn]}] 
-   (theme-pull-fn cmp-key fallback test-fn)))
-
-(defn theme-pull [cmp-key fallback & test-fn] 
-  @(ut/tracked-sub ::theme-pull-sub 
-                   {:cmp-key cmp-key 
-                    :fallback fallback ;; deprecated
-                    :test-fn test-fn}))
 
 (def scrollbar-stylev
   {:scrollbar-width "thin"
@@ -72,10 +71,10 @@
 (defonce scroll-state (reagent/atom {}))
 (defonce node-ref (reagent/atom {}))
 
-;; (ut/tapp>> [:scroll-state @scroll-state]) 
+;; (ut/tapp>> [:scroll-state @scroll-state])
 
 (defn px- [x]
-  (try (edn/read-string (cstr/replace (str x) "px" "")) 
+  (try (edn/read-string (cstr/replace (str x) "px" ""))
        (catch :default _ 0)))
 
 (defn clean-child-map [children id]
@@ -109,9 +108,9 @@
 (defn virtualized-v-box [{:keys [children style width height id follow?] :as props}]
   (let [;node-ref (reagent/atom nil)
         is-at-bottom (reagent/atom true)  ; Initialize as true
-        wssk @(ut/tracked-subscribe_ [::http/websocket-status])
-        websocket-status (select-keys wssk [:status :datasets :panels :waiting])
-        online? (true? (= (get websocket-status :status) :connected))
+        ;wssk @(ut/tracked-subscribe_ [::http/websocket-status])
+        ;websocket-status (select-keys wssk [:status :datasets :panels :waiting])
+        online? true ;(true? (= (get websocket-status :status) :connected))
         mouse-active?  (or @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 60}) (not online?))
         update-visible-range (fn [container-height scroll-top]
                                (let [{:keys [cumulative-heights max-height total-height]} (get @scroll-state id)

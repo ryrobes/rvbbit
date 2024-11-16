@@ -1,0 +1,5 @@
+{:jdbc-url "jdbc:sqlite:data/superstore.db"
+ ;:idle-timeout       600000
+ ;:max-lifetime       1800000
+ :cache "shared"}
+

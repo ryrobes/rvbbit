@@ -9,17 +9,16 @@
    [day8.re-frame.http-fx]
    [day8.re-frame.undo      :as    undo
     :refer [undoable]]
-   [re-frame.alpha          :as rfa]
+   ;[re-frame.alpha          :as rfa]
    [re-frame.core           :as re-frame]
    [reagent.core            :as reagent]
-   [re-pollsive.core        :as poll]
+   ;[re-pollsive.core        :as poll]
    [rvbbit-frontend.db      :as db]
+  ;;  [rvbbit-frontend.block-patrol      :as bp]
    [rvbbit-frontend.utility :as ut]
    [websocket-fx.core       :as wfx]))
 
 (def socket-id :default)
-
-
 
 (defn subscription
   [x sub-name]
@@ -39,13 +38,22 @@
  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
    (get-in db [:websocket-fx.core/sockets socket-id :subscriptions])))
 
+(re-frame/reg-event-db
+ ::refresh-all
+ (fn [db _]
+   (-> db
+       (dissoc :query-history)
+       (dissoc :query-history-meta))))
+
 (defonce last-http-panel-push (atom nil))
+(defonce force-once? (atom false))
 
 (re-frame/reg-event-db
  ::update-panels-hash
- (fn [db _]
-   (if  (or (nil? @last-http-panel-push) ;; debounce this expensive client call 
-            (> (- (get-in db [:re-pollsive.core/polling :counter]) @last-http-panel-push) 600))
+ (fn [db [_ & [force?]]]
+   (if  (or (nil? @last-http-panel-push) ;; debounce this expensive client call
+            (and force? (not @force-once?))
+            (> (- (get-in db [:re-pollsive.core/polling :counter]) @last-http-panel-push) 60))
      (let [pp          (get db :panels)
            _ (reset! last-http-panel-push (get-in db [:re-pollsive.core/polling :counter]))
               ;;ppr         {} ;;; TEMP!
@@ -54,15 +62,20 @@
               ;; ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
               ;;                         {k (materialize-values v)}))
            ;new-h       (hash pp) ;; (hash (ut/remove-underscored pp))
+           _ (when force? (reset! force-once? true))
            client-name (get db :client-name)]
        (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
-       (ut/dispatch-delay 800 [::insert-alert [:box :child "Syncing panel data with RVBBIT server..."] 12 1 5])
+       (ut/dispatch-delay 800 [::insert-alert [:v-box :children [[:box :child "Syncing panel data with RVBBIT server..."]
+                                                                 [:box :child "Warming Leaf caches..."]]] 12 1 5])
+       (ut/dispatch-delay 1500 [::refresh-all]) ;; repopulate the client db caches after a server reboot...
+       (ut/dispatch-delay 3500 [::update-panels-hash true])
      ;;(conn/push-panels-to-server pp ppr client-name)
        (ut/tracked-dispatch
         [::wfx/push :default
          {:kind :current-panels
           :panels pp
           :everything? true
+          ;:drag-body-map @db/drag-body-map
           :materialized-panels {} ;ppm
           :resolved-panels {} ;ppr
           :client-name client-name}])
@@ -70,10 +83,10 @@
        ;(assoc db :panels-hash new-h)
        db) db)))
 
+;;  (ut/tracked-dispatch [::update-panels-hash])
 
 (defn options [x]
-  (let [;protocol (.-protocol js/window.location)
-        protocol          "ws"
+  (let [protocol          "ws"
         host              (.-host js/window.location)
         host-without-port (cstr/replace host #":\d+$" "")
         ws-port           "3030"
@@ -84,18 +97,29 @@
      :on-disconnect [::dispatch-unsubscriptions]
      :on-connect    [::dispatch-subscriptions x]}))
 
+(defn options-secondary [socket-id]
+  (let [protocol          "ws"
+        host              (.-host js/window.location)
+        host-without-port (cstr/replace host #":\d+$" "")
+        ws-port           "3030"
+        url               (str protocol "://" host-without-port ":" ws-port "/ws")]
+    (ut/pp [:http-ws-connect-url! socket-id url])
+    {:url           url
+     :format        :edn
+     ;:on-disconnect [::dispatch-unsubscriptions]
+     ;:on-connect    [::dispatch-subscriptions :default]
+     }))
+
 (re-frame/reg-event-fx
  ::dispatch-subscriptions
  (fn [_ [_ x]]
    (reset! db/last-mouse-activity (js/Date.)) ;; just to juice the mouse timer
    (reset! db/running-queries #{})
    {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
-                 [::update-panels-hash] ;; expensive to re-pop the server data for client panels 
+                 [::update-panels-hash] ;; expensive to re-pop the server data for client panels
                  [::wfx/request :default
                   {:message     {:kind :get-settings :client-name x}
-                   :on-response [::simple-response-boot-no-load] ;; just get
-                                                                                       ;; settings,
-                                                                                       ;; in case
+                   :on-response [::simple-response-boot-no-load]
                    :on-timeout  [::timeout-response [:boot :get-settings]]
                    :timeout     15000}]]}))
 
@@ -200,7 +224,7 @@
          server-params (get result :clover-params [])
          view-codes    (get result :view-keywords [])
          flow-subs     (get db :flow-subs)
-        ;;  data-keys     (vec (for [e (map last (filter #(= (count %) 3) (ut/keypaths (get db :panels))))] 
+        ;;  data-keys     (vec (for [e (map last (filter #(= (count %) 3) (ut/keypaths (get db :panels))))]
         ;;                       (keyword (str "data/" (cstr/replace (str e) ":" "")))))
          data-keys     (vec (for [e (map last (remove empty? (filter #(and (not (number? (last %))) (= (count %) 3)) (ut/kvpaths (get db :panels)))))]
                               (keyword (str "data/" (cstr/replace (str e) ":" "")))))
@@ -294,6 +318,7 @@
 (defn update-context-boxes
   [result task-id ms reco-count]
   (when (and ;(= (first (get result :ui-keypath)) :reeco-status)
+         false ;; disable for now
          (= task-id :reco)
          (= (get result :status) :done))
 
@@ -301,7 +326,7 @@
     ;;   (last (get result :ui-keypath))
     ;;   (str "shapes: found " (ut/nf reco-count) " viz suggestions in ~" ms " secs"))
     (ut/tracked-dispatch [::insert-alert [:box
-                                          :style {:font-size "20px"}
+                                          :style {:font-size "18px"}
                                           :child (str (last (get result :ui-keypath)) ": viz shapes: found " (ut/nf reco-count) " viz suggestions")] 12 nil 5]))
 
   (when (and (= task-id :outliers) ;;(not (= task-id :reco))
@@ -350,9 +375,9 @@
 ;;             :timeout     500000}])))
 ;;     db))
 
-;; (re-frame/reg-event-db 
-;;  ::refresh-runstreams 
-;;  (fn [db [_]] 
+;; (re-frame/reg-event-db
+;;  ::refresh-runstreams
+;;  (fn [db [_]]
 ;;    (dissoc db :runstreams-lookups)))
 
 (re-frame/reg-event-db
@@ -505,8 +530,23 @@
 (re-frame/reg-event-db
  ::simple-response
  (fn [db [_ result & [batched?]]]
-    ;;(ut/tapp>> [:simple-response result])
-   (if (vector? result)
+    (let [;result (try (if (vector? (first result)) (vector (for [r result] (first r))) result) (catch :default _ result))
+          result (try (if (get-in result [0 0 :ui-keypath]) (vec (apply concat result)) result) (catch :default _ result))
+          ] ;; double nesting?
+      ;; (ut/tapp>> [:simple-response-debug batched? (try
+      ;;                                (let [tt (if (map? result) (get result :task-id) (mapv #(get % :task-id) result))
+      ;;                                      tt (if (keyword? tt) [[tt]] tt)]
+      ;;                                (str (count tt) " " (when (vector? (first tt)) (set (mapv first tt)))
+      ;;                                     " " (str tt)
+      ;;                                     ;; (when (or (empty? tt)
+      ;;                                     ;;           (cstr/includes? (str tt) "nil"))
+      ;;                                     ;;   (vec (apply concat result)))
+      ;;                                     ))
+      ;;                                (catch :default e [:error (str e) (map? result) (get result :task-id)])) result])
+
+
+  ;;  (ut/tapp>> [:simple-response2 (str (if (map? result) (get result :status) (mapv #(get % :status) result)))])
+      (if (vector? result)
       ;; (let [grouped-results (group-by #(let [ui-keypath                  (first (get % :ui-keypath))
       ;;                                        kick?                       (= ui-keypath :kick)
       ;;                                        task-id                     (get % :task-id)
@@ -519,20 +559,22 @@
       ;;   (ut/tapp>> [:batch-of-messages (count result)
       ;;               (vec (for [r result] (str (get r :task-id))))])
       ;;   (swap! batches-received inc)
-      ;;   (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches 
-      ;;   db) ;; 
+      ;;   (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches
+      ;;   db) ;;
 
       ;; take all the server subs and apply them all at once instead of feeding them through one by one..
-     (let [grouped-results (group-by #(let [ui-keypath                  (first (get % :ui-keypath))
-                                            kick?                       (= ui-keypath :kick)
-                                            task-id                     (get % :task-id)
-                                            heartbeat?                  (= task-id :heartbeat)]
-                                        (and kick?
-                                             (contains? db/reactor-types (get-in % [:task-id 0]))
-                                             (not heartbeat?))) result)
-           result-subs (get grouped-results true)
-           result-subs (filterv #(not (nil? (get % :status))) result-subs) ;; no point in nil updates.
-           result (get grouped-results false)
+        (let [grouped-results (group-by #(let [ui-keypath                  (first (get % :ui-keypath))
+                                               kick?                       (= ui-keypath :kick)
+                                               task-id                     (get % :task-id)
+                                               heartbeat?                  (= task-id :heartbeat)
+                                               reactor-types               (disj db/reactor-types :leaf)]
+                                           (and kick?
+                                                (contains? reactor-types (get-in % [:task-id 0]))
+                                                (not (= task-id :cnts))
+                                                (not heartbeat?))) result)
+              result-subs (get grouped-results true)
+              result-subs (filterv #(not (nil? (get % :status))) result-subs) ;; no point in nil updates.
+              result (get grouped-results false)
             ;; _ (doseq [rr result-subs] ;; is it rowset? if so lets put it in :data also
             ;;     (let [data (get rr :status)
             ;;           all-maps (and (vector? data) (every? map? data))
@@ -558,24 +600,24 @@
             ;;         all-single-values-set
             ;;         (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :set-val %) data)
             ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
-           _ (doseq [rr result-subs
+              _ (doseq [rr result-subs
                       ;:when (not (nil? (get rr  :status)))
 ] ;; populate the :data key with the rowset data if it exists
-               (let [data (get rr :status)
+                  (let [data (get rr :status)
                       ;; all-maps (and (vector? data) (every? map? data))
                       ;; all-keys-match (and all-maps
                       ;;                     (let [first-keys (set (keys (first data)))]
                       ;;                       (every? #(and (= first-keys (set (keys %)))
                       ;;                                     (every? keyword? (keys %)))
                       ;;                               data)))
-                     data-rowset? (is-rowset? data)
+                        data-rowset? (is-rowset? data)
                       ;all-single-values-vector (and (vector? data) (every? (complement coll?) data))
                       ;all-single-values-set (and (set? data) (every? (complement coll?) data))
-                     flow-key (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]
+                        flow-key (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]
 
-                 (when (and data-rowset?
-                            (not @(ut/tracked-sub ::clover-data-exists? {:data-key flow-key :data data})))
-                   (ut/tracked-dispatch [::insert-implicit-rowset data flow-key]))
+                    (when (and data-rowset?
+                               (not @(ut/tracked-sub ::clover-data-exists? {:data-key flow-key :data data})))
+                      (ut/tracked-dispatch [::insert-implicit-rowset data flow-key]))
 
                   ;; (cond
                   ;;   all-keys-match
@@ -589,72 +631,79 @@
                   ;;   all-single-values-set
                   ;;   (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :set-val %) data)
                   ;;                         (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))
-                 ))
-           updates (reduce (fn [acc res]
-                             (let [task-id (get res :task-id)]
-                               (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
-                           {} result-subs)]
+                    ))
+              updates (reduce (fn [acc res]
+                                (let [task-id (get res :task-id)]
+
+                                  (when (and (= (first task-id) :leaf)
+                                             (cstr/ends-with? (last task-id) "all-actions"))
+                                  (ut/pp [:task-id :bactched-update (str task-id) (str (get res :status))]))
+
+                                  (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
+                              {} result-subs)]
 
         ;; (when (cstr/includes? (str (get db :client-name)) "beaming")
         ;;   (doseq [r result-subs]
         ;;     (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)])))
 
-        ;; (ut/tapp>> [;:batch-of-messages (count result) 
+        ;; (ut/tapp>> [;:batch-of-messages (count result)
         ;;             :grouped-update (count result-subs)
         ;;             (str (vec (for [r result] (str (get r :task-id)))))
         ;;             (str (vec (for [r result-subs] (str (get r :task-id)))))])
 
-       (re-frame/dispatch [::update-sub-counts result-subs])
-       (swap! batches-received inc)
-       (doseq [res result]
-         (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
-       (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates))
+          (re-frame/dispatch [::update-sub-counts result-subs])
+          (swap! batches-received inc)
+          (doseq [res result]
+            (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
+          (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates))
 
 
-     (try
-       (let [ui-keypath                  (first (get result :ui-keypath))
-             client-name                 (get db :client-name)
-             ms                          (try (js/Math.ceil (/ (get result :elapsed-ms) 1000)) (catch :default _ nil))
-             file-push?                  (= ui-keypath :file-changed)
-             external-enabled?           (get db :external? false)
-             task-id                     (get result :task-id)
-             elapsed-ms                  (get result :elapsed-ms)
-             reco-count                  (get result :reco-count)
-             kick?                       (= ui-keypath :kick)
-             new-thread?                 (= ui-keypath :new-conversation)
-             counts?                     (= task-id :cnts)
-             heartbeat?                  (= task-id :heartbeat)
-             new-slice?                  (= task-id :new-slice)
-             push-query?                 (= task-id :push-query)
-             kit-view?                   (= task-id :kit-view)
-             kit-view-opts?              (= task-id :kit-view-opts)
-             kit-view-remove?            (= task-id :kit-view-remove)
-             signals-file?               (= task-id :signals-file)
-             solvers-file?               (= task-id :solvers-file)
-             push-assocs?                (= task-id :push-assocs)
-             materialized-pct?           (= task-id :materialized-pct)
-             alert?                      (cstr/starts-with? (str task-id) ":alert")
-             server-sub?                 (and kick? ;; likely already batched and applied above, but just in case somehow
-                                              (contains? db/reactor-types (get-in result [:task-id 0]))
-                                              (not heartbeat?))
-             runstream-sub?              (and kick? (= (get-in result [:task-id 0]) :runstream)
-                                              (not (cstr/includes? (str (get-in result [:task-id 1])) ">")) ;; its a base call, not a reactor kp
-                                              (not heartbeat?))
-             tracker?                    (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
-             flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?))
-             settings-update?            (and kick? (= (get-in result [:task-id 0]) :settings) (not heartbeat?))
-             flow-runner-tracker-blocks? (and kick? (= (get-in result [:task-id 0]) :tracker-blocks) (not heartbeat?))
-             flow-runner-acc-tracker?    (and kick? (= (get-in result [:task-id 0]) :acc-tracker) (not heartbeat?))
-             condi-tracker?              (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))
-             estimate?                   (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))]
+        (try
+          (let [ui-keypath                  (first (get result :ui-keypath))
+                client-name                 (get db :client-name)
+                ms                          (try (js/Math.ceil (/ (get result :elapsed-ms) 1000)) (catch :default _ nil))
+                file-push?                  (= ui-keypath :file-changed)
+                external-enabled?           (get db :external? false)
+                task-id                     (get result :task-id)
+                elapsed-ms                  (get result :elapsed-ms)
+                reco-count                  (get result :reco-count)
+                kick?                       (= ui-keypath :kick)
+                new-thread?                 (= ui-keypath :new-conversation)
+                counts?                     (= task-id :cnts)
+                heartbeat?                  (or (= task-id :heartbeat) (= task-id [:heartbeat]))
+                new-slice?                  (= task-id :new-slice)
+                push-query?                 (= task-id :push-query)
+                kit-view?                   (= task-id :kit-view)
+                kit-view-opts?              (= task-id :kit-view-opts)
+                kit-view-remove?            (= task-id :kit-view-remove)
+                signals-file?               (= task-id :signals-file)
+                solvers-file?               (= task-id :solvers-file)
+                push-assocs?                (= task-id :push-assocs)
+                materialized-pct?           (= task-id :materialized-pct)
+                alert?                      (cstr/starts-with? (str task-id) ":alert")
+                server-sub?                 (and kick? ;; likely already batched and applied above, but just in case somehow
+                                                 (contains? db/reactor-types (get-in result [:task-id 0]))
+                                                 (not heartbeat?))
+                runstream-sub?              (and kick? (= (get-in result [:task-id 0]) :runstream)
+                                                 (not (cstr/includes? (str (get-in result [:task-id 1])) ">")) ;; its a base call, not a reactor kp
+                                                 (not heartbeat?))
+                tracker?                    (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
+                flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?))
+                settings-update?            (and kick? (= (get-in result [:task-id 0]) :settings) (not heartbeat?))
+                flow-runner-tracker-blocks? (and kick? (= (get-in result [:task-id 0]) :tracker-blocks) (not heartbeat?))
+                flow-runner-acc-tracker?    (and kick? (= (get-in result [:task-id 0]) :acc-tracker) (not heartbeat?))
+                condi-tracker?              (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))
+                estimate?                   (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))]
 
-         (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
+            (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
-         (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ") ;; gross. TODO
-                               (cstr/includes? (cstr/lower-case (str result)) "kit ")))
-           (ut/tracked-dispatch [::refresh-kits]))
+            ;; (when (and alert? (or (cstr/includes? (cstr/lower-case (str result)) "fabric ") ;; gross. TODO
+            ;;                       (cstr/includes? (cstr/lower-case (str result)) "kit ")))
+            ;;   (ut/tracked-dispatch [::refresh-kits]))
 
-         (when alert? (ut/tapp>> [:ALERT result]))
+            ;; (when alert? (ut/tapp>> [:ALERT result]))
+
+            ;; (when heartbeat? (ut/tapp>> [:heartbeat-in result]))
 
           ;; (when (and (cstr/includes? (str client-name) "bronze")  (not runstream-sub?))
           ;;   (ut/tapp>> [:msg-in
@@ -663,51 +712,74 @@
           ;;               ;(str (get-in result [:status :evald-result :value 0]))
           ;;               (str (get result :ui-keypath)) (str result)]))
 
-          ;; (when (not batched?) 
-          ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
-         
-         (when new-thread? (ut/tapp>> [:new-thread result (get result :status)]))
+            ;; (when (not batched?)
+            ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
 
-         (swap! packets-received inc)
+            (when push-assocs? (ut/pp [:push-assoc! (str (keys (get result :status))) (get result :status)]))
 
-         (when heartbeat? ;; test
-            ;;(ut/tapp>> [:heart-beat (get db :flow-subs)])
-           (ut/tracked-dispatch
-            [::wfx/push :default
-             {:kind        :ack
-              :memory      (let [mem     (when (exists? js/window.performance.memory)
-                                           [(.-totalJSHeapSize js/window.performance.memory)
-                                            (.-usedJSHeapSize js/window.performance.memory)
-                                            (.-jsHeapSizeLimit js/window.performance.memory)])
-                                 mem-row {:mem_time    (str (.toISOString (js/Date.)))
-                                          :mem_total   (first mem)
-                                          :packets     @packets-received
-                                          :batches     @batches-received
-                                          :mem_used    (second mem)
-                                          :client-name (str client-name)
-                                          :mem_limit   (last mem)}]
-                             mem-row)
-              :flow-subs   (get db :flow-subs)
-              :client-name (get db :client-name)}]))
+            (when new-thread? (ut/tapp>> [:new-thread result (get result :status)]))
+
+            (swap! packets-received inc)
+
+            (when heartbeat? ;; test
+              (let [;server-panels (set (get db :server-panels))
+                    ;client-panels (set (remove nil? (filter #(not (cstr/starts-with? (str %) ":reco")) (keys (get db :panels)))))
+                    ;diffy (cset/difference  client-panels server-panels)
+                    ;not-in-sync? (true? (> (count diffy) 0))
+                    ]
+                (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab)])
+
+                ;; (when not-in-sync?
+                ;;   (ut/pp [:panels-out-of-sync-with-server! :resolving... (str diffy)])
+                ;;   (ut/tracked-dispatch [::wfx/push :default ;:secondary
+                ;;                         {:kind :current-panels
+                ;;                          :panels   (select-keys (get db :panels) (vec diffy))
+                ;;                          ;:timeout  500000
+                ;;                          :materialized-panels {} ;; ppm
+                ;;                          :resolved-panels {} ;; ppr
+                ;;                          :drag-body-map {} ;;drag-body-map-this-tab
+                ;;                          :client-name client-name}]))
+                (ut/tracked-dispatch
+                 [::wfx/push :default
+                  {:kind        :ack
+                   ;:in-sync? (not not-in-sync?)
+                   :selected-tab (get db :selected-tab)
+                   :screen-name (get db :screen-name)
+                   :memory      (let [mem     (when (exists? js/window.performance.memory)
+                                                [(.-totalJSHeapSize js/window.performance.memory)
+                                                 (.-usedJSHeapSize js/window.performance.memory)
+                                                 (.-jsHeapSizeLimit js/window.performance.memory)])
+                                      mem-row {:mem_time    (str (.toISOString (js/Date.)))
+                                               :mem_total   (first mem)
+                                               :packets     @packets-received
+                                               :batches     @batches-received
+                                               :mem_used    (second mem)
+                                               :selected-tab (get db :selected-tab)
+                                               :screen-name (get db :screen-name)
+                                               :client-name (str client-name)
+                                               :mem_limit   (last mem)}]
+                                  mem-row)
+                   :flow-subs   (get db :flow-subs)
+                   :client-name (get db :client-name)}])))
 
 
 
 
-         (when (and alert?
-                    (not (get db :alert-mute?)))
+            (when (and alert?
+                       (not (get db :alert-mute?)))
             ;; ^^ if they are muted, just ignore (else they create a back log, when reenabled Chrome shits)
-           (let [cnt      (get-in result [:data 0 0])
-                 fstr     (str cnt)
-                 w        (get-in result [:data 0 1] (/ (count fstr) 3.9))
-                 h        (get-in result [:data 0 2] 1)
-                 duration (get-in result [:data 0 3] 6)]
-             (ut/dispatch-delay 400 [::insert-alert [:h-box :children [cnt]] w h duration])))
+              (let [cnt      (get-in result [:data 0 0])
+                    fstr     (str cnt)
+                    w        (get-in result [:data 0 1] (/ (count fstr) 3.9))
+                    h        (get-in result [:data 0 2] 1)
+                    duration (get-in result [:data 0 3] 6)]
+                (ut/dispatch-delay 400 [::insert-alert [:h-box :children [cnt]] w h duration])))
 
-         (when (or (= task-id :reco) 
-                   (= task-id :outliers)) ;; kinda deprecated, won't need
-           (update-context-boxes result task-id ms reco-count))
+            (when (or (= task-id :reco)
+                      (= task-id :outliers)) ;; kinda deprecated, won't need
+              (update-context-boxes result task-id ms reco-count))
 
-         (cond
+            (cond
 
             ;; push-assocs? (let [kp-value-map (get result :status)]
             ;;                (reduce-kv
@@ -716,146 +788,150 @@
             ;;                 db
             ;;                 kp-value-map))
 
-           alert? db ;; do nothing, alerts are a handled side-effect event ^^^
+              push-assocs? (do ;; using sep event because we want it to be specifically undoable, but NOT other streams here. hack.
+                             (ut/tracked-dispatch [::assoc-push-undoable (get result :status)])
+                             db)
 
-           new-thread? (-> db 
-                           (assoc :selected-ai-worker (first (get result :status)))
-                           (assoc :selected-ai-worker-thread (last (get result :status))))
+              alert? db ;; do nothing, alerts are a handled side-effect event ^^^
 
-           push-assocs? (do ;; using sep event because we want it to be specifically undoable, but NOT other streams here. hack.
-                          (ut/tracked-dispatch [::assoc-push-undoable (get result :status)])
-                          db)
+              new-thread? (-> db
+                              (assoc :selected-ai-worker (first (get result :status)))
+                              (assoc :selected-ai-worker-thread (last (get result :status))))
 
-           materialized-pct? (assoc-in db [:mat-pct ui-keypath] (get result :status))
 
-           (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
-           (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
 
-           runstream-sub? (let [dd (get result :status)]
+              materialized-pct? (assoc-in db [:mat-pct ui-keypath] (get result :status))
+
+              (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
+              (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
+
+              runstream-sub? (let [dd (get result :status)]
+                               (-> db
+                                   (assoc-in [:runstreams-lookups (get dd :flow-id) :open-inputs] (get dd :open-inputs))
+                                   (assoc-in [:runstreams-lookups (get dd :flow-id) :blocks] (get dd :blocks))))
+
+              signals-file? (assoc db :signals-map (get result :status))
+
+              solvers-file? (assoc db :solvers-map (get result :status))
+
+              kit-view? (-> db
+                            (assoc-in [:panels (get-in result [:ui-keypath 1]) :views :_kvw1]
+                                      (get-in result [:status :evald-result :value 0]))
+                            (assoc-in [:panels (get-in result [:ui-keypath 1]) :selected-view]
+                                      :_kvw1))
+
+              push-query? (let [panel-key (get-in result [:ui-keypath 1])
+                                q-name (ut/safe-key (get-in result [:ui-keypath 2]))]
+                            (ut/tapp>> [:push-query q-name panel-key (get-in result [:status])])
                             (-> db
-                                (assoc-in [:runstreams-lookups (get dd :flow-id) :open-inputs] (get dd :open-inputs))
-                                (assoc-in [:runstreams-lookups (get dd :flow-id) :blocks] (get dd :blocks))))
+                                (assoc-in [:panels panel-key :queries q-name] (get-in result [:status]))
+                                (assoc-in [:panels panel-key :selected-view] q-name)))
 
-           signals-file? (assoc db :signals-map (get result :status))
-
-           solvers-file? (assoc db :solvers-map (get result :status))
-
-           kit-view? (-> db
-                         (assoc-in [:panels (get-in result [:ui-keypath 1]) :views :_kvw1]
-                                   (get-in result [:status :evald-result :value 0]))
-                         (assoc-in [:panels (get-in result [:ui-keypath 1]) :selected-view]
-                                   :_kvw1))
-
-           push-query? (let [panel-key (get-in result [:ui-keypath 1])
-                             q-name (ut/safe-key (get-in result [:ui-keypath 2]))]
-                         (ut/tapp>> [:push-query q-name panel-key (get-in result [:status])])
-                         (-> db
-                             (assoc-in [:panels panel-key :queries q-name] (get-in result [:status]))
-                             (assoc-in [:panels panel-key :selected-view] q-name)))
-
-           new-slice?    (let [kp [:panels (get-in result [:ui-keypath 0]) (get-in result [:status 0]) (get-in result [:status 1])]
-                               query-map (get-in result [:status 2])]
+              new-slice?    (let [kp [:panels (get-in result [:ui-keypath 0]) (get-in result [:status 0]) (get-in result [:status 1])]
+                                  query-map (get-in result [:status 2])]
                             ;(ut/tapp>> [:new-slice kp (get-in result [:status 2])])
-                           (-> db 
-                               (assoc-in [:panels (get-in result [:ui-keypath 0]) :selected-view] (get-in result [:status 1]))
-                               (assoc-in kp query-map)))
+                              (-> db
+                                  (assoc-in [:panels (get-in result [:ui-keypath 0]) :selected-view] (get-in result [:status 1]))
+                                  (assoc-in kp query-map)))
 
-           kit-view-opts? (update-in db [:click-param (get-in result [:ui-keypath 1])]
-                                     #(merge % (get result :status)))
+              kit-view-opts? (update-in db [:click-param (get-in result [:ui-keypath 1])]
+                                        #(merge % (get result :status)))
 
-           kit-view-remove? (-> db
-                                (ut/dissoc-in  [:panels (get-in result [:ui-keypath 1]) :views :_kvw1])
-                                (ut/dissoc-in  [:click-param (get-in result [:ui-keypath 1]) :go!]))
+              kit-view-remove? (-> db
+                                   (ut/dissoc-in  [:panels (get-in result [:ui-keypath 1]) :views :_kvw1])
+                                   (ut/dissoc-in  [:click-param (get-in result [:ui-keypath 1]) :go!]))
 
-           server-sub?
+              server-sub?
             ;;(assoc-in db (vec (cons :click-param task-id)) (get result :status))
-           (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
-             (-> db
-                 (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
-                 (assoc-in (vec (cons :click-param task-id)) (get result :status))))
+              (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
+                (-> db
+                    (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
+                    (assoc-in (vec (cons :click-param task-id)) (get result :status))))
 
-           settings-update? (assoc-in db [:server :settings] (get result :status))
+              settings-update? (assoc-in db [:server :settings] (get result :status))
 
-           counts? (let [;emeta-map (get-in db [:meta ui-keypath])
-                         ss              (get result :status)
-                         post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))]
-                     (-> db
-                         (assoc-in [:post-meta ui-keypath] post-meta-shape)))
+              counts? (let [;emeta-map (get-in db [:meta ui-keypath])
+                            ss              (get result :status)
+                            post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))]
+                        (-> db
+                            (assoc-in [:post-meta ui-keypath] post-meta-shape)))
 
 
 
-           condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
+              condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
 
-           flow-runner-tracker-blocks? (let [block-keys      (keys (get-in db [:flows (get db :selected-flow) :map]))
-                                             flow-id         (get-in result [:task-id 1])
-                                             filtered-blocks (into {}
-                                                                   (for [[k v] (get result :status)]
-                                                                     {k (vec (cset/intersection (set block-keys)
-                                                                                                (set v)))}))]
-                                         (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
+              flow-runner-tracker-blocks? (let [block-keys      (keys (get-in db [:flows (get db :selected-flow) :map]))
+                                                flow-id         (get-in result [:task-id 1])
+                                                filtered-blocks (into {}
+                                                                      (for [[k v] (get result :status)]
+                                                                        {k (vec (cset/intersection (set block-keys)
+                                                                                                   (set v)))}))]
+                                            (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
 
-           flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
-                                          flow-id    (get-in result [:task-id 1])
-                                          trackers   (select-keys (get result :status) block-keys)]
-                                      (-> db
-                                          (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1))
-                                                          [:flow-results :return-maps flow-id]
-                                                          [:skip-me :yo :yo]))
-                                          (assoc-in [:flow-results :tracker flow-id] trackers)))
+              flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
+                                             flow-id    (get-in result [:task-id 1])
+                                             trackers   (select-keys (get result :status) block-keys)]
+                                         (-> db
+                                             (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1))
+                                                             [:flow-results :return-maps flow-id]
+                                                             [:skip-me :yo :yo]))
+                                             (assoc-in [:flow-results :tracker flow-id] trackers)))
 
-           estimate? (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
+              estimate? (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
 
-           flow-runner-sub? (let [rtn         (get result :status)
-                                  mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
-                                  return-maps (get-in db [:flow-results :return-maps] {})]
-                              (if (= rtn :started) ;; TODO, this eliminates the nice animations, but ensures data delivery per block.
-                                (assoc-in db task-id rtn)
-                                (-> db
-                                    (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
-                                              (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
-                                    (assoc-in task-id rtn))))
+              flow-runner-sub? (let [rtn         (get result :status)
+                                     mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
+                                     return-maps (get-in db [:flow-results :return-maps] {})]
+                                 (if (= rtn :started) ;; TODO, this eliminates the nice animations, but ensures data delivery per block.
+                                   (assoc-in db task-id rtn)
+                                   (-> db
+                                       (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
+                                                 (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
+                                       (assoc-in task-id rtn))))
 
-           (and tracker? (get-in result [:status :start]))
-           (let [rtn         (get result :status)
-                 partial-flow-key (cstr/replace (str (last (get result :task-id))) ":" "")
-                 [flow-id step-id] (cstr/split partial-flow-key #">")
-                 step-id (keyword step-id)]
-             (ut/tapp>> [:tracker-blocks flow-id step-id rtn])
-             (assoc-in db [:flow-results :tracker flow-id step-id]
-                       rtn))
+              (and tracker? (get-in result [:status :start]))
+              (let [rtn         (get result :status)
+                    partial-flow-key (cstr/replace (str (last (get result :task-id))) ":" "")
+                    [flow-id step-id] (cstr/split partial-flow-key #">")
+                    step-id (keyword step-id)]
+                (ut/tapp>> [:tracker-blocks flow-id step-id rtn])
+                (assoc-in db [:flow-results :tracker flow-id step-id]
+                          rtn))
 
-           tracker? (let [rtn         (get result :status)
-                          partial-flow-key (cstr/replace (str (last (get result :task-id))) ":" "")
-                          [flow-id step-id] (cstr/split partial-flow-key #">")
-                          step-id (keyword step-id)
+              tracker? (let [rtn         (get result :status)
+                             partial-flow-key (cstr/replace (str (last (get result :task-id))) ":" "")
+                             [flow-id step-id] (cstr/split partial-flow-key #">")
+                             step-id (keyword step-id)
                            ;mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
                            ;return-maps (get-in db [:flow-results :return-maps] {})
-                          ]
+                             ]
                        ;(ut/tapp>> [:tracker-update flow-id step-id rtn])
-                      (if (= rtn :started) ;; TODO, this eliminates the nice animations, but ensures data delivery per block.
-                        (assoc-in db task-id rtn)
-                        (-> db
-                            (assoc-in [:flow-results :return-maps flow-id step-id] rtn) ;; keeping
+                         (if (= rtn :started) ;; TODO, this eliminates the nice animations, but ensures data delivery per block.
+                           (assoc-in db task-id rtn)
+                           (-> db
+                               (assoc-in [:flow-results :return-maps flow-id step-id] rtn) ;; keeping
                              ;(assoc-in [:flow-results :tracker flow-id step-id] rtn)
-                            )))
+                               )))
 
-           heartbeat? (-> db
-                          (assoc-in [:status task-id ui-keypath] (get-in result [:status :subs]))
-                          (assoc-in [:status-data task-id ui-keypath]
-                                    {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
-                          (assoc :flow-subs (get-in result [:status :subs]))
-                          (assoc :valid-grid-actions (get-in result [:status :grid-actions]))
-                          (assoc :valid-kits (get-in result [:status :kits])))
+              heartbeat? (-> db
+                             (assoc-in [:status task-id ui-keypath] (get-in result [:status :subs]))
+                             (assoc :server-panels (get-in result [:status :panel-keys]))
+                             (assoc-in [:status-data task-id ui-keypath]
+                                       {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
+                             (assoc :flow-subs (get-in result [:status :subs]))
+                             ;(assoc :valid-grid-actions (get-in result [:status :grid-actions]))
+                             ;(assoc :valid-kits (get-in result [:status :kits]))
+                             )
 
-           :else (-> db
-                     (assoc-in [:status task-id ui-keypath] (get result :status))
-                     (assoc-in [:status-data task-id ui-keypath]
-                               {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
-                     (ut/dissoc-in [:query-history :recos-sys])
-                     (ut/dissoc-in [:query-history :viz-shapes-sys])
-                     (ut/dissoc-in [:query-history :viz-shapes0-sys])
-                     (ut/dissoc-in [:query-history :viz-tables-sys]))))
-       (catch :default e (do (ut/tapp>> [:simple-response-error! (str e)]) db))))))
+              :else (-> db
+                        (assoc-in [:status task-id ui-keypath] (get result :status))
+                        (assoc-in [:status-data task-id ui-keypath]
+                                  {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
+                        (ut/dissoc-in [:query-history :recos-sys])
+                        (ut/dissoc-in [:query-history :viz-shapes-sys])
+                        (ut/dissoc-in [:query-history :viz-shapes0-sys])
+                        (ut/dissoc-in [:query-history :viz-tables-sys]))))
+          (catch :default e (do (ut/tapp>> [:simple-response-error! (str e)]) db)))))))
 
 (re-frame/reg-event-db ::status-response
                        (fn [db [_ result]]
@@ -932,6 +1008,11 @@
                                      (vec (cons :post-condi ui-keypath))
                                      (get result :result)))))
 
+(re-frame/reg-sub ::websocket-subs
+                  (fn [db _]
+                    (let [subs     (vec (vals (get-in db [:websocket-fx.core/sockets socket-id :subscriptions]))) ;;; trying
+                          subs1    (vec (for [s subs] (get-in s [:message :kind])))]
+                      subs1)))
 
 (re-frame/reg-sub ::websocket-status
                   (fn [db _]
@@ -979,9 +1060,9 @@
          pl          (keys (get db :panels))
          client-name (get db :client-name)
          p0          (cset/difference (set pl) (set pp))
-         base-keys   (filter (comp not namespace) (remove nil? (keys db)))  
+         base-keys   (filter (comp not namespace) (remove nil? (keys db)))
          _ (ut/tapp>> [:is? base-keys])
-          ;; temp-sub-click-params (filter 
+          ;; temp-sub-click-params (filter
           ;;                        #(or
           ;;                          (not (cstr/starts-with? (str %) ":solver-meta/"))
           ;;                          (not (cstr/starts-with? (str %) ":signal/"))
@@ -989,7 +1070,7 @@
           ;;                               (re-matches #".*\d" (str %)))
           ;;                          (not (cstr/ends-with? (str %) "*running?")))
           ;;                        (keys (get db :click-params)))
-          ;;flow-subs-child-keys (for [e (get db :flow-subs)] 
+          ;;flow-subs-child-keys (for [e (get db :flow-subs)]
           ;;                       (remove nil? (try (keyword (last (cstr/split (str e) #"/"))) (catch :default _ nil))))
          image       (-> db ;; dehydrated... as it were
                          (select-keys base-keys)
@@ -999,6 +1080,7 @@
                          (dissoc :flow-results)
                          (dissoc :webcam-feed)
                          (dissoc :rules-map)
+                         (dissoc :leaf-actions)
                          (dissoc :sessions)
                          (dissoc :status-data)
                          (dissoc :solvers-map)
@@ -1027,12 +1109,13 @@
                          (ut/dissoc-in [:click-param :data])
                          (ut/dissoc-in [:click-param :signal])
                          (as-> db' (reduce #(ut/dissoc-in %1 [:click-param %2]) db' db/reactor-types))
-                         (dissoc :data) ;; but NOT clover edn data TODO 
+                         (dissoc :data) ;; but NOT clover edn data TODO
                          (dissoc :flows) ;;; mostly ephemeral with the UI....
                          (dissoc :http-reqs)
                          (dissoc :orders)
-                         (dissoc :solver-status) 
+                         (dissoc :solver-status)
                          (dissoc :sql-source)
+                         (dissoc :shape-rotations)
                          (dissoc :base-sniff-queries)
                          (dissoc :meta)
                          (dissoc :alerts)
@@ -1054,7 +1137,7 @@
                       :screen-name screen-name}
          _ (ut/tapp>> [:saving screen-name "!" image :removed-bogus-keywords bogus-kw])
           ;clean-db (assoc-in db [:http-reqs :save-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
-          ;;is-valid-edn? (ut/is-valid-edn? request) ;; TODO, invalid EDN will prevent saving... 
+          ;;is-valid-edn? (ut/is-valid-edn? request) ;; TODO, invalid EDN will prevent saving...
          ]
      {:db         (assoc-in db [:http-reqs :save-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
       :http-xhrio {:method          method
@@ -1277,8 +1360,8 @@
          _ (ut/tapp>> [:new-name (get new-db :screen-name) :curr curr-screen-name :snap? snap?])]
      (-> db
          (assoc-in [:http-reqs :load-flowset]
-                   (merge old-status {:result result 
-                                      :ended-unix (.getTime (js/Date.)) 
+                   (merge old-status {:result result
+                                      :ended-unix (.getTime (js/Date.))
                                       :status "success"}))
          (assoc :query-history (get new-db :query-history))
          (ut/dissoc-in [:query-history :blocks-sys])

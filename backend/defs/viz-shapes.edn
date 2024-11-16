@@ -1,6 +1,7 @@
 
 {:basic-h-bar-nivo {:axes {:x [:and :dimension?
-                               :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                               ;;:reasonable-cardinality? ;;
+                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                ;[:or :is-string? :is-year? :is-month?]
                                ;[:and [:not :is-date?] [:not :is-datetime?]]
                                ]
@@ -42,9 +43,10 @@
                       :inner-padding 0
                       :border-radius 2}]
                     :base-score 1}
- 
+
  :basic-h-bar-nivo-color {:axes {:x [:and :dimension?
-                                     :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     ;;:reasonable-cardinality? ;;
+                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                                  :color [:and :dimension?
@@ -91,9 +93,10 @@
                             :inner-padding 0
                             :border-radius 2}]
                           :base-score 1}
- 
+
  :basic-h-bar  {:axes {:x [:and :dimension?
-                           :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                           ;;:reasonable-cardinality? ;;
+                           [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                            ;[:or :is-string? :is-year? :is-month?]
                            ;[:and [:not :is-date?] [:not :is-datetime?]]
                            ]
@@ -122,11 +125,12 @@
                              :type "ordinal"}}
                     :mark {:type "bar"
                            :tooltip {:content "encoding"}}}]
-                  :data {:values :table}} {:actions false}]
+                  :data {:values :query-preview}} {:actions false}]
                 :base-score 1}
 
  :basic-v-bar  {:axes {:x [:and :dimension?
-                           :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                           ;;;:reasonable-cardinality? ;;
+                           [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                            [:or :is-string? :is-year? :is-month?]
                            [:and [:not :is-date?] [:not :is-datetime?]]]
                        :y [:measure?]}
@@ -155,12 +159,13 @@
                              :type "ordinal"}}
                     :mark {:type "bar"
                            :tooltip {:content "encoding"}}}]
-                  :data {:values :table}} {:actions false}]
+                  :data {:values :query-preview}} {:actions false}]
                 :base-score 1}
 
 
  :basic-h-bar-avg  {:axes {:x [:and :dimension?
-                               :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                               ;;;:reasonable-cardinality? ;;
+                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                [:or :is-string? :is-year? :is-month?]
                                [:and [:not :is-date?] [:not :is-datetime?]]]
                            :y [:and [:measure?] [:not :is-rowcount?]]}
@@ -189,11 +194,12 @@
                                  :type "ordinal"}}
                         :mark {:type "bar"
                                :tooltip {:content "encoding"}}}]
-                      :data {:values :table}} {:actions false}]
+                      :data {:values :query-preview}} {:actions false}]
                     :base-score 1}
 
  :basic-v-bar-avg  {:axes {:x [:and :dimension?
-                               :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                               ;;;:reasonable-cardinality? ;;
+                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                [:or :is-string? :is-year? :is-month?]
                                [:and [:not :is-date?] [:not :is-datetime?]]]
                            :y [:and [:measure?] [:not :is-rowcount?]]}
@@ -222,12 +228,13 @@
                                  :type "ordinal"}}
                         :mark {:type "bar"
                                :tooltip {:content "encoding"}}}]
-                      :data {:values :table}} {:actions false}]
+                      :data {:values :query-preview}} {:actions false}]
                     :base-score 1}
 
 
  :basic-h-bar-color  {:axes {:x [:and :dimension?
-                                 :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                 ;;;:reasonable-cardinality? ;;
+                                 [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                  [:or :is-string? :is-year? :is-month?]
                                  [:and [:not :is-date?] [:not :is-datetime?]]]
                              :color [:and :dimension?
@@ -260,11 +267,12 @@
                                    :type "ordinal"}}
                           :mark {:type "bar"
                                  :tooltip {:content "encoding"}}}]
-                        :data {:values :table}} {:actions false}]
+                        :data {:values :query-preview}} {:actions false}]
                       :base-score 1}
 
  :basic-v-bar-color  {:axes {:x [:and :dimension?
-                                 :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                 ;;;:reasonable-cardinality? ;;
+                                 [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                  [:or :is-string? :is-year? :is-month?]
                                  [:and [:not :is-date?] [:not :is-datetime?]]]
                              :color [:and :dimension?
@@ -295,12 +303,13 @@
                                    :type "ordinal"}}
                           :mark {:type "bar"
                                  :tooltip {:content "encoding"}}}]
-                        :data {:values :table}} {:actions false}]
+                        :data {:values :query-preview}} {:actions false}]
                       :base-score 1}
 
 
  :basic-h-bar-avg-color  {:axes {:x [:and :dimension?
-                                     :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     ;;;:reasonable-cardinality? ;;
+                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                                  :color [:and :dimension?
@@ -333,11 +342,12 @@
                                        :type "ordinal"}}
                               :mark {:type "bar"
                                      :tooltip {:content "encoding"}}}]
-                            :data {:values :table}} {:actions false}]
+                            :data {:values :query-preview}} {:actions false}]
                           :base-score 1}
 
  :basic-v-bar-avg-color  {:axes {:x [:and :dimension?
-                                     :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     ;;;:reasonable-cardinality? ;;
+                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                      [:or :is-string? :is-year? :is-month?]
                                      [:and [:not :is-date?] [:not :is-datetime?]]]
                                  :color [:and :dimension?
@@ -370,7 +380,7 @@
                                        :type "ordinal"}}
                               :mark {:type "bar"
                                      :tooltip {:content "encoding"}}}]
-                            :data {:values :table}} {:actions false}]
+                            :data {:values :query-preview}} {:actions false}]
                           :base-score 1}
 
 
@@ -411,7 +421,7 @@
                                 :interpolate "monotone"
                                 :point "transparent"
                                 :tooltip {:content "encoding"}}}]
-                       :data {:values :table}}
+                       :data {:values :query-preview}}
                       {:actions false}]
                      :base-score 1}
 
@@ -421,7 +431,8 @@
                                   :color [:and :dimension?
                                           :medium-cardinality?
                                           :is-string?
-                                    ;:reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                    ;:reasonable-cardinality? ;;
+                                    [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                           [:and [:not :is-date?] [:not :is-datetime?]]]
                                   :y [:measure?]}
 
@@ -453,7 +464,7 @@
                                       :interpolate "monotone"
                                       :point "transparent"
                                       :tooltip {:content "encoding"}}}]
-                             :data {:values :table}}
+                             :data {:values :query-preview}}
                             {:actions false}]
                            :base-score 1}
 
@@ -786,7 +797,8 @@
                            :color [:and :dimension?
                                    :medium-cardinality?
                                    :is-string?
-                                    ;:reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                    ;:reasonable-cardinality? ;;
+                                    [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                                    [:and [:not :is-date?] [:not :is-datetime?]]]}
                     :sql-maps [{:select-distinct [:lat-field :long-field :color-field]
                                 :from [:table]}
@@ -2021,7 +2033,7 @@
 ;;                                 :order-by [:dim-field]}
 ;;                                {:vselect
 ;;                                 [:box :size "auto"
-;;                                  ;:height :panel-height-px 
+;;                                  ;:height :panel-height-px
 ;;                                  :height :panel-height+50-px
 ;;                                  :align :center
 ;;                                  :justify :center
@@ -2095,7 +2107,7 @@
                                        :margin {:top 5 :right 5 :bottom 50 :left 45}
                                        :data :query-preview}]
                      :base-score 1}
- 
+
 ;;  :basic-line-nivo {:axes {:x [:or :is-date? :looks-like-date? :looks-like-datetime?]
 ;;                           :y [:measure?]}
 
@@ -2610,51 +2622,52 @@
                          :base-score 1}
 
 
- :drop-down-filter  {:axes {:dim [:and :dimension?
-                                  :is-string?
-                                  :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
-                                  [:and [:not :is-date?] [:not :is-datetime?]]]}
-                     :h 2 :w 6
-                     :sql-maps [{:select [[:dim-field :id] [:dim-field :label]]
-                                 :from [:table]
-                                 :group-by [:dim-field]
-                                 :order-by [:dim-field]}
+;;  :drop-down-filter  {:axes {:dim [:and :dimension?
+;;                                   :is-string?
+;;                                   ;;;:reasonable-cardinality? ;;
+;;                                    [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+;;                                   [:and [:not :is-date?] [:not :is-datetime?]]]}
+;;                      :h 2 :w 6
+;;                      :sql-maps [{:select [[:dim-field :id] [:dim-field :label]]
+;;                                  :from [:table]
+;;                                  :group-by [:dim-field]
+;;                                  :order-by [:dim-field]}
 
-                            ;;      {:vselect
-                            ;;       [:box :size "auto"
-                            ;;      ;:height :panel-height-px 
-                            ;;        :height :panel-height+50-px
-                            ;;        :align :center
-                            ;;        :justify :center
-                            ;;        :attr
-                            ;;        {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style
-                            ;;        {:border [:if [:= :dim-field :panel-key/dim-field]
-                            ;;                  "4px solid orange" "4px solid #ffffff04"]
-                            ;;         :color [:if [:= :dim-field :panel-key/dim-field]
-                            ;;                 "#ffffff" "inherit"]
-                            ;;         :cursor "pointer"
-                            ;;         :font-size "33px"}
-                            ;;        :child [:string :dim-field]]
-                            ;;       :from :query-preview}
-                                ]
+;;                             ;;      {:vselect
+;;                             ;;       [:box :size "auto"
+;;                             ;;      ;:height :panel-height-px
+;;                             ;;        :height :panel-height+50-px
+;;                             ;;        :align :center
+;;                             ;;        :justify :center
+;;                             ;;        :attr
+;;                             ;;        {:on-click [:set-vsql-parameter :dim-field :dim-field]} :style
+;;                             ;;        {:border [:if [:= :dim-field :panel-key/dim-field]
+;;                             ;;                  "4px solid orange" "4px solid #ffffff04"]
+;;                             ;;         :color [:if [:= :dim-field :panel-key/dim-field]
+;;                             ;;                 "#ffffff" "inherit"]
+;;                             ;;         :cursor "pointer"
+;;                             ;;         :font-size "33px"}
+;;                             ;;        :child [:string :dim-field]]
+;;                             ;;       :from :query-preview}
+;;                                 ]
 
-                   ;:conditionals {:testcc [:= 1 1]}
+;;                    ;:conditionals {:testcc [:= 1 1]}
 
-                     :library-shapes
-                     ;;  [:h-box :size "auto" :align :center :justify :center
-                     ;; ;:width :panel-width-px
-                     ;;   :width :panel-width+80-px
-                     ;;   :gap "10px" :children :query-preview-2]
+;;                      :library-shapes
+;;                      ;;  [:h-box :size "auto" :align :center :justify :center
+;;                      ;; ;:width :panel-width-px
+;;                      ;;   :width :panel-width+80-px
+;;                      ;;   :gap "10px" :children :query-preview-2]
 
-                     [:dropdown
-                      {:choices :query-preview
-                       :width :panel-width+80-px
-                       :style {:padding-top "8px"}
-                       :model :panel-key/dim-field ;[:atom :panel-key/dim-field] ;(reagent/atom v)
-                       :field :dim-field}]
+;;                      [:dropdown
+;;                       {:choices :query-preview
+;;                        :width :panel-width+80-px
+;;                        :style {:padding-top "8px"}
+;;                        :model :panel-key/dim-field ;[:atom :panel-key/dim-field] ;(reagent/atom v)
+;;                        :field :dim-field}]
 
-                     :base-score 1}
- 
+;;                      :base-score 1}
+
 
 
 ;;  :compound-trend-2 {:axes {:x [:and :dimension?
@@ -2755,11 +2768,12 @@
 ;;                                            "hi!"]}
 
 ;;                     :base-score 1}
- 
+
  :recharts-h-bar {:axes {:x [:or
                              [:and :dimension?
-                              ;:reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
-                              :reasonable-cardinality?
+                              ;:reasonable-cardinality? ;;
+                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              ;;;:reasonable-cardinality?
                               ]
                              [:or :looks-like-date? :looks-like-datetime?
                               :is-date? :is-datetime?]]
@@ -2768,103 +2782,111 @@
                   :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
                               :from [:table]
                               :group-by [:x-field]}]
-                  
+
                   :category "recharts"
                   :selected-view :reech
                   :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
                                                                     :height :panel-height+50}
-                                           [:> :BarChart {:data :query-preview
-                                                           :margin {:top 5 :bottom 5
-                                                                    :right 30 :left 20}}
-                                            ;[:> :CartesianGrid {:strokeDasharray "3 3"}]
+                                           [:> :ComposedChart {:margin {:top 5 :bottom 5
+                                                                        :right 30 :left 20}}
                                             [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
                                             ;[:> :Legend]
-                                              [:> :Tooltip
-                                               {:contentStyle {:backgroundColor "#00000099"
-                                                               :border          "none"}
-                                                :itemStyle    {:color "#ecf0f1"}
-                                                :labelStyle   {:color "#3498db"}}]
+                                            [:> :Tooltip
+                                             {:contentStyle {:backgroundColor "#00000099"
+                                                             :border          "none"}
+                                              :itemStyle    {:color "#ecf0f1"}
+                                              :labelStyle   {:color "#3498db"}}]
                                             [:> :XAxis {:dataKey :x-field}]
-                                            [:> :Bar {:dataKey :y-field :stroke "#8884d8" :fill "#8884d8" :on-click [:set-recharts-param>]}]
+                                            [:> :Bar {:dataKey :y-field
+                                                      :data :query-preview
+                                                      :stroke "#8884d8"
+                                                      :fill "#8884d8"
+                                                      :on-click [:set-recharts-param>]}]
                                             ;[:> :Line {:type "monotone" :dataKey :uv :stroke "#82ca9d"}]
                                             ]]}
                   :base-score 1}
- 
+
   :recharts-line {:axes {:x [:or
                              [:and :dimension?
-                              :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              ;;;:reasonable-cardinality? ;;
+                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                               ]
                              [:or :looks-like-date? :looks-like-datetime?
                               :is-date? :is-datetime?]]
                          :y [:measure?]}
- 
+
                   :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
                               :from [:table]
                               :group-by [:x-field]}]
- 
+
                   :category "recharts"
                   :selected-view :reech
                   :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
                                                                     :height :panel-height+50}
-                                           [:> :LineChart {:data :query-preview
-                                                          :margin {:top 5 :bottom 5
-                                                                   :right 30 :left 20}}
+                                           [:> :ComposedChart {:margin {:top 5 :bottom 5
+                                                                        :right 30 :left 20}}
                                              ;[:> :CartesianGrid {:strokeDasharray "3 3"}]
                                             [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
                                             ;[:> :Legend]
-                                              [:> :Tooltip
-   {:contentStyle {:backgroundColor "#00000099"
-                   :border          "none"}
-    :itemStyle    {:color "#ecf0f1"}
-    :labelStyle   {:color "#3498db"}}]
+                                            [:> :Tooltip
+                                             {:contentStyle {:backgroundColor "#00000099"
+                                                             :border          "none"}
+                                              :itemStyle    {:color "#ecf0f1"}
+                                              :labelStyle   {:color "#3498db"}}]
                                             [:> :XAxis {:dataKey :x-field}]
-                                            [:> :Line {:type "monotone" :dataKey :y-field :stroke "#8884d8" :activeDot {:r 8} :on-click [:set-recharts-param>]}]
+                                            [:> :Line {:type "monotone"
+                                                       :data :query-preview
+                                                       :dataKey :y-field :stroke "#8884d8" :activeDot {:r 8} :on-click [:set-recharts-param>]}]
                                              ;[:> :Line {:type "monotone" :dataKey :uv :stroke "#82ca9d"}]
                                             ]]}
                   :base-score 1}
- 
+
    :recharts-area {:axes {:x [:or
                             [:and :dimension?
-                             :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                             ;;;:reasonable-cardinality? ;;
+                             [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
                              ]
                             [:or :looks-like-date? :looks-like-datetime?
                              :is-date? :is-datetime?]]
                         :y [:measure?]}
- 
+
                  :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
                              :from [:table]
                              :group-by [:x-field]}]
 
-                   :h 9 :w 9
+                   :h 6 :w 9
                  :category "recharts"
                  :selected-view :reech
                  :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
                                                                    :height :panel-height+50}
-                                          [:> :AreaChart {:data :query-preview
-                                                          :margin {:top 5 :bottom 5
-                                                                   :right 30 :left 20}}
-                                              ;[:> :CartesianGrid {:strokeDasharray "3 3"}]
+                                          [:> :ComposedChart {:margin {:top 5 :bottom 5
+                                                                       :right 30 :left 20}}
                                            [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
                                            ;[:> :Legend]
-                                             [:> :Tooltip
-   {:contentStyle {:backgroundColor "#00000099"
-                   :border          "none"}
-    :itemStyle    {:color "#ecf0f1"}
-    :labelStyle   {:color "#3498db"}}]
+                                           [:> :Tooltip
+                                            {:contentStyle {:backgroundColor "#00000099"
+                                                            :border          "none"}
+                                             :itemStyle    {:color "#ecf0f1"}
+                                             :labelStyle   {:color "#3498db"}}]
                                            [:> :XAxis {:dataKey :x-field}]
-                                           [:> :Area {:type "monotone" :dataKey :y-field :stroke "#8884d8" :activeDot {:r 8} :on-click [:set-recharts-param>]}]
+                                           [:> :Area {:type "monotone"
+                                                      :data :query-preview
+                                                      :dataKey :y-field
+                                                      :stroke "#8884d8"
+                                                      :activeDot {:r 8}
+                                                      :on-click [:set-recharts-param>]}]
                                               ;[:> :Line {:type "monotone" :dataKey :uv :stroke "#82ca9d"}]
                                            ]]}
                  :base-score 1}
 
- 
+
  ;; claude generated
 ;;  :recharts-scatter {:axes {:x [:measure?]
 ;;                            :y [:measure?]}
- 
+
 ;;                     :sql-maps [{:select [:x-field :y-field]
 ;;                                 :from [:table]}]
- 
+
 ;;                     :category "recharts"
 ;;                     :selected-view :reech
 ;;                     :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
@@ -2878,22 +2900,22 @@
 ;;                                               [:> :Scatter {:name "Data" :data :query-preview
 ;;                                                             :fill "#8884d8" :on-click [:set-recharts-param>]}]]]}
 ;;                     :base-score 1}
- 
+
  ;; claude generated
  :recharts-pie {:axes {:segment [:and :dimension?
-                                 [:or :low-cardinality? :very-low-cardinality?  ]]
+                                 [:or :low-cardinality? :very-low-cardinality?]]
                        :value [:measure?]}
- 
+
                 :sql-maps [{:select [[:segment-field :name] [[:sum :value-field] :value]]
                             :from [:table]
                             :group-by [:segment-field]}]
- 
+                :h 6 :w 9
                 :category "recharts"
                 :selected-view :reech
                 :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
                                                                   :height :panel-height+50}
-                                         [:> :PieChart {:margin {:top 20 :right 20
-                                                                 :bottom 20 :left 20}}
+                                         [:> :ComposedChart {:margin {:top 20 :right 20
+                                                                      :bottom 20 :left 20}}
                                           [:> :Pie {:data :query-preview
                                                     :dataKey :value
                                                     :nameKey :name
@@ -2903,22 +2925,22 @@
                                                     :fill "#8884d8"
                                                     :label true
                                                     :on-click [:set-recharts-param>]}]
-                                            [:> :Tooltip
-   {:contentStyle {:backgroundColor "#00000099"
-                   :border          "none"}
-    :itemStyle    {:color "#ecf0f1"}
-    :labelStyle   {:color "#3498db"}}]]]}
+                                          [:> :Tooltip
+                                           {:contentStyle {:backgroundColor "#00000099"
+                                                           :border          "none"}
+                                            :itemStyle    {:color "#ecf0f1"}
+                                            :labelStyle   {:color "#3498db"}}]]]}
                 :base-score 1}
- 
+
  ;; claude generated
 ;;  :recharts-stacked-bar {:axes {:x [:dimension?]
 ;;                                :y [:measure?]
 ;;                                :stack [:dimension?]}
- 
+
 ;;                         :sql-maps [{:select [:x-field :y-field :stack-field]
 ;;                                     :from [:table]
 ;;                                     :group-by [:x-field :stack-field]}]
- 
+
 ;;                         :category "recharts"
 ;;                         :selected-view :reech
 ;;                         :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
@@ -2940,7 +2962,7 @@
 ;;                                                             :fill "#8884d8"
 ;;                                                             :on-click [:set-recharts-param>]}]]]}
 ;;                         :base-score 1}
- 
+
 
 
 ;;  :recharts-line {:w 8
@@ -2969,18 +2991,18 @@
 ;;                                            ]]}
 ;;                  :base-score 1}
 
- 
+
  ;;; test claude generated vega-lite
  :heatmap-2d {:axes {:x [:and :dimension?
                          [:or :low-cardinality? :medium-cardinality?]]
                      :y [:and :dimension?
                          [:or :low-cardinality? :medium-cardinality?]]
                      :color [:measure?]}
- 
+
               :sql-maps [{:select [:x-field :y-field [[[:sum :color-field]] :color-field]]
                           :from [:table]
                           :group-by [:x-field :y-field]}]
- 
+
               :library-shapes
               [:vega-lite
                {:layer
@@ -2992,17 +3014,17 @@
                            :scale {:scheme "viridis"}}}
                   :mark {:type "rect"
                          :tooltip {:content "encoding"}}}]
-                :data {:values :table}} {:actions false}]
+                :data {:values :query-preview}} {:actions false}]
               :base-score 1}
- 
+
  :scatter-plot {:axes {:x [:measure?]
                        :y [:measure?]
                        :size [:measure?]
                        :color [:dimension?]}
- 
+
                 :sql-maps [{:select [:x-field :y-field :size-field :color-field]
                             :from [:table]}]
- 
+
                 :library-shapes
                 [:vega-lite
                  {:layer
@@ -3015,19 +3037,19 @@
                     :mark {:type "circle"
                            :opacity 0.7
                            :tooltip {:content "encoding"}}}]
-                  :data {:values :table}} {:actions false}]
+                  :data {:values :query-preview}} {:actions false}]
                 :base-score 1}
- 
+
  :stacked-area-chart {:axes {:x [:or [:looks-like-date?] [:looks-like-datetime?]
                                  [:is-date?] [:is-datetime?]]
                              :y [:measure?]
                              :color [:and :dimension?
                                      [:or :low-cardinality? :very-low-cardinality?]]}
- 
+
                       :sql-maps [{:select [:x-field [[[:sum :y-field]] :y-field] :color-field]
                                   :from [:table]
                                   :group-by [:x-field :color-field]}]
- 
+
                       :library-shapes
                       [:vega-lite
                        {:layer
@@ -3041,18 +3063,18 @@
                                    :scale {:scheme "category20b"}}}
                           :mark {:type "area"
                                  :tooltip {:content "encoding"}}}]
-                        :data {:values :table}} {:actions false}]
+                        :data {:values :query-preview}} {:actions false}]
                       :base-score 1}
- 
+
 ;;  :box-plot {:axes {:x [:and :dimension?
 ;;                        :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
 ;;                        ]
 ;;                    :y [:measure?]}
- 
+
 ;;             :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
 ;;                         :from [:table]
 ;;                         :group-by [:x-field]}]
- 
+
 ;;             :library-shapes
 ;;             [:vega-lite
 ;;              {:layer
@@ -3063,14 +3085,14 @@
 ;;                 :mark {:type "boxplot"
 ;;                        :extent "min-max"
 ;;                        :tooltip {:content "encoding"}}}]
-;;               :data {:values :table}} {:actions false}]
+;;               :data {:values :query-preview}} {:actions false}]
 ;;             :base-score 1}
- 
+
 ;;  :code-test {:axes {:x :true?}
-            
+
 ;;              :sql-maps []
 ;;              :runner :clojure
-            
+
 ;;              :library-shapes
 ;;              (str :x-field (rand-int 123) "!")
 ;;              :base-score 1}

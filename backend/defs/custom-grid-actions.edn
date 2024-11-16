@@ -35,7 +35,7 @@
 ;;                                                           :style-override {}
 ;;                                                           :icon "assets/head2.jpg"
 ;;                                                           :tooltip "411-wow."}]})))))}
- 
+
 ;;  :owen-wilson-drawer
 ;;   {:description "test grid action yo1"
 ;;   :build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
@@ -48,7 +48,7 @@
 ;;                                                 ;;   :let [panel (get-in client-panels [k :queries kk])
 ;;                                                 ;;         panel-data (get-in client-data [k :queries kk])]
 ;;                                                  ]
-;;                                              {[k tt kk] [{:body [:box 
+;;                                              {[k tt kk] [{:body [:box
 ;;                                                                  :style {:color "darkcyan"}
 ;;                                                                  :child [:box :child "hey, clover"]]
 ;;                                                           :runner :views
@@ -57,41 +57,41 @@
 ;;                                                           :block-id :wow333
 ;;                                                           :view-id :wow
 ;;                                                           :size 8
-;;                                                           :position :bottom 
+;;                                                           :position :bottom
 ;;                                                           :style-override {}
 ;;                                                           :icon "assets/head1.jpg"
 ;;                                                           :tooltip "Owen Wilson button drawer"}]})))))}
- 
- 
-;;  :pie-pop-up
-;;  {:build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
-;;                      (into {}
-;;                            (apply concat (for [[k v] client-panels
-;;                                                :when (or (get v :queries)
-;;                                                          (not (empty? (get v :implied-rowsets))))]
-;;                                            (for [[tt kk] (into (get v :implied-rowsets)
-;;                                                                (mapv (fn [x] [:queries x]) (keys (get v :queries))))
-;;                                                  ;;   :let [panel (get-in client-panels [k :queries kk])
-;;                                                  ;;         panel-data (get-in client-data [k :queries kk])]
-;;                                                  ]
-;;                                              {[k tt kk] [{:body [:box :size "auto"
-;;                                                                  ;:width :panel-width+50-px
-;;                                                                  :height :panel-height+50-px
-;;                                                                  :align :center :justify :center 
-;;                                                                  :style {:color "red" :font-size "35px" :border "1px solid green"}
-;;                                                                  :child [:speak "hold yer horses"]]
-;;                                                           :runner :views
-;;                                                           :title "bad moon risin', rage an' ruin!"
-;;                                                           :action-type :clover-drawer
-;;                                                           :target :query
-;;                                                           :block-id :wow333
-;;                                                           :view-id :wow
-;;                                                           :size 5
-;;                                                           :position :bottom
-;;                                                           :style-override {}
-;;                                                           :icon "ri-pie-chart-2-fill"
-;;                                                           :tooltip "Bad moon is risin'"}]})))))}
- 
+
+
+ :pie-pop-up
+ {:build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
+                     (into {}
+                           (apply concat (for [[k v] client-panels
+                                               :when (or (get v :queries)
+                                                         (not (empty? (get v :implied-rowsets))))]
+                                           (for [[tt kk] (into (get v :implied-rowsets)
+                                                               (mapv (fn [x] [:queries x]) (keys (get v :queries))))
+                                                 ;;   :let [panel (get-in client-panels [k :queries kk])
+                                                 ;;         panel-data (get-in client-data [k :queries kk])]
+                                                 ]
+                                             {[k tt kk] [{:body [:box :size "auto"
+                                                                 ;:width :panel-width+50-px
+                                                                 :height :panel-height+50-px
+                                                                 :align :center :justify :center
+                                                                 :style {:color "red" :font-size "35px" :border "1px solid green"}
+                                                                 :child [:speak "hold yer horses"]]
+                                                          :runner :views
+                                                          :title "bad moon risin', rage an' ruin!"
+                                                          :action-type :clover-drawer
+                                                          :target :query
+                                                          :block-id :wow333
+                                                          :view-id :wow
+                                                          :size 5
+                                                          :position :bottom
+                                                          :style-override {}
+                                                          :icon "ri-pie-chart-2-fill"
+                                                          :tooltip "Bad moon is risin'"}]})))))}
+
 ;;  :fart-fax
 ;;  {:description "test grid action yo"
 ;;   :build-clover-fn (fn [client-panels client-data client-metadata] ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
@@ -106,10 +106,10 @@
 ;;                                                                      ;:width :panel-width+50-px
 ;;                                                                      :height :panel-height+50-px
 ;;                                                                      :align :center :justify :center
-;;                                                                      :style {:color "orange" 
+;;                                                                      :style {:color "orange"
 ;;                                                                              :font-weight 800
-;;                                                                              :font-size "35px" 
-;;                                                                              :border "1px solid green" 
+;;                                                                              :font-size "35px"
+;;                                                                              :border "1px solid green"
 ;;                                                                              :cursor "pointer"}
 ;;                                                                      :child [:str "set me?" " "  [:or! [:*this-block* :fart-fax222] "START"]]]
 ;;                                                               :runner :views
@@ -123,17 +123,21 @@
 ;;                                                               :style-override {:color "orange"}
 ;;                                                               :icon "ri-customer-service-line"
 ;;                                                               :tooltip "Bad moon is risin'"}]})))))}
- 
+
  :xtdb-temporal-sql-scrubbers
  {:description "when using XTDB we can add scrubbers to the table to timetravel - both VALID_TIME or SYSTEM_TIME"
-  :build-clover-fn (fn [client-panels client-data client-metadata] 
+  :build-clover-fn (fn [client-panels client-data client-metadata]
                      ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions map
                      (let [today (java.time.LocalDate/now)
                            key-seed (rand-int 555)
                            k1 (str "xtdb-val-scrub-" key-seed)
-                           k2 (str "xtdb-sys-scrub-" key-seed)
-                           kkw1 (keyword (str k1 "/" "valid-date-slider"))
-                           kkw2 (keyword (str k2 "/" "system-date-slider"))
+                           k2 (str "xtdb-sys-scrub-" (inc key-seed))
+                           p1 (str "valid-date-slider" key-seed)
+                           p2 (str "system-date-slider" (inc key-seed))
+                           kkw1 (keyword (str k1 "/" p1))
+                           kkw2 (keyword (str k2 "/" p2))
+                           pk1 (keyword p1)
+                           pk2 (keyword p2)
                            kw1 (keyword k1)
                            kw2 (keyword k2)
                            today-str-date (.format today (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd"))]
@@ -148,7 +152,7 @@
                                                          ;;_ (clojure.pprint/pprint panel)
                                                          ] ;; the data output of the panel def (query, repl, solver, etc)
                                                    :when (and (clojure.string/includes? (clojure.string/lower-case (get panel-metadata :connection-id "")) "xtdb")
-                                                              (not= kk :bounds) ;; dont want to circular examine our generated artifacts 
+                                                              (not= kk :bounds) ;; dont want to circular examine our generated artifacts
                                                               (= (get panel-metadata :database-type) "PostgreSQL"))] ;; ^ until we have a better way to identify, since it pgsql wire protocol
                                                (try
                                                  {[k tt kk] [{:body [:box
@@ -163,13 +167,14 @@
                                                                              :color        :theme/editor-outer-rim-color
                                                                              :font-family  :theme/base-font}
                                                                      :child [:date-slider
-                                                                             :valid-date-slider
+                                                                             pk1 ;:valid-date-slider
                                                                              :bounds/vmin.0  ;"2023-01-01"
                                                                              :bounds/mmax.0  ;"2023-12-31"
                                                                              1
                                                                              250
                                                                              ;;:xtdb-scrub/valid-date-slider
-                                                                             [:or! [kw1 :valid-date-slider] today-str-date]
+                                                                             [:or! [kw1 pk1 ;:valid-date-slider
+                                                                                    ] today-str-date]
                                                                              "yyyy-MM-dd"
                                                                              "MMM dd, yyyy"
                                                                              ":valid-time :as-of-date"]]
@@ -209,13 +214,14 @@
                                                                              :color        :theme/editor-outer-rim-color
                                                                              :font-family  :theme/base-font}
                                                                      :child [:date-slider
-                                                                             :system-date-slider
+                                                                             pk2 ;:system-date-slider
                                                                              :bounds/smin.0 ;"2024-01-01"
                                                                              :bounds/mmax.0 ;"2024-12-31"
                                                                              1
                                                                              250
                                                                          ;:xtdb-scrub1/system-date-slider
-                                                                             [:or! [kw2 :system-date-slider] today-str-date]
+                                                                             [:or! [kw2 pk2 ;:system-date-slider
+                                                                                    ] today-str-date]
                                                                              "yyyy-MM-dd"
                                                                              "MMM dd, yyyy"
                                                                              ":system-time :as-of-date"]]
@@ -262,7 +268,7 @@
 
  :field-masters!
  {:description "test grid action yo1"
-  :build-clover-fn (fn [client-panels client-data client-metadata] 
+  :build-clover-fn (fn [client-panels client-data client-metadata]
                      ;; return a map of keys [:block-id :runner-type :view-id] and custom-grid-actions vector as a value
                      (into {}
                            (apply concat (for [[k v] client-panels
@@ -283,7 +289,7 @@
                                                                 :style-override {:background-color "pink"}
                                                                 :icon "zmdi-shape"
                                                                 :tooltip "111wow."}))})))))}}
- 
+
 
 ;;  _______ _     _ _______ _______  _____  _______       ______  ______ _____ ______       _______ _______ _______ _____  _____  __   _ _______
 ;;  |       |     | |______    |    |     | |  |  |      |  ____ |_____/   |   |     \      |_____| |          |      |   |     | | \  | |______
@@ -292,8 +298,8 @@
 ;; comment docs (or is it a design doc? you'll never know)
 
 ;; Every time a client receives a heartbeat (15 seconds) the server-side copies of it's panel defs and data can be run through a function:
-;; 1 - determine if it's a block/view that is of interest by viewing its data 
-;; 2 - access the data to create relevant custom grid UI as Clover 
+;; 1 - determine if it's a block/view that is of interest by viewing its data
+;; 2 - access the data to create relevant custom grid UI as Clover
 
 ;; Currently there are 3 types of custom UI elements
 
@@ -306,9 +312,9 @@
 ;;  :w 3 ;; optional
 ;;  :block-id :my-block-123 ;; optional
 ;;  :view-id  :scrubber-123 ;; optional
-;;  :action-type :draggable 
+;;  :action-type :draggable
 ;;  :target :query ;; :query - targets the bottom bar of the data grid block view
-;;  :style-override {} ;; gets applied to the icon itself 
+;;  :style-override {} ;; gets applied to the icon itself
 ;;  :icon "zmdi-shape" ;; icon. can be an image url, zmdi-* material design (https://zavoloklom.github.io/material-design-iconic-font/icons.html), or remix icons ri-* def https://remixicon.com/
 ;;  :tooltip "111wow."} ;; tooltip for hovering on the icon. Note, since these are dynamically created based on the data every 15 seconds, tooltips and css could be used as a kind of low key alert.
 
@@ -321,9 +327,9 @@
 ;;  :runner :views ;; runner to use
 ;;  :h 3 ;; optional (for new)
 ;;  :w 3 ;; optional
-;;  :action-type :draggable-pill 
+;;  :action-type :draggable-pill
 ;;  :target :field
-;;  :style-override {} ;; gets applied to the icon itself 
+;;  :style-override {} ;; gets applied to the icon itself
 ;;  :icon "zmdi-shape" ;; icon. can be an image url, zmdi-* material design (https://zavoloklom.github.io/material-design-iconic-font/icons.html), or remix icons ri-* def https://remixicon.com/
 ;;  :tooltip "111wow."} ;; tooltip for hovering on the icon. Note, since these are dynamically created based on the data every 15 seconds, tooltips and css could be used as a kind of low key alert.
 
@@ -341,6 +347,6 @@
 ;;  :side :bottom ;; :left :right (top not allowed)
 ;;  :action-type :clover-drawer
 ;;  :target :query ;; location - only one avail now is :query, which targets the bottom bar of the data grid block view
-;;  :style-override {} ;; gets applied to the icon itself 
+;;  :style-override {} ;; gets applied to the icon itself
 ;;  :icon "zmdi-shape" ;; icon. can be an image url, zmdi-* material design (https://zavoloklom.github.io/material-design-iconic-font/icons.html), or remix icons ri-* def https://remixicon.com/
 ;;  :tooltip "111wow."} ;; tooltip for hovering on the icon. Note, since these are dynamically created based on the data every 15 seconds, tooltips and css could be used as a kind of low key alert.

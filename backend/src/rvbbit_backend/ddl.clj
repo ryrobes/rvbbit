@@ -21,60 +21,64 @@
 ;;                           ;")
 
 (def create-reco-vw
-  "create view viz_recos_vw as 
-   select distinct c.context_hash, c.combo_hash, c.connection_id, c.shape_name, c.query_map, c.query_map_str,
-       c.viz_map, c.combo_edn, c.selected_view, c2.table_name as table_name, c.conditionals as condis, c.h as h, c.w as w, c.runner as runner, c.score as score   
+  "create view viz_recos_vw as
+   select distinct c.context_hash, c.combo_hash, c.connection_id, c.shape_name, c.query_map, c.query_map_str, c.mutate_map, c.category,
+       c.viz_map, c.combo_edn, c.selected_view, c2.table_name as table_name, c.conditionals as condis, c.h as h, c.w as w, c.runner as runner, c.score as score
 from combos c left join (select distinct connection_id, table_name, context_hash from found_fields) c2
 on c.connection_id = c2.connection_id and c.context_hash = c2.context_hash
 ;")
 
 (def create-reco-vw2
-  "create view viz_recos_vw2 as 
+  "create view viz_recos_vw2 as
 WITH RankedCombos AS (
-    SELECT distinct 
-        c.context_hash, 
-        c.combo_hash, 
-        c.connection_id, 
-        c.shape_name, 
-        c.query_map, 
+    SELECT distinct
+        c.context_hash,
+        c.combo_hash,
+        c.connection_id,
+        c.shape_name,
+        c.query_map,
         c.query_map_str,
-        c.viz_map, 
-        c.combo_edn, 
+        c.mutate_map,
+        c.category,
+        c.viz_map,
+        c.combo_edn,
         c.selected_view,
-        c2.table_name as table_name, 
-        c.conditionals as condis, 
-        c.h as h, 
-        c.w as w, 
-        c.runner as runner, 
+        c2.table_name as table_name,
+        c.conditionals as condis,
+        c.h as h,
+        c.w as w,
+        c.runner as runner,
         c.score as score,
         ROW_NUMBER() OVER(PARTITION BY c2.table_name, c.shape_name ORDER BY c.score DESC) AS rn
-    FROM 
-        combos c 
-    LEFT JOIN 
+    FROM
+        combos c
+    LEFT JOIN
         (SELECT DISTINCT connection_id, table_name, context_hash  FROM found_fields) c2
-    ON 
+    ON
         c.connection_id = c2.connection_id AND c.context_hash = c2.context_hash
 )
 
-SELECT distinct 
-    context_hash, 
-    combo_hash, 
-    connection_id, 
-    shape_name, 
-    query_map, 
+SELECT distinct
+    context_hash,
+    combo_hash,
+    connection_id,
+    shape_name,
+    query_map,
     query_map_str,
-    viz_map, 
-    combo_edn, 
+    mutate_map,
+    category,
+    viz_map,
+    combo_edn,
     selected_view,
-    table_name, 
-    condis, 
-    h, 
-    w, 
+    table_name,
+    condis,
+    h,
+    w,
     runner,
     score
-FROM 
+FROM
     RankedCombos
-WHERE 
+WHERE
     rn = 1
 ;")
 
@@ -92,18 +96,18 @@ group by 1, 2) tt on s.client_name = tt.client_name
                          and s.ts = tt.max_ts ;")
 
 (def create-realms
-  "create table if not exists realms 
-  (realm_name text NULL, 
-   file_path text NULL, 
+  "create table if not exists realms
+  (realm_name text NULL,
+   file_path text NULL,
    block_name text NULL,
    block_key text NULL,
    block_type text NULL,
    block_data text NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP  DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
-(def create-llm-log-duck ;;; duck 
-  "create table if not exists llm_log 
+(def create-llm-log-duck ;;; duck
+  "create table if not exists llm_log
   (client_name varchar NULL,
    assistant_name varchar NULL,
    thread_id varchar NULL,
@@ -126,7 +130,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     memory VARCHAR,
     push INTEGER,
     queue_size INTEGER,
-    server_subs INTEGER,     
+    server_subs INTEGER,
     last_seen_seconds INTEGER,
     booted_ts BIGINT,
     queue_distro VARCHAR,
@@ -139,8 +143,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 (def create-jvm-stats-duck
   "CREATE TABLE IF NOT EXISTS jvm_stats (
-    used_memory_mb INTEGER, 
-    thread_count INTEGER, 
+    used_memory_mb INTEGER,
+    thread_count INTEGER,
     messages BIGINT,
     batches BIGINT,
     recent_batches INTEGER,
@@ -153,7 +157,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     recent_queries_run INTEGER,
     recent_queries_per_second DOUBLE,
     queries_per_second DOUBLE,
-    sql_cache_size INTEGER, 
+    sql_cache_size INTEGER,
     ws_peers INTEGER,
     subscriptions INTEGER,
     open_flow_channels INTEGER,
@@ -167,53 +171,53 @@ group by 1, 2) tt on s.client_name = tt.client_name
   );")
 
 (def create-status
-  "create table if not exists status 
+  "create table if not exists status
   (client_name text NULL,
    op_name text NULL,
    status text NULL,
-   -- ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
-   ts TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')) 
+   -- ts TIMESTAMP   NULL
+   ts TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))
    ) ;")
 
 (def create-errors
-  "create table if not exists errors 
+  "create table if not exists errors
   (db_conn text NULL,
    sql_stmt text NULL,
    error_str text NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL
    ) ;")
 
 (def create-screens
-  "create table if not exists screens 
+  "create table if not exists screens
   (file_path text NULL,
    screen_name text NULL,
    blocks integer NULL,
    queries integer NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL
    ) ;")
 
 (def create-blocks
-  "create table if not exists blocks 
-  (file_path text NULL, 
+  "create table if not exists blocks
+  (file_path text NULL,
    screen_name text NULL,
    block_key text NULL,
    block_name text NULL,
    views integer NULL,
    queries integer NULL,
    view_names text NULL,
-   query_names text NULL, 
+   query_names text NULL,
    block_data text NULL,
    tab_name text NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL
    ) ;")
 
 (def create-boards
   "create table if not exists boards
-  (file_path text NULL, 
+  (file_path text NULL,
    screen_name text NULL,
    board_name text NULL,
    board_data text NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL
    ) ;")
 
 (def create-tests
@@ -224,21 +228,21 @@ group by 1, 2) tt on s.client_name = tt.client_name
    db_schema text NULL,
    db_catalog text NULL,
    table_name text NULL,
-   field_name text NULL, 
+   field_name text NULL,
    field_type text NULL,
-   data_type text NULL, 
+   data_type text NULL,
    key_hash text NULL,
    context_hash text NULL,
    derived_calc text NULL,
    derived_name text NULL,
-   is_sample integer NULL,  
-   test_sql text NULL, 
+   is_sample integer NULL,
+   test_sql text NULL,
    test_raw_val text NULL,
    test_name text NULL,
    test_val_string text NULL,
    test_val_integer integer NULL,
    test_val_float float NULL,
-   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL,
    run_id integer NULL) ;")
 
 (def create-attributes
@@ -256,14 +260,14 @@ group by 1, 2) tt on s.client_name = tt.client_name
    derived_name text NULL,
    attribute_name text NULL,
    attribute_value boolean NULL,
-   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL,
    run_id integer NULL
    -- primary key (connection_id, attribute_name)
-   -- PK later when we figure out update semantics 
+   -- PK later when we figure out update semantics
    ) ;")
 
 (def create-found-fields
-  "create table if not exists found_fields 
+  "create table if not exists found_fields
   (db_type text NULL,
    connection_id text NULL,
    table_type text NULL,
@@ -273,29 +277,29 @@ group by 1, 2) tt on s.client_name = tt.client_name
    field_name text NULL,
    derived_calc text NULL,
    derived_name text NULL,
-   context_hash text NULL, 
+   context_hash text NULL,
    key_hash text NULL,
-   shape_name text NULL, 
+   shape_name text NULL,
    axes_key text NULL,
-   logic_map text NULL, 
-   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+   logic_map text NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL,
    run_id integer NULL
    -- primary key (connection_id, attribute_name)
-   -- PK later when we figure out update semantics 
+   -- PK later when we figure out update semantics
    ) ;")
 
 (def create-connections
   "create table if not exists connections
-   (connection_id text, 
-    connection_str text, 
-    user_name text NULL, 
-    database_name text NULL, 
+   (connection_id text,
+    connection_str text,
+    user_name text NULL,
+    database_name text NULL,
     database_version text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
-    original_connection_str text NULL, 
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL,
+    original_connection_str text NULL,
     metadata_filter text NULL,
     run_id integer NULL,
-    started_at TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+    started_at TIMESTAMP   NULL,
     ended_at TIMESTAMP NULL --,
     -- primary key (connection_id)
     ) ;")
@@ -308,15 +312,15 @@ group by 1, 2) tt on s.client_name = tt.client_name
    db_schema text NULL,
    db_catalog text NULL,
    table_name text NULL,
-   field_name text NULL, 
+   field_name text NULL,
    field_type text NULL,
-   data_type text NULL, 
+   data_type text NULL,
    context_hash text NULL,
    key_hash text NULL,
    is_group_by boolean NULL,
-   derived_calc text NULL, 
+   derived_calc text NULL,
    derived_name text NULL,
-   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+   updated TIMESTAMP  DEFAULT (datetime('now', 'localtime')) NULL,
    run_id integer NULL --,
    -- primary key (db_type, connection_id, table_type, db_schema, db_catalog, table_name, field_name, derived_calc)
    ) ;")
@@ -326,13 +330,15 @@ group by 1, 2) tt on s.client_name = tt.client_name
   (context_hash text NULL,
    uuid text NULL,
    combo_hash text NULL,
-   connection_id text NULL,                    
+   connection_id text NULL,
    shape_name text NULL,
-   table_name text NULL,    
+   table_name text NULL,
    selected_view text NULL,
    query_map text NULL,
    query_map_str text NULL,
+   category text NULL,
    viz_map text NULL,
+   mutate_map text NULL,
    conditionals text NULL,
    key_hashes text NULL,
    key_hashes_hash text NULL,
@@ -346,18 +352,18 @@ group by 1, 2) tt on s.client_name = tt.client_name
   "create table if not exists combo_rows
   (context_hash text NULL,
    combo_hash text NULL,
-   connection_id text NULL,                    
+   connection_id text NULL,
    shape_name text NULL,
-   axes text NULL,   
-   talias text NULL,                        
-   walk1 text NULL,                        
+   axes text NULL,
+   talias text NULL,
+   walk1 text NULL,
    walk2 text NULL,
    walk3 text NULL,
-   walka text NULL,                        
+   walka text NULL,
    key_hash text NULL,
-   table_type text NULL,                
+   table_type text NULL,
    field_type text NULL,
-   data_type text NULL, 
+   data_type text NULL,
    db_type text NULL,
    db_schema text NULL,
    db_catalog text NULL,
@@ -373,9 +379,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
   "create table if not exists rule_maps_tests
    (connection_id text NULL,
     run_id integer NULL,
-   test_name text NULL, 
-    sql_map text NULL, 
-    when_logic text NULL, 
+   test_name text NULL,
+    sql_map text NULL,
+    when_logic text NULL,
     fetch_one text NULL
     ) ;")
 
@@ -383,7 +389,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
   "create table if not exists rule_maps_attributes
    (connection_id text NULL,
     run_id integer NULL,
-    attribute_name text NULL, 
+    attribute_name text NULL,
     when_logic text NULL
     ) ;")
 
@@ -391,8 +397,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
   " create table if not exists rule_maps_derived_fields
    (connection_id text NULL,
     run_id integer NULL,
-   field_name text NULL, 
-    when_logic text NULL, 
+   field_name text NULL,
+    when_logic text NULL,
     calc_logic text NULL
     ) ;")
 
@@ -400,9 +406,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
   " create table if not exists rule_maps_viz_shapes
    (connection_id text NULL,
     run_id integer NULL,
-    shape_name text NULL, 
-    axes_logic text NULL,    
-    sql_maps text NULL, 
+    shape_name text NULL,
+    axes_logic text NULL,
+    sql_maps text NULL,
     base_score integer NULL,
     selected_view text NULL,
     library_shapes text NULL
@@ -411,30 +417,30 @@ group by 1, 2) tt on s.client_name = tt.client_name
 (def create-logs
   "create table if not exists logs
    (booted text NULL,
-    ts number NULL, 
-    hts text NULL, 
+    ts number NULL,
+    hts text NULL,
     caller text NULL,
-    type_key text NULL,              
+    type_key text NULL,
     log_str text NULL) ;")
 
 (def create-tables
   "create table if not exists connections
-   (connection_hash text NULL, 
-    connection_str text NULL, 
-    user_name text NULL, 
-    product_name text NULL, 
+   (connection_hash text NULL,
+    connection_str text NULL,
+    user_name text NULL,
+    product_name text NULL,
     product_version text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL,
     run_id integer NULL) ;")
 
 (def create-viz
   "create table if not exists connections
-   (connection_hash text NULL, 
-    connection_str text NULL, 
-    user_name text NULL, 
-    product_name text NULL, 
+   (connection_hash text NULL,
+    connection_str text NULL,
+    user_name text NULL,
+    product_name text NULL,
     product_version text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL,
     run_id integer NULL) ;")
 
 ;; {:kp (str kp) :client_name (str client-name) :data (pr-str data) :panel-key (str (get kp 0))
@@ -444,58 +450,58 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 (def create-panel-history
   "create table if not exists panel_history
-   (kp text NULL, 
-    client_name text NULL, 
-    data text NULL, 
+   (kp text NULL,
+    client_name text NULL,
+    data text NULL,
     pre_data text NULL,
-    diff text NULL,     
-    diff_kp text NULL,                           
-    panel_key text NULL, 
+    diff text NULL,
+    diff_kp text NULL,
+    panel_key text NULL,
     key text NULL,
     type text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-panel-resolved-history
   "create table if not exists panel_resolved_history
-   (kp text NULL, 
-    client_name text NULL, 
-    data text NULL, 
+   (kp text NULL,
+    client_name text NULL,
+    data text NULL,
     pre_data text NULL,
-    diff text NULL,     
-    diff_kp text NULL,                           
-    panel_key text NULL, 
+    diff text NULL,
+    diff_kp text NULL,
+    panel_key text NULL,
     key text NULL,
     type text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-panel-materialized-history
   "create table if not exists panel_materialized_history
-   (kp text NULL, 
-    client_name text NULL, 
-    data text NULL, 
+   (kp text NULL,
+    client_name text NULL,
+    data text NULL,
     pre_data text NULL,
-    diff text NULL,     
-    diff_kp text NULL,                           
-    panel_key text NULL, 
+    diff text NULL,
+    diff_kp text NULL,
+    panel_key text NULL,
     key text NULL,
     type text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 
 
 (def create-board-history
   "create table if not exists board_history
-   (client_name text NULL, 
-    data text NULL, 
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+   (client_name text NULL,
+    data text NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-flow-functions
   "create table if not exists flow_functions
    (connection_id text NULL,
     run_id integer NULL,
-    category text NULL, 
+    category text NULL,
     sub_flow text NULL,
-    name text NULL, 
+    name text NULL,
     full_map text NULL,
     description text NULL,
     file_path text NULL,
@@ -503,29 +509,29 @@ group by 1, 2) tt on s.client_name = tt.client_name
     icon text NULL,
     input_types text NULL,
     output_types text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-kits
   "create table if not exists kits
    (id INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_hash text NULL, 
+    item_hash text NULL,
     item_name text NULL,
     kit_name text NULL,
     item_type text NULL,
     item_key text NULL,
-    item_idx integer NULL,   
+    item_idx integer NULL,
     item_options text NULL,
-    item_data text NULL, 
+    item_data text NULL,
     client_name text NULL,
     flow_id text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    updated TIMESTAMP  DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-flow-schedules
   "create table if not exists flow_schedules
    (schedule text NULL,
     flow_id text NULL,
     opts text NULL,
-    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 ;; ^^^ query_hash, type, query_id, kit_name,   key,    idx,  edn_data
 ;; (no client-id so we can "reuse" persistent calls if wanted)
@@ -540,9 +546,11 @@ group by 1, 2) tt on s.client_name = tt.client_name
     client_subs integer NULL,
     last_seen text NULL,
     memory text NULL,
+    screen_name text NULL,
+    selected_tab text NULL,
     push integer NULL,
     queue_size integer NULL,
-    server_subs integer NULL,     
+    server_subs integer NULL,
     last_seen_seconds integer NULL,
     booted_ts integer NULL,
     queue_distro text NULL,
@@ -550,12 +558,12 @@ group by 1, 2) tt on s.client_name = tt.client_name
     uptime text NULL,
     messages_per_second integer NULL,
     recent_messages_per_second integer NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-jvm-stats
   "create table if not exists jvm_stats
-   (used_memory_mb integer NULL, 
-    thread_count integer NULL, 
+   (used_memory_mb integer NULL,
+    thread_count integer NULL,
     messages integer NULL,
     batches integer NULL,
     recent_batches integer NULL,
@@ -568,7 +576,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     recent_queries_run integer NULL,
     recent_queries_per_second float NULL,
     queries_per_second float NULL,
-    sql_cache_size integer NULL, 
+    sql_cache_size integer NULL,
     ws_peers integer NULL,
     subscriptions integer NULL,
     open_flow_channels integer NULL,
@@ -578,7 +586,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     internal_queries_run integer NULL,
     sniffs_run integer NULL,
     sys_load real NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-flows
   "create table if not exists flows
@@ -588,7 +596,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    connections integer NULL,
    last_modified text NULL,
    body text NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL
    ) ;")
 
 (def create-flow-history
@@ -606,16 +614,16 @@ group by 1, 2) tt on s.client_name = tt.client_name
    elapsed_seconds real NULL,
    human_elapsed text NULL,
    overrides text NULL,
-   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL
    ) ;")
 
 (def create-flow-results
   "create table if not exists flow_results
    (flow_id text NULL,
     block_key text NULL,
-    block_value text NULL,                      
+    block_value text NULL,
     data_type text NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-live-schedules
   "create table if not exists live_schedules
@@ -624,7 +632,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     schedule text NULL,
     channel text NULL,
     next_times text NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-channel-history
   "create table if not exists channel_history
@@ -632,7 +640,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     run_id text NULL,
     base_flow_id text NULL,
     channel text NULL,
-    data_type text NULL,                      
+    data_type text NULL,
     dest text NULL,
     end_ts text NULL,
     start_ts text NULL,
@@ -641,7 +649,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     start number NULL,
     type text NULL,
     value text NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-fn-history
   "create table if not exists fn_history
@@ -649,8 +657,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
     run_id text NULL,
     base_flow_id text NULL,
     channel text NULL,
-    block text NULL,                        
-    data_type text NULL,         
+    block text NULL,
+    data_type text NULL,
     end_ts text NULL,
     start_ts text NULL,
     dbgn text NULL,
@@ -663,7 +671,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     start number NULL,
     type text NULL,
     value text NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-client-items
   "create table if not exists client_items
@@ -675,24 +683,26 @@ group by 1, 2) tt on s.client_name = tt.client_name
     sample text NULL,
     display_name text NULL,
     block_meta text NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 (def create-client-memory
   "create table if not exists client_memory
    (mem_time text NULL,
     client_name text NULL,
+    selected_tab text NULL,
+    screen_name text NULL,
     packets integer NULL,
-    batches integer NULL,                           
+    batches integer NULL,
     mem_limit integer NULL,
     mem_used integer NULL,
-    mem_used_mb text NULL, 
+    mem_used_mb text NULL,
     mem_total integer NULL,
     latency integer NULL,
     client_subs integer NULL,
     server_subs integer NULL,
     messages_per_second integer NULL,
     recent_messages_per_second integer NULL,
-    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime'))  NULL) ;")
 
 
 
@@ -707,16 +717,16 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 
 ;; (def create-status
-;;   "create table if not exists status 
+;;   "create table if not exists status
 ;;   (client_name text NULL,
 ;;    op_name text NULL,
 ;;    status text NULL,
 ;;    -- ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
-;;    ts TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')) 
+;;    ts TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))
 ;;    ) ;")
 
 ;; (def create-errors
-;;   "create table if not exists errors 
+;;   "create table if not exists errors
 ;;   (db_conn text NULL,
 ;;    sql_stmt text NULL,
 ;;    error_str text NULL,
@@ -724,7 +734,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    ) ;")
 
 ;; (def create-screens
-;;   "create table if not exists screens 
+;;   "create table if not exists screens
 ;;   (file_path text NULL,
 ;;    screen_name text NULL,
 ;;    blocks integer NULL,
@@ -733,15 +743,15 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    ) ;")
 
 ;; (def create-blocks
-;;   "create table if not exists blocks 
-;;   (file_path text NULL, 
+;;   "create table if not exists blocks
+;;   (file_path text NULL,
 ;;    screen_name text NULL,
 ;;    block_key text NULL,
 ;;    block_name text NULL,
 ;;    views integer NULL,
 ;;    queries integer NULL,
 ;;    view_names text NULL,
-;;    query_names text NULL, 
+;;    query_names text NULL,
 ;;    block_data text NULL,
 ;;    tab_name text NULL,
 ;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
@@ -749,7 +759,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 ;; (def create-boards
 ;;   "create table if not exists boards
-;;   (file_path text NULL, 
+;;   (file_path text NULL,
 ;;    screen_name text NULL,
 ;;    board_name text NULL,
 ;;    board_data text NULL,
@@ -764,15 +774,15 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    db_schema text NULL,
 ;;    db_catalog text NULL,
 ;;    table_name text NULL,
-;;    field_name text NULL, 
+;;    field_name text NULL,
 ;;    field_type text NULL,
-;;    data_type text NULL, 
+;;    data_type text NULL,
 ;;    key_hash text NULL,
 ;;    context_hash text NULL,
 ;;    derived_calc text NULL,
 ;;    derived_name text NULL,
-;;    is_sample integer NULL,  
-;;    test_sql text NULL, 
+;;    is_sample integer NULL,
+;;    test_sql text NULL,
 ;;    test_raw_val text NULL,
 ;;    test_name text NULL,
 ;;    test_val_string text NULL,
@@ -799,11 +809,11 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
 ;;    run_id integer NULL
 ;;    -- primary key (connection_id, attribute_name)
-;;    -- PK later when we figure out update semantics 
+;;    -- PK later when we figure out update semantics
 ;;    ) ;")
 
 ;; (def create-found-fields
-;;   "create table if not exists found_fields 
+;;   "create table if not exists found_fields
 ;;   (db_type text NULL,
 ;;    connection_id text NULL,
 ;;    table_type text NULL,
@@ -813,26 +823,26 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    field_name text NULL,
 ;;    derived_calc text NULL,
 ;;    derived_name text NULL,
-;;    context_hash text NULL, 
+;;    context_hash text NULL,
 ;;    key_hash text NULL,
-;;    shape_name text NULL, 
+;;    shape_name text NULL,
 ;;    axes_key text NULL,
-;;    logic_map text NULL, 
+;;    logic_map text NULL,
 ;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
 ;;    run_id integer NULL
 ;;    -- primary key (connection_id, attribute_name)
-;;    -- PK later when we figure out update semantics 
+;;    -- PK later when we figure out update semantics
 ;;    ) ;")
 
 ;; (def create-connections
 ;;   "create table if not exists connections
-;;    (connection_id text, 
-;;     connection_str text, 
-;;     user_name text NULL, 
-;;     database_name text NULL, 
+;;    (connection_id text,
+;;     connection_str text,
+;;     user_name text NULL,
+;;     database_name text NULL,
 ;;     database_version text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
-;;     original_connection_str text NULL, 
+;;     original_connection_str text NULL,
 ;;     metadata_filter text NULL,
 ;;     run_id integer NULL,
 ;;     started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
@@ -848,13 +858,13 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    db_schema text NULL,
 ;;    db_catalog text NULL,
 ;;    table_name text NULL,
-;;    field_name text NULL, 
+;;    field_name text NULL,
 ;;    field_type text NULL,
-;;    data_type text NULL, 
+;;    data_type text NULL,
 ;;    context_hash text NULL,
 ;;    key_hash text NULL,
 ;;    is_group_by boolean NULL,
-;;    derived_calc text NULL, 
+;;    derived_calc text NULL,
 ;;    derived_name text NULL,
 ;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
 ;;    run_id integer NULL --,
@@ -866,9 +876,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   (context_hash text NULL,
 ;;    uuid text NULL,
 ;;    combo_hash text NULL,
-;;    connection_id text NULL,                    
+;;    connection_id text NULL,
 ;;    shape_name text NULL,
-;;    table_name text NULL,    
+;;    table_name text NULL,
 ;;    selected_view text NULL,
 ;;    query_map text NULL,
 ;;    query_map_str text NULL,
@@ -885,18 +895,18 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists combo_rows
 ;;   (context_hash text NULL,
 ;;    combo_hash text NULL,
-;;    connection_id text NULL,                    
+;;    connection_id text NULL,
 ;;    shape_name text NULL,
-;;    axes text NULL,   
-;;    talias text NULL,                        
-;;    walk1 text NULL,                        
+;;    axes text NULL,
+;;    talias text NULL,
+;;    walk1 text NULL,
 ;;    walk2 text NULL,
 ;;    walk3 text NULL,
-;;    walka text NULL,                        
+;;    walka text NULL,
 ;;    key_hash text NULL,
-;;    table_type text NULL,                
+;;    table_type text NULL,
 ;;    field_type text NULL,
-;;    data_type text NULL, 
+;;    data_type text NULL,
 ;;    db_type text NULL,
 ;;    db_schema text NULL,
 ;;    db_catalog text NULL,
@@ -912,9 +922,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists rule_maps_tests
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;    test_name text NULL, 
-;;     sql_map text NULL, 
-;;     when_logic text NULL, 
+;;    test_name text NULL,
+;;     sql_map text NULL,
+;;     when_logic text NULL,
 ;;     fetch_one text NULL
 ;;     ) ;")
 
@@ -922,7 +932,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists rule_maps_attributes
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;     attribute_name text NULL, 
+;;     attribute_name text NULL,
 ;;     when_logic text NULL
 ;;     ) ;")
 
@@ -930,8 +940,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   " create table if not exists rule_maps_derived_fields
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;    field_name text NULL, 
-;;     when_logic text NULL, 
+;;    field_name text NULL,
+;;     when_logic text NULL,
 ;;     calc_logic text NULL
 ;;     ) ;")
 
@@ -939,9 +949,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   " create table if not exists rule_maps_viz_shapes
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;     shape_name text NULL, 
-;;     axes_logic text NULL,    
-;;     sql_maps text NULL, 
+;;     shape_name text NULL,
+;;     axes_logic text NULL,
+;;     sql_maps text NULL,
 ;;     base_score integer NULL,
 ;;     selected_view text NULL,
 ;;     library_shapes text NULL
@@ -950,28 +960,28 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;; (def create-logs
 ;;   "create table if not exists logs
 ;;    (booted text NULL,
-;;     ts number NULL, 
-;;     hts text NULL, 
+;;     ts number NULL,
+;;     hts text NULL,
 ;;     caller text NULL,
-;;     type_key text NULL,              
+;;     type_key text NULL,
 ;;     log_str text NULL) ;")
 
 ;; (def create-tables
 ;;   "create table if not exists connections
-;;    (connection_hash text NULL, 
-;;     connection_str text NULL, 
-;;     user_name text NULL, 
-;;     product_name text NULL, 
+;;    (connection_hash text NULL,
+;;     connection_str text NULL,
+;;     user_name text NULL,
+;;     product_name text NULL,
 ;;     product_version text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
 ;;     run_id integer NULL) ;")
 
 ;; (def create-viz
 ;;   "create table if not exists connections
-;;    (connection_hash text NULL, 
-;;     connection_str text NULL, 
-;;     user_name text NULL, 
-;;     product_name text NULL, 
+;;    (connection_hash text NULL,
+;;     connection_str text NULL,
+;;     user_name text NULL,
+;;     product_name text NULL,
 ;;     product_version text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
 ;;     run_id integer NULL) ;")
@@ -983,39 +993,39 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 ;; (def create-panel-history
 ;;   "create table if not exists panel_history
-;;    (kp text NULL, 
-;;     client_name text NULL, 
-;;     data text NULL, 
+;;    (kp text NULL,
+;;     client_name text NULL,
+;;     data text NULL,
 ;;     pre_data text NULL,
-;;     diff text NULL,     
-;;     diff_kp text NULL,                           
-;;     panel_key text NULL, 
+;;     diff text NULL,
+;;     diff_kp text NULL,
+;;     panel_key text NULL,
 ;;     key text NULL,
 ;;     type text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 ;; (def create-panel-resolved-history
 ;;   "create table if not exists panel_resolved_history
-;;    (kp text NULL, 
-;;     client_name text NULL, 
-;;     data text NULL, 
+;;    (kp text NULL,
+;;     client_name text NULL,
+;;     data text NULL,
 ;;     pre_data text NULL,
-;;     diff text NULL,     
-;;     diff_kp text NULL,                           
-;;     panel_key text NULL, 
+;;     diff text NULL,
+;;     diff_kp text NULL,
+;;     panel_key text NULL,
 ;;     key text NULL,
 ;;     type text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 ;; (def create-panel-materialized-history
 ;;   "create table if not exists panel_materialized_history
-;;    (kp text NULL, 
-;;     client_name text NULL, 
-;;     data text NULL, 
+;;    (kp text NULL,
+;;     client_name text NULL,
+;;     data text NULL,
 ;;     pre_data text NULL,
-;;     diff text NULL,     
-;;     diff_kp text NULL,                           
-;;     panel_key text NULL, 
+;;     diff text NULL,
+;;     diff_kp text NULL,
+;;     panel_key text NULL,
 ;;     key text NULL,
 ;;     type text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
@@ -1024,17 +1034,17 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 ;; (def create-board-history
 ;;   "create table if not exists board_history
-;;    (client_name text NULL, 
-;;     data text NULL, 
+;;    (client_name text NULL,
+;;     data text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 ;; (def create-flow-functions
 ;;   "create table if not exists flow_functions
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;     category text NULL, 
+;;     category text NULL,
 ;;     sub_flow text NULL,
-;;     name text NULL, 
+;;     name text NULL,
 ;;     full_map text NULL,
 ;;     description text NULL,
 ;;     file_path text NULL,
@@ -1047,14 +1057,14 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;; (def create-kits
 ;;   "create table if not exists kits
 ;;    (id INTEGER PRIMARY KEY AUTOINCREMENT,
-;;     item_hash text NULL, 
+;;     item_hash text NULL,
 ;;     item_name text NULL,
 ;;     kit_name text NULL,
 ;;     item_type text NULL,
 ;;     item_key text NULL,
-;;     item_idx integer NULL,   
+;;     item_idx integer NULL,
 ;;     item_options text NULL,
-;;     item_data text NULL, 
+;;     item_data text NULL,
 ;;     client_name text NULL,
 ;;     flow_id text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
@@ -1081,7 +1091,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     memory text NULL,
 ;;     push integer NULL,
 ;;     queue_size integer NULL,
-;;     server_subs integer NULL,     
+;;     server_subs integer NULL,
 ;;     last_seen_seconds integer NULL,
 ;;     booted_ts integer NULL,
 ;;     queue_distro text NULL,
@@ -1093,8 +1103,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 ;; (def create-jvm-stats
 ;;   "create table if not exists jvm_stats
-;;    (used_memory_mb integer NULL, 
-;;     thread_count integer NULL, 
+;;    (used_memory_mb integer NULL,
+;;     thread_count integer NULL,
 ;;     messages integer NULL,
 ;;     batches integer NULL,
 ;;     recent_batches integer NULL,
@@ -1107,7 +1117,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     recent_queries_run integer NULL,
 ;;     recent_queries_per_second float NULL,
 ;;     queries_per_second float NULL,
-;;     sql_cache_size integer NULL, 
+;;     sql_cache_size integer NULL,
 ;;     ws_peers integer NULL,
 ;;     subscriptions integer NULL,
 ;;     open_flow_channels integer NULL,
@@ -1152,7 +1162,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists flow_results
 ;;    (flow_id text NULL,
 ;;     block_key text NULL,
-;;     block_value text NULL,                      
+;;     block_value text NULL,
 ;;     data_type text NULL,
 ;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
@@ -1171,7 +1181,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     run_id text NULL,
 ;;     base_flow_id text NULL,
 ;;     channel text NULL,
-;;     data_type text NULL,                      
+;;     data_type text NULL,
 ;;     dest text NULL,
 ;;     end_ts text NULL,
 ;;     start_ts text NULL,
@@ -1188,8 +1198,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     run_id text NULL,
 ;;     base_flow_id text NULL,
 ;;     channel text NULL,
-;;     block text NULL,                        
-;;     data_type text NULL,         
+;;     block text NULL,
+;;     data_type text NULL,
 ;;     end_ts text NULL,
 ;;     start_ts text NULL,
 ;;     dbgn text NULL,
@@ -1221,10 +1231,10 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    (mem_time text NULL,
 ;;     client_name text NULL,
 ;;     packets integer NULL,
-;;     batches integer NULL,                           
+;;     batches integer NULL,
 ;;     mem_limit integer NULL,
 ;;     mem_used integer NULL,
-;;     mem_used_mb text NULL, 
+;;     mem_used_mb text NULL,
 ;;     mem_total integer NULL,
 ;;     latency integer NULL,
 ;;     client_subs integer NULL,
@@ -1287,58 +1297,58 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 
 ;; (def create-reco-vw
-;;   "create view viz_recos_vw as 
+;;   "create view viz_recos_vw as
 ;;    select distinct c.context_hash, c.combo_hash, c.connection_id, c.shape_name, c.query_map, c.query_map_str,
-;;        c.viz_map, c.combo_edn, c.selected_view, c2.table_name as table_name, c.conditionals as condis, c.h as h, c.w as w, c.score as score   
+;;        c.viz_map, c.combo_edn, c.selected_view, c2.table_name as table_name, c.conditionals as condis, c.h as h, c.w as w, c.score as score
 ;; from combos c left join (select distinct connection_id, table_name, context_hash from found_fields) c2
 ;; on c.connection_id = c2.connection_id and c.context_hash = c2.context_hash
 ;; ;")
 
 ;; (def create-reco-vw2
-;;   "create view viz_recos_vw2 as 
+;;   "create view viz_recos_vw2 as
 ;; WITH RankedCombos AS (
-;;     SELECT distinct 
-;;         c.context_hash, 
-;;         c.combo_hash, 
-;;         c.connection_id, 
-;;         c.shape_name, 
-;;         c.query_map, 
+;;     SELECT distinct
+;;         c.context_hash,
+;;         c.combo_hash,
+;;         c.connection_id,
+;;         c.shape_name,
+;;         c.query_map,
 ;;         c.query_map_str,
-;;         c.viz_map, 
-;;         c.combo_edn, 
+;;         c.viz_map,
+;;         c.combo_edn,
 ;;         c.selected_view,
-;;         c2.table_name as table_name, 
-;;         c.conditionals as condis, 
-;;         c.h as h, 
-;;         c.w as w, 
+;;         c2.table_name as table_name,
+;;         c.conditionals as condis,
+;;         c.h as h,
+;;         c.w as w,
 ;;         c.score as score,
 ;;         ROW_NUMBER() OVER(PARTITION BY c2.table_name, c.shape_name ORDER BY c.score DESC) AS rn
-;;     FROM 
-;;         combos c 
-;;     LEFT JOIN 
+;;     FROM
+;;         combos c
+;;     LEFT JOIN
 ;;         (SELECT DISTINCT connection_id, table_name, context_hash  FROM found_fields) c2
-;;     ON 
+;;     ON
 ;;         c.connection_id = c2.connection_id AND c.context_hash = c2.context_hash
 ;; )
 
-;; SELECT distinct 
-;;     context_hash, 
-;;     combo_hash, 
-;;     connection_id, 
-;;     shape_name, 
-;;     query_map, 
+;; SELECT distinct
+;;     context_hash,
+;;     combo_hash,
+;;     connection_id,
+;;     shape_name,
+;;     query_map,
 ;;     query_map_str,
-;;     viz_map, 
-;;     combo_edn, 
+;;     viz_map,
+;;     combo_edn,
 ;;     selected_view,
-;;     table_name, 
-;;     condis, 
-;;     h, 
-;;     w, 
+;;     table_name,
+;;     condis,
+;;     h,
+;;     w,
 ;;     score
-;; FROM 
+;; FROM
 ;;     RankedCombos
-;; WHERE 
+;; WHERE
 ;;     rn = 1
 ;; ;")
 
@@ -1355,7 +1365,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;                          and s.ts = tt.max_ts ;")
 
 ;; (def create-status
-;;   "create table if not exists status 
+;;   "create table if not exists status
 ;;   (client_name text NULL,
 ;;    op_name text NULL,
 ;;    status text NULL,
@@ -1363,7 +1373,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    ) ;")
 
 ;; (def create-errors
-;;   "create table if not exists errors 
+;;   "create table if not exists errors
 ;;   (db_conn text NULL,
 ;;    sql_stmt text NULL,
 ;;    error_str text NULL,
@@ -1371,7 +1381,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    ) ;")
 
 ;; (def create-screens
-;;   "create table if not exists screens 
+;;   "create table if not exists screens
 ;;   (file_path text NULL,
 ;;    screen_name text NULL,
 ;;    blocks integer NULL,
@@ -1380,15 +1390,15 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    ) ;")
 
 ;; (def create-blocks
-;;   "create table if not exists blocks 
-;;   (file_path text NULL, 
+;;   "create table if not exists blocks
+;;   (file_path text NULL,
 ;;    screen_name text NULL,
 ;;    block_key text NULL,
 ;;    block_name text NULL,
 ;;    views integer NULL,
 ;;    queries integer NULL,
 ;;    view_names text NULL,
-;;    query_names text NULL, 
+;;    query_names text NULL,
 ;;    block_data text NULL,
 ;;    tab_name text NULL,
 ;;    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -1396,7 +1406,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 ;; (def create-boards
 ;;   "create table if not exists boards
-;;   (file_path text NULL, 
+;;   (file_path text NULL,
 ;;    screen_name text NULL,
 ;;    board_name text NULL,
 ;;    board_data text NULL,
@@ -1411,15 +1421,15 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    db_schema text NULL,
 ;;    db_catalog text NULL,
 ;;    table_name text NULL,
-;;    field_name text NULL, 
+;;    field_name text NULL,
 ;;    field_type text NULL,
-;;    data_type text NULL, 
+;;    data_type text NULL,
 ;;    key_hash text NULL,
 ;;    context_hash text NULL,
 ;;    derived_calc text NULL,
 ;;    derived_name text NULL,
-;;    is_sample integer NULL,  
-;;    test_sql text NULL, 
+;;    is_sample integer NULL,
+;;    test_sql text NULL,
 ;;    test_raw_val text NULL,
 ;;    test_name text NULL,
 ;;    test_val_string text NULL,
@@ -1448,7 +1458,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    ) ;")
 
 ;; (def create-found-fields
-;;   "create table if not exists found_fields 
+;;   "create table if not exists found_fields
 ;;   (db_type text NULL,
 ;;    connection_id text NULL,
 ;;    table_type text NULL,
@@ -1458,24 +1468,24 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    field_name text NULL,
 ;;    derived_calc text NULL,
 ;;    derived_name text NULL,
-;;    context_hash text NULL, 
+;;    context_hash text NULL,
 ;;    key_hash text NULL,
-;;    shape_name text NULL, 
+;;    shape_name text NULL,
 ;;    axes_key text NULL,
-;;    logic_map text NULL, 
+;;    logic_map text NULL,
 ;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 ;;    run_id integer NULL
 ;;    ) ;")
 
 ;; (def create-connections
 ;;   "create table if not exists connections
-;;    (connection_id text, 
-;;     connection_str text, 
-;;     user_name text NULL, 
-;;     database_name text NULL, 
+;;    (connection_id text,
+;;     connection_str text,
+;;     user_name text NULL,
+;;     database_name text NULL,
 ;;     database_version text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-;;     original_connection_str text NULL, 
+;;     original_connection_str text NULL,
 ;;     metadata_filter text NULL,
 ;;     run_id integer NULL,
 ;;     started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -1490,13 +1500,13 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    db_schema text NULL,
 ;;    db_catalog text NULL,
 ;;    table_name text NULL,
-;;    field_name text NULL, 
+;;    field_name text NULL,
 ;;    field_type text NULL,
-;;    data_type text NULL, 
+;;    data_type text NULL,
 ;;    context_hash text NULL,
 ;;    key_hash text NULL,
 ;;    is_group_by boolean NULL,
-;;    derived_calc text NULL, 
+;;    derived_calc text NULL,
 ;;    derived_name text NULL,
 ;;    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 ;;    run_id integer NULL
@@ -1507,9 +1517,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   (context_hash text NULL,
 ;;    uuid text NULL,
 ;;    combo_hash text NULL,
-;;    connection_id text NULL,                    
+;;    connection_id text NULL,
 ;;    shape_name text NULL,
-;;    table_name text NULL,    
+;;    table_name text NULL,
 ;;    selected_view text NULL,
 ;;    query_map text NULL,
 ;;    query_map_str text NULL,
@@ -1526,18 +1536,18 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists combo_rows
 ;;   (context_hash text NULL,
 ;;    combo_hash text NULL,
-;;    connection_id text NULL,                    
+;;    connection_id text NULL,
 ;;    shape_name text NULL,
-;;    axes text NULL,   
-;;    talias text NULL,                        
-;;    walk1 text NULL,                        
+;;    axes text NULL,
+;;    talias text NULL,
+;;    walk1 text NULL,
 ;;    walk2 text NULL,
 ;;    walk3 text NULL,
-;;    walka text NULL,                        
+;;    walka text NULL,
 ;;    key_hash text NULL,
-;;    table_type text NULL,                
+;;    table_type text NULL,
 ;;    field_type text NULL,
-;;    data_type text NULL, 
+;;    data_type text NULL,
 ;;    db_type text NULL,
 ;;    db_schema text NULL,
 ;;    db_catalog text NULL,
@@ -1553,9 +1563,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists rule_maps_tests
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;    test_name text NULL, 
-;;     sql_map text NULL, 
-;;     when_logic text NULL, 
+;;    test_name text NULL,
+;;     sql_map text NULL,
+;;     when_logic text NULL,
 ;;     fetch_one text NULL
 ;;     ) ;")
 
@@ -1563,7 +1573,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists rule_maps_attributes
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;     attribute_name text NULL, 
+;;     attribute_name text NULL,
 ;;     when_logic text NULL
 ;;     ) ;")
 
@@ -1571,8 +1581,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   " create table if not exists rule_maps_derived_fields
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;    field_name text NULL, 
-;;     when_logic text NULL, 
+;;    field_name text NULL,
+;;     when_logic text NULL,
 ;;     calc_logic text NULL
 ;;     ) ;")
 
@@ -1580,9 +1590,9 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   " create table if not exists rule_maps_viz_shapes
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;     shape_name text NULL, 
-;;     axes_logic text NULL,    
-;;     sql_maps text NULL, 
+;;     shape_name text NULL,
+;;     axes_logic text NULL,
+;;     sql_maps text NULL,
 ;;     base_score integer NULL,
 ;;     selected_view text NULL,
 ;;     library_shapes text NULL
@@ -1591,38 +1601,38 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;; (def create-logs
 ;;   "create table if not exists logs
 ;;    (booted text NULL,
-;;     ts bigint NULL, 
-;;     hts text NULL, 
+;;     ts bigint NULL,
+;;     hts text NULL,
 ;;     caller text NULL,
-;;     type_key text NULL,              
+;;     type_key text NULL,
 ;;     log_str text NULL) ;")
 
 ;; (def create-panel-history
 ;;   "create table if not exists panel_history
-;;    (kp text NULL, 
-;;     client_name text NULL, 
-;;     data text NULL, 
+;;    (kp text NULL,
+;;     client_name text NULL,
+;;     data text NULL,
 ;;     pre_data text NULL,
-;;     diff text NULL,     
-;;     diff_kp text NULL,                           
-;;     panel_key text NULL, 
+;;     diff text NULL,
+;;     diff_kp text NULL,
+;;     panel_key text NULL,
 ;;     key text NULL,
 ;;     type text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ;")
 
 ;; (def create-board-history
 ;;   "create table if not exists board_history
-;;    (client_name text NULL, 
-;;     data text NULL, 
+;;    (client_name text NULL,
+;;     data text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ;")
 
 ;; (def create-flow-functions
 ;;   "create table if not exists flow_functions
 ;;    (connection_id text NULL,
 ;;     run_id integer NULL,
-;;     category text NULL, 
+;;     category text NULL,
 ;;     sub_flow text NULL,
-;;     name text NULL, 
+;;     name text NULL,
 ;;     full_map text NULL,
 ;;     description text NULL,
 ;;     file_path text NULL,
@@ -1635,14 +1645,14 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;; (def create-kits
 ;;   "create table if not exists kits
 ;;    (id SERIAL PRIMARY KEY,
-;;     item_hash text NULL, 
+;;     item_hash text NULL,
 ;;     item_name text NULL,
 ;;     kit_name text NULL,
 ;;     item_type text NULL,
 ;;     item_key text NULL,
-;;     item_idx integer NULL,   
+;;     item_idx integer NULL,
 ;;     item_options text NULL,
-;;     item_data text NULL, 
+;;     item_data text NULL,
 ;;     client_name text NULL,
 ;;     flow_id text NULL,
 ;;     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ;")
@@ -1664,7 +1674,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     memory text NULL,
 ;;     push integer NULL,
 ;;     queue_size integer NULL,
-;;     server_subs integer NULL,     
+;;     server_subs integer NULL,
 ;;     last_seen_seconds integer NULL,
 ;;     booted_ts integer NULL,
 ;;     queue_distro text NULL,
@@ -1676,8 +1686,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 
 ;; (def create-jvm-stats
 ;;   "create table if not exists jvm_stats
-;;    (used_memory_mb integer NULL, 
-;;     thread_count integer NULL, 
+;;    (used_memory_mb integer NULL,
+;;     thread_count integer NULL,
 ;;     messages integer NULL,
 ;;     batches integer NULL,
 ;;     recent_batches integer NULL,
@@ -1690,7 +1700,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     recent_queries_run integer NULL,
 ;;     recent_queries_per_second float NULL,
 ;;     queries_per_second float NULL,
-;;     sql_cache_size integer NULL, 
+;;     sql_cache_size integer NULL,
 ;;     ws_peers integer NULL,
 ;;     subscriptions integer NULL,
 ;;     open_flow_channels integer NULL,
@@ -1734,7 +1744,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;   "create table if not exists flow_results
 ;;    (flow_id text NULL,
 ;;     block_key text NULL,
-;;     block_value text NULL,                      
+;;     block_value text NULL,
 ;;     data_type text NULL,
 ;;     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ;")
 
@@ -1753,7 +1763,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     run_id text NULL,
 ;;     base_flow_id text NULL,
 ;;     channel text NULL,
-;;     data_type text NULL,                      
+;;     data_type text NULL,
 ;;     dest text NULL,
 ;;     end_ts text NULL,
 ;;     start_ts text NULL,
@@ -1770,8 +1780,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;     run_id text NULL,
 ;;     base_flow_id text NULL,
 ;;     channel text NULL,
-;;     block text NULL,                        
-;;     data_type text NULL,         
+;;     block text NULL,
+;;     data_type text NULL,
 ;;     end_ts text NULL,
 ;;     start_ts text NULL,
 ;;     dbgn text NULL,
@@ -1803,10 +1813,10 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;;    (mem_time text NULL,
 ;;     client_name text NULL,
 ;;     packets bigint NULL,
-;;     batches bigint NULL,                           
+;;     batches bigint NULL,
 ;;     mem_limit bigint NULL,
 ;;     mem_used bigint NULL,
-;;     mem_used_mb text NULL, 
+;;     mem_used_mb text NULL,
 ;;     mem_total bigint NULL,
 ;;     latency bigint NULL,
 ;;     client_subs bigint NULL,
@@ -1940,14 +1950,14 @@ group by 1, 2) tt on s.client_name = tt.client_name
        "CREATE TABLE IF NOT EXISTS "
        sample-table-name-str
        " (" (cstr/join ", " field-definitions) ")"
-       (or extra-ddl-post ddl-options)  
+       (or extra-ddl-post ddl-options)
        ";"))
     (catch Exception e
       (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset (vec (take 5 rowset))]))))
 
 
 
-;; (ut/pp (create-attribute-sample 
+;; (ut/pp (create-attribute-sample
 ;;  "raw_custom_override178433811__block_9858_clojure_new_clojure_"
 ;;  [{:brightness 60, :hex "#ffb300", :hue 7675, :is_on true, :light-id ":14.", :light-name "Hue lightstrip plus 1", :xy "[0.5016 0.4151]"}
 ;;   {:brightness 163, :hex "#ff3900", :hue 2462, :is_on true, :light-id ":27.", :light-name "Hue Bloom 2", :xy "[0.4657 0.3667]"}
@@ -2034,7 +2044,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
           :order 0
           :parameters {}
           :step-mutates {}}
-         
+
          {:ask-mutates {"Highlight these in your source query?"
                           {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight1640170157]]
                              {:logic [:and [:= :YEAR 2016]]

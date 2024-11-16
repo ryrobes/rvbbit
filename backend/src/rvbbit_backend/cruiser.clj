@@ -1,5 +1,6 @@
 (ns rvbbit-backend.cruiser
   (:require
+   ;[rvbbit-backend.xtdb-init :as xtdb-init]
    [clojure.java.jdbc         :as jdbc]
    [clojure.core.async        :as async]
    [clojure.edn               :as edn]
@@ -11,17 +12,19 @@
    [clojure.walk              :as walk]
    [com.climate.claypoole     :as cp]
    [rvbbit-backend.external    :as ext]
+   [rvbbit-backend.evaluator  :as evl]
     ;[rvbbit-backend.clickhouse-ddl :as clickhouse-ddl]
    [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset-sql-query usage
    [rvbbit-backend.util       :as ut]
+   [rvbbit-backend.config       :as config]
    [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party  :as ppy]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db realms-db
+    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db realms-db systemh2-db
             insert-error-row! to-sql pool-create]]
    [clojure.math.combinatorics :as combo]
   ;;  [clj-time.jdbc] ;; enables joda time returns
-   ) 
+   )
   (:import
     [java.util Date UUID]))
 
@@ -52,29 +55,41 @@
 
 (def filter-db
   {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
-                              :jdbc-url    "jdbc:sqlite:file:./db/filter.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
+                              :jdbc-url    "jdbc:sqlite:file:./db/filter.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
                               :cache       "shared"}
                              "filter-db")})
 
+(def filter-db2
+  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter2.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+                              :jdbc-url    "jdbc:sqlite:file:./db/filter2.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+                              :cache       "shared"}
+                             "filter-db2")})
+
+(def filter-db3
+  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter3.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+                              :jdbc-url    "jdbc:sqlite:file:./db/filter3.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+                              :cache       "shared"}
+                             "filter-db2")})
+
 (defn rowset-sql-query ;; [rowset query & columns-vec]
   "takes a 'rowset' (vector of uniform maps) or a vector with a vector of column names
-   - inserts it into an in memory SQL db, executes a SQL query on it 
+   - inserts it into an in memory SQL db, executes a SQL query on it
    (via a honey-sql map) and returns it"
-  [rowset query & columns-vec]
+  [rowset query & [columns-vec client-name]]
   (when (ut/ne? rowset)
-    (let [rando-name                  (cstr/replace (str "rowset" (hash [rowset columns-vec])) "-" "__") 
+    (let [rando-name                  (cstr/replace (str "rowset" (hash [rowset columns-vec])) "-" "__")
           rowset-type                 (cond (and (map? (first rowset)) (vector? rowset))       :rowset
                                             (and (not (map? (first rowset))) (vector? rowset)) :vectors)
-          columns-vec-arg             (first columns-vec)
-          columns-vec-arg-underscores (edn/read-string (cstr/replace (str columns-vec-arg) #"-" "_")) ;; ugly,
+          ;columns-vec-arg             (first columns-vec)
+          columns-vec-arg-underscores (edn/read-string (cstr/replace (str columns-vec) #"-" "_")) ;; ugly,
           ;; db-conn-old                 {:classname   "org.sqlite.JDBC"
           ;;                              :subprotocol "sqlite"
           ;;                              :auto_vacuum "FULL"
           ;;                              :subname     "::memory::?auto_vacuum=FULL" ;; "file:filterdb?mode=memory&auto_vacuum=FULL"
           ;;                             }
-          db-conn                     filter-db ;; ^^^
-          rowset-fixed                (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec-arg r))) rowset)
+          db-conn                     (if client-name (sql/create-or-get-client-db-pool client-name)
+                                          (rand-nth [filter-db filter-db2])) ;; temp bandaid. will be a non issue when "leaves" is fully implemented and full XTDB 2.0 is integrated
+          rowset-fixed                (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec r))) rowset)
           asort                       (fn [m order]
                                         (let [order-map (apply hash-map (interleave order (range)))]
                                           (conj (sorted-map-by #(compare (order-map %1) (order-map %2))) ; empty
@@ -265,33 +280,35 @@
   (vec
     (doall
       (for [k field-vectors]
-        (let [sniffs        (create-sniff-tests-for system-db k sniff-tests-map)
+        (let [sniffs        (try
+                              (create-sniff-tests-for system-db k sniff-tests-map)
+                              (catch Exception e (do (ut/pp [:error-creating-sniff-test k (str e)]) {})))
               sniff-results (doall
-                              (into {}
-                                    (for [s (keys sniffs)]
-                                      (let [result-type (get-in sniffs [s :type])
-                                            sql-str     (get-in sniffs [s :src]) ;(try (get-in sniffs [s
-                                            calc        (get-in sniffs [s :derived-calc])
-                                            calc-name   (get-in sniffs [s :derived-name])
-                                            s-result    (sql-query target-db [sql-str])
-                                            val         (if (= result-type :one)
-                                                          (let [inner-map? (map? (first s-result))]
-                                                            (try (if inner-map? (first (vals (first s-result))) (first s-result))
-                                                                 (catch Exception e
-                                                                   (do (ut/pp {:sniff-test-exec-error e
-                                                                               :result                s-result
-                                                                               :test                  s
-                                                                               :result-type           result-type
-                                                                               :sql-str               sql-str})
-                                                                       (insert-error-row! target-db
-                                                                                          sql-str
-                                                                                          {:sniff-test-rowset-err e
-                                                                                           :result-type           result-type
-                                                                                           :inner-map?            inner-map?
-                                                                                           :s-result              s-result})
-                                                                       s-result))))
-                                                          (vec s-result))]
-                                        {s {:val val :calc calc :calc-name calc-name :sql sql-str}}))))]
+                             (into {}
+                                   (for [s (keys sniffs)]
+                                     (let [result-type (get-in sniffs [s :type])
+                                           sql-str     (get-in sniffs [s :src]) ;(try (get-in sniffs [s
+                                           calc        (get-in sniffs [s :derived-calc])
+                                           calc-name   (get-in sniffs [s :derived-name])
+                                           s-result    (sql-query target-db [sql-str])
+                                           val         (if (= result-type :one)
+                                                         (let [inner-map? (map? (first s-result))]
+                                                           (try (if inner-map? (first (vals (first s-result))) (first s-result))
+                                                                (catch Exception e
+                                                                  (do (ut/pp {:sniff-test-exec-error e
+                                                                              :result                s-result
+                                                                              :test                  s
+                                                                              :result-type           result-type
+                                                                              :sql-str               sql-str})
+                                                                      (insert-error-row! target-db
+                                                                                         sql-str
+                                                                                         {:sniff-test-rowset-err e
+                                                                                          :result-type           result-type
+                                                                                          :inner-map?            inner-map?
+                                                                                          :s-result              s-result})
+                                                                      s-result))))
+                                                         (vec s-result))]
+                                       {s {:val val :calc calc :calc-name calc-name :sql sql-str}}))))]
           {k sniff-results})))))
 
 (defn insert-sniff-test-results!
@@ -345,6 +362,18 @@
                                                                 (str derived_calc) (str derived_name)
                                                                 (if sample? sample-table-name-str key_hash) (if sample? 1 0)
                                                                 test_name test_val_string test_val_integer test_val_float
+                                                                context_hash this-run-id]]})
+                  stmt-xtdb             (to-sql {:insert-into [:tests]
+                                                 :columns     [:_id :db_type :connection_id :table_type :db_schema :db_catalog
+                                                               :table_name :field_name :field_type :data_type :test_sql
+                                                               :test_raw_val :derived_calc :derived_name :key_hash :is_sample
+                                                               :test_name :test_val_string :test_val_integer :test_val_float
+                                                               :context_hash :run_id]
+                                                 :values      [[(str key_hash connection_id context_hash) db_type connection_id table_type db_schema db_catalog table_name
+                                                                field_name field_type data_type test-sql (str test-value)
+                                                                (str derived_calc) (str derived_name)
+                                                                (if sample? sample-table-name-str key_hash) (if sample? 1 0)
+                                                                test_name test_val_string test_val_integer test_val_float
                                                                 context_hash this-run-id]]})]
               (ut/ppln {:test-name test_name :vector-key vector-key})
               (if sample? ;; meaning the sniff test returns a rowset the needs it own table
@@ -374,6 +403,7 @@
                         (when has-results? ;; dont create a table based on empty vector
                           (sql-exec system-db create-stmt))
                         (sql-exec system-db stmt)
+                        ;(sql-exec system-xtdb stmt-xtdb)
                         (when has-results? ;; dont try to insert an empty vector
                           (sql-exec system-db multi-insert))))
                   (catch Exception e
@@ -432,9 +462,9 @@
                            {:select-distinct
                               [:test_name
                                [[:raw
-                                 "case when test_val_string is not null then 'test_val_string' 
-                                                                                                                   when test_val_integer is not null then 'test_val_integer' 
-                                                                                                                   when test_val_float is not null then 'test_val_float' 
+                                 "case when test_val_string is not null then 'test_val_string'
+                                                                                                                   when test_val_integer is not null then 'test_val_integer'
+                                                                                                                   when test_val_float is not null then 'test_val_float'
                                                                                                                    else test_val_string end"]
                                 :type]]
                             :from [:tests]
@@ -508,7 +538,9 @@
 (def default-sniff-tests (slread "./defs/sniff-tests.edn"))
 (def default-field-attributes (slread "./defs/field-attributes.edn"))
 (def default-derived-fields (slread "./defs/derived-fields.edn"))
-(def default-viz-shapes (slread "./defs/viz-shapes.edn"))
+(def viz-shapes-file-str (or (get (config/settings) :viz-shapes) "./defs/viz-shapes.edn"))
+;; (ut/pp [:using-viz-shapes-from viz-shapes-file-str])
+(def default-viz-shapes (slread viz-shapes-file-str))
 
 ;; (ut/pp (keys default-sniff-tests))
 ;; (ut/pp (keys default-field-attributes))
@@ -528,8 +560,16 @@
                                                                                   :table_name :table_type :key_hash])]
                                                               [:= k v]))))}))
           (when (> (count attribute-map) 0)
-            (sql-exec system-db
-                      (to-sql {:insert-into [:attributes] :columns (keys attribute-map) :values [(vals attribute-map)]})))))))
+            (sql-exec system-db (to-sql {:insert-into [:attributes]
+                                         :columns (keys attribute-map)
+                                         :values [(vals attribute-map)]}))
+            ;; (sql-exec system-xtdb (to-sql {:insert-into [:attributes]
+            ;;                                :columns (conj (keys attribute-map) :_id)
+            ;;                                :values [(conj (vals attribute-map)
+            ;;                                               (str (select-keys attribute-map
+            ;;                                                                 [:connection_id :field_name
+            ;;                                                                  :table_name :key_hash])))]}))
+            )))))
 
 (defn get-possible-derived-fields
   [system-db field-vectors this-run-id derived-field-map]
@@ -588,9 +628,9 @@
                           {:select-distinct
                            [:test_name
                             [[:raw
-                              "case when test_val_string is not null then 'test_val_string' 
-                                                                                                                   when test_val_integer is not null then 'test_val_integer' 
-                                                                                                                   when test_val_float is not null then 'test_val_float' 
+                              "case when test_val_string is not null then 'test_val_string'
+                                                                                                                   when test_val_integer is not null then 'test_val_integer'
+                                                                                                                   when test_val_float is not null then 'test_val_float'
                                                                                                                    else test_val_string end"]
                              :type]]
                            :from [:tests]
@@ -687,7 +727,13 @@
                 (to-sql
                   {:insert-into [:connections]
                    :columns     (conj (conj (conj (vec (keys connect-meta)) :run_id) :original_connection_str) :metadata_filter)
-                   :values      [(conj (conj (conj (vec (vals connect-meta)) this-run-id) (str target-db)) (str sql-filter))]}))))
+                   :values      [(conj (conj (conj (vec (vals connect-meta)) this-run-id) (str target-db)) (str sql-filter))]}))
+      ;; (sql-exec system-xtdb
+      ;;           (to-sql
+      ;;            {:insert-into [:connections]
+      ;;             :columns     (conj (conj (conj (conj (vec (keys connect-meta)) :run_id) :original_connection_str) :metadata_filter) :_id)
+      ;;             :values      [(conj (conj (conj (conj (vec (vals connect-meta)) this-run-id) (str target-db)) (str sql-filter)) (get connect-meta :connection_id))]}))
+      ))
 
 (defn update-connection-data! [system-db this-run-id connection-id]
   (sql-exec system-db
@@ -697,9 +743,11 @@
 
 (defn flat-db-meta [db connect-meta]
   (let [;connect-meta (or connect-meta (surveyor/jdbc-connect-meta db "cache.db"))
-                 ;;_ (ut/pp connect-meta)
-        duck? (= (get connect-meta :database_name) "DuckDB") ;; doesnt support jdbc meta 
-        fm (if duck?
+        ;;_ (ut/pp connect-meta)
+        h2?   (= (get connect-meta :database_name) "H2")
+        duck? (= (get connect-meta :database_name) "DuckDB") ;; doesnt support jdbc meta
+        fm (cond
+             duck?
              (let [rrows (sql-query db (to-sql {:select [:table_name :column_name :data_type]
                                                 :from [:information_schema.columns]
                                                 :order-by [:table_name :column_name]} "DuckDB"))
@@ -710,7 +758,21 @@
                    flat (into {} (for [r rrows] {["DuckDB" conn-id "TABLE" "none" nil (get r :table_name) (get r :column_name)]
                                                  {:column_type (get r :data_type)}}))]
                (merge table-rows flat))
-             (into {} (surveyor/flatten-jdbc-conn-meta connect-meta (surveyor/get-jdbc-conn-meta db))))]
+
+             h2? (let [rrows (sql-query db
+                                        "SELECT TABLE_NAME as table_name, COLUMN_NAME as column_name, DATA_TYPE as data_type
+                                         FROM INFORMATION_SCHEMA.COLUMNS
+                                         WHERE TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA', 'sys')
+                                         AND TABLE_NAME NOT LIKE 'PG_%'")
+                       tables (vec (distinct (map :table_name rrows)))
+                       conn-id (str (get connect-meta :connection_id))
+                       table-rows (into {} (for [t tables] {["H2" conn-id "TABLE" "none" nil t "*"]
+                                                            {:column_type "special"}}))
+                       flat (into {} (for [r rrows] {["H2" conn-id "TABLE" "none" nil (get r :table_name) (get r :column_name)]
+                                                     {:column_type (get r :data_type)}}))]
+                   (merge table-rows flat))
+             :else (into {} (surveyor/flatten-jdbc-conn-meta connect-meta (surveyor/get-jdbc-conn-meta db))))]
+    ;; (ut/pp [:fm fm])
     fm))
 
 (defn create-target-field-vectors [target-db connect-meta]
@@ -752,9 +814,9 @@
          {:select-distinct
             [:test_name
              [[:raw
-               "case when test_val_string is not null then 'test_val_string' 
-                                                                                   when test_val_integer is not null then 'test_val_integer' 
-                                                                                   when test_val_float is not null then 'test_val_float' 
+               "case when test_val_string is not null then 'test_val_string'
+                                                                                   when test_val_integer is not null then 'test_val_integer'
+                                                                                   when test_val_float is not null then 'test_val_float'
                                                                                    else test_val_string end"]
               :type]]
           :from [:tests]
@@ -832,10 +894,13 @@
                                                [:= :db_schema db_schema] [:= :axes-key (ut/unkeyword axes-key)]
                                                [:= :shape_name (ut/unkeyword shape-name)]]})
         rowset-insert   (to-sql {:insert-into [:found_fields]
-                                 :values      rowset ;insert-vals
-                                })]
+                                 :values      rowset})
+        rowset-insert-xtdb   (to-sql {:insert-into [:found_fields]
+                                 :values      (mapv #(assoc % :_id (hash context-map)) rowset)})]
     (sql-exec system-db remove-old-rows)
-    (sql-exec system-db rowset-insert)))
+    (sql-exec system-db rowset-insert)
+    ;; (sql-exec system-xtdb rowset-insert-xtdb)
+    ))
 
 
 
@@ -846,7 +911,7 @@
   (try
     (doall
       (for [f     field-vectors
-            :when (not (empty? f))] ;; todo, just make this a map and pass to both selectively
+            :when (ut/ne? f)] ;; todo, just make this a map and pass to both selectively
         (let [query                 (get @sql/query-history (nth f 5))
               selects               (get query :select)
               group-bys             (get query :group-by)
@@ -866,7 +931,21 @@
               is-group-by?          (if (not no-group-by?)
                                       (true? (try (some #(= (keyword (nth f 6)) %) materialize-group-bys)
                                                   (catch Exception _ false)))
-                                      true)]
+                                      true)
+              insert-vectors-honey {:insert-into [:fields]
+                                    :columns     [:db_type :connection_id :table_type :db_schema :db_catalog :table_name :field_name
+                                                  :field_type :data_type :derived_calc :derived_name :key_hash :context_hash :is_group_by]
+                                    :values      [[(nth f 0) (nth f 1) (nth f 2) (nth f 3) (nth f 4) (nth f 5) (nth f 6) (nth f 7) (nth f 8)
+                                                   (try (str (nth f 9)) (catch Exception _ nil)) (try (str (nth f 10)) (catch Exception _ nil))
+                                                   (keyhash-from-field-vector f) (contexthash-from-field-vector f) is-group-by?]]}
+              ;; insert-vectors-honey-xtdb {:insert-into [:fields]
+              ;;                            :columns     [:_id :db_type :connection_id :table_type :db_schema :db_catalog :table_name :field_name
+              ;;                                          :field_type :data_type :derived_calc :derived_name :key_hash :context_hash :is_group_by]
+              ;;                            :values      [[(str [(keyhash-from-field-vector f) (contexthash-from-field-vector f)])
+              ;;                                           (nth f 0) (nth f 1) (nth f 2) (nth f 3) (nth f 4) (nth f 5) (nth f 6) (nth f 7) (nth f 8)
+              ;;                                           (try (str (nth f 9)) (catch Exception _ nil)) (try (str (nth f 10)) (catch Exception _ nil))
+              ;;                                           (keyhash-from-field-vector f) (contexthash-from-field-vector f) is-group-by?]]}
+              ]
           (sql-exec system-db
                     (to-sql {:delete-from [:fields]
                              :where       [:and [:= :db_type (nth f 0)] [:= :connection_id (nth f 1)] [:= :table_type (nth f 2)]
@@ -874,14 +953,9 @@
                                            [:= :field_name (nth f 6)]
                                            [:= :derived_calc (try (str (nth f 9)) (catch Exception _ nil))]
                                            [:= :derived_name (try (str (nth f 10)) (catch Exception _ nil))]]}))
-          (sql-exec system-db
-                    (to-sql
-                      {:insert-into [:fields]
-                       :columns     [:db_type :connection_id :table_type :db_schema :db_catalog :table_name :field_name
-                                     :field_type :data_type :derived_calc :derived_name :key_hash :context_hash :is_group_by]
-                       :values      [[(nth f 0) (nth f 1) (nth f 2) (nth f 3) (nth f 4) (nth f 5) (nth f 6) (nth f 7) (nth f 8)
-                                      (try (str (nth f 9)) (catch Exception _ nil)) (try (str (nth f 10)) (catch Exception _ nil))
-                                      (keyhash-from-field-vector f) (contexthash-from-field-vector f) is-group-by?]]})))))
+          (sql-exec system-db (to-sql insert-vectors-honey))
+          ;; (sql-exec system-xtdb (to-sql insert-vectors-honey-xtdb))
+          )))
     (catch Exception e
       (do ;(insert-error-row! target-db (str (str e)) {:sql-filter sql-filter :field-vectors field-vectors})
           (ut/pp [:insert-field-vectors-ERROR! :f field-vectors :error e])))))
@@ -917,28 +991,28 @@
 
 (defn process-field-vectors
   [system-db target-db field-vectors this-run-id sniff-tests-map field-attributes-map derived-field-map & derived?]
-  (insert-sniff-test-results! system-db
-                              (get-sniff-test-results system-db target-db field-vectors this-run-id sniff-tests-map)
-                              this-run-id)
-  (insert-attribute-flag-results! system-db
-                                  (get-attribute-flag-results system-db field-vectors this-run-id field-attributes-map)
-                                  this-run-id)
-  (when (not derived?)
-    (let [derived-field-vectors        (get-possible-derived-fields system-db field-vectors this-run-id derived-field-map)
-          derived-field-vectors-tasted (taste-test-derived-fields target-db derived-field-vectors)]
-      (when #_{:clj-kondo/ignore [:not-empty?]}
-        (not (empty? derived-field-vectors-tasted))
-        (dorun ;(ut/pp derived-field-vectors-tasted)
-          (insert-field-vectors! derived-field-vectors-tasted system-db)
-          (process-field-vectors system-db
-                                 target-db
-                                 derived-field-vectors-tasted
-                                 this-run-id
-                                 sniff-tests-map
-                                 field-attributes-map
-                                 derived-field-map
-                                 true
-                                 ))))))
+  (let [field-vectors (filterv #(ut/ne? %) field-vectors)]
+    (insert-sniff-test-results! system-db
+                                (get-sniff-test-results system-db target-db field-vectors this-run-id sniff-tests-map)
+                                this-run-id)
+    (insert-attribute-flag-results! system-db
+                                    (get-attribute-flag-results system-db field-vectors this-run-id field-attributes-map)
+                                    this-run-id)
+    (when (not derived?)
+      (let [derived-field-vectors        (get-possible-derived-fields system-db field-vectors this-run-id derived-field-map)
+            derived-field-vectors-tasted (taste-test-derived-fields target-db derived-field-vectors)]
+        (when #_{:clj-kondo/ignore [:not-empty?]}
+         (not (empty? derived-field-vectors-tasted))
+          (dorun ;(ut/pp derived-field-vectors-tasted)
+           (insert-field-vectors! derived-field-vectors-tasted system-db)
+           (process-field-vectors system-db
+                                  target-db
+                                  derived-field-vectors-tasted
+                                  this-run-id
+                                  sniff-tests-map
+                                  field-attributes-map
+                                  derived-field-map
+                                  true)))))))
 
 (def task-pool (tp/create-pool "field-processing-pool" 8))
 
@@ -978,12 +1052,32 @@
 (def pool1 (cp/threadpool 4))
 (def pool2 (cp/threadpool 4))
 
+(def mutate-fn-cache (atom {}))
+
+;; (ut/pp (count (keys @mutate-fn-cache)))
+
+(defn mutate-fn-runstream [mutate-fn keypath clover-sql]
+  (let [cache-key (hash [mutate-fn keypath (ut/deep-remove-underscore-keys clover-sql)])]
+    (if-let [cached-result (get @mutate-fn-cache cache-key)]
+      cached-result
+      (try
+        (let [res (evl/repl-eval (str "(" mutate-fn keypath clover-sql ")") "localhost" 8181 :rvbbit [] [])
+              vall (get-in res [:evald-result :value])
+              err (get-in res [:evald-result :err])
+              result (if err (do (ut/pp [:mutate-fn-error err]) {}) vall)]
+          (swap! mutate-fn-cache assoc cache-key result)
+          result)
+        (catch Exception e
+          (let [error-result {:error (str "mutate-fn-failed: " e)}]
+            (swap! mutate-fn-cache assoc cache-key error-result)
+            error-result))))))
+
 (defn find-all-viz-combos!
-  [system-db viz-shape connection_id & sql-filter]
-  (ut/pp [:finding-viz-shape-combos (if sql-filter {:where (first sql-filter)} :all-in-database)])
+  [system-db viz-shape connection_id & [sql-filter clover-sql ui-keypath client-name]]
+  (ut/pp [:finding-viz-shape-combos (if sql-filter {:where sql-filter} :all-in-database)])
   (let [base-honey {:select-distinct [:context_hash :shape_name :axes_key :key_hash :derived_name :derived_calc]
                     :from            [:found_fields]}
-        honey-map  (if sql-filter (assoc base-honey :where (first (sqlize-keywords sql-filter))) base-honey)
+        honey-map  (if sql-filter (assoc base-honey :where (sqlize-keywords sql-filter)) base-honey)
         rowset     (sql-query system-db (to-sql honey-map))
         row-map    (into {}
                          (for [[k v] (group-by :context_hash rowset)]
@@ -1016,12 +1110,12 @@
                                                           (if cached?
                                                             cache
                                                             (let [vv (first (sql-query
-                                                                              system-db
-                                                                              (to-sql {:select [:*]
-                                                                                       :from   [:fields]
-                                                                                       :where  [:and [:= :key_hash key-hash]
-                                                                                                [:= :connection_id connection_id]]
-                                                                                       :limit  1})))]
+                                                                             system-db
+                                                                             (to-sql {:select [:*]
+                                                                                      :from   [:fields]
+                                                                                      :where  [:and [:= :key_hash key-hash]
+                                                                                               [:= :connection_id connection_id]]
+                                                                                      :limit  1})))]
                                                               (swap! lookup-field-cache assoc key-hash vv)
                                                               vv)))) ;)
                                 sample-lookup (lookup-field-data-map (first (vals c)))
@@ -1034,155 +1128,179 @@
                                 parent-keys (select-keys sample-lookup
                                                          [:db_type :db_schema :db_catalog :table_name :table_type :connection_id])
                                 is-mysql? (and (cstr/includes? (cstr/lower-case db-type) "mysql") (= db-schema "none"))
-                                field-replacements {:table (str "query/" table-name)}
+                                field-replacements {:table (str "query/" table-name)
+                                                    :promoted-table (-> clover-sql
+                                                                        ut/clean-sql-from-ui-keys
+                                                                        ut/deep-remove-underscore-keys
+                                                                        ut/deep-remove-underscore-keys)}
                                 aliased-selects
-                                  (into {}
-                                        (apply concat
-                                          (remove empty?
-                                            (for [q (get-in viz-shape [(rekey shape-name) :sql-maps])] ;; hash
-                                              (when (filter #(and (vector? %)
-                                                                  (= (count %) 2)
-                                                                  (some (fn [x] (= x (first %)))
-                                                                        (remove nil?
-                                                                          (for [[k v] c]
-                                                                            (when (not (nil? (:derived_name (lookup-field-data-map
-                                                                                                              (str v)))))
-                                                                              (keyword (str (ut/unkeyword k) "-field")))))))
-                                                      (get q :select))
-                                                {[(.indexOf (get-in viz-shape [(rekey shape-name) :sql-maps]) q)]
-                                                   (filter #(and (vector? %)
-                                                                 (= (count %) 2)
-                                                                 (some (fn [x] (= x (first %)))
-                                                                       (remove nil?
-                                                                         (for [[k v] c]
-                                                                           (when (not (nil? (:derived_name (lookup-field-data-map
-                                                                                                             (str v)))))
-                                                                             (keyword (str (ut/unkeyword k) "-field")))))))
-                                                     (get q :select))})))))
+                                (into {}
+                                      (apply concat
+                                             (remove empty?
+                                                     (for [q (get-in viz-shape [(rekey shape-name) :sql-maps])] ;; hash
+                                                       (when (filter #(and (vector? %)
+                                                                           (= (count %) 2)
+                                                                           (some (fn [x] (= x (first %)))
+                                                                                 (remove nil?
+                                                                                         (for [[k v] c]
+                                                                                           (when (not (nil? (:derived_name (lookup-field-data-map
+                                                                                                                            (str v)))))
+                                                                                             (keyword (str (ut/unkeyword k) "-field")))))))
+                                                                     (get q :select))
+                                                         {[(.indexOf (get-in viz-shape [(rekey shape-name) :sql-maps]) q)]
+                                                          (filter #(and (vector? %)
+                                                                        (= (count %) 2)
+                                                                        (some (fn [x] (= x (first %)))
+                                                                              (remove nil?
+                                                                                      (for [[k v] c]
+                                                                                        (when (not (nil? (:derived_name (lookup-field-data-map
+                                                                                                                         (str v)))))
+                                                                                          (keyword (str (ut/unkeyword k) "-field")))))))
+                                                                  (get q :select))})))))
                                 aliased-selects2 (into {}
                                                        (apply concat
-                                                         (for [[k v] c]
-                                                           (when (not (nil? (:derived_name (lookup-field-data-map (str v)))))
-                                                             {(keyword (str (ut/unkeyword k) "-field"))
-                                                                (walk/postwalk-replace
-                                                                  {:field (keyword (:field_name (lookup-field-data-map (str v))))}
-                                                                  (read-string (:derived_calc (lookup-field-data-map (str
-                                                                                                                       v)))))}))))
+                                                              (for [[k v] c]
+                                                                (when (not (nil? (:derived_name (lookup-field-data-map (str v)))))
+                                                                  {(keyword (str (ut/unkeyword k) "-field"))
+                                                                   (walk/postwalk-replace
+                                                                    {:field (keyword (:field_name (lookup-field-data-map (str v))))}
+                                                                    (read-string (:derived_calc (lookup-field-data-map (str
+                                                                                                                        v)))))}))))
                                 aliased-selects3 (into {}
                                                        (apply concat
-                                                         (for [[k a] aliased-selects]
-                                                           {(first (flatten k))
-                                                              (first (let [tt (walk/postwalk-replace aliased-selects2 a)]
-                                                                       (for [idx (range (count tt))]
-                                                                         {(nth a idx) (nth tt idx)})))})))
+                                                              (for [[k a] aliased-selects]
+                                                                {(first (flatten k))
+                                                                 (first (let [tt (walk/postwalk-replace aliased-selects2 a)]
+                                                                          (for [idx (range (count tt))]
+                                                                            {(nth a idx) (nth tt idx)})))})))
                                 query-replacement-map
-                                  (merge (into {} ;; alias and logic - for selected clause
-                                               (for [[k v] c]
-                                                 {(keyword (str (ut/unkeyword k) "-field"))
-                                                    (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
-                                                          base-field (:field_name (lookup-field-data-map (str v)))]
-                                                      (if calc?
-                                                        [(walk/postwalk-replace {:field (keyword base-field)}
-                                                                                (read-string (:derived_calc (lookup-field-data-map
-                                                                                                              (str v)))))
-                                                         (keyword (:derived_name (lookup-field-data-map (str v))))]
-                                                        (keyword base-field)))}))
-                                         field-replacements)
+                                (merge (into {} ;; alias and logic - for selected clause
+                                             (for [[k v] c]
+                                               {(keyword (str (ut/unkeyword k) "-field"))
+                                                (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
+                                                      base-field (:field_name (lookup-field-data-map (str v)))]
+                                                  (if calc?
+                                                    [(walk/postwalk-replace {:field (keyword base-field)}
+                                                                            (read-string (:derived_calc (lookup-field-data-map
+                                                                                                         (str v)))))
+                                                     (keyword (:derived_name (lookup-field-data-map (str v))))]
+                                                    (keyword base-field)))}))
+                                       field-replacements)
                                 query-replacement-map2
-                                  (merge (into {} ;; only the alias name / field name
-                                               (for [[k v] c]
-                                                 {(keyword (str (ut/unkeyword k) "-field"))
-                                                    (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
-                                                          base-field (:field_name (lookup-field-data-map (str v)))]
-                                                      (if calc?
-                                                        (keyword (:derived_name (lookup-field-data-map (str v))))
-                                                        (keyword base-field)))
-                                                  (keyword (str "panel-key/" (ut/unkeyword k) "-field")) ;; for
-                                                    (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
-                                                          base-field (:field_name (lookup-field-data-map (str v)))]
-                                                      (if calc?
-                                                        (keyword (str "panel-key/"
-                                                                      (:derived_name (lookup-field-data-map (str v)))))
-                                                        (keyword (str "panel-key/" base-field))))}))
-                                         field-replacements)
+                                (merge (into {} ;; only the alias name / field name
+                                             (for [[k v] c]
+                                               {(keyword (str (ut/unkeyword k) "-field"))
+                                                (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
+                                                      base-field (:field_name (lookup-field-data-map (str v)))]
+                                                  (if calc?
+                                                    (keyword (:derived_name (lookup-field-data-map (str v))))
+                                                    (keyword base-field)))
+                                                (keyword (str "panel-key/" (ut/unkeyword k) "-field")) ;; for
+                                                (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
+                                                      base-field (:field_name (lookup-field-data-map (str v)))]
+                                                  (if calc?
+                                                    (keyword (str "panel-key/"
+                                                                  (:derived_name (lookup-field-data-map (str v)))))
+                                                    (keyword (str "panel-key/" base-field))))}))
+                                       field-replacements)
                                 query-replacement-map3
-                                  (merge (into {} ;; only the logic (group-by)
-                                               (for [[k v] c]
-                                                 {(keyword (str (ut/unkeyword k) "-field"))
-                                                    (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
-                                                          base-field (:field_name (lookup-field-data-map (str v)))]
-                                                      (if calc?
-                                                        (walk/postwalk-replace {:field (keyword base-field)}
-                                                                               (read-string (:derived_calc (lookup-field-data-map
-                                                                                                             (str v)))))
-                                                        (keyword base-field)))}))
-                                         field-replacements)
+                                (merge (into {} ;; only the logic (group-by)
+                                             (for [[k v] c]
+                                               {(keyword (str (ut/unkeyword k) "-field"))
+                                                (let [calc?      (not (nil? (:derived_name (lookup-field-data-map (str v)))))
+                                                      base-field (:field_name (lookup-field-data-map (str v)))]
+                                                  (if calc?
+                                                    (walk/postwalk-replace {:field (keyword base-field)}
+                                                                           (read-string (:derived_calc (lookup-field-data-map
+                                                                                                        (str v)))))
+                                                    (keyword base-field)))}))
+                                       field-replacements)
                                 query-map
-                                  (vec
-                                    (for [q (get-in viz-shape [(rekey shape-name) :sql-maps])]
-                                      (let [new-query-map (walk/postwalk-replace
-                                                            query-replacement-map2 ;field-replacements
-                                                            (merge q
-                                                                   {:select   (if true ; (not (empty? (get (hash
-                                                                                (walk/postwalk-replace
-                                                                                  query-replacement-map
-                                                                                  (walk/postwalk-replace
-                                                                                    (get aliased-selects3
-                                                                                         (.indexOf (get-in viz-shape
-                                                                                                           [(rekey shape-name)
-                                                                                                            :sql-maps])
-                                                                                                   q)
-                                                                                         {}) ;; do custom
+                                (vec
+                                 (for [q (get-in viz-shape [(rekey shape-name) :sql-maps])]
+                                   (let [new-query-map (walk/postwalk-replace
+                                                        query-replacement-map2 ;field-replacements
+
+
+
+                                                        (merge q
+                                                               {:select   (if true ; (not (empty? (get (hash
+                                                                            (walk/postwalk-replace
+                                                                             query-replacement-map
+                                                                             (walk/postwalk-replace
+                                                                              (get aliased-selects3
+                                                                                   (.indexOf (get-in viz-shape
+                                                                                                     [(rekey shape-name)
+                                                                                                      :sql-maps])
+                                                                                             q)
+                                                                                   {}) ;; do custom
                                                                                              ;; aliases
-                                                                                    (get q :select {})))
-                                                                                (walk/postwalk-replace query-replacement-map
-                                                                                                       (get q :select {})))
-                                                                    :vselect  (walk/postwalk-replace query-replacement-map2
-                                                                                                     (get q :vselect {}))
-                                                                    :group-by (walk/postwalk-replace query-replacement-map3
-                                                                                                     (get q :group-by {}))}))
-                                            new-query-map (if (empty? (get new-query-map :vselect))
-                                                            (dissoc new-query-map :vselect)
-                                                            new-query-map)
-                                            new-query-map (if (empty? (get new-query-map :group-by))
-                                                            (dissoc new-query-map :group-by)
-                                                            new-query-map)
-                                            new-query-map (if (empty? (get new-query-map :select))
-                                                            (dissoc new-query-map :select)
-                                                            new-query-map)]
-                                        new-query-map))) ;; empty vselect or group-by is no
+                                                                              (get q :select {})))
+                                                                            (walk/postwalk-replace query-replacement-map
+                                                                                                   (get q :select {})))
+                                                                :vselect  (walk/postwalk-replace query-replacement-map2
+                                                                                                 (get q :vselect {}))
+                                                                :group-by (walk/postwalk-replace query-replacement-map3
+                                                                                                 (get q :group-by {}))}))
+                                         new-query-map (if (empty? (get new-query-map :vselect))
+                                                         (dissoc new-query-map :vselect)
+                                                         new-query-map)
+                                         new-query-map (if (empty? (get new-query-map :group-by))
+                                                         (dissoc new-query-map :group-by)
+                                                         new-query-map)
+                                         new-query-map (if (empty? (get new-query-map :select))
+                                                         (dissoc new-query-map :select)
+                                                         new-query-map)]
+                                     new-query-map))) ;; empty vselect or group-by is no
                                 condis (get-in viz-shape [(rekey shape-name) :conditionals])
                                 h (get-in viz-shape [(rekey shape-name) :h])
                                 w (get-in viz-shape [(rekey shape-name) :w])
                                 runner (str (get-in viz-shape [(rekey shape-name) :runner] :views))
                                 viz-map (walk/postwalk-replace query-replacement-map2
                                                                (get-in viz-shape [(rekey shape-name) :library-shapes]))
+                                mutate-fn (get-in viz-shape [(rekey shape-name) :mutate-fn])
+                                mutate-fn (when mutate-fn (->> mutate-fn
+                                                               (walk/postwalk-replace aliased-selects)
+                                                               (walk/postwalk-replace aliased-selects2)
+                                                               (walk/postwalk-replace aliased-selects3)
+                                                               (walk/postwalk-replace query-replacement-map)
+                                                               (walk/postwalk-replace query-replacement-map2)
+                                                               (walk/postwalk-replace query-replacement-map3)))
+                                ;; (evl/repl-eval (first loaded-kit-view-fns) repl-host repl-port client-name kit-runner-key ui-keypath)
+                                mutate-map (when mutate-fn (mutate-fn-runstream mutate-fn ui-keypath clover-sql))
+                                ;; _ (when mutate-fn (ut/pp [;:mutate-fn mutate-fn
+                                ;;                           :mutate-map! mutate-map
+                                ;;                           :query-map query-map
+                                ;;                           ;:clover-sql clover-sql
+                                ;;                           ]))
                                 combo-hash (hash [shape-name (pr-str c) ctx connection_id])
                                 combo-map
-                                  {:context-hash    ctx
-                                   :connection-id   connection_id
-                                   :combo-hash      combo-hash
-                                   :shape-name      shape-name
-                                   :table-name      (cstr/replace table-name #"-" "_")
-                                   :conditionals    (str condis)
-                                   :query-map       (str query-map)
-                                   :query-map-str   (to-sql (first query-map) sample-key-vec system-db)
-                                   :viz-map         (str viz-map)
-                                   :key-hashes      (pr-str (into {} (sort-by key c)))
-                                   :key-hashes-hash (str (hash (pr-str (into {} (sort-by key c)))))
-                                   :h               h
-                                   :w               w
-                                   :runner          runner
-                                   :selected-view   (str (get-in viz-shape [(rekey shape-name) :selected-view]))
-                                   :combo-edn       (pr-str (cstr/join
-                                                              ", "
-                                                              (sort
-                                                                (for [v (vals c)]
-                                                                  (let [calc?      (not (nil? (:derived_name
-                                                                                                (lookup-field-data-map (str v)))))
-                                                                        calc-field (:derived_name (lookup-field-data-map (str v)))
-                                                                        base-field (:field_name (lookup-field-data-map (str v)))]
-                                                                    (if calc? (str calc-field "*") base-field))))))}
+                                {:context-hash    ctx
+                                 :connection-id   connection_id
+                                 :combo-hash      combo-hash
+                                 :shape-name      shape-name
+                                 :table-name      (cstr/replace table-name #"-" "_")
+                                 :conditionals    (str condis)
+                                 :category        (str (get-in viz-shape [(rekey shape-name) :category] [:uncategorized :uncategorized]))
+                                 :query-map       (str query-map)
+                                 :query-map-str   (to-sql (first query-map) sample-key-vec system-db)
+                                 :viz-map         (str viz-map)
+                                 :mutate-map      (str mutate-map)
+                                 :key-hashes      (pr-str (into {} (sort-by key c)))
+                                 :key-hashes-hash (str (hash (pr-str (into {} (sort-by key c)))))
+                                 :h               h
+                                 :w               w
+                                 :runner          runner
+                                 :selected-view   (str (get-in viz-shape [(rekey shape-name) :selected-view]))
+                                 :combo-edn       (pr-str (cstr/join
+                                                           ", "
+                                                           (sort
+                                                            (for [v (vals c)]
+                                                              (let [calc?      (not (nil? (:derived_name
+                                                                                           (lookup-field-data-map (str v)))))
+                                                                    calc-field (:derived_name (lookup-field-data-map (str v)))
+                                                                    base-field (:field_name (lookup-field-data-map (str v)))]
+                                                                (if calc? (str calc-field "*") base-field))))))}
                                 cid (hash combo-map)
                                 sel-recos (filter #(= (get % :connection_id) connection_id) @em/selected-recos)
                                 calc-score0 (fn [k v]
@@ -1192,9 +1310,9 @@
                                                   (let [res (for [_ (filter #(and (= (get % :shape_name) shape-name)
                                                                                   (= (get % :field_name)
                                                                                      (:field_name (lookup-field-data-map (str
-                                                                                                                           v))))
+                                                                                                                          v))))
                                                                                   (= (get % :axes_key) k))
-                                                                      sel-recos)]
+                                                                            sel-recos)]
                                                               0.8)]
                                                     (swap! score-atom0 assoc [k v] res)
                                                     res))))
@@ -1204,9 +1322,9 @@
                                                   cache
                                                   (let [res (for [_ (filter #(and (= (get % :field_name)
                                                                                      (:field_name (lookup-field-data-map (str
-                                                                                                                           v))))
+                                                                                                                          v))))
                                                                                   (= (get % :axes_key) k))
-                                                                      sel-recos)]
+                                                                            sel-recos)]
                                                               0.75)]
                                                     (swap! score-atom1 assoc [k v] res)
                                                     res))))
@@ -1216,14 +1334,14 @@
                                                   cache
                                                   (let [res (for [_ (filter #(and (= (get % :field_name)
                                                                                      (:field_name (lookup-field-data-map (str
-                                                                                                                           v)))))
-                                                                      sel-recos)]
+                                                                                                                          v)))))
+                                                                            sel-recos)]
                                                               0.45)]
                                                     (swap! score-atom2 assoc [k v] res)
                                                     res))))
-                                score0 (apply + (flatten (for [[k v] c] (calc-score0 k v))))
-                                score1 (apply + (flatten (for [[k v] c] (calc-score1 k v))))
-                                score2 (apply + (flatten (for [[k v] c] (calc-score2 k v))))
+                                score0 0 ;(apply + (flatten (for [[k v] c] (calc-score0 k v))))
+                                score1 0 ;(apply + (flatten (for [[k v] c] (calc-score1 k v))))
+                                score2 0 ;(apply + (flatten (for [[k v] c] (calc-score2 k v))))
                                 score (+ score0 score1 score2)
                                 combo-map (-> combo-map
                                               (assoc :uuid cid)
@@ -1241,9 +1359,9 @@
                                                                      :derived_name]))
                                                 (assoc :axes k)
                                                 (assoc :talias (pr-str talias))
-                                                (assoc :score0 (apply + (flatten (calc-score0 k v))))
-                                                (assoc :score1 (apply + (flatten (calc-score1 k v))))
-                                                (assoc :score2 (apply + (flatten (calc-score2 k v))))
+                                                (assoc :score0 0) ;(apply + (flatten (calc-score0 k v))))
+                                                (assoc :score1 0) ;(apply + (flatten (calc-score1 k v))))
+                                                (assoc :score2 0) ;(apply + (flatten (calc-score2 k v))))
                                                 (assoc :walk1 (pr-str (select-keys query-replacement-map [talias])))
                                                 (assoc :walk2 (pr-str (select-keys query-replacement-map2 [talias])))
                                                 (assoc :walk3 (pr-str (select-keys query-replacement-map3 [talias])))
@@ -1256,8 +1374,18 @@
                                                                                                              (catch Exception _
                                                                                                                false))))
                                                                                             qq))}))))))))]
-                              (sql-exec system-db (to-sql {:insert-into [:combo-rows] :values combo-rows})))
-                            (sql-exec system-db (to-sql {:insert-into [:combos] :values [combo-map]})))
+                              (sql-exec system-db (to-sql {:insert-into [:combo-rows] :values combo-rows}))
+                              ;; (sql-exec system-xtdb (to-sql {:insert-into [:combo-rows] :values (mapv #(-> %
+                              ;;                                                                              (assoc :_id (str ctx combo-hash shape-name))
+                              ;;                                                                              (assoc :client_name (str client-name))) combo-rows)}))
+                              )
+                            (sql-exec system-db (to-sql {:insert-into [:combos] :values [combo-map]}))
+                            ;; (sql-exec system-xtdb (to-sql {:insert-into [:combos] :values [(-> combo-map
+                            ;;                                                                    (dissoc :query-map-str)
+                            ;;                                                                    (dissoc :uuid)
+                            ;;                                                                    (assoc :_id (str client-name ctx connection_id combo-hash))
+                            ;;                                                                    (assoc :client_name (str client-name)))]}))
+                            )
                           (catch Exception e
                             (let [sw (java.io.StringWriter.)
                                   pw (java.io.PrintWriter. sw)]
@@ -1314,10 +1442,11 @@
       (sql-exec system-db (to-sql {:delete-from [tt] :where [:not [:in :connection_id conn-ids]]})))))
 
 (defn lets-give-it-a-whirl
-  [f-path target-db system-db sniff-tests-map field-attributes-map derived-field-map viz-shape-map & sql-filter]
+  [f-path target-db system-db sniff-tests-map field-attributes-map derived-field-map viz-shape-map & [sql-filter clover-sql ui-keypath client-name]]
   (doall
     (try
-      (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
+      (let [sql-filter        [sql-filter] ;; temp TODO
+            connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
             orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn")
                                 (edn/read-string (slurp f-path))
                                 target-db ;; in order to not disrupt hardcoded cache.db and
@@ -1342,7 +1471,7 @@
                                 (let [col-names       [:db-type :connection-id :table-type :db-schema :db-catalog :table-name
                                                        :field-name :field-type :data-type]
                                       full-sql-filter {:select col-names :from :rowset :where sql-filter}]
-                                  (rowset-sql-query field-vectors-all full-sql-filter col-names))
+                                  (rowset-sql-query field-vectors-all full-sql-filter col-names client-name))
                                 field-vectors-all)]
         (insert-current-rules! system-db
                                connection_id
@@ -1361,8 +1490,8 @@
         (ut/pp [:processing-field-vectors (count field-vectors)])
         (dorun (for [f field-vectors] ;(partition-all 10 field-vectors)]
                  (tp/add-task task-pool ;; tests - removed. 9/28. went with out general (unbounded) task pools instead
-                 ;(ppy/execute-in-thread-pools :serial-give-it-a-whirl            
-                              ;(fn [] 
+                 ;(ppy/execute-in-thread-pools :serial-give-it-a-whirl
+                              ;(fn []
                                 (process-field-vectors system-db
                                                      target-db
                                                      [f]
@@ -1374,11 +1503,11 @@
           (find-all-viz-fields! system-db viz-shape-map connection_id [:and [:= :connection-id connection_id] (first sql-filter)])
           (find-all-viz-fields! system-db viz-shape-map connection_id [:= :connection-id connection_id]))
         (if (and sql-filter #_{:clj-kondo/ignore [:not-empty?]} (not (empty? sql-filter)))
-          (find-all-viz-combos! system-db viz-shape-map connection_id [:and [:= :connection-id connection_id] (first sql-filter)])
-          (find-all-viz-combos! system-db viz-shape-map connection_id [:= :connection-id connection_id]))
+          (find-all-viz-combos! system-db viz-shape-map connection_id [:and [:= :connection-id connection_id] (first sql-filter)] clover-sql ui-keypath client-name)
+          (find-all-viz-combos! system-db viz-shape-map connection_id [:= :connection-id connection_id] clover-sql ui-keypath client-name))
         (update-connection-data! system-db this-run-id connection_id)
         (when (not (cstr/includes? connection_id "mem-cache"))
-          (ut/pp [:db-metadata-with-viz-success! :fields (count field-vectors) connection_id])))
+          (ut/pp [:db-metadata-with-viz-success! :fields (count field-vectors) connection_id (first sql-filter)])))
       (catch Exception e
         (let [sw (java.io.StringWriter.)
               pw (java.io.PrintWriter. sw)]
@@ -1389,7 +1518,8 @@
   [f-path target-db system-db sniff-tests-map field-attributes-map derived-field-map _ & sql-filter]
   (doall
     (try
-      (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
+      (let [;sql-filter        [sql-filter]
+            connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
             orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db)
             connection_id     (get connect-meta :connection_id)
             _ (when (and (empty? sql-filter) (not (= connection_id "cache.db")))
@@ -1425,7 +1555,7 @@
         ;; (dorun (for [f field-vectors] ;; ADDED TO QUICK PATH 9/28 for attribute harvesting
         ;;         (tp/add-task task-pool ;; tests - removed. 9/28. went with out general (unbounded) task pools instead
         ;;         ; (ppy/execute-in-thread-pools :serial-give-it-a-whirl
-        ;;                                       ;(fn [] 
+        ;;                                       ;(fn []
         ;;                                         (process-field-vectors system-db
         ;;                                                                     target-db
         ;;                                                                     [f]
@@ -1444,7 +1574,8 @@
         (merge
          {:*connect-meta connect-meta}
          (into {} (for [tbl (distinct (map #(get % 5) field-vectors))]
-                    {tbl (vec (distinct (map #(get % 6) (filter #(= (get % 5) tbl) field-vectors))))}))))
+                    {tbl (vec (distinct (map #(get % 6) (filter #(= (get % 5) tbl) field-vectors))))})))
+        )
       (catch Exception e
         (let [sw (java.io.StringWriter.)
               pw (java.io.PrintWriter. sw)]
@@ -1512,37 +1643,45 @@
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
 
 
-(def tmp-db-src1
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
-                              :cache       "shared"}
-                             "tmp-db-src1")})
-(def tmp-db-src2
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
-                              :cache       "shared"}
-                             "tmp-db-src2")})
-(def tmp-db-src3
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
-                              :cache       "shared"}
-                             "tmp-db-src3")})
+;; (def tmp-db-src1
+;;   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               ;:auto_vacuum "FULL"
+;;                               :cache       "shared"}
+;;                              "tmp-db-src1")})
+;; (def tmp-db-src2
+;;   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb2?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               ;:auto_vacuum "FULL"
+;;                               :cache       "shared"}
+;;                              "tmp-db-src2")})
+;; (def tmp-db-src3
+;;   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb3?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               ;:auto_vacuum "FULL"
+;;                               :cache       "shared"}
+;;                              "tmp-db-src3")})
 
-(def tmp-db-dest1
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
-                              :cache       "shared"}
-                             "tmp-db-dest1")})
-(def tmp-db-dest2
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
-                              :cache       "shared"}
-                             "tmp-db-dest2")})
-(def tmp-db-dest3
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              ;:auto_vacuum "FULL"
-                              :cache       "shared"}
-                             "tmp-db-dest3")})
+;; (def tmp-db-dest1
+;;   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb1?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               ;:auto_vacuum "FULL"
+;;                               :cache       "shared"}
+;;                              "tmp-db-dest1")})
+;; (def tmp-db-dest2
+;;   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               ;:auto_vacuum "FULL"
+;;                               :cache       "shared"}
+;;                              "tmp-db-dest2")})
+;; (def tmp-db-dest3
+;;   {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb3?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               ;:auto_vacuum "FULL"
+;;                               :cache       "shared"}
+;;                              "tmp-db-dest3")})
+
+
+(def tmp-db-src1 {})
+(def tmp-db-src2 {})
+(def tmp-db-src3 {})
+(def tmp-db-dest1 {})
+(def tmp-db-dest2 {})
+(def tmp-db-dest3 {})
 
 (def sniffs (atom 0))
 
@@ -1552,7 +1691,7 @@
 (defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
  ;(ppy/execute-in-thread-pools
   ;:captured-sniff ;; (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
-  ;(fn [] 
+  ;(fn []
     (swap! sniffs inc)
     (doall
      (let [res?     (not (nil? resultset))
@@ -1587,7 +1726,7 @@
              sniff-rows (dissoc sniff-rows :connections)]
          (sql/insert-all-tables sniff-rows (last sql-filter))
          (doseq [k (keys sniff-rows)] (sql-exec dest (to-sql {:delete-from [k]})))
-         (when res? (sql-exec src-conn 
+         (when res? (sql-exec src-conn
                               ;(to-sql {:drop-table [(last sql-filter)]})
                               (to-sql {:drop-table (keyword (last sql-filter))})
                               )) ;)

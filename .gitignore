@@ -63,7 +63,9 @@ frontend/package-lock.json
 backend/assets/snaps/*
 backend/assets/openai-images/upscaled
 tmp/
-backend/assets.zip 
+package-lock.json
+backend/assets.zip
+settings.json
 dash8
 
 

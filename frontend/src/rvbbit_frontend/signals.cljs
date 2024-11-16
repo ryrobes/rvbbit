@@ -393,7 +393,7 @@
         solver?          (cstr/includes? (str warren-type-string) "solvers")
         signal?          (cstr/includes? (str warren-type-string) "signals")
         react!           [@waiting? @db/selectors-items @db/selectors-open]
-        client-name      @(ut/tracked-sub ::bricks/client-name {})
+        client-name      db/client-name
         ;warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ;ssr              (ut/replacer (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
         ;selected-type    (str ssr "s")
@@ -419,7 +419,7 @@
         ;;      {:on-click #(ut/tracked-dispatch [::delete-signal selected-warren-item warren-item-type])} :child
         ;;      (str "- delete this " warren-type-string "?")]
         ;;     [re-com/gap :size "5px"])]]
-  
+
       [re-com/v-box :padding "6px" :style
        {;:border "1px solid red"
         :overflow "auto"} :gap "6px" :size "none" :children
@@ -461,19 +461,19 @@
                     ;; [re-com/md-icon-button
                     ;;  :src (at)
                     ;;  :md-icon-name "zmdi-play"
-                    ;;  :on-click  #(ut/tracked-dispatch [::wfx/request 
+                    ;;  :on-click  #(ut/tracked-dispatch [::wfx/request
                     ;;                                    :default
                     ;;                                    {:message {:kind         :run-solver
                     ;;                                               :solver-name  name
                     ;;                                  ;:override-map (get @(ut/tracked-sub ::solvers-map {})
                     ;;                                  ;                   selected-warren-item)
-                    ;;                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                    ;;                                               :client-name  db/client-name}
                     ;;                                     :timeout 15000000}])
                     ;;  :style {;:font-size "17px"
                     ;;          :transform-origin "18px 17px"
                     ;;          :cursor "pointer"
                     ;;          :color (theme-pull :theme/editor-outer-rim-color nil)}]
-  
+
                   [re-com/md-icon-button
                    :md-icon-name (if (or (get @waiting? name) solver-running?) "zmdi-refresh" "zmdi-play")
                    :class (cond
@@ -491,7 +491,7 @@
                                                                     :solver-name  name
                                                                        ;:override-map (get @(ut/tracked-sub ::solvers-map {})
                                                                        ;                   selected-warren-item)
-                                                                    :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                                                    :client-name  db/client-name}
                                                           :timeout 15000000}])
                                    (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
                                    (js/setTimeout #(swap! waiting? assoc name false) 5000))))
@@ -501,7 +501,7 @@
                            :transform-origin "18px 17px"
                            :margin-top       "-6px"
                            :cursor           "pointer"}])
-  
+
                 [re-com/box :child (str (get ext-map :last-processed))]
                 [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])]] :operator sigkw])]]]))
 
@@ -537,7 +537,7 @@
       (when open?
         (if (or ;(= name "solvers")
              (cstr/includes? (str name) "solvers")
-             (= name "rules") 
+             (= name "rules")
              (= name "signals"))
           (let [;signals @(ut/tracked-subscribe [::signals-map]) ;; they get passed from the
                 solver? (cstr/includes? (str name) "solvers")
@@ -558,7 +558,7 @@
                 ;;            :else   {})
                 ;;_ (ut/tapp>> [:itmz itmz])
                 ph                   200]
-            [items-list (if selected-warren-item (* ph 0.3) ph) 
+            [items-list (if selected-warren-item (* ph 0.3) ph)
              items selected-warren-item name])
           (if partition?
             [re-com/v-box :style {:margin-top "6px"} :children
@@ -726,7 +726,7 @@
         ;[selector-panel "KPIs" (filter-results @db/signals-searcher-atom time-items) "zmdi-traffic" {} 2] [re-com/gap :size "20px"]
         [selector-panel "signals" (filter-results @db/signals-searcher-atom signals) "zmdi-flash" {} 5]
         ;[selector-panel "rules" (filter-results @db/signals-searcher-atom rules) "zmdi-flash" {} 5]
-        [selector-panel "solvers" (filter-results @db/signals-searcher-atom solvers-only) "zmdi-flash" {} 5] 
+        [selector-panel "solvers" (filter-results @db/signals-searcher-atom solvers-only) "zmdi-flash" {} 5]
         [selector-panel "*run-db-meta-solvers" (filter-results @db/signals-searcher-atom db-meta-solvers) "zmdi-flash" {} 5]
         [selector-panel "*run-cache-solvers" (filter-results @db/signals-searcher-atom cache-solvers) "zmdi-flash" {} 5]
         [re-com/gap :size "10px"]
@@ -789,7 +789,7 @@
                          (ut/tracked-dispatch [::wfx/request :default
                                                {:message     {:kind        :signals-history
                                                               :signal-name (get db :selected-warren-item)
-                                                              :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                                                              :client-name db/client-name}
                                                 :on-response [::signals-history-response]
                                                 :timeout     15000000}])
                          db))
@@ -855,7 +855,7 @@
    (let [data {:h         (if solver? 8 3)
                :w         6
                :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-               :views     {(if solver? 
+               :views     {(if solver?
                              :solver-viewer
                              :signal-viewer) [:data-viewer (keyword (str (if solver? "solver/" "signal/") (ut/replacer (str solver-name) ":" "")))]}
                :name      (str (ut/replacer solver-name ":" "") "-viewer")}]
@@ -890,7 +890,7 @@
         warren-item-type     @(ut/tracked-sub ::warren-item-type {})
         solver-vw-mode       @db/solver-view-mode
         react!               [@waiting?]
-        client-name          @(ut/tracked-sub ::bricks/client-name {})
+        client-name          db/client-name
         signal?              (true? (= warren-item-type :signal))
         solver?              (true? (= warren-item-type :solver))
         signal-vec           (when signal? (get-in signals [selected-warren-item :signal]))
@@ -923,23 +923,23 @@
      [(when selected-warren-item
         [re-com/v-box :style
          {;:font-family   (theme-pull :theme/monospaced-font nil)
-         } :height (px (* ph 0.7)) :padding "6px" 
+         } :height (px (* ph 0.7)) :padding "6px"
           :children
          [(let [ww (* (- (last @db/flow-editor-system-mode) 70) 0.65)]
-            [re-com/h-box 
-             :justify :between 
-             :align :center 
+            [re-com/h-box
+             :justify :between
+             :align :center
              :children
-             [[draggable-viewer 
+             [[draggable-viewer
                [edit-item-name selected-warren-item warren-item-type (* ww 0.9)]
                solver?
                selected-warren-item]
               (cond signal? [re-com/box :align :center :justify :center :style
                              {;:border "1px solid yellow"
                               :font-size   "22px"
-                              :font-weight 700} 
-                             :height "100%" 
-                             :width (px (* ww 0.1)) 
+                              :font-weight 700}
+                             :height "100%"
+                             :width (px (* ww 0.1))
                              :child
                              (str @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                    {:keypath [(keyword (str "signal/"
@@ -947,9 +947,9 @@
                     solver? [draggable-play
                             ;;  [re-com/md-icon-button
                             ;;   :src (at)
-                            ;;   :md-icon-name (if solver-running? 
+                            ;;   :md-icon-name (if solver-running?
                             ;;                   "zmdi-refresh" "zmdi-play")
-                            ;;   :class (when solver-running? 
+                            ;;   :class (when solver-running?
                             ;;            "rotate linear infinite")
                             ;;   :on-click #(ut/tracked-dispatch
                             ;;               [::wfx/push :default
@@ -957,13 +957,13 @@
                             ;;                 :solver-name  selected-warren-item
                             ;;                 :override-map (get @(ut/tracked-sub ::solvers-map {})
                             ;;                                    selected-warren-item)
-                            ;;                 :client-name  @(ut/tracked-sub ::bricks/client-name {})}])
+                            ;;                 :client-name  db/client-name}])
                             ;;   :style {:font-size "34px"
                             ;;           :transform-origin "18px 17px"
                             ;;           :cursor "pointer"
                             ;;           ;:margin-top  "-9px"
                             ;;           :color (theme-pull :theme/editor-outer-rim-color nil)}]
-                             
+
                              [re-com/md-icon-button
                               :md-icon-name (if (or (get @waiting? selected-warren-item) solver-running?) "zmdi-refresh" "zmdi-play")
                               :class (cond
@@ -981,7 +981,7 @@
                                                                                :solver-name  selected-warren-item
                                                                                ;:override-map (get @(ut/tracked-sub ::solvers-map {})
                                                                                 ;                   selected-warren-item)
-                                                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                                                               :client-name  db/client-name}
                                                                      :timeout 15000000}])
                                               (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
                                               (js/setTimeout #(swap! waiting? assoc selected-warren-item false) 5000))))
@@ -998,16 +998,16 @@
           [re-com/box :style {:border (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 45) :border-radius "4px"}
            :height (if signal?
                      (px (- (* (* ph 0.7) 0.25) 12))
-                     (px (- (* (* ph 0.7) 0.55) 12))) 
-           :padding "6px" 
+                     (px (- (* (* ph 0.7) 0.55) 12)))
+           :padding "6px"
            :child
            [code-box nil ;(* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
             (if signal? (- (* (* ph 0.7) 0.25) 5) (- (* (* ph 0.7) 0.55) 5)) (if (not signal?) (str other) (str signal-vec))]]
           (when (or solver? signal?)
-            [re-com/box 
+            [re-com/box
              :height (px (if signal?
                            (- (* (* ph 0.7) 0.75) 50)
-                           (- (* (* ph 0.7) 0.9) 130))) 
+                           (- (* (* ph 0.7) 0.9) 130)))
              :size "none" :padding
              "6px" :style
              (merge {:border        (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
@@ -1017,12 +1017,12 @@
                       {:border-top (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 88) :border-radius "12px"}))
              :child
              (if @db/bad-form-signals?
-               [re-com/box 
-                :size "auto" 
+               [re-com/box
+                :size "auto"
                 :style
-                {:background-color "rgba(255, 0, 0, 0.3)" :border "1px solid red" :padding "6px" :font-size "20px"} 
+                {:background-color "rgba(255, 0, 0, 0.3)" :border "1px solid red" :padding "6px" :font-size "20px"}
                 :child (str @db/bad-form-msg-signals)]
-               
+
 
                (if signal?
                  [bricks/reecatch (visualize-clause signal-vec 0 nil signal-vec)]
@@ -1040,12 +1040,12 @@
                                            :style (if selected? {} {:opacity 0.4 :cursor "pointer"})
                                            :attr {:on-click #(reset! db/solver-view-mode m)}
                                            :child (str m)])]
-                             
+
 
                              (let [;hhh           (- (* (* ph 0.7) 0.55) 60)
                                    hhh (- (* (* ph 0.7) 0.9) 130)
                                    hb            (Math/floor (/ hhh 50))]
-                               
+
                                (cond (= solver-vw-mode "return value")
 
                                      (let [vv            @(ut/tracked-sub
@@ -1081,9 +1081,9 @@
                                                                                       {:keypath [(keyword (str "solver-meta/"
                                                                                                                (ut/replacer (str selected-warren-item) ":" "")
                                                                                                                ">incremental"))]}) (str "solver-output-" selected-warren-item "-console") true]))]]
-                     
+
                      ))])]])
-      
+
       (when signal?
         (let [reaktsz [@db/signal-history-ticker?]]
           [re-com/h-box :gap "10px" :align :center :style {:font-size "13px" :padding-left "21px"} :children
@@ -1092,7 +1092,7 @@
              {:on-click #(reset! db/signal-history-ticker? (not @db/signal-history-ticker?))}]
             [re-com/box :child " live history ticker"]
             [re-com/md-icon-button :src (at) :md-icon-name "zmdi-time-countdown" :style {:font-size "17px"}]]]))
-      
+
       (let [signals-history2 (when signal?
                                (into {}
                                      (for [tt (range (count (get signals-history (first (keys signals-history)))))]
@@ -1101,7 +1101,7 @@
          (cond (and signal? (not (nil? selected-warren-item)))
                  [re-com/h-box :width "600px" :children
                   (for [[e vv] signals-history2
-                        :let   [main       (reduce (fn [a b] (if (> (count a) (count b)) a b)) (map first vv)) 
+                        :let   [main       (reduce (fn [a b] (if (> (count a) (count b)) a b)) (map first vv))
                                 ff         (first (filter #(= main (first %)) vv))
                                 main-true? (true? (first (last ff)))]]
                     ^{:key (str selected-warren-item e vv "h-box")}
@@ -1124,7 +1124,7 @@
                                  {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))})
                                (when (true? ee) {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
                         :child (str sec)])])]
-               
+
                (not (nil? selected-warren-item))
 
                [re-com/gap :size "8px"]
@@ -1151,7 +1151,7 @@
                 ;;     ;;                                                                           (ut/replacer (str selected-warren-item) ":" "")
                 ;;     ;;                                                                           ">history"))]}) (str "solver-output-" selected-warren-item "-meta-status") true]
                 ;;     ]]]
-               
+
                :else "(no signal / rule / solver selected)")])
                ]]))
 
@@ -1162,22 +1162,22 @@
      (ut/tapp>> [:websocket-timeout! client-name result what-req])
      db)))
 
-(re-frame/reg-event-db 
- ::signals-map-response 
+(re-frame/reg-event-db
+ ::signals-map-response
  (fn [db [_ result]]
    (let [] (assoc db :signals-map result))))
 
-(re-frame/reg-event-db 
- ::rules-map-response 
+(re-frame/reg-event-db
+ ::rules-map-response
  (fn [db [_ result]]
    (let [] (assoc db :rules-map result))))
 
-(re-frame/reg-event-db 
- ::solvers-map-response 
+(re-frame/reg-event-db
+ ::solvers-map-response
  (fn [db [_ result]]
    (let [] (assoc db :solvers-map result))))
 
-(re-frame/reg-event-db 
+(re-frame/reg-event-db
  ::signals-history-response
  (fn [db [_ result]]
    (if (not (= result :no-updates))
@@ -1202,7 +1202,7 @@
        {:on-click #(ut/tracked-dispatch [::wfx/request :default
                                          {:message {:kind        server-fn ;;:save-signals-map
                                                     :data-map    data-map
-                                                    :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                                                    :client-name db/client-name}
                                           :timeout 15000000}])} :style {:cursor "pointer" :opacity 0.15} :gap "4px" :children
        [[re-com/box :child (str "push this " item-type-str "s set to server?")]
         [re-com/md-icon-button :src (at) :md-icon-name "zmdi-upload" :style {:font-size "17px"}]]]]]))
@@ -1221,7 +1221,7 @@
         item-type-key        (keyword (str item-type-str "s-map"))
         get-map-evt-vec      [::wfx/request :default
                               {:message     {:kind        item-type-key ;;:signals-map
-                                             :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                                             :client-name db/client-name}
                                :on-response (cond (= item-type-key :rules-map)   [::rules-map-response]
                                                   (= item-type-key :solvers-map) [::solvers-map-response]
                                                   :else                          [::signals-map-response])
@@ -1235,11 +1235,11 @@
                               len          (count tc)
                               has-opacity? (= len 9)
                               cc           (if has-opacity? (subs tc 0 7) tc)]
-                          (str cc "18"))} 
+                          (str cc "18"))}
      :children
      [
       ;; (if (= warren-item-type :unknown)
       ;;   [re-com/gap :size "36px"]
-      ;;   [panel-options get-map-evt-vec selected-warren-item warren-item-type]) 
+      ;;   [panel-options get-map-evt-vec selected-warren-item warren-item-type])
       [re-com/gap :size "5px"]
       (doall [re-com/h-box :children [[left-col ph] [right-col ph]]])]]))

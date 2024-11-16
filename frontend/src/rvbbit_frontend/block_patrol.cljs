@@ -1,8 +1,9 @@
 (ns rvbbit-frontend.block-patrol
   (:require [re-frame.core :as re-frame]
             [rvbbit-frontend.utility :as ut]
+            [rvbbit-frontend.db :as db]
             [rvbbit-frontend.bricks :as bricks]
-            [rvbbit-frontend.http :as http]
+            ;[rvbbit-frontend.http :as http]
             [websocket-fx.core :as wfx]
             [clojure.string :as cstr]))
 
@@ -15,7 +16,7 @@
 (re-frame/reg-sub
  ::panels-hash
  (fn [db]
-   (let [panels (:panels db)
+   (let [panels (dissoc (:panels db) nil)
          cleaned-panels (ut/deep-remove-underscore-keys panels)]
      (hash (cstr/join (sort (map str (flatten (into [] cleaned-panels)))))))))
 
@@ -28,7 +29,7 @@
       (assoc acc panel-key {:data panel-data
                             :hash (hash-block panel-data)}))
     {}
-    (:panels db))))
+    (dissoc (:panels db) nil))))
 
 (re-frame/reg-event-fx
  ::push-panels-to-server
@@ -64,20 +65,34 @@
                          ]
                      (assoc acc k (assoc v :implied-rowsets implied-ds))))
                  {}
-                 panels)]
-     (ut/tapp>> [:pushing-panels-to-server (count (keys panels)) (str (keys panels))])
+                 panels)
+         ;dbody-keys (filterv (fn [x] (cstr/starts-with? (str (first x)) ":block")) (keys @db/drag-body-map))
+         ;dbody-keys-this (filterv (fn [x] (some #(= % (first x)) (keys panels))) dbody-keys)
+         ;drag-body-map-this-tab (select-keys @db/drag-body-map dbody-keys-this)
+         ;;;_ (ut/pp [:this-keys dbody-keys1 dbody-keys2 (keys @db/drag-body-map)])
+         ]
+     (ut/tapp>> [:pushing-panels-to-server (count (keys panels)) (str (keys panels)) ])
      {:dispatch-later
-      [;{:ms 800
-       ; :dispatch [::http/insert-alert [:box :child (str "Sending " (keys panels) " panels to server")] 12 1 5]}
+      [
+      ;;  {:ms 4000
+      ;;   :dispatch [::wfx/push :default ;:leaves
+      ;;              {:kind :warm-leaf-evals
+      ;;               :timeout  500000
+      ;;               :work-targets dbody-keys-this
+      ;;               :client-name client-name}]}
        {:ms 800
         :dispatch [::bricks/refresh-history-log]}]
       :dispatch
-      [::wfx/push :default
+      [::wfx/push :default ;:secondary
        {:kind :current-panels
-        :panels panels
-        :timeout    50000
+        :panels   panels
+        :timeout  500000
         :materialized-panels {} ;; ppm
         :resolved-panels {} ;; ppr
+        :drag-body-map {} ;;drag-body-map-this-tab
+        ;; :resolved-panels  (into {} (for [[k v] panels] ;; super slow and lags out clients when panels edited
+        ;;                             {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)]
+        ;;                                                             {kk (bricks/sql-alias-replace vv)})))}))
         :client-name client-name}]})))
 
 ;; Effect to run side effect function for changed panels
@@ -105,7 +120,7 @@
                          {}
                          new-panels-with-hashes)
          is-initial-boot? (empty? old-hashes)] ;; if nothing has a hash, it's the first time - dont trigger
-     (cond-> {:db (-> db 
+     (cond-> {:db (-> db
                       (assoc :panel-hashes new-hashes)
                       (assoc-in [:click-param :panel-hash] new-hashes))}
        (and (not is-initial-boot?) (seq changed-panels))

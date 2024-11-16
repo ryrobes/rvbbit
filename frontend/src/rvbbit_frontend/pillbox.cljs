@@ -1,7 +1,8 @@
-(ns rvbbit-frontend.pillbox 
+(ns rvbbit-frontend.pillbox
   (:require [clojure.string          :as cstr]
             [clojure.edn             :as edn]
             [rvbbit-frontend.utility :as ut]
+            [rvbbit-frontend.db :as db]
             [re-com.core             :as re-com :refer [at]]
             [re-com.util             :refer [px]]
             [re-frame.core           :as re-frame]
@@ -11,16 +12,16 @@
             ["react-drag-and-drop"   :as rdnd]
             [reagent.core            :as reagent]))
 
-;; _  _ ____ _  _ ____ _   _    ____ ____ _       ___ ____    ____ _  _ ___  ____ ____    _  _ ____ ___     _  _ ____ _  _ ____ _   _    ____ ____ _       ____ _  _ ___     ___  ____ ____ _  _ 
-;; |__| |  | |\ | |___  \_/  __ [__  |  | |        |  |  |    [__  |  | |__] |___ |__/ __ |\/| |__| |__] __ |__| |  | |\ | |___  \_/  __ [__  |  | |       |__| |\ | |  \    |__] |__| |    |_/  
-;; |  | |__| | \| |___   |      ___] |_\| |___     |  |__|    ___] |__| |    |___ |  \    |  | |  | |       |  | |__| | \| |___   |      ___] |_\| |___    |  | | \| |__/    |__] |  | |___ | \_ 
+;; _  _ ____ _  _ ____ _   _    ____ ____ _       ___ ____    ____ _  _ ___  ____ ____    _  _ ____ ___     _  _ ____ _  _ ____ _   _    ____ ____ _       ____ _  _ ___     ___  ____ ____ _  _
+;; |__| |  | |\ | |___  \_/  __ [__  |  | |        |  |  |    [__  |  | |__] |___ |__/ __ |\/| |__| |__] __ |__| |  | |\ | |___  \_/  __ [__  |  | |       |__| |\ | |  \    |__] |__| |    |_/
+;; |  | |__| | \| |___   |      ___] |_\| |___     |  |__|    ___] |__| |    |___ |  \    |  | |  | |       |  | |__| | \| |___   |      ___] |_\| |___    |  | | \| |__/    |__] |  | |___ | \_
 
 
 (defn honey-sql->honeycomb [hsql-map & [metadata]]
   (try
     (let [group-bys (set (:group-by hsql-map))
           select-items (get hsql-map :select)
-          categorize-field (fn [item] 
+          categorize-field (fn [item]
                              (if (or (contains? group-bys item)
                                      (and (vector? item) (contains? group-bys (first item))))
                                {:type :dimension
@@ -51,10 +52,12 @@
                                 {:op op :args (mapv parse-filter args)})
                               f))]
                     (parse-filter (get hsql-map :where)))
+          order-by-vec (vec (for [e (get hsql-map :order-by)]
+                              (if (keyword? e) [e :asc] e)))
           order-bys (mapv (fn [[field direction]]
                             {:field field :direction direction
                              :metadata (get-in metadata [:fields field])})
-                          (get hsql-map :order-by))
+                          order-by-vec)
           table-names (let [from-clause (:from hsql-map)]
                         (cond
                           (and (vector? from-clause) (= (count from-clause) 1)) ; Single-wrapped case
@@ -66,18 +69,18 @@
                                     [table])
                               [{:name table :alias nil
                                 :metadata (get metadata table)}]))
-                          
+
                           (vector? from-clause) ; Double-wrapped case or with alias
                           (mapv (fn [table]
                                   (if (vector? table)
-                                    {:name (first table) 
+                                    {:name (first table)
                                      :alias (second table)
                                      :metadata (get metadata (first table))}
-                                    {:name table 
+                                    {:name table
                                      :alias nil
                                      :metadata (get metadata table)}))
                                 from-clause)
-                          
+
                           :else ; Fallback for any other case
                           [{:name from-clause :alias nil
                             :metadata (get metadata from-clause)}]))
@@ -168,10 +171,13 @@
     (vec (distinct (concat (extract-fields select-fields)
                            (extract-fields group-bys)
                            (flatten (filter-fields filters))
-                           (extract-fields (mapv first order-bys)))))))
+                           (if (vector? (first order-bys)) ;; if properly used
+                             (extract-fields (mapv first order-bys))
+                             (extract-fields (vec order-bys))) ;; other wise if used w/o direction
+                           )))))
 
-;; _  _ ____ _    ___  ____ ____    _  _ ___ _ _       ____ _  _ ____          _  _ ____ _  _ ____ _   _ ____ ____ _  _ ___     _  _ _  _ ___ ____ ___ ____ ____ 
-;; |__| |___ |    |__] |___ |__/    |  |  |  | |       |___ |\ | [__     __    |__| |  | |\ | |___  \_/  |    |  | |\/| |__]    |\/| |  |  |  |__|  |  |___ [__  
+;; _  _ ____ _    ___  ____ ____    _  _ ___ _ _       ____ _  _ ____          _  _ ____ _  _ ____ _   _ ____ ____ _  _ ___     _  _ _  _ ___ ____ ___ ____ ____
+;; |__| |___ |    |__] |___ |__/    |  |  |  | |       |___ |\ | [__     __    |__| |  | |\ | |___  \_/  |    |  | |\/| |__]    |\/| |  |  |  |__|  |  |___ [__
 ;; |  | |___ |___ |    |___ |  \    |__|  |  | |___    |    | \| ___]          |  | |__| | \| |___   |   |___ |__| |  | |__]    |  | |__|  |  |  |  |  |___ ___]
 
 (defn reorder-honey-sql-map [hsql-map]
@@ -246,7 +252,7 @@
 
 ;; used as (add-measure :AMOUNT :agg :sum :alias :sum_amounts) - didn't work, or at least didn't make it through to the honey-sql output
 (defn add-measure
-  "Adds a measure to the query map. 
+  "Adds a measure to the query map.
    If agg is provided, it creates an aggregate measure.
    agg should be one of :sum, :avg, :count, :min, :max"
   [query-map field & {:keys [agg alias metadata]}]
@@ -258,7 +264,7 @@
                  :field measure-field
                  :alias alias
                  :metadata metadata})
-        (update :field-order conj field-identifier)))) 
+        (update :field-order conj field-identifier))))
 
 (defn add-filter
   "Adds a filter to the query map."
@@ -396,7 +402,7 @@
   "Reorders a field in the query map's field-order.
    existing-index: The current index of the field to move.
    put-in-front-of-this-index: The index of the field to put it in front of.
-   If put-in-front-of-this-index is greater than the length of field-order, 
+   If put-in-front-of-this-index is greater than the length of field-order,
    the field will be moved to the end."
   [query-map existing-index put-in-front-of-this-index]
   (let [field-order (:field-order query-map)
@@ -459,7 +465,7 @@
 ;; (ut/tapp>> [:sample-query (str (reorder-honey-sql-map sample-query))])
 ;; (ut/tapp>> [:parsed-query (str parsed-query)])
 ;; (ut/tapp>> [:re-parsed-query (str (reorder-honey-sql-map back-honeycomb->honey-sql))])
-;; (ut/tapp>> [:add-grp-parsed-out-agg  
+;; (ut/tapp>> [:add-grp-parsed-out-agg
 ;;             (str (add-measure parsed-query :AMOUNT :agg :sum :alias :sum_amounts))
 ;;             (str (reorder-honey-sql-map (honeycomb->honey-sql (add-measure parsed-query :AMOUNT :agg :sum :alias :sum_amounts))))])
 
@@ -498,15 +504,15 @@
 ;;                                        :order-by [[:rowcnt :desc]]} {}))])
 
 
-;; _  _ ____ _  _ ____ _   _ ____ ____ _  _ ___     ____ _  _ ___  ____    ____ _  _ ___     ____ _  _ ____ _  _ ___ ____ 
-;; |__| |  | |\ | |___  \_/  |    |  | |\/| |__]    [__  |  | |__] [__     |__| |\ | |  \    |___ |  | |___ |\ |  |  [__  
+;; _  _ ____ _  _ ____ _   _ ____ ____ _  _ ___     ____ _  _ ___  ____    ____ _  _ ___     ____ _  _ ____ _  _ ___ ____
+;; |__| |  | |\ | |___  \_/  |    |  | |\/| |__]    [__  |  | |__] [__     |__| |\ | |  \    |___ |  | |___ |\ |  |  [__
 ;; |  | |__| | \| |___   |   |___ |__| |  | |__]    ___] |__| |__] ___]    |  | | \| |__/    |___  \/  |___ | \|  |  ___]
 
-;;; subs and events - redundancy, but they are trivial, so whatever 
+;;; subs and events - redundancy, but they are trivial, so whatever
 
-(re-frame/reg-sub 
+(re-frame/reg-sub
  ::get-metadata
- (fn [db {:keys [table-key]}] 
+ (fn [db {:keys [table-key]}]
    (let [meta (get-in db [:meta table-key] {})
          post-meta (get-in db [:meta table-key])]
      ;; (if post-meta (for [[k v] meta] {k (merge v (get meta k))})) ;; lets do this later
@@ -556,11 +562,11 @@
          aggable? (or (= data-type "integer") (= data-type "decimal") (= data-type "float"))
          new-honey (case
                     dropped-to
-                     :measures (reorder-honey-sql-map (honeycomb->honey-sql 
-                                                       (if aggable? 
-                                                         (add-measure parsed field-name :agg :sum 
+                     :measures (reorder-honey-sql-map (honeycomb->honey-sql
+                                                       (if aggable?
+                                                         (add-measure parsed field-name :agg :sum
                                                                       :alias (keyword (cstr/replace (str "sum_" field-name) ":" "")))
-                                                         (add-measure parsed field-name :agg :count 
+                                                         (add-measure parsed field-name :agg :count
                                                                       :alias (keyword (cstr/replace (str "cnt_" field-name) ":" ""))))))
                      :dimensions (reorder-honey-sql-map (honeycomb->honey-sql (add-dimension parsed field-name)))
                      :filters (reorder-honey-sql-map (honeycomb->honey-sql (add-filter parsed [:= field-name common-val])))
@@ -604,8 +610,8 @@
      (ut/tapp>> [:change-inline panel-key runner view-key (str parsed) field-name])
      (assoc-in db [:panels panel-key runner view-key] new-honey))))
 
-;; _  _ _    ____ _  _ ___     ____ ____    ____ ____ _  _    ____ ____ _  _ ___  ____ _  _ ____ _  _ ___ ____ 
-;; |  | |    |__| |\ | |  \    |__/ |___ __ |    |  | |\/|    |    |  | |\/| |__] |  | |\ | |___ |\ |  |  [__  
+;; _  _ _    ____ _  _ ___     ____ ____    ____ ____ _  _    ____ ____ _  _ ___  ____ _  _ ____ _  _ ___ ____
+;; |  | |    |__| |\ | |  \    |__/ |___ __ |    |  | |\/|    |    |  | |\/| |__] |  | |\ | |___ |\ |  |  [__
 ;; |__| |    |  | | \| |__/    |  \ |___    |___ |__| |  |    |___ |__| |  | |    |__| | \| |___ | \|  |  ___]
 
 ;;; atom party
@@ -702,7 +708,7 @@
   (let [field-data (cond (keyword? field-data) ;; group-by
                          {:metadata (get-in metadata [:fields field-data])
                           :field field-data :alias nil}
-                         
+
                          (empty? field-data)
                          {:field :_plus}
 
@@ -710,16 +716,18 @@
         data-type (get-in field-data [:metadata :data-type])
         field-name (get field-data :field)
         ttype (get field-data :type)
+        alias (get field-data :alias)
+        dir (get field-data :direction)
         dcolor (or (get @(ut/tracked-sub ::conn/data-colors {}) data-type)  "#ffffff")]
     (if (= field-name :_plus)
-      [re-com/box 
-       :child [re-com/md-icon-button 
-               :md-icon-name "ri-function-add-fill" 
-                :style {:font-size "28px" 
+      [re-com/box
+       :child [re-com/md-icon-button
+               :md-icon-name "ri-function-add-fill"
+                :style {:font-size "28px"
                         :color (str (conn/theme-pull :theme/editor-outer-rim-color nil)  33)
-                        :padding "0px" 
+                        :padding "0px"
                         :margin-top "-6px"}]
-       :justify :center :align :center 
+       :justify :center :align :center
        :style {:border "2px dashed #ffffff12"}
        :padding "4px"
        :size "none"
@@ -743,8 +751,16 @@
                :border (if data-type
                          (str "2px solid " dcolor 99)
                          (str "2px dashed " dcolor 99))}
-       :children [[re-com/box
-                   :child (str field-name)
+       :children [[re-com/h-box
+                   :justify :between :align :center
+                   :children [[re-com/box :child (str field-name)]
+                              (when alias [re-com/box
+                                           :style {:opacity 0.4}
+                                           :child (str "as " alias)])
+                              (when dir [re-com/box
+                                           :style {:opacity 0.4}
+                                           :child (str dir)])
+                              ]
                    :style {:font-size "12px"
                            :padding-left "2px"}]
                   [re-com/h-box
@@ -771,141 +787,146 @@
            :width (str w-per-group "px")
            :child item])])]))
 
+
+
 (defn honeycomb-builder [panel-key runner view-key h w]
-  (let [query     @(ut/tracked-sub ::get-query {:panel-key panel-key :runner runner :table-key view-key})
-        main-table (get-main-table query)
-        main-table (cond 
-                     (cstr/starts-with? (str main-table) ":query/")
-                     (keyword (cstr/replace (str main-table) ":query/" ""))
+  (let [query @(ut/tracked-sub ::get-query {:panel-key panel-key :runner runner :table-key view-key})]
+    (if-let [cached (get @db/honey-comb-cache query)]
+      cached
+      (let [hc-body (let [main-table (get-main-table query)
+                          main-table (cond
+                                       (cstr/starts-with? (str main-table) ":query/")
+                                       (keyword (cstr/replace (str main-table) ":query/" ""))
 
-                     (map? main-table)
-                     @(ut/tracked-sub ::get-query-name-from-query {:query main-table})
+                                       (map? main-table)
+                                       @(ut/tracked-sub ::get-query-name-from-query {:query main-table})
 
-                     :else main-table)
-        used-fields (get-field-names query)
-        metadata  @(ut/tracked-sub ::get-metadata {:table-key main-table})
-        _ (ut/tapp>> [:main-table main-table metadata])
-        parsed    (honey-sql->honeycomb query metadata)
-        react! [@dyn-dropper-hover @dragging? @dragging-out?]
-        ;w (- w 20)
-        pill-menu-w 175]
-    [re-com/h-box
-     :width (px w)
-     :height (px h)
-     :children
-     [[re-com/box
-       :height (px (- h 30))
-       :width (px (+ 20 pill-menu-w))
-       :size "none" ;;(if @dragging-out? "auto" "none")
-       :style {:overflow "auto" 
-               :padding-left "1px"}
-       :child
-       [(if @dragging-out? droppable droppable-stub)
-        [:tabro-pill] :_remove panel-key runner view-key parsed query
-        [re-com/v-box
-         :padding "2px"
-         :gap "2px"
-         :size "auto"
-         :width (px (+ 20 pill-menu-w))
-         :style {:background-color (when @dragging-out? (str (conn/theme-pull :theme/editor-outer-rim-color nil) "99"))}
-        ;; :attr (when @dragging-out? {:on-drag-enter #(reset! dyn-dropper-hover :_out)
-        ;;                             :on-drag-over  #(when (not @dyn-dropper-hover)
-        ;;                                               (reset! dyn-dropper-hover :_out))
-        ;;                             :on-drag-leave #(reset! dyn-dropper-hover false)})
-         :children (if @dragging-out?
-                     [[re-com/box
-                       :size "none"
-                       :height (px (- h 30))
-                       :width (px (+ 20 pill-menu-w))
-                       :align :center :justify :center
-                       :child (str "remove")
-                       :style {:color "#ffffff" 
-                               :border-radius "14px"
-                               :font-size "22px" 
-                               :font-weight 700}]]
+                                       :else main-table)
+                          used-fields (get-field-names query)
+                          metadata  @(ut/tracked-sub ::get-metadata {:table-key main-table})
+                           ;; _ (ut/tapp>> [:main-table main-table metadata])
+                          parsed    (honey-sql->honeycomb query metadata)
+                          react! [@dyn-dropper-hover @dragging? @dragging-out?]
+                            ;w (- w 20)
+                          pill-menu-w 175]
+                      [re-com/h-box
+                       :width (px w)
+                       :height (px h)
+                       :children
+                       [[re-com/box
+                         :height (px (- h 30))
+                         :width (px (+ 20 pill-menu-w))
+                         :size "none" ;;(if @dragging-out? "auto" "none")
+                         :style {:overflow "auto"
+                                 :padding-left "1px"}
+                         :child
+                         [(if @dragging-out? droppable droppable-stub)
+                          [:tabro-pill] :_remove panel-key runner view-key parsed query
+                          [re-com/v-box
+                           :padding "2px"
+                           :gap "2px"
+                           :size "auto"
+                           :width (px (+ 20 pill-menu-w))
+                           :style {:background-color (when @dragging-out? (str (conn/theme-pull :theme/editor-outer-rim-color nil) "99"))}
+                            ;; :attr (when @dragging-out? {:on-drag-enter #(reset! dyn-dropper-hover :_out)
+                            ;;                             :on-drag-over  #(when (not @dyn-dropper-hover)
+                            ;;                                               (reset! dyn-dropper-hover :_out))
+                            ;;                             :on-drag-leave #(reset! dyn-dropper-hover false)})
+                           :children (if @dragging-out?
+                                       [[re-com/box
+                                         :size "none"
+                                         :height (px (- h 30))
+                                         :width (px (+ 20 pill-menu-w))
+                                         :align :center :justify :center
+                                         :child (str "remove")
+                                         :style {:color "#ffffff"
+                                                 :border-radius "14px"
+                                                 :font-size "22px"
+                                                 :font-weight 700}]]
 
-                     (for [ff (merge (get metadata :fields)
-                                     {:* {:field :*  :type :special}
-                                      ;1  {:field 1   :type :special}
-                                      })
-                           :let [ww pill-menu-w]]
-                       [re-com/box
-                        :height "40px"
-                        :child [draggable ff :tabro-pill [pill ff ww used-fields]]]))]]]
-      [re-com/v-box
-       :gap "5px"
-       :size "none"
-       :width (px (- w (+ pill-menu-w 5) 10))
-       :height (px (- h 30))
-       :style {;:border "1px solid lime"
-               :overflow "auto"}
-       :children (for [[k v] (dissoc parsed :field-order :joins :table-names)
-                       :let [v (if (= k :filters) 
-                                 (if (or (= (get v :op) :and)
-                                         (= (get v :op) :or))
-                                   (vec (for [fff (get v :args)] {:field (into [(get fff :op)] (get fff :args))}))
-                                   (if (get v :op)
-                                     [{:field (into [(get v :op)] (get v :args))}] []))
-                                 v)
-                             v (if (nil? v) [] v)
-                            ;; _ (ut/tapp>> [k v])
-                             clause-label (if (= @dyn-dropper-hover k)
-                                            (str "add " (key @dragging-body)  " to " (cstr/replace (str k) ":" ""))
-                                            (cstr/replace (str k) ":" ""))
-                             ]]
-                   [re-com/v-box
-                    :children [;;  [re-com/h-box
-                              ;;   :style {:border "1px dashed #ffffff33"}
-                              ;;   :min-height "40px"
-                              ;;   ;:align :center 
-                              ;;   :width (px (- w 153))
-                              ;;   :children (for [ff v]
-                              ;;               [re-com/v-box 
-                              ;;                :children [[pill-in ff metadata 145]
-                              ;;                           [re-com/box :child (str ff) :width "145px"]
-                              ;;                           ]])]
+                                       (for [ff (merge (get metadata :fields)
+                                                       {:* {:field :*  :type :special}
+                                                          ;1  {:field 1   :type :special}
+                                                        })
+                                             :let [ww pill-menu-w]]
+                                         [re-com/box
+                                          :height "40px"
+                                          :child [draggable ff :tabro-pill [pill ff ww used-fields]]]))]]]
+                        [re-com/v-box
+                         :gap "5px"
+                         :size "none"
+                         :width (px (- w (+ pill-menu-w 5) 10))
+                         :height (px (- h 30))
+                         :style {;:border "1px solid lime"
+                                 :overflow "auto"}
+                         :children (for [[k v] (dissoc parsed :field-order :joins :table-names)
+                                         :let [v (if (= k :filters)
+                                                   (if (or (= (get v :op) :and)
+                                                           (= (get v :op) :or))
+                                                     (vec (for [fff (get v :args)] {:field (into [(get fff :op)] (get fff :args))}))
+                                                     (if (get v :op)
+                                                       [{:field (into [(get v :op)] (get v :args))}] []))
+                                                   v)
+                                               v (if (nil? v) [] v)
+                                                ;; _ (ut/tapp>> [k v])
+                                               clause-label (if (= @dyn-dropper-hover k)
+                                                              (str "add " (key @dragging-body)  " to " (cstr/replace (str k) ":" ""))
+                                                              (cstr/replace (str k) ":" ""))]]
+                                     [re-com/v-box
+                                      :children [;;  [re-com/h-box
+                                                  ;;   :style {:border "1px dashed #ffffff33"}
+                                                  ;;   :min-height "40px"
+                                                  ;;   ;:align :center
+                                                  ;;   :width (px (- w 153))
+                                                  ;;   :children (for [ff v]
+                                                  ;;               [re-com/v-box
+                                                  ;;                :children [[pill-in ff metadata 145]
+                                                  ;;                           [re-com/box :child (str ff) :width "145px"]
+                                                  ;;                           ]])]
 
-                               [droppable [:tabro-pill] k panel-key runner view-key parsed query
-                                [re-com/box
-                                 :attr (when @dragging? {:on-drag-enter #(reset! dyn-dropper-hover k)
-                                                         :on-drag-over  #(when (not @dyn-dropper-hover)
-                                                                           (reset! dyn-dropper-hover k))
-                                                         :on-drag-leave #(reset! dyn-dropper-hover false)})
-                                 :style {:border "3px dashed #ffffff23"
-                                         :background-color (str (conn/theme-pull :theme/editor-outer-rim-color nil)
-                                                                (if (= @dyn-dropper-hover k) "99" "08"))}
-                                 :padding "7px"
-                                 :min-height "40px"
-                                 :width (px (- w (+ pill-menu-w 8) 20))
-                                 :child [drop-target-rows
-                                         (- w (+ pill-menu-w 8))
-                                         (+ 20 pill-menu-w) ;; padding per block
-                                         (vec (for [ff v
-                                                    :let [ff (if (vector? ff) {(first ff) (last ff)} ff)
-                                                          ;;_ (ut/tapp>> [:parsed ff (str parsed)])
-                                                          ]] ;; where clause issues?
-                                                [re-com/box
-                                                 :height "40px"
-                                                 :child [draggable 
-                                                         [(get ff :field) (assoc ff :dragged-from k)] 
-                                                         :tabro-pill
-                                                         [pill-in (assoc ff :dragged-from k)
-                                                          metadata pill-menu-w
-                                                          panel-key runner view-key parsed query] true]]))]]]
-                               [re-com/box
-                                :padding "3px"
-                                :align :end
-                                :style {:margin-right "12px"
-                                        :font-size "16px"
-                                        :font-weight 700
-                                        :color "white"}
-                                :child (if (= k :measures)
-                                         [re-com/v-box
-                                          :children [[re-com/box 
-                                                      :align :end 
-                                                      :child clause-label]
-                                                     [re-com/box
-                                                      :style {:font-size "12px" :font-weight 400 :opacity 0.7}
-                                                      :child "(+ non group-by fields)"]]]
-                                         clause-label)]
-                               [re-com/gap :size "10px"]]])]]]))
+                                                 [droppable [:tabro-pill] k panel-key runner view-key parsed query
+                                                  [re-com/box
+                                                   :attr (when @dragging? {:on-drag-enter #(reset! dyn-dropper-hover k)
+                                                                           :on-drag-over  #(when (not @dyn-dropper-hover)
+                                                                                             (reset! dyn-dropper-hover k))
+                                                                           :on-drag-leave #(reset! dyn-dropper-hover false)})
+                                                   :style {:border "3px dashed #ffffff23"
+                                                           :background-color (str (conn/theme-pull :theme/editor-outer-rim-color nil)
+                                                                                  (if (= @dyn-dropper-hover k) "99" "08"))}
+                                                   :padding "7px"
+                                                   :min-height "40px"
+                                                   :width (px (- w (+ pill-menu-w 8) 20))
+                                                   :child [drop-target-rows
+                                                           (- w (+ pill-menu-w 8))
+                                                           (+ 20 pill-menu-w) ;; padding per block
+                                                           (vec (for [ff v
+                                                                      :let [ff (if (vector? ff) {(first ff) (last ff)} ff)
+                                                                              ;;_ (ut/tapp>> [:parsed ff (str parsed)])
+]] ;; where clause issues?
+                                                                  [re-com/box
+                                                                   :height "40px"
+                                                                   :child [draggable
+                                                                           [(get ff :field) (assoc ff :dragged-from k)]
+                                                                           :tabro-pill
+                                                                           [pill-in (assoc ff :dragged-from k)
+                                                                            metadata pill-menu-w
+                                                                            panel-key runner view-key parsed query] true]]))]]]
+                                                 [re-com/box
+                                                  :padding "3px"
+                                                  :align :end
+                                                  :style {:margin-right "12px"
+                                                          :font-size "16px"
+                                                          :font-weight 700
+                                                          :color "white"}
+                                                  :child (if (= k :measures)
+                                                           [re-com/v-box
+                                                            :children [[re-com/box
+                                                                        :align :end
+                                                                        :child clause-label]
+                                                                       [re-com/box
+                                                                        :style {:font-size "12px" :font-weight 400 :opacity 0.7}
+                                                                        :child "(+ non group-by fields)"]]]
+                                                           clause-label)]
+                                                 [re-com/gap :size "10px"]]])]]])]
+        (swap! db/honey-comb-cache assoc query hc-body)
+        hc-body))))

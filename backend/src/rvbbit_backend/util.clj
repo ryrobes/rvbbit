@@ -86,7 +86,7 @@
 ................................................................................
 ")
 
-(def managed-atoms (atom {}))  
+(def managed-atoms (atom {}))
 
 (declare pp)
 
@@ -148,7 +148,7 @@
 (defn limit-map [m limit]
   (into {} (take limit m)))
 
-(defn limit-sample [data] data) ;; disabled for now 
+(defn limit-sample [data] data) ;; disabled for now
 
 ;; (defn limit-sample
 ;;   ([data] (limit-sample data 10))
@@ -210,7 +210,7 @@
 (defn freeze-atom
   "Freezes a single atom to disk."
   [file-path]
-  (let [a (get @managed-atoms file-path)] 
+  (let [a (get @managed-atoms file-path)]
     (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
 
 
@@ -723,6 +723,15 @@
         out (if (cstr/ends-with? out ",") (subs out 0 (- (count out) 1)) out)]
     out))
 
+(defn format-duration-seconds-compact [seconds]
+  (-> (format-duration-seconds seconds)
+      (cstr/replace " hours" "h")
+      (cstr/replace " hour" "h")
+      (cstr/replace " minutes" "m")
+      (cstr/replace " minute" "m")
+      (cstr/replace " seconds" "s")
+      (cstr/replace " second" "s")))
+
 (defn nf [i] (pprint/cl-format nil "~:d" i))
 
 (defmacro timed-exec
@@ -770,6 +779,31 @@
                              false)))]
          (if aa true false))
        (catch Exception _ true)))
+
+(defn deep-sort
+  "Recursively sorts all collections within a nested data structure.
+   - Maps are sorted by keys
+   - Vectors and lists are sorted by their values
+   - Sets are converted to sorted vectors
+   - Other values are returned as-is"
+  [data]
+  (cond
+    (map? data)
+    (into (sorted-map)
+          (for [[k v] data]
+            [k (deep-sort v)]))
+
+    (vector? data)
+    (vec (sort-by pr-str (map deep-sort data)))
+
+    (list? data)
+    (sort-by pr-str (map deep-sort data))
+
+    (set? data)
+    (vec (sort-by pr-str (map deep-sort data)))
+
+    :else
+    data))
 
 (defn select-keypaths
   [m keypaths]
@@ -931,9 +965,21 @@
   [millis]
   (let [date (java.util.Date. millis) format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")] (.format format date)))
 
+(defn parse-clover-keypath [kw]
+  (let [parts (-> (name kw)
+                  (cstr/split #">"))]
+    (mapv (fn [part]
+            (cond
+              (re-matches #"\d+" part) (Integer/parseInt part)
+              (= part "true") true
+              (= part "false") false
+              (= part "nil") nil
+              :else (keyword part)))
+          parts)))
+
 ;;(defn deep-flatten [x] (if (coll? x) (mapcat deep-flatten x) [x]))
 
-(defn deep-flatten [x] 
+(defn deep-flatten [x]
   (vec (filter keyword? (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x}))))
 
 (def df-cache (atom {}))
@@ -1044,6 +1090,30 @@
 
     :else
     data))
+
+(defn deep-remove-keys-and-underscore
+  [data keys-to-remove]
+  (let [key-remove-set (set keys-to-remove)]
+    (letfn [(should-remove? [k]
+              (or (key-remove-set k)
+                  (and (keyword? k)
+                       (cstr/starts-with? (name k) "_"))))]
+      (cond
+        (map? data)
+        (persistent!
+         (reduce-kv
+          (fn [acc k v]
+            (if (should-remove? k)
+              acc
+              (assoc! acc k (deep-remove-keys-and-underscore v keys-to-remove))))
+          (transient {})
+          data))
+
+        (vector? data)
+        (mapv #(deep-remove-keys-and-underscore % keys-to-remove) data)
+
+        :else
+        data))))
 
 (defn clean-sql-from-ui-keys
   [query]
@@ -1315,7 +1385,7 @@
 (defn hash-group [key num-groups]
   (mod (hash key) num-groups))
 
-(defn delay-execution [ms f] 
+(defn delay-execution [ms f]
   (future (do (Thread/sleep ms) (f))))
 
 (defn safe-cprint [x & [opts-map]]
@@ -1324,13 +1394,157 @@
                          {:width (get-terminal-width)}
                          opts-map) (puget/cprint x))))
 
-(defn ppln [x] 
-  (if (>= debug-level 2) 
+;; (def ansi-colors
+;;   {:red "\u001b[31m"
+;;    :green "\u001b[32m"
+;;    :yellow "\u001b[33m"
+;;    :blue "\u001b[34m"
+;;    :magenta "\u001b[35m"
+;;    :cyan "\u001b[36m"
+;;    :white "\u001b[37m"
+;;    :bright-red "\u001B[91m"
+;;    :bright-green "\u001B[92m"
+;;    :bright-yellow "\u001B[93m"
+;;    :bright-blue "\u001B[94m"
+;;    :bright-magenta "\u001B[95m"
+;;    :bright-cyan "\u001B[96m"
+;;    :bright-white "\u001B[97m"})
+
+(def ansi-colors-ext
+  {;:reset              "\u001b[0m"
+   ;:bold               "\u001b[1m"
+   ;:dim                "\u001b[2m"
+   ;:italic             "\u001b[3m"
+   ;:underline          "\u001b[4m"
+   ;:blink              "\u001b[5m"
+   ;:reverse            "\u001b[7m"
+   ;:hidden             "\u001b[8m"
+   ;:strikethrough      "\u001b[9m"
+
+   ;; Regular colors
+   ;:black              "\u001b[30m"
+   :red                "\u001b[31m"
+   :green              "\u001b[32m"
+   :yellow             "\u001b[33m"
+   :blue               "\u001b[34m"
+   :magenta            "\u001b[35m"
+   :cyan               "\u001b[36m"
+   :white              "\u001b[37m"
+
+   ;; Bright colors
+   ;:bright-black       "\u001b[90m"
+   :bright-red         "\u001b[91m"
+   :bright-green       "\u001b[92m"
+   :bright-yellow      "\u001b[93m"
+   :bright-blue        "\u001b[94m"
+   :bright-magenta     "\u001b[95m"
+   :bright-cyan        "\u001b[96m"
+   :bright-white       "\u001b[97m"
+
+   ;; Background colors
+   ;:bg-black           "\u001b[40m"
+   ;:bg-red             "\u001b[41m"
+   ;:bg-green           "\u001b[42m"
+   ;:bg-yellow          "\u001b[43m"
+   ;:bg-blue            "\u001b[44m"
+   ;:bg-magenta         "\u001b[45m"
+   ;:bg-cyan            "\u001b[46m"
+   ;:bg-white           "\u001b[47m"
+
+   ;; Bright background colors
+   ;:bg-bright-black    "\u001b[100m"
+   ;:bg-bright-red      "\u001b[101m"
+   ;:bg-bright-green    "\u001b[102m"
+   ;:bg-bright-yellow   "\u001b[103m"
+   ;:bg-bright-blue     "\u001b[104m"
+   ;:bg-bright-magenta  "\u001b[105m"
+   ;:bg-bright-cyan     "\u001b[106m"
+   ;:bg-bright-white    "\u001b[107m"
+   })
+
+(defn generate-256-color [n]
+  {:pre [(and (integer? n) (<= 0 n 255))]}
+  (str "\u001b[38;5;" n "m"))
+
+;; (defn generate-256-bg-color [n]
+;;   {:pre [(and (integer? n) (<= 0 n 255))]}
+;;   (str "\u001b[48;5;" n "m"))
+
+(defn generate-rgb-color [r g b]
+  {:pre [(every? #(and (integer? %) (<= 0 % 255)) [r g b])]}
+  (str "\u001b[38;2;" r ";" g ";" b "m"))
+
+(defn bright-color? [n]
+  (let [color-cube-start 16
+        color-cube-end 231]
+    (if (and (>= n color-cube-start) (<= n color-cube-end))
+      (let [base (- n color-cube-start)
+            red (* 36 (mod (quot base 36) 6))
+            green (* 36 (mod (quot base 6) 6))
+            blue (* 36 (mod base 6))]
+        (and (> red 128) (> green 128) (> blue 128)))
+      false)))
+
+(defn generate-bright-256-colors []
+  (let [bright-colors (filter bright-color? (range 256))]
+    (into {}
+          (for [b bright-colors]
+            {(keyword (str "color" b))
+             (str "\u001b[38;5;" b "m")}))))
+
+;; (defn generate-rgb-bg-color [r g b]
+;;   {:pre [(every? #(and (integer? %) (<= 0 % 255)) [r g b])]}
+;;   (str "\u001b[48;2;" r ";" g ";" b "m"))
+
+(def ansi-colors ;; extended-colorss
+  (merge ansi-colors-ext
+         (generate-bright-256-colors)
+         {:orange (generate-256-color 208)
+          :pink (generate-256-color 13)
+          :purple (generate-256-color 93)
+          ;:bg-orange (generate-256-bg-color 208)
+          ;:bg-pink (generate-256-bg-color 13)
+          ;:bg-purple (generate-256-bg-color 93)
+          :custom-red (generate-rgb-color 255 50 50)
+          ;:bg-custom-blue (generate-rgb-bg-color 0 100 255)
+          }))
+
+;; (defn client-color-map []
+;;   (let [colors (vec (vals ansi-colors))
+;;         reset-code "\u001b[0m"
+;;         clients-vec (filterv #(not (= (first %) :rvbbit)) @db/ack-scoreboard)
+;;         ]))
+
+(defn ppln [x]
+  (if (>= debug-level 2)
     (safe-cprint x) ((fn [& _]) x)))
 
-(defn pp [x & [opts-map]] 
-  (if (>= debug-level 1) 
+(defn pp [x & [opts-map]]
+  (if (>= debug-level 1)
     (safe-cprint x opts-map) ((fn [& _]) x)))
+
+(defn ppp [x & [opts-map]]
+  (if (>= debug-level 1)
+    (let [stack-trace (.getStackTrace (Thread/currentThread))
+          caller (first (drop-while #(or (#{"clojure.lang.Compiler"
+                                            "clojure.lang.Var"
+                                            "rvbbit_backend.util"
+                                            "java.lang.Thread"}
+                                          (.getClassName %))
+                                         (= "getStackTrace" (.getMethodName %)))
+                                    stack-trace))
+          file-name (.getFileName caller)
+          line-number (.getLineNumber caller)
+          method-name (.getMethodName caller)
+          class-name (.getClassName caller)
+          context (if (#{"doInvoke" "invokeStatic" "eval"} method-name)
+                    (str file-name ":" line-number " (top level)")
+                    (str file-name ":" line-number " in " method-name))
+          ns-name (-> class-name (clojure.string/split #"\$") first)
+          full-context (str ns-name " - " context)
+          x-with-context [full-context x]]
+      (safe-cprint x-with-context opts-map))
+    ((fn [& _]) x)))
 
 (defn ppa
   [x] ;; always print
@@ -1742,7 +1956,7 @@
 
 
 
-;;; println to file for shutdown dumps 
+;;; println to file for shutdown dumps
 (def ansi-escape-pattern #"\u001b\[[0-9;]*[a-zA-Z]")
 
 (defn strip-ansi [s]

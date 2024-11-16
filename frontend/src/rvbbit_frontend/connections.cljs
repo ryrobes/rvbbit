@@ -260,7 +260,7 @@
   [block-map panel-key]
   (if (try (and (ut/ne? block-map) (or (map? block-map) (vector? block-map) (keyword? block-map))) (catch :default _ false))
     (let [;;valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %)
-          client-name @(ut/tracked-sub ::client-name {})
+          client-name db/client-name
           valid-body-params (vec (ut/get-compound-keys block-map))
           workspace-params (into {}
                                  (for [k valid-body-params] ;; deref here?
@@ -371,7 +371,7 @@
                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
                                      unresolved-req-hash       (hash (if false ;override?
-                                                                       fkp ;this 
+                                                                       fkp ;this
                                                                        ;[solver-name fkp client-name]
                                                                        [solver-name fkp]))
                                      rtype                     (get (first this) :type :unknown)
@@ -597,12 +597,12 @@
 
 ;; (re-frame/reg-sub
 ;;  ::runner-crosswalk-map
-;;  (fn [_ _] 
+;;  (fn [_ _]
 ;;    (let [;; runner-keys       (keys (get-in db [:server :settings :runners] {}))
 ;;         ;;  all-runners       (apply concat
 ;;         ;;                           (for [r runner-keys]
 ;;         ;;                             (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
-;;          modded-map (into {} (for [[k v] 
+;;          modded-map (into {} (for [[k v]
 ;;                                    @db/solver-fn-lookup
 ;;                                    ;(get-in db [:solver-fn :lookup])
 ;;                                    :let [base-k (last k)
@@ -617,25 +617,29 @@
 ;;          ]
 ;;      modded-map)))
 
+;; runner-crosswalk-map-cache
+
 (re-frame/reg-sub
  ::runner-crosswalk-map
  (fn [_ _]
-  ; (try 
-     (let [lkup-atom (into {}(for [[k v] @db/solver-fn-lookup ;; see comment below.... need to dissect this...
-                                   :when (not (integer? (last k)))] {k v}))
-           process-key (fn [k]
-                       (let [base-k (if (vector? k) (last k) k)]
-                         (if (try (namespace base-k) (catch :default _ false)) ;;(try (namespace base-k) (catch :default _ false))
-                           [base-k]
-                           [base-k (keyword "data" (name base-k))])))]
-     (into {}
-           (comp 
-            (mapcat (fn [[k v]]
-                      (map #(vector % v) (process-key (last k)))))
-            (distinct))
-           lkup-atom))
-   ;  (catch :default _ {}))
-   ))
+   (let [ck (hash @db/solver-fn-lookup)]
+     (if-let [cache (get @db/runner-crosswalk-map-cache ck)]
+       cache
+       (let [res (let [lkup-atom (into {} (for [[k v] @db/solver-fn-lookup ;; see comment below.... need to dissect this...
+                                                :when (not (integer? (last k)))] {k v}))
+                       process-key (fn [k]
+                                     (let [base-k (if (vector? k) (last k) k)]
+                                       (if (try (namespace base-k) (catch :default _ false)) ;;(try (namespace base-k) (catch :default _ false))
+                                         [base-k]
+                                         [base-k (keyword "data" (name base-k))])))]
+                   (into {}
+                         (comp
+                          (mapcat (fn [[k v]]
+                                    (map #(vector % v) (process-key (last k)))))
+                          (distinct))
+                         lkup-atom))]
+         (swap! db/runner-crosswalk-map-cache assoc ck res)
+         res)))))
 
 ;; filtered out for now, but def need to deal with it. TODO - 9/4/24
 ;;,throws when keypath ends in a vector idx.. Ex:
@@ -652,83 +656,108 @@
 ;;  [:conns [:settings/runners] :shell :clover-fn] :solver/raw-custom-override-290714520,
 ;;  [:conns [:settings/runners] :fabric :clover-fn] :solver/raw-custom-override1526306838}
 
-;;(ut/tapp>> [:modded-map @(ut/tracked-sub ::runner-crosswalk-map {})]) 
+;;(ut/tapp>> [:modded-map @(ut/tracked-sub ::runner-crosswalk-map {})])
 
+(def flow-key-parts (atom {}))
 
-
-(defn break-up-flow-key
-  [key]
-  (let [ff  (cstr/split (-> (str key)
-                            (cstr/replace #":" ""))
-                        #"/")
-        ff2 (cstr/split (last ff) #">")]
-    (vec (for [k ff2] (if (try (number? (edn/read-string k)) (catch :default _ false)) (edn/read-string k) (keyword k))))))
+(defn break-up-flow-key [key]
+  (if-let [cache (get @flow-key-parts key)]
+    cache
+      (let [res (let [ff  (cstr/split (-> (str key)
+                                          (cstr/replace #":" ""))
+                                      #"/")
+                      ff2 (cstr/split (last ff) #">")]
+                  (vec (for [k ff2] (if (try (number? (edn/read-string k))
+                                             (catch :default _ false))
+                                      (edn/read-string k) (keyword k)))))]
+        (swap! flow-key-parts assoc key res)
+        res)))
 
 (defn split-back [x] (keyword (ut/replacer (first (cstr/split (str x) #">")) ":" "")))
 
+(re-frame/reg-sub
+ ::world-hash
+ (fn [db _]
+   (let [data-hash (hash (get db :data))
+         click-hash (hash (dissoc (get db :click-param) :panel-hash))]
+     [data-hash click-hash])))
+
+
 (re-frame/reg-sub ;; RESOLVE KEYPATH TEMP FOR TESTING
-  ::clicked-parameter-key-alpha ;;; important, common, and likely more expensive than need be.
-  (fn [db {:keys [keypath]}]
-    (let [keypath             (if (vector? keypath) keypath [keypath])
-          cmp                 (ut/splitter (ut/safe-name (nth keypath 0)) "/")
-          runner-crosswalk-map ;(try 
-                                 @(ut/tracked-sub ::runner-crosswalk-map {}) 
+ ::clicked-parameter-key-alpha ;;; important, common, and likely more expensive than need be.
+ (fn [db {:keys [keypath skip?]}]
+
+   (let [wh @(ut/tracked-sub ::world-hash {})
+         cache-key [keypath wh]]
+
+     (if (contains? @db/clicked-parameter-key-cache cache-key) ;; since some results of a fn are valid nils
+
+       (let [cache (get @db/clicked-parameter-key-cache cache-key)]
+          ;(when (cstr/includes? (str keypath) "leaf") )
+           ;(ut/pp [:cached :clicked-parameter-key-alpha (str wh) (str keypath) (str cache)])
+           cache)
+
+       (let [;;_ (ut/pp [:running :clicked-parameter-key-alpha (str wh) (str keypath)])
+             keypath             (if (vector? keypath) keypath [keypath])
+             cmp                 (ut/splitter (ut/safe-name (nth keypath 0)) "/")
+             runner-crosswalk-map ;(try
+             @(ut/tracked-sub ::runner-crosswalk-map {})
                                ;     (catch :default e (do (ut/tapp>> [:runner-crosswalk-map-error e :db/solver-fn-lookup (str @db/solver-fn-lookup)]) {})))
-          kkey                (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
+             kkey                (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
           ;vkey                (keyword (peek cmp))
-          vkey                (keyword (last cmp))
+             vkey                (keyword (last cmp))
           ;; kp-encoded-param?   (and (or (= kkey :theme)
           ;;                              (= kkey :param)) (cstr/includes? (str keypath) ">"))
-          kp-encoded-param? (and (#{:theme :param} kkey) (cstr/includes? (str keypath) ">"))
+             kp-encoded-param? (and (#{:theme :param} kkey) (cstr/includes? (str keypath) ">"))
           ;; param-has-fn? (when kp-encoded-param? ;;(= kkey :param) ;;kp-encoded-param?
           ;;                 (some #(= % :run-solver) (ut/deep-flatten (get-in db (vec (cons :click-param [kkey
           ;;                 (split-back vkey)]))))))
           ;; param-has-fn?       (when (or (= kkey :param) (= kkey :theme))
           ;;                       (= (get-in db (vec (cons :click-param [kkey (split-back vkey) 0]))) :run-solver))
-          param-has-fn?       (when (#{:param :theme} kkey)
-                                (= (get-in db [:click-param kkey (split-back vkey) 0]) :run-solver))
-          full-kp             (cons :click-param (if kp-encoded-param? (vec (cons kkey (break-up-flow-key vkey))) [kkey vkey]))
-          val0                (cond
+             param-has-fn?       (when (#{:param :theme} kkey)
+                                   (= (get-in db [:click-param kkey (split-back vkey) 0]) :run-solver))
+             full-kp             (cons :click-param (if kp-encoded-param? (vec (cons kkey (break-up-flow-key vkey))) [kkey vkey]))
+             val0                (cond
 
-                                (get runner-crosswalk-map (nth keypath 0))  ;; more sketchy recursion... beware!
-                                @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [(get runner-crosswalk-map (nth keypath 0))]})
+                                   (get runner-crosswalk-map (nth keypath 0))  ;; more sketchy recursion... beware!
+                                   @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [(get runner-crosswalk-map (nth keypath 0))]})
 
-                                (and param-has-fn? kp-encoded-param?)
+                                   (and param-has-fn? kp-encoded-param?)
 
-                                (get-in @(ut/tracked-sub
-                                          ::clicked-parameter-key-alpha
-                                          {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath)) #">"))
-                                                                           ":"
-                                                                           ""))]})
-                                        (vec (rest (break-up-flow-key vkey))))
+                                   (get-in @(ut/tracked-sub
+                                             ::clicked-parameter-key-alpha
+                                             {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath)) #">"))
+                                                                              ":"
+                                                                              ""))]})
+                                           (vec (rest (break-up-flow-key vkey))))
 
-                                param-has-fn?                         (try (get-in
-                                                                            db
-                                                                            (vec (cons :click-param
-                                                                                       (map keyword
-                                                                                            (map #(cstr/replace (str %) ":" "")
-                                                                                                 (cstr/split
-                                                                                                  (get @db/solver-fn-lookup [:conns keypath])
+                                   param-has-fn?                         (try (get-in
+                                                                               db
+                                                                               (vec (cons :click-param
+                                                                                          (map keyword
+                                                                                               (map #(cstr/replace (str %) ":" "")
+                                                                                                    (cstr/split
+                                                                                                     (get @db/solver-fn-lookup [:conns keypath])
                                                                                                       ;@(ut/tracked-sub ::solver-fn-lookup {:keypath [:conns keypath]})
-                                                                                                  #"/"))))))
-                                                                           (catch :default _ nil)) ;; get the sub ref and
+                                                                                                     #"/"))))))
+                                                                              (catch :default _ nil)) ;; get the sub ref and
                                                                                                        ;; return that data
-                                kp-encoded-param?                      (get-in @(ut/tracked-sub
-                                                                                 ::clicked-parameter-key-alpha
-                                                                                 {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath)) #">"))
-                                                                                                                  ":"
-                                                                                                                  ""))]})
-                                                                               (vec (rest (break-up-flow-key vkey))))
+                                   kp-encoded-param?                      (get-in @(ut/tracked-sub
+                                                                                    ::clicked-parameter-key-alpha
+                                                                                    {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath)) #">"))
+                                                                                                                     ":"
+                                                                                                                     ""))]})
+                                                                                  (vec (rest (break-up-flow-key vkey))))
 
-                                (let [vv (get-in db full-kp)]  ;; if we get back a clover keyword, try and resolve it. CAREFUL, this could stackoverflow us easy...
-                                  (and (keyword? vv) (cstr/includes? (str vv) "/")))
+                                   (let [vv (get-in db full-kp)]  ;; if we get back a clover keyword, try and resolve it. CAREFUL, this could stackoverflow us easy...
+                                     (and (keyword? vv) (cstr/includes? (str vv) "/")))
 
-                                @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [(get-in db full-kp)]})
+                                   @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [(get-in db full-kp)]})
 
-                                :else                                 (get-in db full-kp))
-          val0                (if (and param-has-fn? (nil? val0)) ;; hasn't run yet - should check atom as well...
-                                (get-in db full-kp)
-                                val0) ;; we need the solver code below to trigger it if need be.
+                                   :else                                 (get-in db full-kp))
+             val0                (if (and param-has-fn? (nil? val0)) ;; hasn't run yet - should check atom as well...
+                                   (get-in db full-kp)
+                                   val0) ;; we need the solver code below to trigger it if need be.
           ;;_ (when (= (first keypath) :param/huger22) (ut/tapp>> [val0]))
           ;; _ (when kp-encoded-param? (ut/tapp>> [:clicked-parameter-key-alpha-w-ext-kp keypath kp-encoded-param?
           ;; param-has-fn?
@@ -747,24 +776,24 @@
           ;;                                       ;(keyword (ut/replacer (first (cstr/split (str keypath)  #">"))
           ;;                                       ":" ""))
           ;;                                       ]))
-          if-walk-map2        (fn [obody]
-                                (let [kps       (ut/extract-patterns obody :if 4)
-                                      logic-kps (into {}
-                                                      (for [v kps]
-                                                        (let [kws             (vec (filter #(cstr/includes? (str %) "/")
-                                                                                     (ut/deep-flatten v)))
-                                                              wm              @(ut/tracked-sub ::resolve-click-param {:long-keyword kws})
-                                                              v0              (ut/postwalk-replacer wm v)
-                                                              [_ l this that] v0]
-                                                          {v (if l this that)})))]
-                                  (ut/postwalk-replacer logic-kps obody)))
-          val0                (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
+             if-walk-map2        (fn [obody]
+                                   (let [kps       (ut/extract-patterns obody :if 4)
+                                         logic-kps (into {}
+                                                         (for [v kps]
+                                                           (let [kws             (vec (filter #(cstr/includes? (str %) "/")
+                                                                                              (ut/deep-flatten v)))
+                                                                 wm              @(ut/tracked-sub ::resolve-click-param {:long-keyword kws})
+                                                                 v0              (ut/postwalk-replacer wm v)
+                                                                 [_ l this that] v0]
+                                                             {v (if l this that)})))]
+                                     (ut/postwalk-replacer logic-kps obody)))
+             val0                (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
           ;ns-kw?              (and (cstr/starts-with? (str val0) ":") (cstr/includes? (str val0) "/") (keyword? val0))
-          ns-kw?              (and (keyword? val0) (namespace val0))
-          val                 (cond ns-kw?      (get-in db
-                                                        (let [sp (ut/splitter (str val0) "/")]
-                                                          [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
-                                                           (ut/unre-qword (last sp))]))
+             ns-kw?              (and (keyword? val0) (namespace val0))
+             val                 (cond ns-kw?      (get-in db
+                                                           (let [sp (ut/splitter (str val0) "/")]
+                                                             [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
+                                                              (ut/unre-qword (last sp))]))
                                     ;; (map? val0) (let [km      (into {}
                                     ;;                                 (distinct (map #(when (>= (count %) 2)
                                     ;;                                                   {(str (ut/replacer (str (get % 0)) ":" "")
@@ -776,31 +805,32 @@
                                     ;;                                 (for [[k v] km]
                                     ;;                                   {(keyword k) (get-in db (cons :click-param v))}))]
                                     ;;               (ut/postwalk-replacer rep-map val0))
-                                    (map? val0)     (let [km (into {}
-                                                                   (comp
-                                                                    (filter #(>= (count %) 2))
-                                                                    (map (fn [[k1 k2 :as path]]
-                                                                           [(str (ut/replacer (str k1) ":" "") "/" (ut/replacer (str k2) ":" ""))
-                                                                            [k1 k2]]))
-                                                                    (distinct))
-                                                                   (ut/keypaths (get db :click-param)))
-                                                          rep-map (into {}
-                                                                        (map (fn [[k v]]
-                                                                               [(keyword k) (get-in db (cons :click-param v))]))
-                                                                        km)]
-                                                      (ut/postwalk-replacer rep-map val0))
-                                    :else       val0)
-          val                 (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
-                                (edn/read-string val) ;; temp hacky param work around (since we
-                                val)
-          contains-params?    (contains-namespaced-keyword? val)
-          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))] 
-      ;;(ut/tapp>> [:kk (str keypath) val])
-      (if (or contains-solver-fn?
-              contains-params?) ;; (and contains-params? (not contains-sql-alias?))
-        (logic-and-params-fn (if contains-solver-fn? (get-in db full-kp) val) ;;val
-                             keypath) ;; process again, no recursion here for now... we want to
-        val))))
+                                       (map? val0)     (let [km (into {}
+                                                                      (comp
+                                                                       (filter #(>= (count %) 2))
+                                                                       (map (fn [[k1 k2 :as path]]
+                                                                              [(str (ut/replacer (str k1) ":" "") "/" (ut/replacer (str k2) ":" ""))
+                                                                               [k1 k2]]))
+                                                                       (distinct))
+                                                                      (ut/keypaths (get db :click-param)))
+                                                             rep-map (into {}
+                                                                           (map (fn [[k v]]
+                                                                                  [(keyword k) (get-in db (cons :click-param v))]))
+                                                                           km)]
+                                                         (ut/postwalk-replacer rep-map val0))
+                                       :else       val0)
+             val                 (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
+                                   (edn/read-string val) ;; temp hacky param work around (since we
+                                   val)
+             contains-params?    (contains-namespaced-keyword? val)
+             contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))
+             val (if (or contains-solver-fn?
+                         contains-params?) ;; (and contains-params? (not contains-sql-alias?))
+                   (logic-and-params-fn (if contains-solver-fn? (get-in db full-kp) val) keypath) ;; process again, no recursion here for now... we want to
+                   val)]
+         (swap! db/clicked-parameter-key-cache assoc cache-key val)
+         ;(ut/pp [:res? (str wh) (str keypath) val])
+         val)))))
 
 
 (re-frame/reg-event-db
@@ -818,10 +848,10 @@
  (fn [db [_ keypath value]]
    (assoc-in db (cons :click-param keypath) value)))
 
-(re-frame/reg-event-db 
- ::declick-parameter 
- (undoable) 
- (fn [db [_ keypath]] 
+(re-frame/reg-event-db
+ ::declick-parameter
+ (undoable)
+ (fn [db [_ keypath]]
    (ut/tapp>> [:unclick-param (str keypath) (str (vec (cons :click-param keypath)))])
    (ut/dissoc-in db (vec (cons :click-param keypath)))))
 
@@ -884,9 +914,9 @@
                       {:fields   (into {} (for [[k v] (get m :fields)] {k (merge v (get pm k))}))
                        :rowcount (get-in pm [:* :rowcount])})))
 
-(re-frame/reg-sub 
- ::sql-data-exists? 
- (fn [db [_ keypath]] 
+(re-frame/reg-sub
+ ::sql-data-exists?
+ (fn [db [_ keypath]]
    (not (nil? (get-in db (cons :data keypath))))))
 
 (re-frame/reg-sub
@@ -1027,50 +1057,87 @@
          query (ut/clean-sql-from-ui-keys query)]
      (assoc-in db (cons :query-history-condi keypath) (hash (str pquery query))))))
 
-(re-frame/reg-sub 
- ::condi-value 
+(re-frame/reg-sub
+ ::condi-value
  (fn [db {:keys [condi-key]}] (true? (= 1 (get-in db [:post-condi condi-key 0 :v])))))
 
-(re-frame/reg-sub 
- ::client-name 
+(re-frame/reg-sub
+ ::client-name
  (fn [db] (get db :client-name)))
+
+;; (defn theme-pull
+;;   [cmp-key fallback & test-fn]
+;;   (let [;v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
+;;         v                   @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
+;;         t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
+;;         t1                  (keyword (first t0))
+;;         t2                  (keyword (last t0))
+;;         ;;self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
+;;         ;; new deep-flatten is already a set with only keywords
+;;         ;self-ref-keys       (filter #(namespace %) (ut/deep-flatten db/base-theme))
+;;         self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
+;;         ;; self-ref-pairs      (into {}
+;;         ;;                           (for [k    self-ref-keys ;; todo add a reurziver version of
+;;         ;;                                 :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
+;;         ;;                             {k (get db/base-theme bk)}))
+;;         self-ref-pairs (reduce (fn [acc k]
+;;                                  (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
+;;                                    (if-let [value (get db/base-theme bk)]
+;;                                      (assoc acc k value)
+;;                                      acc)))
+;;                                {}
+;;                                self-ref-keys)
+;;         resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
+;;         base-theme-keys     (keys resolved-base-theme)
+;;         theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
+;;         fallback0           (if theme-key? (get resolved-base-theme t2) fallback)]
+;;     (if (not (nil? v)) v fallback0)))
 
 (defn theme-pull
   [cmp-key fallback & test-fn]
-  (let [;v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
-        v                   @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
-        t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
-        t1                  (keyword (first t0))
-        t2                  (keyword (last t0))
-        ;;self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
-        ;; new deep-flatten is already a set with only keywords
-        ;self-ref-keys       (filter #(namespace %) (ut/deep-flatten db/base-theme))
-        self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
-        ;; self-ref-pairs      (into {}
-        ;;                           (for [k    self-ref-keys ;; todo add a reurziver version of
-        ;;                                 :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
-        ;;                             {k (get db/base-theme bk)}))
-        self-ref-pairs (reduce (fn [acc k]
-                                 (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
-                                   (if-let [value (get db/base-theme bk)]
-                                     (assoc acc k value)
-                                     acc)))
-                               {}
-                               self-ref-keys)
-        resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
-        base-theme-keys     (keys resolved-base-theme)
-        theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
-        fallback0           (if theme-key? (get resolved-base-theme t2) fallback)]
-    (if (not (nil? v)) v fallback0)))
+  (let [wh @(ut/tracked-sub ::world-hash {})]
+    (if (contains? @db/theme-pull-cache [cmp-key fallback wh])
 
-(re-frame/reg-sub 
- ::data-colors 
- (fn [_] (theme-pull :theme/data-colors db/data-colors)))
+      (let [cache (get @db/theme-pull-cache [cmp-key fallback wh])]
+        ;(ut/pp [:theme-pull-cache (str cmp-key)])
+        cache)
+      ;; cache
+      (let [res (let [v                   @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
+                      t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
+                      t1                  (keyword (first t0))
+                      t2                  (keyword (last t0))
+                      self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
+                      self-ref-pairs (reduce (fn [acc k]
+                                               (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
+                                                 (if-let [value (get db/base-theme bk)]
+                                                   (assoc acc k value)
+                                                   acc)))
+                                             {}
+                                             self-ref-keys)
+                      resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
+                      base-theme-keys     (keys resolved-base-theme)
+                      theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
+                      fallback0           (if theme-key? (get resolved-base-theme t2) fallback)
+                      rs                  (fn [edn] (logic-and-params edn :theme-pull))]
+                  (rs (if (not (nil? v)) v fallback0)))]
+        (swap! db/theme-pull-cache assoc [cmp-key fallback wh] res)
+        ;(ut/pp [:theme-pull-NON-cache (str cmp-key) (str res)])
+        res))))
+
+
+(re-frame/reg-sub
+ ::data-colors
+ (fn [_]
+   (let [wh @(ut/tracked-sub ::world-hash {})]
+     (if-let [cache (get @db/data-colors-cache wh)]
+       cache
+       (let [cc (theme-pull :theme/data-colors db/data-colors)]
+         (swap! db/data-colors-cache assoc wh cc)
+         cc)))))
 
 (def data-colors @(ut/tracked-sub ::data-colors {})) ;; kinda weird usage
 
 (re-frame/reg-sub ::sql-source (fn [db {:keys [kkey]}] (get-in db [:sql-source kkey] {})))
-
 
 (def format-puget-atom (reagent/atom {}))
 
@@ -1113,7 +1180,7 @@
       (do (ut/tracked-dispatch
            [::wfx/request :default
             {:message {:kind :puget-document
-                       :text s :data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color nil)) 
+                       :text s :data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color nil))
                        :width w :opts-map {:map-coll-separator :line
                                            ;:map-delimiter :line
                                            }}
@@ -1134,10 +1201,7 @@
       (doseq [[[name f] hsql] (merge {[:rowcount :*] {:select [[[:count 1] :rowcnt]] :from [[honey-sql :subq]]}}
                                      (if deep-meta? ;; get distinct counts and other shiz if deep-meta (sad that
                                        (into {}
-                                             (for [field (filter #(not (cstr/starts-with? (str %) ":styler_")) (keys fields)) ;; no
-                                                                                                                              ;; styler
-                                                                                                                              ;; fields...
-                                                  ]
+                                             (for [field (filter #(not (cstr/starts-with? (str %) ":styler_")) (keys fields))]
                                                {[:distinct field] {:select [[[:count [:distinct field]] :distinct-values]]
                                                                    :from   [[honey-sql :subq]]}}))
                                        {}))]
@@ -1149,7 +1213,7 @@
                                                       :ui-keypath    (conj (conj keypath f) name)
                                                       :honey-sql     hsql
                                                       :connection-id connection-id
-                                                      :client-name   @(ut/tracked-subscribe [::client-name])}
+                                                      :client-name   db/client-name}
                                         :on-response [::http/socket-response-post-meta]
                                         :on-timeout  [::http/timeout-response (conj (conj keypath f) name)] ;; requeue?
                                         :timeout     50000}])
@@ -1179,7 +1243,7 @@
                                                       :ui-keypath    kp
                                                       :honey-sql     hsql
                                                       :connection-id :cache ;connection-id
-                                                      :client-name   @(ut/tracked-subscribe [::client-name])}
+                                                      :client-name   db/client-name}
                                         :on-response [::http/socket-response-post-style style]
                                         :on-timeout  [::http/timeout-response [keypath honey-sql]]
                                         :timeout     50000}])
@@ -1200,7 +1264,7 @@
                                                       :ui-keypath    kp
                                                       :honey-sql     hsql
                                                       :connection-id :cache ;connection-id
-                                                      :client-name   @(ut/tracked-subscribe [::client-name])}
+                                                      :client-name   db/client-name}
                                         :on-response [::http/socket-response-post-tab panel-key]
                                         :on-timeout  [::http/timeout-response [keypath rules]]
                                         :timeout     50000}])
@@ -1221,7 +1285,7 @@
                                                       :ui-keypath    kp
                                                       :honey-sql     hsql
                                                       :connection-id :cache ;connection-id
-                                                      :client-name   @(ut/tracked-subscribe [::client-name])}
+                                                      :client-name   db/client-name}
                                         :on-response [::http/socket-response-post-condi]
                                         :on-timeout  [::http/timeout-response [keypath rules]]
                                         :timeout     50000}])
@@ -1232,9 +1296,9 @@
 ;;   (let []
 ;;     (dorun (ut/tracked-dispatch
 ;;              [::wfx/push :default
-;;               {:kind :current-panels 
-;;                :panels panels-map 
-;;                :resolved-panels resolved-panels-map 
+;;               {:kind :current-panels
+;;                :panels panels-map
+;;                :resolved-panels resolved-panels-map
 ;;                :client-name client-name}]))))
 
 (re-frame/reg-event-db ::set-query-schedule
@@ -1272,7 +1336,7 @@
          honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
          hselect       (get honey-sql :select)
          flat          (ut/deep-flatten honey-sql)
-         client-name   @(ut/tracked-sub ::client-name {})
+         client-name   db/client-name
          honey-sql     (ut/postwalk-replacer {:*client-name client-name
                                               :*client-name* client-name
                                               :*client-name-str (str client-name)} orig-honey-sql)
@@ -1281,7 +1345,7 @@
          literal-data? (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
          honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
          honey-modded  (ut/clean-sql-from-ui-keys honey-modded) ;; only needed here, below it is handled server-side
-         ;client-name   @(ut/tracked-subscribe [::client-name])
+         ;client-name   db/client-name
          ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
          ;                                     :*client-name* client-name
          ;                                     :*client-name-str (pr-str client-name)} honey-modded)
@@ -1289,8 +1353,8 @@
          ]
      (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
      (ut/tracked-dispatch
-      [::wfx/request :default
-       {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call) 
+      [::wfx/request (rand-nth db/sockets) ;:default
+       {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call)
                       :ui-keypath    keypath
                       :panel-key     panel-key
                       :deep-meta?    deep-meta?
@@ -1316,7 +1380,7 @@
    (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql])
    ;(swap! db/running-queries disj honey-sql)
    )
-   
+
   ([keypath honey-sql connection-id]
    (doall
      (let [style-rules   (get honey-sql :style-rules)
@@ -1332,7 +1396,7 @@
            rules         (when has-rules?
                            (vec (for [[[col name] logic] style-rules]
                                   [[:case (:logic logic) 1 :else 0] (keyword (str "styler_" (ut/safe-name name)))])))
-           client-name   @(ut/tracked-sub ::client-name {})
+           client-name   db/client-name
            honey-sql  (ut/postwalk-replacer {:*client-name client-name
                                              :*client-name* client-name
                                              :*client-name-str (str client-name)} honey-sql)
@@ -1348,16 +1412,16 @@
            honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
            hselect       (get honey-sql :select)
            honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
-           ;client-name   @(ut/tracked-subscribe [::client-name])
-           ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
-           ;                                     :*client-name* client-name 
+           ;client-name   db/client-name
+           ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
+           ;                                     :*client-name* client-name
            ;                                     :*client-name-str (str client-name)} honey-modded)
             ;; _ (ut/tapp>> [:sql-run-w-conn-id (str keypath) (str honey-modded) (str honey-sql) (hash honey-sql)])
            ]
        (do (when (not (nil? refresh-every))
              (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
            (swap! db/kit-run-ids assoc (first keypath) (ut/generate-uuid))
-           (ut/tracked-dispatch [::wfx/request :default
+           (ut/tracked-dispatch [::wfx/request (rand-nth db/sockets) ;:default
                                  {:message     {:kind          :honey-xcall
                                                 :ui-keypath    keypath
                                                 :panel-key     panel-key

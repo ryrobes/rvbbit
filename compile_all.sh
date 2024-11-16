@@ -99,6 +99,11 @@ echo ""
 draw_bordered_text "done. go to ./backend/ or ./$DIR_NAME/  and run ./run-rabbit.sh, then visit localhost:8888"
 echo ""
 
+# link back so shadow-cljs can see server assets w/o pedestal routes
+cd ../frontend/resources/public  
+ln -s ../../../backend/assets assets
+cd ../../../
+
 # draw_bordered_text "building Docker image..."
 # cd ..
 # docker build --no-cache -t rvbbit .

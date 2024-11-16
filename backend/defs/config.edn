@@ -8,10 +8,12 @@
 
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :hide-sub-and-unsub-alerts? true ;;false
- :show-query-times? false 
- :log-atom-sizes? false ;; expensive, only for debugging
+ :show-query-times? false
+ :log-atom-sizes? true ;false ;; expensive, only for debugging
+ ;:viz-shapes "./defs/viz-shapes.edn" ;; "./defs/viz-shapes-only-recharts.edn"
+ :viz-shapes "./defs/viz-shapes-only-recharts.edn"
  ;:default "./screens/frost-terminal2.edn"
- :default "./screens/winter-info-economy.edn"
+ :default "./screens/winter-theme-hybrid.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
  ;;    if this screen can't be read or is nil, you will get a basic blank screen with a default theme
  :harvest-on-boot? true
@@ -51,9 +53,9 @@
                      :icon "🍀"} ;; basic clover render
 
            :raw-sql  {:type :nrepl
-                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
                       :modes [:rowset :edn :terminal]
-                      :default "-- system-db 
+                      :default "-- system-db
 select 1 as one;
 -- to use rabbit reactive param keywords wrap them in {{}}
 "
@@ -77,7 +79,7 @@ select 1 as one;
                       :icon "ri-database-2-line"}
 
            :pivot  {:type :nrepl
-                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
                       :modes [:clover :edn :terminal]
                       :default {:rowset-keypath [:DISTRICT-drag-36]
                                 :row-keys [:DISTRICT]
@@ -87,6 +89,7 @@ select 1 as one;
                       :syntax "clojure"
                       :ext ".edn"
                       :hop-function? false
+                      :hop-bar? false
                       :slice-bar? true
                       :placeholder-on-running? false ;true
                       :clover-fn [:run-solver
@@ -95,8 +98,9 @@ select 1 as one;
                                    :type :clojure
                                    :input-map {}
                                    :data [:crosstab
-                                          (rvbbit-backend.websockets/get-nested-grid 
+                                          (rvbbit-backend.websockets/get-nested-grid
                                            {:input (or :clover-body {})
+                                            :extra :*extra
                                             :client-name :*client-name
                                             :solver-name :*solver-name
                                             :ui-keypath :*ui-keypath
@@ -105,7 +109,7 @@ select 1 as one;
                       :icon "ri-database-2-line"}
 
            :api-call {:type :nrepl
-                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
                       :modes [:edn :data :terminal]
                       :default {:endpoint "https://owen-wilson-wow-api.onrender.com/wows/random"
                                 :method :get
@@ -114,6 +118,7 @@ select 1 as one;
                       :syntax "clojure"
                       :ext ".edn"
                       :hop-function? false
+                      :hop-bar? false
                       :slice-bar? true
                       :placeholder-on-running? true
                       :clover-fn [:run-solver
@@ -131,7 +136,7 @@ select 1 as one;
                       :icon "ri-server-line"}
 
            ;; ^ these 2 are built in a required and mostly not configurable for now
-          ;;  :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default  
+          ;;  :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default
           ;;                  :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
           ;;                  :modes [:clover :text :data  :terminal]
           ;;                  :hop-function? true
@@ -200,7 +205,7 @@ select 1 as one;
                      :placeholder-clover [:v-box
                                           :children [;[:box :child [:str :*solver-name* " running..."]]
                                                      [:img {:src "images/running.gif"
-                                                            ;:width "70px" 
+                                                            ;:width "70px"
                                                             ;:height "70px"
                                                             }]]
                                           :size "auto"
@@ -217,7 +222,7 @@ select 1 as one;
                                   :input-map {}
                                   :data :clover-body}]
                      :description "Run a Clojure expression and return the result. Uses the internal RVBBIT nREPL, has access to all rvbbit-backend.* namespaces."
-                     :pattern-hint "This is a standard Clojure REPL block. It executes Clojure code and returns the result in an arbitrary nREPL server of the users choosing. 
+                     :pattern-hint "This is a standard Clojure REPL block. It executes Clojure code and returns the result in an arbitrary nREPL server of the users choosing.
                                     Since this system is EDN based, all code has to be wrapped in a (do ..) form in order to be evaluated as a single expression. If a user-provided do block already exists, just use it, do not double wrap it - a single parent (do ...) form is all that is needed.
                                     Being saved in EDN also means that it cannot use Clojure artifacts that are invalid EDN - so, do not use the shorthand for anon functions (#(this %)), or shorthand atom derefs (@atom), or shortcode sets (#{}) always use the full for version for these things - instead w/o the special characters (deref, set, (fn[x]...))."
                      :icon "images/clojure-alt.svg"
@@ -243,12 +248,12 @@ select 1 as one;
                             ;;                                                :method :post
                             ;;                                                :body {:model "gpt-4o"
                             ;;                                                       :messages [{:role "system"
-                            ;;                                                                   :content (str "You are a data cleaner. You are given a dataset and instructions, 
-                            ;;                                                                                      you will not respond to anything, you will just clean the data and return it as valid Clojure EDN. 
-                            ;;                                                                                           Do NOT send backticks or language identifiers, JUST the EDN structure please. 
+                            ;;                                                                   :content (str "You are a data cleaner. You are given a dataset and instructions,
+                            ;;                                                                                      you will not respond to anything, you will just clean the data and return it as valid Clojure EDN.
+                            ;;                                                                                           Do NOT send backticks or language identifiers, JUST the EDN structure please.
                             ;;                                                                                      The instructions are: 'Fix the YEAR col - make a guess if you have to with the information given.
                             ;;                                                                                      If a range is given, pick something in the middle - just make a reasonable assumption as to what
-                            ;;                                                                                      the user intended. If you CANNOT decide or there is not enough information, 
+                            ;;                                                                                      the user intended. If you CANNOT decide or there is not enough information,
                             ;;                                                                                      use -1 as the answer for that column.'"
                             ;;                                                                                 "here is the data: " (pr-str test-data))}]}}
                             ;;                                               :settings/openai-api-key
@@ -411,7 +416,7 @@ select 1 as one;
                             ;;                                                 (for  [kk (keys (get v :views))]
                             ;;                                                   [k :views kk])))))
                             ;;                 :output :kit-map
-                            ;;                 :icon-location :card ;; :card, :canvas 
+                            ;;                 :icon-location :card ;; :card, :canvas
                             ;;                 :tooltip "Will take your view & replace it with a Lundberg."
                             ;;                 :kit-expr (let [kit-map {:push-alerts {:body [:box
                             ;;                                                               :style {:font-size "33px"
@@ -437,7 +442,7 @@ select 1 as one;
                             ;; :gen-ev {:when-fn (fn [client-panels client-data] ;; return a vector of [:block-id :runner-type :view-id] for things that are "eligible"
                             ;;                     []) ;; this kit is called in a different way, so it doesn't need an icon or to be validated to the users screen data
                             ;;          :output :kit-map
-                            ;;          :icon-location :card ;; :card, :canvas 
+                            ;;          :icon-location :card ;; :card, :canvas
                             ;;          :tooltip "generate some shit."
                             ;;          :kit-expr (let [canvas-coords (or :*canvas-coords [])
                             ;;                          canvas-size (or :*canvas-size [])
@@ -530,7 +535,7 @@ select 1 as one;
                             }}
 
           ;;  :fabric {:type :nrepl
-          ;;           :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+          ;;           :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
           ;;           :when-expr (do (require '[clojure.java.shell :as shell])
           ;;                          (try
           ;;                            (zero? (:exit (shell/sh "which" "fabric")))
@@ -570,7 +575,7 @@ select 1 as one;
                                        true)
                                      (catch Exception _ false))) ;; connection refused will throw
                       :modes [:text :clover :data :terminal]
-                      :hop-bar? false ;; only used for the kit runner menu on query slice panels 
+                      :hop-bar? false ;; only used for the kit runner menu on query slice panels
                       :slice-bar? false
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
@@ -588,7 +593,7 @@ select 1 as one;
                                                                             (for  [kk (keys (get v :queries))]
                                                                               [k :queries kk])))))
                                             :output :kit-map
-                                            :icon-location :query ;; :card, :canvas 
+                                            :icon-location :query ;; :card, :canvas
                                             :tooltip "Run a dimensional outlier analysis on a SQL rowset (offline, NOT on the db host)"
                                             :kit-view-opts {:max-combos 4 ;; will be applied, client-side when view starts up
                                                             :dimensions-to-scan []}
@@ -643,7 +648,7 @@ select 1 as one;
                                                                               :child "GO?"
                                                                               :attr {:on-click [:set-parameter :go! :go!]}]
                                                                              [:box
-                                                                              :style {;:border "1px solid red" 
+                                                                              :style {;:border "1px solid red"
                                                                                       :cursor "pointer"}
                                                                               :child "CANCEL"
                                                                               :attr {:on-click [:set-parameter :go! :cancel!]}]]]]])]
@@ -705,7 +710,7 @@ select 1 as one;
                                             "Command executed, but produced no output."
                                             result)))}]
                    :description "Run a shell (in your default shell) command (from the ./shell-root/ dir) & return the output. Warning: executes with permissions of RVBBIT server user."
-                   :icon "images/snail-shell.svg"}
+                   :icon "ri-terminal-box-line"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
                       :when-expr (do ;; optional, but you might not want it to show up in the UI if we cant connect
@@ -719,6 +724,7 @@ select 1 as one;
                                      (catch Exception _ false))) ;; connection refused will throw
                       :modes [:text :edn :clover :data :terminal]
                       :ext ".clj"
+                      :hop-bar? false
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
@@ -754,8 +760,8 @@ select 1 as one;
                                          {:prompt
                                           :clover-body}}
                                         :return :hiccup-image-box-w-png}}]
-                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk & vaporwave colors. 
-                                    A retro future. Many rabbits eye the scene. 
+                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk & vaporwave colors.
+                                    A retro future. Many rabbits eye the scene.
                                     There is a beautiful woman standing in the field, she looks upon you with kind eyes. In the style of a 1970s sci-fi movie poster."
                           :icon ["images/openai.png" "images/dalle3.png"]}
         ;;    :python3 {:runner {}
@@ -822,7 +828,7 @@ select 1 as one;
                    "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
                    "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
                    "Well, I never heard it before, but it sounds uncommon nonsense."
-                   ;; end Alice in Wonderland quotes, start various cyberpunk 
+                   ;; end Alice in Wonderland quotes, start various cyberpunk
                    "Why, sometimes I've believed as many as six impossible things before breakfast."
                    "Imagination is the only weapon in the war against reality."
                    "Who in the world am I? Ah, that's the great puzzle."

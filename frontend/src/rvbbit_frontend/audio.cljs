@@ -171,7 +171,7 @@
 
 (defn start-flow
   [flow-id]
-  (let [client-name @(ut/tracked-subscribe [::client-name])
+  (let [client-name db/client-name
         base-opts   {:increment-id? false}
         overrides   @(ut/tracked-subscribe [::runstream-overrides flow-id])
         overrides?  (ut/ne? overrides)
@@ -254,10 +254,10 @@
   (-> (.-mediaDevices js/navigator)
       (.getUserMedia #js {:audio true})))
 
-(defn create-media-recorder [stream] 
+(defn create-media-recorder [stream]
   (js/MediaRecorder. stream))
 
-(defn start-recording [recorder] 
+(defn start-recording [recorder]
   (ut/tapp>> ["start-recording-fn - state:" (.-state recorder)]) (.start recorder))
 
 (defn stop-recording
@@ -276,8 +276,8 @@
  ::audio-started
  (fn [db _] (assoc db :audio-playing? true)))
 
-(re-frame/reg-event-db 
- ::audio-ended 
+(re-frame/reg-event-db
+ ::audio-ended
  (fn [db _] (assoc db :audio-playing? false)))
 
 (re-frame/reg-sub
@@ -295,7 +295,7 @@
 
 (re-frame/reg-sub
  ::voices-enabled?
- (fn [db _] 
+ (fn [db _]
    (ut/ne? (get-in db [:http-reqs "elevenlabs-test" "elevenlabs-test" :message :voices] {}))))
 
 
@@ -488,8 +488,8 @@
   (clear-analyser-data)
   (play-next-audio))
 
-(re-frame/reg-event-db 
- ::save-recording-data 
+(re-frame/reg-event-db
+ ::save-recording-data
  (fn [db [_ audio-map]] (assoc db :audio-data-recorded audio-map)))
 
 (defn blob-to-base64
@@ -510,12 +510,12 @@
                          (blob-to-base64 audio-data)
                          (ut/tracked-dispatch [::save-recording-data {:form form-data :raw audio-data}])))))
 
-(re-frame/reg-event-db 
- ::recorder-created 
+(re-frame/reg-event-db
+ ::recorder-created
  (fn [db [_ recorder]] (assoc db :recorder recorder)))
 
-(re-frame/reg-event-fx 
- ::start-recording 
+(re-frame/reg-event-fx
+ ::start-recording
  (fn [_ _] {::start-recording nil}))
 
 (re-frame/reg-sub
@@ -561,8 +561,8 @@
      (-> db
          (dissoc :recorder)))))
 
-(re-frame/reg-sub 
- ::latest-audio 
+(re-frame/reg-sub
+ ::latest-audio
  (fn [db _] (get db :thumper-speaks)))
 
 (defn speak-last

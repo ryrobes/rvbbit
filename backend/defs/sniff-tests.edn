@@ -8,17 +8,17 @@
                    ;:when       [:and [:= :db-type "SQLite"] [:like :field-name "%fips%"]]
                   :fetch-one? true}
 
-;;  :top-10-values {:sql-map    {:select [:field [[:count 1] :rows]]
+;;  :top-5-values {:sql-map    {:select [:field [[:count 1] :rows]]
 ;;                               :from [:table]
 ;;                               :group-by [:field]
 ;;                               :order-by [[:rows :desc]]
-;;                               :limit 10}
+;;                               :limit 5}
 ;;                  ;:when [:like :field-type "%char%"]
 ;;                  :fetch-one? false}
 
  :example-value {:sql-map    {:select [[:field :example_value]] :from [:table] :where [:<> nil :field] :limit 1}
                  :fetch-one? true}
- 
+
 
  :max-val         {:sql-map    {:select [[[:max :field] :maxval]] :from [:table]}
                    ;:when [:not [:like :field-type "%char%"]]
@@ -36,13 +36,13 @@
                    ;:when [:not [:like :field-type "%char%"]]
                    :fetch-one? true}
 
- 
- ;;; these are run at table granularity, not field granularity since the  don't reference the :field at all
+
+ ;;; these are run at table granularity, not field granularity since they don't reference the :field at all
 
  :total-rows     {:sql-map    {:select [[[:count 1] :cnt]] :from [:table]}
-                  ;:when       [:not-string?]
+                  ;:when       [:= :field-name "*"]
                   :fetch-one? true}
- 
+
 ;;  :sample-rows     {:sql-map    {:select [:*] :from [:table] :limit 10}
 ;;                    ;:when       [:not-string?]
 ;;                    :fetch-one? false}

@@ -1,19 +1,20 @@
-(defproject rvbbit-backend "0.1.7-alpha"
+(defproject rvbbit-backend "0.2.0-alpha"
   :description        "RVBBIT - Dynamic Datascapes, by Ryan Robitaille"
   :url                "https://github.com/ryrobes/rvbbit"
   :license            {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
                        :url  "https://www.eclipse.org/legal/epl-2.0/"}
-  :plugins            [[lein-cljfmt "0.6.4"] 
+  :plugins            [[lein-cljfmt "0.6.4"]
                        [lein-ancient "0.6.15"]]
   :dependencies       [;[org.clojure/clojure "1.10.3"]
-                       [org.clojure/clojure "1.11.4"]
+                       ;[org.clojure/clojure "1.11.4"]
+                       [org.clojure/clojure "1.12.0"]
                        ;;[org.clojure/core.async "1.6.673"]
-                       [org.clojure/core.async "1.6.681"] 
+                       [org.clojure/core.async "1.6.681"]
                        ;;[com.github.seancorfield/honeysql "2.2.868"]
                        [com.github.seancorfield/honeysql "2.6.1147"]
                        [jarohen/chime "0.3.3"]
                        ;;[philoskim/debux "0.8.3"]
-                       [philoskim/debux "0.9.1"]
+                       ;[philoskim/debux "0.9.1"]
                        [org.clojure/java.jdbc "0.7.12"]
                        [clj-taskpool "0.1.0"] ;; https://github.com/WickedShell/clj-taskpool
                        ;;[tea-time "1.0.1"] ;; https://github.com/aphyr/tea-time - task scheduler
@@ -23,7 +24,8 @@
                        ;;[com.nextjournal/beholder "1.0.0"]
                        [com.nextjournal/beholder "1.0.2"]
                        ;[org.xerial/sqlite-jdbc "3.36.0.3"]
-                       [org.xerial/sqlite-jdbc "3.46.0.1"]
+                       ;[org.xerial/sqlite-jdbc "3.46.0.1"]
+                       [org.xerial/sqlite-jdbc "3.47.0.0"]
                        [org.postgresql/postgresql "42.3.3"]
                        [ru.yandex.clickhouse/clickhouse-jdbc "0.3.1"] ; "0.3.2"]
                        [org.clojars.prepor/vertica-jdbc "7.0.1-0"]
@@ -35,7 +37,7 @@
                        [org.clj-commons/claypoole "1.2.2"]
                        [csv-map "0.1.2"]
                        ;;[org.duckdb/duckdb_jdbc "0.9.1"]
-                       [org.duckdb/duckdb_jdbc "1.1.0"] 
+                       [org.duckdb/duckdb_jdbc "1.1.3"]
                        [org.clojure/math.combinatorics "0.1.6"]
                        ;[hikari-cp "3.0.1"] ;; https://github.com/tomekw/hikari-cp
                        [hikari-cp "3.1.0"] ;; https://github.com/tomekw/hikari-cp
@@ -45,7 +47,7 @@
                        [cheshire "5.11.0"]
                        [clj-figlet "0.1.1"]
                        [org.clojure/core.cache "1.0.207"]
-                       [talltale "0.5.14"] 
+                       [talltale "0.5.14"]
                        [clucie "0.4.2"]
                        [zprint "1.2.3"]
                        [jline "2.14.6"] ;; to detect console width
@@ -55,11 +57,15 @@
                        [nrepl "1.3.0"]
                        ;;[org.mentat/emmy "0.32.0"]
                        [shutdown "0.1.0-SNAPSHOT"]
-                       [org.hsqldb/hsqldb "2.7.1"] 
-                       [com.h2database/h2 "2.1.214"]
+                       ;[org.hsqldb/hsqldb "2.7.1"]
+
+                       [org.apache.lucene/lucene-core "9.7.0"]
+                       [com.h2database/h2 "2.3.232"]
+                       ;[com.h2database/h2 "1.4.200"]
+
                        ;;[info.sunng/ring-jetty9-adapter "0.33.4"]
                        ;[org.slf4j/slf4j-nop "1.7.32"]
-                       [org.slf4j/slf4j-nop "2.0.16"] 
+                       [org.slf4j/slf4j-nop "2.0.16"]
                        [com.github.vertical-blank/sql-formatter "1.0.3"]
                        ;[org.clojars.rutledgepaulv/websocket-layer "0.1.11"]
                        [com.ryrobes/websocket-layer "0.1.12-SNAPSHOT"]
@@ -67,21 +73,40 @@
                        [com.fasterxml.jackson.core/jackson-core "2.17.2"]
                        [io.pedestal/pedestal.service "0.6.4"]
                        [io.pedestal/pedestal.jetty "0.6.4"]
-                      ;;  [io.pedestal/pedestal.service "0.7.0"] ;; blocked by websocket-layer old ring/jetty deps 
-                      ;;  [io.pedestal/pedestal.jetty "0.7.0"]   ;; blocked by websocket-layer old ring/jetty deps 
+                       [datalevin "0.9.13"]
+
+                      ;;  [com.xtdb/xtdb-core "2.0.0-beta2"]
+                      ;;  [com.xtdb/xtdb-api "2.0.0-beta2"]
+
+                       ;[com.xtdb/xtdb-core "2.0.0-b1"]
+                       ;[com.xtdb/xtdb-api "2.0.0-b1"]
+                       ;[com.cognitect/transit-clj "1.0.333"]
+
+                      ;;  [io.pedestal/pedestal.service "0.7.0"] ;; blocked by websocket-layer old ring/jetty deps
+                      ;;  [io.pedestal/pedestal.jetty "0.7.0"]   ;; blocked by websocket-layer old ring/jetty deps
                        ]
-  :jvm-opts           ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
-                       ;;"-Xmx32g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
+  :jvm-opts           [;;"--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
+                       ;"-Xmx32g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
                        ;;"-Xmx82g" ;; testing with 64g on my main dev machine
                        ;;"-Xms32g" ;; testing
+
+                       ;; "--add-opens=java.base/java.nio=ALL-UNNAMED" ;; xtdb req
+                       ;; "-Dio.netty.tryReflectionSetAccessible=true" ;; xtdb req
+
+                       ;;"-Dsun.net.maxDatagramSockets=1024"
+                       ;;"-Djava.net.preferIPv4Stack=true"
+                       ;;"-Dsun.nio.ch.bufsiz=131072"
+
                        "-XX:+UseG1GC"
                        "-XX:MaxGCPauseMillis=200"
+
+                       "--add-opens=java.base/java.nio=ALL-UNNAMED" ;; datalevin specific
+                       "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED" ;; datalevin specific
+
                        ;;"-Xss2048k" ;; testing with double the stack space to root out some intermittent flow-runner stack overflow issue... (flows calling flows calling...)
-                       "-Xss1536k"
-                       "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"] ;; datalevin specific
+                       "-Xss1536k"]
   :cljfmt             {}
   :source-paths       ["src" "../shared"]
   :repl-options       {:init-ns rvbbit-backend.core}
   :warn-on-reflection false
-  :main               ^{:skip-aot false} rvbbit-backend.core
-)
+  :main               ^{:skip-aot false} rvbbit-backend.core)

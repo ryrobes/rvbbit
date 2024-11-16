@@ -1,5 +1,6 @@
-(ns rvbbit-backend.db 
+(ns rvbbit-backend.db
   [:require
+   ;[rvbbit-backend.xtdb-init :as xtdb-init]
    [rvbbit-backend.util       :as ut :refer [ne?]]
    [clojure.string            :as cstr]
    [clojure.edn               :as edn]
@@ -8,19 +9,63 @@
    [clojure.walk              :as walk]
    [clj-http.client           :as http]
    [io.pedestal.http          :as phttp]
+   [datalevin.core            :as d]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.freezepop :as fpop]
    [rvbbit-backend.config  :refer [settings-atom]]
    [flowmaps.db               :as flow-db]])
 
-;; the rabbit "reactor"...
+;; datalevin stuff
+(defonce ddb (d/open-kv "db/datalevin"))
+(defonce shapes-db "shapes-db")
 
-(def key-depth-limit (atom 8)) 
+(defn ddb-put! [kkey vval]
+  (d/transact-kv ddb [[:put shapes-db kkey vval]]))
+
+(defn ddb-get [kkey]
+  (d/get-value ddb shapes-db kkey))
+
+(defn open-ddb []
+  (d/open-dbi ddb shapes-db))
+
+(defn close-ddb []
+  (d/close-kv ddb))
+
+;; hikari pool connection map
+(defonce conn-map (atom {}))
+
+;; the rabbit "reactor"...
+(def key-depth-limit (atom 8))
 
 (defonce mem-usage (atom [])) ;; needs to be accessed from evaluator
 (defonce cpu-usage (atom [])) ;; needs to be accessed from evaluator
 
+(defonce shape-rotation-status (atom {}))
+
+(defonce leaf-brute-force-map (atom {}))
+(defonce leaf-brute-force-last-panel-hash (atom {}))
+(defonce query-runstream-cache (atom {}))
+(defonce drag-body-map (fpop/thaw-atom {} "./data/atoms/drag-body-map-atom.msgpack.transit"))
+
+(defonce shapes-result-map (atom {})) ; (fpop/thaw-atom {} "./data/atoms/shapes-result-map-atom.msgpack.transit"))
+;; ^^ client-name, panel, view, {:shapes [all reco block maps] -and- :fields [field maps]}
+(defonce shapes-result-map-by-honey-hash (atom {})) ; (fpop/thaw-atom {} "./data/atoms/shapes-result-map-by-honey-hash-atom.msgpack.transit"))
+;; ^^ honey-hash, {:shapes [all reco block maps] -and- :fields [field maps]}
+
 (defonce realm-atom (atom {}))
+
+(defonce viz-reco-sniffs (atom 0))
+(defonce leaf-evals (atom 0))
+
+(defonce leaf-bench (fpop/thaw-atom {} "./data/atoms/leaf-bench-atom.msgpack.transit")) ;; temp for perf work
+
+(def client-panels (atom {})) ;(fpop/thaw-atom {} "./data/atoms/client-panels-atom.msgpack.transit"))
+(def client-panels-resolved (atom {}))
+(def client-panels-materialized (atom {}))
+(def client-panels-data (atom {}))  ;; (fpop/thaw-atom {} "./data/atoms/client-panels-data-atom.msgpack.transit"))
+(def client-panels-metadata (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/client-panels-metadata-atom.msgpack.transit"))
+
+(def ack-scoreboard (atom {}))  ;; (fpop/thaw-atom {} "./data/atoms/ack-scoreboard-atom.msgpack.transit"))
 
 (defonce kit-atom (fpop/thaw-atom {} "./data/atoms/kit-atom.msgpack.transit"))
 (defonce father-time (fpop/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
@@ -33,16 +78,19 @@
 (defonce model-costs (fpop/thaw-atom {"Anthropic"
                                       {"claude-3-5-sonnet"  {:per-mtok-input 3.0 :per-mtok-output 15.0}
                                        "claude-3-opus"      {:per-mtok-input 15.0 :per-mtok-output 75.00}
-                                       "claude-3-haiku"     {:per-mtok-input 0.25 :per-mtok-output 1.25}}} 
+                                       "claude-3-haiku"     {:per-mtok-input 0.25 :per-mtok-output 1.25}}}
                                      "./ai-workers/model-costs.edn"))
 
+(defonce actions-atom (fpop/thaw-atom {} "./data/atoms/actions-atom.msgpack.transit"))
 (defonce kpi-atom (fpop/thaw-atom {} "./data/atoms/kpi-atom.msgpack.transit"))
 (defonce metric-atom (fpop/thaw-atom {} "./data/atoms/metric-atom.msgpack.transit"))
 (defonce runstream-atom (atom {}))
 (defonce params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
 (defonce panels-atom (fpop/thaw-atom {} "./data/atoms/panels-atom.msgpack.transit"))
+(defonce leaf-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/leaf-atom.msgpack.transit"))
+(defonce leaf-drags-atom (atom {}))
 (defonce solver-status (atom {}))
-(defonce query-metadata (fpop/thaw-atom {} "./data/atoms/query-metadata.msgpack.transit"))
+(defonce query-metadata (atom {})) ;(fpop/thaw-atom {} "./data/atoms/query-metadata.msgpack.transit"))
 (defonce last-signals-history-atom (fpop/thaw-atom {} "./data/atoms/last-signals-history-atom.msgpack.transit"))
 (defonce last-signal-value-atom (fpop/thaw-atom {} "./data/atoms/last-signal-value-atom.msgpack.transit"))
 (defonce last-signals-atom-stamp (fpop/thaw-atom {} "./data/atoms/last-signals-atom-stamp.msgpack.transit"))
@@ -66,12 +114,17 @@
 (defonce param-var-crosswalk (atom {}))
 (defonce param-var-key-mapping (atom {}))
 
+(defonce clover-gen (fpop/thaw-atom {} "./data/atoms/clover-gen-atom.msgpack.transit"))
+
 (def clover-sql-training-atom (fpop/thaw-atom {} "./data/training/clover-sql-training-atom.edn"))
 (def clover-sql-enriched-training-atom (fpop/thaw-atom {} "./data/training/clover-sql-enriched-training-atom.edn"))
 
 (def master-atom-map
   [[:master-time-watcher  father-time  :time]
+   [:master-clover-gen  clover-gen  :clover-gen]
+   [:master-leaf-watcher  leaf-atom  :leaf]
    [:master-incoming-watcher  incoming-atom  :incoming]
+   [:master-actions-watcher  actions-atom  :actions]
    [:master-settings-watcher  settings-atom  :settings]
    [:master-kpi-watcher  kpi-atom  :kpi]
    [:master-metric-watcher  metric-atom  :metric]
@@ -103,8 +156,11 @@
 (def sharded-atoms
   (atom {:time (atom {})
          :settings (atom {})
+         :clover-gen (atom {})
+         :leaf (atom {})
          :screen (atom {})
          :incoming (atom {})
+         :actions (atom {})
          :ai-worker (atom {})
          :client (atom {})
          :kpi (atom {})
@@ -128,14 +184,14 @@
 
 (def type-keys (conj (keys @sharded-atoms) :*data))
 
-(defn current-watchers [] 
+(defn current-watchers []
   (set (apply concat (for [[_ v] @sharded-atoms] (keys @v)))))
 
-(defn current-subs [] 
+(defn current-subs []
   (set (apply concat (for [[_ v] @atoms-and-watchers] (keys v)))))
 
-(defn current-all-subs [] 
-  (set (apply concat (for [[k v] @atoms-and-watchers] 
+(defn current-all-subs []
+  (set (apply concat (for [[k v] @atoms-and-watchers]
                        (for [vv (keys v)] [k vv])))))
 
 (def master-reactor-atoms
@@ -343,9 +399,9 @@
   (let [client-name-str (cstr/replace (str client-name) ":" "")
         flow-key-str (str flow-key)
         ;; flow-key-str (let [client-name-str (if (not (or (cstr/starts-with? (str flow-key) ":solver/*")
-        ;;                                            (cstr/starts-with? (str flow-key) ":solver-meta/*"))) 
-        ;;                                      "rvbbit" 
-        ;;                                      client-name-str)] 
+        ;;                                            (cstr/starts-with? (str flow-key) ":solver-meta/*")))
+        ;;                                      "rvbbit"
+        ;;                                      client-name-str)]
         ;;                   ;; ^^ this is super hacky - we need to unify the flowkey reactor types and behavior. ideally generalized and data drive with config maps.
         ;;                   ;; this means that its an auto generated solver name which needs a client-name prefix, rather than a global solver, which needs rvbbit as the cid
         ;;                (-> flow-key-str
@@ -363,7 +419,7 @@
         ff2 (cstr/split (last ff) #">")]
     [(first ff2) (keyword (last ff2))]))
 
-(defn break-up-flow-key-ext ;;; ex :flow/flow-id>flow-block-data>0>1>key34 etc 
+(defn break-up-flow-key-ext ;;; ex :flow/flow-id>flow-block-data>0>1>key34 etc
   [key]
   (let [ff    (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
         ff2   (cstr/split (last ff) #">")
@@ -383,8 +439,11 @@
           (= base-type :kit)                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :incoming)                     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :actions)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :repl-ns)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :solver-status)                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :clover-gen)                   (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+          (= base-type :leaf)                         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :flow-status)                  keypath ;;(vec (rest sub-path)) ;;keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :kit-status)                   (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
           (= base-type :signal-history)               (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
@@ -412,7 +471,7 @@
           ;last-value         (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c     (keys @atoms-and-watchers)
                                    :when (some #(= % (cstr/replace (str flow-key) ":" ""))
-                                          ;; normalizes since old clients had keyword colons at weird places 
+                                          ;; normalizes since old clients had keyword colons at weird places
                                                (vec (for [fkw (keys (get @atoms-and-watchers c))] (cstr/replace (str fkw) ":" ""))))]
                                c)]
       (when ;(or
@@ -433,11 +492,14 @@
                                                                 (System/currentTimeMillis))
                                                       (assoc-in [client-name flow-key :last-push]
                                                                 (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
-                                         
-                                         (ppy/execute-in-thread-pools :trigger-hooks (fn [] (trigger-hooks flow-key new-value))) 
+
+                                         (ppy/execute-in-thread-pools :trigger-hooks (fn [] (trigger-hooks flow-key new-value)))
                                          ;; push to any subbed REST endpoints
 
                                          (swap! client-click-params assoc-in [client-name flow-key] new-value) ;; for diffing later
+
+                                        ;;  (when (cstr/starts-with? (str client-name) ":gor")
+                                        ;;    (ut/pp [:running-push! flow-key client-name keypath new-value]))
 
                                         ;;  (when (cstr/ends-with? (str flow-key) "*running?") (ut/pp [:running-push! flow-key client-name keypath new-value]))
                                         ;; (when (cstr/includes? (str flow-key) ":solver") (ut/pp [:running-push! flow-key client-name keypath new-value]))
@@ -448,14 +510,20 @@
                                           ;;                                 (when (or (not= flow-key :time/now)
                                           ;;                                           (not= flow-key :time/second)) ;;(not (cstr/starts-with? (str flow-key) ":time/"))
                                           ;;                                   (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")) ".log")
-                                          ;;                                         (str (ut/get-current-timestamp) "  " client-name "  " flow-key " " (ut/data-typer new-value) "\n" 
-                                          ;;                                              (grab-string-chunk old-value) 
-                                          ;;                                              "\n" 
-                                          ;;                                              (grab-string-chunk new-value) 
+                                          ;;                                         (str (ut/get-current-timestamp) "  " client-name "  " flow-key " " (ut/data-typer new-value) "\n"
+                                          ;;                                              (grab-string-chunk old-value)
+                                          ;;                                              "\n"
+                                          ;;                                              (grab-string-chunk new-value)
                                           ;;                                              "\n\n\n") :append true)
                                           ;;           ;(ut/pp [:running-push! flow-key client-name])
                                           ;;                                   )))
-                                         (handler-fn base-type keypath client-name new-value)))
+
+                                         (when
+                                          (not (and (= base-type :leaf) (empty? new-value)))
+                                          ;; ^^ leaf reaction hack TODO, find root cause of sporadic empty resolve
+                                           (handler-fn base-type keypath client-name new-value))
+
+                                         ))
           (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
             (swap! last-values assoc keypath new-value)
             (swap! last-values-per assoc-in [client-name keypath] new-value)) ;; if a new client
@@ -478,15 +546,18 @@
         kpi?            (= base-type :kpi)
         metric?         (= base-type :metric)
         incoming?       (= base-type :incoming)
+        actions?        (= base-type :actions)
         ai-worker?      (= base-type :ai-worker)
         settings?       (= base-type :settings)
         solver?         (= base-type :solver)
         kit?            (= base-type :kit)
-        data?           (or (= base-type :data) 
+        data?           (or (= base-type :data)
                             (= base-type :*data))
         solver-meta?    (= base-type :solver-meta)
         repl-ns?        (= base-type :repl-ns)
         solver-status?  (= base-type :solver-status)
+        clover-gen?     (= base-type :clover-gen)
+        leaf?           (= base-type :leaf)
         flow-status?    (= base-type :flow-status)
         kit-status?     (= base-type :kit-status)
         signal-history? (= base-type :signal-history)
@@ -500,16 +571,19 @@
                           ;;;true [:v]
                           signal?         (vec (rest keypath))
                           settings?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                          solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) 
+                          solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           kpi?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           metric?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           kit?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          actions?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           ai-worker?      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           incoming?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          clover-gen?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          leaf?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           flow-status?    (vec (rest sub-path)) ;keypath ;;(vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           kit-status?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -521,7 +595,7 @@
                           :else           (vec (rest sub-path)) ;;keypath ;;(vec (rest sub-path)) ;;keypath
                           )
         ;;keypath             (if flow? keypath (vec (rest keypath)))
-        ;flow-key          (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key) 
+        ;flow-key          (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key)
         base-type         (if (= base-type :*data) :data base-type)
         watcher          (make-watcher keypath flow-key :all fn (= sub-type :tracker))
         atom-to-watch    (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))]
@@ -563,6 +637,7 @@
           settings? (= base-type :settings)
           solver? (= base-type :solver)
           incoming? (= base-type :incoming)
+          actions? (= base-type :actions)
           kpi? (= base-type :kpi)
           metric? (= base-type :metric)
           ai-worker? (= base-type :ai-worker)
@@ -573,6 +648,8 @@
           solver-meta? (= base-type :solver-meta)
           repl-ns?        (= base-type :repl-ns)
           solver-status?  (= base-type :solver-status)
+          clover-gen?   (= base-type :clover-gen)
+          leaf?         (= base-type :leaf)
           signal-history? (= base-type :signal-history)
           server?         (= base-type :server)
           ;keypath         (if (= (first keypath) (cstr/replace (str (second keypath)) ":" "")) [(first keypath)] keypath)
@@ -589,10 +666,13 @@
                     incoming?       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     ai-worker?      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     kpi?            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    actions?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     metric?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    clover-gen?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    leaf?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     flow-status?    keypath ;; (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     kit-status?     (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -619,7 +699,7 @@
         (do
           (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
           (remove-watch atom-to-watch watch-key) ;; stop watching child atom
-          (unsub-atom-splitter-deep flow-key)))  ;; remove child atom from rabbit-reactor loop 
+          (unsub-atom-splitter-deep flow-key)))  ;; remove child atom from rabbit-reactor loop
 
       (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key]))
     (catch Throwable e (ut/pp [:remove-watcher-error e]))))
@@ -663,8 +743,8 @@
                    client-name
                    (vec (distinct (conj (get @param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
         lv                      (get @last-values keypath)]
-    ;; (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath 
-    ;;         {:sub-path sub-path 
+    ;; (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath
+    ;;         {:sub-path sub-path
     ;;          :new-path (vec (into [client-name] (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))))}])
     (cond
       ;;(cstr/includes? (str flow-key) "*running?")  false
@@ -674,14 +754,17 @@
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :settings)                     (get @settings-atom client-param-path)
-      (or (= base-type :data) 
+      (or (= base-type :data)
           (= base-type :*data))                         (get-in @last-solvers-data-atom
-                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                                                          lv)
+                                                                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                                lv)
       (= base-type :solver)                       (get-in @last-solvers-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :incoming)                     (get-in @incoming-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :actions)                      (get-in @actions-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :kpi)                          (get-in @kpi-atom
@@ -703,13 +786,19 @@
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
       (= base-type :solver-status)                (get-in @solver-status
-                                                            (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                                                            lv)
-      (= base-type :flow-status)                  (get-in @flow-status (vec (rest sub-path)) lv)
-      (= base-type :runstream)                    (get-in @runstream-atom (vec (rest sub-path)) lv)
-      (= base-type :kit-status)                  (get-in @kit-status
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :clover-gen)                  (get-in @clover-gen
                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                          lv)
+      (= base-type :leaf)                        (get-in @leaf-atom
+                                                         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                         lv)
+      (= base-type :flow-status)                  (get-in @flow-status (vec (rest sub-path)) lv)
+      (= base-type :runstream)                    (get-in @runstream-atom (vec (rest sub-path)) lv)
+      (= base-type :kit-status)                   (get-in @kit-status
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :signal-history)               (get-in @last-signals-history-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -721,7 +810,7 @@
       (= base-type :panel)                        (get-in @panels-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
-      :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv) ;; assume flow literal 
+      :else                                       (get-in @flow-db/results-atom (vec (rest sub-path)) lv) ;; assume flow literal
       )))
 
 (defn get-starting-value [base-type client-param-path sub-path keypath lv client-name]
@@ -731,9 +820,9 @@
                     ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
       (or (= base-type :data)
-          (= base-type :*data))                         (get-in @last-solvers-data-atom
-                                                                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
-                                                                lv)
+          (= base-type :*data))                   (get-in @last-solvers-data-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :settings)                     (get-in @settings-atom
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
@@ -754,6 +843,9 @@
       (= base-type :incoming)                     (get-in @incoming-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
+      (= base-type :actions)                      (get-in @actions-atom
+                                                          (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                          lv)
       (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -764,10 +856,18 @@
                                                           (vec (into [(keyword (second sub-path))]
                                                                      (vec (rest (rest sub-path)))))
                                                           lv)
-      (= base-type :solver-status)                  (get-in @solver-status
-                                                            (vec (into [(keyword (second sub-path))]
-                                                                       (vec (rest (rest sub-path)))))
-                                                            lv)
+      (= base-type :solver-status)                (get-in @solver-status
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :clover-gen)                   (get-in @clover-gen
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
+      (= base-type :leaf)                         (get-in @leaf-atom
+                                                          (vec (into [(keyword (second sub-path))]
+                                                                     (vec (rest (rest sub-path)))))
+                                                          lv)
     ;;(= base-type :solver-status)                 {} ; nil ;; the old atom is gone anyways, lets clear the client for new values
       (= base-type :signal-history)               (get-in @last-signals-history-atom
                                                           (vec (into [(keyword (second sub-path))]
@@ -795,7 +895,7 @@
 
 ;; Reactor REST hooks, get, set.
 
-(defn send-edn-success [content] 
+(defn send-edn-success [content]
   (assoc (phttp/edn-response content) :headers {"Content-Type" "application/edn"}))  ;"text/plain"
 
 (defn get-value [namespaced-key client-name]
@@ -804,7 +904,7 @@
     vv))
 
 (defn set-value! [namespaced-key value client-name]
-  (try 
+  (try
     (let [nms (parse-coded-keypath namespaced-key)
         ttype (first nms)
         matom (get-master-atom ttype)
@@ -814,7 +914,7 @@
     (catch Exception e
       (ut/pp [:reactor-REST-put-value-error! namespaced-key value e])
       {:error (str "Error setting value: " (.getMessage e))})))
-  
+
 
 (def allowed-type-keywords (set (for [k type-keys] (name k))))
 
@@ -880,7 +980,7 @@
   ;; curl -X PUT "http://localhost:8888/reactor/:client/:surprising-wide-turkey-1" -H "Content-Type: application/json" -d '{"stats": {"last-seen": "Nice!!"}}'
   ;; curl -X PUT "http://localhost:8888/reactor/:client/surprising-wide-turkey-1" -H "Content-Type: application/edn" -d '{:stats {:last-seen "Nice!!!!"}}'
 
-  
+
 ;;; hooks
 ;; (def subscriptions (atom {}))
 ;; ;;  (fpop/thaw-atom {} "./defs/rest-subscriptions.edn")
@@ -945,7 +1045,7 @@
           (do (subscribe-hook type-keyword keypath-keyword callback-url client-name)
               (send-edn-success {:status "subscribed"})))))))
 
-;; (ut/pp [:hooks @subscriptions]) ;; persist? 
+;; (ut/pp [:hooks @subscriptions]) ;; persist?
 ;; (ut/pp [:hooks @atoms-and-watchers])
 
   ;; Example: Subscribe to changes
@@ -956,7 +1056,7 @@
   ;; curl -X POST "http://localhost:8888/reactor-hook/:client/surprising-wide-turkey-1>stats>last-seen"  -H "Content-Type: application/json" -d '{"callback-url": "http://localhost:8500", "unsubscribe": true}'
 
 ;;  :client/surprising-wide-turkey-1>stats>last-seen
-    
+
 
 
 

@@ -43,7 +43,7 @@
 (defn mad-libs-shapes
   [query-id width-int height-int]
   (let [;all-sql-call-keys @(ut/tracked-subscribe [::all-sql-call-keys])
-        client-name    @(ut/tracked-sub ::client-name {})
+        client-name    db/client-name
         parent-panel-key @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
         [h w] @(ut/tracked-subscribe [::size parent-panel-key])
         height-int (- height-int 42)
@@ -202,8 +202,8 @@
                  recos-keys        (vec (for [{:keys [combo_hash]} recos] combo_hash))]
              (doseq [k prev-preview-keys] (ut/tracked-dispatch [::quick-delete-panel k]))
              (ut/tracked-dispatch [::set-preview-keys2 recos-keys])
-             (doseq [{:keys [combo_hash query_map viz_map condis combo_edn shape_name]} recos]
-               (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
+             (doseq [{:keys [combo_hash query_map viz_map condis combo_edn shape_name mutate_map]} recos]
+               (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name mutate_map false))))
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
                    ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])

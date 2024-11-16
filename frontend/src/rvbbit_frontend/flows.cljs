@@ -497,7 +497,7 @@
 
 (defn has-done? [] (true? (some #(= % :done) (apply concat @(ut/tracked-subscribe [::flowmap-connections])))))
 
-(re-frame/reg-event-db 
+(re-frame/reg-event-db
  ::add-live-flow-subs
  (fn [db [_ running-subs]]
    (let [running-subs-keyed (vec (flatten (for [[k v] running-subs]
@@ -507,7 +507,7 @@
 
 ;; (re-frame/reg-event-db
 ;;  ::add-live-flow-subs
-;;  (fn [db [_ running-subs]] 
+;;  (fn [db [_ running-subs]]
 ;;    (assoc-in db [:click-param ])))
 
 (re-frame/reg-event-db
@@ -578,7 +578,7 @@
         server-running? (or (if only? false chans-open?)
                             @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow-status/" flow-id ">*running?"))]]))
         rrblocks        (get @db/real-running-blocks flow-id [])]
-    
+
     (if (= bid :*) server-running? (and (some #(= bid %) rrblocks) server-running?))
     ;true
     ))
@@ -587,7 +587,7 @@
 
 
 
-(re-frame/reg-sub 
+(re-frame/reg-sub
  ::is-running?
  (fn [db [_ bid flow-id & [only?]]]
    (let [;chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
@@ -696,10 +696,10 @@
         cells? (= block-id :cells)
         main-boxes
           [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)
-           :size "auto" 
-           :padding "5px" 
-           :width (if cells? "280px" "560px") 
-           :gap "2px" 
+           :size "auto"
+           :padding "5px"
+           :width (if cells? "280px" "560px")
+           :gap "2px"
            :style
            {:color       "black"
             :font-family (theme-pull :theme/base-font nil)
@@ -732,7 +732,7 @@
                                            :idx        0 ;idx
                                            :keypath-in keypath-in
                                            :flow-id    flow-name
-                                           :keypath    [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id 
+                                           :keypath    [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id
                                           ^{:key (str block-id keypath kki kk k-val-type 1)}
                                           [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
                                            :style {:cursor (when draggable? "grab")} :children
@@ -1982,7 +1982,7 @@
            :border           (str "3px " (if selected? "dashed" "solid") " " bcolor (if selected? "" 45))
           ;;  :background-color (cond running? (theme-pull :theme/editor-outer-rim-color nil)
           ;;                          :else    (str bcolor (if (or hover-involved? selected?) 75 35)))
-           :background-color (str bcolor (cond (or hover-involved? selected?) 75 
+           :background-color (str bcolor (cond (or hover-involved? selected?) 75
                                                running?  ""
                                                :else 35))
            :width            (px w)
@@ -3224,7 +3224,7 @@
             (ut/tracked-dispatch [::http/load-flow-history selected-run-id selected-start-ts]))
           [re-com/v-box :children
            [[re-com/h-box :size "auto" :height "60px" :width "750px"
-             :justify :between 
+             :justify :between
              :align :center
              :gap "50px"
              :style
@@ -3235,11 +3235,11 @@
               [re-com/box :child ""] [re-com/box :child ""]
               [buffy/render-honey-comb-fragments dropdown2 5 2 "dropdown2-sys*"]
 
-              [re-com/input-text 
-               :model flow-search 
+              [re-com/input-text
+               :model flow-search
                :on-change #(reset! flow-search %)
-               :change-on-blur? false 
-               :width "220px" 
+               :change-on-blur? false
+               :width "220px"
                :placeholder "flow search"
                :style {:text-decoration  (when (ut/ne? @flow-search) "underline")
                                       :border-radius "8px" ;:background-color "#ffffff" :color
@@ -3365,8 +3365,7 @@
                                                           {:message     (merge (get @scheduler-atom flow-id)
                                                                                {:kind        :schedule-flow
                                                                                 :flow-id     flow-id
-                                                                                :client-name @(ut/tracked-subscribe
-                                                                                                [::bricks/client-name])})
+                                                                                :client-name db/client-name})
                                                            :on-response [::simple-response]
                                                            :on-timeout  [::timeout-response :run-flow [:schedule flow-id]] ;; requeue?
                                                            :timeout     15000000}])
@@ -3429,8 +3428,8 @@
                              open-channels (str "idling (" channels " chans)")
                              :else         "stopped") :width "34%"]
                       (if (not process?)
-                        [re-com/md-icon-button 
-                         :style {:font-size "20px"} 
+                        [re-com/md-icon-button
+                         :style {:font-size "20px"}
                          :on-click
                          #(let [;flowmap @(ut/tracked-subscribe [::flowmap])
                                 client-name          @(ut/tracked-sub ::conn/client-name {})
@@ -3451,7 +3450,7 @@
                                                              :flow-id     fid
                                                              :flow-keys   [] ;;running-subs
                                                              :client-name client-name}
-                                                   :timeout 15000000}])) 
+                                                   :timeout 15000000}]))
                          :md-icon-name "zmdi-open-in-browser"]
                         [re-com/gap :size "20px"])
                       [re-com/md-icon-button :style {:font-size "20px"} :on-click
@@ -3459,7 +3458,7 @@
                                               {:message {:kind        :kill-flow
                                                          :flow-id     fid
                                                          :process?    process?
-                                                         :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                                                         :client-name db/client-name}
                                                :timeout 15000000}]) :md-icon-name "zmdi-stop"]]]
                     [re-com/h-box :padding "4px" :height "35px" :align :center :style {:font-size "10px" :padding-right "20px"} :justify
                      :between :children
@@ -3471,7 +3470,7 @@
    ;  :child
     ;;  [re-com/v-box :padding "3px" :style
     ;;   {;:border "1px dashed white"
-    ;;    :color (theme-pull :theme/editor-outer-rim-color nil)} 
+    ;;    :color (theme-pull :theme/editor-outer-rim-color nil)}
     ;;   :gap "11px"
     ;;   :children
     ;;   v-boxes]
@@ -3503,7 +3502,7 @@
         ;;dyn-height ( @db/flow-editor-system-mode)
         selected-file-path @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])
         o-modes    [["flows running" 800] ["flow browser" 600] ["flow parts" 600] ["metrics & KPIs" 990]  ["signals & solvers" 990]
-                    ;;["rules" 990] 
+                    ;;["rules" 990]
                     ["flow history" 1200]]
         sql-calls  {:flow-fn-categories-sys {:select [:category] :from [:flow_functions] :group-by [1]}
                     :flow-fn-all-sys        {:select [:name] :from [:flow_functions] :group-by [1]}
@@ -3527,12 +3526,12 @@
               unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
-    
-       
+
+
     (when (and (not= @last-loaded-file-path selected-file-path) (not (nil? selected-file-path)))
       (reset! last-loaded-file-path selected-file-path)
       (ut/tracked-dispatch [::http/load-flow selected-file-path])
-      (ut/tapp>> [:loading-file-path selected-file-path])) 
+      (ut/tapp>> [:loading-file-path selected-file-path]))
 
     [re-com/v-box :size "none" :width (px w) :height (px h) :gap "10px" :style
      {;:border-right (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
@@ -3562,7 +3561,7 @@
              :text-decoration  (when selected? "underline")
              :background-color (if selected? (str (theme-pull :theme/editor-outer-rim-color nil) 55) "#00000000")} :child
             (str (first o))])] [re-com/gap :size "10px"]]] [re-com/gap :size "8px"]
-      (cond (= (first @db/flow-editor-system-mode) "flows running") [flow-details-block-container "server flow statuses" 
+      (cond (= (first @db/flow-editor-system-mode) "flows running") [flow-details-block-container "server flow statuses"
                                                                      :system
                                                                      :system
                                                                      [re-com/box :height (px (* h 0.5))
@@ -3575,7 +3574,7 @@
                                                                      (first @db/flow-editor-system-mode) :system :system
                                                                      [settings-block flow-id :part-browser] "zmdi-chart-donut"])
       (cond (some #(= (first @db/flow-editor-system-mode) %) ["flow browser" "flow parts"])
-              [flow-details-block-container "server flow statuses" :system :system [server-flows 240] 
+              [flow-details-block-container "server flow statuses" :system :system [server-flows 240]
                "zmdi-dns"]
             (= (first @db/flow-editor-system-mode) "scheduler") [flow-details-block-container (first @db/flow-editor-system-mode)
                                                                  :system :system [settings-block flow-id :scheduler]
@@ -3674,7 +3673,7 @@
                 ;;            :order-by      [[:ts :desc]]
                 ;;            :from          [[:jvm_stats :rr70]]}]
                 ;;    [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]
-                
+
                 ]]
             :else [re-com/box :child "[coming in the future]"])]]))
 
@@ -4043,7 +4042,7 @@
                                                                                                     ;"-3px"
                :attr {:on-click #(swap! flow-details-block-container-atom assoc-in [flow-id bid :condi-paths :open?] (not open?))}
                :children
-               [[re-com/md-icon-button :src (at) :md-icon-name "ri-tree-line" 
+               [[re-com/md-icon-button :src (at) :md-icon-name "ri-tree-line"
                  :style
                  {;:color (theme-pull :theme/editor-outer-rim-color nil)
                   :font-size "17px"
@@ -4561,7 +4560,7 @@
                                                     :description (cstr/join " " (get-in flowmap-raw [flow-select :description]))}
                                                    (select-keys (get flowmap-raw flow-select) [:description])
                                                    (get-in server-flowmap [:components flow-select])))
-                             :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                             :client-name db/client-name}
                :on-response [::simple-response]
                :timeout     15000000}])} :align :center :justify :center :size "auto" :child "save" :padding "5px" :style
        {:font-weight      700
@@ -4818,9 +4817,9 @@
 
 ;; (ut/tapp>> [:running-solvers @(ut/tracked-sub ::running-solvers {}) ])
 
-(re-frame/reg-sub 
- ::estimates 
- (fn [db _] 
+(re-frame/reg-sub
+ ::estimates
+ (fn [db _]
    (get db :flow-estimates)))
 
 (defn alert-box [& [panel-key data-key]]
@@ -4861,13 +4860,13 @@
 
         ;;                        :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
         ;;  alerts          (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts)
-        ;;  alerts          (filterv #(if (cstr/includes? (str %) ":block-") 
+        ;;  alerts          (filterv #(if (cstr/includes? (str %) ":block-")
         ;;                              (not (some (fn [x] (cstr/includes? (str %) (str x))) (mapv first kps-in-tab)))
         ;;                              true) alerts)
         ;; alerts (filterv #(not (cstr/includes? (str %) ":block-8981")) alerts)
-         
+
          estimates       @(ut/tracked-sub ::estimates {})
-         running-kits    @(ut/tracked-sub ::running-kits {}) 
+         running-kits    @(ut/tracked-sub ::running-kits {})
          ;;_ (ut/tapp>> [:running-kits running-kits])
          running-solver-views @(ut/tracked-sub ::running-solvers {}) ;;(conj @(ut/tracked-sub ::running-solvers {}) :*) ;; fabric that does not yet have a block id. hop-bar spawned.
          ;;_ (ut/tapp>> [:alerts rs-running-list running-solver-views])
@@ -4879,9 +4878,9 @@
                                  (> (count running-kits) 0)
                                  (> (count running-solver-views) 0)
                                  (> (count queries-running) 0))
-                           
+
                            (conj alerts
-                                 [[:v-box 
+                                 [[:v-box
                                    :width (px max-w)
                                    :size "none"
                                    :children
@@ -4923,7 +4922,7 @@
                                                          (when est? ;true ;est?
                                                            [:box
                                                             :child [:progress-bar [(- max-w 15)
-                                                                                   est (str e run-id 
+                                                                                   est (str e run-id
                                                                                    (get @db/kit-run-ids e)
                                                                                    ;(get @bricks/kit-run-ids kit-run-ids)
                                                                                             ;(when solver? (ut/generate-uuid))
@@ -4949,7 +4948,7 @@
          edge-hide       (* (- box-width 50) -1)]
      (when (= alerts-cnt 0) (reset! db/kick-alert false))
      (when (> alerts-cnt 0) (reset! db/kick-alert true))
-     (when (or (not in-panel?) 
+     (when (or (not in-panel?)
                (and in-panel? (> (count alerts) 0)))
        [re-com/box :child
         [re-com/h-box :attr
@@ -4966,7 +4965,7 @@
             ;:overflow      "hidden"
             :margin-right "12px"
             :margin-top   "-4px"
-            :font-size    "34px"}] 
+            :font-size    "34px"}]
           [re-com/gap :size "44px"]
           [re-com/v-box
            :gap "12px"
@@ -4981,7 +4980,7 @@
                     ;; _ (ut/tapp>> [:alert abody])
                        ]]
              [re-com/box :size "none"
-              :attr (when (not push-codes?) 
+              :attr (when (not push-codes?)
                       (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
               ;:attr {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])}
               :width (when (> width 0) (px width))
@@ -4989,7 +4988,7 @@
               :style {:overflow      (when in-panel? "hidden")}
               :child [buffy/render-honey-comb-fragments
                       abody
-                      (get a 1) ;; width 
+                      (get a 1) ;; width
                       (get a 2) ;; height
                       ]])]]]
         :width (px (+ 0 box-width))
@@ -5057,7 +5056,7 @@
               unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
-    [re-com/modal-panel 
+    [re-com/modal-panel
      :style {:z-index 999 :padding "0px"}
      :parts
      {:child-container {:style {:left      left
@@ -5065,8 +5064,8 @@
                                 :top       top
                                 :font-size "8px"
                                 :border    (str "5px solid " (theme-pull :theme/editor-outer-rim-color nil))
-                                :position  "fixed"}}} 
-     :backdrop-opacity 0.63 
+                                :position  "fixed"}}}
+     :backdrop-opacity 0.63
      :backdrop-on-click #(reset! lookup-modal? false)
      :child
      [re-com/h-box :justify :between :align :center :gap "10px" :style {:color "#000000" :font-size "18px"} :children
@@ -5284,7 +5283,7 @@
              {:id              "flow-canvas"
               :on-mouse-down   #(when (= (.-button %) 1)
                                   (do #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                      (bricks/tag-screen-position %) ;; event is magic in
+                                   (bricks/tag-screen-position %) ;; event is magic in
                                       (when (nil? @flow-hover) ;(and ;(not @bricks/over-block?)
                                         (let [;block-body {:w 200 :h 60
                                               block-body {:w            125
@@ -5311,17 +5310,18 @@
                                       #_{:clj-kondo/ignore [:unresolved-symbol]}
                                       (.preventDefault %)))
               :on-context-menu (re-com/handler-fn #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                                  (bricks/tag-screen-position event) ;; event is magic in
-                                                  (when (and (empty? @port-hover2) (empty? @flow-hover)) ; (nil?
-                                                                                                         ; @flow-hover)
-                                                                                                         ; ;(and
+                                (bricks/tag-screen-position event) ;; event is magic in
+                                                  (when (and (empty? @port-hover2) (empty? @flow-hover))
                                                     (reset! lookup-modal? true))
                                                   #_{:clj-kondo/ignore [:unresolved-symbol]}
-                                                  (.preventDefault event))} :size "none" :width (px (- panel-width 12)) :height
-             (px (- ppanel-height 35)) :child
+                                                  (.preventDefault event))}
+             :size "none"
+             :width (px (- panel-width 12))
+             :height (px (- ppanel-height 35))
+             :child
              [re-com/v-box :size "1" :style
               (merge ;(theme-pull :theme/canvas-background-css nil)
-                {:font-family (theme-pull :theme/base-font nil) :z-index 200 :border-radius "12px"}) ; "0px 0px 12px 12px"
+               {:font-family (theme-pull :theme/base-font nil) :z-index 200 :border-radius "12px"}) ; "0px 0px 12px 12px"
               :children
               [;;   [tab-menu]
                (when (and @bricks/dragging? @bricks/over-flow? (not @dragging-port?) (not @bricks/on-block?)) ;; AND when
@@ -5439,8 +5439,7 @@
                      {:on-click       #(ut/tracked-dispatch [::wfx/request :default
                                                              {:message {:kind        :kill-flow
                                                                         :flow-id     flow-id
-                                                                        :client-name @(ut/tracked-subscribe
-                                                                                        [::bricks/client-name])}
+                                                                        :client-name db/client-name}
                                                               :timeout 15000000}])
                       :on-mouse-enter #(reset! editor-tooltip-atom (str "kill flow (on server) and all open channels"))
                       :on-mouse-leave #(reset! editor-tooltip-atom nil)} :style
@@ -5545,7 +5544,7 @@
                  :color       (str (theme-pull :theme/editor-outer-rim-color nil))
                  :font-size   "29px"} :gap "10px" :children
                 [[edit-flow-title flow-id 1450]
-                 [re-com/md-icon-button :src (at) :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off") 
+                 [re-com/md-icon-button :src (at) :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off")
                   :on-click
                   #(if watched?
                      (ut/tracked-dispatch [::wfx/request :default
@@ -5568,8 +5567,8 @@
                                                         :flow-keys   running-subs
                                                         :flow-id     flow-id
                                                         :client-name client-name}
-                                              :timeout 15000000}]))) 
-                                              :style
+                                              :timeout 15000000}])))
+                  :style
                   {:cursor "pointer" :margin-top "8px" :font-size "30px"}]]]
                (when has-override?
                  [re-com/h-box :align :center :justify :center :gap "5px" :style

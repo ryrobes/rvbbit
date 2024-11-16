@@ -8,12 +8,17 @@
                           [:not [:like [:lower :field-name] "%code%"]]
                           [:not [:and [:like [:lower :field-name] "lat%"] [:= :data-type "float"]]]
                           [:not [:and [:like [:lower :field-name] "long%"] [:= :data-type "float"]]]]
- :dimension?             [:and [:<> :data-type "number"] 
-                          [:not [:= [:lower :field-name] "sketch"]]
-                          [:not [:= :field-name "rows"]] ;; meta field to reco rowcounts (if we group-by it, the sniff queries will fail)
-                          [:not [:like :field-name "%key%"]] 
-                          [:not [:like :field-name "styler_%"]] ;; ignore user-space conditional formatting fields
-                          [:not [:like :field-name "%_id%"]]]
+ :dimension?             [:or
+                          [:and [:= :data-type "integer"] [:like [:lower :field-name] "%month%"]]
+                          [:and [:= :data-type "integer"] [:like [:lower :field-name] "%year%"]]
+                          [:and [:= :data-type "integer"] [:like [:lower :field-name] "%hour%"]]
+                          [:and [:<> :data-type "number"]
+                           [:not [:= [:lower :field-name] "sketch"]]
+                           [:not [:= :field-name "rows"]] ;; meta field to reco rowcounts (if we group-by it, the sniff queries will fail)
+                           [:not [:like :field-name "%key%"]]
+                           [:not [:like :field-name "styler_%"]] ;; ignore user-space conditional formatting fields
+                           [:not [:like :field-name "%_id%"]]]]
+ :testto?                [:or :zipcode? :low-cardinality? :dimension?]
  :geo-lat?               [:and [:like [:lower :field-name] "lat%"] [:= :data-type "float"]]
  :geo-long?              [:and [:like [:lower :field-name] "long%"] [:= :data-type "float"]]
  :fips-state-code?       [:and [:like [:lower :field-name] "%fips_state_code%"] [:= :data-type "integer"]]
@@ -35,8 +40,9 @@
  :is-rowcount?           [:and [:= :data-type "integer"] [:= :field-name "rows"]] ;; meta field inserted to generate counts by dim
  :not-clickhouse?        [:<> :db-type "ClickHouse"]
  :true?                  [:= 1 1]
+ :false?                 [:= 45 1]
  :looks-like-date?       [:like [:cast :example-value :text] "____-__-__"]
                           ;[:like [:cast :example-value :text] "%____-__-__%"]
  :looks-like-datetime?   [:like [:cast :example-value :text] "____-__-__ %"]}
 
-;;; runs on the field level only atm 
+;;; runs on the field level only atm

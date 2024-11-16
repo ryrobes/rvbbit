@@ -1,0 +1,595 @@
+
+;; _    ____ ____ ____      /    _    ____ ____ _  _ ____ ____      /    ___  ____ ____ _  _ ____ _  _ ____ ____
+;; |    |___ |__| |___     /     |    |___ |__| |  | |___ [__      /     |__] |__/ |__| |\ | |    |__| |___ [__
+;; |___ |___ |  | |       /      |___ |___ |  |  \/  |___ ___]    /      |__] |  \ |  | | \| |___ |  | |___ ___]
+
+{;; available-state-keys (see the bottom for example shapes for all these maps and vectors)
+    ;;  :body - the view/query code itself
+    ;;  :output - console output for card runners that support it (clojure repls, command-line, etc)
+    ;;  :clover-kws - any clover / reactor params included (clover params will also be resolved if used in the leaf-fn is used)
+    ;;  :data - any output value from the cards that support it (rowset data from sql, return value from repl, etc)
+    ;;  :metadata - currently only for database calls
+    ;;  :parent-metadata - (if exists) currently only for database calls
+    ;;  :height-int - height of the container block in pixels
+    ;;  :width-int - width of the container block in pixels
+    ;;  :panel-key - block key, panel-key (same thing)
+    ;;  :block-key - block key, panel-key (same thing)
+    ;;  :data-key - view-key, query-key, data-key (same things)
+    ;;  :view-key - view-key, query-key, data-key (same things)
+    ;;  :query-key - view-key, query-key, data-key (same things)
+    ;;  :tab-name - current tab the view is in (same as tab)
+    ;;  :dragging? - is THIS item current being dragged?
+    ;;  :dragging-body - the meta map payload of the dragged item
+    ;;  :dragging-leaves - current state of the dragging items leaves
+    ;;  :drag-from-self? - target and source are the same block
+    ;;  :canvas-drop? - target is the canvas - no target block
+    ;;  :type - :view or :field (for now)
+    ;;  :tab - current tab the view is in (same as tab-name)
+    ;;  :runner - runner responsible for executing the card (views, queries, clojure, shell, etc)
+    ;;  :ui-keypath - location of the view in the format of [:block-id :runner :view-key]
+    ;;               ^ note, the full keypath for the client would be [:panels :block-id :runner :view-key]
+    ;;
+    ;; If leaf type is :field, these map keys will *also* be available to pull in the function args
+    ;;        - theses fields can also be used as raw keywords in the SQL where clause format
+    ;;
+    ;; [:field/data-type :field/cardinality :field/distinct-values :field/name :field/min
+    ;;  :field/median :field/max :field/avg :field/top-values :field/is-group-by?]
+
+
+ :views ;; run for every visible view on the client's screen (current tab) - RUN LEVEL
+ {:is-query?     (fn [{:keys [runner]}]
+                   (= runner :queries))
+  :has-metadata? (fn [{:keys [metadata]}]
+                   (not (empty? metadata)))
+;;   :is-xtdb?      (fn [{:keys [metadata]}]
+;;                    (and (not (empty? metadata))
+;;                         (clojure.string/includes? (clojure.string/lower-case (str (get metadata :connection-id))) "xtdb")
+;;                         (= (get metadata :database-type) "PostgreSQL")))
+  :is-view?      (fn [{:keys [runner]}]
+                   (= runner :views))
+  :is-recharts?  (fn [{:keys [body runner]}]
+                   (and (contains?
+                         (set (flatten-to-keywords body)) ;; deep flattens the entire struc, leaving only a vector of keywords
+                         :ResponsiveContainer)
+                        (= runner :views)))
+  :is-repl?      (fn [{:keys [runner]}]
+                   (= runner :clojure))
+
+  :sql-agg-types* (fn [_] [:sum :avg :min :max :count]) ;; leaf "batch" used a dynamic args for rules and action fns
+
+  :is-canvas-call? (fn [{:keys [data-key]}]
+                     (= data-key :canvas))
+
+  ;;:is-open-table-pull? [:= :dragging/type ":meta-tables"]
+
+  :none/none [:= 45 45] ;; true ;; important UI stub - acts a signal that the block has received leaf answers (as opposed to nil/waiting)
+
+  :is-self?     [:and :drag-from-self?]
+  :is-recharts-and-view? [:and :is-recharts? :is-view?]
+
+  :drag-from-same-connection? [:= :connection-id :drag-field/connection-id]
+
+;;   :target-has-field?       (fn [{:keys [drag-field drag-meta metadata]}]
+;;                              (not (empty? (get-in metadata [:fields (get drag-field :name)]))))
+  :target-has-field?     (fn [{:keys [drag-field drag-meta metadata]}]
+                           (or
+                            (not (empty? (get-in metadata [:fields (get drag-meta :param-field)])))
+                            (not (empty? (get-in metadata [:fields (get drag-field :name)])))))
+
+  :parent-has-field?     (fn [{:keys [drag-field drag-meta parent-metadata]}]
+                           (or
+                            (not (empty? (get-in parent-metadata [:fields (get drag-meta :param-field)])))
+                            (not (empty? (get-in parent-metadata [:fields (get drag-field :name)])))))
+
+;;   :parent-has-param-field? (fn [{:keys [drag-field parent-metadata]}]
+;;                              (not (empty? (get-in parent-metadata [:fields (get drag-field :name)]))))
+;;   :parent-has-param-field? (fn [{:keys [drag-meta parent-metadata]}]
+;;                              (not (empty? (get-in parent-metadata [:fields (get drag-meta :target)]))))
+
+  :drag-has-same-parent? (fn [{:keys [dragging-body metadata body]}]
+                           (let [src-drag-table (get-in dragging-body [:drag-meta :source-query])
+                                 target-from (first (flatten (get body :from)))]
+                             ;;(println src-drag-table target-from)
+                             (or (= target-from src-drag-table)
+                                 (= src-drag-table
+                                    (keyword (cstr/replace (str target-from) ":query/" ""))))))
+
+;;   :action/uteu! (fn [{:keys [database]}]
+;;                   (= (str (get database :name)) "SQLite"))
+
+  ;;:query-drag? [:= :drag-meta/type ":query"]
+  :is-sqlite? [:= :database/name "SQLite"]
+
+  :xtdb-drawer/click [:and
+                      [:= :database/name "PostgreSQL"]
+                      [:like [:lower :connection-id] "%xtdb%"]]
+
+  :xtdb-button/click [:and
+                      [:= :database/name "PostgreSQL"]
+                      [:like [:lower :connection-id] "%xtdb%"]]
+
+  :xtdb-drag/temporal [:and
+                       [:= :database/name "PostgreSQL"]
+                       [:like [:lower :connection-id] "%xtdb%"]]
+                       ;; ^^ until I get a better way - perhaps search the schemas for :_id field.
+
+  :xtdb-drop/temporal-ops.SYSTEM_TIME.VALID_TIME [:and [:= :drag-meta/type ":xtdb-temporal"] :canvas-drop?]
+
+  ;;:sql2/true [:= 1 1]
+
+  :sql/remove-field      [:and [:= :drag-meta/type ":field"] :is-self? :target-has-field?]
+  :sql/order-by.asc.desc [:and [:= :drag-meta/type ":field"] :is-self? :target-has-field?]
+  :sql/new-select.all.count  [:and
+                              [:or
+                               [:= :drag-meta/type ":query"]
+                               [:= :drag-meta/type ":meta-tables"]]
+                              :canvas-drop?]
+  :dimension-drop?    [:and [:or
+                             [:= :drag-meta/type ":meta-tables"]
+                             [:= :drag-meta/type ":field"]
+                             [:= :drag-meta/type ":meta-fields"]]
+                       ;[:like :drag-meta/source-table ":query/%"]
+                       [:or [:= :drag-meta/data-type "string"]
+                        [:like [:lower :drag-meta/target] "%year%"]
+                        [:like [:lower :drag-meta/target] "%month%"]]
+                       :canvas-drop?]
+  :sql/new-group-by      [:dimension-drop?]
+  :filter/new-drop-down  [:and [:<> :drag-meta/type ":meta-fields"] [:dimension-drop?]]
+  :filter/click-table    [:and [:<> :drag-meta/type ":meta-fields"] [:dimension-drop?]]
+  :sql/count-distinct    [:dimension-drop?]
+  :sql/new-agg.sql-agg-types   [:and [:or
+                                      [:= :drag-meta/type ":meta-tables"]
+                                      [:= :drag-meta/type ":field"]
+                                      [:= :drag-meta/type ":meta-fields"]]
+                                        ;[:like :drag-meta/source-table ":query/%"]
+                                [:<> :drag-meta/data-type "string"]
+                                :canvas-drop?]
+;;   :sql/new-agg.sum.avg.min.max.count   [:and [:= :drag-meta/type ":field"]
+;;                                         [:like :drag-meta/source-table ":query/%"]
+;;                                         [:<> :drag-meta/data-type "string"]
+;;                                         :canvas-drop?]
+  :sql/add-agg.sql-agg-types   [:and [:or
+                                      [:= :drag-meta/type ":meta-fields"]
+                                      [:= :drag-meta/type ":field"]]
+                                      ;[:like :drag-meta/source-table ":query/%"]
+                                      ;[:<> :drag-meta/data-type "string"]
+                                [:not :drag-field/dimension?]
+                                :drag-from-same-connection?
+                                :is-query?
+                                [:not :is-view?]
+                                ;:parent-has-field?
+                                [:not :target-has-field?]
+                                [:not :is-self?]]
+  :sql/add-group-by [:and :drag-field/dimension?
+                     :drag-from-same-connection?
+                     :parent-has-field?
+                     [:not :target-has-field?]
+                     [:not :is-self?]]
+  :param/new-param-view [:and [:= :drag-meta/type ":param"]
+                         :canvas-drop?]
+  :param/where.=.<>.>.< [:and
+                         [:not [:= :drag-meta/param-type "vector"]]
+                         [:or
+                          [:= :drag-meta/type ":param"]
+                          [:= :drag-meta/type ":where"]]
+                         [:or :parent-has-field? :target-has-field?]
+                         ;[:not :is-self?]
+                         ]
+  :param/where-in [:and
+                   [:= :drag-meta/param-type "vector"]
+                   [:or :parent-has-field? :target-has-field?]]
+  :param/where-NOT-in [:and
+                       [:= :drag-meta/param-type "vector"]
+                       [:or :parent-has-field? :target-has-field?]]
+  :cell-drop?        [:and :cell-drag? :canvas-drop?]
+  :cell/new-view     [:cell-drop?]
+  :cell/filter-where.all.count [:cell-drop?]
+
+  :cell/new-pivot-table [:dimension-drop?]
+
+  :view/viz-reco-drop [:and :canvas-drop? [:= :drag-meta/type ":viz-reco"]]
+  :view/tab-grid      [:and :canvas-drop? [:= :drag-meta/type ":tab-grid"]]
+  :view/duplicate     [:and [:= :drag-meta/type ":view"] :canvas-drop?]
+
+;;   :action/everyone [:and [:= 122 122] :drag-field/dimension?]
+;;   :action/everyone2 [:and [:= 1222 1222] :is-query?]
+
+;;   :grid-buttonz/everyone2 [:and [:= 1 1] :is-query?]
+;;   :grid-buttonz/everyone22 [:and [:= 12 12] :is-query?]
+;;   :grid-buttonz2/everyone44 [:and [:= 2 2] :is-query?]
+
+  :fresh/fresh-clover [:and :is-canvas-call? :no-drag?]
+  :fresh/fresh-repl [:and :is-canvas-call? :no-drag?]
+  :fresh/fresh-api-call [:and :is-canvas-call? :no-drag?]
+  :fresh/fresh-shell [:and :is-canvas-call? :no-drag?]
+
+  ;:action/drop-down [:and :drag-field/dimension? :drag-field/medium-cardinality?]
+  ;:action/fresh-clover2 [:fresh?]
+  ;:action/do-param-thing! [:<> :drag-param/field nil]
+  }
+
+;;  :fields ;; runs on all visible dataset fields. these will be accessable during a drag event via :drag-field-* - RUN LEVEL
+;;  {:low-cardinality?    [:<= :field/distinct-values 20] ;; cardinality as it relates to data viz drawing dims, not generally.
+;;   :medium-cardinality? [:<= :field/distinct-values 59]
+;;   :high-cardinality?   [:> :field/distinct-values 60]
+;;   :dimension?       [:or
+;;                         [:= :field/data-type "string"]
+;;                         [:= :field/data-type "date"]]
+;;   :dragging?           [:and :is-dragging? [:= 22 22]]
+;;   }
+
+
+
+ :categories ;; defaults like color and location?
+ {:sql {:label "SQL Actions" :locations [:drop] :color "#a1d76a"} ;; label color overrides cat color
+  :cell  {:label "Cell Actions" :locations [:drop]}
+  :action {:label "Random Actions" :locations [:drop]}
+  ;;:sql {:label "SQL Ops" :locations [:drop]}
+  :filter {:label "SQL UI Filters" :locations [:drop]}
+  :fresh {:label "Fresh Drop!" :locations [:drop]}
+  :grid-buttonz {:label "Random Actions" :locations [:view]}
+  :grid-buttonz2 {:label "Random Actions" :locations [:grid :view]}
+  :xtdb-drag {:label "XTDB Random Actions" :locations [:grid-drag]}
+  :xtdb-drop {:label "XTDB Actions" :locations [:drop]}
+  :xtdb-button {:label "BUTTON"  :locations [:grid :view]} ;; :view-drag
+  :xtdb-drawer  {:label "XRDB DRASRWYER"  :locations [:grid-drawer]}
+  :view {:label "View Actions" :locations [:drop]}
+  }
+
+ :action-labels ;; for rendering the action buttons / drop targets in the UI
+ {:filter {:new-drop-down {:color "#f5f5f5" :label ["Single Select" "Dropdown"]}
+           :click-table {:color "#f5f5f5" :label ["Multi Select" "Table Filter"]}}
+  :view {:viz-reco-drop {:color "#FDDBBB" :label ["Viz Suggestion" "Drop"]}
+         :tab-grid {:color "#FDDBBB" :label ["Tab Grid" "Drop"]}
+         :duplicate {:color "#FDDBBB" :label ["Duplicate" "View"]}}
+  :sql {;:new-select.all.count  {}
+        ;:new-agg.sum  {:color "#dcedc1" :label ["SQL Aggregate" "SUM"]}
+        :new-select.count  {:color "#a1d76a"
+                            :label ["SQL Count" "COUNT(1)"]}
+        :new-select.all  {:color "#a1d76a"
+                          :label ["SQL Select All" "SELECT * ..."]}
+        :count-distinct  {:color "#a1d76a"
+                          :label ["Count Distinct" "(of this field)"]}
+        :new-group-by  {:color "#a1d76a"
+                        :label ["Create Group By" "(plus rowcount)"]}
+        :add-group-by  {:color "#a1d76a"
+                        :label ["Add to Group By" ""]}
+        ;;:new-agg.sum.avg.min.max.count  {:color "#ffd3b6" :label ["SQL Aggregate" :*arg]}
+        :new-agg.sql-agg-types  {:color "#ffd3b6" :label ["SQL Aggregate" :*arg]}
+        :add-agg.sql-agg-types  {:color "#ffd3b6" :label ["Add SQL Agg" :*arg]}
+        ;:new-agg.min  {:color "#dddddd" :label ["SQL Aggregate" "MINNY"]} ;; if overriding a dynamic label, put it AFTER the dynamic def
+        } ;; drop only, so not needed
+  :fresh {:fresh-clover {:color "#f5f5f5" :label ["New Clover Block" "(view)"]}
+          :fresh-repl {:color "#f5f5f5" :label ["New REPL Block" "(clojure)"]}
+          :fresh-shell {:color "#f5f5f5" :label ["New Shell Block" "(bash, etc)"]}
+          :fresh-api-call {:color "#f5f5f5" :label ["New API Call" "(GET, POST, etc)"]}
+          }
+  :grid-buttonz {:everyone2 {:icon "ri-government-line" :tooltip "some tsufsdf ytolfsdfs2"}
+                 :everyone22 {:icon "ri-community-line" :tooltip "some tsufsdf ytolfsdfs22222"}}
+  :grid-buttonz2 {:everyone44 {:icon "ri-home-heart-line" :tooltip "somefsdfsdfsdf tsufsdf ytolfsdfs22222"}}
+  :xtdb-button {:click {:icon "zmdi-pizza" :tooltip "button click test!"}}
+  :xtdb-drag {:temporal {:icon "ri-calendar-schedule-line" :tooltip "XTDB Bi-Temporal Actions"}}
+  :xtdb-drop {:temporal-ops.SYSTEM_TIME.VALID_TIME {:color "#ffffff"
+                                                    :tooltip ["Add a connected scrubber slider for XTDB Bi-Temporal field" :*arg]
+                                                    :label [[ "Temporal Scrubber" ]
+                                                            [:*arg "ri-timeline-view"]
+                                                            ;;"more stuff"
+                                                            ]
+                                                    ;:clover [:box :child [:str "stuff! " :*arg] :style {:color "red"}]
+                                                    }}
+  :action {:param-where.=.<>.>.<  {:color "#f7f77f"
+                                   :label ["Param Filter" :*arg]}
+           :everyone {:color "#f7f77f"
+                      :label ["Everyone" "Single Select"]}
+           :everyone2 {:color "#fafafa"
+                       :label ["Everyone2" "Single Select"]}
+           :drop-down {:color "#f7f77f"
+                       :label ["Dimension Dropdown" "Single Select"]}}}
+
+ :actions-fns ;; has the action function as well as the labels and defs for that action
+ {:view        {:viz-reco-drop (fn [{:keys [drag-meta dragging-body]}]
+                                 (dissoc dragging-body :drag-meta  :conditionals))
+                :tab-grid (fn [{:keys [drag-meta dragging-body]}]
+                            (dissoc dragging-body :drag-meta :conditionals))} ;; blocks are already constructed in the drag-body
+  :xtdb-button {:click      (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                              (let [existing-select   (vec (shuffle (get target-query :select [])))
+                                    target-deep-keypath-sel (conj target-kp :select)]
+                                {target-deep-keypath-sel existing-select}))}
+  :xtdb-drawer {:click      (fn [{:keys []}]
+                              {:body [:box :size "auto"
+                                      ;:width :panel-width+50-px
+                                      :height :panel-height+50-px
+                                      :align :center :justify :center
+                                      :style {:color "red" :font-size "36px"
+                                              ;:border "1px solid green"
+                                              }
+                                      :child [:speak (str "hold yer horses" (rand-int 12))]]
+                               :runner :views
+                               :title "bad moon risin', rage an' ruin!"
+                               :action-type :clover-drawer
+                               :target :query
+                               :block-id :wow333
+                               :view-id :wow
+                               :size 5
+                               :position :bottom
+                               :style-override {}
+                               :icon "ri-pie-chart-2-fill"
+                               :tooltip "Bad moon is risin'"})}
+  :xtdb-drag   {:temporal  (fn [{:keys [source-kp source-block]}]
+                             ;; we are creating the drag-meta map for a drop action...
+                             (let [{:keys [selected-view connection-id]} source-block]
+                               {:type :xtdb-temporal
+                                :connection-id connection-id
+                                :source-query selected-view
+                                :source-table (keyword (str "query/" (clojure.string/replace (str selected-view) ":" "")))}))}
+;;   :xtdb-drop   {:temporal-ops.SYSTEM_TIME.VALID_TIME  (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field drag-meta]}]
+;;                                               (let [existing-where (get target-query :where [])
+;;                                                     ww [:*when (get drag-meta :param-full)
+;;                                                         [:*arg (get drag-meta :param-full) (get drag-meta :param-field)]]
+;;                                                     new-where (if (empty? existing-where) ww [:and existing-where ww])
+;;                                                     target-deep-keypath (conj target-kp :where)]
+;;                                                 {target-deep-keypath new-where}))}
+  :param  {:new-param-view (fn [{:keys [drag-meta]}]
+                             (let [{:keys [param-field param-full param-type]} drag-meta
+                                   view [:box :child [:str param-full]
+                                         :style {:font-size "20px"
+                                                 :color :theme/editor-outer-rim-color}
+                                         :size "auto" :align :center :justify :center]]
+                               {:h 2 :w 5
+                                :selected-view :param-view
+                                :views {:param-view view}}))
+           :where.=.<>.>.<  (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field drag-meta]}]
+                                    (let [existing-where (get target-query :where [])
+                                          ww [:*when (get drag-meta :param-full)
+                                              [:*arg (get drag-meta :param-full) (get drag-meta :param-field)]]
+                                          new-where (if (empty? existing-where) ww [:and existing-where ww])
+                                          target-deep-keypath (conj target-kp :where)]
+                                      {target-deep-keypath new-where}))}
+  :sql    {:add-group-by (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                           (let [existing-group-by (get target-query :group-by [])
+                                 existing-select   (get target-query :select [])
+                                 new-select        (vec (distinct (conj existing-select source-field))) ;; in case added twice
+                                 new-group-by      (vec (distinct (conj existing-group-by source-field))) ;; in case added twice
+                                 target-deep-keypath-gp (conj target-kp :group-by)
+                                 target-deep-keypath-sel (conj target-kp :select)]
+                                        ;; ^^ it would have been shorter to mutate the whole query and send whole,
+                                        ;;    but demoing here how we can do 2 deep assoc-in writes instead
+                             {target-deep-keypath-gp new-group-by
+                              target-deep-keypath-sel new-select}))
+           :new-select.all.count (fn [{:keys [drag-meta]}]
+                                   (let [{:keys [connection-id type source-table table-fields]} drag-meta
+                                         op :*arg
+                                         sub-query? (= type :query)
+                                         all? (= op :all)
+                                         qname (keyword
+                                                (str (if all? "all-" "cnt-")
+                                                     (-> (str source-table)
+                                                         (clojure.string/replace ":query/" "")
+                                                         (clojure.string/replace ":" "")
+                                                         (clojure.string/replace "_" "-"))))
+                                         source-table (if sub-query?
+                                                        (keyword (str "query/" (clojure.string/replace (str source-table) ":" "")))
+                                                        source-table)
+                                         table-alias (keyword (str "ssb99"))
+                                         query {:select (if all?
+                                                          table-fields
+                                                          [[[:count 1] :rowcnt]])
+                                                :from [[source-table table-alias]]}]
+                                      ;; (pp [:drag-meta ?connection-id source-query sopurce-table table-fields])
+                                     {:h (if all? 6 4)
+                                      :w (if all? (max 7 (min 25 (Math/ceil (* (count table-fields) 1.2)))) 6)
+                                      :connection-id connection-id
+                                      :selected-view qname
+                                      :queries {qname query}}))
+
+           :new-group-by (fn [{:keys [drag-meta]}]
+                           (let [{:keys [connection-id source-query source-table target table-fields]} drag-meta
+                                 qname (keyword (str "grouped-"
+                                                     (-> (str source-table)
+                                                         (clojure.string/replace ":query/" "")
+                                                         (clojure.string/replace ":" "")
+                                                         (clojure.string/replace "_" "-"))))
+                                 table-alias (keyword (str "ssb" (rand-int 99)))
+                                 query {:select [target [[:count 1] :rowcnt]]
+                                        :from [[source-table table-alias]]
+                                        :order-by [[:rowcnt :desc]]
+                                        :group-by [target]}]
+                             {:h 4 :w 6
+                              :connection-id connection-id
+                              :selected-view qname
+                              :queries {qname query}}))
+
+           :new-agg.sum.avg.min.max.count (fn [{:keys [drag-meta]}]
+                                            (let [{:keys [connection-id source-query source-table target table-fields]} drag-meta
+                                                  qname (keyword (str "agg-"
+                                                                      (-> (str source-table)
+                                                                          (clojure.string/replace ":query/" "")
+                                                                          (clojure.string/replace ":" "")
+                                                                          (clojure.string/replace "_" "-"))))
+                                                  table-alias (keyword (str "ssb" (rand-int 99)))
+                                                  query {:select [[[:*arg target] target]]
+                                                         :from [[source-table table-alias]]}]
+                                              {:h 4 :w 6
+                                               :connection-id connection-id
+                                               :selected-view qname
+                                               :queries {qname query}}))
+           :count-distinct (fn [{:keys [drag-meta]}]
+                             (let [{:keys [connection-id source-query source-table target table-fields]} drag-meta
+                                   qname (keyword (str "countd-"
+                                                       (-> (str source-table)
+                                                           (clojure.string/replace ":query/" "")
+                                                           (clojure.string/replace ":" "")
+                                                           (clojure.string/replace "_" "-"))))
+                                   table-alias (keyword (str "ssb" (rand-int 99)))
+                                   query {:select [[[:count [:distinct target]] target]]
+                                          :from [[source-table table-alias]]}]
+                               {:h 4 :w 6
+                                :connection-id connection-id
+                                :selected-view qname
+                                :queries {qname query}}))}
+  :filter {:new-drop-down (fn [{:keys [drag-meta source-query-body source-kp]}]
+                            (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta
+                                  new-param    (keyword (clojure.string/replace (str :*this-block* "/" target) ":" ""))
+                                  table-alias  (keyword (str "ddr" (rand-int 99)))
+                                  parent-where (get source-query-body :where)
+                                  parent-table (first (flatten (get source-query-body :from)))
+                                  exists?      (not (nil? parent-where))
+                                  cla           [:*when new-param [:= new-param target]]
+                                  new-where     (if exists? [:and parent-where cla] cla)
+                                  view-body [:dropdown {:choices :query1
+                                                        :width   :panel-width+80-px
+                                                        :style   {:padding-top "8px"
+                                                                  :font-size   "19px"}
+                                                        :ref (keyword (clojure.string/replace (str "query/" source-query) ":" ""))
+                                                      ;:model   [:or! [:dash8 k] ]
+                                                        :model   new-param
+                                                       ;:field   [new-q-key target-field]
+                                                        :field target}]]
+                              {:h 2 :w 6
+                               :selected-view :dropdown1
+                               :connection-id connection-id
+                               :drop-mutate {(vec (into source-kp [:where])) new-where}
+                               :views {:dropdown1 view-body}
+                               :queries {:query1 {:select   [[target :label] [target :id]]
+                                                  :from     [[parent-table table-alias]]
+                                                  :group-by [target]
+                                                  :order-by [[target :asc]]}}}))
+
+           :click-table (fn [{:keys [drag-meta source-query-body source-kp]}]
+                          (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta
+                                ;;new-param    (keyword (clojure.string/replace (str :query1 "/" target) ":" ""))  ;; regular single param click
+                                new-param    (keyword (clojure.string/replace (str :query1 "/*.clicked") ":" ""))
+                                table-alias  (keyword (str "ctr" (rand-int 45)))
+                                parent-where (get source-query-body :where)
+                                parent-table (first (flatten (get source-query-body :from)))
+                                exists?      (not (nil? parent-where))
+                                ;cla          [:*when new-param [:= new-param target]] ;; regular single param click
+                                cla          [:*if new-param [:*all= new-param [target]] [:= 1 1]]
+                                new-where    (if exists? [:and parent-where cla] cla)]
+                            {:h 6 :w 6
+                             :selected-view :query1
+                             :connection-id connection-id
+                             :drop-mutate {(vec (into source-kp [:where])) new-where}
+                             :queries {:query1 {:select   [target [[:count 1] :rowcnt]]
+                                                :from     [[parent-table table-alias]]
+                                                :group-by [target]
+                                                :order-by [[:rowcnt :desc]]
+                                                ;:order-by [[target :asc]]
+                                                }}}))}
+  :cell {:new-pivot-table (fn [{:keys [drag-meta source-query-body source-kp]}]
+                            (let [{:keys [connection-id source-panel-key source-query source-table param-field row-num target table-fields]} drag-meta
+                                  new-param    (keyword (clojure.string/replace (str :*this-block* "/" target) ":" ""))
+                                  table-alias  (keyword (str "ddr" (rand-int 99)))
+                                  parent-where (get source-query-body :where)
+                                  parent-table (first (flatten (get source-query-body :from)))
+                                  exists?      (not (nil? parent-where))
+                                  cla           [:*when new-param [:= new-param target]]
+                                  new-where     (if exists? [:and parent-where cla] cla)
+                                  ;_ (pp [:new-pivot-table source-table source-query])
+                                  ]
+                              {:h 5 :w 6
+                               :selected-view :pivot1
+                               :connection-id connection-id
+                               :pivot {:pivot1 {:rowset-keypath [source-query]
+                                                :rowset-query [source-table]
+                                                :row-keys [target]
+                                                :column-keys ["all"]
+                                                :agg-specs []
+                                       ;:reaction-clover :solver-status/metadata>ufo-sightings-drag-31
+                                       ;:pivot-data-kw :new-pivot-pivot
+                                                }}}))
+         :new-view (fn [{:keys [drag-meta]}]
+                     (let [{:keys [connection-id source-query source-table param-field row-num target table-fields]} drag-meta
+                           vname (keyword (str "cell-"
+                                               (-> (str source-table)
+                                                   (clojure.string/replace ":query/" "")
+                                                   (clojure.string/replace ":" "")
+                                                   (clojure.string/replace "_" "-"))))
+                           cell-keyword (keyword (clojure.string/replace (str source-query "/" param-field "." row-num) ":" ""))]
+                       {:h 2 :w 4
+                        :connection-id connection-id
+                        :selected-view vname
+                        :views {vname [:box
+                                       :style {:font-size "18px" :color :theme/editor-font-color}
+                                       :child [:str cell-keyword]]}}))
+
+         :filter-where.all.count (fn [{:keys [drag-meta parent-query-metadata]}]
+                                   (let [{:keys [connection-id type param-field param-full source-table source-query table-fields]} drag-meta
+                                         op :*arg
+                                         all? (= op :all)
+                                         table-fields (vec (keys (get parent-query-metadata :fields)))
+                                         qname (keyword
+                                                (str (if all? "all-" "cnt-")
+                                                     (-> (str source-table)
+                                                         (clojure.string/replace ":query/" "")
+                                                         (clojure.string/replace ":" "")
+                                                         (clojure.string/replace "_" "-"))))
+                                         table-alias (keyword (str "ssb" (rand-int 99)))
+                                         query {:select (if all?
+                                                          table-fields
+                                                          [[[:count 1] :rowcnt]])
+                                                :where [:= param-field param-full]
+                                                :from [[source-table table-alias]]}]
+                                                                       ;; (pp [:drag-meta ?connection-id source-query sopurce-table table-fields])
+                                     {:h (if all? 6 4)
+                                      :w (if all? (max 32 (+ 2 (Math/ceil (* (count table-fields) 1.2)))) 6)
+                                      :connection-id connection-id
+                                      :selected-view qname
+                                      :queries {qname query}}))}
+
+  :fresh  {:fresh-clover (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                           {:w 7 :h 4
+                            :selected-view :vv1
+                            ;:clojure  {:new-clojure (do (println "farts"))}
+                            :views {:vv1 [:box
+                                          :size "auto"
+                                          :align :center :justify :center
+                                          :style {:font-size "22px"}
+                                          :child "hi"]}})
+           :fresh-repl (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                         {:w 7 :h 4
+                          :selected-view :new-clojure
+                          :selected-mode {:* :text}
+                          :clojure  {:new-clojure (quote (do (let [clojure-version (clojure-version)
+                                                                   jvm-version     (System/getProperty
+                                                                                    "java.version")]
+                                                               (str
+                                                                "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+                                                                clojure-version
+                                                                " on " jvm-version
+                                                                " JVM tech" " 🥕🐇"))))}})
+           :fresh-shell (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                          {:w 7 :h 4
+                           :selected-view :new-shell
+                           :selected-mode {:* :text}
+                           :shell  {:new-shell ["pwd ; whoami "]}})
+           :fresh-api-call (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                             {:w 7 :h 4
+                              :selected-view :new-api-call
+                              :selected-mode {:* :text}
+                              :api-call
+                              {:new-api-call
+                               {:endpoint
+                                "https://owen-wilson-wow-api.onrender.com/wows/random"
+                                :method :get
+                                :params {:results 15}
+                                :flatten? true}}})}
+  :action {;;   :everyone (fn [{:keys [source-kp source-block source-view target-kp target-block target-view source-item]}]
+         ;;               [:box :child "hi"])
+           :fresh-clover2 (fn [{:keys [drag-block target-block]}]
+                            {:w 7 :h 4
+                             :selected-view :vv1
+                             :views {:vv1 [:box
+                                           :size "auto"
+                                           :padding "10px"
+                                           :align :center :justify :center
+                                           :style {:font-size "22px"}
+                                           :child "howdy"]}})
+
+           ;:everyone (fn [context-map] [:context-map! context-map])
+           ;:everyone2 (fn [{:keys [drag-block target-block]}] [:box :child "hi"])
+           ;:drop-down (fn [{:keys [drag-block target-block]}] [:box :child "hi"])
+           }}
+
+}
+

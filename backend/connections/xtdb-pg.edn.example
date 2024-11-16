@@ -7,12 +7,14 @@
  :max-lifetime       1800000
  :minimum-idle       10
  :maximum-pool-size  10
- :jdbc-url           "jdbc:postgresql://localhost:5432/postgres"
+ :jdbc-url           "jdbc:postgresql://localhost:5432/xtdb"
  :adapter            "postgresql"
-;; :username           "postgres"
-;; :password           "test"
-;; :database-name      "rabbit"
+ ;:username           "xtdb"
+ ;:password           "xtdb"
+ ;:database-name      "xtdb"
  :server-name        "localhost"
+; :host "localhost"
  :port-number        5432
- :register-mbeans    false}
+ ;:register-mbeans    false
+ }
 

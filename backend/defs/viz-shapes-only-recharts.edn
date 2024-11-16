@@ -1,0 +1,297 @@
+
+{:recharts-h-bar {:axes {:x [:or
+                             [:and :dimension?
+                              ;:reasonable-cardinality? ;;
+                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              ;;;:reasonable-cardinality?
+                              [:not :measure?]]
+                             [:or :looks-like-date? :looks-like-datetime?
+                              :is-date? :is-datetime?]]
+                         :y [:measure?]}
+
+                  :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+                              :from [:table]
+                              :group-by [:x-field]}]
+                  :h 5 :w 9
+                  :category [:viz :recharts]
+                  :selected-view :reech
+                  :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
+                                                                    :height :panel-height+50}
+                                           [:> :ComposedChart {:data [] ;; needed to fake out :Bar component w/o main :data for some reason
+                                                               :margin {:top 5 :bottom 5
+                                                                        :right 30 :left 20}}
+                                            [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
+                                            [:> :Tooltip
+                                             {:contentStyle {:backgroundColor "#00000099"
+                                                             :border          "none"}
+                                              :itemStyle    {:color "#ecf0f1"}
+                                              :labelStyle   {:color "#3498db"}}]
+                                            [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
+                                            [:> :Bar {:dataKey :y-field
+                                                      :isAnimationActive false
+                                                      :data      :query-preview
+                                                      :stroke    :theme/editor-outer-rim-color
+                                                      :fill      [:str :theme/editor-outer-rim-color "33"]
+                                                      :on-click [:set-recharts-param>]}]]]}
+                  :base-score 1}
+
+ :recharts-line {:axes {:x [:or
+                            [:and :dimension?
+                             ;[:not :measure?]
+                              ;;;:reasonable-cardinality? ;;
+                             ;[:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                             ]
+                            [:or :looks-like-date? :looks-like-datetime?
+                             :is-date? :is-datetime?]]
+                        :y [:measure?]}
+
+                 :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+                             :from [:table]
+                             :group-by [:x-field]}]
+                 :h 5 :w 9
+                 :category [:viz :recharts]
+                 :selected-view :reech
+                 :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
+                                                                   :height :panel-height+50}
+                                          [:> :ComposedChart {:data []
+                                                              :margin {:top 5 :bottom 5
+                                                                       :right 30 :left 20}}
+                                           [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
+                                           [:> :Tooltip
+                                            {:contentStyle {:backgroundColor "#00000099"
+                                                            :border          "none"}
+                                             :itemStyle    {:color "#ecf0f1"}
+                                             :labelStyle   {:color "#3498db"}}]
+                                           [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
+                                           [:> :Line {:type "monotone"
+                                                      :isAnimationActive false
+                                                      :data :query-preview
+                                                      :dataKey :y-field
+                                                      :stroke    :theme/editor-outer-rim-color
+                                                      :activeDot {:r 8} }]
+                                           [:>
+                                            :Scatter ;; needed for on-click to work, since Line and Area have no on-click handlers
+                                            {:data    :query-preview
+                                             :dataKey :y-field
+                                             :isAnimationActive false
+                                             :fill    :theme/editor-outer-rim-color
+                                             :onClick [:set-recharts-param>]}]
+                                           ]]}
+                 :base-score 1}
+
+ :recharts-area {:axes {:x [:or
+                            [:and :dimension?
+                             [:not :measure?]
+                             ;;;:reasonable-cardinality? ;;
+                             [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]]
+                            [:or :looks-like-date? :looks-like-datetime?
+                             :is-date? :is-datetime?]]
+                        :y [:measure?]}
+
+                 :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+                             :from [:table]
+                             :group-by [:x-field]}]
+
+                 :h 5 :w 9
+                 :category [:viz :recharts]
+                 :selected-view :reech
+                 :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
+                                                                   :height :panel-height+50}
+                                          [:> :ComposedChart {:data []
+                                                              :margin {:top 5 :bottom 5
+                                                                       :right 30 :left 20}}
+                                           [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
+                                           [:> :Tooltip
+                                            {:contentStyle {:backgroundColor "#00000099"
+                                                            :border          "none"}
+                                             :itemStyle    {:color "#ecf0f1"}
+                                             :labelStyle   {:color "#3498db"}}]
+                                           [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
+                                           [:> :Area {:type "monotone"
+                                                      :isAnimationActive false
+                                                      :data :query-preview
+                                                      :dataKey :y-field
+                                                      :stroke    :theme/editor-outer-rim-color
+                                                      :fill      [:str :theme/editor-outer-rim-color  "33"]
+                                                      :activeDot {:r 8} }]
+                                           [:>
+                                            :Scatter ;; needed for on-click to work, since Line and Area have no on-click handlers
+                                            {:data    :query-preview
+                                             :isAnimationActive false
+                                             :dataKey :y-field
+                                             :fill    :theme/editor-outer-rim-color
+                                             :onClick [:set-recharts-param>]}]
+                                           ]]}
+                 :base-score 1}
+
+
+ ;; claude generated
+ :recharts-pie {:axes {:segment [:and :dimension?
+                                 [:not :measure?]
+                                 [:or :low-cardinality? :very-low-cardinality?]]
+                       :value [:measure?]}
+
+                :sql-maps [{:select [[:segment-field :segment] [[:sum :value-field] :value]]
+                            :from [:table]
+                            :group-by [:segment-field]}]
+                :h 5 :w 5
+                :category [:viz :recharts]
+                :selected-view :reech
+                :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
+                                                                  :height :panel-height+50}
+                                         [:> :PieChart {:margin {:top 20 :right 20
+                                                                 :bottom 20 :left 20}}
+                                          [:> :Pie {:data :query-preview
+                                                    :dataKey :value
+                                                    :nameKey :segment
+                                                    :isAnimationActive false
+                                                    :innerRadius :quarter-panel-width
+                                                    :outerRadius 80
+                                                    :stroke    :theme/editor-outer-rim-color
+                                                    :fill      [:str :theme/editor-outer-rim-color  "33"]
+                                                    :label true
+                                                    :on-click [:set-recharts-param>]}]
+                                          [:> :Legend {}]
+                                          [:> :Tooltip
+                                           {:contentStyle {:backgroundColor "#00000099"
+                                                           :border          "none"}
+                                            :itemStyle    {:color "#ecf0f1"}
+                                            :labelStyle   {:color "#3498db"}}]]]}
+                :base-score 1}
+
+;; :drop-down-filter  {:axes {:dim [:and :dimension? :is-string?
+;;                                  [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+;;                                  [:and [:not :is-date?] [:not :is-datetime?]]]}
+;;                     :h 2 :w 6
+;;                     :sql-maps [{:select [[:dim-field :id]
+;;                                          [:dim-field :label]]
+;;                                 :from [:promoted-table] ;; :promoted-table instead of :table, so we materialized the query instead of ref it
+;;                                 :group-by [:dim-field]
+;;                                 :order-by [:dim-field]}]
+
+;;                     :category [:filter :dropdown]
+
+;;                     ;; happens at analysis time - for a post-drop mutate - {[:ui :keypath :to-change] {:new-content ...}
+;;                     :mutate-fn (fn [source-keypath source-body] ;; this is small enough to be fine, but bigger data (panel-data, panels, etc) will need an indirect way to pull..
+;;                                    (let [orig-where (get source-body :where {})
+;;                                          our-where [:*when :panel-key/dim-field [:= :panel-key/dim-field :dim-field]]
+;;                                          new-where (if (empty? orig-where)
+;;                                                      our-where [:and orig-where our-where])]
+;;                                      {(conj (into [:panels] source-keypath) :where) new-where}))
+
+;;                     :library-shapes [:dropdown
+;;                                      {:choices :query-preview
+;;                                       :width :panel-width+80-px
+;;                                       :style {:padding-top "8px"}
+;;                                       :model :panel-key/dim-field
+;;                                       :field :dim-field}]
+
+;;                     :base-score 1}
+
+;; :recharts-scatter {:axes {:x [:measure?]
+;;                            :y [:measure?]}
+
+;;                     :sql-maps [{:select [:x-field :y-field]
+;;                                 :from [:table]}]
+;;                     :h 5 :w 9
+;;                     :category [:viz :recharts]
+;;                     :selected-view :reech
+;;                     :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
+;;                                                                       :height :panel-height+50}
+;;                                              [:> :ComposedChart {:margin {:top 20 :right 20
+;;                                                                           :bottom 20 :left 20}}
+;;                                               [:> :CartesianGrid {:strokeDasharray "3 3"}]
+;;                                               [:> :XAxis {:type "number" :dataKey :x-field}]
+;;                                               [:> :YAxis {:type "number" :dataKey :y-field}]
+;;                                               [:> :Tooltip
+;;                                                {:contentStyle {:backgroundColor "#00000099"
+;;                                                                :border "none"}
+;;                                                 :itemStyle {:color "#ecf0f1"}
+;;                                                 :labelStyle {:color "#3498db"}}]
+;;                                               [:> :Scatter {:data :query-preview
+;;                                                             :fill [:str :theme/editor-outer-rim-color "66"]
+;;                                                             :on-click [:set-recharts-param>]}]]]}
+;;                     :base-score 1}
+
+;;  :recharts-stacked-bar {:axes {:x [:or
+;;                                    [:and :dimension?
+;;                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+;;                                     [:not :measure?]]
+;;                                    [:or :looks-like-date? :looks-like-datetime?
+;;                                     :is-date? :is-datetime?]]
+;;                                :y [:measure?]
+;;                                :stack [:and :dimension?
+;;                                        [:or :low-cardinality? :very-low-cardinality?]
+;;                                        [:not :measure?]]}
+
+;;                         :sql-maps [{:select [:x-field :stack-field [[[:sum :y-field]] :y-field]]
+;;                                     :from [:table]
+;;                                     :group-by [:x-field :stack-field]}]
+;;                         :h 5 :w 9
+;;                         :category [:viz :recharts]
+;;                         :selected-view :reech
+;;                         :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
+;;                                                                           :height :panel-height+50}
+;;                                                  [:> :ComposedChart {:margin {:top 20 :right 20
+;;                                                                               :bottom 20 :left 20}}
+;;                                                   [:> :CartesianGrid {:strokeDasharray "3 3"}]
+;;                                                   [:> :XAxis {:dataKey :x-field}]
+;;                                                   [:> :YAxis]
+;;                                                   [:> :Tooltip
+;;                                                    {:contentStyle {:backgroundColor "#00000099"
+;;                                                                    :border "none"}
+;;                                                     :itemStyle {:color "#ecf0f1"}
+;;                                                     :labelStyle {:color "#3498db"}}]
+;;                                                   [:> :Legend]
+;;                                                   [:> :Bar {:dataKey :y-field
+;;                                                             :stackId "a"
+;;                                                             :data :query-preview
+;;                                                             :fill [:str :theme/editor-outer-rim-color "66"]
+;;                                                             :on-click [:set-recharts-param>]}]]]}
+;;                         :base-score 1}
+
+;;  :recharts-combo-line-bar {:axes {:x [:or
+;;                                       [:and :dimension?
+;;                                        [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+;;                                        [:not :measure?]]
+;;                                       [:or :looks-like-date? :looks-like-datetime?
+;;                                        :is-date? :is-datetime?]]
+;;                                   :y1 [:measure?]
+;;                                   :y2 [:measure?]}
+
+;;                            :sql-maps [{:select [:x-field
+;;                                                 [[[:sum :y1-field]] :y1-field]
+;;                                                 [[[:sum :y2-field]] :y2-field]]
+;;                                        :from [:table]
+;;                                        :group-by [:x-field]}]
+;;                            :h 5 :w 9
+;;                            :category [:viz :recharts]
+;;                            :selected-view :reech
+;;                            :library-shapes {:reech [:> :ResponsiveContainer {:width "100%"
+;;                                                                              :height :panel-height+50}
+;;                                                     [:> :ComposedChart {:margin {:top 20 :right 20
+;;                                                                                  :bottom 20 :left 20}}
+;;                                                      [:> :CartesianGrid {:strokeDasharray "3 3"}]
+;;                                                      [:> :XAxis {:dataKey :x-field}]
+;;                                                      [:> :YAxis {:yAxisId "left"}]
+;;                                                      [:> :YAxis {:yAxisId "right" :orientation "right"}]
+;;                                                      [:> :Tooltip
+;;                                                       {:contentStyle {:backgroundColor "#00000099"
+;;                                                                       :border "none"}
+;;                                                        :itemStyle {:color "#ecf0f1"}
+;;                                                        :labelStyle {:color "#3498db"}}]
+;;                                                      [:> :Legend]
+;;                                                      [:> :Bar {:yAxisId "left"
+;;                                                                :dataKey :y1-field
+;;                                                                :data :query-preview
+;;                                                                :fill [:str :theme/editor-outer-rim-color "66"]
+;;                                                                :on-click [:set-recharts-param>]}]
+;;                                                      [:> :Line {:yAxisId "right"
+;;                                                                 :type "monotone"
+;;                                                                 :dataKey :y2-field
+;;                                                                 :data :query-preview
+;;                                                                 :stroke :theme/editor-outer-rim-color
+;;                                                                 :on-click [:set-recharts-param>]}]]]}
+;;                            :base-score 1}
+
+                }

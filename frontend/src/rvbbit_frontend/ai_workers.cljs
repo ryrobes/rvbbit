@@ -199,7 +199,7 @@
     (+ input-cost output-cost)))
 
 (defn get-threads-for-assistant [assistant]
-  (let [client-name @(ut/tracked-sub ::bricks/client-name {})
+  (let [client-name db/client-name
         client-name-str (cstr/replace (str client-name) ":" "")
         threads-key (keyword (str "ai-worker/threads-for>" client-name-str))
         threads @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [threads-key]})]
@@ -210,7 +210,7 @@
     (get-in (filterv #(= (last %) thread-id) threads) [0 1] nil)))
 
 (defn context-metadata []
-  (let [client-name @(ut/tracked-sub ::bricks/client-name {})
+  (let [client-name db/client-name
         curr-tab @(ut/tracked-sub ::bricks/selected-tab {})
         [runner-src data-key] @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
         coords @(ut/tracked-sub ::bricks/all-roots-tab-sizes {:tab curr-tab})
@@ -234,7 +234,7 @@
       ;:id (cstr/replace (str client-name "++" selected-block "++" runner-src "++" data-key) ":" "")
      (when (not no-selected?)
        {:context {[:panels selected-block] context-body}}))))
-  
+
 (re-frame/reg-event-db
  ::delete-thread-local
  (fn [db [_ thread-id worker-name client-name]]
@@ -253,7 +253,7 @@
   (let [workers-map @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:ai-worker/config>client]})
         limit 15
         usage 4.3777
-        client-name @(ut/tracked-sub ::bricks/client-name {})
+        client-name db/client-name
         client-name-str (cstr/replace (str client-name) ":" "")
         threads-key (keyword (str "ai-worker/threads-for>" client-name-str))
         all-threads @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [threads-key]}) ;; for reaction purposes only. data is small.
@@ -263,23 +263,23 @@
                       (js/Number.)
                       (.toFixed 5)
                       (js/parseFloat))
-        costs-ass (group-by :assistant_name costs) 
+        costs-ass (group-by :assistant_name costs)
         panel-height (- panel-height 70)
        ;; _ (ut/tapp>> [:workers-map workers-map])
-        ;usage-pct (Math/ceil (* (/ usage limit) 100))  
+        ;usage-pct (Math/ceil (* (/ usage limit) 100))
         ]
     [re-com/v-box
      ;:justify :between
      :children
      [[re-com/box
-       ;:size "auto" 
+       ;:size "auto"
        :height "33px"
        :padding "5px"
        ;:style {:border "1px solid red"}
        :child [re-com/h-box
                :size "auto"
                :justify :between
-               
+
                ;:gap "10px"
                :children
                [
@@ -290,7 +290,7 @@
                 ;;   :cursor     "pointer"
                 ;;   :margin-top "-2px"
                 ;;   :font-size  "16px"}]
-                [re-com/box 
+                [re-com/box
                  :style {:font-size "18px" :margin-top "3px" :margin-left "10px" :opacity 0.33}
                  :child (str "cumulative total: $" ttl-costs)]
                 ;; [re-com/progress-bar
@@ -322,13 +322,13 @@
                                                        (js/Number.)
                                                        (.toFixed 5)
                                                        (js/parseFloat))]]
-                             [re-com/v-box 
+                             [re-com/v-box
                               :padding "6px"
                               :style {:border-radius "12px"
                                       :backdrop-filter "blur(12px)"
                                       :background-color (str (get name-style :color "#000000") 20)
                                       :border (str "2px solid " (get name-style :color (theme-pull :theme/editor-outer-rim-color nil)))}
-                              :children 
+                              :children
                               [[re-com/h-box
                                 ;:style {:border "1px solid cyan"}
                                 :padding "6px"
@@ -336,24 +336,24 @@
                                 :justify :between
                                 :children [[re-com/v-box
                                             :children
-                                            [[re-com/h-box 
+                                            [[re-com/h-box
                                               ;:justify :between
                                               :gap "10px"
                                               :children [[re-com/box :child (str worker-name)]
-                                                         [re-com/md-icon-button 
+                                                         [re-com/md-icon-button
                                                           :md-icon-name "ri-chat-thread-fill"
                                                           :on-click #(start-conversation client-name worker-name)
                                                           :style {:font-size "25px" :opacity 0.25 :cursor "pointer"
                                                                   :margin-top "5px"}]
                                                          ;;[re-com/box :child (str worker-name)]
-                                                         ] 
-                                              :style (merge 
+                                                         ]
+                                              :style (merge
                                                       (assoc name-style :font-size "28px")
                                                       {:text-shadow "4px 4px 4px #00000099"
                                                        :font-weight 700})]
-                                             [re-com/box 
+                                             [re-com/box
                                               :width "410px"
-                                              :style {;:border "1px solid lime" 
+                                              :style {;:border "1px solid lime"
                                                       :opacity 0.9
                                                       ;:font-weight 700
                                                       :font-size "15px"}
@@ -363,9 +363,9 @@
                                                     :style {:border-radius "12px"}
                                                     :height "100px"
                                                     :width "100px"}])]]
-                               
+
                                (when (ut/ne? threads)
-                                 [re-com/v-box 
+                                 [re-com/v-box
                                   :padding "6px"
                                   :style {:padding-left "20px"}
                                   :children (for [[_ summy t] threads
@@ -375,14 +375,14 @@
                                                         thread-key-running (keyword (str "ai-worker/" worker-name ">" t ">running?"))
                                                         running? @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [thread-key-running]})
                                                         thread @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [thread-key]})
-                                                        msg-count (count thread)]] 
-                                              [re-com/h-box 
+                                                        msg-count (count thread)]]
+                                              [re-com/h-box
                                                :style {:border "1px solid red"
                                                        :border-radius "6px"}
                                                :padding "4px"
                                                :justify :between
                                                :children [[re-com/md-icon-button :md-icon-name "zmdi-close"
-                                                           :on-click #(do 
+                                                           :on-click #(do
                                                                         (ut/tracked-dispatch [::wfx/push   :default
                                                                                             {:kind       :delete-thread
                                                                                              :thread-id  t
@@ -398,7 +398,7 @@
                                                            :child (if running? "**running**" (str (or summy t)))]
                                                           [re-com/box
                                                            :child (str msg-count)]]])])
-                               
+
                                [re-com/h-box
                                 :justify :between
                                 :style {:font-size "13px" :opacity 0.6}
@@ -443,7 +443,7 @@
     [re-com/box
      ;;:attr (when speaking? {:id "chat-v-box1"})
      :style (if speaking?
-              ;;{:border "1px solid red"} 
+              ;;{:border "1px solid red"}
               {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 23)
                :color (theme-pull :theme/editor-outer-rim-color nil)
                :text-shadow "2px 1px 3px #000000"
@@ -568,7 +568,7 @@
                                                   ;(reset! disabled? false)
                                                   (reset! db/hide-annotate? false)
                                                   (let [;;ww @(ut/tracked-subscribe_ [::subs/w])
-                                                        client-name @(ut/tracked-sub ::bricks/client-name {})
+                                                        client-name db/client-name
                                                                           ;;macro-undo-limit (Math/floor (/ ww 180))
                                                         client-name-str (cstr/replace (str client-name) ":" "")
                                                         macro-undos    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (str "client/macro-undo-map>" client-name-str))]})
@@ -576,7 +576,7 @@
                                                     (reset! db/chat-image ll))) 6000))
                     :active? false ;macro-undo?
                     :color "#ffffff"}]
-                  
+
                   (when (not no-selected?)
                     [custom-icon-button
                      {:icon-name "ri-shapes-line"
@@ -589,7 +589,7 @@
                                                      ;(reset! disabled? false)
                                                     (reset! db/hide-annotate? false)
                                                     (let [;;ww @(ut/tracked-subscribe_ [::subs/w])
-                                                          client-name @(ut/tracked-sub ::bricks/client-name {})
+                                                          client-name db/client-name
                                                           ;;macro-undo-limit (Math/floor (/ ww 180))
                                                           client-name-str (cstr/replace (str client-name) ":" "")
                                                           panel-key-str (cstr/replace (str selected-block) ":" "")
@@ -614,16 +614,16 @@
        :height "50px"
        :size "none"
        :justify :center ;:between
-       :align :center 
+       :align :center
        :children [
-                  
+
                   [custom-icon-button
                    {:icon-name "ri-pie-chart-box-line"
                     :tooltip "send canvas and block metadata"
                     :on-click #(swap! client-metadata? not)
                     :active? @client-metadata?
                     :color (if @client-metadata? (theme-pull :theme/editor-outer-rim-color nil) "#ffffff")}]
-                  
+
                   (when voices-enabled?
                     [custom-icon-button
                      {:icon-name "ri-speak-line"
@@ -631,15 +631,15 @@
                       :on-click #(swap! speak? not)
                       :active? @speak?
                       :color (if @speak? (theme-pull :theme/editor-outer-rim-color nil) "#ffffff")}])
-                  
+
                   [custom-icon-button
                    {:icon-name "ri-timeline-view"
                     :tooltip "display timestamps"
                     :on-click #(swap! timestamps? not)
                     :active? @timestamps?
                     :color (if @timestamps? (theme-pull :theme/editor-outer-rim-color nil) "#ffffff")}]
-                  
-                  
+
+
                   ]]
 
       ;; [re-com/box
@@ -670,7 +670,7 @@
       (let [;subs @(ut/tracked-sub ::get-thread-subs {})
             workers-map @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:ai-worker/config>client]})
             selected-worker-map (get workers-map selected-worker)
-            client-name @(ut/tracked-sub ::bricks/client-name {})
+            client-name db/client-name
             selected-thread @(ut/tracked-sub ::selected-ai-worker-thread {})
             panel-height (- panel-height 175) ;;; subtract header height
             ;;_ (ut/tapp>> [:subs selected-thread subs])
@@ -727,7 +727,7 @@
          [[re-com/v-box
            :size "auto" :padding "5px"
            :height "79px"
-           :style {;:border "1px solid red" 
+           :style {;:border "1px solid red"
                    ;:background "#00000011"
                    }
            :justify :center
@@ -751,10 +751,10 @@
                        :height "43px"
                        :style {:font-size "14px"
                                :font-weight 700
-                               ;:border "1px solid yellow" 
+                               ;:border "1px solid yellow"
                                ;:border-bottom "1px solid #00000055"
                                :overflow "hidden"}
-                       :align (if (nil? thread-name) :center  :start) 
+                       :align (if (nil? thread-name) :center  :start)
                        :justify :center
                        :child (str (or thread-name "New Thread"))]]]
           [re-com/box
@@ -802,7 +802,7 @@
                                               :border-radius "12px"
                                               :margin-top "20px"
                                               :opacity 0.7})
-                                           (when (odd? idx)  ;;(= role "assistant") 
+                                           (when (odd? idx)  ;;(= role "assistant")
                                              {:border-radius "12px"
                                               :background-color (str (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil)) 15)})
                                            (when (= event-type "start-thread")
@@ -815,7 +815,7 @@
                                                :padding "5px"
                                                :style {:font-weight 700}
                                                :children
-                                               [[re-com/box :child (let [role (cond (= event-type "tool_result") "rabbit" 
+                                               [[re-com/box :child (let [role (cond (= event-type "tool_result") "rabbit"
                                                                                     (= role "assistant") selected-worker
                                                                                 :else role)]
                                                                      (-> (str (if (cstr/starts-with? (str event-type) "user-")
@@ -920,7 +920,7 @@
                                                  :align :center
                                                  :justify :between
                                                  :style {:padding-right "3px"}
-                                                 :children [[re-com/box 
+                                                 :children [[re-com/box
                                                              :width "400px"
                                                              :padding "8px"
                                                              :child (str (get content :description))]
@@ -964,7 +964,7 @@
                                                                            (first (cstr/split (str content) "CLIENT-METADATA"))
                                                                            (catch :default _ (str content)))])
 
-                                              (when (and 
+                                              (when (and
                                                      @timestamps?
                                                      (and
                                                      (not= event-type "user-image")
@@ -1000,7 +1000,7 @@
 
 (re-frame/reg-sub
  ::get-thread-subs
- (fn [db _] 
+ (fn [db _]
    (let [flow-subs (get db :flow-subs)
          selected-worker (get db :selected-ai-worker)
          ai-worker-subs (filterv #(cstr/starts-with? (str %) (str ":ai-worker/" selected-worker)) flow-subs)]
@@ -1011,10 +1011,10 @@
  (fn [db _]
    (get db :worker-drop-down? false)))
 
-(re-frame/reg-event-db 
- ::toggle-worker-drop-down 
- (fn [db _] 
-   (assoc db :worker-drop-down? (not (get db :worker-drop-down? false))))) 
+(re-frame/reg-event-db
+ ::toggle-worker-drop-down
+ (fn [db _]
+   (assoc db :worker-drop-down? (not (get db :worker-drop-down? false)))))
 
 (re-frame/reg-sub
  ::ai-workers
@@ -1034,7 +1034,7 @@
 (re-frame/reg-event-db
  ::select-ai-worker
  (fn [db [_ worker-name & [thread-id]]]
-   (if thread-id 
+   (if thread-id
      (-> db
          (assoc :selected-ai-worker-thread thread-id)
          (assoc :selected-ai-worker worker-name))
@@ -1077,7 +1077,7 @@
         panel-width     600
         selected-block  @(ut/tracked-subscribe [::bricks/selected-block])
         selected-view   @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
-        client-name     @(ut/tracked-sub ::bricks/client-name {})
+        client-name     db/client-name
         audio-playing?  @(ut/tracked-subscribe [::audio/audio-playing?])
         hh              @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when
         ww              @(ut/tracked-subscribe [::subs/w])
@@ -1139,14 +1139,14 @@
                     [[re-com/h-box :children
                       [
                        [re-com/md-icon-button :style
-                        {:font-size "15px" 
+                        {:font-size "15px"
                          :margin-top "2px"
-                         :width "35px"} 
+                         :width "35px"}
                         :on-click #(ut/tracked-dispatch [::select-ai-worker nil])
                         :md-icon-name "ri-team-line"]
 
                        [re-com/box :child
-                        [re-com/h-box 
+                        [re-com/h-box
                          :style {:font-weight 700}
                          :children
                          [[re-com/box :child " :ai-worker/ " :style {}]
@@ -1158,16 +1158,16 @@
                         :padding "4px"]
                        [re-com/md-icon-button :style
                         {;:font-size "13px" :margin-top "-16px"
-                         :width "28px"} :on-click #(ut/tracked-dispatch [::toggle-worker-drop-down]) 
+                         :width "28px"} :on-click #(ut/tracked-dispatch [::toggle-worker-drop-down])
                         :md-icon-name (if worker-drop-down? "zmdi-chevron-up" "zmdi-chevron-down")]
                        ]]
-                     [re-com/md-icon-button 
-                      :md-icon-name "zmdi-window-minimize" 
+                     [re-com/md-icon-button
+                      :md-icon-name "zmdi-window-minimize"
                       :on-click #(ut/tracked-dispatch [::bricks/toggle-ai-worker])
                       :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}]
                      (when worker-drop-down?
-                       [worker-drop-down])  
-                     
+                       [worker-drop-down])
+
                      ]]]
                   :size "none"
                   :width "588px"
@@ -1176,11 +1176,11 @@
                           :background    (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
                           :border-radius "10px 10px 0px 0px"
                           :color         (theme-pull :theme/editor-outer-rim-color nil)}]
-                 
+
                  (if selected-worker
                    [top-chat-panel panel-height selected-worker]
                    [worker-start-panel panel-height])
-                 
+
                  ;[re-com/box :child "Chat Window"]
                  ;[re-com/box :child "Bottom Window Maybe"]
                  ]])]]))

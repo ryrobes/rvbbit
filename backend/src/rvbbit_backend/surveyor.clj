@@ -69,7 +69,7 @@
         database-version (jdbc/with-db-metadata [m db-conn] (jdbc/metadata-result (.getDatabaseProductVersion m)))
         connection-str   (jdbc/with-db-metadata [m db-conn] (jdbc/metadata-result (.getURL m)))
         conn-id          (str (cstr/replace (cstr/lower-case (last (cstr/split f-name #"/"))) ".edn" ""))
-        conn-id          (if (cstr/ends-with? (cstr/lower-case conn-id) ".csv") "imported" conn-id)] ;; bizarre
+        conn-id          (if (cstr/ends-with? (cstr/lower-case conn-id) ".csv") "imported" conn-id)]
     {:user_name        user-name
      :database_name    database-name
      :database_version database-version
@@ -89,12 +89,12 @@
                       {[conn-type conn-id (:table_type table-map)
                         (if (nil? (:table_schem table-map)) "none" (:table_schem table-map)) (:table_cat table-map)
                         (:table_name table-map) (:column_name field)]
-                         {:column_type (:type_name field) 
+                         {:column_type (:type_name field)
                           ;;:meta_ddl_gen (jt/instant)
                           }}))))))
 
 (defn db-typer-fn [db-conn]
-  (try 
+  (try
     (get (jdbc-connect-meta db-conn "test") :database_name "Unknown")
     (catch Exception _ "Error")))
 

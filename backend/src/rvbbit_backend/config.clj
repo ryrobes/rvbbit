@@ -5,6 +5,7 @@
    [puget.printer   :as puget]
    [clojure.edn     :as edn]
    [clojure.java.io :as io]
+   ;;[rvbbit-backend.util :as ut]
    [clojure.string  :as cstr]))
 
 (defonce settings-atom (atom {}))
@@ -42,11 +43,11 @@
 ;;                      (catch Exception _
 ;;                        {:no-secrets-file-found-at sec-edn}))
 ;;         ;; validated {:openai (when (get (list-models) :data))}
-;;         openai-models (get (ass/oai-call {:url "https://api.openai.com/v1/models" :method :get} 
+;;         openai-models (get (ass/oai-call {:url "https://api.openai.com/v1/models" :method :get}
 ;;                                          (get secrets :openai-api-key) (get secrets :openai-org-id)) :data)
-;;         models-valid? (true? (and (vector? openai-models) 
-;;                                   (not-empty openai-models) 
-;;                                   (contains? (first openai-models) :id) 
+;;         models-valid? (true? (and (vector? openai-models)
+;;                                   (not-empty openai-models)
+;;                                   (contains? (first openai-models) :id)
 ;;                                   (contains? (first openai-models) :created)))
 ;;         settings-map (merge config secrets {:openai-valid? models-valid?})]
 ;;     (reset! settings-atom settings-map)
@@ -135,6 +136,7 @@
                                   (contains? (first openai-models) :id)
                                   (contains? (first openai-models) :created)))
         settings-map (merge config secrets {:openai-valid? models-valid?})]
+    ;; (ut/pp [:diff (=  @settings-atom settings-map)])
     (reset! settings-atom settings-map)
     settings-map))
 
@@ -152,17 +154,17 @@
 ;;                {:name "Ryan7" :year "0078"}
 ;;                {:name "Ryan8" :year "001978"}])
 
-;; data cleaner, partiion all value , data, and a clean command 
+;; data cleaner, partiion all value , data, and a clean command
 ;; (pp (ass/oai-call {:url "https://api.openai.com/v1/chat/completions"
 ;;                    :method :post
 ;;                    :body {:model "gpt-4o"
 ;;                           :messages [{:role "system"
-;;                                       :content (str "You are a data cleaner. You are given a dataset and instructions, 
-;;                                                      you will not respond to anything, you will just clean the data and return it as valid Clojure EDN. 
-;;                                                           Do NOT send backticks or language identifiers, JUST the EDN structure please. 
+;;                                       :content (str "You are a data cleaner. You are given a dataset and instructions,
+;;                                                      you will not respond to anything, you will just clean the data and return it as valid Clojure EDN.
+;;                                                           Do NOT send backticks or language identifiers, JUST the EDN structure please.
 ;;                                                      The instructions are: 'Fix the YEAR col - make a guess if you have to with the information given.
 ;;                                                      If a range is given, pick something in the middle - just make a reasonable assumption as to what
-;;                                                      the user intended. If you CANNOT decide or there is not enough information, 
+;;                                                      the user intended. If you CANNOT decide or there is not enough information,
 ;;                                                      use -1 as the answer for that column.'"
 ;;                                                     "here is the data: " (pr-str test-data))}]}}
 ;;                   (get (settings) :openai-api-key)
