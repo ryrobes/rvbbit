@@ -13,8 +13,8 @@
  ;:viz-shapes "./defs/viz-shapes.edn" ;; "./defs/viz-shapes-only-recharts.edn"
  :viz-shapes "./defs/viz-shapes-only-recharts.edn"
  ;:default "./screens/frost-terminal2.edn"
- ;:default "./screens/winter-theme-hybrid.edn"
- :default "screens/ecto-cooler-shade.edn"
+ :default "./screens/winter-theme-hybrid.edn"
+ ;:default "screens/ecto-cooler-shade.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
  ;;    if this screen can't be read or is nil, you will get a basic blank screen with a default theme
  :harvest-on-boot? true

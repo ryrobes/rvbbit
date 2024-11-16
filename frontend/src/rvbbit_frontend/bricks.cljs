@@ -998,14 +998,14 @@
 
 
 (re-frame/reg-sub
- ::get-flow-subs ;; TODO, this could probably be cached based on panel-key hashes which we already have... but there are some recombinator side effects to fix first.. with delayed subs we then iterate on
+ ::get-flow-subs-stub ;; TODO, this could probably be cached based on panel-key hashes which we already have... but there are some recombinator side effects to fix first.. with delayed subs we then iterate on
  (fn [db {:keys [all?]}]
    []
  ))
 
 
 (re-frame/reg-sub
- ::get-flow-subs-stub ;; TODO, this could probably be cached based on panel-key hashes which we already have... but there are some recombinator side effects to fix first.. with delayed subs we then iterate on
+ ::get-flow-subs ;; TODO, this could probably be cached based on panel-key hashes which we already have... but there are some recombinator side effects to fix first.. with delayed subs we then iterate on
  (fn [db {:keys [all?]}]
    ;(try
      (let [selected-block        (get db :selected-block)
