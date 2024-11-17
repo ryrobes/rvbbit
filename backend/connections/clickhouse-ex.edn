@@ -7,4 +7,7 @@
  :connection-init-sql "USE default"
  :connection-timeout 5000
  :maximum-pool-size 20
+ :pre-filter-fn (fn [m] (and (not= (get m :db-schema) "system")
+                             (not= (get m :db-schema) "INFORMATION_SCHEMA")
+                             (not= (get m :db-schema) "information_schema")))
  :max-lifetime 300000}

@@ -358,6 +358,7 @@
                               target-deep-keypath-sel new-select}))
            :new-select.all.count (fn [{:keys [drag-meta]}]
                                    (let [{:keys [connection-id type source-table table-fields]} drag-meta
+                                         table-fields (vec (distinct table-fields))
                                          op :*arg
                                          sub-query? (= type :query)
                                          all? (= op :all)

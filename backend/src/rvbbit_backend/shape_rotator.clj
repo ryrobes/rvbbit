@@ -134,7 +134,8 @@
                         :else (edn/read-string (slurp f-path)))
         poolable? (try (and (map? conn) (find conn :jdbc-url)) (catch Exception _ false))
         conn      (if poolable?
-                    (try {:datasource @(pool-create conn (str conn-name "-pool"))}
+                    (try {:pre-filter-fn (get conn :pre-filter-fn)
+                          :datasource @(pool-create conn (str conn-name "-pool"))}
                          (catch Exception e (do (ut/pp [:connection-error conn-name e]) {:datasource nil})))
                     conn)]
     (swap! db/conn-map assoc conn-name conn)
@@ -324,7 +325,10 @@
                                                                                                    [(dissoc base-query :order-by) :subq1]
                                                                                                    (keyword (get field-map :table-name)))} sql-map)
                                                  runnable? (= [{:1 1}] (cached-sql-query ghost-db (to-sql {:select [1] :where (or when-where [:= 1 1])})))
-                                                 vval (if runnable? (cached-sql-query conn (to-sql sql-map-resolved)) nil)]
+                                                 vval (if runnable?
+                                                        (if (= fname "*") ;; for row count
+                                                          (sql-query conn (to-sql sql-map-resolved) {:extra [:shape-test shape-key] :no-error? true})
+                                                          (cached-sql-query conn (to-sql sql-map-resolved))) nil)]
                                              {shape-key (if (get-in vval [0 :database_says]) ;; indicates sql error, return nil for now
                                                           nil
                                                           (if fetch-one?
@@ -453,10 +457,14 @@
             (assoc m :is-group-by? is-group-by?))) field-maps))
 
 (defn insert-into-fields [field-maps]
-  (let [context-grouped (group-by :context field-maps)]
-    (doseq [[k field-maps1] context-grouped]
-      (let [;_ (ut/pp [:inserting-fields-h2-context k])
-            _ (sql-exec systemh2-db (to-sql {:delete-from [:fields] :where [:= :context (str k)]}))
+  (let [context-grouped (group-by (fn [m] [(get m :context) (get m :table-type)]) field-maps)]
+    (doseq [[[k ttype] field-maps1] context-grouped]
+      (let [_ (ut/pp ["🦁" :inserting-fields-h2-context! [k ttype] (count field-maps1)])
+            _ (sql-exec systemh2-db
+                        (to-sql {:delete-from [:fields]
+                                 :where [:and
+                                         [:= :context (str k)]
+                                         [:= :table_type (str ttype)]]}))
             ;fm-hash (hash field-maps1)
             res (walk/postwalk-replace {:is-group-by? :is-group-by
                                         :measure? :is-measure
@@ -517,6 +525,7 @@
       (let [result
             (let [conn (if (map? f-path) f-path (get-or-create-db-pool f-path))
                   f-path (if (map? f-path) "" f-path)
+                  ;;connection-id (get-connection-id f-path)
                   connection-id (get (cset/map-invert @db/conn-map) conn)
                   ;;_ (swap! db/shape-rotation-status assoc-in [connection-id :started] (System/currentTimeMillis))
                   connect-meta (get-jdbc-db-meta conn f-path)
@@ -524,12 +533,21 @@
                                (add-query-attributes
                                 (create-query-field-vectors conn connect-meta (first (to-sql honey-sql)) query-name) honey-sql)
                                (create-target-field-vectors conn connect-meta))
+                  field-maps (pmapv #(assoc % :connection-id connection-id) field-maps)
+                  ;; _ (ut/pp [:sniff (first field-maps)])
                   ;;field-maps field-maps ;; filter out system
                   _ (when (nil? honey-sql)
-                      (swap! db/shape-rotation-status assoc-in [connection-id :all :fields] (count field-maps)))
+                      (swap! db/shape-rotation-status assoc-in [connection-id :all :fields] (count field-maps))
+                      (swap! db/shape-rotation-status assoc-in [connection-id :all :tables] (count (distinct (mapv :table-name field-maps)))))
                   field-maps (into [] (pmapv #(assoc % :table-type (-> (get % :table-type) cstr/lower-case keyword)) field-maps))
-                  field-maps (if pre-filter-fn (filterv pre-filter-fn field-maps) field-maps)
-                  field-maps (pmapv #(assoc % :connection-id connection-id) field-maps)
+                  field-maps (if (list? pre-filter-fn)
+                               (try (filterv (eval pre-filter-fn) field-maps)
+                                    (catch Exception e (do (ut/pp [:get-fields-pre-filter-fn-error! (str pre-filter-fn) (str e) e {:sample-map (first field-maps)}])
+                                                           field-maps)))
+                               field-maps)
+                  field-maps (mapv (fn [m] (assoc m :db-catalog (if (= (get m :connection-id) (get m :db-catalog)) nil (get m :db-catalog)))) field-maps)
+                  ;; ^^ odd workaround for system H2 db metadata strangeness
+
                   with-shape-tests (add-shape-tests field-maps conn shape-test-defs honey-sql)
                   with-shape-attribs (add-shape-attributes with-shape-tests shape-attributes-defs)
                   context-juxt (juxt :connection-id :db-catalog :db-schema :table-name)
@@ -643,41 +661,14 @@
 ;;                          ; combo-viz (materialize-viz-shape res (first combos) viz-shapes)
 ;;                           ;combo-viz (materialize-viz-shapes combos res viz-shapes)
 ;;                           ;combo-viz (get-viz-shape-blocks res viz-shapes)
-;;                           ff (walk/postwalk-replace {:is-group-by? :is-group-by
-;;                                                      :measure? :is-measure
-;;                                                      :dimension? :is-dimension}
-;;                                                     (pmapv #(select-keys % [:database-name
-;;                                                                            :is-group-by?
-;;                                                                            :measure?
-;;                                                                            :sum-val
-;;                                                                            :dimension?
-;;                                                                            :data-type
-;;                                                                            :field-type
-;;                                                                            :example-value
-;;                                                                            :honey-hash
-;;                                                                            :total-rows
-;;                                                                            :user-name
-;;                                                                            :field-name
-;;                                                                            :distinct-count
-;;                                                                            :db-schem
-;;                                                                            :parent-table-name
-;;                                                                            :max-val
-;;                                                                            :db-catalog
-;;                                                                            :database-version
-;;                                                                            :context-key
-;;                                                                            :context
-;;                                                                            :connection-id
-;;                                                                            :table-name
-;;                                                                            :table-type
-;;                                                                            :avg-val
-;;                                                                            :min-val]) res))
+
 ;;                           ]
 ;;                       ;[res combos (count res) (count combos) combos combo-viz ]
 ;;                       ;(count res)
 ;;                       ;[combo-viz (count res) (count combo-viz)]
 ;;                       ;combo-viz
 
-;;                       (keys (first ff))
+;;                       res
 ;;                       )] {:width 120})
 
 

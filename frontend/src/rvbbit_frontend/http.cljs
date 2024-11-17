@@ -852,7 +852,8 @@
 
               counts? (let [;emeta-map (get-in db [:meta ui-keypath])
                             ss              (get result :status)
-                            post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))]
+                            post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))
+                            _ (ut/pp [:counts-incoming (get ss :*) ui-keypath ss post-meta-shape])]
                         (-> db
                             (assoc-in [:post-meta ui-keypath] post-meta-shape)))
 

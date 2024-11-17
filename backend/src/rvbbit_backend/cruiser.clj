@@ -53,23 +53,27 @@
         (boolean? v) "boolean"
         :else        "unknown"))
 
-(def filter-db
-  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
-                              :jdbc-url    "jdbc:sqlite:file:./db/filter.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
-                              :cache       "shared"}
-                             "filter-db")})
+;; (def filter-db
+;;   {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+;;                               :jdbc-url    "jdbc:sqlite:file:./db/filter.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               :cache       "shared"}
+;;                              "filter-db")})
 
-(def filter-db2
-  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter2.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
-                              :jdbc-url    "jdbc:sqlite:file:./db/filter2.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
-                              :cache       "shared"}
-                             "filter-db2")})
+;; (def filter-db2
+;;   {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter2.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+;;                               :jdbc-url    "jdbc:sqlite:file:./db/filter2.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               :cache       "shared"}
+;;                              "filter-db2")})
 
-(def filter-db3
-  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter3.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
-                              :jdbc-url    "jdbc:sqlite:file:./db/filter3.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
-                              :cache       "shared"}
-                             "filter-db2")})
+;; (def filter-db3
+;;   {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter3.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+;;                               :jdbc-url    "jdbc:sqlite:file:./db/filter3.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;                               :cache       "shared"}
+;;                              "filter-db2")})
+
+(def filter-db nil)
+(def filter-db2 nil)
+(def filter-db3 nil)
 
 (defn rowset-sql-query ;; [rowset query & columns-vec]
   "takes a 'rowset' (vector of uniform maps) or a vector with a vector of column names

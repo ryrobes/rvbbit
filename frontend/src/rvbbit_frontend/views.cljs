@@ -2275,12 +2275,16 @@
 
 ;; (ut/tapp>> [:ns @(ut/tracked-sub ::local-namespaces-for {:runner-key :clojure})])
 
+(def search-mode {:description "Search Rabbit for Tables, Fields, Viz" :icon "images/large-rabbit.svg" :syntax "text" :type "n/a" :name :rabbit-search})
+
 (defonce base-hop-bar-runner (merge (select-keys ;; set default to clover ("views")
                                  (get @(ut/tracked-sub ::bricks/hop-bar-runners {}) :views)
                                  [:icon :description :type :syntax])
-                                    {:name :clover
-                                     :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
-                                     :icon "🍀"}))
+                                    ;; {:name :clover
+                                    ;;  :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
+                                    ;;  :icon "🍀"}
+                                    search-mode
+                                    ))
 
 (defonce selected-mode (reagent/atom base-hop-bar-runner))
 
@@ -2502,7 +2506,7 @@
                                                    (reset! history-index new-index)
                                                    (.setValue cm (nth (vec @console-history) new-index)))))})}}]])))
 
-(def search-mode {:description "Search Rabbit for Tables, Fields, Viz" :icon "images/large-rabbit.svg" :syntax "text" :type "n/a"})
+
 
 (defn cycle-mode [current-mode]
   (let [modes           (assoc @(ut/tracked-sub ::bricks/hop-bar-runners {}) :rabbit-search search-mode)
@@ -2822,12 +2826,12 @@
         item-walk (merge
                    {[[:sum :rrows]] [:count 1]}
                    (into {} (for [idx (range (count item-paths))] {(get-in reco-items [idx 1]) (get-in item-paths [idx 1])})))]
-    (ut/pp [:reco-converted (str (get-in reco-map [:shape-rotator :axes]) " " (get-in reco-map [:shape-rotator :shape-name]))])
+    ;;(ut/pp [:reco-converted (str (get-in reco-map [:shape-rotator :axes]) " " (get-in reco-map [:shape-rotator :shape-name]))])
     (walk/postwalk-replace item-walk reco-map)))
 
 (def rotate-waiter (reagent/atom {}))
 
-(defn shape-rotator-panel [panel-key shape-rotator-meta & [hh ww]]
+(defn shape-rotator-panel-old [panel-key shape-rotator-meta & [hh ww]]
   (let [{:keys [context shape-name axes items source-panel]} shape-rotator-meta
         {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         react! [@rotate-waiter]
@@ -2953,6 +2957,160 @@
                                                                                     ;:style {:margin-top "2px"}
                                                        ]
                                                       [re-com/box :child " "]]])])]]]])]]]))
+
+(defonce shape-rotator-drawers (reagent/atom {}))
+
+(defn shape-rotator-panel [panel-key shape-rotator-meta & [hh ww]]
+  (let [{:keys [context shape-name axes items source-panel]} shape-rotator-meta
+        {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+        react! [@rotate-waiter @shape-rotator-drawers]
+        single-height (or hh single-height)
+        single-width (or ww single-width)
+        shape-rotations @(ut/tracked-sub ::bricks/shape-rotations {:panel-key panel-key})
+        {:keys [options recos shapes]} shape-rotations
+        recos-map (into {} (for [r recos] {(get-in r [:shape-rotator :axes]) r}))
+        converted-recos-map (into {} (for [[reco-key reco] recos-map] {reco-key (convert-reco-to-insert reco items)}))
+        ;_ (ut/pp [:recos items recos-map])
+        ;_ (ut/pp [:resolved-recos ])
+        _ (ut/pp [:options options])
+        mod-map (assoc options :*shapes shapes)
+        cols (count (keys mod-map))
+        col-width (Math/floor (/ (- single-width 20) cols))
+        options (into (sorted-map) mod-map)
+        c (theme-pull :theme/editor-outer-rim-color nil)
+        ccolors (ut/tetrads c)
+        ccolors1 (ut/split-complements c)
+        colors (vec (disj (set (into ccolors ccolors1)) c))
+        ;; _ (ut/pp  [:tet  (disj (set (into ccolors ccolors1)) c)])
+        ]
+    (when (empty? shape-rotations)
+      (ut/tracked-dispatch [::request-shape-rotation-options context shape-name panel-key source-panel]))
+    [re-com/box
+     :height (px (- single-height 75))
+     :width (px single-width)
+     :padding "15px"
+     :size "none"
+     :style {:overflow "auto"}
+     :child
+     [re-com/v-box
+      :size "auto"
+      :gap "6px"
+      :children
+      (for [[k v] options
+            :let [open? (get @shape-rotator-drawers k false)
+                  color-idx (mod (hash (str k)) (count colors))
+                  sec-color (nth colors color-idx)
+                  ffa (if (= (get axes k "...") "rrows") "(row count)" (get axes k "..."))
+                  ka (-> k str (cstr/replace "*" "") (cstr/replace ":" ""))]]
+        [re-com/v-box
+         :padding "6px"
+         :style {:border (str "2px solid " sec-color 66)
+                 :border-radius "6px"}
+         :children
+         [[re-com/h-box
+           :justify :between
+           :attr {:on-click #(swap! shape-rotator-drawers assoc k (not (get @shape-rotator-drawers k false)))}
+           :align :center
+           :height "30px"
+           :style {:font-size "16px" :color "#ffffff" :font-weight 700 :cursor "pointer"}
+           :children [(if open?
+                        [re-com/box
+                         :style {:color sec-color}
+                         :child (str ka)]
+                        [re-com/h-box
+                         :gap "12px"
+                         :children [[re-com/box
+                                     :style {:color sec-color}
+                                     :child (str ka)]
+                                    [re-com/box
+                                     :child (if (= k :*shapes)
+                                              (str shape-name)
+                                              (str ffa))]]])
+                      [re-com/md-icon-button
+
+                       :md-icon-name (if open? "zmdi-chevron-down" "zmdi-chevron-up")
+                       :style
+                       {:font-size "24px"
+                        :color "#ffffff"}]]]
+          ;[re-com/gap :size "5px"]
+          (when open?
+            [re-com/v-box
+             :size "auto"
+             :children
+             (for [f v
+                   :let [selected? (or (= (get axes k) f) (= shape-name f))
+                         fa (if (= f "rrows") "(row count)" f)]]
+               [re-com/box
+                :padding "5px"
+                :size "auto"
+                :attr (when (not selected?)
+                        (if (= k :*shapes)
+                          {:on-click (fn []
+                                       (let [k :*shapes
+                                             _ (swap! rotate-waiter assoc-in [k f] true)
+                                             _ (js/setTimeout
+                                                (fn []
+                                                  (let [shape-rotations @(ut/tracked-sub ::bricks/shape-rotations {:panel-key panel-key})
+                                                        {:keys [options recos shapes]} shape-rotations
+                                                        recos-map (into {} (for [r recos] {(get-in r [:shape-rotator :axes]) r}))
+                                                        converted-recos-map (into {} (for [[reco-key reco] recos-map] {reco-key (convert-reco-to-insert reco items)}))
+                                                        new-axes (rand-nth (keys converted-recos-map))
+                                                        new-map (get converted-recos-map new-axes)
+                                                        _ (ut/pp [:opts f (rand-nth (keys converted-recos-map)) :new-axes new-axes])
+                                                        assocs-map (into {} (for [kp items] {(into [:panels panel-key] kp) (get-in new-map kp)}))
+                                                        assocs-map (assoc assocs-map [:panels panel-key :shape-rotator :axes] new-axes)
+                                                        assocs-map (assoc assocs-map [:panels panel-key :name] (cstr/join ", " (vals new-axes)))
+                                                        assocs-map (assoc assocs-map [:panels panel-key :shape-rotator :shape-name] f)]
+                                                    (ut/pp [:delayed-assocs-map assocs-map])
+                                                    (ut/tracked-dispatch [::http/assoc-push-undoable assocs-map])
+                                                    (swap! rotate-waiter assoc-in [k f] false))) 3400)]
+                                         (ut/tracked-dispatch [::request-shape-rotation-options context f panel-key source-panel])
+                                         (ut/tracked-dispatch [::http/assoc-push-undoable {[:panels panel-key :shape-rotator :shape-name] f
+                                                                                           [:panels panel-key :shape-rotator :axes] {}}])))}
+                          {:on-click #(let [_ (swap! rotate-waiter assoc-in [k f] true)
+                                            _ (js/setTimeout (fn [] (swap! rotate-waiter assoc-in [k f] false)) 2000)
+                                            new-axes (assoc axes k f)
+                                            _ (ut/pp [:rotating panel-key shape-name :from axes new-axes])
+                                            new-map (get converted-recos-map (assoc axes k f))
+                                            assocs-map (into {} (for [kp items] {(into [:panels  panel-key]  kp) (get-in new-map kp)}))
+                                            assocs-map (assoc assocs-map [:panels panel-key :name] (cstr/join ", " (vals new-axes)))
+                                            assocs-map (assoc assocs-map [:panels panel-key :shape-rotator :axes] new-axes)
+                                            _ (ut/pp [:ss shape-name assocs-map converted-recos-map])]
+                                        (ut/tracked-dispatch [::http/assoc-push-undoable assocs-map]))}))
+                :style (merge {:font-size "14px"} ;{:border "1px solid #ffffff25"}
+                              (if selected?
+                                {:color "#ffffff"
+                                 ;:border (str "1px solid " sec-color 44)
+                                 :background-color (str sec-color 22)
+                                 :border-radius "10px"
+                                 :font-weight 700}
+                                {:cursor "pointer"
+                                 :color "#ffffff78"}))
+                :height "30px"
+                :child (if (get-in @rotate-waiter [k f] false)
+                         [re-com/h-box
+                          :gap "10px"
+                          :height "25px"
+                          :align :center :justify :between
+                                          ;:style {:filter "brightness(200%)"}
+                          :children
+                          [[re-com/box :child (str fa)]
+                           [re-com/md-icon-button
+                            :md-icon-name "ri-box-3-line"
+                            :class "rotate linear infinite"
+                            :style
+                            {:font-size "14px"
+                             :color "#ffffff"
+                             :transform-origin "7px 11px"}]]]
+                         [re-com/h-box
+                          :gap "10px"
+                          :height "25px"
+                          :align :center
+                          :children
+                          [[re-com/box :child (str fa)
+                                                                                                  ;:style {:margin-top "2px"}
+                            ]
+                           [re-com/box :child " "]]])])])]])]]))
 
 (defn editor-panel
   [bricks-wide bricks-tall]
@@ -5032,7 +5190,7 @@
                  :align :center
                  :children
                  [[re-com/h-box
-                   :children (vec (for [e [:help :client :system :reactor :pools :clients :sql-sizes]]
+                   :children (vec (for [e [:help :client :system :reactor :pools :clients :sql-sizes :db-shape-rotator]]
                                     [re-com/box
                                      :attr {:on-click #(reset! selected-stats-page e)}
                                      :style {:color (if (= e @selected-stats-page) "cyan" "white")
@@ -5233,9 +5391,24 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":system-stats" :bright-cyan) ;; :solvers :nrepl-calls :websockets
-                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 5.66)) true)
-                         ;(draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls :websockets :load] [15] false 200 true)
-                         )))}
+                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 5.66)) true))))}
+
+         (= @selected-stats-page :db-shape-rotator)
+         {:signal false
+          :cache? false
+          :type :clojure
+          :input-map {}
+          :data '(do (ns rvbbit-backend.websockets)
+                     (let [tt :tt]
+                       (with-out-str
+                         (fig-render ":db-shape-rotator" :bright-cyan) ;; :solvers :nrepl-calls :websockets
+                         (rvbbit-backend.util/pp
+                          (into {} (for [[k v] (deref rvbbit-backend.db/shape-rotation-status)
+                                         :let [vv (get v :all)]]
+                                     {k (-> vv
+                                            (assoc :time-taken (rvbbit-backend.util/format-duration-seconds (try (/ (- (get vv :ended) (get vv :started)) 1000) (catch Exception _ -1))))
+                                            (assoc :started (try (rvbbit-backend.util/ms-to-iso8601 (get vv :started)) (catch Exception _ -1)))
+                                            (assoc :ended (try (rvbbit-backend.util/ms-to-iso8601 (get vv :ended (System/currentTimeMillis))) (catch Exception _ -1))))}))))))}
 
          (= @selected-stats-page :queues)
          {:signal false
@@ -7050,12 +7223,6 @@
                            ]))
 
 
-(defn main-panel2 []
-     (let [_ (ut/pp [:mount-rooddddtd?])]
-       [re-com/box :child "fart fax!"]
-       )
-  )
-
 (defn main-panel []
   (let [editor? (and @(ut/tracked-subscribe_ [::bricks/editor?])
                      (not @db/fresh-spawn-modal?)
@@ -7166,7 +7333,7 @@
        :attr {:id              "base-canvas"
               :on-click        #(do (reset! bricks/over-block? false)
                                     (reset! db/bar-hover-text nil)
-                                    (reset! bricks/over-block nil)
+                                    ;(reset! bricks/over-block nil)
                                     (reset! db/last-mouse-activity (js/Date.))
                                     (reset! bricks/over-flow? false))
               :on-drag-over    #(bricks/tag-screen-position %)

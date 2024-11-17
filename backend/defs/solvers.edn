@@ -96,6 +96,15 @@
                                            :from          [[:offenses :pp251]]
                                            :page          -4
                                            :connection-id "boston-crime"}}
+ :refresh-clickhouse-ex {:signal :signal/daily-at-9am
+                         :type   :clojure
+                         :cache? false
+                         :data   (do (ns rvbbit-backend.cruiser
+                                       (:require [rvbbit-backend.websockets :as wss]
+                                                 [rvbbit-backend.pool-party :as ppy]
+                                                 [rvbbit-backend.sql :as sql]))
+                                     (let [conn (get (deref db/conn-map) "clickhouse-ex")]
+                                       (shape-rotation-run "connections/clickhouse-ex.edn")))}
  :random-mp3
    {:signal :signal/changed-wallpaper?
     :type :clojure

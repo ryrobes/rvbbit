@@ -5055,7 +5055,7 @@
                              [re-com/box
                               :style {:font-size "13px"
                                       :font-weight 700}
-                              :child (if table? connection-id table-name)]]]]]]))
+                              :child (str (if table? connection-id table-name))]]]]]]))
 
 ;; (defn click-param-rows-vec
 ;;   [width-int height-int]

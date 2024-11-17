@@ -393,19 +393,27 @@
                          (update-screen-meta f-path)))
                     file-path)))
 
-(defn shape-rotation-run [f-path]
+(defn shape-rotation-run [f-path & [pre-filter-fn]]
   (let [connection-id (rota/get-connection-id f-path)
-        _ (ut/pp ["🎁" :running-full-shape-rotation-job (str f-path)])
+        _ (ut/pp ["🥩" :running-full-shape-rotation-job connection-id (str f-path)])
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] (System/currentTimeMillis))
+        conn-map (if (map? f-path) f-path (get @db/conn-map connection-id))
+        _ (sql-exec systemh2-db
+                  (to-sql {:delete-from [:fields] ;; clear last - in case a table was deleted (we clear each table before we add, but dont address orphans)
+                           :where [:= :connection_id (str connection-id)]}))
+        pre-filter-fn (when (= connection-id "systemh2-db") '(fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
+                                                                         (not= (get m :db-schema) "PG_CATALOG"))))
         res (rota/get-field-maps {:f-path f-path
                                   :shape-test-defs cruiser/default-sniff-tests
                                   :shape-attributes-defs cruiser/default-field-attributes
-                                  :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
-                                  :pre-filter-fn nil})
+                                  ;;:filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
+                                  :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
         combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)
-        _ (ut/pp ["🎁" :shape-rotator-fields [:fields (count res) :viz (count combo-viz)]])
+        _ (ut/pp ["🥩" :shape-rotator-fields [:fields (count res) :viz (count combo-viz)]])
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
+
+
 
 (defn db-sniff-solver-default [f-path conn-name]
   {:signal :signal/daily-at-9am
@@ -437,14 +445,27 @@
 ;; (ut/pp (db-sniff-solver-default "./connections/postgres.edn" "postgres"))
 ;; (ut/pp (keys @db/conn-map))
 ;; (ut/pp @db/shape-rotation-status)
+;; (shape-rotation-run systemh2-db)
+
+;; (wss/fig-render ":db-shape-rotator" :bright-cyan) ;; :solvers :nrepl-calls :websockets
+;; (ut/pp
+;;  (into {} (for [[k v] (deref rvbbit-backend.db/shape-rotation-status)
+;;        :let [vv (get v :all)]]
+;;    {k (-> vv
+;;           (assoc :time-taken (rvbbit-backend.util/format-duration-seconds (try (/ (- (get vv :ended) (get vv :started)) 1000) (catch Exception _ -1))))
+;;           (assoc :started (try (rvbbit-backend.util/ms-to-iso8601 (get vv :started)) (catch Exception _ -1)))
+;;           (assoc :ended (try (rvbbit-backend.util/ms-to-iso8601 (get vv :ended)) (catch Exception _ -1))))})))
+
+;; (rvbbit-backend.util/ms-to-iso8601 (System/currentTimeMillis))
 
 (defn update-all-conn-meta []
   (let [prefix "connections/"
         files  (ut/get-file-vectors-simple prefix ".edn")
-        current-conn-ids (vec (for [f files ;; remove "missing" DBs - TODO more robust archive and reappear
-                                    :let [f-path    (str prefix f)
-                                          conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))]]
-                                conn-name))]
+        ;; current-conn-ids (vec (for [f files ;; remove "missing" DBs - TODO more robust archive and reappear
+        ;;                             :let [f-path    (str prefix f)
+        ;;                                   conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))]]
+        ;;                         conn-name))
+        ]
     (doseq [f    files
             :let [f-path    (str prefix f)
                   conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))
@@ -462,7 +483,8 @@
                   conn      (edn/read-string (slurp f-path))
                   poolable? (try (and (map? conn) (find conn :jdbc-url)) (catch Exception _ false))
                   conn      (if poolable?
-                              (try {:datasource @(pool-create conn (str conn-name))}
+                              (try {:pre-filter-fn (get conn :pre-filter-fn)
+                                    :datasource @(pool-create conn (str conn-name))}
                                    (catch Exception e (do (ut/pp [:connection-error conn-name e]) {:datasource nil})))
                               conn)]]
       (try ;; connection errors, etc
@@ -487,7 +509,7 @@
                                             ;;                                                :pre-filter-fn nil})
                                             ;;                      combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)]
                                             ;;                  [:boot :fields (count res) :viz (count combo-viz)])]))
-                                             (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (shape-rotation-run f-path)))
+                                             (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (shape-rotation-run f-path)))
                                              ))))
         (catch Exception e (do (swap! db/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))
     ;; (cruiser/clean-up-some-db-metadata current-conn-ids)
@@ -986,7 +1008,7 @@
     (println " ")
     (ut/print-ansi-art "data/nname.ans")
     (ut/print-ansi-art "data/rrvbbit.ans")
-    (ut/pp [:version "0.2.0" :october 2024 "Yo."])
+    (ut/pp [:version "0.2.0" :november 2024 "Yo."])
     ;; (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
     (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   ;; (println " ")
@@ -1028,7 +1050,7 @@
     (sql-exec systemh2-db h2/create-realms)
     (sql-exec systemh2-db h2/create-fields)
     (sql-exec systemh2-db h2/create-fields-view)
-    (sql-exec systemh2-db h2/create-ft-index)
+    ;; (sql-exec systemh2-db h2/create-ft-index)
 
     (db/open-ddb) ;; start datalevin instance
 
@@ -1050,7 +1072,7 @@
     ;; (cruiser/create-sqlite-sys-tables-if-needed! systemh2-db)
 
     (when harvest-on-boot?
-      (update-all-conn-meta))
+      (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (update-all-conn-meta))))
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
@@ -1117,7 +1139,7 @@
       [system-db flows-db systemh2-db import-db metrics-kpi-db cache-db cache-db-memory realms-db history-db system-reporting-db])
 
     (doseq [db system-dbs]
-      (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (shape-rotation-run db))))
+      (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (shape-rotation-run db))))
 
     ;; (time (cruiser/lets-give-it-a-whirl-no-viz
     ;;        "system-db"
@@ -1624,7 +1646,7 @@
   ;; (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))
 
     (let [_ (ut/pp [:waiting-for-background-systems...])
-          _ (Thread/sleep 6000) ;; 10 enough? want everything cranking before clients come
+          ;;_ (Thread/sleep 6000) ;; 10 enough? want everything cranking before clients come
           _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))
           _ (start-services)
           _ (let [destinations (vec (keys @wss/client-queues))]

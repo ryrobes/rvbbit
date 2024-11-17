@@ -27,6 +27,7 @@
   [jdbc-body name]
   (delay (let [base  {:idle-timeout 600000 :max-lifetime 1800000 :pool-name name}
                bbase (merge base jdbc-body)
+               ;pre-filter-fn (get jdbc-body :pre-filter-fn)
                conn (hik/make-datasource bbase)]
            (swap! db/conn-map assoc name {:datasource conn})
            conn)))
@@ -94,8 +95,8 @@
   {:datasource
    @(pool-create
      {:jdbc-url
-      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=5000&locking_mode=NORMAL"
-      ;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
+      ;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=5000&locking_mode=NORMAL"
+      "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
       ;:idle-timeout      600000
       :maximum-pool-size  20  ;5 ;20 ;1 ;5 ;20
       ;:max-lifetime      1800000
@@ -110,6 +111,8 @@
       ;;:url   "jdbc:h2:file:./db/systemh2-db?MODE=PostgreSQL&DATABASE_TO_UPPER=false&AUTO_SERVER=TRUE&CACHE_SIZE=65536&COMPRESS=TRUE&WRITE_DELAY=500&PAGE_SIZE=4096"
       :username     "sa"
       :password     ""
+      ;; :pre-filter-fn (fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
+      ;;                             (not= (get m :db-schema) "PG_CATALOG")))
       ;:pool-name    "mvstore-pool"
       :maximum-pool-size 50}
      "systemh2-db")})
@@ -294,7 +297,7 @@
       :max-lifetime 1800000
       :auto_vacuum  "FULL"
       :cache        "shared"}
-     "imports-db-pool")})
+     "import-db")})
 
 (def mem-cache-db
   {:datasource
@@ -304,7 +307,7 @@
       ;;"jdbc:sqlite:file:./db/temp-cache.db?mode=memory&cache=shared&journal_mode=WAL"
       "jdbc:sqlite:file:./db/temp-cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
       :cache    "shared"}
-     "mem-cache-db-pool")})
+     "mem-cache-db")})
 
 (def realms-db
   {:datasource
@@ -313,7 +316,7 @@
       "jdbc:sqlite:file:./db/realms.db?mode=memory&cache=shared&journal_mode=WAL"
       ;;"jdbc:sqlite:file:./db/realms.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
       :cache    "shared"}
-     "realms-db-pool")})
+     "realms-db")})
 
 ;; (def realms-db
 ;;   {:datasource
@@ -333,7 +336,7 @@
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
-     "system-reporting-db-pool")})
+     "system-reporting-db")})
 
 ;;(def default-schema "base")
 (def cache-db
@@ -344,7 +347,7 @@
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
-     "cache-db-pool")})
+     "cache-db")})
 
 (def metrics-kpi-db
   {:datasource
@@ -354,7 +357,7 @@
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
-     "metrics-kpi-db-pool")})
+     "metrics-kpi-db")})
 
 (def cache-db-memory
   {:datasource
@@ -364,7 +367,7 @@
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
-     "cache-db-memory-pool")})
+     "cache-db-memory")})
 
 (defn insert-error-row-OLD! [error-db-conn query error]
   (jdbc/with-db-connection

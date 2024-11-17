@@ -1783,7 +1783,7 @@
         pkg {:options options
              :recos shape-recos
              :shapes all-shapes}]
-    (client-mutate client-name {[:shape-rotations panel-key] pkg})))
+    (client-mutate client-name {[:shape-rotations panel-key] pkg} true)))
 
 (defmethod wl/handle-push :warm-leaf-evals
   [{:keys [client-name work-targets drag-bodies]}]
@@ -1908,8 +1908,7 @@
     ;; clean up client/server state flags
     ;; (swap! db/leaf-drags-atom dissoc client-name) ;; clear the dragging keypath
     ;; (swap! db/leaf-atom assoc-in [client-name :actions] {})
-    fn-output
-    ))
+    fn-output))
 
 ;; (ut/pp [:dggg @db/leaf-brute-force-map])
 
@@ -1917,8 +1916,14 @@
   (let [[panel-key runner data-key _ field-name] dragged-kp]
     (when (= runner :queries)
       (when-let [done-shapes (get-in @db/shapes-result-map [client-name panel-key data-key])]
-        (let [reco-count (count (get done-shapes :shapes))
-              relevant-shapes (filterv #(contains? (set (ut/deep-flatten %)) field-name) (get done-shapes :shapes))
+        (let [dim? (get (first (filter #(= (get % :field-name) (name field-name)) (get done-shapes :fields))) :dimension? false)
+              _ (ut/pp [:BOO! field-name dim?])
+              reco-count (count (get done-shapes :shapes))
+              relevant-shapes (if dim?
+                                (filterv #(and
+                                           (contains? (set (ut/deep-flatten %)) :rrows)
+                                           (contains? (set (ut/deep-flatten %)) field-name)) (get done-shapes :shapes))
+                                (filterv #(contains? (set (ut/deep-flatten %)) field-name) (get done-shapes :shapes)))
               recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) relevant-shapes)
               _ (ut/pp ["🧀" :shape-rotator-DRAG field-name :honey-hash-cached-loaded client-name data-key (count relevant-shapes) :/ reco-count :viz-cnt (count recos-for-grouped)])
               one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
@@ -6028,7 +6033,8 @@
                      {:select [:*] :from [honey-sql]}
                      honey-sql)
          ;sniff? true
-         deep-meta? true
+         connection-id (if (= connection-id "system") "system-db" connection-id) ; workaround for legacy code. TODO
+         ;deep-meta? true
          honey-sql (ut/deep-remove-keys honey-sql [:post-process-fn]) ;; disregard if we have
          has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql)))
                        (catch Exception _ false))
@@ -6279,48 +6285,48 @@
                                  (do (ut/pp [:transform (assoc orig-honey-sql :from [:data])])
                                      (let [res (ts/transform (assoc orig-honey-sql :from [:data]) result)] res))
                                  result)
-                        result (if has-rql? ;; RQL deprecated as well due to proper :post-process-fn REPL integration? ... except read-edn? double-check. TODO
-                                 (let [walk-map (get-in @rql-holder ui-keypath)
-                                       replaced
-                                       (vec
-                                        (for [row-map result]
-                                          (let [;with-code (walk/postwalk-replace walk-map
-                                                safe-keys     (into {}
-                                                                    (apply (fn [x]
-                                                                             {x (keyword (cstr/replace (str x) #":_" ""))})
-                                                                           (filter #(cstr/starts-with? (str %) ":_")
-                                                                                   (distinct (ut/deep-flatten orig-honey-sql)))))
-                                                safe-keys-rev (into {} (for [[k v] safe-keys] [v k])) ; {:key
-                                                from-kp       [1 :queries :gen-viz-609 :from] ;(first
-                                                walk-map      (into {}
-                                                                    (for [[k v] walk-map
-                                                                          :let  [protect-where (get-in v from-kp)]]
-                                                                      {k (assoc-in v
-                                                                                   from-kp
-                                                                                   (walk/postwalk-replace safe-keys-rev
-                                                                                                          protect-where))}))
-                                                new-field     (walk/postwalk-replace row-map walk-map)
-                                                new-field     (into {}
-                                                                    (for [[k v] new-field]
-                                                                      (if (= (first v) :*read-edn*)
-                                                                        (let [bd  (get v 1) ;; edn body
-                                                                              kp  (get v 2) ;; keypath
-                                                                              cst (get v 3) ;; cast if
-                                                                                                   ;; asked?
-                                                                              rr  (try
-                                                                                    (let [vv (get-in (edn/read-string bd)
-                                                                                                     kp)]
-                                                                                      (if cst (ut/cast-to-type vv cst) vv))
-                                                                                    (catch Exception e
-                                                                                      (str ":*read-edn-error*:" e bd)))]
-                                                                          {k rr})
-                                                                        {k v})))
-                                                new-row       (walk/postwalk-replace new-field row-map)
-                                                new-row       (walk/postwalk-replace safe-keys new-row)] ;; replace
-                                            new-row)))]
-                                   (println (first replaced))
-                                   replaced)
-                                 result)
+                        ;; result (if has-rql? ;; RQL deprecated as well due to proper :post-process-fn REPL integration? ... except read-edn? double-check. TODO
+                        ;;          (let [walk-map (get-in @rql-holder ui-keypath)
+                        ;;                replaced
+                        ;;                (vec
+                        ;;                 (for [row-map result]
+                        ;;                   (let [;with-code (walk/postwalk-replace walk-map
+                        ;;                         safe-keys     (into {}
+                        ;;                                             (apply (fn [x]
+                        ;;                                                      {x (keyword (cstr/replace (str x) #":_" ""))})
+                        ;;                                                    (filter #(cstr/starts-with? (str %) ":_")
+                        ;;                                                            (distinct (ut/deep-flatten orig-honey-sql)))))
+                        ;;                         safe-keys-rev (into {} (for [[k v] safe-keys] [v k])) ; {:key
+                        ;;                         from-kp       [1 :queries :gen-viz-609 :from] ;(first
+                        ;;                         walk-map      (into {}
+                        ;;                                             (for [[k v] walk-map
+                        ;;                                                   :let  [protect-where (get-in v from-kp)]]
+                        ;;                                               {k (assoc-in v
+                        ;;                                                            from-kp
+                        ;;                                                            (walk/postwalk-replace safe-keys-rev
+                        ;;                                                                                   protect-where))}))
+                        ;;                         new-field     (walk/postwalk-replace row-map walk-map)
+                        ;;                         new-field     (into {}
+                        ;;                                             (for [[k v] new-field]
+                        ;;                                               (if (= (first v) :*read-edn*)
+                        ;;                                                 (let [bd  (get v 1) ;; edn body
+                        ;;                                                       kp  (get v 2) ;; keypath
+                        ;;                                                       cst (get v 3) ;; cast if
+                        ;;                                                                            ;; asked?
+                        ;;                                                       rr  (try
+                        ;;                                                             (let [vv (get-in (edn/read-string bd)
+                        ;;                                                                              kp)]
+                        ;;                                                               (if cst (ut/cast-to-type vv cst) vv))
+                        ;;                                                             (catch Exception e
+                        ;;                                                               (str ":*read-edn-error*:" e bd)))]
+                        ;;                                                   {k rr})
+                        ;;                                                 {k v})))
+                        ;;                         new-row       (walk/postwalk-replace new-field row-map)
+                        ;;                         new-row       (walk/postwalk-replace safe-keys new-row)] ;; replace
+                        ;;                     new-row)))]
+                        ;;            (println (first replaced))
+                        ;;            replaced)
+                        ;;          result)
                         result (if (not (nil? post-process-fn))
                                  (try ((eval post-process-fn) result)
                                       (catch Throwable e
@@ -6335,7 +6341,7 @@
                                            (get orig-honey-sql :data)) ;; TODO< this is ugly
                                      (get-query-metadata result honey-sql (surveyor/db-typer target-db) connection-id) ;; get new meta on
                                      honey-meta)
-                        fields (get honey-meta :fields) ;; lol, refactor, this is cheesy (will
+                        fields (get honey-meta :fields) ;; lol, refactor, this is cheese
                         ;; sniff-worthy? (and (not is-meta?)
                         ;;                    (not= page -3)
                         ;;                    (not has-rql?) ;;; temp since insert will fail dur to not being
@@ -6684,7 +6690,8 @@
                                                                                  modded-shapes (assoc cached :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] panel-key)
                                                                                                                            (get cached :shapes)))]
                                                                              (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-                                                                             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded client-name (first ui-keypath) reco-count :viz-cnt])
+                                                                             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
+                                                                                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows])
                                                                              (swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
                                                                              (db/ddb-put! [client-name panel-key (first ui-keypath)] modded-shapes)
 
@@ -6715,7 +6722,8 @@
                                                                                  modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] panel-key)
                                                                                                                         (get res :shapes)))]
                                                                              (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-                                                                             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms] client-name (first ui-keypath) reco-count :viz-cnt])
+                                                                             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
+                                                                                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows])
                                                                              (swap! db/shapes-result-map-by-honey-hash assoc honey-hash res) ;; multi-client cache
                                                                              (db/ddb-put! honey-hash res)
                                                                              (swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
@@ -7287,12 +7295,12 @@
                           (str ":incoming/" (cstr/replace (cstr/join ">" e) ":" "")) false
                           (strunc (ut/replace-large-base64 (get-in @db/incoming-atom e))) (display-name e) nil])
 
-        data-rows  (ut/keypaths2 @db/last-solvers-data-atom)
-        data-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) data-rows)))
-        data-rows  (for [e data-rows]
-                       [(cstr/replace (str (first e)) ":" "") "data" (cstr/replace (str (second e)) ":" "")
-                        (str ":data/" (cstr/replace (cstr/join ">" e) ":" "")) false
-                        (strunc (ut/replace-large-base64 (get-in @db/last-solvers-data-atom e))) (display-name e) nil])
+        ;; data-rows  (ut/keypaths2 @db/last-solvers-data-atom)
+        ;; data-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) data-rows)))
+        ;; data-rows  (for [e data-rows]
+        ;;                [(cstr/replace (str (first e)) ":" "") "data" (cstr/replace (str (second e)) ":" "")
+        ;;                 (str ":data/" (cstr/replace (cstr/join ">" e) ":" "")) false
+        ;;                 (strunc (ut/replace-large-base64 (get-in @db/last-solvers-data-atom e))) (display-name e) nil])
 
         solver-rows  (ut/keypaths2 @db/last-solvers-atom)
         solver-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) solver-rows)))
@@ -7354,7 +7362,7 @@
                                       ":"
                                       "") (str ":screen/" (cstr/replace (cstr/join ">" e) ":" "")) nil
                         (strunc (ut/replace-large-base64 (get-in @db/screens-atom e))) (display-name e) (str sample)])
-        prows        (vec (apply concat [param-rows flow-rows block-rows panel-rows solver-rows signal-rows incoming-rows data-rows]))
+        prows        (vec (apply concat [param-rows flow-rows block-rows panel-rows solver-rows signal-rows incoming-rows  ]))
         _ (reset! param-sql-sync-rows (count prows)) ;; so we can add to stats logger and keep an eye on this easier than SQL querying it
         rows         (vec (for [r prows]
                             (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :block_meta] r)))

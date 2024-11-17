@@ -75,7 +75,7 @@ CALL FT_CREATE_INDEX('PUBLIC', 'fields', NULL);")
     max_val VARCHAR(255) NULL,
     db_catalog VARCHAR(255) NULL,
     database_version VARCHAR(255) NULL,
-    context_key VARCHAR(555) NOT NULL PRIMARY KEY,
+    context_key VARCHAR(555) NULL, --- NOT NULL PRIMARY KEY,
     context VARCHAR(255) NULL,
     connection_id VARCHAR(255) NULL,
     connection_str VARCHAR(3255) NULL,
