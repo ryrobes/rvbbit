@@ -3134,11 +3134,15 @@
      (ut/dissoc-in db [:click-param :leaf action-kp]))))
 
 (defn get-dragged-kp [drag-body]
-  (let [dkp (if (= (get drag-body :type) :field)
-              [(get drag-body :source-panel-key) :queries (get drag-body :source-query) :field (get drag-body :target)]
-              [(get drag-body :source-panel-key)
-               @(ut/tracked-sub ::view-type {:panel-key (get drag-body :source-panel-key) :view (get drag-body :source-table)}) ;;:views
-               (get drag-body :source-query (get drag-body :source-table))])]
+  (let [dkp (cond (= (get drag-body :type) :field)
+                  [(get drag-body :source-panel-key) :queries (get drag-body :source-query) :field (get drag-body :target)]
+
+                  (and (= (get drag-body :type) :meta-tables) (= (get drag-body :source-panel-key) "none!"))
+                  [:fresh-table! (get drag-body :connection-id) (get drag-body :source-query (get drag-body :source-table))]
+
+                  :else [(get drag-body :source-panel-key)
+                         @(ut/tracked-sub ::view-type {:panel-key (get drag-body :source-panel-key) :view (get drag-body :source-table)}) ;;:views
+                         (get drag-body :source-query (get drag-body :source-table))])]
     (if (= (first dkp) :canvas) [:canvas :canvas :canvas] dkp)))
 
 
@@ -4254,7 +4258,7 @@
  (fn [db _]
    (let [panels-map (get db :panels)
          selected-tab (get db :selected-tab)]
-     (set (keys (only-relevant-tabs panels-map selected-tab))))))
+     (set (filter #(not (cstr/starts-with? (str %) ":reco-pre")) (keys (only-relevant-tabs panels-map selected-tab)))))))
 
 
 ;;; do this for every code panel visible based on the db/ atom map
@@ -9855,7 +9859,8 @@
         [h w] @(ut/tracked-subscribe [::size parent-panel-key])
         height-int (- height-int 42)
         width-int (- width-int 10)
-        full-recos @(ut/tracked-sub ::get-shape-viz {:panel-key parent-panel-key :query-key query-id})
+        ;full-recos @(ut/tracked-sub ::get-shape-viz {:panel-key parent-panel-key :query-key query-id})
+        full-recos @(ut/tracked-sub ::get-shape-viz {:dragged-kp [parent-panel-key :queries query-id]})
         recos-count (count full-recos)
         charts-wide (js/Math.floor (/ w 7))
         charts-high (js/Math.floor (/ h 4.5))
@@ -10030,12 +10035,15 @@
         [h w] @(ut/tracked-subscribe [::size parent-panel-key])
         height-int (- height-int 42)
         width-int (- width-int 10)
+        ;react! [@reco-modal-page]
         full-recos @(ut/tracked-sub ::get-shape-viz {:dragged-kp @db/dragged-kp})
         recos-count (count full-recos)
-        charts-wide 2 ;(js/Math.floor (/ w 7))
-        charts-high 2 ;(js/Math.floor (/ h 4.5))
+        ;charts-wide 2 ;(js/Math.floor (/ w 7))
+        ;charts-high 2 ;(js/Math.floor (/ h 4.5))
+        charts-wide (Math/floor (/ width-int 150))
+        charts-high (Math/floor (/ height-int 100))
         per-page (* charts-wide charts-high)
-        grid-page  @(ut/tracked-subscribe [::recos-page2])
+        grid-page  @reco-modal-page ;@(ut/tracked-subscribe [::recos-page2])
         pages (/ recos-count per-page)
         grid-page (if (> (- grid-page 1) pages) 0 grid-page)
         recos             (take per-page
@@ -10059,7 +10067,7 @@
         _ (swap! db/temp-viz-reco-panel-keys assoc query-id (vec pkeys))
         h-multi 2.2 ;; offsets for css zoom math fuckery
         w-multi 2.3
-        recos-page @(ut/tracked-subscribe [::recos-page2]) ;0
+        ;recos-page @(ut/tracked-subscribe [::recos-page2]) ;0
         preview-container
         (fn [preview-maps pk pnum]
           (try
@@ -10100,7 +10108,7 @@
                   [re-com/v-box
                    :size "none"
                    :width (px (* ww db/brick-size))
-                   :height (px (* hh db/brick-size))
+                   :height (px (+ (* hh db/brick-size) 16))
                    :style
                    {:zoom         0.44
                     :padding-left "10px"
@@ -10109,11 +10117,16 @@
                     :border       (str "1px dashed " (theme-pull :theme/editor-outer-rim-color nil) 44)
                     :overflow     "hidden"}
                    :justify :between
+
                    :children
-                   [[re-com/h-box :justify :between :children
+                   [[re-com/h-box :justify :between
+
+                     :children
                      [[re-com/h-box :gap "5px" :style {:padding-left "3px"} :children
-                       [[re-com/box :size "none" :child " " :style
+                       [
+                        [re-com/box :size "none" :child " " :style
                          {:background-color heat-color :width "26px" :height "26px" :border-radius "12px" :margin-top "13px"}]
+
                         [re-com/box :size "auto" :height "40px" :style
                          {:padding-left  "10px"
                           :padding-top   "4px"
@@ -10122,13 +10135,17 @@
                           :z-index       105
                           :filter        "drop-shadow(0 0 0.9rem black)"
                           :font-weight   400
-                          :font-size     "30px"} :attr
-                         {:on-double-click #(do (ut/tracked-dispatch [::set-recos-page2 0])
-                                                (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys2 :combo_edn]
-                                                                      ce]))}
+                          :font-size     "22px"}
+                        ;;  :attr
+                        ;;  {:on-double-click #(do (ut/tracked-dispatch [::set-recos-page2 0])
+                        ;;                         (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys2 :combo_edn]
+                        ;;                                               ce]))}
                          :child (str combo_edn)]]]
+
                       [re-com/box :padding "6px" :style {:font-size "20px" :opacity 0.3 :font-weight 700}
-                       :child (str (rounder score))]]]
+                       :child (str (rounder score))]
+
+                      ]]
 
                     ;; [panel-key & [override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map]]
                     ;; [clover :virtual-panel :virtual-view ww hh (get-in preview-maps [panel-key :views]) (get-in preview-maps [panel-key :queries])]
@@ -10143,11 +10160,12 @@
                       :font-family    (theme-pull :theme/base-font nil)
                       :filter         "drop-shadow(0 0 0.9rem black)"
                       :z-index        105
-                      :font-weight    400
-                      :font-size      "29px"}
-                     :attr {:on-double-click #(do (ut/tracked-dispatch [::set-recos-page2 0])
-                                                  (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys2 :shape]
-                                                                        shape_name]))} :child (str shape_name)]]]]
+                      :font-weight    500
+                      :font-size      "25px"}
+                    ;;  :attr {:on-double-click #(do (ut/tracked-dispatch [::set-recos-page2 0])
+                    ;;                               (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys2 :shape]
+                    ;;                                                     shape_name]))}
+                     :child (str shape_name)]]]]
               ;; [re-com/box :size "auto"
               ;;  :child [draggable (fn [] (sql-spawner-meta panel-key)) "meta-menu" body]]
 
@@ -10183,7 +10201,8 @@
                                          (clear-state)) 500))}
                :child body]))
             (catch :default _
-              [re-com/box :height (px (* (js/Math.floor (* (/ (/ height-int charts-high) db/brick-size) h-multi)) db/brick-size))
+              [re-com/box
+               :height (px (* (js/Math.floor (* (/ (/ height-int charts-high) db/brick-size) h-multi)) db/brick-size))
                :width (px (* (js/Math.floor (* (/ (/ width-int charts-wide) db/brick-size) w-multi)) db/brick-size)) :size "auto"
                :align :center :justify :center :style
                {:color     (str (theme-pull :theme/editor-font-color nil) 22) ; "#ffffff22"
@@ -10197,17 +10216,22 @@
      :children [[re-com/h-box :size "auto" :style {:color (theme-pull :theme/editor-font-color nil)}
                  :children
                  [(let []                                                ;; get the next 6 graphs and render?
-                    [re-com/h-box :children
+                    [re-com/h-box
+                     ;:justify :between
+                     :children
                      [[re-com/v-box :size "auto"
                        :height (px height-int)
                        :width (px width-int)
+                       :gap "5px"
                        :children
                        (for [h (range charts-high)]
                          [re-com/h-box :size "none"
                           :children
-                          (for [w (range charts-wide)] [reecatch [preview-container preview-maps preview-keys (+ (* h charts-wide) w)]])])]
+                          (for [w (range charts-wide)]
+                            [reecatch [preview-container preview-maps preview-keys (+ (* h charts-wide) w)]])])]
                       [re-com/v-box :size "auto" :height (px height-int)
-                       :style {:border-top (str "1px solid " (theme-pull :theme/editor-outer-rim-color "#9973e0") "66") :overflow "hidden"}
+                       :style {;:border-top (str "1px solid " (theme-pull :theme/editor-outer-rim-color "#9973e0") "66")
+                               :overflow "hidden"}
                        :children
                        [
                         ;; [re-com/box :child
@@ -10224,24 +10248,26 @@
                         ;;                       (theme-pull :theme/editor-outer-rim-color "#9973e0")
                         ;;                       "inherit")} :align :center :justify :center]
 
-                        [re-com/gap :size "2px"]
+                        ;[re-com/gap :size "2px"]
                         [re-com/v-box :children
                          (for [c (range pages)]
                            [re-com/box
-                            :child [re-com/box :child (str (+ 1 c)) :style {:padding-right "3px"}]
+                            :child [re-com/box :child (str (+ 1 c))
+                                    :style {:padding-right "3px"}]
                             :height "19px"
                             :width "20px"
-                            :align :end :justify :center
+                            :align :end
+                            :justify :center
                             :attr {:on-click #(reset! reco-modal-page c)}
                             :style
                             {:padding-right    "4px"
                              :cursor           "pointer"
                              :font-size        "9px"
                              :border-radius "6px 0px 0px 6px"
-                             :color            (if (= c recos-page)
+                             :color            (if (= c grid-page)
                                                  (theme-pull :theme/editor-font-color nil)
                                                  (str (theme-pull :theme/editor-font-color nil) 77))
-                             :background-color (if (= c recos-page)
+                             :background-color (if (= c grid-page)
                                                  (theme-pull :theme/editor-outer-rim-color nil)
                                                  "inherit")}])]
 
@@ -10909,6 +10935,7 @@
         ;;                               (not (= :meta-blocks (get drag-meta :type))))
         ;;                          false)
         callout-instead? (and (= rowcount 1) (= fields-cnt 1))
+        ;;;_ (ut/pp [:callout? callout-instead? hh panel-key data-keypath rowcount fields-cnt])
         mad-libs? (= query-key @mad-libs-view)
         ;; overlay? (or mad-libs?
         ;;              (and (not non-panel?) ;; no render on editor panels?
@@ -10956,7 +10983,7 @@
     (when (not= default-col-widths equal-width-final)
       (ut/tracked-dispatch [::set-column-default-widths panel-key query-key equal-width-final])) ;; bad
     (if (seq @rowset) ;(and (seq @rowset) (not running?))
-      (if (and callout-instead? (nil? hh))
+      (if (and callout-instead? (or (= panel-key :virtual-panel) (nil? hh)))
         (let [label         (nth fields 0)
               md            (get-in metadata [:fields label :data-type])
               num?          (or (= md "integer") (= md "float"))
@@ -10969,13 +10996,21 @@
               agg?          false ;(not (get-in metadata [:fields label :group-by?]))
               pxlabel       (px (if (< labelsz 20) 20 labelsz))]
           ^{:key (str "magic-table-callout-parent" query-key)}
-          [re-com/v-box :size "auto" :style {:overflow "hidden"} :align :center :justify :center :class
-           (when (and (= panel-key (last @hover-field)) @animate?) "zoom-and-fade2") :children
+          [re-com/v-box
+           :size "auto"
+           :style {:overflow "hidden"}
+           :align :center
+           :justify :center
+           :height (px (if hh (* hh db/brick-size) (- height-int 40)))
+           :width (px (if ww (* ww db/brick-size) width-int))
+           ;:class (when (and (= panel-key (last @hover-field)) @animate?) "zoom-and-fade2")
+           :children
            [(when (and overlay? (not mad-libs?))
               ;@(ut/tracked-subscribe [::dynamic-drop-targets table-source @dragging-body panel-key query-key width-int height-int])
               ;@(ut/tracked-sub ::dynamic-drop-targets-alpha {:table-source table-source :dbody @dragging-body :panel-key panel-key :query-key query-key :width-int width-int :height-int height-int})
               [dynamic-spawner-targets table-source @dragging-body panel-key query-key width-int height-int])
-            [re-com/box :child (str label) :size "none" :height (px (* height-int 0.1)) :style
+            [re-com/box :child (str label) :size "none" :height (px (* height-int 0.1))
+             :style
              {:font-weight 700
               :transition  "all 0.6s ease-in-out"
               :filter      (if overlay? "blur(3px) opacity(88)" "none")
@@ -11022,12 +11057,13 @@
             ;;                                                :query-key query-key :width-int width-int :height-int height-int})
             [dynamic-spawner-targets table-source @dragging-body panel-key query-key width-int height-int])
 
-          (when (and overlay? mad-libs? (not non-panel?)) ;;; MAD LIBS
+          (when (and mad-libs? (not non-panel?)) ;;; MAD LIBS
             [re-com/box :child [mad-libs-shapes query-key width-int height-int] :size "none" :align :center :justify :center
              :height (px (- height-int 40)) :width (px width-int) :style {:position "fixed" :z-index 100}])
 
           ^{:key (str "magic-table-base-" data-keypath "-"   non-panel?)}
-          [re-com.core/simple-v-table
+          (when (not mad-libs?)
+            [re-com.core/simple-v-table
            :columns
            (vec
             (for [c fields]
@@ -11475,159 +11511,160 @@
                                            :drag-color       (when mouse-active? "#791679")
                                            :hover-color      "#8c78b789"}}
             }
-           :model rowset]
+           :model rowset])
 
           (when-let [clover-map (get-in @db/custom-clover-drawers [panel-key query-key])]
             (let [size (get clover-map :size 3)]
               [clover-drawer panel-key query-key size width-int h w]))
 
-          [re-com/h-box
-           :padding "4px"
-           :justify :between
-           :children
-           [;; panel-code-box [panel-id key width-int height-int value]
-            (if (and (= @formula-bar data-keypath) selected? (not non-panel?))
-              (let [block-h        (or hh h)
-                    block-w        (or ww w)
-                    label-px-width (js/Math.floor (* db/brick-size (- block-w 0.45)))]
-                (ut/tapp>> [:formula-bar-open? panel-key query-key block-h block-w column-selected selected-field-idx ff])
-                [re-com/h-box :size "auto" :style {:filter (if overlay? "blur(3px) opacity(88)" "none") :margin-top "12px"}
-                 :justify :between :children
-                 [[re-com/v-box :size "auto" :children
-                   [;; [re-com/box :height "15px"
-                    [field-code-box panel-key query-key selected-field-idx label-px-width 55 selected-field-code]]]]])
+          (when (not mad-libs?)
+            [re-com/h-box
+             :padding "4px"
+             :justify :between
+             :children
+             [;; panel-code-box [panel-id key width-int height-int value]
+              (if (and (= @formula-bar data-keypath) selected? (not non-panel?))
+                (let [block-h        (or hh h)
+                      block-w        (or ww w)
+                      label-px-width (js/Math.floor (* db/brick-size (- block-w 0.45)))]
+                  (ut/tapp>> [:formula-bar-open? panel-key query-key block-h block-w column-selected selected-field-idx ff])
+                  [re-com/h-box :size "auto" :style {:filter (if overlay? "blur(3px) opacity(88)" "none") :margin-top "12px"}
+                   :justify :between :children
+                   [[re-com/v-box :size "auto" :children
+                     [;; [re-com/box :height "15px"
+                      [field-code-box panel-key query-key selected-field-idx label-px-width 55 selected-field-code]]]]])
 
-              (let [;; waitings (filter #(and (> (count (get % :ui-keypath)) 1)
-                    reco-wait?   @(ut/tracked-subscribe [::reco-running? query-key :reco])
-                    reco-queued? @(ut/tracked-subscribe [::reco-queued? query-key :reco])]
-                [re-com/h-box :size "none" :height "10px" :padding "3px" :style
-                 {:font-size "12px" :filter (if overlay? "blur(3px) opacity(88)" "none")} :children
-                 [[re-com/h-box
-                   :gap "5px"
-                   :children
-                   (into
-                    [[re-com/box :child rowcount-string]]
-                    (when (not full-no-ui?)
-                      (into
-                       [[re-com/gap :size "0px"]
+                (let [;; waitings (filter #(and (> (count (get % :ui-keypath)) 1)
+                      reco-wait?   @(ut/tracked-subscribe [::reco-running? query-key :reco])
+                      reco-queued? @(ut/tracked-subscribe [::reco-queued? query-key :reco])]
+                  [re-com/h-box :size "none" :height "10px" :padding "3px" :style
+                   {:font-size "12px" :filter (if overlay? "blur(3px) opacity(88)" "none")} :children
+                   [[re-com/h-box
+                     :gap "5px"
+                     :children
+                     (into
+                      [[re-com/box :child rowcount-string]]
+                      (when (not full-no-ui?)
+                        (into
+                         [[re-com/gap :size "0px"]
 
-                        (when (not implied-rowset?)
-                          [re-com/md-icon-button :md-icon-name "zmdi-refresh"
-                           :on-click #(ut/tracked-dispatch [::conn/clear-query-history query-key])
-                           :attr (when hover-field-enable?
+                          (when (not implied-rowset?)
+                            [re-com/md-icon-button :md-icon-name "zmdi-refresh"
+                             :on-click #(ut/tracked-dispatch [::conn/clear-query-history query-key])
+                             :attr (when hover-field-enable?
                                             ;{:on-mouse-enter #(swap! db/context-box assoc query-key "execute: (re)run query")
                                             ; :on-mouse-leave #(swap! db/context-box dissoc query-key)}
-                                   {:on-mouse-enter #(reset! db/bar-hover-text "execute: (re)run query")
-                                    :on-mouse-leave #(reset! db/bar-hover-text nil)})
-                           :class (when single-wait? "rotate linear infinite")
-                           :style {:font-size        "15px"
-                                   :cursor           "pointer"
-                                   :transform-origin "7.5px 10px"
-                                   :opacity          0.5
-                                   :padding          "0px"
-                                   :margin-top       "-3px"}])
+                                     {:on-mouse-enter #(reset! db/bar-hover-text "execute: (re)run query")
+                                      :on-mouse-leave #(reset! db/bar-hover-text nil)})
+                             :class (when single-wait? "rotate linear infinite")
+                             :style {:font-size        "15px"
+                                     :cursor           "pointer"
+                                     :transform-origin "7.5px 10px"
+                                     :opacity          0.5
+                                     :padding          "0px"
+                                     :margin-top       "-3px"}])
 
-                        (when (and ;;(> full-rowcount 5) ;; TODO, gets messed up sometimes?
-                               (not implied-rowset?)
-                               (not non-panel?))
-                          [re-com/md-icon-button
-                           :md-icon-name "zmdi-toll"
-                           :on-click  #(ut/tracked-dispatch [::conn/run-sql-deep-meta-for panel-key query-key (sql-alias-replace query)])
-                           :attr (when hover-field-enable?
+                          (when (and ;;(> full-rowcount 5) ;; TODO, gets messed up sometimes?
+                                 (not implied-rowset?)
+                                 (not non-panel?))
+                            [re-com/md-icon-button
+                             :md-icon-name "zmdi-toll"
+                             :on-click  #(ut/tracked-dispatch [::conn/run-sql-deep-meta-for panel-key query-key (sql-alias-replace query)])
+                             :attr (when hover-field-enable?
                                                    ;;  {:on-mouse-enter #(swap! db/context-box assoc query-key "meta: (re)run full counts of unique values for each column")
                                                    ;;   :on-mouse-leave #(swap! db/context-box dissoc query-key)}
-                                   {:on-mouse-enter #(reset! db/bar-hover-text "meta: (re)run full counts of unique values for each column")
-                                    :on-mouse-leave #(reset! db/bar-hover-text nil)})
+                                     {:on-mouse-enter #(reset! db/bar-hover-text "meta: (re)run full counts of unique values for each column")
+                                      :on-mouse-leave #(reset! db/bar-hover-text nil)})
                                             ;;:class (when deep-meta-running? "rotate linear infinite")
-                           :style {:font-size        "15px"
-                                   :cursor           "pointer"
-                                   :transform-origin "7.5px 10px"
-                                   :opacity          0.5
-                                   :padding          "0px"
-                                   :margin-top       "-3px"}])
+                             :style {:font-size        "15px"
+                                     :cursor           "pointer"
+                                     :transform-origin "7.5px 10px"
+                                     :opacity          0.5
+                                     :padding          "0px"
+                                     :margin-top       "-3px"}])
 
-                        (when (and (not non-panel?) (not implied-rowset?))
-                          [re-com/md-icon-button :md-icon-name "zmdi-shape"
-                           :on-click #(do (swap! db/sniff-deck assoc query-key :reco)
-                                          (ut/tracked-dispatch [::set-reco-queued query-key :reco])
-                                          (ut/tracked-dispatch [::conn/clear-query-history query-key]))
-                           :attr (when hover-field-enable?
+                          (when (and (not non-panel?) (not implied-rowset?))
+                            [re-com/md-icon-button :md-icon-name "zmdi-shape"
+                             :on-click #(do (swap! db/sniff-deck assoc query-key :reco)
+                                            (ut/tracked-dispatch [::set-reco-queued query-key :reco])
+                                            (ut/tracked-dispatch [::conn/clear-query-history query-key]))
+                             :attr (when hover-field-enable?
                                                    ;;  {:on-mouse-enter #(swap! db/context-box assoc query-key "shapes: (re)generate all possible viz combos for this query")
                                                    ;;   :on-mouse-leave #(swap! db/context-box dissoc query-key)}
-                                   {:on-mouse-enter #(reset! db/bar-hover-text "shapes: (re)generate all possible viz combos for this query")
-                                    :on-mouse-leave #(reset! db/bar-hover-text nil)})
-                           :class (cond reco-wait?   "rotate linear infinite"
-                                        reco-queued? "rotate-reverse linear infinite"
-                                        :else        nil)
-                           :style {:font-size        "15px"
-                                   :cursor           "pointer"
-                                   :transform-origin "7.5px 10px"
-                                   :opacity          0.5
-                                   :padding          "0px"
-                                   :margin-top       "-3px"}])
+                                     {:on-mouse-enter #(reset! db/bar-hover-text "shapes: (re)generate all possible viz combos for this query")
+                                      :on-mouse-leave #(reset! db/bar-hover-text nil)})
+                             :class (cond reco-wait?   "rotate linear infinite"
+                                          reco-queued? "rotate-reverse linear infinite"
+                                          :else        nil)
+                             :style {:font-size        "15px"
+                                     :cursor           "pointer"
+                                     :transform-origin "7.5px 10px"
+                                     :opacity          0.5
+                                     :padding          "0px"
+                                     :margin-top       "-3px"}])
 
                                                 ;[re-com/gap :size "2px"]
-                        ]
+                          ]
 
-                       (into
-                        (into
+                         (into
+                          (into
 
-                         (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key panel-key :data-key query-key :location :query}])
+                           (let [valid-kits  @(ut/tracked-subscribe [::valid-kits-for {:panel-key panel-key :data-key query-key :location :query}])
                                     ;;valid-kits  @(ut/tracked-sub ::valid-kits-for {:panel-key panel-key :data-key query-key :location :query})
                                                      ;;_ (tapp>>  [:valid-kits valid-kits])
-                               curr-tab       @(ut/tracked-sub ::selected-tab {})
-                               block-runners  @(ut/tracked-sub ::block-runners {})
-                               client-name    db/client-name]
-                           (vec (for [e valid-kits
-                                      :let [icon (get-in block-runners [(first e) :kits (last e) :icon])
-                                            tooltip (str (get-in block-runners [(first e) :kits (last e) :tooltip] "(missing tooltip)"))
-                                            kit-runner-key (str "kit-runner" (hash (str client-name panel-key query-key (first e) (last e))))
-                                            running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
-                                            output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
-                                            running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
-                                            trig!        [@waiting?]
-                                            class        (cond
-                                                           running? "rotate linear infinite"
-                                                           (get @waiting? kit-runner-key) "rotate-reverse linear infinite"
-                                                           :else "")]]
-                                  [re-com/box
-                                   :attr {:on-mouse-over #(reset! db/bar-hover-text tooltip)
-                                          :on-mouse-leave #(reset! db/bar-hover-text nil)
-                                          :on-click (fn []
-                                                      (when (not running?)
-                                                        (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
-                                                        (swap! waiting? assoc kit-runner-key true)
-                                                        (swap! temp-extra-subs conj running-key)
-                                                        (swap! temp-extra-subs conj output-key)
-                                                        (swap! db/kit-fn-lookup assoc [panel-key query-key] running-key)
-                                                        (let [fstr (str "kit-runner " kit-runner-key)
-                                                              w    (/ (count fstr) 4.1)]
-                                                          (ut/tracked-dispatch
-                                                           [::wfx/push   :default
-                                                            {:kind       :run-kit
-                                                             :kit-keypath e
-                                                             :kit-runner-key kit-runner-key
-                                                             :panel-key   panel-key
-                                                             :data-key    query-key
-                                                             :tab-name    curr-tab
-                                                             :runner      :queries
-                                                             :client-name client-name
-                                                             :ui-keypath     [:panels panel-key :queries query-key]}])
-                                                          (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
-                                                          (tapp>> [:clicked-kit running-key])
-                                                          (js/setTimeout #(swap! waiting? assoc kit-runner-key false) 5000))))}
-                                   :child [render-kit-icon-query icon class]])))
+                                 curr-tab       @(ut/tracked-sub ::selected-tab {})
+                                 block-runners  @(ut/tracked-sub ::block-runners {})
+                                 client-name    db/client-name]
+                             (vec (for [e valid-kits
+                                        :let [icon (get-in block-runners [(first e) :kits (last e) :icon])
+                                              tooltip (str (get-in block-runners [(first e) :kits (last e) :tooltip] "(missing tooltip)"))
+                                              kit-runner-key (str "kit-runner" (hash (str client-name panel-key query-key (first e) (last e))))
+                                              running-key  (keyword (str "kit-status/" kit-runner-key ">running?"))
+                                              output-key   (keyword (str "kit/" kit-runner-key ">incremental"))
+                                              running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                                              trig!        [@waiting?]
+                                              class        (cond
+                                                             running? "rotate linear infinite"
+                                                             (get @waiting? kit-runner-key) "rotate-reverse linear infinite"
+                                                             :else "")]]
+                                    [re-com/box
+                                     :attr {:on-mouse-over #(reset! db/bar-hover-text tooltip)
+                                            :on-mouse-leave #(reset! db/bar-hover-text nil)
+                                            :on-click (fn []
+                                                        (when (not running?)
+                                                          (swap! db/kit-run-ids assoc (keyword kit-runner-key) (ut/generate-uuid))
+                                                          (swap! waiting? assoc kit-runner-key true)
+                                                          (swap! temp-extra-subs conj running-key)
+                                                          (swap! temp-extra-subs conj output-key)
+                                                          (swap! db/kit-fn-lookup assoc [panel-key query-key] running-key)
+                                                          (let [fstr (str "kit-runner " kit-runner-key)
+                                                                w    (/ (count fstr) 4.1)]
+                                                            (ut/tracked-dispatch
+                                                             [::wfx/push   :default
+                                                              {:kind       :run-kit
+                                                               :kit-keypath e
+                                                               :kit-runner-key kit-runner-key
+                                                               :panel-key   panel-key
+                                                               :data-key    query-key
+                                                               :tab-name    curr-tab
+                                                               :runner      :queries
+                                                               :client-name client-name
+                                                               :ui-keypath     [:panels panel-key :queries query-key]}])
+                                                            (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                                                            (tapp>> [:clicked-kit running-key])
+                                                            (js/setTimeout #(swap! waiting? assoc kit-runner-key false) 5000))))}
+                                     :child [render-kit-icon-query icon class]])))
 
 
                               ;;; custom grid actions that are targeted for the query bar footer
 
-                         (into
-                          (into
                            (into
-                            (custom-grid-actions-button-row panel-key runner query-key)
-                            (custom-leaf-actions-button-row panel-key runner query-key :grid))
-                           (custom-leaf-actions-button-row panel-key runner query-key :grid-drag))
-                          (custom-leaf-actions-button-row panel-key runner query-key :grid-drawer))
+                            (into
+                             (into
+                              (custom-grid-actions-button-row panel-key runner query-key)
+                              (custom-leaf-actions-button-row panel-key runner query-key :grid))
+                             (custom-leaf-actions-button-row panel-key runner query-key :grid-drag))
+                            (custom-leaf-actions-button-row panel-key runner query-key :grid-drawer))
 
                         ;;  (let [;valid-grid-actions  @(ut/tracked-subscribe [::valid-grid-actions-for
                         ;;              ;                                            {:panel-key panel-key
@@ -11706,42 +11743,42 @@
                         ;;                ;(when (not implied-rowset?)
                         ;;                ;  [re-com/gap :size "12px"])
                         ;;          )))
-                         )
+                           )
 
-                        (when-let [sqlize-source-view (get-in panel-map [:queries query-key :_sqlized-by])] ;; hack to get source view to react even if only sqlize is up
-                          (let [[bid runner vid] sqlize-source-view
-                                vdata  @(ut/tracked-subscribe [::hidden-clover-frag-trigger {:bid bid :runner runner :vid vid}])]
-                            [[clover bid vid 0 0]
+                          (when-let [sqlize-source-view (get-in panel-map [:queries query-key :_sqlized-by])] ;; hack to get source view to react even if only sqlize is up
+                            (let [[bid runner vid] sqlize-source-view
+                                  vdata  @(ut/tracked-subscribe [::hidden-clover-frag-trigger {:bid bid :runner runner :vid vid}])]
+                              [[clover bid vid 0 0]
                                               ;[clover-fragments vdata 1 1]
                                              ;[re-com/box :child "hey"]
-                             ]))))))]
+                               ]))))))]
 
-                  (when (and server-kits (not non-panel?))
-                    [re-com/h-box :gap "5px" :children
-                     (vec
-                      (cons
-                       [re-com/gap :size "6px"]
+                    (when (and server-kits (not non-panel?))
+                      [re-com/h-box :gap "5px" :children
                        (vec
-                        (for [{:keys [description kit-name name icon]} server-kits
-                              :let [wait?   @(ut/tracked-subscribe [::reco-running? query-key kit-name])
-                                    queued? @(ut/tracked-subscribe [::reco-queued? query-key kit-name])]]
-                          [re-com/md-icon-button
-                           :md-icon-name icon
-                           :on-click #(do (swap! db/sniff-deck assoc query-key kit-name)
-                                          (ut/tracked-dispatch [::set-reco-queued query-key kit-name])
-                                          (ut/tracked-dispatch [::conn/clear-query-history query-key]))
-                           :attr (when hover-field-enable?
-                                   {:on-mouse-enter #(reset! db/bar-hover-text (str "kit-fn: " name " - " description))
-                                    :on-mouse-leave #(reset! db/bar-hover-text nil)})
-                           :class (cond wait?   "rotate linear infinite"
-                                        queued? "rotate-reverse linear infinite"
-                                        :else   nil) :style
-                           {:font-size        "15px"
-                            :cursor           "pointer"
-                            :transform-origin "7.5px 10px"
-                            :opacity          0.5
-                            :padding          "0px"
-                            :margin-top       "-3px"}]))))])
+                        (cons
+                         [re-com/gap :size "6px"]
+                         (vec
+                          (for [{:keys [description kit-name name icon]} server-kits
+                                :let [wait?   @(ut/tracked-subscribe [::reco-running? query-key kit-name])
+                                      queued? @(ut/tracked-subscribe [::reco-queued? query-key kit-name])]]
+                            [re-com/md-icon-button
+                             :md-icon-name icon
+                             :on-click #(do (swap! db/sniff-deck assoc query-key kit-name)
+                                            (ut/tracked-dispatch [::set-reco-queued query-key kit-name])
+                                            (ut/tracked-dispatch [::conn/clear-query-history query-key]))
+                             :attr (when hover-field-enable?
+                                     {:on-mouse-enter #(reset! db/bar-hover-text (str "kit-fn: " name " - " description))
+                                      :on-mouse-leave #(reset! db/bar-hover-text nil)})
+                             :class (cond wait?   "rotate linear infinite"
+                                          queued? "rotate-reverse linear infinite"
+                                          :else   nil) :style
+                             {:font-size        "15px"
+                              :cursor           "pointer"
+                              :transform-origin "7.5px 10px"
+                              :opacity          0.5
+                              :padding          "0px"
+                              :margin-top       "-3px"}]))))])
                             ;; (when (not non-panel?)
                             ;;   [re-com/box
                             ;;    :size "auto"
@@ -11757,13 +11794,11 @@
                             ;;    :child
                             ;;    (str ;(count waitings) " "
                             ;;     (get @db/context-box query-key " "))])
-                  ]]))
+                    ]]))
 
-            [re-com/h-box
-             :children
-             [
-
-              ;; (when
+              [re-com/h-box
+               :children
+               [;; (when
               ;;  (and (not non-panel?)
               ;;       (not full-no-ui?)
               ;;       (not implied-rowset?))
@@ -11801,62 +11836,62 @@
 
 
 
-              (when col-selected?
-                (let [;heat-simple (into {} (for [[[k1 _] v] (get-in query [:style-rules])] {k1
-                      heat-keys (into {}
-                                      (first (for [[[k1 k2] v] (get-in query [:style-rules])
-                                                   :when       (and (cstr/starts-with? (str k2) ":heatmap-")
-                                                                    (= k1 column-selected))]
-                                               {[k1 k2] v})))
-                      has-one?  (ut/ne? heat-keys)]
-                  [re-com/h-box :size "none" :height "10px" :padding "3px" :style {:margin-right "10px" :font-size "12px"} :gap
-                   "5px" :children
-                   [[re-com/md-icon-button :md-icon-name "zmdi-fire" :on-click
-                     #(do (ut/tracked-dispatch [::toggle-heatmap panel-key query-key column-selected])
-                          (ut/tracked-dispatch [::column-select panel-key query-key nil]))
-                     :attr (when hover-field-enable?
-                             {:on-mouse-enter #(reset! db/bar-hover-text "toggle heatmap on this column")
-                              :on-mouse-leave #(reset! db/bar-hover-text nil)})
-                     :style {:font-size        "15px"
-                             :color            (if has-one? "orange" "inherit")
-                             :cursor           "pointer"
-                             :transform-origin "7.5px 10px"
-                             :opacity          0.5
-                             :padding          "0px"
-                             :margin-top       "-3px"}]
-                    [re-com/md-icon-button
-                     :md-icon-name "zmdi-delete" ;; panel-key query-key clause drop-data
-                     :on-click #(do (ut/tracked-dispatch [::execute-pill-drop panel-key query-key :remove
-                                                          {:drag-body {:target column-selected}}])
-                                    (ut/tracked-dispatch [::column-select panel-key query-key nil])) :attr
-                     (when hover-field-enable?
-                       {:on-mouse-enter #(reset! db/bar-hover-text "remove this column from the query")
-                        :on-mouse-leave #(reset! db/bar-hover-text nil)})
-                     :style {:font-size        "15px"
-                             :cursor           "pointer"
-                             :transform-origin "7.5px 10px"
-                             :opacity          0.5
-                             :padding          "0px"
-                             :margin-top       "-3px"}]]]))
+                (when col-selected?
+                  (let [;heat-simple (into {} (for [[[k1 _] v] (get-in query [:style-rules])] {k1
+                        heat-keys (into {}
+                                        (first (for [[[k1 k2] v] (get-in query [:style-rules])
+                                                     :when       (and (cstr/starts-with? (str k2) ":heatmap-")
+                                                                      (= k1 column-selected))]
+                                                 {[k1 k2] v})))
+                        has-one?  (ut/ne? heat-keys)]
+                    [re-com/h-box :size "none" :height "10px" :padding "3px" :style {:margin-right "10px" :font-size "12px"} :gap
+                     "5px" :children
+                     [[re-com/md-icon-button :md-icon-name "zmdi-fire" :on-click
+                       #(do (ut/tracked-dispatch [::toggle-heatmap panel-key query-key column-selected])
+                            (ut/tracked-dispatch [::column-select panel-key query-key nil]))
+                       :attr (when hover-field-enable?
+                               {:on-mouse-enter #(reset! db/bar-hover-text "toggle heatmap on this column")
+                                :on-mouse-leave #(reset! db/bar-hover-text nil)})
+                       :style {:font-size        "15px"
+                               :color            (if has-one? "orange" "inherit")
+                               :cursor           "pointer"
+                               :transform-origin "7.5px 10px"
+                               :opacity          0.5
+                               :padding          "0px"
+                               :margin-top       "-3px"}]
+                      [re-com/md-icon-button
+                       :md-icon-name "zmdi-delete" ;; panel-key query-key clause drop-data
+                       :on-click #(do (ut/tracked-dispatch [::execute-pill-drop panel-key query-key :remove
+                                                            {:drag-body {:target column-selected}}])
+                                      (ut/tracked-dispatch [::column-select panel-key query-key nil])) :attr
+                       (when hover-field-enable?
+                         {:on-mouse-enter #(reset! db/bar-hover-text "remove this column from the query")
+                          :on-mouse-leave #(reset! db/bar-hover-text nil)})
+                       :style {:font-size        "15px"
+                               :cursor           "pointer"
+                               :transform-origin "7.5px 10px"
+                               :opacity          0.5
+                               :padding          "0px"
+                               :margin-top       "-3px"}]]]))
 
 
 
-              (when (and has-pages? (or non-panel? (not col-selected?)))
-                [re-com/h-box :style {:filter (if overlay? "blur(3px) opacity(88)" "none")}
-                 :children [(when (and has-pages? (not first-page?))
-                              [re-com/md-icon-button :md-icon-name "zmdi-caret-left" :on-click
-                               #(do (ut/tracked-dispatch [::change-page panel-key query-key (- page-num 1) ttl-pages])
-                                    (ut/tracked-dispatch [::conn/clear-query-history query-key])) :style
-                               {:font-size "22px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])
-                            (when has-pages?
-                              [re-com/box :align :center :justify :center :style {:font-size "10px"} :child (str page-num " / " ttl-pages)])
-                            (if (and has-pages? (not last-page?))
-                              [re-com/md-icon-button :md-icon-name "zmdi-caret-right" :on-click
-                               #(do (ut/tracked-dispatch [::change-page panel-key query-key (+ page-num 1) ttl-pages])
-                                    (ut/tracked-dispatch [::conn/clear-query-history query-key])) :style
-                               {:font-size "22px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}]
-                              [re-com/box :child " " :width "22px"])]])
-              [re-com/gap :size "0px"]]]]]]]) ;; just in case so we don't
+                (when (and has-pages? (or non-panel? (not col-selected?)))
+                  [re-com/h-box :style {:filter (if overlay? "blur(3px) opacity(88)" "none")}
+                   :children [(when (and has-pages? (not first-page?))
+                                [re-com/md-icon-button :md-icon-name "zmdi-caret-left" :on-click
+                                 #(do (ut/tracked-dispatch [::change-page panel-key query-key (- page-num 1) ttl-pages])
+                                      (ut/tracked-dispatch [::conn/clear-query-history query-key])) :style
+                                 {:font-size "22px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])
+                              (when has-pages?
+                                [re-com/box :align :center :justify :center :style {:font-size "10px"} :child (str page-num " / " ttl-pages)])
+                              (if (and has-pages? (not last-page?))
+                                [re-com/md-icon-button :md-icon-name "zmdi-caret-right" :on-click
+                                 #(do (ut/tracked-dispatch [::change-page panel-key query-key (+ page-num 1) ttl-pages])
+                                      (ut/tracked-dispatch [::conn/clear-query-history query-key])) :style
+                                 {:font-size "22px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}]
+                                [re-com/box :child " " :width "22px"])]])
+                [re-com/gap :size "0px"]]]]])]]) ;; just in case so we don't
                                                                                               ;; render empty child
       [re-com/v-box :padding "20px" :align :center :justify :center :style
        {:font-size "18px" :opacity 0.2 :color (str text-color 77) :font-weight 700} :children
@@ -14547,6 +14582,69 @@
                                         linear-gradient(90deg, transparent 48px, #ffffff27 48px, #ffffff27 50px, transparent 50px)")})
      :children boxes]))
 
+
+
+
+
+(defn multi-dropdown
+  [{:keys [choices field panel-key width button-style style placeholder]}]
+  (let [compound-key (if (vector? field)
+                       (keyword (cstr/replace (str (first field) "/" (last field)) ":" ""))
+                       (keyword (cstr/replace (str panel-key "/" field) ":" "")))
+        choice @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [compound-key]})
+        ;choice (if (string? (get-in choices [0 :id])) (str choice) choice)
+        ;choice (if (and (string? choice) (empty? (cstr/trim choice))) nil choice) ;; in case we
+        width  (if (string? width) (try (edn/read-string (ut/replacer width "px" "")) (catch :default _ 100)) width)]
+    [re-com/h-box
+     :size "auto"
+     :justify :between
+     :align :center
+     :style {;:color "#000000"
+             :background-color (theme-pull :theme/base-block-color nil)
+             }
+     :children
+     [[re-com/md-icon-button
+       :on-click #(ut/tracked-dispatch [::conn/click-parameter
+                                        (if (vector? field)
+                                          field
+                                          [panel-key field])
+                                        nil])
+       :style (merge {:font-size "19px"
+                      :color "#ffffff99"
+                      ;:background-color (theme-pull :theme/base-block-color nil)
+                      :width "30px" :margin-top "8px"
+                      :opacity 0.33} button-style)
+       :md-icon-name "zmdi-close"]
+
+      [re-com/tree-select-dropdown
+       :model (or choice #{})
+       :placeholder (str field)
+       :max-height "400px"
+       :style (merge {:outline "none"
+                      :color "#00000099"
+                      :border "none"
+                      :font-size "14px"
+                      :background-color (theme-pull :theme/base-block-color nil)
+                      :border-radius "5px"}
+                     (if (nil? style) {} style)
+                     ;(when (nil? choice) {:color "#ffffff22"})
+                     )
+       :parts {;:label {:style {:background-color "#000000"}}
+               :chosen-drop {:style {:overflow "visible" :color "#00000099"}}}
+       :show-reset-button? false ; true
+       ;:field-label-fn (fn [_] [re-com/box :child (cstr/replace (str field) ":" "")])
+       :width (px (- width 30))
+       :choices choices
+       :on-change #(ut/tracked-dispatch [::conn/click-parameter
+                                         (if (vector? field)
+                                           field
+                                           [panel-key field])
+                                         %])
+       :multi-select? true]
+      ]]))
+
+
+
 (defn dropdown
   [{:keys [choices field panel-key width button-style style placeholder]}]
   (let [compound-key (if (vector? field)
@@ -14555,7 +14653,8 @@
         choice @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [compound-key]})
         choice (if (string? (get-in choices [0 :id])) (str choice) choice)
         choice (if (and (string? choice) (empty? (cstr/trim choice))) nil choice) ;; in case we
-        width  (if (string? width) (try (edn/read-string (ut/replacer width "px" "")) (catch :default _ 100)) width)]
+        width  (if (string? width) (try (edn/read-string (ut/replacer width "px" "")) (catch :default _ 100)) width)
+        ]
     [re-com/h-box
      :size "auto"
      :justify :between
@@ -14569,20 +14668,21 @@
                                         nil])
        :style (merge {:font-size "19px" :width "30px" :margin-top "8px" :opacity 0.33} button-style)
        :md-icon-name "zmdi-close"]
+
       [re-com/single-dropdown
        :style (merge {:outline "none"} (if (nil? style) {} style) (when (nil? choice) {:color "#ffffff22"}))
        :parts {:chosen-drop {:style {:overflow "visible"}}}
        :placeholder (str (or placeholder (str "(all " (ut/n- field) ")")))
        :choices choices
-       :model choice ;(ut/tracked-subscribe [::conn/clicked-parameter-key [(try (keyword
-                                                        ;(str
-       :width (px (- width 30)) :on-change ;#(ut/tracked-dispatch [::conn/click-parameter
-                                           ;[panel-key] {field %}])
-       #(ut/tracked-dispatch [::conn/click-parameter
-                              (if (vector? field)
-                                field
-                                [panel-key field])
-                              %])]]]))
+       :max-height "400px"
+       :model choice
+       :width (px (- width 30))
+       :on-change #(ut/tracked-dispatch [::conn/click-parameter
+                                         (if (vector? field)
+                                           field
+                                           [panel-key field])
+                                         %])]
+      ]]))
 
 
 (re-frame/reg-sub ::generate-all-clicked
@@ -15542,7 +15642,7 @@
   (let [kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type])
         in-editor? (not (nil? override-view))
         cc (get @ut/clover-walk-singles-map kk)]
-    (if cc ;(ut/ne? cc)
+    (if false ;cc ;(ut/ne? cc)
       cc
       (let [in-editor? (not (nil? override-view))
             walk-map
@@ -15554,6 +15654,7 @@
               :honeycomb clover-fragments
               :single-dropdown re-com/single-dropdown
               :dropdown #(dropdown (try (assoc % :panel-key panel-key) (catch :default _ %)))
+              :multi-dropdown #(multi-dropdown (try (assoc % :panel-key panel-key) (catch :default _ %)))
               :atom #(reagent/atom %)
               :get get
               ;;:edn #(edn-box (+ px-width-int 70) (+ px-height-int 55) %)
@@ -17570,12 +17671,22 @@
        (swap! db/rel-kw-cache-atom assoc (hash [panel-data runner selected-view]) res)
        res)))
 
+(re-frame/reg-sub
+ ::upstream-panel-hashes
+ (fn [db {:keys [panel-key]}]
+   (let [relations (get-in @(ut/tracked-sub ::panel-relations {}) [:full-relations panel-key :upstream])
+         upstream-hashes (sort-by key (select-keys (get db :panel-hashes) relations))]
+     (str upstream-hashes))))
 
 (re-frame/reg-sub
  ::clover-cache
  (fn [db [_ panel-key & [override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map]]]
    (let [panel-data (get-in db [:panels panel-key])
          panel-data (dissoc panel-data :root :h  :w)
+         ;relations (get-in @(ut/tracked-sub ::panel-relations {}) [:full-relations panel-key :upstream])
+         ;upstream-hashes (sort-by key (select-keys (get db :panel-hashes) relations))
+         upstream-hashes @(ut/tracked-sub ::upstream-panel-hashes {:panel-key panel-key})
+         ;;_ (ut/pp [:relations panel-key (sort-by key (select-keys (get db :panel-hashes) relations))])
          selected-view (or override-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}))
          runner @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
          ;[runner selected-view] @(ut/tracked-sub ::panel-selected-view {:panel-key panel-key})
@@ -17585,7 +17696,7 @@
          param-hash (hash (select-keys (get db :click-param) param-keys))
          data-hash  (hash (select-keys (get db :data) data-keys))
          panel-hash (hash panel-data)
-         cache-key  (pr-str [panel-hash param-hash data-hash theme-hash panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map])]
+         cache-key  (pr-str [upstream-hashes panel-hash param-hash data-hash theme-hash panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map])]
      (if-let [cache (get @db/clover-cache-atom cache-key)]
        cache
        (let [render (clover panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map)]
@@ -18372,6 +18483,7 @@
  (fn [db [_ brick-vec-key selected-view-type selected-view]]
    (let [flat-set (ut/deep-flatten (get-in db [:panels brick-vec-key selected-view-type selected-view]))
          res (true? (some #(or (= % :datepicker-dropdown)
+                               (= % :multi-dropdown)
                                (= % :dropdown)) flat-set))]
      res))) ;; will add other edge cases as needed for allowed overflow
 
@@ -18753,7 +18865,7 @@
                                         (not @dragging-editor?))
                               {:on-mouse-enter  #(do (reset! over-block? true)
                                                     (reset! over-block brick-vec-key)
-                                                                          ;;  (request-viz-shapes brick-vec-key selected-view)
+                                                    ;;  (request-viz-shapes brick-vec-key selected-view)
                                                     (reset! db/last-mouse-activity (js/Date.)))
                               :on-mouse-over  #(when (or (not @over-block?) (not mouse-over?))
                                                  (reset! over-block brick-vec-key)
@@ -19109,8 +19221,8 @@
                                                       [[re-com/box :child (str s (when (and not-view? reco-count) (str " " (nf reco-count))))
                                                         :attr
                                                         {:on-click #(do (reset! mad-libs-view nil)
-                                                                        (clear-preview2-recos)
-                                                                        (tapp>> [:clicked-on brick-vec-key s])
+                                                                        ;; (clear-preview2-recos)
+                                                                        (ut/pp [:reco-grid-icon-clicked-on brick-vec-key s])
                                                                         (ut/tracked-dispatch [::select-view brick-vec-key
                                                                                               (if (= s base-view-name) nil s)]))}
                                                         :style {:font-size        "12px"
@@ -19165,15 +19277,16 @@
                                                        (when reco-ready?
                                                          [re-com/box :style {:margin-top "-6px"} :child
                                                           [re-com/md-icon-button :md-icon-name "zmdi-view-dashboard"
-                                                           :on-click #(do (clear-preview2-recos)
-                                                                          (ut/tracked-dispatch [::select-view brick-vec-key
-                                                                                                (if (= s base-view-name) nil s)])
-                                                                          (reset! mad-libs-view (if (= s @mad-libs-view) nil s))
-                                                                          (when (not (= s
-                                                                                        @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                                         {:keypath [:viz-tables-sys2/table_name]})))
-                                                                            (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name]
-                                                                                                  s])))
+                                                           :on-click #(do ;(clear-preview2-recos)
+                                                                        (ut/pp [:reco-tab!])
+                                                                        (ut/tracked-dispatch [::leaf-push [brick-vec-key :queries s] {}])
+                                                                        (ut/tracked-dispatch [::select-view brick-vec-key
+                                                                                              (if (= s base-view-name) nil s)])
+                                                                        (reset! mad-libs-view (if (= s @mad-libs-view) nil s))
+                                                                        (when (not (= s
+                                                                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                                                       {:keypath [:viz-tables-sys2/table_name]})))
+                                                                          (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name] s])))
                                                            :style {:font-size        "14px"
                                                                    :cursor           "pointer"
                                                                    :margin-top       "2px"

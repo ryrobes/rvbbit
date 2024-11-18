@@ -133,9 +133,11 @@
                         [:like [:lower :drag-meta/target] "%year%"]
                         [:like [:lower :drag-meta/target] "%month%"]]
                        :canvas-drop?]
+  :dimension-filter?     [:and [:<> :drag-meta/type ":meta-fields"] [:dimension-drop?]]
   :sql/new-group-by      [:dimension-drop?]
-  :filter/new-drop-down  [:and [:<> :drag-meta/type ":meta-fields"] [:dimension-drop?]]
-  :filter/click-table    [:and [:<> :drag-meta/type ":meta-fields"] [:dimension-drop?]]
+  :filter/new-drop-down  [:dimension-filter?]
+  :filter/new-multi-drop-down  [:dimension-filter?]
+  :filter/click-table    [:dimension-filter?]
   :sql/count-distinct    [:dimension-drop?]
   :sql/new-agg.sql-agg-types   [:and [:or
                                       [:= :drag-meta/type ":meta-tables"]
@@ -431,7 +433,7 @@
   :filter {:new-drop-down (fn [{:keys [drag-meta source-query-body source-kp]}]
                             (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta
                                   new-param    (keyword (clojure.string/replace (str :*this-block* "/" target) ":" ""))
-                                  table-alias  (keyword (str "ddr" (rand-int 99)))
+                                  table-alias  (keyword (str "ddr45"))
                                   parent-where (get source-query-body :where)
                                   parent-table (first (flatten (get source-query-body :from)))
                                   exists?      (not (nil? parent-where))
@@ -451,6 +453,34 @@
                                :connection-id connection-id
                                :drop-mutate {(vec (into source-kp [:where])) new-where}
                                :views {:dropdown1 view-body}
+                               :queries {:query1 {:select   [[target :label] [target :id]]
+                                                  :from     [[parent-table table-alias]]
+                                                  :group-by [target]
+                                                  :order-by [[target :asc]]}}}))
+
+           :new-multi-drop-down (fn [{:keys [drag-meta source-query-body source-kp]}]
+                            (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta
+                                  new-param    (keyword (clojure.string/replace (str :*this-block* "/" target) ":" ""))
+                                  table-alias  (keyword (str "ddr45"))
+                                  parent-where (get source-query-body :where)
+                                  parent-table (first (flatten (get source-query-body :from)))
+                                  exists?      (not (nil? parent-where))
+                                  cla           [:*when new-param [:in target new-param]]
+                                  new-where     (if exists? [:and parent-where cla] cla)
+                                  view-body [:multi-dropdown {:choices :query1
+                                                        :width   :panel-width+80-px
+                                                        :style   {:padding-top "8px"
+                                                                  :font-size   "19px"}
+                                                        :ref (keyword (clojure.string/replace (str "query/" source-query) ":" ""))
+                                                         ;:model   [:or! [:dash8 k] ]
+                                                        :model   new-param
+                                                         ;:field   [new-q-key target-field]
+                                                        :field target}]]
+                              {:h 2 :w 6
+                               :selected-view :mdropdown1
+                               :connection-id connection-id
+                               :drop-mutate {(vec (into source-kp [:where])) new-where}
+                               :views {:mdropdown1 view-body}
                                :queries {:query1 {:select   [[target :label] [target :id]]
                                                   :from     [[parent-table table-alias]]
                                                   :group-by [target]

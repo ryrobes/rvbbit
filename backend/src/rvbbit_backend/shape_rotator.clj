@@ -571,7 +571,7 @@
           this-viz-shape (get viz-shapes-defs shape-name)
           {:keys [library-shapes sql-maps runner] :or {runner :views}} this-viz-shape
           relevant-field-maps (get field-maps-by-context context) ;;(filterv #(= (get % :context) context) field-maps) ;; pre-index with a group-by map?
-          {:keys [table-type connection-id table-name]} (first relevant-field-maps)
+          {:keys [table-type connection-id table-name honey-hash]} (first relevant-field-maps)
 
           axes-walk (into {} (for [[k v] axes] {(keyword (str (cstr/replace (str k) ":" "") "-field")) (keyword v)}))
           sql-table-walk {:table [(if (= table-type :query)
@@ -608,6 +608,7 @@
              {runner library-shapes
               :connection-id connection-id
               :shape-rotator {:context context :shape-name shape-name :axes axes
+                              :honey-hash honey-hash
                               :items (into (vec (for [v (keys library-shapes)] [runner v]))
                                            (vec (for [v (keys queries-map)] [:queries v])))}
               :name block-name

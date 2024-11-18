@@ -179,7 +179,7 @@
                                                                "exclusion" "hue" "saturation" "color" "luminosity"]}
        [[:font-family] [:titleFont] [:monospaced-font] [:base-font] [:labelFont] [:legendFont]]
          {:message "font face!"
-          :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono"
+          :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono" "Chicago Kare"
                                     "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha"
                                     "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono"
                                     "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline"
@@ -489,18 +489,18 @@
      [re-com/h-box :src (at) :size "auto" :justify :between ;:size "1"
       :children
       [[re-com/md-icon-button :md-icon-name "zmdi-caret-left" :on-click
-        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (- v 1) "px") (- v 1)) view-key type-key]) 
-        :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" 
+        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (- v 1) "px") (- v 1)) view-key type-key])
+        :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff"
                 :padding "0px" :margin-top "-11px"}]
-       
-       [re-com/slider :src (at) :model v :min min-val :step step-val :max max-val 
+
+       [re-com/slider :src (at) :model v :min min-val :step step-val :max max-val
         :style (custom-slider-style "#ffffff" "#ffffff")
         :width (when (try (= (first view-key) :runstreams) (catch :default _ false)) "210px") :on-change
         #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str % "px") %) view-key type-key]) :disabled? false]
-       
+
        [re-com/md-icon-button :md-icon-name "zmdi-caret-right" :on-click
-        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (+ v 1) "px") (+ v 1)) view-key type-key]) 
-        :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff" 
+        #(ut/tracked-dispatch [::scrubber-view-update kp (if (= ext :px) (str (+ v 1) "px") (+ v 1)) view-key type-key])
+        :style {:font-size "34px" :cursor "pointer" :opacity 0.3 :color "#ffffff"
                 :padding "0px" :margin-top "-11px"
                 }]]])])
 

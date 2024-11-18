@@ -64,9 +64,11 @@
            ;new-h       (hash pp) ;; (hash (ut/remove-underscored pp))
            _ (when force? (reset! force-once? true))
            client-name (get db :client-name)]
-       (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
-       (ut/dispatch-delay 800 [::insert-alert [:v-box :children [[:box :child "Syncing panel data with RVBBIT server..."]
-                                                                 [:box :child "Warming Leaf caches..."]]] 12 1 5])
+       (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server" force?])
+       (when force?
+         (ut/dispatch-delay 800 [::insert-alert [:v-box :children [[:box :child "Syncing panel data with RVBBIT server..."]
+                                                                 ;[:box :child "Warming Leaf caches..."]
+                                                                   ]]12 1 5]))
        (ut/dispatch-delay 1500 [::refresh-all]) ;; repopulate the client db caches after a server reboot...
        (ut/dispatch-delay 3500 [::update-panels-hash true])
      ;;(conn/push-panels-to-server pp ppr client-name)

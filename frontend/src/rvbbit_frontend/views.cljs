@@ -2953,9 +2953,7 @@
                                                      :height "25px"
                                                      :align :center
                                                      :children
-                                                     [[re-com/box :child (str fa)
-                                                                                    ;:style {:margin-top "2px"}
-                                                       ]
+                                                     [[re-com/box :child (str fa)]
                                                       [re-com/box :child " "]]])])]]]])]]]))
 
 (defonce shape-rotator-drawers (reagent/atom {}))
@@ -2973,7 +2971,7 @@
         ;_ (ut/pp [:recos items recos-map])
         ;_ (ut/pp [:resolved-recos ])
         _ (ut/pp [:options options])
-        mod-map (assoc options :*shapes shapes)
+        mod-map (assoc options :*shapes (sort-by str shapes))
         cols (count (keys mod-map))
         col-width (Math/floor (/ (- single-width 20) cols))
         options (into (sorted-map) mod-map)
@@ -6650,6 +6648,7 @@
 
 
 (defonce viz-modes-atom (reagent/atom "quick viz"))
+(defonce dimensions (reagent/atom {}))
 
 (defn fresh-spawn-modal []
   (let [[left top] @db/context-modal-pos
@@ -6723,7 +6722,7 @@
         temp-panels (get @db/temp-viz-reco-panel-keys query-id)
         tpanel (first temp-panels)
         shape-rotator-meta @(ut/tracked-sub ::bricks/shape-rotator-block-meta {:panel-key tpanel})
-        _ (ut/pp [:temp-panels temp-panels shape-rotator-meta])
+        ;_ (ut/pp [:temp-panels temp-panels shape-rotator-meta])
         ;these-recos (count @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [:recos-sys2]}))
          ;pkeys @(ut/tracked-subscribe [::bricks/preview-keys2])
         viz-modes ["quick viz" "pick viz"]
@@ -6750,9 +6749,17 @@
      :backdrop-on-click clear-state ;;(if (not @over-spawn-modal) clear-state (fn []))
      :child
 
+     ^{:key (str "fresh-spawns-" @db/dragged-kp)}
      [re-com/v-box
       :width "650px"
-      :height "400px"
+      :min-height "400px"
+      :attr {:ref #(when %
+                     (js/setTimeout
+                      (fn [] (let [rect (get-client-rect (clj->js {:target %}))
+                                   ;_ (ut/pp [:fresh-spawn-new-size (str (select-keys rect [:height :width]))])
+                                   ]
+                               (reset! dimensions {:width (Math/ceil (:width rect))
+                                                              :height (Math/ceil (:height rect))}))) 300))}
       ;;:style {:filter "brightness(200%)"}
       ;;:style {:backdrop-filter "blur(4px)"}
       :children
@@ -7038,13 +7045,14 @@
 
          ]]
 
-                                   (let [table-name-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :source-query])) "-" "_"))
-                                         field-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :target])) "-" "_"))
+                                   (let [;table-name-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :source-query])) "-" "_"))
+                                         ;field-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :target])) "-" "_"))
                                          ;data-keypath [(keyword (str "reco-combo-counts." table-name-str "." field-str))]
                                          recos @(ut/tracked-sub ::bricks/get-shape-viz {:dragged-kp @db/dragged-kp})
+                                         _ (ut/pp [:ff (str @db/dragged-kp) (count recos) ])
                                          reco-count (count recos) ;;(get-in @(ut/tracked-sub ::conn/sql-data-alpha {:keypath data-keypath}) [0 :rowcnt])
                                          ]
-                                     (ut/pp [:new-rowset (str reco-count " " table-name-str " " field-str)])
+                                    ;;  (ut/pp [:new-rowset (str reco-count " " table-name-str " " field-str)])
                                     ;;  (when true ;(empty? rowset)
                                     ;;    (conn/sql-data data-keypath
                                     ;;                   {:select   [[[:count :combo_edn] :rowcnt]]
@@ -7085,12 +7093,14 @@
                                                           ;;                                                :field (ut/n- (get-in dbody [:drag-meta :target]))}) 0)
                                                           (or (= ttype :query)
                                                               (= ttype :table)
+                                                              (= ttype :meta-tables)
                                                               (= ttype :field)))
 
 
                                                      (let [
                                            ;running? (or (= (count pkeys) 0) (not= @db/last-modal-viz-field field))
                                            ;running? (= (count pkeys) 0)
+
                                                            ]
                                                        ;(ut/pp [:viz-panel field dbody])
                                                        [re-com/v-box
@@ -7144,12 +7154,17 @@
 
 
 
-                                                                    [re-com/box
-                                                                     :child
-                                                                     [bricks/mad-libs-shapes-modal query-id 330 300 field [bx by]]
+                                                                    (let [dynh (max 300 (- (get @dimensions :height 0) 100))]
+                                                                      [re-com/box
+                                                                       :min-height (px dynh)
+                                                                       :child
+                                                                       [bricks/mad-libs-shapes-modal query-id
+                                                                        346
+                                                                        dynh
+                                                                        field [bx by]]
                                                                     ;[shape-rotator-panel tpanel shape-rotator-meta]
                                                                     ;[bricks/clover tpanel nil 9 6]
-                                                                     ])
+                                                                       ]))
 
 
 
@@ -7179,7 +7194,7 @@
                                                                       ;;  :size "auto" :align :center :justify :center
                                                                       ;;  :child "(dasdasdasdasd)"]
                                                                       [re-com/v-box
-                                                                       :height "400px"
+                                                                       :min-height "400px"
                                                                        ;:width "340px"
                                                                        :padding "5px"
                                                                        :style {;:margin-left "10px"
@@ -7214,7 +7229,7 @@
                                    ]]
 
                                    (when (and (empty? dbody)
-                                              (nil? @db/clover-leaf-previews))
+                                              (empty? @db/clover-leaf-previews))
                                      ;[re-com/box :child "yoyoyo"]
                                      [quake-console 770]
                                      )

@@ -13,6 +13,7 @@
    [clojure.java.io :as io]
    [clojure.java.jdbc :as jdbc]
    [clojure.java.shell :as shell]
+   [datalevin.core :as d]
    ;[clojure.math.combinatorics :as combo]
    [rvbbit-backend.pool-party :as ppy]
    [clojure.pprint :as ppt]
@@ -409,11 +410,30 @@
                                   ;;:filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
                                   :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
         combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)
+        shapes-by (group-by (fn [m] [(get-in m [:shape-rotator :honey-hash])
+                                     (keyword (get-in m [:shape-rotator :context 3]))]) combo-viz)
+        fields-by (group-by (fn [m] [(get m :honey-hash)
+                                     (keyword (get m :table-name))]) res)
+        ;; _ (ut/pp [:kk (keys shapes-by) (keys fields-by)])
+        _ (doseq [kk (keys fields-by)
+                  :let [[honey-hash table-name-kw] kk
+                        shapes (get shapes-by kk)
+                        fields (get fields-by kk)
+                        res {:shapes shapes :fields fields}
+                        hash-key (hash [:fresh-table! connection-id table-name-kw])
+                        modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] [:fresh-table! connection-id table-name-kw])
+                                                               (get res :shapes)))]]
+            (d/transact-kv db/ddb
+                           [[:put "honeyhash-map" honey-hash res]
+                            [:put "shapes-map" hash-key modded-shapes]]))
+        ;; group by honeyhash - do artificial inserts into datalevin
+        ;; "[\"none!\" nil :Crime_Data_from_2020_to_Present]"
+        ;;_ (ut/pp ["🥩" :shape-rotator-db {:fields (take 2 res) :shapes (take 2 combo-viz)}])
         _ (ut/pp ["🥩" :shape-rotator-fields [:fields (count res) :viz (count combo-viz)]])
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
 
-
+;; (shape-rotation-run "connections/bigfoot-ufos.edn")
 
 (defn db-sniff-solver-default [f-path conn-name]
   {:signal :signal/daily-at-9am
@@ -423,24 +443,12 @@
             {:conn-name conn-name
              :f-path f-path}
             '(do
-               (ns rvbbit-backend.cruiser
+               (ns rvbbit-backend.core
                  (:require [rvbbit-backend.websockets :as wss]
                            [rvbbit-backend.pool-party :as ppy]
                            [rvbbit-backend.sql :as sql]))
                (let [conn (get (deref db/conn-map) :conn-name)]
-                 ;(ppy/execute-in-thread-pools
-                 ; :conn-schema-sniff-serial
-                 ; (fn []
-                ;;  (lets-give-it-a-whirl-no-viz
-                ;;   :f-path
-                ;;   conn
-                ;;   sql/system-db
-                ;;   default-sniff-tests
-                ;;   default-field-attributes
-                ;;   default-derived-fields
-                ;;   default-viz-shapes)
-                 (shape-rotation-run :f-path)
-                 )))})
+                 (shape-rotation-run :f-path))))})
 
 ;; (ut/pp (db-sniff-solver-default "./connections/postgres.edn" "postgres"))
 ;; (ut/pp (keys @db/conn-map))
@@ -470,7 +478,7 @@
             :let [f-path    (str prefix f)
                   conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))
                   solver-name (keyword (str "refresh-" conn-name))
-                  solver-edn-fp "./defs/solvers.edn"
+                  solver-edn-fp "defs/solvers.edn"
                   solver-exist? (get @wss/solvers-atom solver-name)
                   _ (when (not solver-exist?)
                       (ut/pp [:refresh-metadata-schedule-being-created-for conn-name :as solver-name])
@@ -1016,7 +1024,7 @@
 
    ;; create dirs for various artifacts, if not already present
     (doseq [dir ["assets" "assets/snaps" "assets/screen-snaps" "defs/backup"
-                 "db/xtdb-system/tx-log" "db/xtdb-system/storage"
+                 ;; "db/xtdb-system/tx-log" "db/xtdb-system/storage"
                  "flow-logs" "flow-blocks" "flow-history" "live"]]
       (ext/create-dirs dir))
 
@@ -1052,7 +1060,12 @@
     (sql-exec systemh2-db h2/create-fields-view)
     ;; (sql-exec systemh2-db h2/create-ft-index)
 
-    (db/open-ddb) ;; start datalevin instance
+    (db/open-ddb "honeyhash-map") ;; start datalevin instances
+    (db/open-ddb "shapes-map")
+    (db/open-ddb "shapes-map/fields")
+    (db/open-ddb "shapes-map/shapes")
+    (db/open-ddb "last-values")
+
 
     (sql-exec system-db "drop table if exists jvm_stats;")
     (sql-exec system-db "drop table if exists client_memory;")

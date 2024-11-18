@@ -161,7 +161,7 @@
        :poll-when                [::bricks/new-flow-subs?]
        :dispatch-event-on-start? false}
 
-      {:interval                 60 ;; 5 ;; unsubscribe to server data
+      {:interval                 30 ;; 5 ;; unsubscribe to server data
        :event                    [::bricks/unsub-to-flows]
        :poll-when                [::bricks/stale-flow-subs?]
        :dispatch-event-on-start? false}
@@ -170,11 +170,11 @@
       ;;  :event                    [::bricks/purge-cache-atoms]
       ;;  :dispatch-event-on-start? false}
 
-      {:interval                 60 ;;300
+      {:interval                 120 ;;300
        :event                    [::bricks/save-snap-periodically]
        :dispatch-event-on-start? false}
 
-      {:interval                 3600 ;; one hour. more?
+      {:interval                 1800 ;; 30 mins. more?
        :event                    [::bricks/clear-cache-atoms]
        :dispatch-event-on-start? false}
 
@@ -212,6 +212,7 @@
 
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
+  (reset! db/clover-cache-atom {})
   (let [root-el (.getElementById js/document "app")]
     (rdom/unmount-component-at-node root-el)
     (rdom/render [views/main-panel] root-el)))
@@ -238,11 +239,6 @@
                         {:message     {:kind :signals-map
                                        :client-name db/client-name}
                          :on-response [::signals/signals-map-response]
-                         :timeout     15000000}])
-  (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :rules-map
-                                       :client-name db/client-name}
-                         :on-response [::signals/rules-map-response]
                          :timeout     15000000}])
   (ut/tracked-dispatch [::wfx/request :default
                         {:message     {:kind :solvers-map
@@ -283,6 +279,7 @@
   (ut/tracked-dispatch [::subs/window-fx-watcher])
   (ut/dispatch-delay 7000 [::audio/text-to-speech11 :audio :elevenlabs nil])
   ;; ^^ get voices if avail, but wait to make sure we have the api key from the server first
+  (ut/dispatch-delay 4000 [::bricks/leaf-push [:canvas :canvas :canvas] {}])
   (dispatch-poller-rules)
   (dispatch-keyup-rules)
   (dispatch-keydown-rules)

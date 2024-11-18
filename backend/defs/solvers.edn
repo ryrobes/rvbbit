@@ -1,38 +1,9 @@
-{:materialize-bigfoot-sightings-drag-37
-   {:signal    :signal/daily-at-7am
-    :type      :sql
-    :snapshot? false
-    :data      {:select        [:alsonoticed :bfroid :class :county :date :environment :fixed_month :fixed_year
-                                :locationdetails :month :nearestroad :nearesttown :observed :otherstories
-                                :otherwitnesses :run_id :run_time :season :sketch :state :submitted :submitted_date
-                                :timeandconditions :title :url :year]
-                :from          [[:bigfoot_sightings :ii912]]
-                :page          -4
-                :connection-id "bigfoot-ufos"}}
- :colors-of-the-moment {:signal :signal/changed-wallpaper?
+{:colors-of-the-moment {:signal :signal/changed-wallpaper?
                         :cache? false
                         :type   :flow
                         :data   {:flowmap "node-color-thief-js-webp"
                                  :opts    {:overrides {:image-path :solver/wallpaper-of-the-moment}}
                                  :return  nil}}
- :materialize-albums-drag-42 {:signal    :signal/daily-at-7am
-                              :type      :sql
-                              :snapshot? false
-                              :data      {:select        [:album_href :album_name :img_300 :img_64 :img_640 :popularity
-                                                          :release_date :ts]
-                                          :from          [[:albums :uu754]]
-                                          :page          -4
-                                          :connection-id "met-on-tour"}}
- :materialize-offenses-drag-4 {:signal    :signal/daily-at-7am
-                               :type      :sql
-                               :snapshot? false
-                               :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                           :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                           :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                           :SHOOTING :STREET :UCR_PART :YEAR]
-                                           :from          [[:offenses :dd96]]
-                                           :page          -4
-                                           :connection-id "boston-crime"}}
  :all-large-webp-files {:signal false
                         :type   :clojure
                         :cache? true
@@ -46,87 +17,26 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
- :refresh-met-on-tour {:signal :signal/daily-at-9am
-                       :type   :clojure
-                       :cache? false
-                       :data   (do (ns rvbbit-backend.cruiser
-                                     (:require [rvbbit-backend.websockets :as wss]
-                                               [rvbbit-backend.pool-party :as ppy]
-                                               [rvbbit-backend.sql :as sql]))
-                                   (let [conn (get (deref wss/conn-map) "met-on-tour")]
-                                     (lets-give-it-a-whirl-no-viz "connections/met-on-tour.edn"
-                                                                  conn
-                                                                  sql/system-db
-                                                                  default-sniff-tests
-                                                                  default-field-attributes
-                                                                  default-derived-fields
-                                                                  default-viz-shapes)))}
- :materialize-cached-offenses-drag-43-1
-   {:signal    :signal/daily-at-7am
-    :type      :sql
-    :snapshot? false
-    :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH
-                                :OCCURRED_ON_DATE :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                :SHOOTING :STREET :UCR_PART :YEAR]
-                :from          [[:offenses_drag_43 :zz175]]
-                :page          -4
-                :connection-id "cache.db.memory"}}
- :materialize-DISTRICT-drag-18
-   {:signal :signal/daily-at-7am
-    :type :sql
-    :snapshot? false
-    :data
-      {:select [:DISTRICT [[:count 1] :rowcnt] :OFFENSE_CODE :STREET]
-       :from
-         [[{:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE
-                     :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
-                     :YEAR]
-            :from   [[:offenses :ww131]]} :kk71]]
-       :group-by [:DISTRICT :OFFENSE_CODE :STREET]
-       :order-by [[:rowcnt :desc]]
-       :page -4
-       :connection-id "boston-crime"}}
- :materialize-offenses-drag-6 {:signal    :signal/daily-at-7am
-                               :type      :sql
-                               :snapshot? false
-                               :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                           :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                           :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                           :SHOOTING :STREET :UCR_PART :YEAR]
-                                           :from          [[:offenses :pp251]]
-                                           :page          -4
-                                           :connection-id "boston-crime"}}
- :refresh-clickhouse-ex {:signal :signal/daily-at-9am
-                         :type   :clojure
-                         :cache? false
-                         :data   (do (ns rvbbit-backend.cruiser
-                                       (:require [rvbbit-backend.websockets :as wss]
-                                                 [rvbbit-backend.pool-party :as ppy]
-                                                 [rvbbit-backend.sql :as sql]))
-                                     (let [conn (get (deref db/conn-map) "clickhouse-ex")]
-                                       (shape-rotation-run "connections/clickhouse-ex.edn")))}
  :random-mp3
    {:signal :signal/changed-wallpaper?
-    :type :clojure
+    :type   :clojure
     :cache? false
-    :data
-      (do
-        (ns mp3-finder.core
-          (:require [clojure.java.io :as io]))
-        (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
-        (defn is-mp3? "Checks if the given file object is an MP3 file." [file] (.endsWith (.getName file) ".mp3"))
-        (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
-        (defn get-file-name "Gets the name of a file object." [file] (.getName file))
-        (defn find-random-mp3
-          "Given a starting directory, finds all *.mp3 files recursively\n                                       and returns a vector containing:\n                                       [full-path file-name]\n                                       for a random MP3 file."
-          [start-dir]
-          (let [mp3-files (->> (file-seq (io/file start-dir))
-                               (filter is-file?)
-                               (filter is-mp3?)
-                               (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
-                               (into []))]
-            (if (seq mp3-files) (rand-nth mp3-files) nil)))
-        [:play-click-custom (find-random-mp3 "~/Music")])}
+    :data   (do
+              (ns mp3-finder.core
+                (:require [clojure.java.io :as io]))
+              (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
+              (defn is-mp3? "Checks if the given file object is an MP3 file." [file] (.endsWith (.getName file) ".mp3"))
+              (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
+              (defn get-file-name "Gets the name of a file object." [file] (.getName file))
+              (defn find-random-mp3
+                [start-dir]
+                (let [mp3-files (->> (file-seq (io/file start-dir))
+                                     (filter is-file?)
+                                     (filter is-mp3?)
+                                     (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
+                                     (into []))]
+                  (if (seq mp3-files) (rand-nth mp3-files) nil)))
+              [:play-click-custom (find-random-mp3 "~/Music")])}
  :get-my-colors {:signal    false
                  :cache?    true
                  :type      :flow
@@ -152,21 +62,6 @@
                    :cache?    true
                    :input-map {:some-string "HEYa!" :some-number 123}
                    :data      (str :some-string (+ 123 :some-number))}
- :refresh-superstore {:signal :signal/daily-at-9am
-                      :type   :clojure
-                      :cache? false
-                      :data   (do (ns rvbbit-backend.cruiser
-                                    (:require [rvbbit-backend.websockets :as wss]
-                                              [rvbbit-backend.pool-party :as ppy]
-                                              [rvbbit-backend.sql :as sql]))
-                                  (let [conn (get (deref wss/conn-map) "superstore")]
-                                    (lets-give-it-a-whirl-no-viz "connections/superstore.edn"
-                                                                 conn
-                                                                 sql/system-db
-                                                                 default-sniff-tests
-                                                                 default-field-attributes
-                                                                 default-derived-fields
-                                                                 default-viz-shapes)))}
  :sql-solver-1
    {:signal :signal/every-5-minutes
     :type :sql
@@ -181,107 +76,11 @@
        :connection-id   "system-db"
        :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
        :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
- :materialize-offenses-drag-43 {:signal    :signal/daily-at-7am
-                                :type      :sql
-                                :snapshot? false
-                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                            :SHOOTING :STREET :UCR_PART :YEAR]
-                                            :from          [[:offenses :aa855]]
-                                            :page          -4
-                                            :connection-id "boston-crime"}}
- :materialize-offenses-drag-20 {:signal    :signal/daily-at-7am
-                                :type      :sql
-                                :snapshot? false
-                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                            :SHOOTING :STREET :UCR_PART :YEAR]
-                                            :from          [[:offenses :zz384]]
-                                            :page          -4
-                                            :connection-id "boston-crime"}}
  :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
- :refresh-boston-crime {:signal :signal/daily-at-9am
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (deref wss/conn-map) "boston-crime")]
-                                      (lets-give-it-a-whirl-no-viz "connections/boston-crime.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
  :png-wallpaper? {:signal :signal/changed-wallpaper?
                   :type   :clojure
                   :cache? true
                   :data   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}
- :materialize-bigfoot-sightings-locations-drag-36
-   {:signal    :signal/daily-at-7am
-    :type      :sql
-    :snapshot? false
-    :data      {:select        [:alsonoticed :bfroid :class :county :cty_abbrev :cty_name :date :environment
-                                :fips_county_code :fips_state_code :fixed_month :fixed_year :housing_units :land_area
-                                :latitude :locationdetails :longitude :month :nearestroad :nearesttown :observed
-                                :otherstories :otherwitnesses :population :run_id :run_time :season :state :state_abbrev
-                                :state_name :submitted :submitted_date :timeandconditions :title :url :water_area :year
-                                :zip_lat :zip_long :zip_name :zipcode]
-                :from          [[:bigfoot_sightings_locations :pp646]]
-                :page          -4
-                :connection-id "bigfoot-ufos"}}
- :materialize-bigfoot-sightings-locations-drag-40
-   {:signal    :signal/daily-at-7am
-    :type      :sql
-    :snapshot? false
-    :data      {:select        [:alsonoticed :bfroid :class :county :cty_abbrev :cty_name :date :environment
-                                :fips_county_code :fips_state_code :fixed_month :fixed_year :housing_units :land_area
-                                :latitude :locationdetails :longitude :month :nearestroad :nearesttown :observed
-                                :otherstories :otherwitnesses :population :run_id :run_time :season :state :state_abbrev
-                                :state_name :submitted :submitted_date :timeandconditions :title :url :water_area :year
-                                :zip_lat :zip_long :zip_name :zipcode]
-                :from          [[:bigfoot_sightings_locations :nn100]]
-                :page          -4
-                :connection-id "bigfoot-ufos"}}
- :materialize-offenses-drag-24 {:signal    :signal/daily-at-7am
-                                :type      :sql
-                                :snapshot? false
-                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                            :SHOOTING :STREET :UCR_PART :YEAR]
-                                            :from          [[:offenses :ww131]]
-                                            :page          -4
-                                            :connection-id "boston-crime"}}
- :materialize-offenses-drag-26 {:signal    :signal/daily-at-7am
-                                :type      :sql
-                                :snapshot? false
-                                :data      {:select        [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location
-                                                            :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE
-                                                            :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA
-                                                            :SHOOTING :STREET :UCR_PART :YEAR]
-                                            :from          [[:offenses :oo871]]
-                                            :page          -4
-                                            :connection-id "boston-crime"}}
- :refresh-xtdb-pg {:signal :signal/daily-at-9am
-                   :type   :clojure
-                   :cache? false
-                   :data   (do (ns rvbbit-backend.cruiser
-                                 (:require [rvbbit-backend.websockets :as wss]
-                                           [rvbbit-backend.pool-party :as ppy]
-                                           [rvbbit-backend.sql :as sql]))
-                               (let [conn (get (deref wss/conn-map) "xtdb-pg")]
-                                 (lets-give-it-a-whirl-no-viz "connections/xtdb-pg.edn"
-                                                              conn
-                                                              sql/system-db
-                                                              default-sniff-tests
-                                                              default-field-attributes
-                                                              default-derived-fields
-                                                              default-viz-shapes)))}
  :wallpaper-of-the-moment
    {:signal  :signal/every-5-minutes
     :type    :clojure
@@ -295,63 +94,4 @@
                        image-paths    (map (fn [x] (.getPath x)) image-files)
                        relative-paths (map (fn [x] (.substring x (count (.getPath dir)))) image-paths)]
                    (str relative-dir (when (seq relative-paths) (rand-nth relative-paths)))))}
- :refresh-pg-date-test {:signal :signal/daily-at-9am
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (deref wss/conn-map) "pg-date-test")]
-                                      (lets-give-it-a-whirl-no-viz "connections/pg-date-test.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
- :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
-                        :type   :clojure
-                        :cache? false
-                        :data   (do (ns rvbbit-backend.cruiser
-                                      (:require [rvbbit-backend.websockets :as wss]
-                                                [rvbbit-backend.pool-party :as ppy]
-                                                [rvbbit-backend.sql :as sql]))
-                                    (let [conn (get (deref wss/conn-map) "bigfoot-ufos")]
-                                      (lets-give-it-a-whirl-no-viz "connections/bigfoot-ufos.edn"
-                                                                   conn
-                                                                   sql/system-db
-                                                                   default-sniff-tests
-                                                                   default-field-attributes
-                                                                   default-derived-fields
-                                                                   default-viz-shapes)))}
- :materialize-Lat-drag-22
-   {:signal :signal/daily-at-7am
-    :type :sql
-    :snapshot? false
-    :data
-      {:select [[[:sum :Lat] :Lat_sum] :OFFENSE_CODE_GROUP]
-       :from
-         [[{:select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE
-                     :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART
-                     :YEAR]
-            :from   [[:offenses :ww131]]} :ee900]]
-       :group-by [:OFFENSE_CODE_GROUP]
-       :page -4
-       :connection-id "boston-crime"}}
- :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}
- :refresh-imported {:signal :signal/daily-at-9am
-                    :type   :clojure
-                    :cache? false
-                    :data   (do (ns rvbbit-backend.cruiser
-                                  (:require [rvbbit-backend.websockets :as wss]
-                                            [rvbbit-backend.pool-party :as ppy]
-                                            [rvbbit-backend.sql :as sql]))
-                                (let [conn (get (deref wss/conn-map) "imported")]
-                                  (lets-give-it-a-whirl-no-viz "connections/imported.edn"
-                                                               conn
-                                                               sql/system-db
-                                                               default-sniff-tests
-                                                               default-field-attributes
-                                                               default-derived-fields
-                                                               default-viz-shapes)))}}
+ :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}}

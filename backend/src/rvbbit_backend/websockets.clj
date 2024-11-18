@@ -14,6 +14,7 @@
    [clojure.java.jdbc         :as jdbc]
    [flowmaps.db               :as flow-db]
    [clojure.data              :as data]
+   [datalevin.core :as d]
    [rvbbit-backend.external   :as ext]
    [rvbbit-backend.endpoints   :as edp]
    [rvbbit-backend.db         :as db]
@@ -199,13 +200,10 @@
 
 (def pool-stats-atom  (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/pool-stats-atom.edn"))
 
-(def times-atom (fpop/thaw-atom {} "./data/atoms/times-atom.edn"))
+(def times-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/times-atom.edn"))
 ;;(def params-atom (fpop/thaw-atom {} "./data/atoms/params-atom.edn"))
 ;; (def params-atom (atom  {})) ;; stop persisting params, they are dynamic and can be reloaded live (do we *really* care about dead rabbit session params? no)
 ;; (def atoms-and-watchers (atom {}))
-
-;; (def last-values (fpop/thaw-atom {} "./data/atoms/last-values.edn"))
-;; (def last-values-per (fpop/thaw-atom {} "./data/atoms/last-values-per.edn"))
 
 ;; (def param-var-mapping (atom {}))
 ;; (def param-var-crosswalk (atom {}))
@@ -1696,9 +1694,14 @@
 ;;             :execution-time (str execution-time " seconds")])))
 
 (defmethod wl/handle-push :give-viz-recos-for [{:keys [client-name panel-key data-key existing]}]
-  (let [recos-for (get-in @db/shapes-result-map [client-name panel-key data-key :shapes])
+  (let [;;recos-for (get-in @db/shapes-result-map [client-name panel-key data-key :shapes])
+        dd (d/get-value db/ddb "shapes-map" (hash [client-name panel-key data-key]))
+        recos-for (get
+                   ;;(db/ddb-get "honeyhash-map" (hash [client-name panel-key data-key]))
+                   dd
+                   :shapes)
         recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) recos-for)
-        one-of-each (mapv (fn [[k v]] (first v)) recos-for-grouped)
+        one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)
         count-found (count recos-for)]
     (ut/pp ["🦐" :give-viz-recos-for :client client-name panel-key data-key :had existing :found count-found (count one-of-each)])
     (when (not= count-found existing)
@@ -1771,9 +1774,16 @@
 (defmethod wl/handle-push :get-shape-rotations
   [{:keys [panel-key source-panel shape-name query-key client-name]}]
   (ut/pp [:req-shape-rotations client-name panel-key :src source-panel shape-name query-key])
-  (let [full-recos (get-in @db/shapes-result-map [client-name source-panel query-key :shapes]) ;; :fields
-        ;;_ (ut/pp [:wut (get-in @db/shapes-result-map [client-name source-panel])])
-        ;;_ (ut/pp [:full-recos (count full-recos) [client-name source-panel query-key]])
+  (let [;full-recos (get-in @db/shapes-result-map [client-name source-panel query-key :shapes]) ;; :fields
+                ;;dd (db/ddb-get "honeyhash-map" (hash [client-name panel-key query-key]))
+        key-hash (if (vector? source-panel)
+                   (hash source-panel) ;; only for fresh-table spawns that have no block to reference
+                   ;; will be something like [:fresh-table! "connection-id" :keyword_sql_table], else it's a normal panel-key keyword from the client
+                   (hash [client-name source-panel query-key]))
+        dd (d/get-value db/ddb "shapes-map" key-hash)
+        full-recos (get dd :shapes)
+        ;;_ (ut/pp [:wut key-hash dd])
+        _ (ut/pp [:full-recos (count full-recos) [client-name source-panel query-key]])
         all-shapes (vec (distinct (map (fn [m] (get-in m [:shape-rotator :shape-name])) full-recos)))
         shape-recos (filterv #(= (get-in % [:shape-rotator :shape-name]) shape-name) full-recos)
         _ (ut/pp [:req-shape-rotations :shape-recos (count shape-recos) :of (count full-recos)])
@@ -1913,21 +1923,30 @@
 ;; (ut/pp [:dggg @db/leaf-brute-force-map])
 
 (defn push-drag-related-shape-viz  [client-name dragged-kp]
-  (let [[panel-key runner data-key _ field-name] dragged-kp]
-    (when (= runner :queries)
-      (when-let [done-shapes (get-in @db/shapes-result-map [client-name panel-key data-key])]
-        (let [dim? (get (first (filter #(= (get % :field-name) (name field-name)) (get done-shapes :fields))) :dimension? false)
-              _ (ut/pp [:BOO! field-name dim?])
+  (let [[panel-key runner data-key _ field-name] dragged-kp
+        hash-key (if (string? runner)
+                   (hash dragged-kp) ;; [:fresh-table!  "bigfoot-ufos" :some_table_name]
+                   (hash [client-name panel-key data-key]))]
+    (when (or (= runner :queries) (string? runner)) ;; for fresh-table spawns runner pos is connection-id str
+      (when-let [;;done-shapes (get-in @db/shapes-result-map [client-name panel-key data-key])
+                 ;;done-shapes (db/ddb-get "honeyhash-map" (hash [client-name panel-key data-key]))
+                 done-shapes (d/get-value db/ddb "shapes-map" hash-key)]
+        (let [dim? (get (first (filter #(= (get % :field-name) (cstr/replace (str field-name) ":" "")) (get done-shapes :fields))) :dimension? false)
               reco-count (count (get done-shapes :shapes))
-              relevant-shapes (if dim?
+              _ (ut/pp [:BOO! field-name dim? reco-count])
+              relevant-shapes (cond
+                                (nil? field-name)
+                                (filterv #(contains? (set (ut/deep-flatten %)) :rrows) (get done-shapes :shapes))
+
+                                dim?
                                 (filterv #(and
                                            (contains? (set (ut/deep-flatten %)) :rrows)
                                            (contains? (set (ut/deep-flatten %)) field-name)) (get done-shapes :shapes))
-                                (filterv #(contains? (set (ut/deep-flatten %)) field-name) (get done-shapes :shapes)))
+                                :else (filterv #(contains? (set (ut/deep-flatten %)) field-name) (get done-shapes :shapes)))
               recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) relevant-shapes)
               _ (ut/pp ["🧀" :shape-rotator-DRAG field-name :honey-hash-cached-loaded client-name data-key (count relevant-shapes) :/ reco-count :viz-cnt (count recos-for-grouped)])
               one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
-          (client-mutate client-name {[:shapes dragged-kp] one-of-each}))))))
+          (client-mutate client-name {[:shapes dragged-kp] one-of-each} true))))))
 
 (defmethod wl/handle-push :client-ui
   [{:keys [client-name atom-name value dragged-kp dragging-body]}]
@@ -1987,8 +2006,16 @@
       cached-result
       (let [[panel-key _ query-key _ field] dragged-kp
             str-field (name field)
-            kp [client-name panel-key query-key :fields]
-            result (or (first (get (group-by :field-name (get-in @db/shapes-result-map kp)) str-field))
+            ;kp [client-name panel-key query-key :fields]
+            dd (d/get-value db/ddb "shapes-map" (hash [client-name panel-key query-key]))
+            data (get
+                  ;;(db/ddb-get "honeyhash-map" (hash [client-name panel-key query-key]))
+                  dd
+                  :fields)
+            result (or (first (get (group-by :field-name
+                                             ;(get-in @db/shapes-result-map kp)
+                                             data
+                                             ) str-field))
                        {})]
         (swap! shape-rotation-meta-cache assoc cache-key result)
         result))))
@@ -1999,7 +2026,7 @@
 
 (defmethod wl/handle-push :leaf-push
   [{:keys [client-name dragged-kp dragging-body]}]
-  (ut/pp  ["👀🍂" :leaf-push client-name dragged-kp dragging-body])
+  ;; (ut/pp  ["👀🍂" :leaf-push client-name dragged-kp dragging-body])
   (swap! db/leaf-evals inc)
   (swap! db/drag-body-map assoc-in [client-name dragged-kp] dragging-body)
   (swap! db/leaf-drags-atom assoc client-name dragged-kp)
@@ -2016,7 +2043,8 @@
     (client-mutate client-name {kp-targeta actions
                                 kp-targetm meta} true)
     (swap! db/leaf-atom assoc client-name {:actions actions :metadata meta})
-    (ut/pp ["👀🍂" :leaf-push-output (get res :actions)]))
+    ;; (ut/pp ["👀🍂" :leaf-push-output (get res :actions)])
+    )
 
   (ppy/execute-in-thread-pools ;; send one of each recos to the client
    (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
@@ -4744,7 +4772,9 @@
                                                                         sub-path
                                                                         keypath)
                                                 keypath
-                                                (get @db/last-values keypath))]]
+                                                ;(get @db/last-values keypath)
+                                                (db/ddb-get "last-values" (hash keypath))
+                                                )]]
                          {k v3})))}))
          client-name :rvbbit
          nowah (System/currentTimeMillis) ;; want to have a consistent timestamp for this
@@ -4890,7 +4920,7 @@
         (swap! db/client-panels dissoc k)
         (swap! db/client-panels-data dissoc k)
         (swap! db/client-panels-metadata dissoc k)
-        (swap! db/shapes-result-map dissoc k)
+        ;(swap! db/shapes-result-map dissoc k)
         ;; (swap! client-panels-history dissoc k)
         (swap! db/ack-scoreboard dissoc k)))
     (catch Exception e (ut/pp [:purge-client-queues-error e]))))
@@ -5021,7 +5051,8 @@
             (swap! db/param-var-key-mapping assoc
                    client-name
                    (vec (distinct (conj (get @db/param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
-        lv                      (get @db/last-values keypath)]
+        lv                      (db/ddb-get "last-values" (hash keypath)) ;;(get @db/last-values keypath)
+        ]
     ;; (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath
     ;;         ;{:sub-path sub-path}
     ;;         flow-key])
@@ -5130,7 +5161,9 @@
                                                                                                                   sub-path
                                                                                                                   keypath)
                                                                                           keypath
-                                                                                          (get @db/last-values keypath))]] ;; extra
+                                                                                          ;;(get @db/last-values keypath)
+                                                                                          (db/ddb-get "last-values" (hash keypath))
+                                                                                          )]] ;; extra
                                                                                                                            ;; cache
                                                                                                                            ;; for
                                                                                                                            ;; last
@@ -6010,7 +6043,7 @@
 
 (def qcache (atom {})) ;; test
 
-(defn cached-sql-query [target-db honey-sql-str ui-keypath & [connection-id]]
+(defn cached-sql-query [target-db honey-sql-str ui-keypath & [connection-id ]]
   (if (not (cstr/includes? (str connection-id) "system"))
     (let [cache-key (hash [honey-sql-str connection-id])]
       (if-let [cached-result (@qcache cache-key)]
@@ -6020,6 +6053,79 @@
           (swap! qcache assoc cache-key result)
           result)))
     (sql-query target-db honey-sql-str ui-keypath)))
+
+
+
+(defn query-shape-rotation [client-name panel-key ui-keypath connection-id honey-hash honey-sql row-count]
+  (ppy/execute-in-thread-pools
+   (keyword (cstr/replace (str "shape-rotator-for-each-sql-query-serial-" client-name) ":" ""))
+   (fn []
+     (let [system-query? (cstr/includes? (str connection-id) "system")]
+       (try
+         (if-let [cached (when true ;(not system-query?) ;;
+                           ;;(get @db/shapes-result-map-by-honey-hash honey-hash)
+                           ;(db/ddb-get "honeyhash-map" honey-hash)
+                           (d/get-value db/ddb "honeyhash-map" honey-hash)
+                           )]
+
+           (let [reco-count (count (get cached :shapes))
+                 fields (get cached :fields)
+                 field-counts (into {} (for [r fields] {(keyword (get r :field-name)) (get r :distinct-count)
+                                                        :* (or row-count (get r :total-rows))}))
+                 modded-shapes (assoc cached :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] panel-key)
+                                                           (get cached :shapes)))
+                 hash-key (hash [client-name panel-key (first ui-keypath)])]
+             (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
+             (ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
+                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
+             ;(swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
+             (db/ddb-put! "shapes-map" hash-key modded-shapes)
+
+            ;;  (ppy/execute-in-thread-pools ;; send one of each recos to the client
+            ;;   (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
+            ;;   (fn [] (let [;_ (Thread/sleep 500) ;; pace out the client packets a bit
+            ;;                recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) modded-shapes)
+            ;;                one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
+            ;;            (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each}))))
+             (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0))
+
+           ;; non honeyhash cache
+           (let [;;_ (ut/pp [:hh client-name honey-hash (str honey-sql)])
+                 {fields-ms :elapsed-ms fields :result} (ut/timed-exec
+                                                         (rota/get-field-maps
+                                                          {:f-path connection-id ;target-db
+                                                           :shape-test-defs cruiser/default-sniff-tests
+                                                           :shape-attributes-defs cruiser/default-field-attributes
+                                                           :query-name (first ui-keypath)
+                                                           :honey-sql honey-sql}))
+                 {shapes-ms :elapsed-ms shapes :result} (ut/timed-exec
+                                                         (rota/get-viz-shape-blocks fields cruiser/default-viz-shapes))
+                 res {:fields fields :shapes shapes}
+                 reco-count (count shapes)
+                 field-counts (into {} (for [r fields] {(keyword (get r :field-name)) (get r :distinct-count)
+                                                        :* (get r :total-rows)}))
+                 modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] panel-key)
+                                                        (get res :shapes)))
+                 hash-key (hash [client-name panel-key (first ui-keypath)])]
+             (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
+             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
+                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
+             ;;(swap! db/shapes-result-map-by-honey-hash assoc honey-hash res) ;; multi-client cache
+             ;(db/ddb-put! "honeyhash-map" honey-hash res)
+             ;(swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
+             ;(db/ddb-put! "honeyhash-map" hash-key modded-shapes)
+             (d/transact-kv db/ddb
+                            [[:put "honeyhash-map" honey-hash res]
+                             [:put "shapes-map" hash-key modded-shapes]])
+
+            ;;  (ppy/execute-in-thread-pools ;; send one of each recos to the client
+            ;;   (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
+            ;;   (fn [] (let [;_ (Thread/sleep 500) ;; pace out the client packets a bit
+            ;;                recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) modded-shapes)
+            ;;                one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
+            ;;            (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each}))))
+             (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0)))
+         (catch Throwable e (ut/pp [:shape-rotator-for-each-error! (str e) client-name ui-keypath])))))))
 
 (defn query-runstream
   [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache?]
@@ -6259,9 +6365,15 @@
                         ;; _ (swap! materialized-full-queries assoc-in [client-name (last ui-keypath)] honey-sql)
                        ;; _ (ppy/execute-in-thread-pools :harvest-clover-training (fn [] (get-clover-sql-training clover-sql honey-sql-str2)))
                         honey-result (timed-expr (if literal-data?
-                                                   honey-sql ;; which in this case IS the
-                                                   (cached-sql-query target-db honey-sql-str ui-keypath connection-id)
-                                                   ))
+                                                   honey-sql ;; which in this case IS the data
+                                                   (cached-sql-query target-db honey-sql-str ui-keypath connection-id)))
+                        row-count (try
+                                    (get-in
+                                     (sql-query target-db
+                                                (-> (str "select count(1) as cnt from (" honey-sql-str2 ") subq")
+                                                    (cstr/replace "LIMIT 500" "")
+                                                    (cstr/replace "limit 500" ""))
+                                                ui-keypath connection-id) [0 :cnt]) (catch Exception _ -1))
                         query-ms (get honey-result :elapsed-ms)
                         honey-result (get honey-result :result)
                         query-error? (get (first honey-result) :database_says)
@@ -6383,7 +6495,8 @@
                                                         (get orig-honey-sql :data))
                                                   (keys fields)
                                                   (get @sql/map-orders honey-sql-str))}
-                        result-hash (hash result)]
+                        ;result-hash (hash result)
+                        ]
 
                     ;; (when (cstr/includes? (str ui-keypath) "advanced") (ut/pp [:output (get output :honey-meta) :!!]))
                      ;(enqueue-task-sql-meta
@@ -6675,68 +6788,7 @@
 
 
 
-                                                                  (ppy/execute-in-thread-pools
-                                                                   (keyword (cstr/replace (str "shape-rotator-for-each-sql-query-serial-" client-name) ":" ""))
-                                                                   (fn []
-                                                                     (let [system-query? (cstr/includes? (str connection-id) "system")]
-                                                                       (try
-                                                                         (if-let [cached (when (not system-query?)
-                                                                                           (get @db/shapes-result-map-by-honey-hash honey-hash))]
-
-                                                                           (let [reco-count (count (get cached :shapes))
-                                                                                 fields (get cached :fields)
-                                                                                 field-counts (into {} (for [r fields] {(keyword (get r :field-name)) (get r :distinct-count)
-                                                                                                                        :* (get r :total-rows)}))
-                                                                                 modded-shapes (assoc cached :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] panel-key)
-                                                                                                                           (get cached :shapes)))]
-                                                                             (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-                                                                             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
-                                                                                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows])
-                                                                             (swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
-                                                                             (db/ddb-put! [client-name panel-key (first ui-keypath)] modded-shapes)
-
-                                                                             (ppy/execute-in-thread-pools ;; send one of each recos to the client
-                                                                              (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
-                                                                              (fn [] (let [;_ (Thread/sleep 500) ;; pace out the client packets a bit
-                                                                                           recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) (get cached :shapes))
-                                                                                           one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
-                                                                                       (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each}))))
-                                                                             (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0))
-
-                                                                       ;; non cache
-
-                                                                           (let [;;_ (ut/pp [:hh client-name honey-hash (str honey-sql)])
-                                                                                 {fields-ms :elapsed-ms fields :result} (ut/timed-exec
-                                                                                                                         (rota/get-field-maps
-                                                                                                                          {:f-path connection-id ;target-db
-                                                                                                                           :shape-test-defs cruiser/default-sniff-tests
-                                                                                                                           :shape-attributes-defs cruiser/default-field-attributes
-                                                                                                                           :query-name (first ui-keypath)
-                                                                                                                           :honey-sql honey-sql}))
-                                                                                 {shapes-ms :elapsed-ms shapes :result} (ut/timed-exec
-                                                                                                                         (rota/get-viz-shape-blocks fields cruiser/default-viz-shapes))
-                                                                                 res {:fields fields :shapes shapes}
-                                                                                 reco-count (count shapes)
-                                                                                 field-counts (into {} (for [r fields] {(keyword (get r :field-name)) (get r :distinct-count)
-                                                                                                                        :* (get r :total-rows)}))
-                                                                                 modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] panel-key)
-                                                                                                                        (get res :shapes)))]
-                                                                             (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-                                                                             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
-                                                                                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows])
-                                                                             (swap! db/shapes-result-map-by-honey-hash assoc honey-hash res) ;; multi-client cache
-                                                                             (db/ddb-put! honey-hash res)
-                                                                             (swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
-                                                                             (db/ddb-put! [client-name panel-key (first ui-keypath)] modded-shapes)
-
-                                                                             (ppy/execute-in-thread-pools ;; send one of each recos to the client
-                                                                              (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
-                                                                              (fn [] (let [;_ (Thread/sleep 500) ;; pace out the client packets a bit
-                                                                                           recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) shapes)
-                                                                                           one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
-                                                                                       (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each}))))
-                                                                             (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0)))
-                                                                         (catch Throwable e (ut/pp [:shape-rotator-for-each-error! (str e) client-name ui-keypath]))))))
+                                                                  (query-shape-rotation client-name panel-key ui-keypath connection-id honey-hash honey-sql row-count)
 
 
                                                                   ;; (ppy/execute-in-thread-pools :clover-gen-atom-push ;; (ut/pp @db/clover-gen) ;; (reset! db/clover-gen {})

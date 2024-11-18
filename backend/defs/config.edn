@@ -9,11 +9,11 @@
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :hide-sub-and-unsub-alerts? true ;;false
  :show-query-times? false
- :log-atom-sizes? false ;; expensive, only for debugging
+ :log-atom-sizes? true ;; expensive, only for debugging
  :viz-shapes "./defs/viz-shapes.edn" ;; "./defs/viz-shapes-only-recharts.edn"
  ;:viz-shapes "./defs/viz-shapes-only-recharts.edn"
  ;:default "./screens/frost-terminal2.edn"
- :default "./screens/winter-theme-hybrid.edn"
+ :default "./screens/winter-theme-hybrid3.edn"
  ;:default "screens/ecto-cooler-shade.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
  ;;    if this screen can't be read or is nil, you will get a basic blank screen with a default theme

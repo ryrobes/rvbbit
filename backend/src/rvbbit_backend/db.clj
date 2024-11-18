@@ -16,20 +16,40 @@
    [flowmaps.db               :as flow-db]])
 
 ;; datalevin stuff
-(defonce ddb (d/open-kv "db/datalevin"))
-(defonce shapes-db "shapes-db")
+(defonce ddb (d/open-kv "db/shape-rotations"))
+;; (defonce shapes-db "shapes-db")
 
-(defn ddb-put! [kkey vval]
-  (d/transact-kv ddb [[:put shapes-db kkey vval]]))
+(defn ddb-put! [coll-name kkey vval]
+  (d/transact-kv ddb [[:put coll-name kkey vval]]))
 
-(defn ddb-get [kkey]
-  (d/get-value ddb shapes-db kkey))
+(defn ddb-get [coll-name kkey]
+  (d/get-value ddb coll-name kkey))
 
-(defn open-ddb []
-  (d/open-dbi ddb shapes-db))
+(defn open-ddb [coll-name]
+  (ut/pp ["📊" :opening-datalevin-shape-rotations-collection coll-name])
+  (d/open-dbi ddb coll-name))
 
 (defn close-ddb []
   (d/close-kv ddb))
+
+
+;; (open-ddb "honeyhash-map") ;; start datalevin instance
+;; (open-ddb "honeyhash-map") ;; start datalevin instance
+
+;; (d/sync-kv ddb)
+
+;; (ddb-put! "honeyhash-map" 650895555 {:farts 123})
+;; (mapv first (d/get-range ddb "honeyhash-map" [:all]))
+;; (d/get-value ddb "honeyhash-map" 650895555)
+
+;; (ddb-put! "honeyhash-map" 650895555 {:farts 123})
+;; (ddb-get "honeyhash-map" 650895555 )
+;; (filterv #(= (first %) 650895555) (d/get-range ddb "honeyhash-map" [:all]))
+
+;; (mapv first (d/get-range ddb "honeyhash-map" [:all]))
+;; (first (d/get-range ddb "honeyhash-map" [:all]))
+;; (d/get-value ddb "honeyhash-map" 131743921)
+
 
 ;; hikari pool connection map
 (defonce conn-map (atom {}))
@@ -48,6 +68,7 @@
 (defonce drag-body-map (fpop/thaw-atom {} "./data/atoms/drag-body-map-atom.msgpack.transit"))
 
 (defonce shapes-result-map (atom {})) ; (fpop/thaw-atom {} "./data/atoms/shapes-result-map-atom.msgpack.transit"))
+;; (defonce shapes-result-crosswalk (fpop/thaw-atom {} "./data/atoms/shapes-result-crosswalk-atom.msgpack.transit"))
 ;; ^^ client-name, panel, view, {:shapes [all reco block maps] -and- :fields [field maps]}
 (defonce shapes-result-map-by-honey-hash (atom {})) ; (fpop/thaw-atom {} "./data/atoms/shapes-result-map-by-honey-hash-atom.msgpack.transit"))
 ;; ^^ honey-hash, {:shapes [all reco block maps] -and- :fields [field maps]}
@@ -107,8 +128,8 @@
 (defonce watcher-log (atom {}))
 (defonce client-click-params (atom {}))
 
-(defonce last-values (fpop/thaw-atom {} "./data/atoms/last-values.msgpack.transit"))
-(defonce last-values-per (fpop/thaw-atom {} "./data/atoms/last-values-per.msgpack.transit"))
+;; (defonce last-values (fpop/thaw-atom {} "./data/atoms/last-values.msgpack.transit"))
+;; (defonce last-values-per (fpop/thaw-atom {} "./data/atoms/last-values-per.msgpack.transit"))
 
 (defonce param-var-mapping (atom {}))
 (defonce param-var-crosswalk (atom {}))
@@ -468,7 +489,6 @@
           new-value          (get-in new-state keypath)
           sub-path           (break-up-flow-key-ext flow-key)
           base-type          (first sub-path)
-          ;last-value         (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c     (keys @atoms-and-watchers)
                                    :when (some #(= % (cstr/replace (str flow-key) ":" ""))
                                           ;; normalizes since old clients had keyword colons at weird places
@@ -525,8 +545,10 @@
 
                                          ))
           (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
-            (swap! last-values assoc keypath new-value)
-            (swap! last-values-per assoc-in [client-name keypath] new-value)) ;; if a new client
+            ;(swap! last-values assoc keypath new-value)
+            (ddb-put! "last-values" (hash keypath) new-value)
+            ;(swap! last-values-per assoc-in [client-name keypath] new-value)
+            ) ;; if a new client
           )))))
 
 (defn add-watcher
@@ -742,7 +764,10 @@
             (swap! param-var-key-mapping assoc
                    client-name
                    (vec (distinct (conj (get @param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
-        lv                      (get @last-values keypath)]
+        lv                      ;(get @last-values keypath)
+                                (ddb-get "last-values" (hash keypath))
+
+        ]
     ;; (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath
     ;;         {:sub-path sub-path
     ;;          :new-path (vec (into [client-name] (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))))}])
