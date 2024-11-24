@@ -13,7 +13,7 @@
    [rvbbit-backend.db     :as db]
    [clojure.walk          :as walk]
    [rvbbit-backend.sql    :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db cache-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
+    :refer [sql-exec sql-query sql-query-one system-db cache-db ghost-db insert-error-row! to-sql
             pool-create]]
    [rvbbit-backend.ddl    :as sqlite-ddl]
    [rvbbit-backend.surveyor :as svy]
@@ -22,8 +22,7 @@
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.util   :as ut])
-  (:import [java.util.concurrent Executors ExecutorService atomic.AtomicBoolean ScheduledExecutorService ThreadFactory TimeoutException TimeUnit]
-            ))
+  (:import [java.util.concurrent Executors ExecutorService atomic.AtomicBoolean ScheduledExecutorService ThreadFactory TimeoutException TimeUnit]))
 
 (def ^:private initial-max-items 200)
 (def ^:private max-wire-size (* 600 1024)) ; 300KB, as per your example
@@ -243,7 +242,7 @@
 
 (defn insert-rowset
   [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
-  ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
+  (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
   (if (ut/ne? rowset)
     (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
                                      (and (not (map? (first rowset))) (vector? rowset)) :vectors)
@@ -279,7 +278,7 @@
           ;;                          rowset-fixed
           ;;                          client-name)
 
-           ;;(ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
+           (ut/pp [:INSERTED-SUCCESS! (count rowset) :into table-name-str db-type ddl-str (first rowset-fixed)])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))

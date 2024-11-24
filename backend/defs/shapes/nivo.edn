@@ -1,0 +1,477 @@
+{
+
+ :basic-h-bar-nivo {:axes {:x [:and :dimension?
+                                ;;:reasonable-cardinality? ;;
+                               [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                ;[:or :is-string? :is-year? :is-month?]
+                                ;[:and [:not :is-date?] [:not :is-datetime?]]
+                               ]
+                           :y [:measure?]}
+
+                    :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+                                :from [:table]
+                                :group-by [:x-field]}]
+                    :category "nivo"
+                    :library-shapes
+                    [:nivo-bar-chart
+                     {:width :panel-width+70
+                      :height :panel-height+50
+                      :margin {:top 5 :right 5 :bottom 50 :left 45}
+                      :click {:x :x-field :y :y-field} ;; for click actions dim keys
+                      :data :query-preview ; :table ;data
+                      :layout "vertical"
+                      :groupMode "stacked" ; grouped
+                      :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                      :indexBy :x-field
+                      :keys [:y-field]
+                      :labelTextColor "#423939"
+                      :colorBy "id" ;"indexValue"
+                      :theme :theme/nivo-defaults
+                      :axisLeft {:tickRotation 0
+                                 :legendPosition "middle"
+                                 :legendOffset -65
+                                    ;:legend ":sightings-sum"
+                                 }
+                      :axisBottom {:tickRotation 0
+                                   :legendPosition "middle"
+                                   :legendOffset 40
+                                      ;:legend ":season"
+                                   }
+                      :enableGridX false ;true
+                      :enableGridY false ;true
+                      :enableLabel false
+                      :padding 0.1
+                      :inner-padding 0
+                      :border-radius 2}]
+                    :base-score 1}
+
+ :basic-h-bar-nivo-color {:axes {:x [:and :dimension?
+                                     ;;:reasonable-cardinality? ;;
+                                    [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                    [:or :is-string? :is-year? :is-month?]
+                                    [:and [:not :is-date?] [:not :is-datetime?]]]
+                                :color [:and :dimension?
+                                        [:or :low-cardinality? :very-low-cardinality?]
+                                        [:or :is-string? :is-year? :is-month?]
+                                        [:and [:not :is-date?] [:not :is-datetime?]]]
+                                :y [:measure?]}
+
+                         :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                     :from [:table]
+                                     :group-by [:x-field :color-field]}]
+
+                         :library-shapes
+                         [:nivo-bar-chart
+                          {:width :panel-width+70
+                           :height :panel-height+50
+                           :margin {:top 5 :right 5 :bottom 50 :left 45}
+                           :click {:x :x-field :y :y-field :c :color-field} ;; for click actions dim keys
+                           :data :query-preview ; :table ;data
+                           :transformation-map {:transform-select [[[:sum :y-field] :y-field] :x-field]
+                                                :pivot-by [:color-field]}
+                           :layout "vertical"
+                           :groupMode "stacked" ; grouped
+                           :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                           :indexBy :x-field
+                            ;:keys [:y-field]
+                           :labelTextColor "#423939"
+                           :colorBy "id" ;"indexValue"
+                           :theme :theme/nivo-defaults
+                           :axisLeft {:tickRotation 0
+                                      :legendPosition "middle"
+                                      :legendOffset -65
+                                                             ;:legend ":sightings-sum"
+                                      }
+                           :axisBottom {:tickRotation 0
+                                        :legendPosition "middle"
+                                        :legendOffset 40
+                                                               ;:legend ":season"
+                                        }
+                           :enableGridX false ;true
+                           :enableGridY false ;true
+                           :enableLabel true
+                           :padding 0.1
+                           :inner-padding 0
+                           :border-radius 2}]
+                         :base-score 1}
+
+
+ :nivo-calendar-sum {:axes {:x [:or :is-date? :looks-like-date?]
+                           :y [:measure?]}
+
+                    :sql-maps [{:select [[[[:sum :y-field]] :value] [:x-field :day]]
+                                :from [:table]
+                                :group-by [:x-field]}]
+
+                    :category "nivo"
+                    :library-shapes [:nivo-calendar
+                                     {:labelTextColor "#423939"
+                                      :emptyColor "#00000000"
+                                      :axisLeft {:tickRotation 0
+                                                 :legendPosition "middle"
+                                                 :legendOffset -65}
+                                      :dayBorderColor "#ffffff10"
+                                      :enableLabel false
+                                      :motionDamping 10
+                                      :axisBottom {:tickRotation 0
+                                                   :legendPosition "middle"
+                                                   :legendOffset 40}
+                                      :inner-padding 0
+                                      :width :panel-width+70
+                                      :monthBorderColor "#ffffff15"
+                                      :colors ["#2a4858" "#294d5d" "#275163" "#255667" "#225b6c"
+                                               "#1e6071" "#1a6575" "#156a79" "#0e6f7d" "#057480"
+                                               "#007983" "#007e86" "#008488" "#00898a" "#008e8c"
+                                               "#00938d" "#00988e" "#039d8f" "#12a28f" "#1ea78f"
+                                               "#28ac8f" "#32b18e" "#3cb68d" "#46bb8c" "#50bf8b"
+                                               "#5ac489" "#64c987" "#6ecd85" "#79d283" "#83d681"
+                                               "#8eda7f" "#99de7c" "#a5e27a" "#b0e678" "#bcea75"
+                                               "#c8ed73" "#d4f171" "#e0f470" "#edf76f" "#fafa6e"
+                                               "#fafa6e" "#faf568" "#faf162" "#faec5d" "#fae757"
+                                               "#f9e352" "#f9de4c" "#f9d947" "#f9d441" "#f9cf3c"
+                                               "#f8cb37" "#f8c632" "#f8c12c" "#f8bc27" "#f7b722"
+                                               "#f7b21d" "#f6ad17" "#f6a811" "#f6a30a" "#f59e04"
+                                               "#f49800" "#f49300" "#f38e00" "#f28800" "#f28300"
+                                               "#f17d00" "#f07800" "#ef7200" "#ee6c00" "#ed6600"
+                                               "#ec6000" "#eb5a00" "#ea5300" "#e84c00" "#e74500"
+                                               "#e53d00" "#e43502" "#e22b05" "#e11e08"
+                                               "#df0b0b"]
+                                      :theme :theme/nivo-defaults
+                                      :click {:x :day :y :value}
+                                      :padding 0.1
+                                      :enableGridX true
+                                      :border-radius 2
+                                      :enableGridY true
+                                      :height :panel-height+50
+                                      :margin {:top 5 :right 5 :bottom 50 :left 45}
+                                      :data :query-preview}]
+                    :base-score 1}
+
+ :pie-nivo {:axes {:x [:and :dimension?
+                      [:or :low-cardinality? :very-low-cardinality?]]
+                  :y [:measure?]}
+
+           :sql-maps [{:select [[[:sum :y-field] :value]
+                                [:x-field :id]]
+                       :from [:table]
+                       :group-by [:x-field]}]
+
+           :category "nivo"
+           :library-shapes
+           [:nivo-pie-chart
+            {:padAngle 0.7
+             :innerRadius 0.5
+             :width :panel-width+70
+             :arcLinkLabelsThickness 4
+             :borderWidth 2
+             :cornerRadius 3
+             :activeOuterRadiusOffset 8
+             :theme :theme/nivo-defaults
+             :arcLinkLabelsSkipAngle 10
+             :click {:c :x-field :y :y-field}
+             :arcLabelsSkipAngle 10
+             :height :panel-height+50
+             :margin {:top 50 :right 50 :bottom 50 :left 45}
+             :data :query-preview
+             :arcLinkLabelsTextColor "#ffffff"}]
+           :base-score 1}
+
+ :scatterplot-nivo {:axes {:x [:and [:measure?] [:not :is-rowcount?]]
+                                 ;:color [:and :dimension?
+                                 ;        [:or :low-cardinality? :very-low-cardinality?]
+                                 ;        [:or :is-string? :is-year? :is-month?]
+                                 ;        [:and [:not :is-date?] [:not :is-datetime?]]]
+                          :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                   :sql-maps [{:select [:y-field :x-field]  ;; aliasing as original name to lessen confusion?
+                               :from [:table]}]
+                   :category "nivo"
+                   :library-shapes
+                   [:nivo-scatterplot
+                    {:transformation-map {:transform-select [[:y-field :y] [:x-field :x]]
+                                          :fill-gaps? false ;true
+                                          :order-nest-by :x
+                                          :nest-by ["single"]}
+                     :xScale {:type "linear" :min 0 :max "auto"}
+                     :yScale {:type "linear" :min 0 :max "auto"}
+                     :blendMode "multiply"
+                     :axisTop nil
+                     :axisRight nil
+                     :nodeSize 14 ;; or keyword of size param
+                     :axisBottom {:orient "bottom"
+                                  :tickSize 5
+                                  :tickPadding 5
+                                  :tickRotation 0
+                                  :legend "weight"
+                                  :legendPosition "middle"
+                                  :legendOffset 46}
+                     :axisLeft {:orient "left"
+                                :tickSize 5
+                                :tickPadding 5
+                                :tickRotation 0
+                                :legend "size"
+                                :legendPosition "middle"
+                                :legendOffset -60}
+                     :legends [{:anchor "bottom-right"
+                                :direction "column"
+                                :justify false
+                                :translateX 130
+                                :translateY 0
+                                :itemWidth 100
+                                :itemHeight 12
+                                :itemsSpacing 5
+                                :itemDirection "left-to-right"
+                                :symbolSize 12
+                                :symbolShape "circle"
+                                :effects
+                                {:on "hover" :style {:itemOpacity 1}}}]
+                     :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                     :padding 1
+                     :borderRadius 3
+                     :width :panel-width+70
+                     :theme :theme/nivo-defaults
+                     :click {:c :x-field :y :y-field}
+                     :height :panel-height+50
+                     :margin {:top 5 :right 5 :bottom 45 :left 45}
+                     :data :query-preview}]
+                   :base-score 1}
+
+
+ :scatterplot-nivo-color {:axes {:x [:and [:measure?] [:not :is-rowcount?]]
+                                :color [:and :dimension?
+                                        [:or :low-cardinality? :very-low-cardinality?]
+                                        [:or :is-string? :is-year? :is-month?]
+                                        [:and [:not :is-date?] [:not :is-datetime?]]]
+                                :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                         :sql-maps [{:select [:y-field :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                     :from [:table]}]
+                         :category "nivo"
+                         :library-shapes
+                         [:nivo-scatterplot
+                          {:transformation-map {:transform-select [[:y-field :y] [:x-field :x]]
+                                                :fill-gaps? false ;true
+                                                :order-nest-by :x
+                                                :nest-by [:color-field]}
+                           :xScale {:type "linear" :min 0 :max "auto"}
+                           :yScale {:type "linear" :min 0 :max "auto"}
+                           :blendMode "multiply"
+                           :axisTop nil
+                           :axisRight nil
+                           :nodeSize 14 ;; or keyword of size param
+                           :axisBottom {:orient "bottom"
+                                        :tickSize 5
+                                        :tickPadding 5
+                                        :tickRotation 0
+                                        :legend "weight"
+                                        :legendPosition "middle"
+                                        :legendOffset 46}
+                           :axisLeft {:orient "left"
+                                      :tickSize 5
+                                      :tickPadding 5
+                                      :tickRotation 0
+                                      :legend "size"
+                                      :legendPosition "middle"
+                                      :legendOffset -60}
+                           :legends [{:anchor "bottom-right"
+                                      :direction "column"
+                                      :justify false
+                                      :translateX 130
+                                      :translateY 0
+                                      :itemWidth 100
+                                      :itemHeight 12
+                                      :itemsSpacing 5
+                                      :itemDirection "left-to-right"
+                                      :symbolSize 12
+                                      :symbolShape "circle"
+                                      :effects
+                                      {:on "hover" :style {:itemOpacity 1}}}]
+                           :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                           :padding 1
+                           :borderRadius 3
+                           :width :panel-width+70
+                           :theme :theme/nivo-defaults
+                           :click {:c :x-field :y :y-field}
+                           :height :panel-height+50
+                           :margin {:top 5 :right 5 :bottom 45 :left 45}
+                           :data :query-preview}]
+                         :base-score 1}
+
+
+ :scatterplot-nivo-size {:axes {:x [:and [:measure?] [:not :is-rowcount?]]
+                               :size [:and [:measure?] [:not :is-rowcount?]]
+                               :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                        :sql-maps [{:select [:y-field :x-field :size-field]  ;; aliasing as original name to lessen confusion?
+                                    :from [:table]}]
+                        :category "nivo"
+                        :library-shapes
+                        [:nivo-scatterplot
+                         {:transformation-map {:transform-select [[:y-field :y] [:x-field :x] :size-field]
+                                               :fill-gaps? false ;true
+                                               :order-nest-by :x
+                                               :nest-by ["single"]}
+                          :xScale {:type "linear" :min 0 :max "auto"}
+                          :yScale {:type "linear" :min 0 :max "auto"}
+                          :blendMode "multiply"
+                          :axisTop nil
+                          :axisRight nil
+                          :nodeSize 14 ;; or keyword of size param
+                          :axisBottom {:orient "bottom"
+                                       :tickSize 5
+                                       :tickPadding 5
+                                       :tickRotation 0
+                                       :legend "weight"
+                                       :legendPosition "middle"
+                                       :legendOffset 46}
+                          :axisLeft {:orient "left"
+                                     :tickSize 5
+                                     :tickPadding 5
+                                     :tickRotation 0
+                                     :legend "size"
+                                     :legendPosition "middle"
+                                     :legendOffset -60}
+                          :legends [{:anchor "bottom-right"
+                                     :direction "column"
+                                     :justify false
+                                     :translateX 130
+                                     :translateY 0
+                                     :itemWidth 100
+                                     :itemHeight 12
+                                     :itemsSpacing 5
+                                     :itemDirection "left-to-right"
+                                     :symbolSize 12
+                                     :symbolShape "circle"
+                                     :effects
+                                     {:on "hover" :style {:itemOpacity 1}}}]
+                          :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                          :padding 1
+                          :borderRadius 3
+                          :width :panel-width+70
+                          :theme :theme/nivo-defaults
+                          :click {:c :x-field :y :y-field}
+                          :height :panel-height+50
+                          :margin {:top 5 :right 5 :bottom 45 :left 45}
+                          :data :query-preview}]
+                        :base-score 1}
+
+ :scatterplot-nivo-color-size {:axes {:x [:and [:measure?] [:not :is-rowcount?]]
+                                     :color [:and :dimension?
+                                             [:or :low-cardinality? :very-low-cardinality?]
+                                             [:or :is-string? :is-year? :is-month?]
+                                             [:and [:not :is-date?] [:not :is-datetime?]]]
+                                     :size [:and [:measure?] [:not :is-rowcount?]]
+                                     :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                              :sql-maps [{:select [:y-field :x-field :size-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                          :from [:table]}]
+                              :category "nivo"
+                              :library-shapes
+                              [:nivo-scatterplot
+                               {:transformation-map {:transform-select [[:y-field :y] [:x-field :x] :size-field]
+                                                     :fill-gaps? false ;true
+                                                     :order-nest-by :x
+                                                     :nest-by [:color-field]}
+                                :xScale {:type "linear" :min 0 :max "auto"}
+                                :yScale {:type "linear" :min 0 :max "auto"}
+                                :blendMode "multiply"
+                                :axisTop nil
+                                :axisRight nil
+                                :nodeSize :size-field ;; or keyword of size param
+                                :axisBottom {:orient "bottom"
+                                             :tickSize 5
+                                             :tickPadding 5
+                                             :tickRotation 0
+                                             :legend "weight"
+                                             :legendPosition "middle"
+                                             :legendOffset 46}
+                                :axisLeft {:orient "left"
+                                           :tickSize 5
+                                           :tickPadding 5
+                                           :tickRotation 0
+                                           :legend "size"
+                                           :legendPosition "middle"
+                                           :legendOffset -60}
+                                :legends [{:anchor "bottom-right"
+                                           :direction "column"
+                                           :justify false
+                                           :translateX 130
+                                           :translateY 0
+                                           :itemWidth 100
+                                           :itemHeight 12
+                                           :itemsSpacing 5
+                                           :itemDirection "left-to-right"
+                                           :symbolSize 12
+                                           :symbolShape "circle"
+                                           :effects
+                                           {:on "hover" :style {:itemOpacity 1}}}]
+                                :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                                :padding 1
+                                :borderRadius 3
+                                :width :panel-width+70
+                                :theme :theme/nivo-defaults
+                                :click {:c :x-field :y :y-field}
+                                :height :panel-height+50
+                                :margin {:top 5 :right 5 :bottom 45 :left 45}
+                                :data :query-preview}]
+                              :base-score 1}
+
+ :treemap-nivo-2-levels {:axes {:x1 [:and :dimension?
+                                    [:or :low-cardinality? :very-low-cardinality?]
+                                    [:or :is-string? :is-year? :is-month?]
+                                    [:and [:not :is-date?] [:not :is-datetime?]]]
+                               :x2 [:and :dimension?
+                                    [:or :low-cardinality? :very-low-cardinality?]
+                                    [:or :is-string? :is-year? :is-month?]
+                                    [:and [:not :is-date?] [:not :is-datetime?]]]
+                            ;;     :x3 [:and :dimension?
+                            ;;          :reasonable-cardinality? ;; [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                            ;;           ;[:or :is-string? :is-year? :is-month?]
+                            ;;          [:and [:not :is-date?] [:not :is-datetime?]]]
+                               :y [:measure?]}
+
+                        :sql-maps [{:select [[[:sum :y-field] :y-field] :x1-field :x2-field]
+                                    :from [:table]
+                                    :group-by [:x1-field :x2-field]
+                                    :order-by [[1 :desc]]}]
+                        :category "set3"
+                        :library-shapes
+                        [:nivo-treemap
+                         {:orientLabel false
+                          :labelTextColor "#000000"
+                          :tile "squarify"
+                          :identity :name
+                          :labelSkipSize 12
+                          :borderColor "#000000"
+                          :value :y-field
+                          :enableLabel true
+                          :width :panel-width+70
+                          :parentLabelPosition "top"
+                          :colors {:scheme "nivo"}
+                          :transformation-map
+                          {:transform-select [[[:sum :y-field] :y-field]
+                                              [:x2-field :name]]
+                           :from [:data]
+                           :nest-by [:x1-field :x2-field]}
+                          :theme :theme/nivo-defaults
+                          :leavesOnly false
+                          :click {:c :x1-field :x :x2-field :y :y-field}
+                          :label :name
+                          :parentLabelSize 22
+                          :parentLabelTextColor "#ffffff"
+                          :enableParentLabel true
+                          :parentLabel "id"
+                          :height :panel-height+50
+                          :margin {:top 15 :right 5 :bottom 15 :left 15}
+                          :data :query-preview}]
+                        :base-score 1}
+
+
+
+
+
+
+
+
+
+}

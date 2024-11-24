@@ -135,7 +135,7 @@
        :dispatch-event-on-start? true}
 
       {:interval                 600 ;; was 3600
-       :event                    [::bricks/clean-up-reco-previews] ;;; TODO REENABLE
+       :event                    [::bricks/clean-up-reco-previews]
        :dispatch-event-on-start? false}
 
       {:interval                 5
@@ -229,7 +229,7 @@
   (ut/tracked-dispatch [::wfx/connect :query1 (http/options-secondary :query1)])
   (ut/tracked-dispatch [::wfx/connect :query2 (http/options-secondary :query2)])
   (ut/tracked-dispatch [::wfx/connect :query3 (http/options-secondary :query3)])
-  (ut/tracked-dispatch [::wfx/request :default
+  (ut/tracked-dispatch-sync [::wfx/request :default
                         {:message     {:kind :get-settings
                                        :client-name db/client-name}
                          :on-response [::http/simple-response-boot-no-load] ;; just get settings

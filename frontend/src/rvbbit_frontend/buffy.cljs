@@ -2076,10 +2076,10 @@
         kp              (if (some #(or (= % :viz-gen) (= % :*)) kp)
                           (vec (ut/postwalk-replacer {:* :base :viz-gen :base} (remove nil? kp)))
                           kp)
-        sql-calls       {hist-key {:select   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated]
+        sql-calls       {hist-key {:select   [:client_name :data :diff :diff_kp :vkey :kp :panel_key :pre_data :type :updated]
                                    :from     [:panel_history]
-                                   :connection-id "history-db"
-                                   :group-by [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated] ;; distinct
+                                   :connection-id "systemh2-db"
+                                   :group-by [:client_name :data :diff :diff_kp :vkey :kp :panel_key :pre_data :type :updated] ;; distinct
                                    :limit    10
                                    :order-by [[:updated :desc]]
                                    :where    [:= :kp (str kp)]}}
@@ -2092,7 +2092,8 @@
                    ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
-               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query "history-db")))))
+               (when (or (not data-exists?) unrun-sql?)
+                 (conn/sql-data [k] query "systemh2-db")))))
 
     ;;(reagent.core/next-tick #(smooth-scroll-to-bottom "chat-v-box-parent" "chat-v-box"))
 
@@ -2109,7 +2110,7 @@
       :width (px (- panel-width 30))
       :height (px (- panel-height 12 25 (when text-box? text-box-height)))
       :children (vec (doall
-                      (for [{:keys [client_name data diff diff_kp key kp panel_key pre_data type updated] :as full} (reverse history-log)]
+                      (for [{:keys [client_name data diff diff_kp vkey kp panel_key pre_data type updated] :as full} (reverse history-log)]
                         (let [diff           (try (edn/read-string diff) (catch :default _ [:cannot-read-val!]))
                               diff-lines     (count (cstr/split-lines (ut/format-map 480 (str diff))))
                               panel_key      (try (edn/read-string panel_key) (catch :default _ :nope-cant-work-panel_key))
@@ -2128,11 +2129,11 @@
                               diff-height    (min (* diff-lines 25) 400)
                               hist-block-h   (+ 405 diff-height) ;; dynamic later
                               block-runners  (vec (keys (dissoc @(ut/tracked-sub ::bricks/block-runners {}) :views :queries)))
-                              has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
-                              key            (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
-                              temp-key       (keyword (str (ut/replacer (str key) #":" "") "-hist-" (rand-int 123) (hash data)))
+                             ; has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
+                              vkey            (try (edn/read-string vkey) (catch :default _ :nope-cant-work-key))
+                              temp-key       (keyword (str (ut/replacer (str vkey) #":" "") "-hist-" (hash updated) (hash data)))
                               typek          (try (edn/read-string type) (catch :default _ type))]
-                          (ut/tapp>> [:history-log diff-lines type (str diff) key])
+                          (ut/tapp>> [:history-log diff-lines type (str diff) vkey])
                           [650 hist-block-h
                            [re-com/v-box
                             :gap "5px"
@@ -2166,22 +2167,26 @@
                                                  :transform "translate(0)"} :child
                               (cond ;has-flow-drop?      ""
                                     (= type ":views")
-                                    (let [view {key data_d}]
-                                      [bricks/clover panel_key key 11 8 view nil])
+                                    (let [view {vkey data_d}]
+                                      [bricks/clover panel_key vkey 11 8 view nil])
 
                                     ;(= type ":clojure")
                                     (some #(= % typek) block-runners)
                                     (let [view {:virtual-view data_d}
-                                          curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key panel_key :data-key key})
-                                          opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key panel_key :data-key key})
-                                          clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key panel_key :data-key key})
-                                          temp-panel-key (keyword (cstr/replace (str "hist-" panel_key key "-" (hash updated)) ":" ""))]
-                                      [bricks/clover temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map])
+                                          curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key panel_key :data-key vkey})
+                                          opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key panel_key :data-key vkey})
+                                          clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key panel_key :data-key vkey})
+                                          temp-panel-key (keyword (cstr/replace (str "hist-" panel_key vkey "-" (hash updated)) ":" ""))]
+
+                                      ;[bricks/clover temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map]
+                                      @(ut/tracked-subscribe [::bricks/clover-cache temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map])
+                                      )
 
                                     (= type ":queries") (let [query {temp-key (-> data_d ;(get data_d :queries)
                                                                                   (dissoc :cache?)
                                                                                   (dissoc :refresh-every))}]
-                                                          [bricks/clover panel_key temp-key 8 11 nil query]
+                                                          ;[bricks/clover panel_key temp-key 8 11 nil query]
+                                                          @(ut/tracked-subscribe [::bricks/clover-cache  panel_key temp-key 8 11 nil query ])
                                                           )
                                     (= type ":base")    (let [queries (get data_d :queries)
                                                               views   (get data_d :views)
@@ -2189,14 +2194,24 @@
                                                                             (for [q (keys queries)]
                                                                               {q (keyword (str (ut/replacer (str q) #":" "")
                                                                                                "-hist-"
-                                                                                               (rand-int 123)
+                                                                                               ;(rand-int 123)
+                                                                                               (hash updated)
                                                                                                (hash data_d)))}))
                                                               ndata   (ut/postwalk-replacer qkeys data_d)]
-                                                          [bricks/clover panel_key
-                                                           (get data_d :selected-view) 11 8
-                                                           (get ndata :views)
-                                                           (get ndata :queries)])
-                                    :else               [bricks/clover panel_key key 11 8])]
+                                                          ;; [bricks/clover panel_key
+                                                          ;;  (get data_d :selected-view) 11 8
+                                                          ;;  (get ndata :views)
+                                                          ;;  (get ndata :queries)]
+                                                          @(ut/tracked-subscribe [::bricks/clover-cache panel_key
+                                                                                                        (get data_d :selected-view) 11 8
+                                                                                                        (get ndata :views)
+                                                                                                        (get ndata :queries)])
+
+                                                          )
+                                    :else               ;;[bricks/clover panel_key vkey 11 8]
+                                                        @(ut/tracked-subscribe [::bricks/clover-cache panel_key vkey 11 8])
+
+                                    )]
                              [code-box 575 diff-height diff]
                              [re-com/gap :size "10px"]]]]))))}]]))
 

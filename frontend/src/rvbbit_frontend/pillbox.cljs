@@ -790,8 +790,9 @@
 
 
 (defn honeycomb-builder [panel-key runner view-key h w]
-  (let [query @(ut/tracked-sub ::get-query {:panel-key panel-key :runner runner :table-key view-key})]
-    (if-let [cached (get @db/honey-comb-cache query)]
+  (let [query @(ut/tracked-sub ::get-query {:panel-key panel-key :runner runner :table-key view-key})
+        cache-key [query (hash @dragging-body)]]
+    (if-let [cached (get @db/honey-comb-cache cache-key)]
       cached
       (let [hc-body (let [main-table (get-main-table query)
                           main-table (cond
@@ -928,5 +929,5 @@
                                                                         :child "(+ non group-by fields)"]]]
                                                            clause-label)]
                                                  [re-com/gap :size "10px"]]])]]])]
-        (swap! db/honey-comb-cache assoc query hc-body)
+        (swap! db/honey-comb-cache assoc cache-key hc-body)
         hc-body))))

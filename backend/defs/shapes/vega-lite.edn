@@ -1,0 +1,472 @@
+
+
+{
+
+  :basic-h-bar  {:axes {:x [:and :dimension?
+                            ;;:reasonable-cardinality? ;;
+                           [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                            ;[:or :is-string? :is-year? :is-month?]
+                            ;[:and [:not :is-date?] [:not :is-datetime?]]
+                           ]
+                       :y [:measure?]}
+                :w 9
+                :h 5
+                :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+                            :from [:table]
+                            :group-by [:x-field]}]
+
+                :library-shapes
+                [:vega-lite
+                 {:layer
+                  [{:encoding
+                    {:x {:field :x-field :type "ordinal"}
+                     :y {:aggregate "sum"
+                         :field :y-field
+                         :type "quantitative"}
+                     :row {:field nil :legend nil}
+                     :size {:legend nil}
+                     :shape {:legend nil}
+                     :column {:field nil :legend nil}
+                     :color {:scale :theme/vega-default-color-scheme
+                             :legend nil
+                             :field 1 ;:y-field
+                             :type "ordinal"}}
+                    :mark {:type "bar"
+                           :tooltip {:content "encoding"}}}]
+                  :data {:values :query-preview}} {:actions false}]
+                :base-score 1}
+
+ :basic-v-bar  {:axes {:x [:and :dimension?
+                           ;;;:reasonable-cardinality? ;;
+                          [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                          [:or :is-string? :is-year? :is-month?]
+                          [:and [:not :is-date?] [:not :is-datetime?]]]
+                      :y [:measure?]}
+
+               :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]  ;; aliasing as original name to lessen confusion?
+                           :from [:table]
+                           :group-by [:x-field]}]
+
+               :library-shapes
+               [:vega-lite
+                {:layer
+                 [{:encoding
+                   {:y {:field :x-field :type "ordinal"
+                        ;:sort "-y"
+                        }
+                    :x {:aggregate "sum"
+                        :field :y-field
+                        :type "quantitative"}
+                    :row {:field nil :legend nil}
+                    :size {:legend nil}
+                    :shape {:legend nil}
+                    :column {:field nil :legend nil}
+                    :color {:scale :theme/vega-default-color-scheme
+                            :legend nil
+                            :field 1 ;:y-field
+                            :type "ordinal"}}
+                   :mark {:type "bar"
+                          :tooltip {:content "encoding"}}}]
+                 :data {:values :query-preview}} {:actions false}]
+               :base-score 1}
+
+
+:basic-h-bar-avg  {:axes {:x [:and :dimension?
+                               ;;;:reasonable-cardinality? ;;
+                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              [:or :is-string? :is-year? :is-month?]
+                              [:and [:not :is-date?] [:not :is-datetime?]]]
+                          :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                   :sql-maps [{:select [[[[:avg :y-field]] :y-field] :x-field]  ;; aliasing as original name to lessen confusion?
+                               :from [:table]
+                               :group-by [:x-field]}]
+
+                   :library-shapes
+                   [:vega-lite
+                    {:layer
+                     [{:encoding
+                       {:x {:field :x-field :type "ordinal"
+                         ;:sort "-y"
+                            }
+                        :y {:aggregate "avg"
+                            :field :y-field
+                            :type "quantitative"}
+                        :row {:field nil :legend nil}
+                        :size {:legend nil}
+                        :shape {:legend nil}
+                        :column {:field nil :legend nil}
+                        :color {:scale :theme/vega-default-color-scheme
+                                :legend nil
+                                :field 1 ;:y-field
+                                :type "ordinal"}}
+                       :mark {:type "bar"
+                              :tooltip {:content "encoding"}}}]
+                     :data {:values :query-preview}} {:actions false}]
+                   :base-score 1}
+
+
+ :basic-v-bar-avg  {:axes {:x [:and :dimension?
+                               ;;;:reasonable-cardinality? ;;
+                              [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                              [:or :is-string? :is-year? :is-month?]
+                              [:and [:not :is-date?] [:not :is-datetime?]]]
+                          :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                   :sql-maps [{:select [[[[:avg :y-field]] :y-field] :x-field]  ;; aliasing as original name to lessen confusion?
+                               :from [:table]
+                               :group-by [:x-field]}]
+
+                   :library-shapes
+                   [:vega-lite
+                    {:layer
+                     [{:encoding
+                       {:y {:field :x-field :type "ordinal"
+                        ;:sort "-y"
+                            }
+                        :x {:aggregate "avg"
+                            :field :y-field
+                            :type "quantitative"}
+                        :row {:field nil :legend nil}
+                        :size {:legend nil}
+                        :shape {:legend nil}
+                        :column {:field nil :legend nil}
+                        :color {:scale :theme/vega-default-color-scheme
+                                :legend nil
+                                :field 1 ;:y-field
+                                :type "ordinal"}}
+                       :mark {:type "bar"
+                              :tooltip {:content "encoding"}}}]
+                     :data {:values :query-preview}} {:actions false}]
+                   :base-score 1}
+
+
+ :basic-h-bar-color  {:axes {:x [:and :dimension?
+                                 ;;;:reasonable-cardinality? ;;
+                                [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                [:or :is-string? :is-year? :is-month?]
+                                [:and [:not :is-date?] [:not :is-datetime?]]]
+                            :color [:and :dimension?
+                                    [:or :low-cardinality? :very-low-cardinality?]
+                                    [:or :is-string? :is-year? :is-month?]
+                                    [:and [:not :is-date?] [:not :is-datetime?]]]
+                            :y [:measure?]}
+
+                     :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                 :from [:table]
+                                 :group-by [:x-field :color-field]}]
+
+                     :library-shapes
+                     [:vega-lite
+                      {:layer
+                       [{:encoding
+                         {:x {:field :x-field :type "ordinal"
+                         ;:sort "-y"
+                              }
+                          :y {:aggregate "sum"
+                              :field :y-field
+                              :type "quantitative"}
+                          :row {:field nil :legend nil}
+                          :size {:legend nil}
+                          :shape {:legend nil}
+                          :column {:field nil :legend nil}
+                          :color {:scale :theme/vega-default-color-scheme
+                                  ;:legend nil
+                                  :field :color-field
+                                  :type "ordinal"}}
+                         :mark {:type "bar"
+                                :tooltip {:content "encoding"}}}]
+                       :data {:values :query-preview}} {:actions false}]
+                     :base-score 1}
+
+ :basic-v-bar-color  {:axes {:x [:and :dimension?
+                                 ;;;:reasonable-cardinality? ;;
+                                [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                [:or :is-string? :is-year? :is-month?]
+                                [:and [:not :is-date?] [:not :is-datetime?]]]
+                            :color [:and :dimension?
+                                    [:or :low-cardinality? :very-low-cardinality?]
+                                    [:or :is-string? :is-year? :is-month?]
+                                    [:and [:not :is-date?] [:not :is-datetime?]]]
+                            :y [:measure?]}
+
+                     :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                 :from [:table]
+                                 :group-by [:x-field :color-field]}]
+
+                     :library-shapes
+                     [:vega-lite
+                      {:layer
+                       [{:encoding
+                         {:y {:field :x-field :type "ordinal"}
+                          :x {:aggregate "sum"
+                              :field :y-field
+                              :type "quantitative"}
+                          :row {:field nil :legend nil}
+                          :size {:legend nil}
+                          :shape {:legend nil}
+                          :column {:field nil :legend nil}
+                          :color {:scale :theme/vega-default-color-scheme
+                            ;:legend nil
+                                  :field :color-field
+                                  :type "ordinal"}}
+                         :mark {:type "bar"
+                                :tooltip {:content "encoding"}}}]
+                       :data {:values :query-preview}} {:actions false}]
+                     :base-score 1}
+
+
+
+ :basic-h-bar-avg-color  {:axes {:x [:and :dimension?
+                                      ;;;:reasonable-cardinality? ;;
+                                     [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                     [:or :is-string? :is-year? :is-month?]
+                                     [:and [:not :is-date?] [:not :is-datetime?]]]
+                                 :color [:and :dimension?
+                                         [:or :low-cardinality? :very-low-cardinality?]
+                                         [:or :is-string? :is-year? :is-month?]
+                                         [:and [:not :is-date?] [:not :is-datetime?]]]
+                                 :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                          :sql-maps [{:select [[[[:avg :y-field]] :y-field] :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                      :from [:table]
+                                      :group-by [:x-field :color-field]}]
+
+                          :library-shapes
+                          [:vega-lite
+                           {:layer
+                            [{:encoding
+                              {:x {:field :x-field :type "ordinal"
+                          ;:sort "-y"
+                                   }
+                               :y {:aggregate "avg"
+                                   :field :y-field
+                                   :type "quantitative"}
+                               :row {:field nil :legend nil}
+                               :size {:legend nil}
+                               :shape {:legend nil}
+                               :column {:field nil :legend nil}
+                               :color {:scale :theme/vega-default-color-scheme
+                                 ;:legend nil
+                                       :field :color-field
+                                       :type "ordinal"}}
+                              :mark {:type "bar"
+                                     :tooltip {:content "encoding"}}}]
+                            :data {:values :query-preview}} {:actions false}]
+                          :base-score 1}
+
+
+ :basic-v-bar-avg-color  {:axes {:x [:and :dimension?
+                                     ;;;:reasonable-cardinality? ;;
+                                    [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                    [:or :is-string? :is-year? :is-month?]
+                                    [:and [:not :is-date?] [:not :is-datetime?]]]
+                                :color [:and :dimension?
+                                        [:or :low-cardinality? :very-low-cardinality?]
+                                        [:or :is-string? :is-year? :is-month?]
+                                        [:and [:not :is-date?] [:not :is-datetime?]]]
+                                :y [:and [:measure?] [:not :is-rowcount?]]}
+
+                         :sql-maps [{:select [[[[:avg :y-field]] :y-field] :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                     :from [:table]
+                                     :group-by [:x-field :color-field]}]
+
+                         :library-shapes
+                         [:vega-lite
+                          {:layer
+                           [{:encoding
+                             {:y {:field :x-field :type "ordinal"
+                        ;:sort "-y"
+                                  }
+                              :x {:aggregate "avg"
+                                  :field :y-field
+                                  :type "quantitative"}
+                              :row {:field nil :legend nil}
+                              :size {:legend nil}
+                              :shape {:legend nil}
+                              :column {:field nil :legend nil}
+                              :color {:scale :theme/vega-default-color-scheme
+                                ;:legend nil
+                                      :field :color-field
+                                      :type "ordinal"}}
+                             :mark {:type "bar"
+                                    :tooltip {:content "encoding"}}}]
+                           :data {:values :query-preview}} {:actions false}]
+                         :base-score 1}
+
+
+ :basic-timeseries  {:axes {:x [:and :dimension?
+                               [:or :looks-like-date? :looks-like-datetime?
+                                :is-date? :is-datetime?]]
+                           ; :color [:and :dimension?
+                           ;         [:or :low-cardinality? :very-low-cardinality?]
+                           ;         [:or :is-string? :is-year? :is-month?]
+                           ;         [:and [:not :is-date?] [:not :is-datetime?]]]
+                           :y [:measure?]}
+
+                    :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]  ;; aliasing as original name to lessen confusion?
+                                :from [:table]
+                                :group-by [:x-field]}]
+
+                    :library-shapes
+                    [:vega-lite
+                     {:layer
+                      [{:encoding
+                        {:x {:field :x-field
+                             :type "temporal"
+                             :sort "x"}
+                         :y {:aggregate "sum"
+                             :field :y-field
+                             :type "quantitative"}
+                         :row {:field nil
+                               :legend nil}
+                         :size {:legend nil}
+                         :shape {:legend nil}
+                         :column {:field nil
+                                  :legend nil}
+                         :color {:scale :theme/vega-default-color-scheme
+                                 :legend nil
+                                 :field nil
+                                 :type "ordinal"}}
+                        :mark {:type "area"
+                               :interpolate "monotone"
+                               :point "transparent"
+                               :tooltip {:content "encoding"}}}]
+                      :data {:values :query-preview}}
+                     {:actions false}]
+                    :base-score 1}
+
+
+ :basic-timeseries-color  {:axes {:x [:and :dimension?
+                                     [:or :looks-like-date? :looks-like-datetime?
+                                      :is-date? :is-datetime?]]
+                                 :color [:and :dimension?
+                                         :medium-cardinality?
+                                         :is-string?
+                                    ;:reasonable-cardinality? ;;
+                                         [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+                                         [:and [:not :is-date?] [:not :is-datetime?]]]
+                                 :y [:measure?]}
+
+                          :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field :color-field]  ;; aliasing as original name to lessen confusion?
+                                      :from [:table]
+                                      :group-by [:x-field :color-field]}]
+
+                          :library-shapes
+                          [:vega-lite
+                           {:layer
+                            [{:encoding
+                              {:x {:field :x-field
+                                   :type "temporal"
+                                   :sort "x"}
+                               :y {:aggregate "sum"
+                                   :field :y-field
+                                   :type "quantitative"}
+                               :row {:field nil
+                                     :legend nil}
+                               :size {:legend nil}
+                               :shape {:legend nil}
+                               :column {:field nil
+                                        :legend nil}
+                               :color {:scale :theme/vega-default-color-scheme
+                                       :legend nil
+                                       :field :color-field
+                                       :type "ordinal"}}
+                              :mark {:type "line"
+                                     :interpolate "monotone"
+                                     :point "transparent"
+                                     :tooltip {:content "encoding"}}}]
+                            :data {:values :query-preview}}
+                           {:actions false}]
+                          :base-score 1}
+
+ :heatmap-2d {:axes {:x [:and :dimension?
+                        [:or :low-cardinality? :medium-cardinality?]]
+                    :y [:and :dimension?
+                        [:or :low-cardinality? :medium-cardinality?]]
+                    :color [:measure?]}
+
+             :sql-maps [{:select [:x-field :y-field [[[:sum :color-field]] :color-field]]
+                         :from [:table]
+                         :group-by [:x-field :y-field]}]
+
+             :library-shapes
+             [:vega-lite
+              {:layer
+               [{:encoding
+                 {:x {:field :x-field :type "ordinal"}
+                  :y {:field :y-field :type "ordinal"}
+                  :color {:field :color-field
+                          :type "quantitative"
+                          :scale {:scheme "viridis"}}}
+                 :mark {:type "rect"
+                        :tooltip {:content "encoding"}}}]
+               :data {:values :query-preview}} {:actions false}]
+             :base-score 1}
+
+:scatter-plot {:axes {:x [:measure?]
+                      :y [:measure?]
+                      :size [:measure?]
+                      :color [:dimension?]}
+
+               :sql-maps [{:select [:x-field :y-field :size-field :color-field]
+                           :from [:table]}]
+
+               :library-shapes
+               [:vega-lite
+                {:layer
+                 [{:encoding
+                   {:x {:field :x-field :type "quantitative"}
+                    :y {:field :y-field :type "quantitative"}
+                    :size {:field :size-field :type "quantitative"}
+                    :color {:field :color-field :type "nominal"
+                            :scale {:scheme "category10"}}}
+                   :mark {:type "circle"
+                          :opacity 0.7
+                          :tooltip {:content "encoding"}}}]
+                 :data {:values :query-preview}} {:actions false}]
+               :base-score 1}
+
+
+ :stacked-area-chart {:axes {:x [:or [:looks-like-date?] [:looks-like-datetime?]
+                                [:is-date?] [:is-datetime?]]
+                            :y [:measure?]
+                            :color [:and :dimension?
+                                    [:or :low-cardinality? :very-low-cardinality?]]}
+
+                     :sql-maps [{:select [:x-field [[[:sum :y-field]] :y-field] :color-field]
+                                 :from [:table]
+                                 :group-by [:x-field :color-field]}]
+
+                     :library-shapes
+                     [:vega-lite
+                      {:layer
+                       [{:encoding
+                         {:x {:field :x-field :type "temporal"}
+                          :y {:field :y-field
+                              :type "quantitative"
+                              :stack "zero"}
+                          :color {:field :color-field
+                                  :type "nominal"
+                                  :scale {:scheme "category20b"}}}
+                         :mark {:type "area"
+                                :tooltip {:content "encoding"}}}]
+                       :data {:values :query-preview}} {:actions false}]
+                     :base-score 1}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

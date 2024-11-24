@@ -49,8 +49,8 @@
    [puget.printer             :as puget]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db system-reporting-db realms-db import-db systemh2-db
-            cache-db cache-db-memory ghost-db flows-db insert-error-row! to-sql pool-create]]
+    :refer [sql-exec sql-query sql-query-one system-db system-reporting-db import-db systemh2-db
+            cache-db cache-db-memory ghost-db insert-error-row! to-sql pool-create]]
    [clojure.data.csv          :as csv]
    [csv-map.core              :as ccsv]
    [clojure.core.cache        :as cache]
@@ -183,8 +183,8 @@
 (defonce signals-atom (fpop/thaw-atom {} "./defs/signals.edn"))
 (defonce rules-atom (fpop/thaw-atom {} "./defs/rules.edn"))
 (defonce solvers-atom (fpop/thaw-atom {} "./defs/solvers.edn"))
-(defonce solvers-cache-atom (fpop/thaw-atom {} "./data/atoms/solvers-cache.msgpack.transit"))
-(defonce solvers-cache-hits-atom (fpop/thaw-atom {} "./data/atoms/solvers-cache-hits.msgpack.transit"))
+(defonce solvers-cache-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/solvers-cache.msgpack.transit"))
+(defonce solvers-cache-hits-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/solvers-cache-hits.msgpack.transit"))
 ;; (defonce last-solvers-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-atom.edn"))
 ;; (defonce last-solvers-data-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-data-atom.edn"))
 ;; (defonce last-solvers-atom-meta (fpop/thaw-atom {} "./data/atoms/last-solvers-atom-meta.edn"))
@@ -714,7 +714,7 @@
                                    (assoc :messages-per-second msgs)
                                    (assoc :mem_used_mb mem-mb))]}]
     ;; (ut/pp [:hb-ackd client-name])
-    (sql-exec system-db (to-sql ins-sql) {:queue :client-memory}))
+    (sql-exec systemh2-db (to-sql ins-sql) {:queue :client-memory}))
   (swap! db/ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! db/ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
   (swap! db/ack-scoreboard assoc-in [client-name :selected-tab] selected-tab)
@@ -1243,12 +1243,12 @@
                             :diff        (pr-str pdiff)
                             :diff_kp     (pr-str (kvpaths pdiff))
                             :panel_key   (str (first kp))
-                            :key         (str (last kp))
+                            :vkey         (str (last kp))
                             :type        (str (second kp))}))
         ;;_ (ut/pp [:diffy3 (count rows) tname])
         ins-sql     {:insert-into [table-name] :values rows}]
     (when (ut/ne? rows)
-      (sql-exec history-db (to-sql ins-sql))))
+      (sql-exec systemh2-db (to-sql ins-sql))))
   (swap! comp-atom assoc client-name panels))
 
 
@@ -2034,16 +2034,17 @@
   (let [;;_ (ut/pp [:test! client-name dragged-kp])
         field-map (if (> (count dragged-kp) 3) ;; only for field drags
                     (get-shape-rotation-field-meta client-name dragged-kp) {})
-        res (leaves/leaf-eval-runstream3 client-name dragged-kp dragging-body field-map)
+        {:keys [result elapsed-ms]} (ut/timed-exec (leaves/leaf-eval-runstream3 client-name dragged-kp dragging-body field-map))
         client-str (cstr/replace (str client-name) ":" "")
         kp-targeta [:click-param :leaf (keyword (str client-str ">actions"))]
         kp-targetm [:click-param :leaf (keyword (str client-str ">metadata"))]
-        meta (get res :metadata) ;;(select-keys (get res :metadata) [:action-labels :categories])
-        actions (get res :actions)]
+        meta (get result :metadata) ;;(select-keys (get res :metadata) [:action-labels :categories])
+        actions (get result :actions)]
     (client-mutate client-name {kp-targeta actions
                                 kp-targetm meta} true)
     (swap! db/leaf-atom assoc client-name {:actions actions :metadata meta})
     ;; (ut/pp ["👀🍂" :leaf-push-output (get res :actions)])
+    (ut/pp ["👀🍂" :leaf-push elapsed-ms dragged-kp client-name])
     )
 
   (ppy/execute-in-thread-pools ;; send one of each recos to the client
@@ -2984,8 +2985,6 @@
                                                                8)
                                                        {:error error-map})))))))
 
-;(sql-exec flows-db "ALTER TABLE flow_history ADD COLUMN orig_flow_id TEXT;")
-
 (defn schedule!
   [time-seq1 flowmap & [opts]]
   (let [;[opts chan-out override] args
@@ -3773,7 +3772,7 @@
         (swap! trigger-words-atom assoc
                (cstr/lower-case trigger-words)
                {:flow-id flow-id :created-by client-name :trigger-word-insert trigger-word-insert})
-        (sql-exec flows-db
+        (sql-exec systemh2-db
                   (to-sql {:insert-into [:live_schedules]
                            :values      [{:flow-id flow-id :override (str trigger-word-insert) :schedule (str trigger-words)}]}))
         :scheduled!)
@@ -5697,7 +5696,7 @@
                             {v rql-key})))]
     (walk/postwalk-replace logic-kps obody)))
 
-(defonce pre-sql-cache (fpop/thaw-atom [] "./data/atoms/pre-sql-cache.edn")) ;; no need to persist for now...
+;; (defonce pre-sql-cache (fpop/thaw-atom [] "./data/atoms/pre-sql-cache.edn"))
 
 (defn replace-pre-sql
   [honey-sql]
@@ -5750,7 +5749,7 @@
                            fix-nil-ins
                            ut/deep-remove-nil-values)
         pre-sql-out    (ut/lists-to-vectors pre-sql-out)]
-    (reset! pre-sql-cache (vec (distinct (conj @pre-sql-cache pre-sql-out))))
+    ;; (reset! pre-sql-cache (vec (distinct (conj @pre-sql-cache pre-sql-out))))
     pre-sql-out))
 
 
@@ -5923,8 +5922,8 @@
             error-rows))))))
 
 (defn run-raw-sql [{:keys [input client-name connection-id ui-keypath solver-name]}]
-  (let [sys-connections ["system-db" "flows-db" "autocomplete-db" "import-db"
-                         "history-db" "system-reporting-db" "cache.db.memory"
+  (let [sys-connections ["system-db" "import-db" "systemh2-db"
+                          "system-reporting-db" "cache.db.memory"
                          "cache.db"]
         user-connections (vec (keys @db/conn-map))
         conn-string-names (vec (into sys-connections user-connections))
@@ -5956,12 +5955,12 @@
                     (or (nil? connection-id)
                         (nil? empty?))                  system-db
                     (= connection-id "import-db")       import-db
-                    (= connection-id "realms-db")       realms-db
+                    (= connection-id "realms-db")       systemh2-db
                     (= connection-id "system-db")       system-db
                     (= connection-id "systemh2-db")     systemh2-db
-                    (= connection-id "flows-db")        flows-db
-                    (= connection-id "autocomplete-db") autocomplete-db
-                    (= connection-id "history-db")      history-db
+                    (= connection-id "flows-db")        systemh2-db
+                    ;; (= connection-id "autocomplete-db") autocomplete-db
+                    ;; (= connection-id "history-db")      history-db
                     (= connection-id "system")          system-db
                     (= connection-id "system-reporting-db") system-reporting-db
                     (= connection-id "cache.db.memory") cache-db-memory
@@ -6033,7 +6032,7 @@
         pivot-data-kw (keyword (cstr/replace (str (last ui-keypath) "-pivot") ":" ""))
         pre-pivot-data-kw (keyword (cstr/replace (str (last ui-keypath) "-flat") ":" ""))
         reaction-clover (get grid :reaction-clover)]
-    (ut/pp [:pivot-data data])
+    (ut/pp [:pivot-data! mmap])
     (push-to-client (vec (rest ui-keypath)) [] client-name 1 :push-assocs {(vec (conj ui-keypath :reaction-clover)) reaction-clover
                                                                            (vec (conj ui-keypath :pivot-data-kw)) pivot-data-kw
                                                                            (vec (into (vec (take 2 ui-keypath)) [:queries pre-pivot-data-kw])) grp-query-int
@@ -6044,7 +6043,9 @@
 (def qcache (atom {})) ;; test
 
 (defn cached-sql-query [target-db honey-sql-str ui-keypath & [connection-id ]]
-  (if (not (cstr/includes? (str connection-id) "system"))
+  (if (and (not (cstr/includes? (str connection-id) "cache"))
+           (not (cstr/includes? (str connection-id) "flows"))
+           (not (cstr/includes? (str connection-id) "system")))
     (let [cache-key (hash [honey-sql-str connection-id])]
       (if-let [cached-result (@qcache cache-key)]
         (do (ut/pp ["🤑" :sql-cache-used ui-keypath connection-id])
@@ -6076,8 +6077,8 @@
                                                            (get cached :shapes)))
                  hash-key (hash [client-name panel-key (first ui-keypath)])]
              (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-             (ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
-                     client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
+            ;;  (ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
+            ;;          client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
              ;(swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
              (db/ddb-put! "shapes-map" hash-key modded-shapes)
 
@@ -6099,7 +6100,7 @@
                                                            :query-name (first ui-keypath)
                                                            :honey-sql honey-sql}))
                  {shapes-ms :elapsed-ms shapes :result} (ut/timed-exec
-                                                         (rota/get-viz-shape-blocks fields cruiser/default-viz-shapes))
+                                                         (rota/get-viz-shape-blocks fields @db/shapes-map))
                  res {:fields fields :shapes shapes}
                  reco-count (count shapes)
                  field-counts (into {} (for [r fields] {(keyword (get r :field-name)) (get r :distinct-count)
@@ -6108,7 +6109,7 @@
                                                         (get res :shapes)))
                  hash-key (hash [client-name panel-key (first ui-keypath)])]
              (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-             (ut/pp ["🧀" :shape-rotator (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
+             (ut/pp ["🧀" :shape-rotator-run (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
                      client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
              ;;(swap! db/shapes-result-map-by-honey-hash assoc honey-hash res) ;; multi-client cache
              ;(db/ddb-put! "honeyhash-map" honey-hash res)
@@ -6191,12 +6192,12 @@
                                     (keyword? connection-id)           (sql/create-or-get-client-db-pool client-name)
                                     (some #(= % connection-id) client-db-strs) (sql/create-or-get-client-db-pool (keyword connection-id))
                                     (= connection-id "import-db")       import-db
-                                    (= connection-id "realms-db")       realms-db
+                                    (= connection-id "realms-db")       systemh2-db
                                     (= connection-id "system-db")       system-db
                                     (= connection-id "systemh2-db")     systemh2-db
-                                    (= connection-id "flows-db")        flows-db
-                                    (= connection-id "autocomplete-db") autocomplete-db
-                                    (= connection-id "history-db")      history-db
+                                    (= connection-id "flows-db")        systemh2-db
+                                    ;; (= connection-id "autocomplete-db") autocomplete-db
+                                    ;; (= connection-id "history-db")      history-db
                                     (= connection-id "system")          system-db ;system-db
                                     (= connection-id "system-reporting-db") system-reporting-db
                                     (= connection-id "cache.db.memory") cache-db-memory
@@ -6242,7 +6243,7 @@
                             (not literal-data?) ;; questionable, we SHOULD be able to invalidate
                             (not (= connection-id "flows-db"))
                             (not (keyword? connection-id))
-                            (not (= connection-id "autocomplete-db"))
+                            ;; (not (= connection-id "autocomplete-db"))
                             (not (= connection-id "system-log"))
                             (not (= target-db system-db)))
                     cache-table-name ;(if (or post-sniffed-literal-data? literal-data?)
@@ -6439,6 +6440,10 @@
                         ;;            (println (first replaced))
                         ;;            replaced)
                         ;;          result)
+                        ;; nivo-calendar-rowset? (and (get-in result [0 :dday]) (get-in result [0 :vvalue]))
+                        ;; result (if nivo-calendar-rowset?
+                        ;;          ;; ^^ ugly hack for nivo calendar requiring H2 reserved words as keys...
+                        ;;          (walk/postwalk-replace {:dday :day :vvalue :value} result) result)
                         result (if (not (nil? post-process-fn))
                                  (try ((eval post-process-fn) result)
                                       (catch Throwable e
@@ -6449,6 +6454,7 @@
 
                         honey-meta (if (or (get orig-honey-sql :transform-select)
                                            has-rql? ;query-error?
+                                           ;;nivo-calendar-rowset?
                                            post-process-fn
                                            (get orig-honey-sql :data)) ;; TODO< this is ugly
                                      (get-query-metadata result honey-sql (surveyor/db-typer target-db) connection-id) ;; get new meta on
@@ -6491,6 +6497,7 @@
                                 :client-name    client-name
                                 :map-order      (if (or (get orig-honey-sql :transform-select)
                                                         query-error?
+                                                        ;;nivo-calendar-rowset?
                                                         post-process-fn
                                                         (get orig-honey-sql :data))
                                                   (keys fields)
@@ -6835,7 +6842,7 @@
                       (when (and (and
                                   (not (= connection-id "system-db"))
                                   (not (= connection-id "systemh2-db"))
-                                  (not (= connection-id "history-db"))
+                                  ;; (not (= connection-id "history-db"))
                                   (not (= connection-id "flow-db"))
                                   (not (cstr/starts-with? (str ui-keypath) "[:c")) ;; condi queries
                                   (not (cstr/includes? (str ui-keypath) "query-preview")))
@@ -7312,7 +7319,7 @@
                (item_key text NULL,
                 item_type text NULL,
                 item_sub_type text NULL,
-                value text NULL,
+                vvalue text NULL,
                 is_live boolean NULL,
                 sample text NULL,
                 display_name text NULL,
@@ -7422,20 +7429,15 @@
                                                                                        (cstr/starts-with? (str %) ":client/")))
                                                                               (<= (count (re-seq #"/" (str %))) 1))
                                                                         (mapv :value rows)))))
-        delete-sql   {:delete-from [:client_items] :where [:= 1 1]}
-        ;drop-ddl "drop table if exists client_items;"
-        _ (sql-exec autocomplete-db (to-sql delete-sql) {:queue :autocomplete})]
-    ;(enqueue-task3
-    ;(sql-exec autocomplete-db create-ddl {:queue :autocomplete})
+        delete-sql   {:truncate :client_items}
+        _ (sql-exec systemh2-db (to-sql delete-sql) {:queue :autocomplete})
+        rows (mapv #(assoc (dissoc % :value) :vvalue (:value %)) rows)] ;; :value reserved word in H2
 
     (qp/serial-slot-queue :autocomplete-sql :sql
     ;(ppy/execute-in-thread-pools :general-serial
                           (fn []
-                            ;(sql-exec autocomplete-db drop-ddl   {:queue :autocomplete})
-                            ;(sql-exec autocomplete-db create-ddl {:queue :autocomplete})
-                            ;(sql-exec autocomplete-db (to-sql delete-sql) {:queue :autocomplete})
-                            (doseq [rr (partition-all 50 rows)]
-                              (sql-exec autocomplete-db
+                            (doseq [rr (partition-all 100 rows)]
+                              (sql-exec systemh2-db
                                         (to-sql {:insert-into [:client_items] :values rr})
                                         {:queue :autocomplete}))))))
 
@@ -7451,11 +7453,10 @@
                                                          [:start :end]))))))
                   (catch Exception e (do (ut/pp [:update-flow-results>sql-error (str e)]) [])))]
     (when (ut/ne? rows)
-      (sql-exec flows-db (to-sql {:delete-from [:flow_results]}))
-      (doseq [chunk (partition-all 50 rows)] (sql-exec flows-db (to-sql {:insert-into [:flow_results] :values (vec chunk)}))))))
+      (sql-exec systemh2-db (to-sql {:delete-from [:flow_results]}))
+      (doseq [chunk (partition-all 50 rows)] (sql-exec systemh2-db (to-sql {:insert-into [:flow_results] :values (vec chunk)}))))))
 
-(defn update-channel-history>sql
-  []
+(defn update-channel-history>sql []
   (let [rows          (try (apply concat
                                   (for [[flow-id v] (ut/replace-large-base64 (dissoc @flow-db/channel-history "client-keepalive"))]
                                     (for [vv v]
@@ -7467,17 +7468,19 @@
                                                                                 vv))
                                                         [:start :end]))))
                            (catch Exception e (do (ut/pp [:update-channel-history>sql-error (str e)]) [])))
-        le            (sql-query flows-db (to-sql {:select [[[:max :end] :last_end]] :from [:channel_history]}))
+        le            (sql-query systemh2-db (to-sql {:select [[[:max :eend] :last_end]] :from [:channel_history]}))
         lee           (get-in le [0 :last_end] 0)
         lee           (or lee 0) ;; weird, but sometimes less was nil - TODO
         rows-filtered (vec (filter #(> (get % :end) lee) rows))
         rows-filtered (vec (for [r    rows-filtered
                                  :let [v (str (if (> (count (get r :value)) 3000) (subs (get r :value) 0 3000) (get r :value)))]]
                              (assoc r :value v)))
+        rows-filtered (mapv #(assoc (dissoc % :end) :eend (:end %)) rows-filtered)
+        rows-filtered (mapv #(assoc (dissoc % :value) :vvalue (:value %)) rows-filtered)
         insert-sql    {:insert-into [:channel_history] :values rows-filtered}]
     (when (ut/ne? rows-filtered)
       (do ;(ut/pp [:channel-history-added>sql :last-end lee :full (count rows) :filtered (count
-        (sql-exec flows-db (to-sql insert-sql) :update-channel-history>sql)))))
+        (sql-exec systemh2-db (to-sql insert-sql) :update-channel-history>sql)))))
 
 (defn update-fn-history>sql []
   (let [rows          (try (apply concat
@@ -7491,17 +7494,19 @@
                                                                                 vv))
                                                         [:start :end :elapsed-ms]))))
                            (catch Exception e (do (ut/pp [:update-fn-history>sql-error (str e)]) [])))
-        le            (sql-query flows-db (to-sql {:select [[[:max :end] :last_end]] :from [:fn_history]}))
+        le            (sql-query systemh2-db (to-sql {:select [[[:max :eend] :last_end]] :from [:fn_history]}))
         lee           (get-in le [0 :last_end] 0)
         lee           (or lee 0) ;; weird, but sometimes less was nil - TODO
         rows-filtered (vec (filter #(> (get % :end) lee) rows))
         rows-filtered (vec (for [r    rows-filtered
                                  :let [v (if (> (count (get r :value)) 3000) (subs (get r :value) 0 3000) (get r :value))]]
                              (assoc r :value v)))
+        rows-filtered (mapv #(assoc (dissoc % :end) :eend (:end %)) rows-filtered)
+        rows-filtered (mapv #(assoc (dissoc % :value) :vvalue (:value %)) rows-filtered)
         insert-sql    {:insert-into [:fn_history] :values rows-filtered}]
     (when (ut/ne? rows-filtered)
       (do ;(ut/pp [:fn-history-added>sql :last-end lee :full (count rows) :filtered (count
-        (sql-exec flows-db (to-sql insert-sql) :update-fn-history>sql)))))
+        (sql-exec systemh2-db (to-sql insert-sql) :update-fn-history>sql)))))
 
 (defn update-live-schedules>sql []
   (let [rows       (try (vec (for [v @flow-db/live-schedules] (stringify-except v [:start :end])))
@@ -7509,8 +7514,8 @@
         insert-sql {:insert-into [:live_schedules] :values rows}]
     (when (ut/ne? rows)
       (do
-        (sql-exec flows-db (to-sql {:delete-from [:live_schedules]}))
-        (sql-exec flows-db (to-sql insert-sql))))))
+        (sql-exec systemh2-db (to-sql {:truncate :live_schedules}))
+        (sql-exec systemh2-db (to-sql insert-sql))))))
 
 (def checkpoint-atom (atom {}))
 
@@ -8062,6 +8067,8 @@
 
 ;; (ut/pp monitored-atoms)
 
+;; (reset! pool-stats-atom {})
+
 ;; (ut/pp (sort-by last (for [[k v] @atom-metrics] [k (get (last v) :size-mb)])))
 
 ;; (ut/pp @db/shape-rotation-status)
@@ -8138,7 +8145,7 @@
     (catch Exception e (ut/pp [:draw-client-stats-error e]))))
 
 (defn get-table-sizes []
-  (let [dbs [system-db cache-db flows-db autocomplete-db]
+  (let [dbs [system-db systemh2-db cache-db]
         cnts-all (into {} (for [db dbs
                                 :let [dbname (-> (last (cstr/split (str (:datasource db)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)]]
                             {dbname
@@ -8599,9 +8606,9 @@
 
         ;; (ut/pp [:post-cli-rows (count cli-rows)])
         (swap! stats-cnt inc)
-        (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
-        (sql-exec system-db (to-sql insert-cli))
-        (sql-exec system-db (to-sql insert-sql))
+        (sql-exec systemh2-db (to-sql {:delete-from [:client_stats]}))
+        (sql-exec systemh2-db (to-sql insert-cli))
+        (sql-exec systemh2-db (to-sql insert-sql))
 
         (when booted?
           (println " ")
@@ -8696,7 +8703,7 @@
         ;;(ut/pp [:latency-adaptations @dynamic-timeouts])
 
                   ;; [kks & [freqs label? width limit?]]
-        (draw-stats [:cpu :mem :threads :websockets :viz-recos :leaf-evals
+        (draw-stats [:cpu :mem :threads :websockets ;:viz-recos :leaf-evals
                      ] [15] false nil true)
 
         ;; (draw-stats [:cpu :mem :threads] [15] false nil false)

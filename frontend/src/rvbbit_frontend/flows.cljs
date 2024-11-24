@@ -3071,7 +3071,7 @@
               dropdown1
                 {:view    [:dropdown
                            {:choices     :gen-viz-812aaa
-                            :width       "300px"
+                            :width       "240px"
                             :placeholder "(all callers)"
                             :style       {:padding-top   "8px"
                                           :border-radius "8px" ;:background-color "#ffffff"
@@ -3087,7 +3087,7 @@
                                             :order-by      [:client_name]}}}
               dropdown2 [:dropdown
                          {:choices     [{:id 1 :label "error"} {:id 0 :label "success"} {:id -1 :label "timeout"}]
-                          :width       "200px"
+                          :width       "253px"
                           :placeholder "(all return statuses)"
                           :style       {:padding-top   "8px"
                                         :border-radius "8px" ;:background-color "#ffffff" :color
@@ -3121,17 +3121,20 @@
                                                      :connection-id "flows-db"
                                                      :from          [[:fn_history :cc393]]
                                                      :group-by      [1]}]}}}
-              viz1 {:queries {:flow-history-calendar-sys* {:select        [[[[:count [:distinct :run_id]]] :value]
-                                                                           [[:substr :start_ts 0 11] :day]]
+              viz1 {:queries {:flow-history-calendar-sys* {:select        [[[[:count [:distinct :run_id]]] "value"]
+                                                                           [[:substr :start_ts 0 11] "day"]
+                                                                           ;:start_ts
+                                                                           ]
                                                            :connection-id "flows-db"
                                                            :from          [[:flow_history :cc393]]
                                                            :where         [:and
                                                                            (if @flow-search [:like :flow_id (str "%" (str @flow-search) "%")] [:= 1 1])
-                                                                           (if caller [:= :client_name (str caller)] [:= 1 1]) ;; since
+                                                                           (if caller [:= :client_name (str caller)] [:= 1 1])
                                                                            (if status
                                                                              [:= :in_error :virtual-panel/return_status]
                                                                              [:= 1 1])]
-                                                           :group-by      [[:substr :start_ts 0 11]]}}
+                                                           ;;:post-process-fn (fn [x] (clojure.walk/keywordize-keys x))
+                                                           :group-by      [2]}}
                     :view    [:nivo-calendar
                               {:labelTextColor   "#ffffff" ;"#423939"
                                :emptyColor       "#00000000"
@@ -3180,10 +3183,10 @@
               selected? @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
               grid1 {:select [:flow_id :run_id :start_ts [:elapsed_seconds :seconds] :human_elapsed
                               [[:case [:= "nil" :overrides] "No" :else "Yes"] :overrides]
-                              [[:case [:= :in_error 1] "error" :else "success"] :result]]
+                              [[:case [:= :in_error true] "error" :else "success"] :result]]
                      :connection-id "flows-db"
                      :group-by [1 2]
-                     :style-rules {[:* :highlight-8369aaa1] {:logic [:= :in_error 1]
+                     :style-rules {[:* :highlight-8369aaa1] {:logic [:= :in_error true]
                                                              :style {;:background-color "#FF000021"
                                                                      :opacity    0.4
                                                                      :font-style "italic"}}}
@@ -3231,9 +3234,9 @@
              {:font-size "15px"} :children
              [;[re-com/box :child [buffy/render-honey-comb-fragments dropdown1 5 2 true] :width
 
-              [buffy/render-honey-comb-fragments dropdown1 5 2 "dropdown1-sys*"]
-              [re-com/box :child ""] [re-com/box :child ""]
-              [buffy/render-honey-comb-fragments dropdown2 5 2 "dropdown2-sys*"]
+              [re-com/box :child [buffy/render-honey-comb-fragments dropdown1 5 2 "dropdown1-sys*"] :width "250px"]
+              ;[re-com/box :child ""] [re-com/box :child ""] ;[re-com/box :child ""]
+              [re-com/box :child  [buffy/render-honey-comb-fragments dropdown2 5 2 "dropdown2-sys*"] :width "250px"]
 
               [re-com/input-text
                :model flow-search
@@ -3242,18 +3245,18 @@
                :width "220px"
                :placeholder "flow search"
                :style {:text-decoration  (when (ut/ne? @flow-search) "underline")
-                                      :border-radius "8px" ;:background-color "#ffffff" :color
-                                      :color         "#ffffff75"
-                                                    ;:outline       (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
-                                                    ;:color            "inherit"
-                                      :height "40px"
-                                      :border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
-                                      :outline          "none"
-                                      :text-align       "center"
-                                      :background-color "#00000000"}]
+                       :border-radius "8px" ;:background-color "#ffffff" :color
+                       :color         "#ffffff75"
+                       ;:outline       (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
+                       ;:color            "inherit"
+                       :height "40px"
+                       :border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)
+                       :outline          "none"
+                       :text-align       "center"
+                       :background-color "#00000000"}]
               [re-com/box :child ""]
-              [re-com/box :child (str flow-day)]
-              ]]
+              [re-com/box :child (str flow-day)]]]
+
             [re-com/box :size "none" :height "255px" :style {:font-size "15px"} :child
              [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 24 "viz1-sys*"]]
             [re-com/h-box :children
@@ -3261,25 +3264,38 @@
                [buffy/render-honey-comb-fragments grid-menu (* (/ dyn-width 50) 0.25) 10 "grid-menu-sys*"]]
               [re-com/box :size "none" :align :center :justify :center :style {:font-size "15px"} :child
                [buffy/render-honey-comb-fragments grid1 (* (/ dyn-width 50) 0.75) 10 "grid1-sys*"]]]]
+
             [buffy/render-honey-comb-fragments
              [:h-box :size "auto" :justify :between :align :center :gap "10px" :padding "8px" :style
-              {:font-size "19px" :opacity 0.33 :font-weight 700} :children
+              {:font-size "19px" :opacity 0.33 :font-weight 700}
+              :children
               [;"filters: "
-               [:string :virtual-panel/flow-day] [:string [(keyword (str gm-kw "/flow_id")) " "]] caller
-               [:string [(keyword (str grid-kw "/run_id")) " "]]]] (- (/ dyn-width 50) 1) 6 "filter-row-sys*"]
+               [:str :virtual-panel/flow-day]
+               [:str [(keyword (str gm-kw "/flow_id")) " "]]
+               caller
+               [:str [(keyword (str grid-kw "/run_id")) " "]]]]
+             (- (/ dyn-width 50) 1) 6 "filter-row-sys*"]
+
             [re-com/gap :size "10px"]
+
             (when run-selected?
               [flow-details-block-container "flow block results log*" :system :system
                [re-com/box :size "none" :align :center :justify :center :style {:font-size "15px"} :child
                 [buffy/render-honey-comb-fragments grid2 (- (/ dyn-width 50) 1) (- (/ panel-height-bricks 2) 1) ;; 10
                  "grid2-sys*"]] ; flow-id orderb true 570 nil ;366
-               "zmdi-dns"]) (when run-selected? [re-com/gap :size "10px"])
+               "zmdi-dns"])
+
+            (when run-selected? [re-com/gap :size "10px"])
+
             (when run-selected?
               [flow-details-block-container "flow channel results log*" :system :system
                [re-com/box :size "none" :align :center :justify :center :style {:font-size "15px"} :child
                 [buffy/render-honey-comb-fragments grid3 (- (/ dyn-width 50) 1) (- (/ panel-height-bricks 2) 1) ;;10
                  "grid3-sys*"]] ; flow-id orderb true 570 nil ;366
-               "zmdi-dns"]) [re-com/gap :size "10px"]
+               "zmdi-dns"])
+
+            [re-com/gap :size "10px"]
+
             (let [pval @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]])
                   blk  @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/block"))]])
                   flw  @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/flow_id"))]])
@@ -3292,7 +3308,9 @@
                    (if (or (map? pval) (vector? pval))
                      [map-boxes2 pval blk (str flw " / " blk) [] :output (if (vector? pval) "vector" "map") true]
                      [re-com/box :child
-                      (pr-str @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))]))]])
+                      (pr-str @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))]))
+
+            ]])
       (= ttype :flow-browser) [re-com/h-box :children
                                [[re-com/box :size "auto" :child [bricks/magic-table :flow-list* [:flows-sys] 12 19 []]]]]
       (= ttype :part-browser) [re-com/h-box :children

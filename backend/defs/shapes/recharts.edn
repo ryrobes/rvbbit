@@ -25,7 +25,7 @@
                                              {:contentStyle {:backgroundColor "#00000099"
                                                              :border          "none"}
                                               :itemStyle    {:color "#ecf0f1"}
-                                              :labelStyle   {:color "#3498db"}}]
+                                              :labelStyle   {:color  :theme/editor-outer-rim-color}}]
                                             [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
                                             [:> :Bar {:dataKey :y-field
                                                       :isAnimationActive false
@@ -61,7 +61,7 @@
                                             {:contentStyle {:backgroundColor "#00000099"
                                                             :border          "none"}
                                              :itemStyle    {:color "#ecf0f1"}
-                                             :labelStyle   {:color "#3498db"}}]
+                                             :labelStyle   {:color  :theme/editor-outer-rim-color}}]
                                            [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
                                            [:> :Line {:type "monotone"
                                                       :isAnimationActive false
@@ -105,7 +105,7 @@
                                             {:contentStyle {:backgroundColor "#00000099"
                                                             :border          "none"}
                                              :itemStyle    {:color "#ecf0f1"}
-                                             :labelStyle   {:color "#3498db"}}]
+                                             :labelStyle   {:color :theme/editor-outer-rim-color}}]
                                            [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
                                            [:> :Area {:type "monotone"
                                                       :isAnimationActive false
@@ -156,7 +156,7 @@
                                            {:contentStyle {:backgroundColor "#00000099"
                                                            :border          "none"}
                                             :itemStyle    {:color "#ecf0f1"}
-                                            :labelStyle   {:color "#3498db"}}]]]}
+                                            :labelStyle   {:color  :theme/editor-outer-rim-color}}]]]}
                 :base-score 1}
 
 ;; :drop-down-filter  {:axes {:dim [:and :dimension? :is-string?

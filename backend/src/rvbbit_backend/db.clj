@@ -25,6 +25,15 @@
 (defn ddb-get [coll-name kkey]
   (d/get-value ddb coll-name kkey))
 
+(defn ddb-clear! [coll-name]
+  (ut/pp ["📊🔥" :clearing-datalevin-collection coll-name])
+  (let [;dbi (d/open-dbi ddb coll-name)
+        all-keys (mapv first (d/get-range ddb coll-name [:all]))]
+    (d/transact-kv ddb
+                   (mapv (fn [k] [:del coll-name k]) all-keys))
+    ;; (doseq [k all-keys] (d/transact-kv ddb [[:del coll-name k]]))
+    ))
+
 (defn open-ddb [coll-name]
   (ut/pp ["📊" :opening-datalevin-shape-rotations-collection coll-name])
   (d/open-dbi ddb coll-name))
@@ -32,6 +41,7 @@
 (defn close-ddb []
   (d/close-kv ddb))
 
+(defonce shapes-map (atom {}))
 
 ;; (open-ddb "honeyhash-map") ;; start datalevin instance
 ;; (open-ddb "honeyhash-map") ;; start datalevin instance

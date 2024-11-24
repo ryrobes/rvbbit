@@ -155,18 +155,48 @@
                                       [:= :drag-meta/type ":field"]]
                                       ;[:like :drag-meta/source-table ":query/%"]
                                       ;[:<> :drag-meta/data-type "string"]
-                                [:not :drag-field/dimension?]
+                                ;[:not :drag-field/dimension?]
+                                [:or [:in :drag-field/data-type ["float" "integer" "decimal"]]]
                                 :drag-from-same-connection?
                                 :is-query?
-                                [:not :is-view?]
+                                ;[:not :is-view?]
                                 ;:parent-has-field?
                                 [:not :target-has-field?]
                                 [:not :is-self?]]
-  :sql/add-group-by [:and :drag-field/dimension?
+  :add-compat-dim?  [:and
+                     :drag-field/dimension?
+                     ;[:not [:or [:in :drag-field/data-type ["float" "integer" "decimal"]]]]
+                     :is-query?
                      :drag-from-same-connection?
                      :parent-has-field?
                      [:not :target-has-field?]
                      [:not :is-self?]]
+  :sql/add-count-distinct [:add-compat-dim?]
+  :sql/add-group-by [:add-compat-dim?]
+  :pivot/add-as-row [:and
+                     :drag-field/dimension?
+                     ;[:or [:in :drag-field/data-type ["float" "integer" "decimal"]]]
+                     [:= :runner-str ":pivot"]
+                     [:<> :drag-meta/pivot? true]
+                     :drag-from-same-connection?
+                     :parent-has-field?
+                     [:not :is-self?]]
+  :pivot/add-as-column [:and
+                        :drag-field/dimension?
+                       ;[:or [:in :drag-field/data-type ["float" "integer" "decimal"]]]
+                        [:= :runner-str ":pivot"]
+                        [:<> :drag-meta/pivot? true]
+                        :drag-from-same-connection?
+                        :parent-has-field?
+                        [:not :is-self?]]
+  :pivot/remove-field [:and
+                       [:= :runner-str ":pivot"]
+                       [:= :drag-meta/pivot? true]
+                       :is-self?]
+  :pivot/swap-axes? [:and
+                     [:= :runner-str ":pivot"]
+                     [:= :drag-meta/pivot? true]
+                     :is-self?]
   :param/new-param-view [:and [:= :drag-meta/type ":param"]
                          :canvas-drop?]
   :param/where.=.<>.>.< [:and
@@ -176,12 +206,14 @@
                           [:= :drag-meta/type ":where"]]
                          [:or :parent-has-field? :target-has-field?]
                          ;[:not :is-self?]
-                         ]
+                         :is-query?]
   :param/where-in [:and
                    [:= :drag-meta/param-type "vector"]
+                   :is-query?
                    [:or :parent-has-field? :target-has-field?]]
   :param/where-NOT-in [:and
                        [:= :drag-meta/param-type "vector"]
+                       :is-query?
                        [:or :parent-has-field? :target-has-field?]]
   :cell-drop?        [:and :cell-drag? :canvas-drop?]
   :cell/new-view     [:cell-drop?]
@@ -200,10 +232,13 @@
 ;;   :grid-buttonz/everyone22 [:and [:= 12 12] :is-query?]
 ;;   :grid-buttonz2/everyone44 [:and [:= 2 2] :is-query?]
 
-  :fresh/fresh-clover [:and :is-canvas-call? :no-drag?]
-  :fresh/fresh-repl [:and :is-canvas-call? :no-drag?]
-  :fresh/fresh-api-call [:and :is-canvas-call? :no-drag?]
-  :fresh/fresh-shell [:and :is-canvas-call? :no-drag?]
+  :fresh-drop?          [:and :is-canvas-call? :no-drag?]
+  :fresh/fresh-clover   [:fresh-drop?]
+  :fresh/fresh-repl     [:fresh-drop?]
+  ;:fresh/fresh-api-call [:fresh-drop?]
+  :fresh/fresh-shell    [:fresh-drop?]
+  :fresh/fresh-raw-sql  [:fresh-drop?]
+  :fresh/fresh-ask-calliope  [:fresh-drop?]
 
   ;:action/drop-down [:and :drag-field/dimension? :drag-field/medium-cardinality?]
   ;:action/fresh-clover2 [:fresh?]
@@ -228,7 +263,7 @@
   :action {:label "Random Actions" :locations [:drop]}
   ;;:sql {:label "SQL Ops" :locations [:drop]}
   :filter {:label "SQL UI Filters" :locations [:drop]}
-  :fresh {:label "Fresh Drop!" :locations [:drop]}
+  :fresh {:label "Fresh Drops!" :locations [:drop]}
   :grid-buttonz {:label "Random Actions" :locations [:view]}
   :grid-buttonz2 {:label "Random Actions" :locations [:grid :view]}
   :xtdb-drag {:label "XTDB Random Actions" :locations [:grid-drag]}
@@ -256,16 +291,18 @@
                         :label ["Create Group By" "(plus rowcount)"]}
         :add-group-by  {:color "#a1d76a"
                         :label ["Add to Group By" ""]}
+        ;:order-by.asc.desc {:color "#a1d76a"}
         ;;:new-agg.sum.avg.min.max.count  {:color "#ffd3b6" :label ["SQL Aggregate" :*arg]}
         :new-agg.sql-agg-types  {:color "#ffd3b6" :label ["SQL Aggregate" :*arg]}
         :add-agg.sql-agg-types  {:color "#ffd3b6" :label ["Add SQL Agg" :*arg]}
         ;:new-agg.min  {:color "#dddddd" :label ["SQL Aggregate" "MINNY"]} ;; if overriding a dynamic label, put it AFTER the dynamic def
         } ;; drop only, so not needed
-  :fresh {:fresh-clover {:color "#f5f5f5" :label ["New Clover Block" "(view)"]}
-          :fresh-repl {:color "#f5f5f5" :label ["New REPL Block" "(clojure)"]}
-          :fresh-shell {:color "#f5f5f5" :label ["New Shell Block" "(bash, etc)"]}
-          :fresh-api-call {:color "#f5f5f5" :label ["New API Call" "(GET, POST, etc)"]}
-          }
+  :fresh {:fresh-clover {:label ["New Clover Block" "(view)"]}
+          :fresh-repl {:label ["New REPL Block" "(clojure)"]}
+          :fresh-raw-sql {:label ["New Raw SQL Block" "(farm fresh!)"]}
+          :fresh-ask-calliope {:label ["Ask Calliope" "(Rabbit Worker)"]}
+          :fresh-shell {:label ["New Shell Block" "(bash, etc)"]}
+          :fresh-api-call {:label ["New API Call" "(GET, POST, etc)"]}}
   :grid-buttonz {:everyone2 {:icon "ri-government-line" :tooltip "some tsufsdf ytolfsdfs2"}
                  :everyone22 {:icon "ri-community-line" :tooltip "some tsufsdf ytolfsdfs22222"}}
   :grid-buttonz2 {:everyone44 {:icon "ri-home-heart-line" :tooltip "somefsdfsdfsdf tsufsdf ytolfsdfs22222"}}
@@ -290,7 +327,7 @@
 
  :actions-fns ;; has the action function as well as the labels and defs for that action
  {:view        {:viz-reco-drop (fn [{:keys [drag-meta dragging-body]}]
-                                 (dissoc dragging-body :drag-meta  :conditionals))
+                                 (dissoc dragging-body :drag-meta :conditionals))
                 :tab-grid (fn [{:keys [drag-meta dragging-body]}]
                             (dissoc dragging-body :drag-meta :conditionals))} ;; blocks are already constructed in the drag-body
   :xtdb-button {:click      (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
@@ -525,10 +562,8 @@
                                                 :rowset-query [source-table]
                                                 :row-keys [target]
                                                 :column-keys ["all"]
-                                                :agg-specs []
-                                       ;:reaction-clover :solver-status/metadata>ufo-sightings-drag-31
-                                       ;:pivot-data-kw :new-pivot-pivot
-                                                }}}))
+                                                ;:agg-specs [[:rowcnt :count 1 :*]]
+                                                :agg-specs []}}}))
          :new-view (fn [{:keys [drag-meta]}]
                      (let [{:keys [connection-id source-query source-table param-field row-num target table-fields]} drag-meta
                            vname (keyword (str "cell-"
@@ -589,6 +624,14 @@
                                                                 clojure-version
                                                                 " on " jvm-version
                                                                 " JVM tech" " 🥕🐇"))))}})
+           :fresh-raw-sql (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                            {:w 7 :h 4
+                             :selected-view :new-raw-sql
+                             :selected-mode {:* :text}
+                             :raw-sql  {:new-raw-sql ["-- system-db"
+                                                      "select 42 as the_answer;"
+                                                      "-- to use rabbit reactive param keywords wrap them in {{}}"
+                                                      ""]}})
            :fresh-shell (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
                           {:w 7 :h 4
                            :selected-view :new-shell

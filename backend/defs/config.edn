@@ -9,7 +9,7 @@
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :hide-sub-and-unsub-alerts? true ;;false
  :show-query-times? false
- :log-atom-sizes? true ;; expensive, only for debugging
+ :log-atom-sizes? false ;; expensive, only for debugging
  :viz-shapes "./defs/viz-shapes.edn" ;; "./defs/viz-shapes-only-recharts.edn"
  ;:viz-shapes "./defs/viz-shapes-only-recharts.edn"
  ;:default "./screens/frost-terminal2.edn"

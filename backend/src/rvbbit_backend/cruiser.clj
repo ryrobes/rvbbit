@@ -12,6 +12,7 @@
    [clojure.walk              :as walk]
    [com.climate.claypoole     :as cp]
    [rvbbit-backend.external    :as ext]
+   [rvbbit-backend.db    :as db]
    [rvbbit-backend.evaluator  :as evl]
     ;[rvbbit-backend.clickhouse-ddl :as clickhouse-ddl]
    [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset-sql-query usage
@@ -20,7 +21,7 @@
    [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party  :as ppy]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db cache-db realms-db systemh2-db
+    :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db cache-db systemh2-db
             insert-error-row! to-sql pool-create]]
    [clojure.math.combinatorics :as combo]
   ;;  [clj-time.jdbc] ;; enables joda time returns
@@ -174,11 +175,11 @@
     (sql-exec system-db sqlite-ddl/create-rules-table2)
     (sql-exec system-db sqlite-ddl/create-rules-table3)
     (sql-exec system-db sqlite-ddl/create-flow-functions)
-    (sql-exec history-db sqlite-ddl/create-panel-history)
-    (sql-exec history-db sqlite-ddl/create-panel-resolved-history)
-    (sql-exec history-db sqlite-ddl/create-panel-materialized-history)
-    (sql-exec autocomplete-db sqlite-ddl/create-client-items)
-    (sql-exec realms-db sqlite-ddl/create-realms)
+    ;; (sql-exec history-db sqlite-ddl/create-panel-history)
+    ;; (sql-exec history-db sqlite-ddl/create-panel-resolved-history)
+    ;; (sql-exec history-db sqlite-ddl/create-panel-materialized-history)
+    ;; (sql-exec autocomplete-db sqlite-ddl/create-client-items)
+    ;; (sql-exec realms-db sqlite-ddl/create-realms)
     (sql-exec system-db sqlite-ddl/create-board-history)
     (sql-exec system-db sqlite-ddl/create-errors)
     (sql-exec system-db sqlite-ddl/create-reco-vw)
@@ -187,15 +188,15 @@
     (sql-exec system-db sqlite-ddl/create-client-memory)
     (sql-exec system-db sqlite-ddl/create-status-vw)))
 
-(defn create-sqlite-flow-sys-tables-if-needed! [flows-db] ;; db-type
-  (ut/pp [:creating-flow-sys-tables])
-  (sql-exec flows-db sqlite-ddl/create-flow-results)
-  (sql-exec flows-db sqlite-ddl/create-flow-schedules)
-  (sql-exec flows-db sqlite-ddl/create-flows)
-  (sql-exec flows-db sqlite-ddl/create-flow-history)
-  (sql-exec flows-db sqlite-ddl/create-live-schedules)
-  (sql-exec flows-db sqlite-ddl/create-channel-history)
-  (sql-exec flows-db sqlite-ddl/create-fn-history))
+;; (defn create-sqlite-flow-sys-tables-if-needed! [flows-db] ;; db-type
+;;   (ut/pp [:creating-flow-sys-tables])
+;;   (sql-exec flows-db sqlite-ddl/create-flow-results)
+;;   (sql-exec flows-db sqlite-ddl/create-flow-schedules)
+;;   (sql-exec flows-db sqlite-ddl/create-flows)
+;;   (sql-exec flows-db sqlite-ddl/create-flow-history)
+;;   (sql-exec flows-db sqlite-ddl/create-live-schedules)
+;;   (sql-exec flows-db sqlite-ddl/create-channel-history)
+;;   (sql-exec flows-db sqlite-ddl/create-fn-history))
 
 (defn create-sniff-tests-for
   [system-db key-vector sniff-tests-map] ;; gets run once for each key-vector being processed
@@ -542,9 +543,9 @@
 (def default-sniff-tests (slread "./defs/sniff-tests.edn"))
 (def default-field-attributes (slread "./defs/field-attributes.edn"))
 (def default-derived-fields (slread "./defs/derived-fields.edn"))
-(def viz-shapes-file-str (or (get (config/settings) :viz-shapes) "./defs/viz-shapes.edn"))
+;; (def viz-shapes-file-str (or (get (config/settings) :viz-shapes) "./defs/viz-shapes.edn"))
 ;; (ut/pp [:using-viz-shapes-from viz-shapes-file-str])
-(def default-viz-shapes (slread viz-shapes-file-str))
+;; (def default-viz-shapes (slread viz-shapes-file-str))
 
 ;; (ut/pp (keys default-sniff-tests))
 ;; (ut/pp (keys default-field-attributes))
@@ -1441,7 +1442,7 @@
     (sql-exec system-db (to-sql {:delete-from [tt] :where [:= :connection_id conn-id]}))))
 
 (defn clean-up-some-db-metadata [conn-ids]
-  (let [conn-ids (vec (into conn-ids ["system-db" "flows-db" "cache.db" "history-db"]))]
+  (let [conn-ids (vec (into conn-ids ["system-db" "cache.db" ]))]
     (doseq [tt [:attributes :connections :fields :combo_rows :combos :tests]]
       (sql-exec system-db (to-sql {:delete-from [tt] :where [:not [:in :connection_id conn-ids]]})))))
 
@@ -1718,7 +1719,7 @@
         default-sniff-tests
         default-field-attributes
         default-derived-fields
-        default-viz-shapes
+        @db/shapes-map
         sql-filter) ;[:= :table-name "viz_recos_vw"]
        (let [sniff-rows (sql/fetch-all-tables dest quick?)
              sniff-rows (-> sniff-rows

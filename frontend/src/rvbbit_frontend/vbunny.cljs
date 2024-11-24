@@ -47,7 +47,7 @@
         res))))
 
 
-(def scrollbar-stylev
+(defn scrollbar-stylev []
   {:scrollbar-width "thin"
    ;;:scrollbar-color (str (theme-pull :theme/universal-pop-color nil) "#00000033")
    :scrollbar-color (str (theme-pull :theme/editor-outer-rim-color nil) "#00000033")
@@ -213,7 +213,7 @@
               v-box-style (merge {:overflow-y (if mouse-active? "auto" "hidden")
                                   :overflow-x "hidden"}
                                  style
-                                 scrollbar-stylev)]
+                                 (scrollbar-stylev))]
           [:div (merge
                  (dissoc props :children :initial-scroll :follow?)
                  {:style (merge v-box-style
@@ -357,7 +357,7 @@
                                   ;:border "1px solid cyan"
                                   }
                                  style
-                                 scrollbar-stylev)]
+                                 (scrollbar-stylev))]
           [:div (merge
                  (dissoc props :children :initial-scroll)
                  {:style (merge h-box-style

@@ -262,8 +262,7 @@
       (collect! x)
       (persistent! result))))
 
-(defn deep-flatten-strings
-  [x]
+(defn deep-flatten-strings [x]
   (let [result (transient #{})]
     (letfn [(collect! [item]
               (cond
@@ -284,8 +283,7 @@
 ;;       (collect! processed-x)
 ;;       (persistent! result))))
 
-(defn deep-flatten*
-  [x]
+(defn deep-flatten* [x]
   (let [hx (hash x)]
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
@@ -293,9 +291,8 @@
           (swap! deep-flatten-data assoc hx deep)
           deep))))
 
-(defn deep-flatten
-  [x] ;; param based
-  (if true ;;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
+(defn deep-flatten [x] ;; param based
+  (if cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
     (deep-flatten* x)
     (deep-flatten-real x)))
 
@@ -429,7 +426,7 @@
 
 (defn get-compound-keys
   [x] ;; param based
-  (if true ;cache? ;(true? @(rfa/sub ::param-lookup {:kk :get-compound-keys-cache?}))
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :get-compound-keys-cache?}))
     (get-compound-keys* x)
     (get-compound-keys-real x)))
 
@@ -521,7 +518,7 @@
 
 (defn extract-patterns
   [data kw num] ;; param based
-  (if true ;; cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
     (extract-patterns* data kw num)
     (extract-patterns-real data kw num)))
 
@@ -1746,7 +1743,7 @@
 
 (defn clean-sql-from-ui-keys
   [x] ; <-- gets called hundreds of times
-  (if true ;cache?
+  (if cache?
     (let [hx    (hash x)
           cache (get @clean-sql-atom hx)]
       (if cache

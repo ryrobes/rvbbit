@@ -18,8 +18,8 @@
    [rvbbit-backend.pool-party :as ppy]
    [clojure.pprint :refer [pprint]]
    [rvbbit-backend.sql :as    sql
-    :refer [flows-db insert-error-row! pool-create sql-exec sql-query metrics-kpi-db
-            sql-query-meta sql-query-one system-db cache-db cache-db-memory history-db system-reporting-db
+    :refer [insert-error-row! pool-create sql-exec sql-query metrics-kpi-db
+            sql-query-meta sql-query-one system-db cache-db cache-db-memory  system-reporting-db
             to-sql]]
    [rvbbit-backend.db         :as db])
   (:import
@@ -97,23 +97,23 @@
 ;;        {:model "gpt-4-1106-preview"
 ;;         :name "general-coordinator"
 ;;         :instructions
-;;           "You are 'Rabbit', a helpful assistant that helps people create useful data boards from their SQL databases. 
+;;           "You are 'Rabbit', a helpful assistant that helps people create useful data boards from their SQL databases.
 ;;                                                These boards consist of query resultsets and data visualizations. They are laid out on a grid canvas based on 50 pixels per square.
 
-;;                                                Each thread will contain 3 files: 
+;;                                                Each thread will contain 3 files:
 
-;;                                                The first file (filename ending with 'recos.csv') will be all the generated visualizations for the users queries - you can use this data to suggest 
-;;                                                individual combo_ids that the user can choose, these will then be rendered for the users inspection and selection. 
+;;                                                The first file (filename ending with 'recos.csv') will be all the generated visualizations for the users queries - you can use this data to suggest
+;;                                                individual combo_ids that the user can choose, these will then be rendered for the users inspection and selection.
 ;;                                                There are a number of fields in this file to help you select the appropriate one.
 
-;;                                                The second file (filename ending with 'meta.csv') contains the metadata for the queries that the user has on their board - 
+;;                                                The second file (filename ending with 'meta.csv') contains the metadata for the queries that the user has on their board -
 ;;                                                these are the ones we should focus on. You will find lots of data about each field in each query/table here to help you with you descision making.
-                                               
-;;                                                The third file (filename ending with 'canvas.json') contains the current state of the users board - the coordinates of all the objects, how big 
+
+;;                                                The third file (filename ending with 'canvas.json') contains the current state of the users board - the coordinates of all the objects, how big
 ;;                                                they are as well as how much space the user has. This will be imporatant for suggesting placements for these new items on a simple x, y, w, h grid system.
-                                               
-;;                                                Follow the users instructions and always be suggesting new things for them to try, iterating on them. If you are given no instructions, 
-;;                                                then you should look at the files and the state of the board and recommend things that seems useful or interesting, this could 
+
+;;                                                Follow the users instructions and always be suggesting new things for them to try, iterating on them. If you are given no instructions,
+;;                                                then you should look at the files and the state of the board and recommend things that seems useful or interesting, this could
 ;;                                                start a conversation with the user to iterate on."
 ;;         :tools [{:type "retrieval"}]}}))
 
@@ -666,7 +666,7 @@
         (ut/pp [:delete-OpenAI-assistant-threads thread-id])
         (delete-thread thread-id)
         (ut/pp [:delete-OpenAI-assistant assistant-id])
-        (delete-assistant assistant-id))))) 
+        (delete-assistant assistant-id)))))
 
 ;; (runstream-boot-agent "Calliope" :lucid-blue-kangaroo-0)
 
@@ -689,8 +689,8 @@
 
 
 (defn call-function-by-name [function-name args client-name]
-  (let [function-name (-> (str function-name) 
-                          (cstr/replace  "__"  ".") 
+  (let [function-name (-> (str function-name)
+                          (cstr/replace  "__"  ".")
                           (cstr/replace  "_"  "/"))
         parts (clojure.string/split function-name #"/")
         [ns-name fn-name] (if (= (count parts) 2)
@@ -760,8 +760,8 @@
 ;; (def assistant-configs
 ;;   {"Calliope"
 ;;    {:model "claude-3-5-sonnet-20240620"
-;;     :system-message "You are a helpful AI assistant with access to various tools. 
-;;                      Your personality is 90% business and 10% valley girl 
+;;     :system-message "You are a helpful AI assistant with access to various tools.
+;;                      Your personality is 90% business and 10% valley girl
 ;;                      (think Buffy the Vampire Slayer, not Hannah Montana), your name is Calliope."
 ;;     :max-tokens 8192
 ;;     :tools [{:name "rvbbit-backend__assistants_get-stock-price"
@@ -778,8 +778,8 @@
 ;;                             :required ["seed"]}}]}
 ;;    "Summy"
 ;;    {:model "claude-3-haiku-20240307"
-;;     :system-message "You are a thread summarizer. You will be given a thread of messages and you will summarize it all into one short sentence. 
-;;                      Output ONLY that sentence. Don't start with 'The Summary' just say the summary in a single SHORT sentence. 
+;;     :system-message "You are a thread summarizer. You will be given a thread of messages and you will summarize it all into one short sentence.
+;;                      Output ONLY that sentence. Don't start with 'The Summary' just say the summary in a single SHORT sentence.
 ;;                      Less than 10 words, brevity is more important than accuracy."
 ;;     :max-tokens 1024}
 
@@ -798,16 +798,16 @@
 (defn assistant-configs []
   (assoc
    (get-in @db/ai-worker-atom [:config :server])
-   ;; hardcoded "system" assistants for various tasks 
+   ;; hardcoded "system" assistants for various tasks
    "Summy"
    {:model "claude-3-haiku-20240307"
-    :system "You are a thread summarizer. You will be given a thread of messages and you will summarize it all into one short sentence. 
-             Output ONLY that sentence. Don't start with 'The Summary' just say the summary in a single SHORT sentence. 
+    :system "You are a thread summarizer. You will be given a thread of messages and you will summarize it all into one short sentence.
+             Output ONLY that sentence. Don't start with 'The Summary' just say the summary in a single SHORT sentence.
              Less than 10 words, brevity is more important than accuracy."
     :max-tokens 1024}
    "Clammy"
    {:model "claude-3-haiku-20240307"
-    :system [{:text (str "You are a SQL translator. Your job is to convert string SQL into Honey-SQL Clojure vectors and maps format. 
+    :system [{:text (str "You are a SQL translator. Your job is to convert string SQL into Honey-SQL Clojure vectors and maps format.
                                       This is a dialect of Honey-SQL called Rabbit Clover and there is added functionality beyond the Honey-SQL spec, the examples will make this clear.
                                       You will be given the string - output ONLY the EDN of the converted query. Here are some examples of this type of conversion plus some additional metadata to help understand."
                          (with-out-str
@@ -968,13 +968,13 @@
     (pprint new-message)
     (swap! responses assoc-in [client-name assistant-name thread-id]
            (conj (get-in @responses [client-name assistant-name thread-id] []) (merge new-message {:_metadata extra})))
-  ;; limit to a single atom later, but for now... we can control the reactions with an airlock atom 
+  ;; limit to a single atom later, but for now... we can control the reactions with an airlock atom
   ;; since we have to strip base64 files from the messages anyways - it's too much memory stress on the browser/websocket reader
     (swap! db/ai-worker-atom assoc-in [(keyword assistant-name) (keyword thread-id) :last]
            (if (not= assistant-name "Summy") ;; else we will loop forever, lol
              (interpret-and-clean-messages (get-responses client-name assistant-name thread-id) thread-id client-name)
              (get-responses client-name assistant-name thread-id)))))
-  
+
 (defn update-conversation-hierarchy [client-name assistant-name thread-id & [parent-info]]
   (swap! conversation-hierarchy update-in [client-name]
          (fn [client-convos]
@@ -1098,7 +1098,7 @@
             (pprint response)
             (set-running-status client-name assistant-name thread-id false)
             (swap! db/ai-worker-atom assoc-in [(keyword assistant-name) (keyword thread-id) :last]
-                   (conj (vec (if (not= assistant-name "Summy")  
+                   (conj (vec (if (not= assistant-name "Summy")
                                 (interpret-and-clean-messages (get-responses client-name assistant-name thread-id) thread-id client-name)
                                 (get-responses client-name assistant-name thread-id)))
                          {:role "assistant"
@@ -1113,13 +1113,13 @@
                 input-cost-per-tok (try (/ (get-in @db/model-costs ["Anthropic" model-trunc :per-mtok-input]) 1000000.0) (catch Exception e (do (ut/pp [:str (str e)]) 0)))
                 output-cost-per-tok (try (/ (get-in @db/model-costs ["Anthropic" model-trunc :per-mtok-output]) 1000000.0) (catch Exception e (do (ut/pp [:str (str e)]) 0)))
                 ;;_ (ut/pp [:model-trunc model-trunc (get-in @db/model-costs ["Anthropic" model-trunc :per-mtok-input])])
-                in-tok (get-in response [:body :usage :input_tokens]) 
+                in-tok (get-in response [:body :usage :input_tokens])
                 out-tok (get-in response [:body :usage :output_tokens])
-                sql-row {:client_name (str client-name) 
-                         :assistant_name assistant-name 
-                         :thread_id thread-id 
-                         :model_id model 
-                         :platform "Anthropic" 
+                sql-row {:client_name (str client-name)
+                         :assistant_name assistant-name
+                         :thread_id thread-id
+                         :model_id model
+                         :platform "Anthropic"
                          :input_tokens in-tok
                          :output_tokens out-tok
                          :input_cost (* in-tok input-cost-per-tok)
@@ -1165,9 +1165,9 @@
                      (conj existing [assistant-name assistant-id thread-id]))))]
     (swap! db/ai-worker-atom assoc-in [(keyword assistant-name) (keyword thread-id) :last]
            [{:role (str "summoning-" assistant-name)
-             :content {:summoning assistant-name 
-                       :description (get assistant-config :description) 
-                       :image (get assistant-config :image) 
+             :content {:summoning assistant-name
+                       :description (get assistant-config :description)
+                       :image (get assistant-config :image)
                        :name-style (get assistant-config :name-style)}
              :event-type "start-thread"
              :_metadata {:created-at (System/currentTimeMillis)
@@ -1241,7 +1241,7 @@
                                 (for [{:keys [id name input]} tool-requests
                                       :let [_ (set-running-status client-name assistant-name thread-id true)
                                             _ (ut/pp [:running-tool-request id name input])
-                                            results (try 
+                                            results (try
                                                       (call-function-by-name name input client-name)
                                                       (catch Throwable e {:tool-calling-error (str e)}))
                                             results (json/generate-string results)
@@ -1284,9 +1284,9 @@
     (println "Tracking info:")
     (pprint tracking-info)
 
-    (update-responses parent-client-name parent-assistant-name parent-thread-id 
-                      {:role "user" 
-                       :content (str "Sub-Thread-Request: " initial-message)} 
+    (update-responses parent-client-name parent-assistant-name parent-thread-id
+                      {:role "user"
+                       :content (str "Sub-Thread-Request: " initial-message)}
                       {:sub-assistant sub-assistant-name})
     (update-responses parent-client-name parent-assistant-name parent-thread-id
                       {:role "assistant"
@@ -1300,11 +1300,11 @@
   (swap! db/ai-worker-atom ut/dissoc-in [(keyword assistant-name) (keyword thread-id)])
   (swap! responses ut/dissoc-in [client-name assistant-name thread-id])
   (swap! running-status ut/dissoc-in [client-name assistant-name thread-id])
-  (swap! db/ai-worker-atom assoc-in [:threads-for client-name] 
+  (swap! db/ai-worker-atom assoc-in [:threads-for client-name]
          (filterv #(not= (last %) thread-id) (get-in @db/ai-worker-atom [:threads-for client-name])))
   (swap! conversation-hierarchy ut/dissoc-in [client-name assistant-name thread-id]))
 
-;;; testing shit 
+;;; testing shit
 
 (def test-client-name :quality-linear-ferret-34)
 (def test-assistant-name "Calliope")
@@ -1326,7 +1326,7 @@
                 test-assistant-name
                 main-session
                 "What is good, my dude?")
-  
+
     (send-message test-client-name
                 test-assistant-name
                 main-session
@@ -1364,23 +1364,23 @@
                 "what is the user appear to be requesting here? And if so, what would your plan be to fulfill that request?"
                   ;;"/home/ryanr/rvbbit/backend/assets/screen-snaps/server-clock.jpg"
                 "/home/ryanr/Desktop/Screenshot_20240921_150055.png")
-  
+
     (send-message test-client-name
                 test-assistant-name
                 main-session
                 "so we ran it twice, with the same seed and got the same results")
-  
+
       (send-message test-client-name
                 test-assistant-name
                 main-session
                 "go for it, im feeling lucky")
-  
+
     (send-message test-client-name
                   test-assistant-name
                   main-session
                   "describe the image, what might it be?"
                   "/home/ryanr/rvbbit/backend/assets/screen-snaps/server-clock.jpg")
-  
+
   (ut/pp [:analyze-image-path (analyze-image-path "/home/ryanr/rvbbit/backend/assets/screen-snaps/server-clock.jpg")])
   (ut/pp [:analyze-image-path (analyze-image-path "assets/screen-snaps/server-clock.jpg")])
   (ut/pp [:analyze-image-path (analyze-image-path "/home/ryanr/Desktop/Screenshot_20240921_150055.png")])
@@ -1402,7 +1402,7 @@
   (send-message test-client-name
                 test-assistant-name
                 main-session
-                "I need to perform a specialized task related to quantum computing. 
+                "I need to perform a specialized task related to quantum computing.
                  Please use the run-sub-conversation tool with the specialized-assistant.")
 
   ;; Check the responses to see the result of the sub-conversation

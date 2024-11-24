@@ -221,8 +221,9 @@
 ;;     fm))
 
 (defn flat-db-meta [db connect-meta]
-  (let [h2?   (= (get connect-meta :database_name) "H2")
-        duck? (= (get connect-meta :database_name) "DuckDB") ;; doesnt support jdbc meta
+  (let [h2?   (= (get connect-meta :database-name) "H2")
+        duck? (= (get connect-meta :database-name) "DuckDB") ;; doesnt support jdbc meta
+        ;;_ (ut/pp [:flat-meta-in h2? duck? connect-meta])
         fm (cond
              duck?
              (let [rrows (sql-query db (to-sql {:select [:table_name :column_name :data_type]
@@ -256,6 +257,7 @@
 
 (defn create-target-field-vectors [target-db connect-meta]
   (let [flat-meta     (flat-db-meta target-db connect-meta)
+        ;;_ (ut/pp [:flat-meta flat-meta])
         field-vectors (vec (for [[k v] flat-meta]
                              (let [db-col-type        (get v :column_type)
                                    general-data-infer (general-data-type-infer db-col-type)]
@@ -324,7 +326,7 @@
                                                                                           :table (if base-query
                                                                                                    [(dissoc base-query :order-by) :subq1]
                                                                                                    (keyword (get field-map :table-name)))} sql-map)
-                                                 runnable? (= [{:1 1}] (cached-sql-query ghost-db (to-sql {:select [1] :where (or when-where [:= 1 1])})))
+                                                 runnable? (= [{:1 1}] (sql-query ghost-db (to-sql {:select [1] :where (or when-where [:= 1 1])}) {:no-error? true}))
                                                  vval (if runnable?
                                                         (if (= fname "*") ;; for row count
                                                           (sql-query conn (to-sql sql-map-resolved) {:extra [:shape-test shape-key] :no-error? true})
@@ -347,9 +349,9 @@
                  (reduce (fn [acc-map [shape-key where-vector]]
                            (let [where-vector (walk/postwalk-replace acc-map where-vector)
                                  is-true? (= [{:1 1}]
-                                             (cached-sql-query ghost-db
+                                             (sql-query ghost-db
                                                                  (to-sql {:select [1]
-                                                                          :where (or where-vector [:= 1 1])})))]
+                                                                          :where (or where-vector [:= 1 1])}) {:no-error? true}))]
                              (assoc acc-map shape-key is-true?)))
                          field-map  ; Start with existing attributes
                          shape-attrib-defs)))
@@ -393,7 +395,7 @@
                          (for [[axis-name logic] axes]
                            (for [field-map vector-group
                                  :let [walked-map (walk/postwalk-replace field-map logic)
-                                       res (= [{:1 1}] (cached-sql-query ghost-db (to-sql {:select [1] :where walked-map})))]
+                                       res (= [{:1 1}] (sql-query ghost-db (to-sql {:select [1] :where walked-map}) {:no-error? true}))]
                                  :when res]
                              [shape-name axis-name (get field-map :field-name) (get field-map :table-name)]))))))))
 
@@ -529,6 +531,7 @@
                   connection-id (get (cset/map-invert @db/conn-map) conn)
                   ;;_ (swap! db/shape-rotation-status assoc-in [connection-id :started] (System/currentTimeMillis))
                   connect-meta (get-jdbc-db-meta conn f-path)
+                  ;;;_ (ut/pp [:connect-meta connection-id connect-meta])
                   field-maps (if (map? honey-sql)
                                (add-query-attributes
                                 (create-query-field-vectors conn connect-meta (first (to-sql honey-sql)) query-name) honey-sql)

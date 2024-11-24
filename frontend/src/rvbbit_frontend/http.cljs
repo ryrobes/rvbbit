@@ -724,23 +724,20 @@
             (swap! packets-received inc)
 
             (when heartbeat? ;; test
-              (let [;server-panels (set (get db :server-panels))
-                    ;client-panels (set (remove nil? (filter #(not (cstr/starts-with? (str %) ":reco")) (keys (get db :panels)))))
-                    ;diffy (cset/difference  client-panels server-panels)
-                    ;not-in-sync? (true? (> (count diffy) 0))
-                    ]
-                (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab)])
-
-                ;; (when not-in-sync?
-                ;;   (ut/pp [:panels-out-of-sync-with-server! :resolving... (str diffy)])
-                ;;   (ut/tracked-dispatch [::wfx/push :default ;:secondary
-                ;;                         {:kind :current-panels
-                ;;                          :panels   (select-keys (get db :panels) (vec diffy))
-                ;;                          ;:timeout  500000
-                ;;                          :materialized-panels {} ;; ppm
-                ;;                          :resolved-panels {} ;; ppr
-                ;;                          :drag-body-map {} ;;drag-body-map-this-tab
-                ;;                          :client-name client-name}]))
+              (let [server-panels (set (get db :server-panels))
+                    client-panels (set (remove nil? (filter #(not (cstr/starts-with? (str %) ":reco")) (keys (get db :panels)))))
+                    diffy (cset/difference  client-panels server-panels)
+                    not-in-sync? (true? (> (count diffy) 0))]
+                (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab) :server-panels (count (get-in result [:status :panel-keys]))])
+                (when not-in-sync?
+                  (ut/pp [:panels-out-of-sync-with-server! :resolving... (str diffy)])
+                  (ut/tracked-dispatch [::wfx/push :default ;:secondary
+                                        {:kind :current-panels
+                                         :panels   (select-keys (get db :panels) (vec diffy))
+                                         :materialized-panels {} ;; ppm
+                                         :resolved-panels {} ;; ppr
+                                         :drag-body-map {} ;;drag-body-map-this-tab
+                                         :client-name client-name}]))
                 (ut/tracked-dispatch
                  [::wfx/push :default
                   {:kind        :ack

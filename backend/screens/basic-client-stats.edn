@@ -1,9 +1,15 @@
 {:reco-preview nil,
  :annotate? false,
  :default-col-widths
- {:block-3108 {:client-memory-drag-36 151},
+ {:block-3108 {:client-memory-drag-36 132},
+  :block-5159 {:reporting-market-drag-41 361},
+  :block-12050 {:gen-viz-516 127},
+  :block-9644 {:rowcnt-drag-14 161},
+  :reco-preview-c--412708267 {:all-realms-c--412708267 100},
   :block-2618 {:client-stats-drag-36 114},
-  :block-2178 {:new-query 170}},
+  :block-2178 {:new-query 553},
+  :block-10898 {:screen-type-drag-1 361},
+  :block-4941 {:all-realms 100, :new-query-1 170}},
  :runstream-drops nil,
  :tabs
  ["generated lass of the woodlands"
@@ -17,19 +23,15 @@
   "chartreuse dog"
   "purple peafowl"
   "short echidna"],
- :auto-run? true,
  :selected-cols nil,
  :server nil,
  :runstreams {},
  :editor? false,
  :buffy? false,
- :memory [250997271 185402775 4294705152],
+ :memory [508242572 412249924 4294705152],
  :sched
- {:gen-viz-516 97351,
-  :client-memory-drag-36 97351,
-  :client-stats-drag-36 97351,
-  :new-query 97351},
- :client-name :good-prismatic-swan-6,
+ {:client-memory-drag-36 2206, :gen-viz-516 2206, :client-stats-drag-36 2206},
+ :client-name :jovial-long-peafowl-32,
  :server-panels
  [:block-11815
   :block-5869
@@ -98,33 +100,45 @@
   :block-10898
   :block-3255
   :block-10826
+  :block-4941
   :block-3695
   :block-10941],
  :flow-editor? true,
- :window {:w 2140, :h 1245},
+ :window {:w 2059, :h 1272},
  :ai-worker? false,
  :quake-console? false,
  :implicit-rowsets {:solver [nil]},
  :post-meta
- {:client-memory-drag-36
-  {:mem_used {:distinct 1},
-   :* {:rowcount 1},
-   :recent_messages_per_second {:distinct 0},
+ {:realms
+  {:* {:rowcount 31},
+   :block_type {:distinct 2},
    :rrows {:distinct nil},
+   :block_data {:distinct 31},
+   :block_key {:distinct 31},
    :ts {:distinct 1},
-   :messages_per_second {:distinct 0},
-   :batches {:distinct 1},
+   :file_path {:distinct 1},
+   :block_name {:distinct 31},
+   :realm_name {:distinct 1}},
+  :client-memory-drag-36
+  {:mem_used {:distinct 59},
+   :* {:rowcount 74},
+   :recent_messages_per_second {:distinct 6},
+   :rrows {:distinct nil},
+   :ts {:distinct 59},
+   :messages_per_second {:distinct 2},
+   :batches {:distinct 59},
    :client_name {:distinct 1},
-   :packets {:distinct 1}},
+   :ts_hour {:distinct 3},
+   :packets {:distinct 59}},
   :gen-viz-516
-  {:mem_used {:distinct 0},
-   :* {:rowcount 0},
-   :messages_per_second {:distinct 0},
-   :ts {:distinct 0},
+  {:mem_used {:distinct 39},
+   :* {:rowcount 50},
+   :messages_per_second {:distinct 4},
+   :ts {:distinct 39},
    :rrows {:distinct nil}},
   :client-stats-drag-36
   {:server_subs {:distinct 0},
-   :* {:rowcount 0},
+   :* {:rowcount 11},
    :push {:distinct 0},
    :recent_messages_per_second {:distinct 0},
    :uptime {:distinct 0},
@@ -138,17 +152,23 @@
    :client_name {:distinct 0},
    :last_seen {:distinct 0}},
   :new-query
-  {:mem_used {:distinct 82},
-   :* {:rowcount 82},
-   :ts_hour {:distinct 82},
+  {:mem_used {:distinct 3},
+   :* {:rowcount 4},
+   :ts_hour {:distinct 3},
+   :rrows {:distinct nil}},
+  :new-query-1
+  {:mem_used {:distinct 3},
+   :* {:rowcount 4},
+   :ts_hour {:distinct 3},
    :rrows {:distinct nil}}},
  :flow-estimates
  {:client-memory-drag-36 {:times 0.001, :run-id :client-memory-drag-36},
-  :new-query {:times 0.002, :run-id :new-query},
   :client_stats {:times 0.002, :run-id :client_stats},
-  :client_memory {:times 0.003, :run-id :client_memory},
+  :new-query {:times 0.003, :run-id :new-query},
+  :client-stats-drag-36 {:times 0.001, :run-id :client-stats-drag-36},
   :gen-viz-516 {:times 0.002, :run-id :gen-viz-516},
-  :client-stats-drag-36 {:times 0.001, :run-id :client-stats-drag-36}},
+  :rabbit-search-like {:times 0.01, :run-id :rabbit-search-like},
+  :new-query-1 {:times 0.001, :run-id :new-query-1}},
  :screen-name "basic-client-stats",
  :panel-hashes
  {:block-11815 1956066986,
@@ -166,7 +186,7 @@
   :block-9638 1853537599,
   :block-8681 1571810690,
   :block-7453 1028784509,
-  :block-3108 -590002652,
+  :block-3108 534816278,
   :block-10824 604661495,
   :block-1226-window 2071427679,
   :block-5159 152434049,
@@ -195,16 +215,16 @@
   :block-11288 1148092962,
   :block-8103 -2084723892,
   :block-285 987646976,
-  :block-12050 926492713,
+  :block-12050 207213774,
   :block-9644 174781924,
   :block-10540 -2103852768,
   :block-7953 726341912,
   :block-1667 -791954968,
   :block-23 658083465,
   :block-998 -1595168924,
-  :block-2618 -2040461792,
+  :block-2618 -447649816,
   :block-10902 1867151557,
-  :block-2178 -159466749,
+  :block-2178 311264599,
   :block-7035 266904066,
   :block-10297 -1413461270,
   :block-702 -684281261,
@@ -218,6 +238,7 @@
   :block-10898 -1832904811,
   :block-3255 -1374385628,
   :block-10826 678420119,
+  :block-4941 869136980,
   :block-3695 -776305775,
   :block-10941 6587675},
  :recos-page2 0,
@@ -877,11 +898,11 @@
      :block-342 {:country nil}}}}},
  :recos-page 0,
  :rs-overrides-hashmap {},
- :user-params-hash 1858050073,
+ :user-params-hash 1255728749,
  :grid-recos? true,
- :session-hash -1476095787,
+ :session-hash -912374612,
  :resolved-queries
- {nil {:_last-run "04:55:02"},
+ {nil {:_last-run "07:46:10"},
   :grouped-all-offenses-3
   {:select [:DISTRICT [[:count 1] :rowcnt]],
    :from
@@ -987,7 +1008,7 @@
      :ssb98]],
    :group-by [:OFFENSE_CODE_GROUP]},
   :screen-type-drag-1
-  {:_sqlize-hash nil,
+  {:_sqlize-hash 918369995,
    :select [:screen_type [[:count 1] :rowcnt]],
    :from
    [[{:select
@@ -1010,7 +1031,7 @@
        :daypart_total_seconds],
       :_sqlized-at "2024-10-17 00:25:27",
       :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash nil,
+      :_sqlized-hash 918369995,
       :from
       [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
         :ii785]]}
@@ -1096,8 +1117,8 @@
   {:cache? false,
    :where [:= :client_name :*client-name-str],
    :limit 126,
-   :group-by [2],
-   :_last-run "04:55:24",
+   :group-by [:ts_hour],
+   :_last-run "07:45:36",
    :refresh-every 10,
    :from
    [{:select
@@ -1105,15 +1126,16 @@
       :recent_messages_per_second
       :messages_per_second
       :mem_used
+      [[:substring :ts 1 15] :ts_hour]
       :batches
       :packets
       :ts],
      :where [:= :client_name :*client-name-str],
      :from [[:client_memory :ee183]],
      :order-by [[:mem_time :desc]]}],
-   :order-by [[:ts :desc]],
-   :connection-id "system-db",
-   :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]],
+   :order-by [[:ts_hour :desc]],
+   :connection-id "systemh2-db",
+   :select [[[:avg :mem_used] :mem_used] :ts_hour],
    :post-process-fn
    (fn [x]
      (vec
@@ -1132,22 +1154,73 @@
            mb
            (/ (get row :mem_used) 1048576)
            diff
-           (Math/round (- mb pre-mb))
+           (rvbbit-backend.util/rnd (- mb pre-mb) 0)
            pos
            (cond (> diff 0) "+" (< diff 0) "" :else "")]]
          (merge
            row
-           {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
+           {:diff
+            (if (= idx 0)
+              (str (rvbbit-backend.util/rnd mb 0) " MB")
+              (str pos diff))}))))},
   :all-game-daily-player-summary-1k-1
   {:select
    [:_id :achievements :player_id :player_level :playtime_minutes :revenue :vdate],
    :from [[:game_daily_player_summary_1k :ssb26]]},
+  :new-query-1
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 126,
+   :group-by [:ts_hour],
+   :from
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      [[:substring :ts 1 15] :ts_hour]
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts_hour :desc]],
+   :connection-id "systemh2-db",
+   :select [[[:avg :mem_used] :mem_used] :ts_hour],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (for
+         [idx
+          (range (count x))
+          :let
+          [rx
+           (vec (reverse x))
+           prev-row
+           (get rx (- idx 1) {:mem_used 0})
+           row
+           (get rx idx {:mem_used 0})
+           pre-mb
+           (/ (get prev-row :mem_used) 1048576)
+           mb
+           (/ (get row :mem_used) 1048576)
+           diff
+           (rvbbit-backend.util/rnd (- mb pre-mb) 0)
+           pos
+           (cond (> diff 0) "+" (< diff 0) "" :else "")]]
+         (merge
+           row
+           {:diff
+            (if (= idx 0)
+              (str (rvbbit-backend.util/rnd mb 0) " MB")
+              (str pos diff))}))))},
   :network-analysis-sqlized
   {:select [:database_says],
    :connection-id "cache.db",
    :_sqlized-at "2024-10-20 21:34:16",
    :_sqlized-by [:block-1226 :api-call :network-analysis],
-   :_sqlized-hash nil,
+   :_sqlized-hash 918369995,
    :from
    [[:block_1226_network_analysis__block_1226_api_call_network_analysis_ :gg606]]},
   :grouped-grouped-all-offenses-3
@@ -1222,7 +1295,7 @@
    :from [[:client_stats :gg588]],
    :refresh-every 10,
    :cache? false,
-   :_last-run "04:55:24",
+   :_last-run "07:46:25",
    :col-widths
    {:ack 81,
     :client_latency 141,
@@ -1283,7 +1356,7 @@
        :daypart_total_seconds],
       :_sqlized-at "2024-10-17 00:25:27",
       :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash nil,
+      :_sqlized-hash 918369995,
       :from
       [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
         :ii785]]}
@@ -1360,7 +1433,7 @@
        :daypart_total_seconds],
       :_sqlized-at "2024-10-17 00:25:27",
       :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash nil,
+      :_sqlized-hash 918369995,
       :from
       [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
         :ii785]]}
@@ -1693,7 +1766,7 @@
      :hh890]],
    :group-by [:DAY_OF_WEEK]},
   :reporting-market-drag-41
-  {:_sqlize-hash nil,
+  {:_sqlize-hash 918369995,
    :select [:reporting_market [[:count 1] :rowcnt]],
    :from
    [[{:select
@@ -1716,7 +1789,7 @@
        :daypart_total_seconds],
       :_sqlized-at "2024-10-17 00:25:27",
       :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash nil,
+      :_sqlized-hash 918369995,
       :from
       [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
         :ii785]]}
@@ -1886,6 +1959,7 @@
     :recent_messages_per_second
     :messages_per_second
     :mem_used
+    [[:substring :ts 1 15] :ts_hour]
     :batches
     :packets
     :ts],
@@ -1893,7 +1967,7 @@
    :from [[:client_memory :ee183]],
    :refresh-every 20,
    :cache? false,
-   :_last-run "04:55:14",
+   :_last-run "07:46:15",
    :order-by [[:mem_time :desc]]},
   :all-offenses
   {:select
@@ -1921,7 +1995,7 @@
    [:and [:> :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
    :limit 50,
    :group-by [:ts],
-   :_last-run "04:55:14",
+   :_last-run "07:46:15",
    :refresh-every 20,
    :from
    [{:select
@@ -1929,6 +2003,7 @@
       :recent_messages_per_second
       :messages_per_second
       :mem_used
+      [[:substring :ts 1 15] :ts_hour]
       :batches
       :packets
       :ts],
@@ -1936,7 +2011,7 @@
      :from [[:client_memory :ee183]],
      :order-by [[:mem_time :desc]]}],
    :order-by [[:ts :desc]],
-   :connection-id "system-db",
+   :connection-id "systemh2-db",
    :select
    [[[[:sum :mem_used]] :mem_used]
     [[:sum :recent_messages_per_second] :messages_per_second]
@@ -2002,7 +2077,7 @@
           :daypart_total_seconds],
          :_sqlized-at "2024-10-17 00:25:27",
          :_sqlized-by [:block-1226 :api-call :network-analysis],
-         :_sqlized-hash nil,
+         :_sqlized-hash 918369995,
          :from
          [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
            :ii785]]}
@@ -2017,14 +2092,14 @@
    [[{:select [:database_says],
       :_sqlized-at "2024-10-20 21:34:16",
       :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash nil,
+      :_sqlized-hash 918369995,
       :from
       [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
         :gg606]]}
      :agg45]],
    :group-by [:day_of_week :daypart]}},
  :panels
- {nil {:queries {nil {:_last-run "04:55:02"}}},
+ {nil {:queries {nil {:_last-run "07:46:10"}}},
   :block-11815
   {:leaf-drop [:sql :new-agg.sum],
    :name "block-11815",
@@ -2335,7 +2410,7 @@
   :block-3108
   {:h 5,
    :w 22,
-   :connection-id "system-db",
+   :connection-id "systemh2-db",
    :name "select-all-client_memory",
    :queries
    {:client-memory-drag-36
@@ -2344,6 +2419,7 @@
       :recent_messages_per_second
       :messages_per_second
       :mem_used
+      [[:substring :ts 1 15] :ts_hour]
       :batches
       :packets
       :ts],
@@ -2351,7 +2427,7 @@
      :from [[:client_memory :ee183]],
      :refresh-every 20,
      :cache? false,
-     :_last-run "04:55:14",
+     :_last-run "07:46:15",
      :order-by [[:mem_time :desc]]}},
    :root [1 21],
    :tab "generated lass of the woodlands",
@@ -3178,7 +3254,7 @@
    :selected-view :every-45-seconds,
    :root [1 1],
    :h 6,
-   :connection-id "system-db",
+   :connection-id "systemh2-db",
    :queries
    {:gen-viz-516
     {:cache? false,
@@ -3186,11 +3262,11 @@
      [:and [:> :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
      :limit 50,
      :group-by [:ts],
-     :_last-run "04:55:14",
+     :_last-run "07:46:15",
      :refresh-every 20,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
-     :connection-id "system-db",
+     :connection-id "systemh2-db",
      :select
      [[[[:sum :mem_used]] :mem_used]
       [[:sum :recent_messages_per_second] :messages_per_second]
@@ -3403,7 +3479,7 @@
   :block-2618
   {:h 8,
    :w 26,
-   :connection-id "system-db",
+   :connection-id "systemh2-db",
    :name "select-all-client_stats",
    :queries
    {:client-stats-drag-36
@@ -3422,7 +3498,7 @@
      :from [[:client_stats :gg588]],
      :refresh-every 10,
      :cache? false,
-     :_last-run "04:55:24",
+     :_last-run "07:46:25",
      :col-widths
      {:ack 81,
       :client_latency 141,
@@ -3499,13 +3575,13 @@
     {:cache? false,
      :where [:= :client_name :*client-name-str],
      :limit 126,
-     :group-by [2],
-     :_last-run "04:55:24",
+     :group-by [:ts_hour],
+     :_last-run "07:45:36",
      :refresh-every 10,
      :from [:query/client-memory-drag-36],
-     :order-by [[:ts :desc]],
-     :connection-id "system-db",
-     :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]],
+     :order-by [[:ts_hour :desc]],
+     :connection-id "systemh2-db",
+     :select [[[:avg :mem_used] :mem_used] :ts_hour],
      :post-process-fn
      (fn [x]
        (vec
@@ -3524,13 +3600,15 @@
              mb
              (/ (get row :mem_used) 1048576)
              diff
-             (Math/round (- mb pre-mb))
+             (rvbbit-backend.util/rnd (- mb pre-mb) 0)
              pos
              (cond (> diff 0) "+" (< diff 0) "" :else "")]]
            (merge
              row
              {:diff
-              (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))}}},
+              (if (= idx 0)
+                (str (rvbbit-backend.util/rnd mb 0) " MB")
+                (str pos diff))}))))}}},
   :block-7035
   {:leaf-drop [:sql :new-select.all],
    :name "block-7035",
@@ -3853,6 +3931,52 @@
      :from [[:query/all-offenses :ssb11]],
      :group-by [:DISTRICT]}},
    :tab "circular guinea pig"},
+  :block-4941
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-4941",
+   :w 16,
+   :selected-view :new-query-1,
+   :root [2 4],
+   :h 6,
+   :connection-id "systemh2-db",
+   :queries
+   {:new-query-1
+    {:cache? false,
+     :where [:= :client_name :*client-name-str],
+     :limit 126,
+     :group-by [:ts_hour],
+     :from [:query/client-memory-drag-36],
+     :order-by [[:ts_hour :desc]],
+     :connection-id "systemh2-db",
+     :select [[[:avg :mem_used] :mem_used] :ts_hour],
+     :post-process-fn
+     (fn [x]
+       (vec
+         (for
+           [idx
+            (range (count x))
+            :let
+            [rx
+             (vec (reverse x))
+             prev-row
+             (get rx (- idx 1) {:mem_used 0})
+             row
+             (get rx idx {:mem_used 0})
+             pre-mb
+             (/ (get prev-row :mem_used) 1048576)
+             mb
+             (/ (get row :mem_used) 1048576)
+             diff
+             (rvbbit-backend.util/rnd (- mb pre-mb) 0)
+             pos
+             (cond (> diff 0) "+" (< diff 0) "" :else "")]]
+           (merge
+             row
+             {:diff
+              (if (= idx 0)
+                (str (rvbbit-backend.util/rnd mb 0) " MB")
+                (str pos diff))}))))}},
+   :tab "thriving moose"},
   :block-3695
   {:leaf-drop [:sql :new-select.count],
    :name "block-3695",
@@ -4059,14 +4183,14 @@
    :selected-view-data
    {:cache? false,
     :where [:= :client_name :*client-name-str],
-    :limit 26,
-    :group-by [2],
-    :_last-run "04:54:38",
+    :limit 126,
+    :group-by [:ts_hour],
+    :_last-run "07:41:04",
     :refresh-every 10,
     :from [:query/client-memory-drag-36],
-    :order-by [[:ts :desc]],
-    :connection-id "system-db",
-    :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]],
+    :order-by [[:ts_hour :desc]],
+    :connection-id "systemh2-db",
+    :select [[[:avg :mem_used] :mem_used] :ts_hour],
     :post-process-fn
     (fn [x]
       (vec
@@ -4085,12 +4209,13 @@
             mb
             (/ (get row :mem_used) 1048576)
             diff
-            (Math/round (- mb pre-mb))
+            (Math/round (- mb pre-mb) 0)
             pos
             (cond (> diff 0) "+" (< diff 0) "" :else "")]]
           (merge
             row
-            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
+            {:diff
+             (if (= idx 0) (str (Math/round mb 0) " MB") (str pos diff))}))))},
    :selected-block :block-2178,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
@@ -4242,1032 +4367,141 @@
    :ts "2024-05-13 21:53:16"},
   :all-offenses nil,
   :block-342 {:country nil}},
- :selected-flow "my-new-flow4480",
+ :selected-flow "my-new-flow743",
  :shapes
- {:block-2618
-  {:client-stats-drag-36
-   [{:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
+ {[:fresh-table! "realms-db" :realms]
+  [{:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
       [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
        [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :queue_distro, :allowDuplicatedCategory false}]
-        [:>
-         :Bar
-         {:dataKey :push,
-          :isAnimationActive false,
-          :data :query-preview,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-stats-drag-36"],
-      :shape-name :recharts-h-bar,
-      :axes {:y "push", :x "queue_distro"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "push, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :push]] :push] :queue_distro],
-       :from [[:query/client-stats-drag-36 :subq1]],
-       :group-by [:queue_distro]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color :theme/editor-outer-rim-color}}]
+       [:> :XAxis {:dataKey :file_path, :allowDuplicatedCategory false}]
+       [:>
+        :Bar
+        {:dataKey :rrows,
+         :isAnimationActive false,
+         :data :query-preview,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :on-click [:set-recharts-param>]}]]]},
+    :connection-id "realms-db",
+    :shape-rotator
+    {:context ["realms-db" nil "none" "realms"],
+     :shape-name :recharts-h-bar,
+     :axes {:y "rrows", :x "file_path"},
+     :honey-hash 806865728,
+     :items [[:views :reech] [:queries :query-preview]],
+     :source-panel [:fresh-table! "realms-db" :realms]},
+    :name "rrows, file_path",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :file_path],
+      :from [[:realms :subq1]],
+      :group-by [:file_path]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
       [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
        [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :queue_distro, :allowDuplicatedCategory false}]
-        [:>
-         :Line
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :push,
-          :stroke :theme/editor-outer-rim-color,
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :dataKey :push,
-          :isAnimationActive false,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-stats-drag-36"],
-      :shape-name :recharts-line,
-      :axes {:y "push", :x "queue_distro"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "push, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :push]] :push] :queue_distro],
-       :from [[:query/client-stats-drag-36 :subq1]],
-       :group-by [:queue_distro]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color :theme/editor-outer-rim-color}}]
+       [:> :XAxis {:dataKey :file_path, :allowDuplicatedCategory false}]
+       [:>
+        :Line
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :activeDot {:r 8}}]
+       [:>
+        :Scatter
+        {:data :query-preview,
+         :dataKey :rrows,
+         :isAnimationActive false,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "realms-db",
+    :shape-rotator
+    {:context ["realms-db" nil "none" "realms"],
+     :shape-name :recharts-line,
+     :axes {:y "rrows", :x "file_path"},
+     :honey-hash 806865728,
+     :items [[:views :reech] [:queries :query-preview]],
+     :source-panel [:fresh-table! "realms-db" :realms]},
+    :name "rrows, file_path",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :file_path],
+      :from [[:realms :subq1]],
+      :group-by [:file_path]}}}
+   {:h 5,
+    :w 9,
+    :selected-view :reech,
+    :views
+    {:reech
+     [:>
+      :ResponsiveContainer
+      {:width "100%", :height :panel-height+50}
       [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
+       :ComposedChart
+       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
        [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :queue_distro, :allowDuplicatedCategory false}]
-        [:>
-         :Area
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :push,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :isAnimationActive false,
-          :dataKey :push,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-stats-drag-36"],
-      :shape-name :recharts-area,
-      :axes {:y "push", :x "queue_distro"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "push, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :push]] :push] :queue_distro],
-       :from [[:query/client-stats-drag-36 :subq1]],
-       :group-by [:queue_distro]}}}
-    {:h 5,
-     :w 5,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
+        :Tooltip
+        {:contentStyle {:backgroundColor "#00000099", :border "none"},
+         :itemStyle {:color "#ecf0f1"},
+         :labelStyle {:color :theme/editor-outer-rim-color}}]
+       [:> :XAxis {:dataKey :file_path, :allowDuplicatedCategory false}]
        [:>
-        :PieChart
-        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
-        [:>
-         :Pie
-         {:stroke :theme/editor-outer-rim-color,
-          :nameKey :segment,
-          :innerRadius :quarter-panel-width,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>],
-          :outerRadius 80,
-          :dataKey :value,
-          :label true,
-          :isAnimationActive false,
-          :data :query-preview}]
-        [:> :Legend {}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-stats-drag-36"],
-      :shape-name :recharts-pie,
-      :axes {:value "push", :segment "queue_distro"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "push, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[:queue_distro :segment] [[:sum :push] :value]],
-       :from [[:query/client-stats-drag-36 :subq1]],
-       :group-by [:queue_distro]}}}]},
-  :block-12050
-  {:gen-viz-516
-   [{:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
+        :Area
+        {:type "monotone",
+         :isAnimationActive false,
+         :data :query-preview,
+         :dataKey :rrows,
+         :stroke :theme/editor-outer-rim-color,
+         :fill [:str :theme/editor-outer-rim-color "33"],
+         :activeDot {:r 8}}]
        [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Bar
-         {:dataKey :mem_used,
-          :isAnimationActive false,
-          :data :query-preview,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "gen-viz-516"],
-      :shape-name :recharts-h-bar,
-      :axes {:y "mem_used", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :mem_used]] :mem_used] :ts],
-       :from [[:query/gen-viz-516 :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Line
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :mem_used,
-          :stroke :theme/editor-outer-rim-color,
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :dataKey :mem_used,
-          :isAnimationActive false,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "gen-viz-516"],
-      :shape-name :recharts-line,
-      :axes {:y "mem_used", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :mem_used]] :mem_used] :ts],
-       :from [[:query/gen-viz-516 :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Area
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :mem_used,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :isAnimationActive false,
-          :dataKey :mem_used,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "gen-viz-516"],
-      :shape-name :recharts-area,
-      :axes {:y "mem_used", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :mem_used]] :mem_used] :ts],
-       :from [[:query/gen-viz-516 :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 5,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :PieChart
-        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
-        [:>
-         :Pie
-         {:stroke :theme/editor-outer-rim-color,
-          :nameKey :segment,
-          :innerRadius :quarter-panel-width,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>],
-          :outerRadius 80,
-          :dataKey :value,
-          :label true,
-          :isAnimationActive false,
-          :data :query-preview}]
-        [:> :Legend {}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "gen-viz-516"],
-      :shape-name :recharts-pie,
-      :axes {:value "mem_used", :segment "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts",
-     :queries
-     {:query-preview
-      {:select [[:ts :segment] [[:sum :mem_used] :value]],
-       :from [[:query/gen-viz-516 :subq1]],
-       :group-by [:ts]}}}]},
-  :block-3108
-  {:client-memory-drag-36
-   [{:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Bar
-         {:dataKey :batches,
-          :isAnimationActive false,
-          :data :query-preview,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-memory-drag-36"],
-      :shape-name :recharts-h-bar,
-      :axes {:y "batches", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :batches]] :batches] :ts],
-       :from [[:query/client-memory-drag-36 :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Line
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :batches,
-          :stroke :theme/editor-outer-rim-color,
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :dataKey :batches,
-          :isAnimationActive false,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-memory-drag-36"],
-      :shape-name :recharts-line,
-      :axes {:y "batches", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :batches]] :batches] :ts],
-       :from [[:query/client-memory-drag-36 :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Area
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :batches,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :isAnimationActive false,
-          :dataKey :batches,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-memory-drag-36"],
-      :shape-name :recharts-area,
-      :axes {:y "batches", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :batches]] :batches] :ts],
-       :from [[:query/client-memory-drag-36 :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 5,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :PieChart
-        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
-        [:>
-         :Pie
-         {:stroke :theme/editor-outer-rim-color,
-          :nameKey :segment,
-          :innerRadius :quarter-panel-width,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>],
-          :outerRadius 80,
-          :dataKey :value,
-          :label true,
-          :isAnimationActive false,
-          :data :query-preview}]
-        [:> :Legend {}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client-memory-drag-36"],
-      :shape-name :recharts-pie,
-      :axes {:value "batches", :segment "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[:ts :segment] [[:sum :batches] :value]],
-       :from [[:query/client-memory-drag-36 :subq1]],
-       :group-by [:ts]}}}]},
-  nil
-  {:client_memory
-   [{:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Bar
-         {:dataKey :batches,
-          :isAnimationActive false,
-          :data :query-preview,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_memory"],
-      :shape-name :recharts-h-bar,
-      :axes {:y "batches", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :batches]] :batches] :ts],
-       :from [[:query/client_memory :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Line
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :batches,
-          :stroke :theme/editor-outer-rim-color,
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :dataKey :batches,
-          :isAnimationActive false,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_memory"],
-      :shape-name :recharts-line,
-      :axes {:y "batches", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :batches]] :batches] :ts],
-       :from [[:query/client_memory :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts, :allowDuplicatedCategory false}]
-        [:>
-         :Area
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :batches,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :isAnimationActive false,
-          :dataKey :batches,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_memory"],
-      :shape-name :recharts-area,
-      :axes {:y "batches", :x "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :batches]] :batches] :ts],
-       :from [[:query/client_memory :subq1]],
-       :group-by [:ts]}}}
-    {:h 5,
-     :w 5,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :PieChart
-        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
-        [:>
-         :Pie
-         {:stroke :theme/editor-outer-rim-color,
-          :nameKey :segment,
-          :innerRadius :quarter-panel-width,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>],
-          :outerRadius 80,
-          :dataKey :value,
-          :label true,
-          :isAnimationActive false,
-          :data :query-preview}]
-        [:> :Legend {}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_memory"],
-      :shape-name :recharts-pie,
-      :axes {:value "batches", :segment "ts"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "batches, ts",
-     :queries
-     {:query-preview
-      {:select [[:ts :segment] [[:sum :batches] :value]],
-       :from [[:query/client_memory :subq1]],
-       :group-by [:ts]}}}],
-   :client_stats
-   [{:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :queue_distro, :allowDuplicatedCategory false}]
-        [:>
-         :Bar
-         {:dataKey :booted_ts,
-          :isAnimationActive false,
-          :data :query-preview,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_stats"],
-      :shape-name :recharts-h-bar,
-      :axes {:y "booted_ts", :x "queue_distro"}},
-     :name "booted_ts, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :booted_ts]] :booted_ts] :queue_distro],
-       :from [[:query/client_stats :subq1]],
-       :group-by [:queue_distro]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :queue_distro, :allowDuplicatedCategory false}]
-        [:>
-         :Line
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :booted_ts,
-          :stroke :theme/editor-outer-rim-color,
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :dataKey :booted_ts,
-          :isAnimationActive false,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_stats"],
-      :shape-name :recharts-line,
-      :axes {:y "booted_ts", :x "queue_distro"}},
-     :name "booted_ts, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :booted_ts]] :booted_ts] :queue_distro],
-       :from [[:query/client_stats :subq1]],
-       :group-by [:queue_distro]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :queue_distro, :allowDuplicatedCategory false}]
-        [:>
-         :Area
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :booted_ts,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :isAnimationActive false,
-          :dataKey :booted_ts,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_stats"],
-      :shape-name :recharts-area,
-      :axes {:y "booted_ts", :x "queue_distro"}},
-     :name "booted_ts, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :booted_ts]] :booted_ts] :queue_distro],
-       :from [[:query/client_stats :subq1]],
-       :group-by [:queue_distro]}}}
-    {:h 5,
-     :w 5,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :PieChart
-        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
-        [:>
-         :Pie
-         {:stroke :theme/editor-outer-rim-color,
-          :nameKey :segment,
-          :innerRadius :quarter-panel-width,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>],
-          :outerRadius 80,
-          :dataKey :value,
-          :label true,
-          :isAnimationActive false,
-          :data :query-preview}]
-        [:> :Legend {}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "client_stats"],
-      :shape-name :recharts-pie,
-      :axes {:value "booted_ts", :segment "queue_distro"}},
-     :name "booted_ts, queue_distro",
-     :queries
-     {:query-preview
-      {:select [[:queue_distro :segment] [[:sum :booted_ts] :value]],
-       :from [[:query/client_stats :subq1]],
-       :group-by [:queue_distro]}}}]},
-  :block-2178
-  {:new-query
-   [{:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts_hour, :allowDuplicatedCategory false}]
-        [:>
-         :Bar
-         {:dataKey :mem_used,
-          :isAnimationActive false,
-          :data :query-preview,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "new-query"],
-      :shape-name :recharts-h-bar,
-      :axes {:y "mem_used", :x "ts_hour"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts_hour",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :mem_used]] :mem_used] :ts_hour],
-       :from [[:query/new-query :subq1]],
-       :group-by [:ts_hour]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts_hour, :allowDuplicatedCategory false}]
-        [:>
-         :Line
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :mem_used,
-          :stroke :theme/editor-outer-rim-color,
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :dataKey :mem_used,
-          :isAnimationActive false,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "new-query"],
-      :shape-name :recharts-line,
-      :axes {:y "mem_used", :x "ts_hour"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts_hour",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :mem_used]] :mem_used] :ts_hour],
-       :from [[:query/new-query :subq1]],
-       :group-by [:ts_hour]}}}
-    {:h 5,
-     :w 9,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]
-        [:> :XAxis {:dataKey :ts_hour, :allowDuplicatedCategory false}]
-        [:>
-         :Area
-         {:type "monotone",
-          :isAnimationActive false,
-          :data :query-preview,
-          :dataKey :mem_used,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :activeDot {:r 8}}]
-        [:>
-         :Scatter
-         {:data :query-preview,
-          :isAnimationActive false,
-          :dataKey :mem_used,
-          :fill :theme/editor-outer-rim-color,
-          :onClick [:set-recharts-param>]}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "new-query"],
-      :shape-name :recharts-area,
-      :axes {:y "mem_used", :x "ts_hour"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used, ts_hour",
-     :queries
-     {:query-preview
-      {:select [[[[:sum :mem_used]] :mem_used] :ts_hour],
-       :from [[:query/new-query :subq1]],
-       :group-by [:ts_hour]}}}
-    {:h 5,
-     :w 5,
-     :selected-view :reech,
-     :views
-     {:reech
-      [:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :PieChart
-        {:margin {:top 20, :right 20, :bottom 20, :left 20}}
-        [:>
-         :Pie
-         {:stroke :theme/editor-outer-rim-color,
-          :nameKey :segment,
-          :innerRadius :quarter-panel-width,
-          :fill [:str :theme/editor-outer-rim-color "33"],
-          :on-click [:set-recharts-param>],
-          :outerRadius 80,
-          :dataKey :value,
-          :label true,
-          :isAnimationActive false,
-          :data :query-preview}]
-        [:> :Legend {}]
-        [:>
-         :Tooltip
-         {:contentStyle {:backgroundColor "#00000099", :border "none"},
-          :itemStyle {:color "#ecf0f1"},
-          :labelStyle {:color "#3498db"}}]]]},
-     :connection-id "system-db",
-     :shape-rotator
-     {:context ["system-db" nil nil "new-query"],
-      :shape-name :recharts-pie,
-      :axes {:value "mem_used"},
-      :items [[:views :reech] [:queries :query-preview]]},
-     :name "mem_used",
-     :queries
-     {:query-preview
-      {:select [[:segment-field :segment] [[:sum :mem_used] :value]],
-       :from [[:query/new-query :subq1]],
-       :group-by [:segment-field]}}}]}}}
+        :Scatter
+        {:data :query-preview,
+         :isAnimationActive false,
+         :dataKey :rrows,
+         :fill :theme/editor-outer-rim-color,
+         :onClick [:set-recharts-param>]}]]]},
+    :connection-id "realms-db",
+    :shape-rotator
+    {:context ["realms-db" nil "none" "realms"],
+     :shape-name :recharts-area,
+     :axes {:y "rrows", :x "file_path"},
+     :honey-hash 806865728,
+     :items [[:views :reech] [:queries :query-preview]],
+     :source-panel [:fresh-table! "realms-db" :realms]},
+    :name "rrows, file_path",
+    :queries
+    {:query-preview
+     {:select [[[:count 1] :rrows] :file_path],
+      :from [[:realms :subq1]],
+      :group-by [:file_path]}}}]}}

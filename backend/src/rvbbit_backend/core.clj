@@ -45,8 +45,8 @@
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.sql :as    sql
-    :refer [flows-db pool-create sql-exec sql-query metrics-kpi-db import-db systemh2-db
-            system-db cache-db cache-db-memory history-db realms-db
+    :refer [pool-create sql-exec sql-query metrics-kpi-db import-db systemh2-db
+            system-db cache-db cache-db-memory
             system-reporting-db to-sql]]
    [rvbbit-backend.util :as    ut
     :refer [ne?]]
@@ -286,12 +286,12 @@
                                                                        :connections   (count (get flow-data :connections))
                                                                        :file_path     (str f-path)
                                                                        :body          (pr-str flow-data)}]}]
-                                        (sql-exec flows-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
-                                        (sql-exec flows-db (to-sql insert-sql)))
+                                        (sql-exec systemh2-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
+                                        (sql-exec systemh2-db (to-sql insert-sql)))
                                       (catch Exception e (ut/pp [:read-flow-error f-path e]))))))
 
 (defn update-all-flow-meta []
-  (sql-exec flows-db (to-sql {:delete-from [:flows]})) ;; just in case
+  (sql-exec systemh2-db (to-sql {:truncate :flows})) ;; just in case
   (let [prefix "./flows/"
         files  (ut/get-file-vectors-simple prefix ".edn")]
     (doseq [f files]
@@ -385,6 +385,42 @@
              (ut/pp [:ai-workers-updated-successfully])))))
      file-path)))
 
+(defn merge-shape-files []
+  (let [file-path "./defs/shapes/"
+        files (->> (ut/get-file-vectors-simple file-path ".edn")
+                   (sort-by str))
+        merged-shapes (reduce
+                       (fn [acc file]
+                         (try
+                           (let [full-path (str file-path file)
+                                 shape-data (edn/read-string (slurp full-path))
+                                 shape-set (-> file cstr/lower-case (cstr/replace ".edn" ""))
+                                 shape-data (into {} (for [[k v] shape-data] {k (assoc v :shape-set shape-set)}))
+                                 _ (ut/pp ["🎲🃏" :shapes full-path (count (keys shape-data))])]
+                             (merge acc shape-data))
+                           (catch Exception e
+                             (ut/pp [:error-reading-shape-file file (.getMessage e)])
+                             acc)))
+                       {}  ; to acc into
+                       files)]
+    (reset! db/shapes-map merged-shapes)))
+
+;; (ut/pp (keys (merge-shape-files)))
+
+(defn watch-shapes-folder []
+  (let [file-path "./defs/shapes/"]
+    (beholder/watch
+     (fn [event]
+       (when (and (= (:type event) :modify)
+                  (cstr/ends-with? (str (:path event)) ".edn"))
+         (let [f-path (str (:path event))
+               f-op (:type event)]
+           (ut/pp ["🎲🃏" :shape-files-change! :merging f-op f-path])
+           (merge-shape-files)
+           (db/ddb-clear! "honeyhash-map")
+           (db/ddb-clear! "shapes-map"))))
+     file-path)))
+
 (defn watch-screens-folder []
   (let [file-path "./screens/"]
     (beholder/watch #(when (cstr/ends-with? (str (get % :path)) ".edn")
@@ -409,7 +445,7 @@
                                   :shape-attributes-defs cruiser/default-field-attributes
                                   ;;:filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
                                   :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
-        combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)
+        combo-viz (rota/get-viz-shape-blocks res @db/shapes-map)
         shapes-by (group-by (fn [m] [(get-in m [:shape-rotator :honey-hash])
                                      (keyword (get-in m [:shape-rotator :context 3]))]) combo-viz)
         fields-by (group-by (fn [m] [(get m :honey-hash)
@@ -433,7 +469,8 @@
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
         _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
 
-;; (shape-rotation-run "connections/bigfoot-ufos.edn")
+;; (time (shape-rotation-run "connections/bigfoot-ufos.edn"))
+;; 5000 1652 1190 1208 1359 1246
 
 (defn db-sniff-solver-default [f-path conn-name]
   {:signal :signal/daily-at-9am
@@ -454,6 +491,7 @@
 ;; (ut/pp (keys @db/conn-map))
 ;; (ut/pp @db/shape-rotation-status)
 ;; (shape-rotation-run systemh2-db)
+;; (shape-rotation-run cache-db)
 
 ;; (wss/fig-render ":db-shape-rotator" :bright-cyan) ;; :solvers :nrepl-calls :websockets
 ;; (ut/pp
@@ -856,7 +894,7 @@
                                                                        :in_error        (cstr/includes? (str res) ":error")
                                                                        :human_elapsed   (str human-elapsed)}
                                                            insert-sql {:insert-into [:flow_history] :values [row]}]
-                                                       (sql-exec flows-db (to-sql insert-sql))) ;; sql-exec has it's own serial queue
+                                                       (sql-exec systemh2-db (to-sql insert-sql))) ;; sql-exec has it's own serial queue
                                                      (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
                                             _ (swap! last-look assoc k done?)
                                             _ (when run-sql? (swap! saved-uids conj run-id))
@@ -1041,10 +1079,6 @@
   ;;                                    ;; :max-cache-entries 536870912
   ;;                                   }]})
 
-
-
-
-
     (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
     (get-ai-workers) ;; just in case for the cold boot atom has no
 
@@ -1058,14 +1092,27 @@
     (sql-exec systemh2-db h2/create-realms)
     (sql-exec systemh2-db h2/create-fields)
     (sql-exec systemh2-db h2/create-fields-view)
+    (sql-exec systemh2-db h2/create-panel-history)
+    (sql-exec systemh2-db h2/create-panel-materialized-history)
+    (sql-exec systemh2-db h2/create-panel-resolved-history)
+    (sql-exec systemh2-db h2/create-client-memory)
+    (sql-exec systemh2-db h2/create-client-stats)
+    (sql-exec systemh2-db h2/create-jvm-stats)
+    (sql-exec systemh2-db h2/create-client-items)
+    (sql-exec systemh2-db h2/create-flow-results)
+    (sql-exec systemh2-db h2/create-flow-schedules)
+    (sql-exec systemh2-db h2/create-flows)
+    (sql-exec systemh2-db h2/create-flow-history)
+    (sql-exec systemh2-db h2/create-live-schedules)
+    (sql-exec systemh2-db h2/create-channel-history)
+    (sql-exec systemh2-db h2/create-fn-history)
     ;; (sql-exec systemh2-db h2/create-ft-index)
 
-    (db/open-ddb "honeyhash-map") ;; start datalevin instances
+    (db/open-ddb "honeyhash-map") ;; start datalevin "table" instances
     (db/open-ddb "shapes-map")
-    (db/open-ddb "shapes-map/fields")
-    (db/open-ddb "shapes-map/shapes")
+    ;(db/open-ddb "shapes-map/fields")
+    ;(db/open-ddb "shapes-map/shapes")
     (db/open-ddb "last-values")
-
 
     (sql-exec system-db "drop table if exists jvm_stats;")
     (sql-exec system-db "drop table if exists client_memory;")
@@ -1076,7 +1123,7 @@
     (sql-exec system-db "drop view  if exists latest_status;")
 
     (cruiser/create-sqlite-sys-tables-if-needed! system-db)
-    (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
+    ;; (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
     (cruiser/create-system-reporting-tables-if-needed! system-reporting-db)
 
     ;; (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest1)
@@ -1084,9 +1131,13 @@
     ;; (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest3)
     ;; (cruiser/create-sqlite-sys-tables-if-needed! systemh2-db)
 
+    (merge-shape-files) ;; build db/shapes-map for upcoming shape-rotation
+
     (when harvest-on-boot?
       (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (update-all-conn-meta))))
 
+    #_{:clj-kondo/ignore [:inline-def]}
+    (defonce start-shape-watcher (watch-shapes-folder))
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
     #_{:clj-kondo/ignore [:inline-def]}
@@ -1149,10 +1200,12 @@
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce system-dbs
-      [system-db flows-db systemh2-db import-db metrics-kpi-db cache-db cache-db-memory realms-db history-db system-reporting-db])
+      [system-db systemh2-db import-db metrics-kpi-db cache-db cache-db-memory system-reporting-db])
 
-    (doseq [db system-dbs]
-      (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (shape-rotation-run db))))
+    (ppy/execute-in-thread-pools
+     :shape-rotation-jobs-wrapper
+     (fn [] (doseq [db system-dbs]
+              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (shape-rotation-run db))))))
 
     ;; (time (cruiser/lets-give-it-a-whirl-no-viz
     ;;        "system-db"

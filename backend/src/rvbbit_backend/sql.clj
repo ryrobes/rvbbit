@@ -103,19 +103,27 @@
       :cache             "shared"}
      "system-db")})
 
+;; (def systemh2-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:adapter    "h2"
+;;       :url        "jdbc:h2:file:./db/systemh2-db;MODE=PostgreSQL;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;WRITE_DELAY=500;PAGE_SIZE=4096;"
+;;       :username     "sa"
+;;       :password     ""
+;;       :maximum-pool-size 50}
+;;      "systemh2-db")})
+
 (def systemh2-db
   {:datasource
    @(pool-create
      {:adapter    "h2"
-      :url        "jdbc:h2:file:./db/systemh2-db;MODE=PostgreSQL;DATABASE_TO_UPPER=false;CACHE_SIZE=65536;WRITE_DELAY=500;PAGE_SIZE=4096;"
-      ;;:url   "jdbc:h2:file:./db/systemh2-db?MODE=PostgreSQL&DATABASE_TO_UPPER=false&AUTO_SERVER=TRUE&CACHE_SIZE=65536&COMPRESS=TRUE&WRITE_DELAY=500&PAGE_SIZE=4096"
-      :username     "sa"
-      :password     ""
-      ;; :pre-filter-fn (fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
-      ;;                             (not= (get m :db-schema) "PG_CATALOG")))
-      ;:pool-name    "mvstore-pool"
-      :maximum-pool-size 50}
+      :url        "jdbc:h2:file:./db/systemh2-db;MODE=PostgreSQL;DATABASE_TO_UPPER=false;CACHE_SIZE=131072;WRITE_DELAY=500;PAGE_SIZE=4096;LOCK_MODE=0;COMPRESS=TRUE;MAX_MEMORY_ROWS=100000;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1;QUERY_CACHE_SIZE=8;"
+      :username   "sa"
+      :password   ""
+      :maximum-pool-size 100}
      "systemh2-db")})
+
+;;       ;;:url   "jdbc:h2:file:./db/systemh2-db?MODE=PostgreSQL&DATABASE_TO_UPPER=false&AUTO_SERVER=TRUE&CACHE_SIZE=65536&COMPRESS=TRUE&WRITE_DELAY=500&PAGE_SIZE=4096"
 
 ;; (def system-db
 ;;   {:datasource
@@ -189,31 +197,31 @@
 ;;      "system-db")})
 
 
-(def history-db
-  {:datasource
-   @(pool-create
-     {:jdbc-url
-      ;;;"jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
-           ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL"
-           ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-      "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
-      :idle-timeout      600000
-      :maximum-pool-size 20
-      :max-lifetime      1800000
-      :cache             "shared"}
-     "history-db")})
+;; (def history-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url
+;;       ;;;"jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
+;;            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL"
+;;            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
+;;       "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
+;;       :idle-timeout      600000
+;;       :maximum-pool-size 20
+;;       :max-lifetime      1800000
+;;       :cache             "shared"}
+;;      "history-db")})
 
-(def autocomplete-db
-  {:datasource
-   @(pool-create
-     {:jdbc-url
-      ;;"jdbc:sqlite:file:./db/autocomplete.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
-      "jdbc:sqlite:file:./db/autocomplete.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
-      :idle-timeout      600000
-      :maximum-pool-size 20
-      :max-lifetime      1800000
-      :cache             "shared"}
-     "autocomplete-db")})
+;; (def autocomplete-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url
+;;       ;;"jdbc:sqlite:file:./db/autocomplete.db?cache=shared&journal_mode=WAL&mode=memory&busy_timeout=50000&locking_mode=NORMAL"
+;;       "jdbc:sqlite:file:./db/autocomplete.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL"
+;;       :idle-timeout      600000
+;;       :maximum-pool-size 20
+;;       :max-lifetime      1800000
+;;       :cache             "shared"}
+;;      "autocomplete-db")})
 
 
 ;; (def system-db
@@ -242,18 +250,18 @@
 
 
 
-(def flows-db
-  {:datasource
-   @(pool-create
-     {:jdbc-url
-           ;"jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL"
-           ;;&journal_mode=WAL"
-      "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" ;
-      :idle-timeout 600000
-      :max-lifetime 1800000
-      :auto_vacuum  "FULL"
-      :cache        "shared"}
-     "flows-db")})
+;; (def flows-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url
+;;            ;"jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL"
+;;            ;;&journal_mode=WAL"
+;;       "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" ;
+;;       :idle-timeout 600000
+;;       :max-lifetime 1800000
+;;       :auto_vacuum  "FULL"
+;;       :cache        "shared"}
+;;      "flows-db")})
 
 ;; (def flows-db
 ;;   {:datasource
@@ -279,13 +287,21 @@
 ;;       :register-mbeans    false}
 ;;      "flows-db")})
 
+;; (def ghost-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url     "jdbc:sqlite:file:./db/ghost.db?cache=shared&journal_mode=WAL&mode=memory" ;&journal_mode=WAL"
+;;       :idle-timeout 600000
+;;       :max-lifetime 1800000
+;;       :cache        "shared"}
+;;      "ghost-db")})
+
 (def ghost-db
   {:datasource
    @(pool-create
-     {:jdbc-url     "jdbc:sqlite:file:./db/ghost.db?cache=shared&journal_mode=WAL&mode=memory" ;&journal_mode=WAL"
+     {:jdbc-url     "jdbc:sqlite:file::memory:?journal_mode=OFF&synchronous=OFF&temp_store=MEMORY" ;; all memory logic ops
       :idle-timeout 600000
-      :max-lifetime 1800000
-      :cache        "shared"}
+      :max-lifetime 1800000}
      "ghost-db")})
 
 (def import-db
@@ -309,14 +325,14 @@
       :cache    "shared"}
      "mem-cache-db")})
 
-(def realms-db
-  {:datasource
-   @(pool-create
-     {:jdbc-url
-      "jdbc:sqlite:file:./db/realms.db?mode=memory&cache=shared&journal_mode=WAL"
-      ;;"jdbc:sqlite:file:./db/realms.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
-      :cache    "shared"}
-     "realms-db")})
+;; (def realms-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:jdbc-url
+;;       "jdbc:sqlite:file:./db/realms.db?mode=memory&cache=shared&journal_mode=WAL"
+;;       ;;"jdbc:sqlite:file:./db/realms.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
+;;       :cache    "shared"}
+;;      "realms-db")})
 
 ;; (def realms-db
 ;;   {:datasource
@@ -369,6 +385,8 @@
       :max-lifetime      1800000}
      "cache-db-memory")})
 
+
+
 (defn insert-error-row-OLD! [error-db-conn query error]
   (jdbc/with-db-connection
     [sdb system-db] ;; ?
@@ -383,8 +401,8 @@
 (defn insert-error-row! [error-db-conn query error & [silent?]]
   (swap! errors conj [(str error) (str error-db-conn) query])
   (when (and (not (cstr/includes? (str error) "already exists"))
-             (not (cstr/includes? (str query) "client_memory"))
-             (not (cstr/includes? (str query) "client_stats"))
+             ;(not (cstr/includes? (str query) "client_memory"))
+             ;(not (cstr/includes? (str query) "client_stats"))
              (not (cstr/includes? (str query) "No results were returned by the query"))
              (not (cstr/includes? (str error) "no such column: diff"))
              (not (cstr/includes? (str error) "no such column: mb")))

@@ -94,6 +94,7 @@
   (reset! visible-views-cache {}))
 
 (def keypaths-cache (atom {}))
+;; (reset! keypaths-cache {})
 
 (defn hash-client-state [client-name]
   (let [cpans (get @db/client-panels client-name)
@@ -106,25 +107,27 @@
 ;; (ut/pp (get @db/client-panels :superb-Prussian-blue-gnu-36))
 
 (defn view-keypaths [client-name & [tab]]
-  (let [cache-key [:view-keypaths client-name (get @db/leaf-brute-force-last-panel-hash client-name)]
-        cached-result (get @keypaths-cache cache-key)]
+  (let [cache-key 0  ;[:view-keypaths client-name (get @db/leaf-brute-force-last-panel-hash client-name)]
+        cached-result nil] ;(get @keypaths-cache cache-key)]
     (if (ut/ne? cached-result)
       ;;cached-result
-      (do (ut/pp ["💰" :cache-hit :view-keypaths client-name tab]) cached-result)
-      (let [result (vec (sort (conj
+      (do ;(ut/pp ["💰" :cache-hit :view-keypaths client-name tab])
+          cached-result)
+      (let [cpanels (get @db/client-panels client-name)
+            result (vec (sort (conj
                                (filter #(not (cstr/includes? (str (first %)) "preview"))
                                        (distinct (map #(vec (take 3 %))
                                                       (filter (fn [x] (some #(= % (second x)) current-runners))
                                                               (ut/keypaths
                                                                (if (not (nil? tab))
-                                                                 (let [all (get @db/client-panels client-name)
+                                                                 (let [all cpanels
                                                                        tabbers (vec (for [[k v] all
                                                                                           :when (= (get v :tab) tab)] k))]
                                                                    (visible-views (select-keys all tabbers)))
-                                                                 (visible-views (get @db/client-panels client-name))))))))
+                                                                 (visible-views cpanels)))))))
                                [:canvas :canvas :canvas])))]
-        (ut/pp ["💨" :cache-miss :view-keypaths client-name tab])
-        (swap! keypaths-cache assoc cache-key result)
+        ;(ut/pp ["💨" :cache-miss :view-keypaths client-name tab])
+        ;(swap! keypaths-cache assoc cache-key result)
         result))))
 
 (defn field-keypaths [client-name & [tab]]
@@ -196,13 +199,17 @@
             tab-name (get-in @db/client-panels [client-name panel-key :tab])
             outputs (into {} (for [[[_ kp] v] (get @evl/nrepl-output-atom client-name)] {kp v}))
             body  (get-in @db/client-panels [client-name panel-key runner data-key])
-            parent-table (when (= runner :queries)
+            parent-table (cond
+                           (= runner :queries)
                            (try
                              (let [ww (first (flatten (get body :from)))]
                                (if (cstr/starts-with? (str ww) ":query/")
                                  (keyword (cstr/replace (str ww) ":query/" ""))
                                  ww))
-                             (catch Exception _ nil)))
+                             (catch Exception _ nil))
+
+                           (= runner :pivot) (get-in body [:rowset-keypath 0]) ;; source of the pivot, not the middle flat table
+                           :else nil)
             dragging-kp (or selected-kp (get @db/leaf-drags-atom client-name))
             dragging? (true? (or (= leaf-kp dragging-kp) ; are WE dragging
                                  (= [panel-key runner data-key :field field-name] dragging-kp)))
@@ -225,6 +232,7 @@
             hh (get-in @db/client-panels [client-name panel-key :h] 0)
             ww (get-in @db/client-panels [client-name panel-key :w] 0)
             drag-meta (get dragging-body :drag-meta)
+            drag-meta (assoc drag-meta :pivot? (get drag-meta :pivot? false)) ;; so we always resolve this key
             cell-drag? (try (>= (get drag-meta :row-num) 0) (catch Exception _ false))
             drag-meta (if cell-drag? (assoc drag-meta :type :cell) drag-meta)
             result (merge
@@ -357,6 +365,7 @@
                      :view-key data-key
                      :tab tab-name
                      :runner runner
+                     :runner-str (str runner)
                      :ui-keypath [:panels panel-key runner data-key]})]
         ;;(ut/pp ["💨" :cache-miss :context-map client-name leaf-kp selected-kp])
         (swap! context-map-cache assoc cache-key result)
@@ -692,7 +701,7 @@
                              lql-walks (merge (get-in @resy [:by-keypath view-kp]) field-walk-map clover-kp-kws-walk)
                              lql-res (walk/postwalk-replace lql-walks lql)
                              ;;;_ (ut/pp  [:lql-walks lql-res leaf-ql clover-kp-kws-walk])
-                             sqlcall (memoized-sql-query ghost-db (to-sql lql-res) {:lql-def lql :leaf-name leaf-name :client-name client-name})
+                             sqlcall (sql-query ghost-db (to-sql lql-res) {:lql-def lql :leaf-name leaf-name :client-name client-name :no-error? true})
                              leaf-val (true? (= sqlcall [{:one 1}]))]
                          (assoc acc leaf-name leaf-val)))
                      {}
@@ -719,127 +728,6 @@
 ;; (leaf-eval-runstream :fields :truthful-cerulean-eagle-40)
 ;; (leaf-eval-runstream :patches :truthful-cerulean-eagle-40)
 ;; (leaf-eval-runstream :fields :spirited-triangular-serval-31)
-
-;; (defn leaf-eval-runstream [leaf-type & [client-name selected-kp]]
-;;   (swap! db/leaf-evals inc)
-;;   (let [accl (active-clients)
-;;         ui-action-map-acc (atom {})
-;;         dragging-kp (or selected-kp (get @db/leaf-drags-atom client-name))
-;;         active-clients-and-tab (if client-name (filterv #(= (first %) client-name) accl) accl) ;; [[:unreal-pear-wren-40 "delightful echidna"]]
-;;         leaf-defs (get (load-leaf-fns) leaf-type)
-;;         leaf-fns (into {} (for [[k v] leaf-defs
-;;                                 :when (try
-;;                                         (not (keyword? (first v)))
-;;                                         (catch Exception _ false))] {k v}))
-;;         leaf-qls (into {} (for [[k v] leaf-defs
-;;                                 :when (try
-;;                                         (keyword? (first v))
-;;                                         (catch Exception _ false))] {k v}))
-;;         _ (ut/pp [:pre-tab leaf-type leaf-fns leaf-qls])]
-;;     (doseq [[client-name tab-name] active-clients-and-tab
-;;             :let [resy (atom {})
-;;                   resy-grp (atom {})
-;;                   work-paths (if (or (= leaf-type :views)
-;;                                      (= leaf-type :patches))
-;;                                (view-keypaths client-name tab-name)
-;;                                (field-keypaths client-name tab-name))]]
-;;       ;; (ut/pp [:*leaf-eval :*working-on leaf-type client-name tab-name (count work-paths) :keypaths-to-walk :sel dragging-kp])
-;;       (doseq [view-kp work-paths]
-;;         (ut/pp [:view-kp view-kp leaf-fns])
-;;         (doseq [[leaf-name leaf-fn] leaf-fns]
-;;           (let [leaf-val (leaf-fn-eval leaf-fn leaf-name client-name view-kp dragging-kp)
-;;                 leaf-val (if (vector? leaf-val) (first leaf-val)  leaf-val)]
-;;             (ut/pp [:leaf-fns-loop leaf-name := leaf-val client-name tab-name view-kp leaf-val])
-;;             (swap! resy assoc-in (into [:by-keypath] [view-kp leaf-name]) leaf-val)
-;;             (if (true? leaf-val)
-;;               (swap! resy-grp assoc-in [:by-leaf leaf-name] (vec (conj (get-in @resy-grp [:by-leaf leaf-name] []) view-kp)))
-;;               (swap! resy-grp assoc-in [:by-leaf leaf-name] (vec (get-in @resy-grp [:by-leaf leaf-name] []))))))
-
-;;         ;; for :where clause nested logic leaves....
-;;         (let [_ (ut/pp [:context-map client-name view-kp dragging-kp])
-;;               ctx-map (context-map client-name view-kp dragging-kp)
-;;              ; field-keys (filterv #(or (cstr/starts-with? (str %) ":drag-")
-;;              ;                          (cstr/includes? (str %) "dragging")
-;;              ;                          (cstr/includes? (str %) "connection")
-;;              ;                          (cstr/starts-with? (str %) ":field-")) (keys ctx-map))
-;;              ;; _ (ut/pp [:field-keys field-keys (keys ctx-map)])
-;;              ; field-ctx (select-keys ctx-map field-keys)
-;;               ]
-;;           (resolve-and-evaluate-leaf-qls client-name leaf-qls resy resy-grp view-kp 100 ctx-map))) ;; ensure we have an empty vector if none satisfy
-;;       ;;  (ut/pp [:*leaf-eval leaf-type :done {client-name @resy-grp :work-paths (count work-paths)}] {:width 120})
-
-;;       (let [_ (doseq [[k v] (get @resy-grp :by-leaf)
-;;                       :when (cstr/includes? (str k) "/")
-;;                       :let [[atype akey] (mapv keyword (cstr/split (cstr/replace (str k) ":" "") #"/"))]]
-;;                 (swap! ui-action-map-acc assoc-in [atype akey] v))]
-;;         (swap! db/leaf-atom
-;;                (fn [current-state]
-;;                  (-> current-state
-;;                      (assoc-in [client-name :metadata :categories] (get (load-leaf-fns) :categories))
-;;                      (assoc-in [client-name :metadata :action-labels] (get (load-leaf-fns) :action-labels))
-;;                      (assoc-in [client-name :actions] @ui-action-map-acc)
-;;                      (assoc-in [client-name leaf-type] (merge @resy @resy-grp)))))))
-;;     {dragging-kp @ui-action-map-acc}))
-
-;; (defn leaf-eval-runstream2 [leaf-type & [client-name selected-kp res]]
-;;   ;(swap! db/leaf-evals inc)
-;;   (let [accl (active-clients)
-;;         res (or res {})
-;;         ui-action-map-acc (atom {})
-;;         resy (atom {})
-;;         resy-grp (atom {})
-;;         dragging-kp selected-kp  ;;(or selected-kp (get @db/leaf-drags-atom client-name))
-;;         active-clients-and-tab (if client-name
-;;                                  (filterv #(= (first %) client-name) accl)
-;;                                  accl) ;; [[:unreal-pear-wren-40 "delightful echidna"]]
-;;         leaf-defs (get (load-leaf-fns) leaf-type)
-;;         leaf-fns (into {} (for [[k v] leaf-defs
-;;                                 :when (try
-;;                                         (not (keyword? (first v)))
-;;                                         (catch Exception _ false))] {k v}))
-;;         leaf-qls (into {} (for [[k v] leaf-defs
-;;                                 :when (try
-;;                                         (keyword? (first v))
-;;                                         (catch Exception _ false))] {k v}))]
-
-;;     (doseq [[client-name tab-name] active-clients-and-tab
-;;             :let [
-;;                   work-paths (if (or (= leaf-type :views)
-;;                                      (= leaf-type :patches))
-;;                                (view-keypaths client-name tab-name)
-;;                                (field-keypaths client-name tab-name))]]
-;;       ;(ut/pp [:*leaf-eval :*working-on leaf-type client-name tab-name (count work-paths) :keypaths-to-walk :sel dragging-kp])
-
-;;       (doseq [view-kp work-paths]
-;;         ;(ut/pp [:view-kp view-kp leaf-fns])
-;;         (doseq [[leaf-name leaf-fn] leaf-fns]
-;;           (let [leaf-val (leaf-fn-eval leaf-fn leaf-name client-name view-kp dragging-kp res)
-;;                 leaf-val (if (vector? leaf-val) (first leaf-val) leaf-val)]
-;;             ;(ut/pp [:leaf-fns-loop leaf-name := leaf-val client-name tab-name view-kp leaf-val])
-;;             (swap! resy assoc-in (into [:by-keypath] [view-kp leaf-name]) leaf-val)
-;;             (if (true? leaf-val)
-;;               (swap! resy-grp assoc-in [:by-leaf leaf-name]
-;;                      (vec (conj (get-in @resy-grp [:by-leaf leaf-name] []) view-kp)))
-;;               (swap! resy-grp assoc-in [:by-leaf leaf-name]
-;;                      (vec (get-in @resy-grp [:by-leaf leaf-name] []))))))
-
-;;         ;; for :where clause nested logic leaves....
-;;         (let [;_ (ut/pp [:context-map client-name view-kp dragging-kp])
-;;               ctx-map (context-map client-name view-kp dragging-kp res)]
-;;           (resolve-and-evaluate-leaf-qls client-name leaf-qls resy resy-grp view-kp 100 ctx-map)))
-
-;;       ;; Process results and update ui-action-map-acc
-;;       (doseq [[k v] (get @resy-grp :by-leaf)
-;;               :when (cstr/includes? (str k) "/")
-;;               :let [[atype akey] (mapv keyword (cstr/split (cstr/replace (str k) ":" "") #"/"))]]
-;;         (swap! ui-action-map-acc assoc-in [atype akey] v)))
-
-;;     ;; Return the final accumulated results
-;;     (-> res
-;;         (assoc-in [:metadata :categories] (get (load-leaf-fns) :categories))
-;;         (assoc-in [:metadata :action-labels] (get (load-leaf-fns) :action-labels))
-;;         (assoc-in [:actions] @ui-action-map-acc)
-;;         (assoc-in [leaf-type] (merge @resy @resy-grp)))))
 
 (def filtered-leaf-defs-cache (atom {}))
 
@@ -872,81 +760,7 @@
 (defn clear-filtered-leaf-defs-cache! []
   (reset! filtered-leaf-defs-cache {}))
 
-;; (defn leaf-eval-runstream3-serial [client-name selected-kp & [res]]
-;;   ;(swap! db/leaf-evals inc)
-;;   (let [accl (active-clients)
-;;         res (or res {})
-;;         ui-action-map-acc (atom {})
-;;         dragging-kp (if (= (first selected-kp) :canvas)
-;;                       [:canvas :canvas :canvas] selected-kp)
-;;         active-clients-and-tab (if client-name
-;;                                  (filterv #(= (first %) client-name) accl)
-;;                                  accl) ;; [[:unreal-pear-wren-40 "delightful echidna"]]
-;;         ;; leaf-defs (load-leaf-fns) ;(get (load-leaf-fns) leaf-type)
-;;         {:keys [leaf-fns-f leaf-qls-f leaf-fns-v leaf-qls-v]} (get-filtered-leaf-defs client-name view-kp dragging-kp)
-;;         res (let  [resy (atom {})
-;;                    resy-grp (atom {})]
-;;               (doseq [[client-name tab-name] active-clients-and-tab
-;;                       :let [work-paths
-;;                             ;(field-keypaths client-name tab-name)
-;;                             (if (= (count dragging-kp) 5) [dragging-kp] [])
-;;                             ]]
-;;                 (doseq [view-kp work-paths]
-;;                   (doseq [[leaf-name leaf-fn] leaf-fns-f]
-;;                     (let [leaf-val (leaf-fn-eval leaf-fn leaf-name client-name view-kp dragging-kp res)
-;;                           leaf-val (if (vector? leaf-val) (first leaf-val) leaf-val)]
-;;                         ;(ut/pp [:leaf-fns-loop leaf-name := leaf-val client-name tab-name view-kp leaf-val])
-;;                       (swap! resy assoc-in (into [:by-keypath] [view-kp leaf-name]) leaf-val)
-;;                       (if (true? leaf-val)
-;;                         (swap! resy-grp assoc-in [:by-leaf leaf-name]
-;;                                (vec (conj (get-in @resy-grp [:by-leaf leaf-name] []) view-kp)))
-;;                         (swap! resy-grp assoc-in [:by-leaf leaf-name]
-;;                                (vec (get-in @resy-grp [:by-leaf leaf-name] []))))))
-;;                     ;; for :where clause nested logic leaves....
-;;                   (let [ctx-map (context-map client-name view-kp dragging-kp {:fields (merge @resy @resy-grp)})]
-;;                     (resolve-and-evaluate-leaf-qls client-name leaf-qls-f resy resy-grp view-kp 100 ctx-map)))
-;;                   ;; Process results and update ui-action-map-acc
-;;                 (doseq [[k v] (get @resy-grp :by-leaf)
-;;                         :when (cstr/includes? (str k) "/")
-;;                         :let [[atype akey] (mapv keyword (cstr/split (cstr/replace (str k) ":" "") #"/"))]]
-;;                   (swap! ui-action-map-acc assoc-in [atype akey] v)))
-;;               ;;(ut/pp [:res-grp (get @resy-grp :by-leaf) @ui-action-map-acc])
-;;               (-> res
-;;                   (assoc-in [:metadata :categories] (get (load-leaf-fns) :categories))
-;;                   (assoc-in [:metadata :action-labels] (get (load-leaf-fns) :action-labels))
-;;                   (assoc-in [:debug] {:dragging-kp dragging-kp})
-;;                   ;(assoc-in [:actions1] @ui-action-map-acc)
-;;                   (assoc-in [:fields] (merge @resy @resy-grp))))]
-;;     ;;(ut/pp [:res! res])
-;;     ;; TODO go back to first princ and refactor this runstream, this suffers from internal pivots and reusing scaffolding that not longer is apt - 10/30/24
-;;     (let [resy (atom {})
-;;           resy-grp (atom {})]
-;;       (doseq [[client-name tab-name] active-clients-and-tab
-;;               :let [work-paths (view-keypaths client-name tab-name)]]
-;;         (doseq [view-kp work-paths]
-;;           (doseq [[leaf-name leaf-fn] leaf-fns-v]
-;;             (let [leaf-val (leaf-fn-eval leaf-fn leaf-name client-name view-kp dragging-kp res)
-;;                   leaf-val (if (vector? leaf-val) (first leaf-val) leaf-val)]
-;;                             ;(ut/pp [:leaf-fns-loop leaf-name := leaf-val client-name tab-name view-kp leaf-val])
-;;               (swap! resy assoc-in (into [:by-keypath] [view-kp leaf-name]) leaf-val)
-;;               (if (true? leaf-val)
-;;                 (swap! resy-grp assoc-in [:by-leaf leaf-name]
-;;                        (vec (conj (get-in @resy-grp [:by-leaf leaf-name] []) view-kp)))
-;;                 (swap! resy-grp assoc-in [:by-leaf leaf-name]
-;;                        (vec (get-in @resy-grp [:by-leaf leaf-name] []))))))
-;;                         ;; for :where clause nested logic leaves....
-;;           (let [ctx-map (context-map client-name view-kp dragging-kp res)]
-;;             (resolve-and-evaluate-leaf-qls client-name leaf-qls-v resy resy-grp view-kp 100 ctx-map)))
-;;                       ;; Process results and update ui-action-map-acc
-;;         (doseq [[k v] (get @resy-grp :by-leaf)
-;;                 :when (cstr/includes? (str k) "/")
-;;                 :let [[atype akey] (mapv keyword (cstr/split (cstr/replace (str k) ":" "") #"/"))]]
-;;           (swap! ui-action-map-acc assoc-in [atype akey] v)))
-;;       (-> res
-;;           (assoc-in [:metadata :categories] (get (load-leaf-fns) :categories))
-;;           (assoc-in [:metadata :action-labels] (get (load-leaf-fns) :action-labels))
-;;           (assoc-in [:actions] (merge {:*dragging-kp dragging-kp} @ui-action-map-acc))
-;;           (assoc-in [:views] (merge @resy @resy-grp))))))
+;; (ut/pp [:acc (active-clients)])
 
 (defn leaf-eval-runstream3 [client-name selected-kp & [dbody dragged-field-map]]
   (let [accl (active-clients)
@@ -1007,7 +821,8 @@
               resy-grp (atom {})
               resy-meta (atom {})
               work-paths (view-keypaths client-name (-> active-clients-and-tab first second))
-              ;;_ (ut/pp [:leaf-runstream3 :view-work-paths client-name (count work-paths) selected-kp])
+              ;work-paths (view-keypaths client-name nil)
+              _ (ut/pp [:leaf-runstream3 :view-work-paths client-name (count work-paths) selected-kp])
               ]
 
           ;; Process views sequentially to maintain context
@@ -1056,15 +871,6 @@
         )))
 
 ;; (ut/pp (active-clients))
-
-;; (declare leaf-eval-runstream-parallel-cached)
-
-;; (ut/pp
-;;  ;(ut/pretty-spit "/home/ryanr/new-res.edn"
-;;                  (time
-;;                  ;(ut/deep-sort
-;;                   (select-keys (leaf-eval-runstream3-serial :smile-rectangular-turtle-38 [:block-10889 :queries :all-offenses :field :DISTRICT]) [:actions :debug])))
-;;  ;);)
 
 ;; (ut/pp
 ;;  ;(ut/pretty-spit "/home/ryanr/new-res.edn"

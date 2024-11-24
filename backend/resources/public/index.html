@@ -18,11 +18,14 @@
     href="https://fonts.googleapis.com/css?family=Ubuntu|Alata|Oxygen+Mono|Lato|Poppins|Montserrat|Open+Sans|Raleway"
     rel="stylesheet">
   <!-- <link href="http://fonts.googleapis.com/css?family=Kulim+Park:300,400,500,700,400italic" rel="stylesheet" type="text/css"> -->
-  <link href="http://fonts.googleapis.com/css?family=IBM+Plex+Mono:300,400,500,700,400italic" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=IBM+Plex+Mono:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet" type="text/css">
-  <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:300,400,500,700,400italic" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
   <!-- <link href="http://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700,400italic" rel="stylesheet" type="text/css"> -->
-  <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700,400italic" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
   <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
   <!-- <link href="http://fonts.googleapis.com/css?family=Fira+Sans:600,500,400,300" rel="stylesheet" type="text/css"> -->
   <!-- <link href="http://fonts.googleapis.com/css?family=Fira+Code:600,500,400,300" rel="stylesheet" type="text/css"> -->
@@ -138,6 +141,13 @@
       background-image:
         linear-gradient(to right, #00000055 1px, transparent 1px),
         linear-gradient(to bottom, #00000055 1px, transparent 1px);
+
+        -webkit-transform: translate3d(0,0,0);
+  -moz-transform: translate3d(0,0,0);
+  -ms-transform: translate3d(0,0,0);
+  -o-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+
     }
 
     /* .chosen-container-single .chosen-single {
@@ -163,12 +173,12 @@
     }
 
     .rc-dropdown {
-      z-index: 333;
+      z-index: 933;
       overflow: visible;
     }
 
     .chosen-drop {
-      z-index: 333;
+      z-index: 933;
       overflow: visible;
     }
 
@@ -489,8 +499,12 @@
       src: url('fonts/FSEX302-alt.ttf') format('truetype');
     }
 
-
-
+    /* https://chicagokare.xyz/ https://github.com/KingDuane/Chicago-Kare MIT */
+    @font-face {
+      font-family: 'Chicago Kare';
+      src: url('fonts/ChicagoKare-Regular.woff') format('woff'),
+        url('fonts/ChicagoKare-Regular.ttf') format('truetype');
+    }
 
     /* kulim-park-300 - latin */
     @font-face {
@@ -1008,10 +1022,10 @@
   <div id="app"></div>
 
   <div id="initialDiv" style="
-  font-size: 2.1vw; 
-  font-weight: bold; 
-  font-family: 'Homemade Apple'; 
- 
+  font-size: 2.1vw;
+  font-weight: bold;
+  font-family: 'Homemade Apple';
+
   background-image: linear-gradient(to right, #eeeeee03 2px, transparent 4px), linear-gradient(to bottom, #eeeeee03 2px, transparent 4px);
   background-size: 80px 80px;
   height: 100vh;

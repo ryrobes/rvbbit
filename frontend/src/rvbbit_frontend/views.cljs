@@ -5202,7 +5202,7 @@
                            :font-weight 700
                            :font-size "12px"}]
                   [re-com/h-box
-                   :children (vec (for [e [15 30 45 90 180 360 600]]
+                   :children (vec (for [e [15 30 45 90 180 360 600 900 1200 1800]]
                                     [re-com/box
                                      :attr {:on-click #(reset! time-freq e)}
                                      :style {:color (if (= e @time-freq) "cyan" "white")
@@ -5983,10 +5983,24 @@
                            [custom-icon-button
                             {:icon-name "ri-leaf-line"
                              :tooltip "Debug: Clear Clover Cache"
-                             :on-click #(reset! db/clover-cache-atom {})
+                             :on-click #(do
+                                          (reset! db/clover-cache-atom {})
+                                          (ut/tracked-dispatch [::bricks/clean-up-reco-previews]))
                              ;:active? (if baked-leaves? "#98FF98" "#FFF8DC")
                              :color "#D4A76A" ;(if baked-leaves? "#98FF98" "#D4A76A")
                              }]
+
+                           (let [cnt (count (keys @db/clover-cache-atom))]
+                             [custom-text-display
+                              {:text (ut/nf cnt)
+                               :tooltip (str "clover cache keys " (ut/nf cnt))}])
+
+                           (let [kk @(ut/tracked-sub ::bricks/panel-keys {})
+                                 cntr (count (filter #(cstr/starts-with? (str %) ":reco-p") kk))
+                                 cnt (count kk)]
+                             [custom-text-display
+                              {:text (str (ut/nf cnt) "b" (ut/nf cntr))
+                               :tooltip (str "panels " (ut/nf cnt))}])
 
                           ;; (when @(ut/tracked-subscribe_ [::audio/recording?])
                           ;;   [custom-icon-button
@@ -6470,7 +6484,8 @@
 
    (js/setTimeout (fn []
                     (swap! waiting? assoc [leaf-drop leaves-kp] false)
-                    (clear-state!)) 500)
+                    (clear-state!)
+                    (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])) 500)
    db))
 
 (re-frame/reg-event-db
@@ -6479,9 +6494,24 @@
    (let [data (assoc data :leaf-drop leaf-drop)
          data (if (get data :queries)
                 (assoc data :queries (into {} (for [[k v] (get data :queries)] {k (assoc v :limit 20)})))
-                data)]
-    ;;  (ut/pp [:new-leaf-block-preview data])
-     (assoc-in db [:leaf-preview leaf-drop leaves-kp] data)
+                data)
+         runner-keys (vec (keys @(ut/tracked-subscribe [::bricks/block-runners])))
+         panel-key (keyword (str "reco-preview-c-" (hash data)))
+         panel-exists? @(ut/tracked-sub ::bricks/panel-exists? {:panel-key panel-key})
+         _ (when (not panel-exists?)
+             (let [body (assoc data :bid panel-key)
+                   qkey-walk (into {} (for [qk
+                                            ;(keys (get body :queries))
+                                            (vec (mapcat #(keys (get body %)) runner-keys))
+                                            ]
+                                        {qk (ut/safe-key (keyword (cstr/replace (str qk (cstr/replace (str panel-key) ":reco-preview" "")) ":" "")))}))
+                   body (-> (walk/postwalk-replace qkey-walk body) (assoc :h 7) (assoc :w 6))]
+               (bricks/insert-new-block [-100 -100] 7 6 body)))
+
+
+         ]
+     (ut/pp [:new-leaf-block-preview panel-key data])
+     (assoc-in db [:leaf-preview leaf-drop leaves-kp] panel-key)
      )
 
   ;;  (swap! waiting? assoc [leaf-drop leaves-kp] false)
@@ -6540,7 +6570,7 @@
         [src-kp tgt-kp] leaves-kp]
     ;(ut/pp [:spawn-button (str src-kp) (str tgt-kp) leaf-action-cat leaf-action])
     ;(ut/pp [:leaf-action-preview leaf-action-preview])
-    (when (and (not= leaf-action :tab-grid) (empty? leaf-action-preview))
+    (when (and (not= leaf-action :tab-grid) (nil? leaf-action-preview))
       (ut/pp [:leaf-preview-call {:leaf-drop leaf-drop :leaves-kp leaves-kp}])
       (ut/tracked-dispatch [::wfx/request :default ;:secondary
                             {:message {:kind        :run-leaf-action-preview
@@ -6658,8 +6688,9 @@
         orig-top top
         ;left (if (> (+ left 300) screen-w) (- left (- screen-w left)) left)
         modal-zoom 1 ;.2
+        dynh (max 300 (- (get @dimensions :height 0) 100))
         bw (* 650 modal-zoom)
-        bh (* 400 modal-zoom)
+        bh (* (+ 200 dynh) modal-zoom)
         left (if (> (+ left bw) screen-w) (- screen-w bw) left)
         left (if (< left 100) 100 left)
         top  (if (> (+ top bh) screen-h) (- screen-h bh) top)
@@ -7049,7 +7080,7 @@
                                          ;field-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :target])) "-" "_"))
                                          ;data-keypath [(keyword (str "reco-combo-counts." table-name-str "." field-str))]
                                          recos @(ut/tracked-sub ::bricks/get-shape-viz {:dragged-kp @db/dragged-kp})
-                                         _ (ut/pp [:ff (str @db/dragged-kp) (count recos) ])
+                                        ;;  _ (ut/pp [:ff (str @db/dragged-kp) (count recos) ])
                                          reco-count (count recos) ;;(get-in @(ut/tracked-sub ::conn/sql-data-alpha {:keypath data-keypath}) [0 :rowcnt])
                                          ]
                                     ;;  (ut/pp [:new-rowset (str reco-count " " table-name-str " " field-str)])
@@ -7066,23 +7097,40 @@
                                       :size "auto"
                                       :width "330px"
                                     ;:height "400px"
-                                      :child (or (if (and (map? @db/clover-leaf-previews)
-                                                          (ut/ne? @db/clover-leaf-previews))
+                                      :child (or (if (and ;(map? @db/clover-leaf-previews)
+                                                          (keyword? @db/clover-leaf-previews))
 
-                                                   (let [qq (get @db/clover-leaf-previews :queries)
-                                                         qqq (get-in @db/clover-leaf-previews [:queries (ffirst qq)])
-                                                         vv (get @db/clover-leaf-previews :views)
-                                                         vvv (get-in @db/clover-leaf-previews [:views (ffirst vv)])]
-                                                     [re-com/v-box
-                                                      :size "auto"
-                                                      :align :center :justify :center
-                                                      :children [;[re-com/box :child (str @db/clover-leaf-previews)]
-                                                                 [bricks/clover-fragments
-                                                                  (cond (map? qqq)
-                                                                        (assoc qqq :connection-id (get @db/clover-leaf-previews :connection-id))
-                                                                        (vector? vvv) vvv
-                                                                        :else @db/clover-leaf-previews)
-                                                                  6.5 7]]])
+                                                  ;;  (let [qq (get @db/clover-leaf-previews :queries)
+                                                  ;;        qqq (get-in @db/clover-leaf-previews [:queries (ffirst qq)])
+                                                  ;;        vv (get @db/clover-leaf-previews :views)
+                                                  ;;        vvv (get-in @db/clover-leaf-previews [:views (ffirst vv)])
+                                                  ;;        render-frag (cond (map? qqq)
+                                                  ;;                          (assoc qqq :connection-id (get @db/clover-leaf-previews :connection-id))
+
+                                                  ;;                          (vector? vvv) vvv
+
+                                                  ;;                          :else @db/clover-leaf-previews)
+                                                  ;;        _ (ut/pp [:preview @db/clover-leaf-previews render-frag])
+                                                  ;;        ]
+                                                  ;;    [re-com/v-box
+                                                  ;;     :size "auto"
+                                                  ;;     :align :center :justify :center
+                                                  ;;     :children [;[re-com/box :child (str @db/clover-leaf-previews)]
+                                                  ;;                [bricks/clover-fragments
+                                                  ;;                render-frag
+                                                  ;;                 6.5 7]]])
+
+                                                   [re-com/v-box
+                                                    :size "auto"
+                                                    :padding "5px"
+                                                    :style {:border-radius "8px"
+                                                            :border (str "4px dashed " (theme-pull :theme/editor-outer-rim-color nil) 22)}
+                                                    :align :center :justify :center
+                                                    :children [;[re-com/box :child (str @db/clover-leaf-previews)]
+                                                               ;[bricks/clover @db/clover-leaf-previews nil   ]
+                                                               @(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil ])
+                                                               ]
+                                                               ]
 
                                                    (if (and
                                                           (> reco-count 0)
@@ -7154,7 +7202,7 @@
 
 
 
-                                                                    (let [dynh (max 300 (- (get @dimensions :height 0) 100))]
+                                                                    (let []
                                                                       [re-com/box
                                                                        :min-height (px dynh)
                                                                        :child
@@ -7229,7 +7277,7 @@
                                    ]]
 
                                    (when (and (empty? dbody)
-                                              (empty? @db/clover-leaf-previews))
+                                              (nil? @db/clover-leaf-previews))
                                      ;[re-com/box :child "yoyoyo"]
                                      [quake-console 770]
                                      )
