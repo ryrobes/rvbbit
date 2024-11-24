@@ -16,7 +16,7 @@
 
 (def rabbit-search-input (reagent/atom nil))
 (def clover-leaf-previews (reagent/atom {}))
-(def sockets [:query1 :query2 :query3])
+(def sockets [:query1  :query2  :query3])
 (def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data :incoming :solver-status :ai-worker :clover-gen :leaf :actions
                      :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
 

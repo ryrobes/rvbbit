@@ -114,6 +114,7 @@
                        ;; ^^ until I get a better way - perhaps search the schemas for :_id field.
 
   :xtdb-drop/temporal-ops.SYSTEM_TIME.VALID_TIME [:and [:= :drag-meta/type ":xtdb-temporal"] :canvas-drop?]
+  :repl/add-as-clover-snippet [:and [:= :runner-str ":clojure"] [:not :is-self?]]
 
   ;;:sql2/true [:= 1 1]
 
@@ -326,7 +327,65 @@
                        :label ["Dimension Dropdown" "Single Select"]}}}
 
  :actions-fns ;; has the action function as well as the labels and defs for that action
- {:view        {:viz-reco-drop (fn [{:keys [drag-meta dragging-body]}]
+ {:repl {:add-as-clover-snippet (fn [{:keys [drag-meta dragging-body target-view target-kp]}]
+                                  (let [
+                                        dtype (get-in dragging-body [:drag-meta :type])
+                                        src-table  (get-in dragging-body [:drag-meta :source-table])
+                                        src-table-string (-> (str src-table) (clojure.string/replace ":" "") (clojure.string/replace "query/" ""))
+                                        tfields (get-in dragging-body [:drag-meta :table-fields])
+                                        target-bindings (cond
+                                                          (and (= dtype :query) (= (count tfields) 1)) ;; assume single value like a row count (FE filled)
+                                                           {;;(keyword (str src-table-string "-val"))
+                                                           (first tfields)
+                                                            (keyword (clojure.string/replace (str src-table-string "/" (first tfields) ".0") ":" ""))}
+
+                                                          (and (= dtype :query) (> (count tfields) 1)) ;; assume regular table (BE filled / injected)
+                                                          {(keyword (str src-table-string "-vec"))
+                                                           (keyword (clojure.string/replace (str "data/" src-table-string) ":" ""))}
+
+                                                           (or (= dtype :param) (= dtype :data) (= dtype :where)) ;; param
+                                                          {(get-in dragging-body [:drag-meta :param-field])
+                                                           (get-in dragging-body [:drag-meta :param-full])}
+
+                                                          (= dtype :field) ;; field (will be BE filled)
+                                                          {(keyword (clojure.string/replace (str "all-" (get-in dragging-body [:drag-meta :target])) ":" ""))
+                                                           (list 'mapv
+                                                                 (get-in dragging-body [:drag-meta :target])
+                                                                 (keyword (clojure.string/replace (str "data/" src-table-string) ":" "")))}
+
+                                                      ;;     (= dtype :data) ;; field (will be BE filled)
+                                                      ;;     {(get-in dragging-body [:drag-meta :param-field])
+                                                      ;;      (list 'mapv
+                                                      ;;            (get-in dragging-body [:drag-meta :target])
+                                                      ;;            (keyword (clojure.string/replace (str "data/" src-table-string) ":" "")))}
+
+                                                           :else {:something-else? [dtype src-table]})
+                                        unwrapped-view (if (and (seq? target-view)
+                                                                (= 'do (first target-view)))
+                                                         (second target-view)  ; get the first form after (hidden) 'do
+                                                         target-view)
+                                        existing-bindings (when (and (seq? unwrapped-view)
+                                                                     (= 'let (first unwrapped-view)))
+                                                            (set (map first (partition 2 (second unwrapped-view)))))
+                                        new-bindings (mapcat (fn [[k v]]
+                                                               (let [base-sym (symbol (name k))
+                                                                     final-sym (if (contains? existing-bindings base-sym)
+                                                                                 (symbol (str (name k) "-" (rand-int 99)))
+                                                                                 base-sym)]
+                                                                 [final-sym v]))
+                                                             target-bindings)
+
+                                        new-body (let [has-let? (and (seq? unwrapped-view)
+                                                                     (= 'let (first unwrapped-view)))]
+                                                   (if has-let?
+                                                     (let [[let-sym bindings & body] unwrapped-view
+                                                           new-bindings (vec (concat bindings new-bindings))]
+                                                       (concat [let-sym new-bindings] body))
+                                                     (list 'let
+                                                           (vec new-bindings)
+                                                           unwrapped-view)))]
+                                    {target-kp new-body}))}
+  :view        {:viz-reco-drop (fn [{:keys [drag-meta dragging-body]}]
                                  (dissoc dragging-body :drag-meta :conditionals))
                 :tab-grid (fn [{:keys [drag-meta dragging-body]}]
                             (dissoc dragging-body :drag-meta :conditionals))} ;; blocks are already constructed in the drag-body
@@ -378,12 +437,12 @@
                                 :selected-view :param-view
                                 :views {:param-view view}}))
            :where.=.<>.>.<  (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field drag-meta]}]
-                                    (let [existing-where (get target-query :where [])
-                                          ww [:*when (get drag-meta :param-full)
-                                              [:*arg (get drag-meta :param-full) (get drag-meta :param-field)]]
-                                          new-where (if (empty? existing-where) ww [:and existing-where ww])
-                                          target-deep-keypath (conj target-kp :where)]
-                                      {target-deep-keypath new-where}))}
+                              (let [existing-where (get target-query :where [])
+                                    ww [:*when (get drag-meta :param-full)
+                                        [:*arg (get drag-meta :param-full) (get drag-meta :param-field)]]
+                                    new-where (if (empty? existing-where) ww [:and existing-where ww])
+                                    target-deep-keypath (conj target-kp :where)]
+                                {target-deep-keypath new-where}))}
   :sql    {:add-group-by (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
                            (let [existing-group-by (get target-query :group-by [])
                                  existing-select   (get target-query :select [])
@@ -496,32 +555,32 @@
                                                   :order-by [[target :asc]]}}}))
 
            :new-multi-drop-down (fn [{:keys [drag-meta source-query-body source-kp]}]
-                            (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta
-                                  new-param    (keyword (clojure.string/replace (str :*this-block* "/" target) ":" ""))
-                                  table-alias  (keyword (str "ddr45"))
-                                  parent-where (get source-query-body :where)
-                                  parent-table (first (flatten (get source-query-body :from)))
-                                  exists?      (not (nil? parent-where))
-                                  cla           [:*when new-param [:in target new-param]]
-                                  new-where     (if exists? [:and parent-where cla] cla)
-                                  view-body [:multi-dropdown {:choices :query1
-                                                        :width   :panel-width+80-px
-                                                        :style   {:padding-top "8px"
-                                                                  :font-size   "19px"}
-                                                        :ref (keyword (clojure.string/replace (str "query/" source-query) ":" ""))
+                                  (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta
+                                        new-param    (keyword (clojure.string/replace (str :*this-block* "/" target) ":" ""))
+                                        table-alias  (keyword (str "ddr45"))
+                                        parent-where (get source-query-body :where)
+                                        parent-table (first (flatten (get source-query-body :from)))
+                                        exists?      (not (nil? parent-where))
+                                        cla           [:*when new-param [:in target new-param]]
+                                        new-where     (if exists? [:and parent-where cla] cla)
+                                        view-body [:multi-dropdown {:choices :query1
+                                                                    :width   :panel-width+80-px
+                                                                    :style   {:padding-top "8px"
+                                                                              :font-size   "19px"}
+                                                                    :ref (keyword (clojure.string/replace (str "query/" source-query) ":" ""))
                                                          ;:model   [:or! [:dash8 k] ]
-                                                        :model   new-param
+                                                                    :model   new-param
                                                          ;:field   [new-q-key target-field]
-                                                        :field target}]]
-                              {:h 2 :w 6
-                               :selected-view :mdropdown1
-                               :connection-id connection-id
-                               :drop-mutate {(vec (into source-kp [:where])) new-where}
-                               :views {:mdropdown1 view-body}
-                               :queries {:query1 {:select   [[target :label] [target :id]]
-                                                  :from     [[parent-table table-alias]]
-                                                  :group-by [target]
-                                                  :order-by [[target :asc]]}}}))
+                                                                    :field target}]]
+                                    {:h 2 :w 6
+                                     :selected-view :mdropdown1
+                                     :connection-id connection-id
+                                     :drop-mutate {(vec (into source-kp [:where])) new-where}
+                                     :views {:mdropdown1 view-body}
+                                     :queries {:query1 {:select   [[target :label] [target :id]]
+                                                        :from     [[parent-table table-alias]]
+                                                        :group-by [target]
+                                                        :order-by [[target :asc]]}}}))
 
            :click-table (fn [{:keys [drag-meta source-query-body source-kp]}]
                           (let [{:keys [connection-id source-panel-key source-query param-field row-num target table-fields]} drag-meta

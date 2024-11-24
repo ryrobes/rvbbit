@@ -259,7 +259,7 @@
                extra           {:queue (if (= db-conn cache-db) nil queue-name)
                                 :extras [ddl-str columns-vec-arg table-name table-name-str]}]
            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
-           ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
+           (swap! db/last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
            ;(write-transit-data rowset-fixed keypath client-name table-name-str)
            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
            (sql-exec db-conn ddl-str extra)
@@ -755,6 +755,7 @@
                     ))
 
                 (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] (get output :value))
+                ;(write-transit-data output (last ui-keypath) client-name (cstr/replace (str solver-name (last ui-keypath) client-name) ":" ""))
 
                 ;;(when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end client-name id ui-keypath output]))
 

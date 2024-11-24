@@ -600,7 +600,7 @@
                extra           {:queue (if (= db-conn cache-db) nil queue-name)
                                 :extras [ddl-str columns-vec-arg table-name table-name-str]}]
            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
-           ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
+           (swap! db/last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
            (write-transit-data rowset-fixed keypath client-name table-name-str)
            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
            (sql-exec db-conn ddl-str extra)
@@ -4183,7 +4183,8 @@
              fabric-opts-map             (when is-fabric? (last output))
              output                      (if is-fabric? (first output) output)
              _                           (write-transit-data output (last ui-keypath) client-name (ut/unkeyword (last ui-keypath))) ;; for :data/usage
-             _                           (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] output)
+             ;;_                           (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] output)
+             _                           (write-transit-data output (last ui-keypath) client-name (cstr/replace (str solver-name (last ui-keypath) client-name) ":" ""))
              ;;_ (when (cstr/includes? (str client-name) "square") (ut/pp [:writing-nrepl-data [(last ui-keypath)] output]))
 
              ;;_ (when is-fabric? (ut/pp [:fabric fabric-opts-map output]))
@@ -4454,11 +4455,12 @@
                                                       raw-val-str (pr-str raw-val)
                                                       raw-val-size (count raw-val-str)
                                                       size-threshold 1000 ;; chars
-                                                      ;;_ (ut/pp [:vdata-sub :raw-val-size raw-val-size :kp kp :extra-kp extra-kp :base-query-key base-query-key :raw-val-str raw-val-str])
-                                                      ccode (cond (<= raw-val-size size-threshold) ;; If raw-val is small enough, use it directly
+                                                      ;; _ (ut/pp [:vdata-sub :raw-val-size raw-val-size :kp kp :extra-kp extra-kp :cid client-name
+                                                      ;;           :base-query-key base-query-key :raw-val-str raw-val-str])
+                                                      ccode (cond (and raw-val (<= raw-val-size size-threshold)) ;; If raw-val is small enough, use it directly
                                                                   raw-val
 
-                                                                  (= (get-in runner-map [:runner :port]) 8181) ;; if not small, but we are in the same repl, send the atom deref
+                                                                  (and raw-val (= (get-in runner-map [:runner :port]) 8181)) ;; if not small, but we are in the same repl, send the atom deref
                                                                   `(get-in @rvbbit-backend.db/last-solvers-data-atom [~base-query-key])
 
                                                                     ;; otherwise, load it from local disk
@@ -4477,7 +4479,8 @@
                                                    (catch Exception e
                                                      (ut/pp [:clover-lookup-error kp e])
                                                      (str "clover-param-lookup-error " kp))))}))
-          ;; _ (ut/pp [:solver-clover ui-keypath vdata-clover-kps vdata-clover-walk-map vdata (get solver-map :data)])
+          ;;  _ (when (= client-name :terrific-mauve-falcon-18)
+          ;;      (ut/pp [:solver-clover override-map input-map ui-keypath vdata vdata-clover-kps vdata-clover-walk-map vdata (get solver-map :data)]))
           ;; prev-times       (get @times-atom solver-name [-1])
           ;; ship-est         (fn [client-name]
           ;;                    (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
@@ -4496,7 +4499,7 @@
                                  (ut/lists-to-vectors [solver-map input-map vdata runner-name])
                                  [:id :history? :cache?])
           cache-key             (hash sanitized-req) ;; mostly for fabric and history cache forcing
-          _ (when (cstr/includes? (str client-name) "powerful") (ut/pp [solver-name client-name cache-key sanitized-req]))
+          ;; _ (when (cstr/includes? (str client-name) "powerful") (ut/pp [solver-name client-name cache-key sanitized-req]))
           cache-val             (when use-cache? (get @solvers-cache-atom cache-key))
           cache-hit?            (true?  (and (and use-cache?
                                                   (ut/ne? cache-val)
@@ -6662,8 +6665,19 @@
                                                                 (swap! times-atom assoc times-key (conj (get @times-atom times-key) query-ms)))
                                                               (swap! db/client-panels-metadata assoc-in [client-name panel-key :queries (first ui-keypath)] (get output :result-meta))
                                                               (swap! db/client-panels-data assoc-in [client-name panel-key :queries (first ui-keypath)] result)
-                                                              (swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] result)
-                                                              (swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] result)
+
+                                                              (when true ;(not (get-in @db/last-solvers-data-atom [(first ui-keypath)]))
+                                                                (ppy/execute-in-thread-pools ;; revist lol
+                                                                 :full-pull-yolo-query
+                                                                 (fn []
+                                                                   (let [full-res (sql-query target-db (to-sql (dissoc honey-sql :limit)))]
+                                                                    ;;  (swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] full-res)
+                                                                     (d/transact-kv db/ddb [[:put "repl-data" (hash [client-name (first ui-keypath)]) full-res]])
+                                                                     (write-transit-data modded-meta (first ui-keypath) client-name (ut/unkeyword cache-table-name) true)
+                                                                     (write-transit-data full-res (first ui-keypath) client-name (ut/unkeyword cache-table-name))
+                                                                     (ut/pp ["🐖" :inserted :data client-name (first ui-keypath) (count full-res)])))))
+
+                                                              ;(swap! db/last-solvers-data-atom assoc-in [(first ui-keypath)] result)
                                                               (swap! db/solver-status assoc-in [:metadata (first ui-keypath)] (hash (get output :result-meta)))
                                                           ;; ^^ <--- expensive mem-wise, will pivot to off memory DB later if use cases pan out
                                                               (when (= page -3) ;; materialize and schedule a new solver job if not exists

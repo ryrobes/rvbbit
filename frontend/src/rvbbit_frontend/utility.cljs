@@ -358,15 +358,15 @@
 
 (def clover-walk-singles-map (atom {}))
 
-(defonce process-key-cache (atom {}))
-(defonce process-key-tracker (atom {}))        ;;; ;
+(def process-key-cache (atom {}))
+(def process-key-tracker (atom {}))
 
 (defn process-key
   [k]
   (let [args (str k)]
     (if-let [result (@process-key-cache args)]
       (do (swap! process-key-tracker update args (fnil inc 0)) result)
-      (let [result (when (and (keyword? k) (cstr/includes? (str k) "/")) k)]
+      (let [result (when (and (keyword? k) (cstr/includes? (str k) "/") (not (cstr/starts-with? (str k) ":data/"))) k)]
         (swap! process-key-cache assoc args result)
         (swap! process-key-tracker update args (fnil inc 0))
         result))))

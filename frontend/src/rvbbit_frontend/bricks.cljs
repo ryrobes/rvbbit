@@ -4997,7 +4997,7 @@
         table? (= @rabbit-search-tab :tables)
         hovered? (= @rabbit-search-hover context-key)
         dcolor (get (assoc (theme-pull :theme/data-colors nil) "*"
-                           (last (ut/tetrads (theme-pull :theme/editor-outer-rim-color  nil)))) data_type)]
+                           (second (ut/tetrads (theme-pull :theme/editor-outer-rim-color  nil)))) data_type)]
     (ut/pp [:fields data_type table-name table-fields (Math/ceil (* (count table-fields) 1.5))])
 
     [draggable

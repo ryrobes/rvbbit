@@ -1110,6 +1110,7 @@
 
     (db/open-ddb "honeyhash-map") ;; start datalevin "table" instances
     (db/open-ddb "shapes-map")
+    (db/open-ddb "repl-data") ;; full resultsets for clj access
     ;(db/open-ddb "shapes-map/fields")
     ;(db/open-ddb "shapes-map/shapes")
     (db/open-ddb "last-values")

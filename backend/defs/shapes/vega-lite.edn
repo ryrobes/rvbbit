@@ -448,7 +448,7 @@
                               :stack "zero"}
                           :color {:field :color-field
                                   :type "nominal"
-                                  :scale {:scheme "category20b"}}}
+                                  :scale {:scheme "category10b"}}}
                          :mark {:type "area"
                                 :tooltip {:content "encoding"}}}]
                        :data {:values :query-preview}} {:actions false}]

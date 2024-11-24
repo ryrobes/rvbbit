@@ -127,7 +127,7 @@
 (defonce last-signals-atom-stamp (fpop/thaw-atom {} "./data/atoms/last-signals-atom-stamp.msgpack.transit"))
 (defonce last-solvers-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-atom.msgpack.transit"))
 (defonce last-solvers-data-atom (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/last-solvers-data-atom.msgpack.transit"))
-(defonce last-solvers-atom-meta (fpop/thaw-atom {} "./data/atoms/last-solvers-atom-meta..msgpack.transit"))
+(defonce last-solvers-atom-meta (atom {})) ;; (fpop/thaw-atom {} "./data/atoms/last-solvers-atom-meta..msgpack.transit"))
 (defonce last-solvers-history-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-history-atom.msgpack.transit"))
 (defonce last-solvers-history-counts-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-history-counts-atom.msgpack.transit"))
 (defonce last-signals-atom (fpop/thaw-atom {} "./data/atoms/last-signals-atom.msgpack.transit"))
