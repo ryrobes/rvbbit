@@ -137,7 +137,7 @@ CALL FT_CREATE_INDEX('PUBLIC', 'fields', NULL);")
     mem_limit bigint NULL,
     mem_used bigint NULL,
     mem_used_mb text NULL,
-    mem_total integer NULL,
+    mem_total bigint NULL,
     latency integer NULL,
     client_subs integer NULL,
     server_subs integer NULL,

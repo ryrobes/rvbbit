@@ -10,15 +10,17 @@
 
 (def brick-size 50)
 (def version "0.2.0-alpha")
-(def version-date "10/2024")
+(def version-date "12/2024")
 
 (defonce client-name (gen-client-name))
 
 (def rabbit-search-input (reagent/atom nil))
-(def clover-leaf-previews (reagent/atom {}))
+(def clover-leaf-previews (reagent/atom nil))
 (def sockets [:query1  :query2  :query3])
 (def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data :incoming :solver-status :ai-worker :clover-gen :leaf :actions
-                     :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings :panel-hash})
+                     :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings
+                     ;:panel-hash :data-hash
+                     })
 
 (def drag-body-map (atom {}))
 
@@ -43,8 +45,8 @@
 (defonce drop-spawn-modal? (reagent/atom false))
 (defonce drop-spawn-package (reagent/atom {}))
 
-(defonce clover-cache-atom (reagent/atom {}))
-(defonce rel-kw-cache-atom (atom {}))
+(def clover-cache-atom (reagent/atom {}))
+(def rel-kw-cache-atom (atom {}))
 
 (def canvas-scale (reagent/atom 0.7))
 ;; (defn svg-scale [] (str "scale(" @canvas-scale ") translate(0%, " (* (* @canvas-scale 10) -1) ")"))
@@ -109,6 +111,9 @@
 (defonce markers-panel-code-box (atom {}))
 
 (defonce autocomplete-keywords (atom []))
+
+(defonce reserved-block-keywords (atom #{}))
+(defonce reserved-view-keywords (atom #{}))
 
 (def param-code-hover (atom nil))
 

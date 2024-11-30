@@ -380,6 +380,8 @@
                                      resolved-full-map         (when override? (logic-and-params (first this) panel-key))
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
                                      new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
+                                     cid                       (get-in resolved-full-map [:input-map :cid])
+                                     new-solver-name           (if cid (cstr/replace (str new-solver-name cid) ":" "") new-solver-name)
                                      sub-param                 (keyword (str "solver/" new-solver-name))
                                      resolved-input-map        (assoc resolved-input-map :*solver-name (keyword new-solver-name))
                                      req-map                   (merge
@@ -997,6 +999,7 @@
  (fn [db [_ query-id]]
    (let [;panel @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
          panel @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key query-id})]
+     (swap! db/clover-cache-atom #(into {} (remove (fn [[k _]] (cstr/includes? k (str panel))) %))) ;; kill cache just in case data-hash doesnt trigger
      (-> db
          (assoc-in [:panels panel :queries query-id :_last-run] (ut/get-time-format-str))
          (ut/dissoc-in [:query-history query-id])

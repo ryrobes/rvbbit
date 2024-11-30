@@ -9,8 +9,11 @@
    [rvbbit-backend.util  :as ut]
    [rvbbit-backend.config  :as cfg]
    [clojure.pprint :as ppr]
+   [cognitect.transit         :as transit]
+   [rvbbit-backend.freezepop  :as fpop]
    [websocket-layer.core :as wl])
   (:import    [java.security MessageDigest]
+              [java.nio.file Paths]
               [java.math BigInteger]))
 
 (defonce file-versions (atom {}))
@@ -25,11 +28,15 @@
 ;;     (.update md (.getBytes data "UTF-8"))
 ;;     (format "%064x" (BigInteger. 1 (.digest md)))))
 
+(defn create-dirs [path]
+  (when (not (.exists (io/file path)))
+    (.mkdirs (io/file path))))
+
 (defn calculate-file-hash [file]
   (hash (slurp file)))
 
 (defn calculate-data-hash [data]
-  (try (hash (pr-str data)) 
+  (try (hash (pr-str data))
        (catch Exception _ -1)))
 
 (defn update-client-version [file-path data]
@@ -54,10 +61,37 @@
   (let [src (or src :server)
         ;data-hash (calculate-data-hash collection)
         ]
-    ;;(swap! file-versions assoc-in [file-name src] data-hash)  
+    ;;(swap! file-versions assoc-in [file-name src] data-hash)
       (spit (java.io.File. file-name)
         (with-out-str (ppr/write collection
                                  :dispatch ppr/code-dispatch)))))
+
+
+
+(def transit-file-mapping (fpop/thaw-atom {} "./data/atoms/transit-file-mapping-atom.edn"))
+
+(defn write-transit-data
+  [data query-key client-name table-name & [meta?]]
+  (let [base-dir        "./transit-data"
+        client-name-str (cstr/replace (str client-name) ":" "")
+        filepath        (str base-dir "/" client-name-str)
+        file            (str filepath "/" table-name (when meta? ".meta") ".transit")
+        abs-filepath (.toString (.toAbsolutePath (Paths/get file (into-array String []))))]
+    (when (cstr/includes? (str client-name) "respected") (ut/pp [:save-transit abs-filepath [client-name query-key (if meta? :meta-file :file)]]))
+    (swap! transit-file-mapping assoc-in [client-name query-key (if meta? :meta-file :file)] abs-filepath)
+    (create-dirs filepath)
+    (with-open [out (io/output-stream file)] (transit/write (transit/writer out :msgpack) data))
+    ;file
+    abs-filepath))
+
+(defn read-transit-data
+  [file-path]
+  (let [abs-filepath (.toString (.toAbsolutePath (Paths/get file-path (into-array String []))))]
+    (if (.exists (io/file abs-filepath))
+      (with-open [in (io/input-stream abs-filepath)]
+        (transit/read (transit/reader in :msgpack)))
+      (throw (ex-info "File not found" {:file abs-filepath})))))
+
 
 
 
@@ -89,19 +123,19 @@
   [dir]
   (let [dir-file (io/file dir)]
     (when (and (.isDirectory dir-file) (empty? (.list dir-file)))
-      (try (do ;;(ut/pp [:**clean-up! :deleting-empty dir]) 
+      (try (do ;;(ut/pp [:**clean-up! :deleting-empty dir])
                (io/delete-file dir-file))
            (catch Exception e (ut/pp [:error-deleting-empty dir e]))))))
 
 (defn cleanup
   [extra-files dirs]
   (doseq [file extra-files]
-    (try (do ;;(ut/pp [:**clean-up! :deleting file]) 
+    (try (do ;;(ut/pp [:**clean-up! :deleting file])
              (io/delete-file file))
          (catch Exception e (ut/pp [:error-deleting file :err e]))))
   (doseq [dir dirs] (delete-if-empty dir)))
 
-(defn create-dirs [path] (when (not (.exists (io/file path))) (.mkdirs (io/file path))))
+
 
 
 (defn read-dir
@@ -135,16 +169,16 @@
                             (for [file  files
                                   :let  [relative-path (cstr/replace file block-dir "")
                                          keyname       (keyword
-                                                        (cstr/replace (str (last (cstr/split relative-path #"/"))) ".edn" "")) ;; the file name with will become the item key 
+                                                        (cstr/replace (str (last (cstr/split relative-path #"/"))) ".edn" "")) ;; the file name with will become the item key
                                          subkey        (cond (cstr/includes? (str relative-path) "/queries/") q ;; hardcoded :queries
-                                                             (cstr/includes? (str relative-path) "/views/")   v ;; hardcoded :views 
+                                                             (cstr/includes? (str relative-path) "/views/")   v ;; hardcoded :views
                                                              :else                                            nil)
                                          file-data     (try (when (.exists (io/file file)) (edn/read-string (slurp file)))
                                                             (catch Exception _ nil))]
                                   :when file-data]
                               (if subkey (do (swap! subkey merge {keyname file-data}) {}) {keyname file-data})))
         repack        (-> repack
-                          (assoc :queries @q) ;; hardcoded repacks 
+                          (assoc :queries @q) ;; hardcoded repacks
                           (assoc :views @v))
         _ (ut/pp [:repack2 repack])
         base-map      (get repack panel-key)]
@@ -223,7 +257,7 @@
                 (pretty-spit view-file-base vv)))));)
 
 (defn write-panels [client-name panels]
-  (ut/pp [:write-panels! client-name (count (keys panels)) :panels])  
+  (ut/pp [:write-panels! client-name (count (keys panels)) :panels])
   (pretty-spit (str "./live/" (fixstr client-name) ".edn") panels :client) ;; overwrite existing FULL deck image
   (let [name-mapping-raw (into {} (for [[k v] panels] {k (get v :name)}))
         name-mapping     (ut/generate-unique-names name-mapping-raw)
@@ -277,7 +311,7 @@
 
 
 
-(defn write-panels-old 
+(defn write-panels-old
   [client-name panels]
   (pretty-spit (str "./live/" (fixstr client-name) ".edn") panels) ;; overwrite existing
   (let [name-mapping-raw (into {} (for [[k v] panels] {k (get v :name)}))

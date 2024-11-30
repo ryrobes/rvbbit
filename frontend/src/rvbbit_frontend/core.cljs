@@ -134,7 +134,7 @@
        :poll-when                [::bricks/update-flow-statuses?]
        :dispatch-event-on-start? true}
 
-      {:interval                 600 ;; was 3600
+      {:interval                 120 ;; was 3600
        :event                    [::bricks/clean-up-reco-previews]
        :dispatch-event-on-start? false}
 

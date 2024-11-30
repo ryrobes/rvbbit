@@ -19,6 +19,9 @@
 (defonce ddb (d/open-kv "db/shape-rotations"))
 ;; (defonce shapes-db "shapes-db")
 
+(defonce unique-block-set (atom #{}))
+(defonce unique-view-set (atom #{}))
+
 (defn ddb-put! [coll-name kkey vval]
   (d/transact-kv ddb [[:put coll-name kkey vval]]))
 
@@ -255,32 +258,6 @@
            limited-path (take @key-depth-limit parsed-path)]
        (into [master-type] limited-path)))))
 
-;; (def parse-coded-keypath
-;;   (memoize
-;;    (fn [coded-keypath]
-;;      (let [parts (cstr/split (ut/safe-name coded-keypath) #"[/>]")
-;;            master-type (keyword (first (cstr/split (cstr/replace (str coded-keypath) ":" "") #"/")))
-;;            path (rest parts)
-;;            parsed-path (cond
-;;                          (and (= master-type :ai-worker)
-;;                               (not (cstr/includes? (str coded-keypath) "threads-for")))
-;;                          (cons (str (second parts))
-;;                                (cons (str (nth parts 2))
-;;                                      (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) (drop 3 parts))))
-
-;;                          (or (= master-type :flow)
-;;                              (= master-type :runstream)
-;;                              (= master-type :flow-runner)
-;;                              (= master-type :tracker)
-;;                              (= master-type :flow-status))
-;;                          (cons (str (second parts))
-;;                                (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) (drop 2 parts)))
-
-;;                          :else
-;;                          (map (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s))) path))
-;;            limited-path (take @key-depth-limit parsed-path)]
-;;        (into [master-type] limited-path)))))
-
 (def create-coded-keypath
   (memoize
    (fn [base-type keypath]
@@ -492,7 +469,7 @@
 (declare trigger-hooks)
 
 (defn make-watcher
-  [keypath flow-key client-name handler-fn & [no-save]]
+  [keypath flow-key client-name handler-fn & [no-save extra]]
   (fn [kkey atom old-state new-state]
     (let [client-name          :all ;; test, no need for individual cache for clients. kinda
           old-value          (get-in old-state keypath)
@@ -551,7 +528,7 @@
                                          (when
                                           (not (and (= base-type :leaf) (empty? new-value)))
                                           ;; ^^ leaf reaction hack TODO, find root cause of sporadic empty resolve
-                                           (handler-fn base-type keypath client-name new-value))
+                                           (handler-fn base-type keypath client-name new-value extra))
 
                                          ))
           (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
@@ -628,8 +605,8 @@
                           )
         ;;keypath             (if flow? keypath (vec (rest keypath)))
         ;flow-key          (if status? (edn/read-string (cstr/replace (str flow-key) ":flow/" ":flow-status/")) flow-key)
-        base-type         (if (= base-type :*data) :data base-type)
-        watcher          (make-watcher keypath flow-key :all fn (= sub-type :tracker))
+        base-type         (if (= base-type :*data) :data base-type)                     ;;; extra to send-reaction below
+        watcher          (make-watcher keypath flow-key :all fn (= sub-type :tracker) [sub-path keypath :test flow-key])
         atom-to-watch    (get-atom-splitter-deep flow-key (get master-reactor-atoms base-type))]
 
     ;(remove-watch atom-to-watch watch-key) ;; not needed if we're just going to re-add the same atom and watch-key anyways. but good to keep in mind.

@@ -210,36 +210,6 @@
 
 (defn strip-ansi-codes [s] (cstr/replace s #"\u001B\[[0-9;]*m" ""))
 
-;; (defn insert-rowset
-;;   [rowset table-name keypath client-name & [columns-vec db-conn queue-name metadata]]
-;;   ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
-;;   (if (ut/ne? rowset)
-;;     (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
-;;                                      (and (not (map? (first rowset))) (vector? rowset)) :vectors)
-;;                columns-vec-arg columns-vec
-;;                ;db-conn         (or db-conn cache-db)
-;;                rowset-fixed    (if (= rowset-type :vectors)
-;;                                  (for [r rowset] (zipmap columns-vec-arg r))
-;;                                  rowset)
-;;                columns         (keys (first rowset-fixed))
-;;                table-name-str  (ut/unkeyword table-name)
-;;                ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
-;;                extra           {:queue queue-name
-;;                                 :extras [ddl-str columns-vec-arg table-name table-name-str]}]
-;;            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
-;;            ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
-;;            ;(write-transit-data rowset-fixed keypath client-name table-name-str)
-;;            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
-;;            (sql-exec db-conn ddl-str extra)
-;;            (doseq [batch (partition-all 10 rowset-fixed)
-;;                    :let  [values     (vec (for [r batch] (vals r)))
-;;                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
-;;              (sql-exec db-conn insert-sql extra))
-;;            (ut/pp [:INSERTED-SUCCESS! :introspected-rowset (count rowset) :into table-name-str  client-name])
-;;            {:sql-cache-table table-name :rows (count rowset)})
-;;          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
-;;     (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
-
 (defn insert-rowset
   [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
   (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
@@ -258,9 +228,8 @@
                ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed db-type)
                extra           {:queue (if (= db-conn cache-db) nil queue-name)
                                 :extras [ddl-str columns-vec-arg table-name table-name-str]}]
-           ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
            (swap! db/last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
-           ;(write-transit-data rowset-fixed keypath client-name table-name-str)
+           (ext/write-transit-data rowset-fixed keypath client-name table-name-str)
            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
            (sql-exec db-conn ddl-str extra)
            (doseq [batch (partition-all 10 rowset-fixed)
@@ -613,190 +582,193 @@
               (every? #(not-any? (fn [v] (or (map? v) (vector? v))) (vals %)) data)))))
 
 (defn repl-eval [code repl-host repl-port client-name id ui-keypath]
-  (let [_           (swap! nrepls-run inc)
+  ;(ppy/execute-in-thread-pools
+  ; (keyword (str "serial-" client-name "data-ops"))
+  ; (fn []
+     (let [_           (swap! nrepls-run inc)
         ;;  _ (ut/pp [:repl-eval-start client-name id ui-keypath])
-        output-atom (atom [])
-        code        (if (and (string? code)
-                             (re-matches #"^(?:\.{1,2}/)?[\w/.-]+\.\w+$" code)
-                             (.exists (java.io.File. code)))
-                      (try
-                        (slurp code)
-                        (catch Exception e
-                          (str "Error reading file: " code "\n" (.getMessage e))))
-                      code)
-        e (try
-            (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
-              (let [user-fn-str   (try (slurp "./user.clj") (catch Exception _ ""))
-                    custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
-                    gen-ns        (cstr/replace
-                                   (str "repl-" (str client-name) "-"
-                                        (if (vector? id)
-                                          (-> (ut/keypath-munger id)
-                                              (cstr/replace  "_" "-")
-                                              (cstr/replace  "--" "-"))
-                                          (-> (str id)
-                                              (cstr/replace  "_" "-")
-                                              (cstr/replace  "--" "-")))) ":" "")
+           output-atom (atom [])
+           code        (if (and (string? code)
+                                (re-matches #"^(?:\.{1,2}/)?[\w/.-]+\.\w+$" code)
+                                (.exists (java.io.File. code)))
+                         (try
+                           (slurp code)
+                           (catch Exception e
+                             (str "Error reading file: " code "\n" (.getMessage e))))
+                         code)
+           e (try
+               (with-open [conn (nrepl/connect :host repl-host :port repl-port)]
+                 (let [user-fn-str   (try (slurp "./user.clj") (catch Exception _ ""))
+                       custom-nrepl-map {:repl-host repl-host :repl-port repl-port}
+                       gen-ns        (cstr/replace
+                                      (str "repl-" (str client-name) "-"
+                                           (if (vector? id)
+                                             (-> (ut/keypath-munger id)
+                                                 (cstr/replace  "_" "-")
+                                                 (cstr/replace  "--" "-"))
+                                             (-> (str id)
+                                                 (cstr/replace  "_" "-")
+                                                 (cstr/replace  "--" "-")))) ":" "")
                     ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end-1  client-name id ui-keypath code]))
-                    user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
-                                    (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
-                    s             (str user-fn-str "\n" code)
-                    client        (nrepl/client conn 120000)
+                       user-fn-str   (if (not (cstr/includes? (str code) "(ns "))
+                                       (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
+                       s             (str user-fn-str "\n" code)
+                       client        (nrepl/client conn 120000)
                     ;; console-key   (if (cstr/includes? (str id) "kit")
                     ;;                 (keyword (str "kit/" (cstr/replace (str id) ":" "") ">output"))
                     ;;                 (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>out")))
-                    is-kit?       (cstr/includes? (str id) "kit")
+                       is-kit?       (cstr/includes? (str id) "kit")
                     ;; :solver-meta/raw-custom-override-48330736>output>evald-result>out
-                    push-to-console-clover (fn [o kk]
-                                             (if is-kit? ;; else solver call
-                                               (swap! db/kit-atom assoc-in [id kk] o)
-                                               (swap! db/last-solvers-atom-meta assoc-in [id kk] o)))
-                    _ (push-to-console-clover (str "starting "  id " " ui-keypath) :incremental)
+                       push-to-console-clover (fn [o kk]
+                                                (if is-kit? ;; else solver call
+                                                  (swap! db/kit-atom assoc-in [id kk] o)
+                                                  (swap! db/last-solvers-atom-meta assoc-in [id kk] o)))
+                       _ (push-to-console-clover (str "starting "  id " " ui-keypath) :incremental)
 
                     ;; console-clover-kp (if (cstr/includes? (str id) "kit")
                     ;;                     [id :output]
                     ;;                     [id :output :evald-result :out])
 
                     ; process each message, but still block for the final result
-                    process-msg   (fn [msg]
-                                    (when-let [out (:out msg)]
-                                      (swap! output-atom conj out)
-                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
-                                      (push-to-console-clover (cstr/join "" @output-atom) :incremental)
+                       process-msg   (fn [msg]
+                                       (when-let [out (:out msg)]
+                                         (swap! output-atom conj out)
+                                         (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
+                                         (push-to-console-clover (cstr/join "" @output-atom) :incremental)
                                       ;(println "Real-time output:" out)
-                                      )
-                                    (when-let [err (:err msg)]
-                                      (swap! output-atom conj err)
-                                      (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
+                                         )
+                                       (when-let [err (:err msg)]
+                                         (swap! output-atom conj err)
+                                         (swap! nrepl-output-atom assoc-in [client-name [id ui-keypath]] @output-atom) ;; temp
                                       ;(push-to-console-clover @output-atom)
-                                      (push-to-console-clover (cstr/join "" @output-atom) :incremental)
+                                         (push-to-console-clover (cstr/join "" @output-atom) :incremental)
                                       ;(println "Real-time error:" err)
-                                      )
-                                    msg)
-                    raw-sql?  (cstr/includes? (str s) "rvbbit-backend.websockets/run-raw-sql")
+                                         )
+                                       msg)
+                       raw-sql?  (cstr/includes? (str s) "rvbbit-backend.websockets/run-raw-sql")
                    ;; _ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end0 raw-sql? client-name id ui-keypath]))
 
                     ; Send the eval message and process each response
-                    responses     (doall (map process-msg
-                                              (nrepl/message client
-                                                             {:op "eval"
-                                                              :timeout 10000
+                       responses     (doall (map process-msg
+                                                 (nrepl/message client
+                                                                {:op "eval"
+                                                                 :timeout 10000
                                                               ;:max-memory-diff 50
                                                               ;:max-cpu-diff 20
-                                                              :code s})))
+                                                                 :code s})))
 
                     ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end00 responses raw-sql? client-name id ui-keypath]))
-                    r-vals (try (nrepl/response-values responses) (catch Throwable e (ut/pp {:decoding-response-values-error (str e)})))
-                    rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
-                                               r-vals))
+                       r-vals (try (nrepl/response-values responses) (catch Throwable e (ut/pp {:decoding-response-values-error (str e)})))
+                       rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
+                                                  r-vals))
                    ;; _ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end000 raw-sql? client-name id ui-keypath]))
-                    rsp           (nrepl/combine-responses responses)
-                    msg-out       @output-atom
+                       rsp           (nrepl/combine-responses responses)
+                       msg-out       @output-atom
                     ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end0000 raw-sql? client-name id ui-keypath]))
-                    merged-values rsp-read ;; "merged" as in a vector of values, but currently we are forcing a single value via DO blocks...
-                    is-rowset?    (rowset? (first merged-values))
-                    sqlize? (and (not raw-sql?) is-rowset?)
-                    sampled-values (when (not sqlize?) ;; sqlize only
-                                     (try
-                                       (safe-sample-with-description (first rsp-read))
-                                       (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {}))))
+                       merged-values rsp-read ;; "merged" as in a vector of values, but currently we are forcing a single value via DO blocks...
+                       is-rowset?    (rowset? (first merged-values))
+                       sqlize? (and (not raw-sql?) is-rowset?)
+                       sampled-values (when (not sqlize?) ;; sqlize only
+                                        (try
+                                          (safe-sample-with-description (first rsp-read))
+                                          (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {}))))
                     ;;_ (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end00000 raw-sql? client-name id ui-keypath]))
-                    _ (push-to-console-clover (cstr/join "" @output-atom) :out)
+                       _ (push-to-console-clover (cstr/join "" @output-atom) :out)
 
-                    sqlized       (atom nil)
-                    output        {:evald-result
-                                   (-> rsp
-                                       (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
-                                       (assoc :value merged-values)
-                                       (assoc :value-hash (hash merged-values))
-                                       (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
-                                       (dissoc :id)
-                                       (dissoc :session))
-                                   :sampled sampled-values}
-                    ns-str (get-in output [:evald-result :ns] "user")]
+                       sqlized       (atom nil)
+                       output        {:evald-result
+                                      (-> rsp
+                                          (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
+                                          (assoc :value merged-values)
+                                          (assoc :value-hash (hash merged-values))
+                                          (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
+                                          (dissoc :id)
+                                          (dissoc :session))
+                                      :sampled sampled-values}
+                       ns-str (get-in output [:evald-result :ns] "user")]
 
                 ;; (when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end1 client-name id ui-keypath output]))
 
                 ;; (swap! db/repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
                 ;;        (vec (distinct (conj (get-in @db/repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
 
-                (when (and false ;;;(cstr/includes? (str code) ":introspect!")
-                           (or (cstr/includes? (str code) "(def ")
-                               (cstr/includes? (str code) "(defonce ")
-                               (cstr/includes? (str code) "(atom "))
-                           (not= client-name :rvbbit)
-                           (not (nil? client-name))
-                           (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
+                   (when (and false ;;;(cstr/includes? (str code) ":introspect!")
+                              (or (cstr/includes? (str code) "(def ")
+                                  (cstr/includes? (str code) "(defonce ")
+                                  (cstr/includes? (str code) "(atom "))
+                              (not= client-name :rvbbit)
+                              (not (nil? client-name))
+                              (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
 
-                  (qp/serial-slot-queue :nrepl-introspection client-name
-                                        (fn [] (update-namespace-state-async repl-host repl-port client-name id code ns-str))))
+                     (qp/serial-slot-queue :nrepl-introspection client-name
+                                           (fn [] (update-namespace-state-async repl-host repl-port client-name id code ns-str))))
 
-                (when sqlize?
+                   (when sqlize?
 
-                  (let [table-name (ut/keypath-munger [id ui-keypath])
-                        query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
-                    (reset! sqlized [query-name {:select (vec (keys (first (first merged-values)))) ;; [:*]
-                                                 :connection-id "cache.db" ;;client-name
-                                                 :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
-                                                 :_sqlized-by ui-keypath
-                                                 :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
-                                                 :from [[(keyword table-name) (ut/gen-sql-sql-alias)]]}])
+                     (let [table-name (ut/keypath-munger [id ui-keypath])
+                           query-name (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]
+                       (reset! sqlized [query-name {:select (vec (keys (first (first merged-values)))) ;; [:*]
+                                                    :connection-id "cache.db" ;;client-name
+                                                    :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
+                                                    :_sqlized-by ui-keypath
+                                                    :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
+                                                    :from [[(keyword table-name) (ut/gen-sql-sql-alias)]]}])
                                     ;(qp/serial-slot-queue :sqlize-repl-rowset client-name
-                    (ppy/execute-in-thread-pools-but-deliver
-                     :sqlize-repl-rowset
-                     (fn [] (insert-rowset (first merged-values)
-                                           table-name
-                                           nil
-                                           nil
-                                           (keys (first (first merged-values)))
-                                           cache-db ;;(sql/create-or-get-client-db-pool client-name)
-                                           client-name)))
+                       (ppy/execute-in-thread-pools-but-deliver
+                        :sqlize-repl-rowset
+                        (fn [] (insert-rowset (first merged-values)
+                                              table-name
+                                              nil
+                                              nil
+                                              (keys (first (first merged-values)))
+                                              cache-db ;;(sql/create-or-get-client-db-pool client-name)
+                                              client-name)))
                     ;; (ut/pp [:sqlized-repl-output! @sqlized])
-                    ))
+                       ))
 
-                (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] (get output :value))
-                ;(write-transit-data output (last ui-keypath) client-name (cstr/replace (str solver-name (last ui-keypath) client-name) ":" ""))
+                   (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] (get output :value))
+                   (ext/write-transit-data output (last ui-keypath) client-name (cstr/replace id ":" ""))
+                   (when (cstr/includes? (str client-name) "skillful") (ut/pp [:repl-data-write! (last ui-keypath) client-name (cstr/replace id ":" "")]))
 
                 ;;(when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end client-name id ui-keypath output]))
 
-                (let [oo (merge output
-                                (when sqlize?
-                                  {:sqlized @sqlized}))
+                   (let [oo (merge output
+                                   (when sqlize?
+                                     {:sqlized @sqlized}))
 
-                      oo (if sqlize? ;; test. rely on sqlize? param it?
+                         oo (if sqlize? ;; test. rely on sqlize? param it?
                            ;(ut/dissoc-in oo [:evald-result :value])
-                           (assoc-in oo [:evald-result :value]
-                                     (conj (vec (cstr/split (cstr/join (ut/strip-ansi msg-out)) #"\n"))
-                                           [[:rowset-detected :sqlized-to (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]])
+                              (assoc-in oo [:evald-result :value]
+                                        (conj (vec (cstr/split (cstr/join (ut/strip-ansi msg-out)) #"\n"))
+                                              [[:rowset-detected :sqlized-to (keyword (str (cstr/replace (str (last ui-keypath)) ":" "") "-sqlized"))]])
                                      ;(vec (cstr/split-lines (ut/strip-ansi msg-out)))
                                      ;(str (ut/strip-ansi (cstr/join msg-out)))
-                                     )
-                           oo)]
+                                        )
+                              oo)]
 
-                  oo)
+                     oo)))
 
-                ))
-
-            (catch Exception ee
-              (let [error-msg (ex-message ee)
-                    added-errors
-                    (if (cstr/includes? error-msg "Could not read response value")
-                      (str
-                       "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str.
+               (catch Exception ee
+                 (let [error-msg (ex-message ee)
+                       added-errors
+                       (if (cstr/includes? error-msg "Could not read response value")
+                         (str
+                          "Looks like a Tag Reader issue: Try printing it w println or wrapping it in a str.
                         (Rabbit cares about 'values' first, not printing, so you may have to be
                         explicit about what you want, output-wise). Tags don't cross the CLJ/CLJS 'blood-brain barrier' easily..."
-                       "\n")
-                      nil)]
-                {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
-                                       :cause      (str (ex-cause ee))
-                                       :err-data   (str (ex-data ee))
-                                       :error      (ex-message ee)}
-                                      (when (cstr/includes? (str code) "rvbbit-backend.websockets/run-raw-sql") ;raw-sql?
-                                        {:value [{:database_says (str (ex-cause ee))}
-                                                 {:database_says (str (ex-data ee))}
-                                                 {:database_says (str (ex-message ee))}]})
-                                      (when (not (nil? added-errors))
-                                        {:rabbit-added added-errors}))})))]
-    e))
+                          "\n")
+                         nil)]
+                   {:evald-result (merge {:nrepl-conn {:repl-host repl-host :repl-port repl-port}
+                                          :cause      (str (ex-cause ee))
+                                          :err-data   (str (ex-data ee))
+                                          :error      (ex-message ee)}
+                                         (when (cstr/includes? (str code) "rvbbit-backend.websockets/run-raw-sql") ;raw-sql?
+                                           {:value [{:database_says (str (ex-cause ee))}
+                                                    {:database_says (str (ex-data ee))}
+                                                    {:database_says (str (ex-message ee))}]})
+                                         (when (not (nil? added-errors))
+                                           {:rabbit-added added-errors}))})))]
+       e))
+       ;))
 
 

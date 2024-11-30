@@ -942,19 +942,67 @@
                      (catch :default _ {:value :any})))]
     port-map))
 
-
+(defn extract-base-and-number
+  [name-str]
+  (if-let [matches (re-matches #"(.*?)(\d+)$" (str name-str))]
+    [(second matches) (js/parseInt (nth matches 2))]
+    [(str name-str) 0]))
 
 (defn unique-block-id-helper
   [base-name counter all-names]
-  (loop [new-counter counter]
-    (let [new-name (if (= new-counter 0) base-name (str base-name "-" new-counter))
-          new-name (if (keyword? base-name) (keyword (replacer (str new-name) #":" "")) new-name)]
-      (if (contains? all-names new-name) (recur (inc new-counter)) new-name))))
+  (let [[base num] (extract-base-and-number base-name)
+        start-counter (if (and (nil? counter) (pos? num)) num counter)]
+    (loop [new-counter (or start-counter 0)]
+      (let [new-name (if (zero? new-counter)
+                       base-name
+                       (keyword (str base (if (pos? num) new-counter (str "-" new-counter)))))
+            new-name (if (keyword? base-name)
+                       (keyword (replacer (str new-name) ":" ""))
+                       new-name)]
+        (if (contains? all-names new-name)
+          (recur (inc new-counter))
+          new-name)))))
 
 (defn unique-block-id
-  [proposed existing-keys reserved-names]
-  (let [all-names (set (concat existing-keys reserved-names))]
+  [proposed existing-keys]
+  (let [reserved-names (into @db/reserved-block-keywords @db/reserved-view-keywords)
+        all-names (set (concat existing-keys reserved-names))]
     (unique-block-id-helper proposed 0 all-names)))
+
+(re-frame/reg-sub
+ ::safe-key
+ (fn [db {:keys [proposed locals]}]
+   (let [block-names       (keys (get db :panels))
+         locals            (or locals [])
+         incoming-keyword? (keyword? proposed)
+         snapshot-names    (keys (get-in db [:snapshots :params]))
+         tab-names         (get db :tabs)
+         user-param-names  (keys (get-in db [:click-param :param]))
+         view-names        (distinct (mapcat (fn [[_ v]] (keys (get v :views))) (get db :panels)))
+         query-names       (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster
+         runner-keys       (keys (get-in db [:server :settings :runners] {}))
+         all-runners       (apply concat
+                                  (for [r runner-keys]
+                                    (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
+         all-keys          (vec (apply concat
+                                       [block-names user-param-names locals
+                                        view-names snapshot-names tab-names
+                                        query-names all-runners]))
+         reco              (unique-block-id proposed all-keys)]
+     (cond (and incoming-keyword? (keyword? reco))       reco
+           (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
+           :else                                         reco))))
+
+(defn safe-key [proposed & [locals]]
+  @(tracked-sub ::safe-key {:proposed proposed :locals locals}))
+
+(pp [:safe-key-test (safe-key :block-2835) (safe-key :blockddd)  (safe-key :grouped-bigfoot-sightings) (safe-key :grouped-grouped-all-offenses-5)])
+;; exists  :block-2835, :block-5863, :block-4635, :block-7126, :block-494, :block-rabbit, :block-1084, :block-12316',
+;; exists  :grouped-all-offenses-3, :new-clojure-1, :grouped-bigfoot-sightings, :query-3799, :new-raw-sql, :virtual-view-flat, :grouped-grouped-all-offenses-5, :clojure-hop
+
+;; [':safe-key-test', ':block-7', ':blockddd', ':grouped-bigfoot-sightings-2', ':grouped-grouped-all-offenses-1']
+
+;; (pp [:cc (contains? @db/reserved-view-keywords :grouped-bigfoot-sightings-1)])
 
 (defn hex-to-rgb [hex] (mapv #(js/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)]))
 
@@ -981,34 +1029,7 @@
 (defn sort-map-by-key [m]
   (sort-by first (into [] m)))
 
-(re-frame/reg-sub
- ::safe-key
- (fn [db {:keys [proposed locals]}]
-   (let [block-names       (keys (get db :panels))
-         locals            (or locals [])
-         incoming-keyword? (keyword? proposed)
-         snapshot-names    (keys (get-in db [:snapshots :params]))
-         tab-names         (get db :tabs)
-         user-param-names  (keys (get-in db [:click-param :param]))
-         view-names        (distinct (mapcat (fn [[_ v]] (keys (get v :views))) (get db :panels)))
-         query-names       (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster
-         runner-keys       (keys (get-in db [:server :settings :runners] {}))
-         all-runners       (apply concat
-                                  (for [r runner-keys]
-                                    (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
-                     ;;      _ (tapp>>  [:prop runner-keys all-runners])
-         all-keys          (vec (apply concat
-                                       [block-names user-param-names locals
-                                        view-names snapshot-names tab-names
-                                        query-names all-runners]))
-         _                 (reset! db/unsafe-keys (into @db/unsafe-keys all-keys))
-         reco              (unique-block-id proposed @db/unsafe-keys [])]
-     (cond (and incoming-keyword? (keyword? reco))       reco
-           (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
-           :else                                         reco))))
 
-(defn safe-key [proposed & [locals]]
-  @(tracked-sub ::safe-key {:proposed proposed :locals locals}))
 
 (defn get-time-format-str [] (cstr/join " " (drop 4 (drop-last 4 (splitter (str (js/Date.)) #" ")))))
 

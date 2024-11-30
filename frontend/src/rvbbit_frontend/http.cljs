@@ -223,18 +223,23 @@
  ::autocomplete-response
  (fn [db [_ result]]
    (let [;;codes [:theme/base-font :font-family :height]
-         server-params (get result :clover-params [])
-         view-codes    (get result :view-keywords [])
-         flow-subs     (get db :flow-subs)
+         server-params  (get result :clover-params [])
+         view-codes     (get result :view-keywords [])
+         res-block-keys (get result :block-names [])
+         res-view-keys  (get result :view-names [])
+         _ (ut/pp [:inserted-autocomplete-words-and-reserved-keys (str (into {} (for [[k v] result]  {k (count v)})))])
+         flow-subs      (get db :flow-subs)
         ;;  data-keys     (vec (for [e (map last (filter #(= (count %) 3) (ut/keypaths (get db :panels))))]
         ;;                       (keyword (str "data/" (cstr/replace (str e) ":" "")))))
-         data-keys     (vec (for [e (map last (remove empty? (filter #(and (not (number? (last %))) (= (count %) 3)) (ut/kvpaths (get db :panels)))))]
-                              (keyword (str "data/" (cstr/replace (str e) ":" "")))))
-         click-params  (vec (for [e (keys (get-in db [:click-param :param]))]
-                              (keyword (str "param/" (ut/replacer (str e) ":" "")))))
-         themes        (vec (for [e (keys (get-in db [:click-param :theme]))]
-                              (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
-         codes         (vec (apply concat [server-params view-codes themes flow-subs click-params data-keys]))]
+         data-keys      (vec (for [e (map last (remove empty? (filter #(and (not (number? (last %))) (= (count %) 3)) (ut/kvpaths (get db :panels)))))]
+                               (keyword (str "data/" (cstr/replace (str e) ":" "")))))
+         click-params   (vec (for [e (keys (get-in db [:click-param :param]))]
+                               (keyword (str "param/" (ut/replacer (str e) ":" "")))))
+         themes         (vec (for [e (keys (get-in db [:click-param :theme]))]
+                               (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
+         codes          (vec (apply concat [server-params view-codes themes flow-subs click-params data-keys]))]
+     (reset! db/reserved-block-keywords (set res-block-keys))
+     (reset! db/reserved-view-keywords (set res-view-keys))
      (reset! db/autocomplete-keywords (set (map str codes)))
      db)))
 
@@ -247,13 +252,21 @@
      db)))
 
 
+;; (ut/pp [:reserved-block @db/reserved-block-keywords])
+;; (ut/pp [:reserved-view @db/reserved-view-keywords])
+;;(ut/tracked-dispatch [::get-autocomplete-values])
+
 (re-frame/reg-event-db
  ::get-autocomplete-values
  (fn [db _]
    (let [client-name (get db :client-name)]
      (ut/tracked-dispatch
       [::wfx/request :default
-       {:message {:kind :autocomplete :surrounding nil :panel-key nil :view nil :client-name client-name}
+       {:message {:kind :autocomplete
+                  :surrounding nil
+                  :panel-key nil
+                  :view nil
+                  :client-name client-name}
         :on-response [::autocomplete-response]
         :on-timeout [::timeout-response ::autocomplete]
         :timeout 15000000}]))
@@ -530,6 +543,11 @@
       kp-value-map))))
 
 (re-frame/reg-event-db
+ ::write-repl-data-hash
+ (fn [db [_ data-key data]]
+   (assoc-in db [:click-param :data-hash data-key] (hash data))))
+
+(re-frame/reg-event-db
  ::simple-response
  (fn [db [_ result & [batched?]]]
     (let [;result (try (if (vector? (first result)) (vector (for [r result] (first r))) result) (catch :default _ result))
@@ -637,12 +655,29 @@
               updates (reduce (fn [acc res]
                                 (let [task-id (get res :task-id)]
 
+                                  (when (= (first task-id) :solver)
+                                    (let [clover-kw (last (get-in res [:data 0 :extra 0]))
+                                          data (get res :status)
+                                          [_ panel-key data-key] (get (ut/flip-map @db/solver-fn-lookup) clover-kw)]
+                                      (ut/tracked-dispatch [::write-repl-data-hash data-key data])
+                                      ;;(ut/pp [:solver-incoming-BATCHED! (last task-id) (get res :status)])
+                                      ))
+
                                   (when (and (= (first task-id) :leaf)
                                              (cstr/ends-with? (last task-id) "all-actions"))
-                                  (ut/pp [:task-id :bactched-update (str task-id) (str (get res :status))]))
+                                    (ut/pp [:task-id :bactched-update (str task-id) (str (get res :status))]))
 
                                   (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
                               {} result-subs)]
+
+
+          (when (= (get-in result [:task-id 0]) :solver)
+            (let [clover-kw (last (get-in result [:data 0 :extra 0]))
+                  data (get result :status)
+                  [_ panel-key data-key] (get (ut/flip-map @db/solver-fn-lookup) clover-kw)]
+              (ut/tracked-dispatch [::write-repl-data-hash data-key data])
+              ;;(ut/pp [:solver-incoming-SINGLE! (get-in result [:task-id 0]) (get result :status)])
+              ))
 
         ;; (when (cstr/includes? (str (get db :client-name)) "beaming")
         ;;   (doseq [r result-subs]
@@ -728,7 +763,7 @@
                     client-panels (set (remove nil? (filter #(not (cstr/starts-with? (str %) ":reco")) (keys (get db :panels)))))
                     diffy (cset/difference  client-panels server-panels)
                     not-in-sync? (true? (> (count diffy) 0))]
-                (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab) :server-panels (count (get-in result [:status :panel-keys]))])
+                (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab) :subs (count (get db :flow-subs)) :server-panels (count (get-in result [:status :panel-keys]))])
                 (when not-in-sync?
                   (ut/pp [:panels-out-of-sync-with-server! :resolving... (str diffy)])
                   (ut/tracked-dispatch [::wfx/push :default ;:secondary
@@ -970,11 +1005,13 @@
                                    (assoc-in (cons :repl-output ui-keypath) repl-output)
                                    (assoc-in (cons :sql-str ui-keypath) sql-str)
                                    (assoc-in (cons :data ui-keypath) new-map)
+                                   (assoc-in (into [:click-param :data-hash] [(last ui-keypath)]) (hash new-map))
                                    (assoc-in (cons :orders ui-keypath) map-order)
                                    (assoc-in (cons :meta ui-keypath) meta))
                                (-> db
                                    (assoc-in (cons :sql-str ui-keypath) sql-str)
                                    (assoc-in (cons :data ui-keypath) new-map)
+                                   (assoc-in (into [:click-param :data-hash] [(last ui-keypath)]) (hash new-map))
                                    (assoc-in (cons :orders ui-keypath) map-order)
                                    (assoc-in (cons :meta ui-keypath) meta)))
                              db))))

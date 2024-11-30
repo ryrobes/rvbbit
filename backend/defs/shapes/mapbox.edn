@@ -1,0 +1,51 @@
+
+{
+    ;;  :mapbox-point-map {:axes {:x [:or
+;;                                [:and :dimension?
+;;                                 ;:reasonable-cardinality? ;;
+;;                                 [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+;;                                  ;;;:reasonable-cardinality?
+;;                                 [:not :measure?]]
+;;                                [:or :looks-like-date? :looks-like-datetime?
+;;                                 :is-date? :is-datetime?]]
+;;                            :y [:measure?]}
+
+;;                     :sql-maps [{:select [[[[:sum :y-field]] :y-field] :x-field]
+;;                                 :from [:table]
+;;                                 :group-by [:x-field]}]
+;;                     :runner :clojure
+;;                     :h 5 :w 9
+;;                     :category [:viz :recharts]
+;;                     :selected-view :reech
+;;                     :library-shapes {:reech [:> :ResponsiveContainer {:width  "100%"
+;;                                                                       :height :panel-height+50}
+;;                                              [:> :ComposedChart {:data [] ;; needed to fake out :Bar component w/o main :data for some reason
+;;                                                                  :margin {:top 5 :bottom 5
+;;                                                                           :right 30 :left 20}}
+;;                                               [:> :CartesianGrid {:strokeDasharray "1 4" :opacity 0.33}]
+;;                                               [:> :Tooltip
+;;                                                {:contentStyle {:backgroundColor "#00000099"
+;;                                                                :border          "none"}
+;;                                                 :itemStyle    {:color "#ecf0f1"}
+;;                                                 :labelStyle   {:color  :theme/editor-outer-rim-color}}]
+;;                                               [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
+;;                                               [:> :Bar {:dataKey :y-field
+;;                                                         :isAnimationActive false
+;;                                                         :data      :query-preview
+;;                                                         :stroke    :theme/editor-outer-rim-color
+;;                                                         :fill      [:str :theme/editor-outer-rim-color "33"]
+;;                                                         :on-click [:set-recharts-param>]}]]]}
+;;                     :base-score 1}
+
+ :aacode-test {:axes {:x [:true?]}
+
+               :sql-maps [{:select [[[:count [:distinct :x-field]] :dd]]
+                           :from [:table]}]
+
+               :runner :clojure
+
+               :library-shapes
+               (quote (let [trig :data-hash/query-preview
+                            data :data/query-preview]
+                        (str :x-field :rand-int-> (rand-int 123) " counts of " :x-field " ! =" (count data) "!")))
+               :base-score 1}}

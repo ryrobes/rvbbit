@@ -12,7 +12,7 @@
  ;:username           "xtdb"
  ;:password           "xtdb"
  ;:database-name      "xtdb"
- :server-name        "localhost"
+ :server-name        "dev-pig-37" ;;"localhost"
 ; :host "localhost"
  :port-number        5432
  ;:register-mbeans    false

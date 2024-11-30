@@ -1239,7 +1239,7 @@
                    ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
-               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
+               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query "systemh2-db")))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [;[re-com/box
       [re-com/box :size "auto" :child [bricks/magic-table :files-list* [:files-sys]
@@ -1434,7 +1434,7 @@
                    ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
-               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
+               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query "systemh2-db")))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [;[re-com/box
       [re-com/v-box :size "auto" :children
@@ -5262,7 +5262,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5278,7 +5278,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5291,7 +5291,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5305,7 +5305,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5316,7 +5316,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5327,7 +5327,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :placeholder-on-running? true
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
@@ -5370,7 +5370,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :placeholder-on-running? true
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
@@ -5384,7 +5384,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5395,7 +5395,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5412,7 +5412,7 @@
          {:signal false
           :cache? false
           :type :clojure
-          :input-map {}
+          :input-map {:cid client-name}
           :data '(do (ns rvbbit-backend.websockets)
                      (let [tt :tt]
                        (with-out-str
@@ -5425,7 +5425,7 @@
          :else {:signal false
                 :cache? false
                 :type :clojure
-                :input-map {}
+                :input-map {:cid client-name}
                 :data '(do (ns rvbbit-backend.websockets)
                            (let [tt :tt]
                              (with-out-str
@@ -5439,7 +5439,7 @@
                                    {:signal false
                                     :cache? false
                                     :type :clojure
-                                    :input-map {}
+                                    :input-map {:cid client-name}
                                     :data '(do (ns rvbbit-backend.websockets)
                                                (with-out-str
                                                  (fig-render :text :color)))})])
@@ -6492,8 +6492,13 @@
  ::insert-leaf-action-preview
  (fn [db [_ leaf-drop leaves-kp data]]
    (let [data (assoc data :leaf-drop leaf-drop)
+         conn-id (get data :connection-id)
          data (if (get data :queries)
-                (assoc data :queries (into {} (for [[k v] (get data :queries)] {k (assoc v :limit 20)})))
+                (assoc data :queries (into {} (for [[k v] (get data :queries)
+                                                    :let [qconn-id (get v :connection-id)]]
+                                                (if (cstr/includes? (cstr/lower-case (str conn-id qconn-id)) "xtdb")
+                                                  {k v} ;; nested LIMIT isn't supported in XTDB yet(?)
+                                                  {k (assoc v :limit 20)}))))
                 data)
          runner-keys (vec (keys @(ut/tracked-subscribe [::bricks/block-runners])))
          panel-key (keyword (str "reco-preview-c-" (hash data)))
@@ -6688,7 +6693,7 @@
         orig-top top
         ;left (if (> (+ left 300) screen-w) (- left (- screen-w left)) left)
         modal-zoom 1 ;.2
-        dynh (max 300 (- (get @dimensions :height 0) 100))
+        dynh (max 400 (- (get @dimensions :height 0) 100))
         bw (* 650 modal-zoom)
         bh (* (+ 200 dynh) modal-zoom)
         left (if (> (+ left bw) screen-w) (- screen-w bw) left)
@@ -7120,17 +7125,38 @@
                                                   ;;                render-frag
                                                   ;;                 6.5 7]]])
 
-                                                   [re-com/v-box
-                                                    :size "auto"
-                                                    :padding "5px"
-                                                    :style {:border-radius "8px"
-                                                            :border (str "4px dashed " (theme-pull :theme/editor-outer-rim-color nil) 22)}
-                                                    :align :center :justify :center
-                                                    :children [;[re-com/box :child (str @db/clover-leaf-previews)]
-                                                               ;[bricks/clover @db/clover-leaf-previews nil   ]
-                                                               @(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil ])
-                                                               ]
-                                                               ]
+                                                   (let [preview-panel          @db/clover-leaf-previews
+                                                         selected-view          @(ut/tracked-sub ::bricks/selected-view-alpha {:panel-key preview-panel})
+                                                         selected-view-type     @(ut/tracked-sub ::bricks/view-type {:panel-key preview-panel :view selected-view})
+                                                         view-body              @(ut/tracked-sub ::bricks/panel-view {:panel-key preview-panel
+                                                                                                                     :view-key selected-view :runner selected-view-type})
+                                                         text? (and (vector? view-body) (every? string? view-body))]
+                                                     [re-com/v-box
+                                                      :size "auto"
+                                                      :padding "5px"
+                                                      :max-height "400px"
+                                                      :style {:border-radius "8px"
+                                                              :border (str "4px dashed " (theme-pull :theme/editor-outer-rim-color nil) 22)}
+                                                      :align :center :justify :between
+                                                      :gap "10px"
+                                                      :children [;[re-com/box :child (str @db/clover-leaf-previews)]
+                                                                 [re-com/box
+                                                                  :size "auto"
+                                                                  :child
+                                                                  ;[bricks/clover preview-panel nil 5]
+                                                                  @(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil 5])
+                                                                  ]
+                                                                 [re-com/box
+                                                                  :padding "8px"
+                                                                  ;:max-height "100px"
+                                                                  :size "auto" ;:width "330px" :height "100px"
+                                                                  :child (if text?
+                                                                           [re-com/v-box
+                                                                            :style {:font-size "11px" :font-weight 700}
+                                                                            :children (for [l view-body] [re-com/box :child (str l)])]
+                                                                           [bricks/edn-code-box 400 100 (str view-body) {:font-size "10px" :font-weight 700}])]
+                                                               ;@(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil ])
+                                                                 ]])
 
                                                    (if (and
                                                           (> reco-count 0)

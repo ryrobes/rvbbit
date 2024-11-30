@@ -192,7 +192,7 @@
         screen-data   (try (edn/read-string valid-edn-str) (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))]
     (convert-back-to-original screen-data)))
 
-(defn update-screen-meta [f-path]
+(defn update-screen-meta [f-path runners]
   ;(qp/slot-queue :update-screen-meta f-path
   (ppy/execute-in-thread-pools :update-screen-meta
                                (fn []
@@ -216,9 +216,13 @@
                                          theme-name       (if (and has-theme? (not (nil? (get theme-map :theme-name))))
                                                             (str ", " (get theme-map :theme-name) " ")
                                                             "")
-                                         blocks           (remove nil? (conj (keys (get-in screen-data [:panels]))
+                                         blocks           (remove nil? (conj (keys (get screen-data :panels))
                                                                              (when has-theme? :*theme*)
                                                                              (when has-materialized-theme? :*materialized-theme*)))
+                                         _               (doseq [b blocks]
+                                                           (doseq [r runners]
+                                                             (swap! db/unique-view-set into (filterv keyword? (keys (get-in screen-data [:panels b r]))))))
+                                         _                (swap! db/unique-block-set into (filterv keyword? blocks))
                                          boards           (distinct (for [[_ v] (get-in screen-data [:panels])] (get v :tab)))
                                          blocks           (into blocks boards) ; (map #(str "board/" %) boards))
                                          params           (get-in screen-data [:click-param])
@@ -232,13 +236,13 @@
                                                                                          (distinct (into (vec (distinct (ut/deep-flatten vv)))
                                                                                                          @wss/autocomplete-view-atom)))))))
                                      (swap! db/screens-atom assoc screen-name screen-data) ;; update master screen atom for
-                                     (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
-                                     (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
-                                     (sql-exec system-db
+                                     (sql-exec systemh2-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
+                                     (sql-exec systemh2-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
+                                     (sql-exec systemh2-db
                                                (to-sql {:insert-into [:screens]
                                                         :columns     [:file_path :screen_name :blocks :queries]
                                                         :values      [[f-path screen-name (count blocks) (count (keys queries))]]}))
-                                     (sql-exec system-db
+                                     (sql-exec systemh2-db
                                                (to-sql
                                                 {:insert-into [:blocks]
                                                  :columns     [:file_path :screen_name :block_key :block_name :views
@@ -260,17 +264,26 @@
                                                                          materialized-theme? (str (get materialized-theme :theme))
                                                                          board? (pr-str {:panels (get board-map b) :click-param {:param (get params :param)}})
                                                                          :else  (str (get-in screen-data [:panels b])))
-                                                                   (str (get-in screen-data [:panels b :tab]))]))})))
+                                                                   (str (get-in screen-data [:panels b :tab]))]))}))
+                                    ;;  (ut/pp [:screen screen-name (count blocks)])
+                                     )
                                    (catch Throwable e
       ;(ut/pp [:update-screen-meta-error! f-path e])
                                      (println "Error in update-screen-meta:" (.getMessage e))
                                      (.printStackTrace e))))))
 
 (defn update-all-screen-meta []
-  (sql-exec system-db (to-sql {:delete-from [:screens]})) ;; just in case
+  (sql-exec systemh2-db (to-sql {:truncate :screens}))
+  (sql-exec systemh2-db (to-sql {:truncate :blocks}))
   (let [prefix "./screens/"
+        runners (keys (dissoc (get (config/settings) :runners) :views))
         files  (ut/get-file-vectors-simple prefix ".edn")]
-    (doseq [f files] (update-screen-meta (str prefix f)))))
+    (doseq [f files] (update-screen-meta (str prefix f) runners))))
+
+;; (ut/pp (update-all-screen-meta))
+;; (ut/pp [:blocks @db/unique-block-set (count @db/unique-block-set)])
+;; (ut/pp [:blocks @db/unique-view-set (count @db/unique-view-set)])
+;; (ut/pp [:cc (keys (get (config/settings) :runners))])
 
 (defn update-flow-meta [f-path]
   ;(qp/slot-queue :update-flow-meta f-path
@@ -427,7 +440,9 @@
                        (let [f-path (str (get % :path))
                              f-op   (get % :type)]
                          (ut/pp [:screen-change! f-op f-path])
-                         (update-screen-meta f-path)))
+                         ;(update-screen-meta f-path)
+                         (update-all-screen-meta)
+                         ))
                     file-path)))
 
 (defn shape-rotation-run [f-path & [pre-filter-fn]]
@@ -1200,8 +1215,8 @@
     ;;  (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
 
     #_{:clj-kondo/ignore [:inline-def]}
-    (defonce system-dbs
-      [system-db systemh2-db import-db metrics-kpi-db cache-db cache-db-memory system-reporting-db])
+    (defonce system-dbs ;; for default shape rotation
+      [system-db systemh2-db import-db cache-db cache-db-memory])
 
     (ppy/execute-in-thread-pools
      :shape-rotation-jobs-wrapper
@@ -1595,7 +1610,7 @@
 
     (shutdown/add-hook! ::the-pool-is-now-closing
                         #(do (reset! wss/shutting-down? true)
-                             (db/close-ddb)
+                             ;(db/close-ddb)
                              (doseq [electric-eye [start-conn-watcher start-screen-watcher start-flow-watcher macro-undo-watcher ;;watch-leaves-watcher
                                                    start-ai-workers-watcher start-settings-watcher start-solver-watcher ;session-file-watcher
                                                    ]]
@@ -1677,6 +1692,7 @@
                              (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
                              (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                            ;(shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))
+                            ;; (db/close-ddb) ;; close datalevin last to make sure there are no writes (will crash otherwise)
                              ))
 
     (ppy/add-watch+

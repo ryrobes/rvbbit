@@ -180,7 +180,7 @@
        [[:font-family] [:titleFont] [:monospaced-font] [:base-font] [:labelFont] [:legendFont]]
          {:message "font face!"
           :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono" "Chicago Kare"
-                                    "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha"
+                                    "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha" "Afacad Flux" "Space Grotesk" "Rubik" "Roboto Slab"
                                     "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono"
                                     "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline"
                                     "IBM Plex Mono" "Roboto Slab" "Source Code Pro" "Pastor of Muppets" "Odor Mean Chey"

@@ -267,6 +267,8 @@
                                      resolved-full-map         (when override? (logic-and-params (first this) panel-key))
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
                                      new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
+                                     cid                       (get-in resolved-full-map [:input-map :cid])
+                                     new-solver-name           (if cid (cstr/replace (str new-solver-name cid) ":" "") new-solver-name)
                                      sub-param                 (keyword (str "solver/" new-solver-name))
                                      resolved-input-map        (assoc resolved-input-map :*solver-name (keyword new-solver-name))
                                      req-map                   (merge

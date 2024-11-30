@@ -461,7 +461,7 @@
 (defn insert-into-fields [field-maps]
   (let [context-grouped (group-by (fn [m] [(get m :context) (get m :table-type)]) field-maps)]
     (doseq [[[k ttype] field-maps1] context-grouped]
-      (let [_ (ut/pp ["🦁" :inserting-fields-h2-context! [k ttype] (count field-maps1)])
+      (let [;;_ (ut/pp ["🦁" :inserting-fields-h2-context! [k ttype] (count field-maps1)])
             _ (sql-exec systemh2-db
                         (to-sql {:delete-from [:fields]
                                  :where [:and
@@ -586,6 +586,11 @@
                                         q-key (if (= qidx 0)
                                                 :query-preview
                                                 (keyword (str "query-preview-" qidx)))]] {q-key q-map}))
+          add-data-pre (fn [kw] (keyword (cstr/replace (str "data/" kw) ":" "")))
+          ;; queries-map (merge
+          ;;              queries-map ;; in case some viz recos use BE data fetching clover method w :data/*
+          ;;              (into {} (for [[k v] queries-map]
+          ;;                         {(add-data-pre k) (add-data-pre v)})))
 
           library-shapes (walk/postwalk-replace axes-walk library-shapes)
 

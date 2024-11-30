@@ -460,12 +460,12 @@
         result))))
 
 (defn clover-error-wrapper [message-header1 message-header2 message-body & [code]]
-  {:h 7 :w 6.5
+  {;:h nil :w 6.5
    :selected-view :error
    :views {:error [:v-box
                    :padding "5px"
                    :gap "6px"
-                   :size "auto"
+                   ;:size "auto"
                    :align :center :justify :center
                    :style {:font-size "17px"}
                    :children [[:box :child (str message-header1)]

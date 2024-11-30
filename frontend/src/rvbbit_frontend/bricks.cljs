@@ -2786,7 +2786,7 @@
   (and (number? n) (not= n (js/Math.floor n))))
 
 (defn insert-new-block-raw [root width height body runner syntax opts-map no-selected?]
-  (let [new-key            (str "block-" (rand-int 12345))
+  (let [new-key            "block" ;(str "block-" (rand-int 12345))
         clover?            (= runner :clover)
         clojure?           (= syntax "clojure")
         view-name          (ut/safe-key (keyword (str (cstr/replace (str runner) ":" "") "-hop")))
@@ -2862,10 +2862,23 @@
                                      (keys (get body r)))))]
     (into {} (for [v view-keys] {v (ut/safe-key v)}))))
 
+(defn quote-to-do ;; used for nested viz-recos protected from transport eval with quote
+  "Walks through a nested map and replaces any (quote ...) with (do ...)"
+  [form]
+  (walk/postwalk
+   (fn [x]
+     (if (and (list? x)
+              (= 'quote (first x)))
+       (cons 'do (rest x))
+       x))
+   form))
+
 (defn insert-new-block
   [root width height & body]
   (when (not @over-flow?)
-    (let [new-key        (or (get (first body) :bid) (str "block-" (rand-int 12345)))
+    (let [new-key        (or (get (first body) :bid)
+                             ;(str "block-" (rand-int 12345))
+                             "block")
           req-block-name (get-in (first body) [:drag-meta :block-name])
           new-keyw       (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
           new-keyw       (if (cstr/starts-with? (str new-keyw) ":reco-preview-")  ;; ":reco-preview-c-")
@@ -2885,8 +2898,12 @@
                                            (into {} (for [vv (filterv #(cstr/starts-with? (str %) (str k "/")) (ut/deep-flatten body))]
                                                       {vv (-> (str vv) (cstr/replace ":" "") (cstr/replace (cstr/replace (str k) ":" "")
                                                                                                            (cstr/replace (str sk) ":" "")) keyword)})))))
+          extra-versions-walk (into {}
+                                    (for [[k v] internal-key-walk]
+                                      {(keyword (cstr/replace (str "data/" k) ":" ""))
+                                       (keyword (cstr/replace (str "data/" v) ":" ""))}))
           all-walks (merge this-block-param-walks internal-key-walk)
-          _ (ut/pp [:new-block-internal-key-walks all-walks])
+          _ (ut/pp [:new-block-internal-key-walks all-walks extra-versions-walk])
           body (walk/postwalk-replace all-walks body)
           drop-mutate (when (not (cstr/starts-with? (str new-keyw) ":reco-preview")) ;; we dont want to mutate on preview blocks.... just drops
                         (get (first body) :drop-mutate {}))
@@ -3031,7 +3048,8 @@
                                                        :child (str (rand-nth quotes))]}
                             ;; :views         {view-name [:new-block-quotes-box (rand-nth quotes)]}
                             :queries       {}})
-          _ (ut/pp [:inserted-block new-keyw base-map])
+          base-map (quote-to-do base-map)
+          _ (ut/pp [:inserted-block! new-keyw base-map body])
           ;; _ (when (get base-map :mad-libs-combo-hash)
           ;;     (ut/dispatch-delay 4000 [::get-combo-rows-event new-keyw (get base-map :mad-libs-combo-hash)])
           ;;     (ut/dispatch-delay 3000 [::update-reco-previews]))
@@ -3253,7 +3271,10 @@
 (defn assess-new-block
   [root width height & body]
   (when (not @over-flow?)
-    (let [new-key        (or (get (first body) :bid) (str "block-" (rand-int 12345)))
+    (let [new-key        (or (get (first body) :bid)
+                             ;(str "block-" (rand-int 12345))
+                             "block"
+                             )
           drop-mutate    (get (first body) :drop-mutate {})
           req-block-name (get-in (first body) [:drag-meta :block-name])
           new-keyw       (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
@@ -5374,6 +5395,7 @@
                                  (not (cstr/starts-with? (str (first %)) ":settings/"))
                                  (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
                                  (not (cstr/starts-with? (str (first %)) ":panel-hash/"))
+                                 (not (cstr/starts-with? (str (first %)) ":data-hash/"))
                                  (not (cstr/starts-with? (str (first %)) ":ai-worker/"))
                                  (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
                                  (not (cstr/starts-with? (str (first %)) ":solver-status/"))
@@ -5583,7 +5605,11 @@
   (let [like-syntax (str "%" (cstr/replace (str @db/rabbit-search-input) " " "%") "%")
         sql-calls {:rabbit-search-like {:select [[:context_key :QUERY] :data_type :total_rows :distinct_count :table_fields]
                                         :from [:fields]
-                                        :where [:and [:<> :table_type ":query"]
+                                        :where [:and
+                                                [:<> :table_type ":query"]
+                                                [:<> :connection_id "cache-db"]
+                                                [:<> :connection_id "system-db"]
+                                                [:<> :connection_id "systemh2-db"]
                                                 [:or
                                                  [:like :table_name like-syntax]
                                                  [:like :field_name like-syntax]
@@ -5776,6 +5802,7 @@
                                            (not (cstr/starts-with? (str (first %)) ":settings/"))
                                            (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
                                            (not (cstr/starts-with? (str (first %)) ":panel-hash/"))
+                                           (not (cstr/starts-with? (str (first %)) ":data-hash/"))
                                            (not (cstr/starts-with? (str (first %)) ":ai-worker/"))
                                            (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
                                            (not (cstr/starts-with? (str (first %)) ":solver-status/"))
@@ -6814,16 +6841,21 @@
      ;; update counts so we can do viz-gen
 
     (cond (= type :viz-reco)     (let [;; we need to change all the generic aliases into real rando keys
-                                       req-name-str     (str "block-" (rand-int 999))
+                                       req-name-str     "block" ;(str "block-" (rand-int 999))
                                        ddata            @(ut/tracked-subscribe [::panel-map :reco-preview])
                                        poss-value-walks (filter #(or (cstr/starts-with? (str %) ":query-preview")
                                                                      (cstr/starts-with? (str %) ":panel-key"))
                                                                 (ut/deep-flatten ddata))
                                        key-walk1        (filter #(not (cstr/includes? (str %) "/")) poss-value-walks)
-                                       key-walk         (merge (into {}
-                                                                     (for [k key-walk1]
-                                                                       {k (keyword (str "gen-viz-" (rand-int 1234)))}))
+                                       add-data-pre     (fn [kw] (cstr/replace (str "data/" kw) ":" ""))
+                                       base-key-walk    (into {}
+                                                              (for [k key-walk1]
+                                                                {k (ut/safe-key (keyword (str "gen-viz-" (rand-int 9999))))}))
+                                       key-walk         (merge base-key-walk
+
                                                                {:panel-key (keyword req-name-str)})
+                                       _ (ut/pp [:key-walk1 key-walk ;(into {} (for [[k v] base-key-walk] {(add-data-pre k) (add-data-pre v)}))
+                                                 ])
                                        value-walk1      (filter #(cstr/includes? (str %) "/") poss-value-walks)
                                        value-walk       (into {}
                                                               (for [v value-walk1]
@@ -6845,16 +6877,25 @@
           (= type :meta-blocks)  meta-block-load
           (= type :realms)       realm-block-load
           :else                  (let [;; same as viz-reco but with dynamic combo id via panel lookup - NEW SHAPE ROTATOR DROPS HERE
-                                       req-name-str     (ut/safe-key (keyword (str "block-" (rand-int 999))))
+                                       req-name-str     (ut/safe-key (keyword
+                                                                      ;(str "block-" (rand-int 999))
+                                                                      "block"
+                                                                      ))
                                        ddata            @(ut/tracked-subscribe [::panel-map type])
                                        poss-value-walks (filter #(or (cstr/starts-with? (str %) ":query-preview")
+                                                                    ; (cstr/starts-with? (str %) ":data/query-preview")
                                                                      (cstr/starts-with? (str %) ":panel-key"))
                                                                 (ut/deep-flatten ddata))
+                                      ;;; _ (ut/pp [:ddata ddata :panel-keys @(ut/tracked-sub ::panels {})])
                                        key-walk1        (filter #(not (cstr/includes? (str %) "/")) poss-value-walks)
-                                       key-walk         (merge (into {}
-                                                                     (for [k key-walk1]
-                                                                       {k (keyword (str "gen-viz-" (rand-int 1234)))}))
-                                                               {:panel-key req-name-str})
+                                       add-data-pre     (fn [kw] (keyword (cstr/replace (str "data/" kw) ":" "")))
+                                       base-key-walk    (into {}
+                                                              (for [k key-walk1]
+                                                                {k (ut/safe-key (keyword (str "gen-viz-" (rand-int 9999))))}))
+                                       key-walk         (merge base-key-walk
+                                                               (into {} (for [[k v] base-key-walk] {(add-data-pre k) (add-data-pre v)}))
+                                                               {:panel-key (keyword req-name-str)})
+                                       _ (ut/pp [:key-walk2 "line6843" ddata key-walk])
                                        value-walk1      (filter #(cstr/includes? (str %) "/") poss-value-walks)
                                        value-walk       (into {}
                                                               (for [v value-walk1]
@@ -7065,6 +7106,10 @@
                                                   ;(some (fn [x] (cstr/includes? (cstr/replace (str %) ":" "") (cstr/replace (str x) ":" ""))) (vec visible-panel-keys))
                                                   ;(cstr/starts-with? (str %) (str qk "/"))
                                                   ;;(cstr/starts-with? (str %) ":block-6443/")
+                                                  (= (keyword (str "render-hash/" (cstr/replace (str (first k)) ":" ""))) %)
+                                                  (= (keyword (str "panel-hash/" (cstr/replace (str (first k)) ":" ""))) %)
+
+                                                  (= (keyword (str "data-hash/" (cstr/replace (str qk) ":" ""))) %)
                                                   (= (keyword (str "data/" (cstr/replace (str qk) ":" ""))) %)
                                                   (= (keyword (str "*data/" (cstr/replace (str qk) ":" ""))) %)
                                                   ;(cstr/starts-with? (str %) (str qk "/"))
@@ -9949,9 +9994,10 @@
 (re-frame/reg-sub
  ::get-shape-viz
  (fn [db {:keys [panel-key query-key dragged-kp]}]
-   (if dragged-kp
-     (get-in db [:shapes dragged-kp])
-     (get-in db [:shapes panel-key query-key]))))
+   (let [data (if dragged-kp
+                (get-in db [:shapes dragged-kp])
+                (get-in db [:shapes panel-key query-key]))]
+     data)))
 
 (re-frame/reg-sub
  ::panel-exists?
@@ -10022,8 +10068,11 @@
                   panel-exists? @(ut/tracked-sub ::panel-exists? {:panel-key panel-key})
                   _ (when (not panel-exists?)
                       (let [body (assoc (get preview-maps panel-key) :bid panel-key)
-                            qkey-walk (into {} (for [qk (keys (get body :queries))]
-                                                 {qk (ut/safe-key (keyword (cstr/replace (str qk (cstr/replace (str panel-key) ":reco-preview" "")) ":" "")))}))
+                            qkey-walk (into {} (for [qk (keys (get body :queries))
+                                                     :let [add-data-pre (fn [kw] (keyword (cstr/replace (str "data/" kw) ":" "")))
+                                                           qqk (ut/safe-key (keyword (cstr/replace (str qk (cstr/replace (str panel-key) ":reco-preview" "")) ":" "")))]]
+                                                 {qk qqk
+                                                  (add-data-pre qk) (add-data-pre qqk)}))
                             body (walk/postwalk-replace qkey-walk body)]
                         (insert-new-block [-100 -100] 5 5 body)))
                   body
@@ -10211,11 +10260,15 @@
                   ;_ (ut/pp [:vv panel-key (get preview-maps panel-key)])
                   panel-exists? @(ut/tracked-sub ::panel-exists? {:panel-key panel-key})
                   _ (when (not panel-exists?)
-                      (let [_ (ut/pp [:pp panel-key panel-exists?])
+                      (let [_ (ut/pp [:reco-preview-inserts panel-key panel-exists?])
                             body (assoc (get preview-maps panel-key) :bid panel-key)
-                            qkey-walk (into {} (for [qk (keys (get body :queries))]
-                                                 {qk (ut/safe-key (keyword (cstr/replace (str qk (cstr/replace (str panel-key) ":reco-preview" "")) ":" "")))}))
-                            body (walk/postwalk-replace qkey-walk body)]
+                            qkey-walk (into {} (for [qk (keys (get body :queries))
+                                                     :let [qsafe (ut/safe-key (keyword (cstr/replace (str qk (cstr/replace (str panel-key) ":reco-preview" "")) ":" "")))]]
+                                                 {qk qsafe
+                                                  (keyword (cstr/replace (str "data/" qk) ":" ""))  (keyword (cstr/replace (str "data/" qsafe) ":" ""))}))
+                            _ (ut/pp [:reco-preview-inserts2 panel-key body qkey-walk])
+                            body (walk/postwalk-replace qkey-walk body)
+                            body (quote-to-do body)]
                         (insert-new-block [-100 -100] 5 5 body)))
                   body
                   [re-com/v-box
@@ -10286,8 +10339,8 @@
               (if (get @mwaiting? panel-key)
                 [re-com/box
                  :size "none"
-                 :width (px (* (* hh db/brick-size) 0.54))
-                 :height (px (* (* ww db/brick-size)  0.39))
+                 :width (px (* (* hh db/brick-size) 0.60))
+                 :height (px (* (* ww db/brick-size)  0.40))
                  :style {;:transform    "translate(0)"
                          ;:border "1px solid white"
                          }
@@ -12194,6 +12247,11 @@
 
 (re-frame/reg-sub ::panel-view-keys (fn [db {:keys [panel-key]}] (let [v (get-in db [:panels panel-key :views])] (vec (keys v)))))
 
+(re-frame/reg-sub
+ ::panel-view
+ (fn [db {:keys [panel-key runner view-key]}]
+   (get-in db [:panels panel-key runner view-key])))
+
 (re-frame/reg-sub ::selected-view
                   (fn [db [_ panel-key]]
                     (let [body    (get-in db [:panels panel-key :views])
@@ -12530,23 +12588,25 @@
             :child (str (vals r)) :style
             (merge styles {:cursor "pointer" :background-color (if (= r clicked-param) "grey" "inherit")})]))))
 
-(re-frame/reg-sub ::keypaths-in-view
-                  (fn [db [_ panel-key view-key]]
-                    (let [view                 (if (or (= view-key :base) (nil? view-key))
-                                                 (get-in db [:panels panel-key :views])
-                                                 (get-in db [:panels panel-key :views view-key]))
-                          kvpaths              (ut/keypaths view) ;(sort (ut/keypaths view))
-                          layout-map-scrubbers @(ut/tracked-subscribe [::scrub/keypaths-of-layout-panels panel-key view-key])
-                          kvpaths-vals         (into {}
-                                                     (for [p (sort (into layout-map-scrubbers kvpaths))]
-                                                       {p (let [v (get-in view p)]
-                                                            [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
-                      kvpaths-vals)))
+(re-frame/reg-sub
+ ::keypaths-in-view
+ (fn [db [_ panel-key view-key]]
+   (let [view                 (if (or (= view-key :base) (nil? view-key))
+                                (get-in db [:panels panel-key :views])
+                                (get-in db [:panels panel-key :views view-key]))
+         kvpaths              (ut/keypaths view) ;(sort (ut/keypaths view))
+         layout-map-scrubbers @(ut/tracked-subscribe [::scrub/keypaths-of-layout-panels panel-key view-key])
+         kvpaths-vals         (into {}
+                                    (for [p (sort (into layout-map-scrubbers kvpaths))]
+                                      {p (let [v (get-in view p)]
+                                           [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
+     kvpaths-vals)))
 
-(re-frame/reg-sub ::query-schedule
-                  (fn [db _]
-                    (let [sched (get db :sched {})]
-                      (into {} (for [[k v] sched] {(str [:run k]) (- v (get-in db [:re-pollsive.core/polling :counter]))})))))
+(re-frame/reg-sub
+ ::query-schedule
+ (fn [db _]
+   (let [sched (get db :sched {})]
+     (into {} (for [[k v] sched] {(str [:run k]) (- v (get-in db [:re-pollsive.core/polling :counter]))})))))
 
 (re-frame/reg-sub
  ::keypaths-in-rs-values
@@ -12564,22 +12624,23 @@
           kvpaths-vals)
         (catch :default e (do (ut/tapp>> [:error-in :keypaths-in-rs-values e :passed bid]) {})))))
 
-(re-frame/reg-sub ::keypaths-in-flow
-                  (fn [db [_ bid & [single-input?]]]
-                    (try (let [single-input? (if (nil? single-input?) false true)
-                               params        (get-in db
-                                                     (if single-input?
-                                                       [:flows (get db :selected-flow) :map bid :data :user-input]
-                                                       [:flows (get db :selected-flow) :map bid :data :flow-item :defaults])
-                                                     {})
-                               params        (if single-input? {:* params} params)
-                               kvpaths       (ut/keypaths params)
-                               kvpaths-vals  (into (sorted-map)
-                                                   (for [p kvpaths]
-                                                     {p (let [v (get-in params p)]
-                                                          [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
-                           kvpaths-vals)
-                         (catch :default e (do (ut/tapp>> [:error-in :keypaths-in-flow e :passed bid]) {})))))
+(re-frame/reg-sub
+ ::keypaths-in-flow
+ (fn [db [_ bid & [single-input?]]]
+   (try (let [single-input? (if (nil? single-input?) false true)
+              params        (get-in db
+                                    (if single-input?
+                                      [:flows (get db :selected-flow) :map bid :data :user-input]
+                                      [:flows (get db :selected-flow) :map bid :data :flow-item :defaults])
+                                    {})
+              params        (if single-input? {:* params} params)
+              kvpaths       (ut/keypaths params)
+              kvpaths-vals  (into (sorted-map)
+                                  (for [p kvpaths]
+                                    {p (let [v (get-in params p)]
+                                         [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
+          kvpaths-vals)
+        (catch :default e (do (ut/tapp>> [:error-in :keypaths-in-flow e :passed bid]) {})))))
 
 (re-frame/reg-sub ::keypaths-in-flow-opts
                   (fn [db _]
@@ -12919,18 +12980,19 @@
    (-> db
        (ut/dissoc-in [:sched query-key]))))
 
-(re-frame/reg-event-db ;; original. works fine. BUT dumps all the query execs into one
+(re-frame/reg-event-db
  ::dispatch-auto-queries
  (fn [db [_]]
    (let [scheds         (get db :sched)
-         scheds-reverse (doall (into {} (for [vv (vals scheds)] {vv (vec (for [[k v] scheds :when (= v vv)] k))})))
-         ticktock       (get-in db [:re-pollsive.core/polling :counter])]
-     (dorun (doseq [[timer queries] scheds-reverse
-                    :when           (>= ticktock timer)]
-              (doseq [query queries]
-                (dorun (let []
-                         (ut/tracked-dispatch [::remove-schedule query])
-                         (ut/tracked-dispatch [::conn/clear-query-history query]))))))
+         scheds-reverse (into {} (for [vv (vals scheds)] {vv (vec (for [[k v] scheds :when (= v vv)] k))}))
+         ticktock       (get-in db [:re-pollsive.core/polling :counter])
+         _ (ut/pp ["⏰" :scheds-processing (str scheds)])]
+     (doseq [[timer queries] scheds-reverse
+             :when           (>= ticktock timer)]
+       (doseq [query queries]
+         (ut/pp ["⏰🏃‍♂️" :sched-running query])
+         (ut/tracked-dispatch [::remove-schedule query])
+         (ut/tracked-dispatch [::conn/clear-query-history query])))
      db)))
 
 
@@ -13080,19 +13142,33 @@
          pvts    (vec (apply concat (for [k (keys (get-in db [:panels]))] (keys (get-in db [:panels k :pivot])))))
          sys-ks  (vec (filter #(or (cstr/ends-with? (str %) "-sys")
                                    (cstr/ends-with? (str %) "-sys2")
+                                   (cstr/includes? (str %) "-search-")
                                    (cstr/ends-with? (str %) "-sys*"))
                               (keys (get db :data))))
          implicit-rowsets (vec (into (get-in db [:implicit-rowsets :clover] []) (get-in db [:implicit-rowsets :solver] [])))
          base-ks (into (vec (keys (get db :base-sniff-queries))) [:reco-counts]) ;; why is
          ks      (into implicit-rowsets (into base-ks (into ks1 sys-ks)))
-         ks-all  (keys (get db :data)) ;;; hmmm, curious why I did this initially...
+         ;;ks-all  (keys (get db :data)) ;;; hmmm, curious why I did this initially...
          keepers (vec (filter #(and
                                 (not (cstr/starts-with? (str %) ":reco-preview"))
                                 (not (cstr/starts-with? (str %) ":query-preview"))) ks))
          keepers (into keepers (mapv (fn [k] (keyword (str (cstr/replace (str k) ":" "") "-pivot"))) pvts)) ;; to grab inserted pivots
-         run-it? (or (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))
-                     (and (get db :flow?) (get db :flow-editor?)))
-         _ (reset! db/temp-viz-reco-panel-keys {})]
+        ;;  run-it? (or (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))
+        ;;              (and (get db :flow?) (get db :flow-editor?)))
+         run-it? true
+         _ (reset! db/temp-viz-reco-panel-keys {})
+         temp-flow-subs (filterv #(cstr/includes? (str %) "reco-preview") (get db :flow-subs))
+         flow-subs (filterv #(not (cstr/includes? (str %) "reco-preview")) (get db :flow-subs))]
+    ;;  (ut/dispatch-delay 100 [::http/insert-alert "::clean-up-reco-previews running" 7 0.75 3])
+     (when run-it?
+       (reset! db/solver-fn-lookup
+               (select-keys @db/solver-fn-lookup
+                            (filterv #(not (cstr/includes? (str %) "reco-preview")) (keys @db/solver-fn-lookup))))
+       (reset! db/solver-fn-runs
+               (select-keys @db/solver-fn-runs
+                            (filterv #(not (cstr/includes? (str %) "reco-preview")) (keys @db/solver-fn-runs))))
+       (doseq [ff temp-flow-subs]
+         (ut/tracked-dispatch [::http/unsub-to-flow-value ff])))
      (if run-it?
        (-> db
            (ut/dissoc-in [:panels nil]) ;; garbage keys created by external edit with bad
@@ -13102,33 +13178,35 @@
                                                  (not (cstr/starts-with? (str %) ":query-preview")))
                                                (keys (get db :panels)))))
            (assoc :data (select-keys (get db :data) keepers)) ;; temp until we can filter out the pivot data inserts cleanly
+           (assoc-in [:click-param :data-hash] (select-keys (get-in db [:click-param :data-hash]) keepers))
            (assoc :meta (select-keys (get db :meta) keepers))
            (assoc :orders (select-keys (get db :orders) keepers))
            (assoc :post-meta (select-keys (get db :post-meta) keepers))
            (assoc :sql-str (select-keys (get db :sql-str) keepers))
            (assoc :sql-source (select-keys (get db :sql-source) keepers))
            (assoc :query-history (select-keys (get db :query-history) (filter #(not (cstr/ends-with? (str %) "-sys*")) keepers)))
-          ;;  (assoc :click-param (into {}
-          ;;                            (for [[k v] (get db :click-param)
-          ;;                                  :when (and (not (cstr/starts-with? (str k) ":kit-")) (not (nil? k)) (not (nil? v)))]
-          ;;                              {k v})))
-           (dissoc :shape-rotations)
+           (assoc :click-param (into {}
+                                     (for [[k v] (get db :click-param)
+                                           :when (and (not (cstr/starts-with? (str k) ":reco-preview")) (not (nil? k)) (not (nil? v)))]
+                                       {k v})))
+           ;(dissoc :shape-rotations)
            (dissoc :leaf-preview )
+           (assoc :flow-subs flow-subs)
            (ut/dissoc-in [:panels "none!"])
            (ut/dissoc-in [:panels :queries])
            (ut/dissoc-in [:panels :views])
            (ut/dissoc-in [:panels nil]))
        (-> db
            (ut/dissoc-in [:panels nil])
-           (dissoc :shape-rotations)
+           ;(dissoc :shape-rotations)
            (dissoc :leaf-preview )
            (ut/dissoc-in [:panels "none!"])
            (ut/dissoc-in [:panels :queries])
            (ut/dissoc-in [:panels :views])
-          ;;  (assoc :click-param (into {}
-          ;;                            (for [[k v] (get db :click-param)
-          ;;                                  :when (and (not (cstr/starts-with? (str k) ":kit-")) (not (nil? k)) (not (nil? v)))]
-          ;;                              {k v})))
+           (assoc :click-param (into {}
+                                     (for [[k v] (get db :click-param)
+                                           :when (and (not (cstr/starts-with? (str k) ":reco-preview")) (not (nil? k)) (not (nil? v)))]
+                                       {k v})))
 )))))  ;; garbage keys created by external edit with bad files
 
 
@@ -13260,11 +13338,9 @@
                                                            ]
                                                         {:view view :query query :condis reco-condis :conn original-conn})
 
-        :else                                         (let [view          (read-string reco-viz) ;; read-string will ruin my
-                                                                                                 ;; internal
+        :else                                         (let [view          (read-string reco-viz)
                                                             q-data        (read-string reco-query)
-                                                            incoming      (first q-data)         ;; read-string will ruin my
-                                                                                                 ;; internal
+                                                            incoming      (first q-data)
                                                             ffrom         (ut/replacer (first (get incoming :from)) "_" "-")
                                                             original-conn @(ut/tracked-subscribe
                                                                             [::lookup-connection-id-by-query-key
@@ -13273,8 +13349,7 @@
                                                                                  (if (nil? (find q :vselect))
                                                                                    (assoc q :from [[(keyword ffrom) (ut/gen-sql-sql-alias)]])
                                                                                    q)))
-                                                            query         (ut/postwalk-replacer {[:sum :rrows] [:count 1]} query)
-                                                            ]
+                                                            query         (ut/postwalk-replacer {[:sum :rrows] [:count 1]} query)]
                                                         {:view view :query query :condis reco-condis :conn original-conn})))
 
 (defn modify-combo-viz
@@ -13311,7 +13386,7 @@
 (defn final-combo-viz
   [ddata panel-key query-keys]
   (let [;; we need to change all the generic aliases into real rando keys
-        req-name-str     (ut/replacer (str panel-key) #":" "") ;OLD req-name-str (str "block-"
+        req-name-str     (ut/replacer (str panel-key) #":" "")
         poss-value-walks (distinct (filter #(or (cstr/starts-with? (str %) ":query-preview")
                                                 (cstr/starts-with? (str %) ":panel-key"))
                                            (ut/deep-flatten ddata)))
@@ -14635,7 +14710,7 @@
                   pstyle (get p :style {}) ;; has overridden style map?
                   left (+ -1 (* x db/brick-size)) ;; compensate for parents borders
                   top (+ 25 (* y db/brick-size))  ;; compensate for parents borders
-                  root-visible? (not (or (> x (- pw-int 1)) (> y (- ph-int 2)))) ;; dont
+                  root-visible? (not (or (> x (- pw-int 1)) (> y (- ph-int 2))))
                   blank-map
                   {:child   [re-com/v-box :size "auto" :justify :center :align :center :children
                              (if scrub-borders?
@@ -14932,7 +15007,7 @@
                               w        (get data_d :_w (or w 10))]
                           [re-com/box :size "none" :width (px (* w db/brick-size)) :height (px (- (* h db/brick-size) 30)) :child
                            [clover panel-key temp-key h w nil query]
-                           ;;@(re-frame/subscribe [::clover-cache panel-key temp-key h w nil query])
+                           ;@(re-frame/subscribe [::clover-cache panel-key temp-key h w nil query])
                            ])
         (= type :both)  (let [queries (get data_d :queries)
                               qkeys   (into {}
@@ -14942,10 +15017,10 @@
                               h       (get data_d :_h (or h 11))
                               w       (get data_d :_w (or w 9))]
                           [clover panel-key key h w {key (get ndata :view)} (get ndata :queries)]
-                          ;;@(re-frame/subscribe [::clover-cache panel-key key h w {key (get ndata :view)} (get ndata :queries)])
+                          ;@(re-frame/subscribe [::clover-cache panel-key key h w {key (get ndata :view)} (get ndata :queries)])
                           )
         :else           [clover panel-key key 11 9]
-                        ;;@(re-frame/subscribe [::clover-cache panel-key key 11 9])
+                        ;@(re-frame/subscribe [::clover-cache panel-key key 11 9])
         ))))
 
 
@@ -15053,12 +15128,15 @@
 
 
 (defn edn-code-box
-  [width-int height-int value & [syntax]]
+  [width-int height-int value & [css-map]]
   [re-com/box :size "auto" :style
-   {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
-    :overflow      "auto"
-    :border-radius "12px"
-    :font-weight   700} :child
+   (merge
+    {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+     :overflow      "auto"
+     :border-radius "12px"
+     :font-weight   700}
+    css-map)
+   :child
    [(reagent/adapt-react-class cm/UnControlled)
     {;:value   (str value)
      :value   (ut/format-map width-int (str value))
@@ -17202,10 +17280,12 @@
                                    resolved-input-map        (resolver/logic-and-params input-map panel-key)
                                    resolved-full-map         (when override? (resolver/logic-and-params (first this) panel-key))
                                    unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
-                                   ;;new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                    new-solver-name           (if (ut/ne? (rest fkp))
                                                                (cstr/replace (cstr/join "-" (rest fkp)) ":" "")
                                                                (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash))
+                                   cid                       (get-in resolved-full-map [:input-map :cid])
+                                   new-solver-name           (if cid (cstr/replace (str new-solver-name cid) ":" "") new-solver-name)
+                                   ;;_ (ut/pp [:solcwe!! (str new-solver-name) (get-in resolved-full-map [:input-map :cid]) input-map])
                                    sub-param                 (keyword (str "solver/" new-solver-name))
                                    resolved-input-map        (assoc resolved-input-map :*solver-name (keyword new-solver-name))
                                    req-map                   (merge
@@ -17307,8 +17387,8 @@
 
 (defn clover ;; only for editor   ;; only for honey-frag             ;; only for history
   [panel-key & [override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map]] ;; can sub lots of this
-  (let [_ (ut/pp [:clover-render panel-key])
-    ;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace
+  (let [;_ (ut/pp [:clover-render panel-key])
+        ;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace
         all-sql-call-keys @(ut/tracked-sub ::all-sql-call-keys {})
         ;; all-runner-data-keys @(ut/tracked-sub ::all-runner-data-keys {})
         all-view-keys @(ut/tracked-sub ::panel-view-keys {:panel-key panel-key})
@@ -17995,7 +18075,7 @@
      cache
      (let [;panel-data (get-in panel-data [runner selected-view])
            ;;pflat (ut/deep-flatten panel-data)
-           data-keys  (mapv #(-> % str (cstr/replace ":query/" "") (cstr/replace ":" "") keyword) pflat)
+           data-keys  (mapv #(-> % str (cstr/replace ":query/" "") (cstr/replace ":data/" "") (cstr/replace ":data-hash/" "") (cstr/replace ":" "") keyword) pflat)
            param-keys (mapv #(-> % str (cstr/split #"/") first (cstr/replace ":" "") keyword)
                             (filterv #(cstr/includes? (str %) "/") pflat))
            param-keys  (into param-keys (mapv #(keyword (str (-> % str (cstr/replace ":" "")) ".*")) param-keys))
@@ -18004,23 +18084,38 @@
            both-keys (vec (distinct (into data-keys param-keys)))
            ;param-keys  (into param-keys (mapv #(keyword (str (-> % str (cstr/replace ":" "")) "/*.clicked")) param-keys))
            ;;;_ (ut/pp [:both-keys both-keys])
-           res {:param-keys both-keys
-                :data-keys both-keys}]
-       (swap! db/rel-kw-cache-atom assoc (hash [panel-data runner selected-view]) res)
-       res)))
+           ]
+       (swap! db/rel-kw-cache-atom assoc (hash [panel-data runner selected-view]) both-keys)
+       both-keys)))
 
 (re-frame/reg-sub
  ::upstream-panel-hashes
  (fn [db {:keys [panel-key]}]
    (let [relations (get-in @(ut/tracked-sub ::panel-relations {}) [:full-relations panel-key :upstream])
-         upstream-hashes (sort-by key (select-keys (get db :panel-hashes) relations))]
-     (str upstream-hashes))))
+         upstream-panel-hashes (sort-by key (select-keys (get db :panel-hashes) relations))
+         data-keys (vec (apply concat (for [k relations] (into (keys (get-in db [:panels k :queries])) (keys (get-in db [:panels k :clojure]))))))
+         upstream-data-hashes (sort-by key (select-keys (get-in db [:click-param :data-hash]) data-keys))
+         ;;_ (ut/pp [:data-keys-upstream data-keys [upstream-panel-hashes upstream-data-hashes]])
+        ;;  _ (ut/pp [:garbage-keys? (keys (get db :panel-hashes))  (keys (get-in db [:click-param :panel-hash]))
+        ;;            (keys (get-in db [:click-param :data-hash])) (keys (get-in db [:data]))])
+         ]
+     (hash [upstream-panel-hashes upstream-data-hashes]))))
+
+(re-frame/reg-event-db
+ ::write-render-hash
+ (fn [db [_ panel-key render]]
+   ;;(ut/pp [:write-render-hash (str panel-key "   " (hash render) ) ])
+   (assoc-in db [:click-param :render-hash panel-key] (hash render))))
 
 (re-frame/reg-sub
  ::clover-cache
  (fn [db [_ panel-key & [override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map]]]
    (let [panel-data (get-in db [:panels panel-key])
-         panel-data (dissoc panel-data :root :h :w)
+         selected-view (or override-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}))
+         runner @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
+         panel-data (if (not= runner :views)
+                      (dissoc panel-data :root :h :w)
+                      (dissoc panel-data :root))
          pflat (ut/deep-flatten panel-data)
         ;;  second? (or
         ;;           (contains? pflat :grid)
@@ -18031,22 +18126,36 @@
 
      (if (not second?)
 
-       (let [upstream-hashes [] ;@(ut/tracked-sub ::upstream-panel-hashes {:panel-key panel-key})
-             selected-view (or override-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}))
-             runner @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
-             {:keys [param-keys data-keys]} (relevant-keywords-cache panel-data pflat runner selected-view)
+       (let [upstream-hashes  [] ;; @(ut/tracked-sub ::upstream-panel-hashes {:panel-key panel-key})
+             both-keys (into (relevant-keywords-cache panel-data pflat runner selected-view) [selected-view  panel-key])
              ;;param-keys nil data-keys nil
              theme-hash (hash @(ut/tracked-sub ::materialized-theme {}))
-             param-hash (hash (select-keys (get db :click-param) param-keys))
-             data-hash  (hash (select-keys (get db :data) data-keys))
-             panel-hash (hash panel-data)
+             ;param-hash (hash (select-keys (get-in db [:click-param :data-hash]) both-keys))
+             params (select-keys (dissoc (get db :click-param) :render-hash :data-hash :panel-hash :solver) both-keys)
+             solver-concat (keyword (cstr/replace (str panel-key "-" selected-view) ":" ""))
+             solver-keyword (keyword (cstr/replace (str "solver/" solver-concat) ":" ""))
+             params (merge params {:solver [solver-keyword (get-in db [:click-param :solver solver-concat])]})
+             ;_ (ut/pp [:papp panel-key (str params) ])
+             param-hash (hash params)
+             ;;_ (ut/pp [:papp panel-key both-keys pflat])
+             ;data-hash (hash (select-keys (get db :data) data-keys))
+             data-hash (hash (select-keys (get-in db [:click-param :data-hash]) both-keys))
+             render-hash (hash (select-keys (get-in db [:click-param :render-hash])
+                                            (mapv (fn [k] (keyword (cstr/replace (str k) ":render-hash/" "")))
+                                                  (filterv #(cstr/starts-with? (str %) ":render-hash/") pflat))))
+             panel-hash (get-in db [:click-param :panel-hash panel-key]) ;(hash panel-data)
              ;;;_ (ut/pp [:relations panel-key upstream-hashes param-keys data-keys])
-             cache-key  (pr-str [upstream-hashes panel-hash param-hash data-hash theme-hash panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map])]
+             cache-key  (pr-str [upstream-hashes panel-hash param-hash data-hash render-hash theme-hash panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map])
+             ;cache-key2 (pr-str [upstream-hashes panel-hash param-hash data-hash theme-hash panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map])
+             ]
          (if-let [cache (get @db/clover-cache-atom cache-key)]
-           cache
-           (let [;;_ (ut/pp [:cache-run-miss panel-key pflat])
+           (do
+             ;(ut/pp [:clover-cache! (str panel-key)])
+             cache)
+           (let [;;_ (ut/pp [:miss panel-key both-keys params cache-key])
                  render (clover panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map)]
              (swap! db/clover-cache-atom assoc cache-key render)
+             (ut/tracked-dispatch [::write-render-hash panel-key render])
              render)))
 
        (clover panel-key override-view fh fw replacement-view replacement-query runner-type curr-view-mode clover-fn opts-map)
@@ -19031,8 +19140,8 @@
      ;:style {:transform (str "scale(" @db/canvas-scale ")")}
      ;:style {:transform (str "scale(0.5)")}
      :children
-     [(;(maybedoall no-user?)
-       doall
+     [((maybedoall no-user?)
+       ;doall
        (for [[bw bh brick-vec-key] brick-roots] ;diff-grid1] ;(if @dragging? current-grid
                (let [;[bw bh] (if (or (vector? bw) (vector? bh))
                      ;          @(ut/tracked-subscribe [::dynamic-root [bw bh]])
