@@ -1254,7 +1254,10 @@
     (swap! db/drag-body-map assoc client-name (select-keys (get @db/drag-body-map client-name) dbody-keys)))
 
   (let [panels (get @db/client-panels client-name {})
-        scrub-fn (fn [panels-map] (ut/deep-sort (ut/deep-remove-keys-and-underscore panels-map [:h :w :root])))
+        scrub-fn (fn [panels-map] ;(ut/deep-sort
+                                   (ut/deep-remove-keys-and-underscore panels-map [:h :w :root])
+                                  ; )
+                   )
         old-panels-scrubbed (scrub-fn panels)]
     (swap! db/leaf-brute-force-last-panel-hash assoc client-name (hash old-panels-scrubbed))) ;; reset hash key
   ;; remove from atoms
@@ -1277,7 +1280,10 @@
             _ (swap! db/drag-body-map assoc client-name (merge (get @db/drag-body-map client-name) drag-body-map))
             old-panels (get @db/client-panels client-name {})
             panels (merge old-panels panels)
-            scrub-fn  (fn [panels-map] (ut/deep-sort (ut/deep-remove-keys-and-underscore panels-map [:h :w :root])))
+            scrub-fn  (fn [panels-map] ;(ut/deep-sort
+                                        (ut/deep-remove-keys-and-underscore panels-map [:h :w :root])
+                                        ;)
+                        )
             old-panels-scrubbed (scrub-fn panels)
             panels-hash (hash old-panels-scrubbed)
             _ (swap! db/leaf-brute-force-last-panel-hash assoc client-name panels-hash)
@@ -1762,6 +1768,7 @@
                    (hash [client-name source-panel query-key]))
         dd (d/get-value db/ddb "shapes-map" key-hash)
         full-recos (get dd :shapes)
+        ;; _ (ut/pretty-spit (str "/tmp/shape-recos-" key-hash "-panel-key.edn") dd 220)
         ;;_ (ut/pp [:wut key-hash dd])
         _ (ut/pp [:full-recos (count full-recos) [client-name source-panel query-key]])
         all-shapes (vec (distinct (map (fn [m] (get-in m [:shape-rotator :shape-name])) full-recos)))
@@ -1920,7 +1927,10 @@
 
                                 dim?
                                 (filterv #(and
-                                           (contains? (set (ut/deep-flatten %)) :rrows)
+                                           (or
+                                            (contains? (set (ut/deep-flatten %)) :rrows)
+                                            (contains? (set (ut/deep-flatten %)) :count)
+                                            (contains? (set (ut/deep-flatten %)) :sum))
                                            (contains? (set (ut/deep-flatten %)) field-name)) (get done-shapes :shapes))
                                 :else (filterv #(contains? (set (ut/deep-flatten %)) field-name) (get done-shapes :shapes)))
               recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) relevant-shapes)
@@ -6076,12 +6086,13 @@
              ;(swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
              (db/ddb-put! "shapes-map" hash-key modded-shapes)
 
-            ;;  (ppy/execute-in-thread-pools ;; send one of each recos to the client
-            ;;   (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
-            ;;   (fn [] (let [;_ (Thread/sleep 500) ;; pace out the client packets a bit
-            ;;                recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) modded-shapes)
-            ;;                one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
-            ;;            (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each}))))
+             (ppy/execute-in-thread-pools ;; send one of each recos to the client
+              (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
+              (fn [] (let [_ (Thread/sleep 500) ;; pace out the client packets a bit
+                           recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) (get modded-shapes :shapes))
+                           one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
+                       (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each} true))))
+
              (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0))
 
            ;; non honeyhash cache
@@ -6113,12 +6124,13 @@
                             [[:put "honeyhash-map" honey-hash res]
                              [:put "shapes-map" hash-key modded-shapes]])
 
-            ;;  (ppy/execute-in-thread-pools ;; send one of each recos to the client
-            ;;   (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
-            ;;   (fn [] (let [;_ (Thread/sleep 500) ;; pace out the client packets a bit
-            ;;                recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) modded-shapes)
-            ;;                one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
-            ;;            (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each}))))
+             (ppy/execute-in-thread-pools ;; send one of each recos to the client
+              (keyword (cstr/replace (str "shape-rotator-send-blocks-serial-" client-name) ":" ""))
+              (fn [] (let [_ (Thread/sleep 500) ;; pace out the client packets a bit
+                           recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) (get modded-shapes :shapes))
+                           one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
+                       (client-mutate client-name {[:shapes panel-key (first ui-keypath)] one-of-each} true))))
+
              (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0)))
          (catch Throwable e (ut/pp [:shape-rotator-for-each-error! (str e) client-name ui-keypath])))))))
 
@@ -6354,7 +6366,13 @@
                                                 (= page-num -4)
                                                 (= page-num -2)) ;; or limit
                                           (to-sql honey-sql target-db-type)
-                                          (to-sql (assoc honey-sql :limit (if (cstr/includes? (str ui-keypath) "-hist-") 50 500)) target-db-type)))
+                                          (to-sql (assoc honey-sql
+                                                         :limit (if
+                                                                 (or
+                                                                  (cstr/includes? (str ui-keypath) "query-preview")
+                                                                  (cstr/includes? (str ui-keypath) "query_preview")
+                                                                  (cstr/includes? (str ui-keypath) "-hist-"))
+                                                                  50 500)) target-db-type)))
                         honey-sql-str2 (first honey-sql-str)
                         ;;;_ (async/thread (get-clover-sql-training clover-sql honey-sql-str2))
                         ;; _ (swap! materialized-full-queries assoc-in [client-name (last ui-keypath)] honey-sql)
@@ -6754,11 +6772,11 @@
                                                               (when (or sniffable? ;; manual sniff. almost completely unneeded now?
                                                                         (and ;;;false
                                                                          ;(not= connection-id "system-db")
-                                                                         ;(not (cstr/includes? (str connection-id) "system"))
+                                                                         (not (cstr/includes? (str connection-id) "system"))
                                                                          (not= connection-id client-name)
                                                                          (not= client-name :rvbbit)
-                                                                        ; (not (cstr/includes? (str cache-table-name) "query_preview"))
-                                                                        ; (not (cstr/includes? (str cache-table-name) "query-preview"))
+                                                                         (not (cstr/includes? (str cache-table-name) "query_preview"))
+                                                                         (not (cstr/includes? (str cache-table-name) "query-preview"))
                                                                          (not (cstr/starts-with? (str cache-table-name) "kick"))
                                                                          (not= connection-id (cstr/replace (str client-name) ":" ""))
                                                                          ;(not (some #(= % [client-name (hash (select-keys honey-sql [:select :from :group-by]))]) @auto-viz-runs))
@@ -7155,14 +7173,14 @@
   (send-edn-success {:status "saved-csv"
                      :screen (first (get request :edn-params))}))
 
-(defn save-alert-notification [client-name name fpath flow?]
+(defn save-alert-notification [client-name name fpath flow? & [theme?]]
   (alert! client-name
           [:v-box :justify :center :style
            {;:margin-top "-6px"
             :opacity 0.7} ;:color (if error? "red" "inherit")}
            :children
            [[:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
-             (str (str "successfully saved " (if flow? "flow" "screen")))]
+             (str (str "successfully saved " (if theme? "theme" (if flow? "flow" "screen"))))]
             [:box :style {:font-weight 700 :font-size "18px"} :child (str name)]
             [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child (str "@ " fpath)]]]
           10
@@ -7201,6 +7219,35 @@
                    [:v-box :justify :center :style {:opacity 0.6}
                     :children [[:box :style {:font-weight 700 :font-size "13px"}
                                 :child (str "error saving " (get-in request [:edn-params :screen-name]) "...")]
+                               [:box :style {:font-weight 700 :font-size "13px"}
+                                :child (str e)]]]
+                   10
+                   0.6
+                   8))))
+  (send-edn-success {:status "saved" :screen (first (get request :edn-params))}))
+
+(defn save-theme [request]
+  (ut/pp [:save-theme-coming-in])
+  (try (let [theme-name    (get-in request [:edn-params :theme-name])
+             client-name    (get-in request [:edn-params :client-name] "unknown")
+             file-base-name (ut/sanitize-name (str theme-name))
+             file-path      (str "./themes/" file-base-name ".edn")
+             fpath          (ut/abs-file-path file-path)]
+         (save-alert-notification-pre client-name theme-name nil false)
+         (do (ut/pp [:saved-theme-file file-path])
+             (try (ut/pretty-spit file-path (get-in request [:edn-params :image]))
+                  (catch Throwable e
+                    (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
+                        (spit file-path (get-in request [:edn-params :image])))))
+             (save-alert-notification client-name theme-name fpath false true)))
+       (catch Exception e
+         (do
+           (ut/pp [:error-saving-theme-outer (get-in request [:edn-params :theme-name])
+                   (get-in request [:edn-params :client-name] "unknown") e])
+           (alert! (get-in request [:edn-params :client-name] "unknown")
+                   [:v-box :justify :center :style {:opacity 0.6}
+                    :children [[:box :style {:font-weight 700 :font-size "13px"}
+                                :child (str "error saving " (get-in request [:edn-params :theme-name]) "...")]
                                [:box :style {:font-weight 700 :font-size "13px"}
                                 :child (str e)]]]
                    10
@@ -8971,6 +9018,7 @@
 (def routes
   #{["/" :get (conj common-interceptors `static-root)]
     ["/save" :post (conj common-interceptors `save)]
+    ["/save-theme" :post (conj common-interceptors `save-theme)]
     ["/assets/*" :get (conj common-interceptors `serve-user-asset)]
     ["/save-flow" :post (conj common-interceptors `save-flow)]
     ["/save-snap" :post (conj common-interceptors `save-snap)]

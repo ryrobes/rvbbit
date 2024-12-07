@@ -49,7 +49,7 @@
 
 (defn scrollbar-stylev []
   {:scrollbar-width "thin"
-   ;;:scrollbar-color (str (theme-pull :theme/universal-pop-color nil) "#00000033")
+   ;;:scrollbar-color (str (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#00000033")
    :scrollbar-color (str (theme-pull :theme/editor-outer-rim-color nil) "#00000033")
    "--webkit-scrollbar" {;:height "10px"
                           ;:opacity 0.8
@@ -105,13 +105,13 @@
                    (update :max-height #(max (or % 0) new-total-height))
                    (assoc :total-height new-total-height)))))))
 
-(defn virtualized-v-box [{:keys [children style width height id follow?] :as props}]
+(defn virtualized-v-box [{:keys [children style width height id follow? no-sleep?] :as props}]
   (let [;node-ref (reagent/atom nil)
         is-at-bottom (reagent/atom true)  ; Initialize as true
         ;wssk @(ut/tracked-subscribe_ [::http/websocket-status])
         ;websocket-status (select-keys wssk [:status :datasets :panels :waiting])
         online? true ;(true? (= (get websocket-status :status) :connected))
-        mouse-active?  (or @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 60}) (not online?))
+        mouse-active?  (or no-sleep? @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 60}) (not online?))
         update-visible-range (fn [container-height scroll-top]
                                (let [{:keys [cumulative-heights max-height total-height]} (get @scroll-state id)
                                      start (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)

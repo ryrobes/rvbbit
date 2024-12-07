@@ -1,0 +1,115 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#181820"
+ :pop-2 "#00ff9d"
+ :base-block-style
+   {:transform-style "preserve-3d"
+    :box-shadow
+      "inset 1px 1px 0px #505050,                                      inset -1px -1px 0px #101010,                                      0 15px 35px -20px rgba(0,0,0,0.7)"
+    :transform "perspective(1000px) rotateX(0.5deg)"
+    :transition "all 0.2s ease"
+    :border-left-color "#404040"
+    :background
+      "linear-gradient(135deg,                                                      rgba(0,255,157,0.05) 0%,                                                     transparent 50%,                                                     rgba(255,0,157,0.05) 100%),                                      url(\"data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='%23ffffff' fill-opacity='0.02'/%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay, normal"
+    :backdrop-filter "blur(8px) brightness(95%)"
+    :border-right-color "#000000"
+    :filter "none"
+    :border-top-color "#404040"
+    :text-shadow "none"
+    :border "2px solid"
+    :border-bottom-color "#000000"
+    :border-radius "0"}
+ :vega-defaults {:mark    {:font "MS Sans Serif" :stroke "#00ff9d" :color "#00ff9d65"}
+                 :legend  {:labelFont  "MS Sans Serif"
+                           :legendFont "MS Sans Serif"
+                           :labelColor "#dddddd"
+                           :titleColor "#dddddd"
+                           :stroke     "#00ff9d"
+                           :titleFont  "MS Sans Serif"}
+                 :header  {:labelFont "MS Sans Serif" :titleFont "MS Sans Serif" :titleColor "#dddddd"}
+                 :title   {:font         "MS Sans Serif"
+                           :subtitleFont "MS Sans Serif"
+                           :labelFont    "MS Sans Serif"
+                           :titleFont    "MS Sans Serif"
+                           :titleColor   "#dddddd"}
+                 :point   {:font "MS Sans Serif" :stroke "#00ff9d" :color "#00ff9d65"}
+                 :area    {:font "MS Sans Serif" :stroke "#00ff9d" :color "#00ff9d65"}
+                 :axis    {:domainColor "#404040"
+                           :grid        true
+                           :font        "MS Sans Serif"
+                           :labelColor  "#dddddd"
+                           :titleFont   "MS Sans Serif"
+                           :titleColor  "#dddddd"
+                           :labelFont   "MS Sans Serif"
+                           :domain      false
+                           :gridColor   "#33333333"
+                           :tickColor   "#404040"
+                           :axisFont    "MS Sans Serif"}
+                 :tooltip {:fill "#181820ee" :stroke "#404040" :strokeWidth 2 :color "#dddddd"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "rgba(0,255,157,0.1)"
+                            :filter           "none"
+                            :backdrop-filter  "blur(4px) brightness(110%)"
+                            :box-shadow       "inset 0 0 0 1px #00ff9d44"}
+ :base-block-color-selected "#202028"
+ :block-title-font-color "#dddddd"
+ :base-block-color "#181820ee"
+ :pop-3 "#ff009d"
+ :editor-rim-color "#072419"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#00ff9d"
+               "boolean"     "#ff009d"
+               "map"         "#dddddd"
+               "list"        "#00ff9d"
+               "string"      "#ff009d"
+               "any"         "#00ff9d"
+               "vector"      "#ff009d"
+               "keyword"     "#dddddd"
+               "rabbit-code" "#00ff9d"
+               "datetime"    "#ff009d"
+               "integer"     "#dddddd"
+               "unknown"     "#00ff9d"
+               "date"        "#ff009d"}
+ :editor-grid-selected-font-color "#181820"
+ :monospaced-font "Iosevka"
+ :editor-grid-selected-background-color "#00ff9d"
+ :nivo-defaults
+   {:font-family "MS Sans Serif"
+    :labels      {:text {:fill "#dddddd" :font-size "12px" :font-family "MS Sans Serif" :font-weight 400}}
+    :tooltip     {:container {:box-shadow
+                                "1px 1px 0 #505050,                                             -1px -1px 0 #101010"
+                              :color "#dddddd"
+                              :borderRadius "0"
+                              :border-left-color "#404040"
+                              :background "#181820ee"
+                              :backdrop-filter "blur(8px)"
+                              :border-right-color "#000000"
+                              :padding "6px 10px"
+                              :border-top-color "#404040"
+                              :fontSize "12px"
+                              :border "2px solid"
+                              :border-bottom-color "#000000"
+                              :text {:fill "#dddddd"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#dddddd" :font-size "12px" :font-family "MS Sans Serif" :font-weight 400}}
+                  :ticks  {:line {:stroke "#40404060"} :text {:fill "#dddddd" :font-weight 400}}}
+    :grid        {:line {:stroke "#33333333" :strokeWidth 1 :strokeDasharray "2 2"}}}
+ :editor-outer-rim-color "#00ff9d"
+ :grid-selected-font-color "#181820"
+ :block-title-selected-font-color "#181820"
+ :grid-selected-background-color "#00ff9d"
+ :grid-font-color "#dddddd"
+ :canvas-background-css {:background
+                           "repeating-linear-gradient(45deg, #181820 0px, #181820 2px, #202028 2px, #202028 4px)"
+                         :transition "none"
+                         :background-color "#181820"}
+ :editor-font-color "#dddddd"
+ :base-font "Iosevka"
+ :block-tab-selected-font-color "#181820"
+ :editor-background-color "#181820"
+ :editor-grid-font-color "#dddddd"
+ :pop-1 "#202028"}
+
+

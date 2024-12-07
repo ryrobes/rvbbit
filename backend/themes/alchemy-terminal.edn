@@ -1,0 +1,103 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1c1810"
+ :pop-2 "#cd7f32"
+ :base-block-style
+   {:text-shadow "none"
+    :border-radius "0 16px 0 16px"
+    :filter "none"
+    :backdrop-filter "blur(3px) sepia(20%)"
+    :border "12px solid"
+    :border-image "linear-gradient(45deg, #6b4423 0%, #cd7f32 25%, #ffd700 50%, #cd7f32 75%, #6b4423 100%) 1"
+    :box-shadow
+      "inset 0 0 30px #00000099,                                        inset 0 0 60px #cd7f3208,                                       0 0 1px #cd7f32aa,                                       8px 8px 15px #00000066"}
+ :vega-defaults {:mark    {:font "Uncial Antiqua" :stroke "#cd7f32" :color "#cd7f3265"}
+                 :legend  {:labelFont  "Uncial Antiqua"
+                           :legendFont "Uncial Antiqua"
+                           :labelColor "#e6c797"
+                           :titleColor "#e6c797"
+                           :stroke     "#cd7f32"
+                           :titleFont  "Uncial Antiqua"}
+                 :header  {:labelFont "Uncial Antiqua" :titleFont "Uncial Antiqua" :titleColor "#e6c797"}
+                 :title   {:font         "Uncial Antiqua"
+                           :subtitleFont "Uncial Antiqua"
+                           :labelFont    "Uncial Antiqua"
+                           :titleFont    "Uncial Antiqua"
+                           :titleColor   "#e6c797"}
+                 :point   {:font "Uncial Antiqua" :stroke "#cd7f32" :color "#cd7f3265"}
+                 :area    {:font "Uncial Antiqua" :stroke "#cd7f32" :color "#cd7f3265"}
+                 :axis    {:domainColor "#cd7f3244"
+                           :grid        true
+                           :font        "Uncial Antiqua"
+                           :labelColor  "#e6c797"
+                           :titleFont   "Uncial Antiqua"
+                           :titleColor  "#e6c797"
+                           :labelFont   "Uncial Antiqua"
+                           :domain      false
+                           :gridColor   "#6b442355"
+                           :tickColor   "#cd7f3244"
+                           :axisFont    "Uncial Antiqua"}
+                 :tooltip {:fill "#1c1810ee" :stroke "#cd7f32" :strokeWidth 2 :color "#e6c797"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#cd7f3215"
+                            :filter           "sepia(50%)"
+                            :backdrop-filter  "blur(2px)"
+                            :box-shadow       "0 0 20px #cd7f3222, inset 0 0 20px #ffd70011"}
+ :base-block-color-selected "#2c2820"
+ :block-title-font-color "#e6c797"
+ :base-block-color "#1c1810ee"
+ :pop-3 "#ffd700"
+ :editor-rim-color "#cd7f32"
+ :base-block-filter-selected "sepia(30%)"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#cd7f32"
+               "boolean"     "#ffd700"
+               "map"         "#e6c797"
+               "list"        "#cd7f32"
+               "string"      "#ffd700"
+               "any"         "#cd7f32"
+               "vector"      "#ffd700"
+               "keyword"     "#e6c797"
+               "rabbit-code" "#cd7f32"
+               "datetime"    "#ffd700"
+               "integer"     "#e6c797"
+               "unknown"     "#cd7f32"
+               "date"        "#ffd700"}
+ :editor-grid-selected-font-color "#1c1810"
+ :monospaced-font "Courier Prime"
+ :editor-grid-selected-background-color "#cd7f32"
+ :nivo-defaults
+   {:font-family "Uncial Antiqua"
+    :labels      {:text {:fill "#e6c797" :font-size "15px" :font-family "Uncial Antiqua" :font-weight 450}}
+    :tooltip     {:container {:box-shadow      "0 0 20px #cd7f3222, inset 0 0 20px #00000088"
+                              :color           "#e6c797"
+                              :borderRadius    "0 8px 0 8px"
+                              :background      "#1c1810ee"
+                              :backdrop-filter "blur(3px) sepia(20%)"
+                              :padding         "8px 12px"
+                              :fontSize        "14px"
+                              :border          "2px solid #cd7f32"
+                              :text            {:fill "#e6c797"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#e6c797" :font-size "14px" :font-family "Uncial Antiqua" :font-weight 450}}
+                  :ticks  {:line {:stroke "#cd7f3260"} :text {:fill "#e6c797" :font-weight 450}}}
+    :grid        {:line {:stroke "#6b442355" :strokeWidth 1 :strokeDasharray "8 8"}}}
+ :editor-outer-rim-color "#cd7f32"
+ :grid-selected-font-color "#1c1810"
+ :block-title-selected-font-color "#1c1810"
+ :grid-selected-background-color "#cd7f32"
+ :grid-font-color "#e6c797"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 50% 50%, #2c2820 0%, #1c1810 100%),                                      url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23cd7f32' stroke-width='1' opacity='0.15'%3E%3Cpath d='M40 0v80M0 40h80'/%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3Cpath d='M20 20l40 40M20 60l40-40'/%3E%3C/g%3E%3C/svg%3E\"),                                      url(\"data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.08'/%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay, multiply, normal"
+    :transition "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#1c1810"}
+ :editor-font-color "#e6c797"
+ :base-font "Uncial Antiqua"
+ :block-tab-selected-font-color "#1c1810"
+ :editor-background-color "#1c1810"
+ :editor-grid-font-color "#e6c797"
+ :pop-1 "#6b4423"}
+
+

@@ -1,0 +1,103 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#a47d54"
+ :pop-2 "#b87537"
+ :base-block-style {:box-shadow          "inset -1px -1px 0px #896644, inset 1px 1px 0px #d8b793"
+                    :border-left-color   "#e8c7a3"
+                    :backdrop-filter     "none"
+                    :border-right-color  "#5e442b"
+                    :filter              "none"
+                    :border-top-color    "#e8c7a3"
+                    :text-shadow         "none"
+                    :border              "2px solid"
+                    :border-bottom-color "#5e442b"
+                    :border-radius       "0px"}
+ :vega-defaults {:mark    {:font "Lucida Sans Typewriter" :stroke "#896644" :color "#89664465"}
+                 :legend  {:labelFont  "Lucida Sans"
+                           :legendFont "Lucida Sans"
+                           :labelColor "#000000"
+                           :titleColor "#000000"
+                           :stroke     "#896644"
+                           :titleFont  "Lucida Sans"}
+                 :header  {:labelFont "Lucida Sans" :titleFont "Lucida Sans" :titleColor "#000000"}
+                 :title   {:font         "Lucida Sans"
+                           :subtitleFont "Lucida Sans"
+                           :labelFont    "Lucida Sans"
+                           :titleFont    "Lucida Sans"
+                           :titleColor   "#000000"}
+                 :point   {:font "Lucida Sans" :stroke "#896644" :color "#89664465"}
+                 :area    {:font "Lucida Sans" :stroke "#896644" :color "#89664465"}
+                 :axis    {:domainColor "#5e442b"
+                           :grid        true
+                           :font        "Lucida Sans"
+                           :labelColor  "#000000"
+                           :titleFont   "Lucida Sans"
+                           :titleColor  "#000000"
+                           :labelFont   "Lucida Sans"
+                           :domain      false
+                           :gridColor   "#b8753733"
+                           :tickColor   "#5e442b"
+                           :axisFont    "Lucida Sans"}
+                 :tooltip {:fill "#cba783" :stroke "#5e442b" :strokeWidth 1 :color "#000000"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#b87537" :filter "none" :box-shadow "inset 1px 1px 0px #e8c7a3, inset -1px -1px 0px #5e442b"}
+ :base-block-color-selected "#cba783"
+ :block-title-font-color "#000000"
+ :base-block-color "#b87537"
+ :pop-3 "#e8c7a3"
+ :editor-rim-color "#896644"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "browns"}
+ :data-colors {"float"       "#b87537"
+               "boolean"     "#cba783"
+               "map"         "#896644"
+               "list"        "#e8c7a3"
+               "string"      "#000000"
+               "any"         "#b87537"
+               "vector"      "#cba783"
+               "keyword"     "#896644"
+               "rabbit-code" "#b87537"
+               "datetime"    "#cba783"
+               "integer"     "#896644"
+               "unknown"     "#b87537"
+               "date"        "#cba783"}
+ :editor-grid-selected-font-color "#000000"
+ :monospaced-font "Lucida Sans Typewriter"
+ :editor-grid-selected-background-color "#cba783"
+ :nivo-defaults
+   {:font-family "Lucida Sans"
+    :labels      {:text {:fill "#000000" :font-size "12px" :font-family "Lucida Sans" :font-weight 400}}
+    :tooltip     {:container {:color               "#000000"
+                              :borderRadius        "0px"
+                              :border-left-color   "#e8c7a3"
+                              :background          "#cba783"
+                              :border-right-color  "#5e442b"
+                              :padding             "4px 6px"
+                              :border-top-color    "#e8c7a3"
+                              :fontSize            "12px"
+                              :border              "2px solid"
+                              :border-bottom-color "#5e442b"
+                              :text                {:fill "#000000"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 5px"}}
+    :axis        {:legend {:text {:fill "#000000" :font-size "12px" :font-family "Lucida Sans" :font-weight 400}}
+                  :ticks  {:line {:stroke "#5e442b"} :text {:fill "#000000" :font-weight 400}}}
+    :grid        {:line {:stroke "#b87537" :strokeWidth 1 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#896644"
+ :grid-selected-font-color "#000000"
+ :block-title-selected-font-color "#000000"
+ :grid-selected-background-color "#cba783"
+ :grid-font-color "#000000"
+ :canvas-background-css {:background-image
+                           "repeating-linear-gradient(45deg, #a47d5444 0px, #a47d5444 2px, #896644 2px, #896644 4px)"
+                         :transition "all 0.3s ease-in-out"
+                         :background-blend-mode "multiply"
+                         :background-color "#a47d54"}
+ :editor-font-color "#000000"
+ :base-font "Lucida Sans"
+ :block-tab-selected-font-color "#000000"
+ :editor-background-color "#b87537"
+ :editor-grid-font-color "#000000"
+ :pop-1 "#896644"}
+
+

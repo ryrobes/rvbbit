@@ -1,0 +1,86 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#001100"
+ :pop-2 "#00ff00"
+ :base-block-style {:text-shadow     "4px 4px 12px #00ff0044"
+                    :border-radius   "2px"
+                    :filter          "brightness(110%)"
+                    :backdrop-filter "brightness(25%) blur(1px)"}
+ :vega-defaults {:mark {:font "Lato" :stroke "#003300" :color "#00330065"}
+                 :legend {:labelFont  "Lato"
+                          :legendFont "Lato"
+                          :labelColor "#00ff0099"
+                          :titleColor "#00ff0099"
+                          :stroke     "#00ff0099"
+                          :titleFont  "Lato"}
+                 :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#00ff0099"}
+                 :title {:font "Lato" :subtitleFont "Lato" :labelFont "Lato" :titleFont "Lato" :titleColor "#00ff0099"}
+                 :point {:font "Lato" :stroke "#003300" :color "#00330065"}
+                 :area {:font "Lato" :stroke "#003300" :color "#00330065"}
+                 :axis {:domainColor "#00ff0022"
+                        :grid        true
+                        :font        "Lato"
+                        :labelColor  "#00ff0088"
+                        :titleFont   "Lato"
+                        :titleColor  "#00ff0099"
+                        :labelFont   "Lato"
+                        :domain      false
+                        :gridColor   "#00ff0022"
+                        :tickColor   "#00ff0022"
+                        :axisFont    "Lato"}
+                 :tooltip {:fill "black" :stroke "#00ff00" :strokeWidth 1 :color "#00ff00"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#00110088" :filter "brightness(200%) contrast(120%)"}
+ :base-block-color-selected "#001100"
+ :block-title-font-color "#00ff00"
+ :base-block-color "#00110099"
+ :pop-3 "#66ff66"
+ :editor-rim-color "#00ff0099"
+ :base-block-filter-selected "drop-shadow(0.35rem 0.35rem 0.4rem #00ff00) drop-shadow(-0.35rem -0.35rem 0.4rem #00ff00)"
+ :_vega-default-color-scheme {:scheme "greens"}
+ :data-colors {"float"       "#00ff00"
+               "boolean"     "#66ff66"
+               "map"         "#44ff44"
+               "list"        "#88ff88"
+               "string"      "#00ff00"
+               "any"         "#00ff00"
+               "vector"      "#44ff44"
+               "keyword"     "#88ff88"
+               "rabbit-code" "#00ff00"
+               "datetime"    "#66ff66"
+               "integer"     "#44ff44"
+               "unknown"     "#00ff00"
+               "date"        "#66ff66"}
+ :editor-grid-selected-font-color "#000000"
+ :monospaced-font "VT323"
+ :editor-grid-selected-background-color "#00ff00"
+ :nivo-defaults {:font-family "VT323"
+                 :labels      {:text {:fill "#00ff00" :font-size "16px" :font-family "VT323" :font-weight 400}}
+                 :tooltip     {:container {:background   "#001100"
+                                           :color        "#00ff00"
+                                           :text         {:fill "#00ff00"}
+                                           :fontSize     "18px"
+                                           :borderRadius "2px"
+                                           :boxShadow    "0 1px 2px #00ff0055"
+                                           :padding      "5px 9px"}
+                               :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                               :tableCell {:padding "3px 5px"}}
+                 :axis        {:legend {:text {:fill "#00ff00" :font-size "14px" :font-family "VT323" :font-weight 400}}
+                               :ticks  {:line {:stroke "#00ff0060"} :text {:fill "#00ff0060" :font-weight 400}}}
+                 :grid        {:line {:stroke "#00ff00" :strokeWidth 0 :strokeDasharray "2 2"}}}
+ :editor-outer-rim-color "#00ff00"
+ :grid-selected-font-color "#000000"
+ :block-title-selected-font-color "#00ff00"
+ :grid-selected-background-color "#00ff00"
+ :grid-font-color "#00ff00"
+ :canvas-background-css {:background-image      "linear-gradient(#00330070,#00330012),url(images/gray-brick.png)"
+                         :transition            "all 0.6s ease-in-out"
+                         :background-blend-mode "multiply"
+                         :background-color      "#001100"}
+ :editor-font-color "#00ff00"
+ :base-font "VT323"
+ :block-tab-selected-font-color "#00ff00"
+ :editor-background-color "#001100"
+ :editor-grid-font-color "#00ff00"
+ :pop-1 "#003300"}
+
+

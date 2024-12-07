@@ -1,0 +1,101 @@
+{:codemirror-theme                      "rvbbit-dynamic"
+ :editor-param-background-color         "#ffffff"
+ :pop-2                                 "#2196f3"
+ :base-block-style                      {:text-shadow     "none"
+                                         :border-radius   "6px"
+                                         :filter          "none"
+                                         :backdrop-filter "none"
+                                         :border          "1px solid #e0e0e0"
+                                         :box-shadow      "0 2px 4px rgba(0,0,0,0.08)"}
+ :vega-defaults                         {:mark    {:font "Inter" :stroke "#2196f3" :color "#2196f365"}
+                                         :legend  {:labelFont  "Inter"
+                                                   :legendFont "Inter"
+                                                   :labelColor "#333333"
+                                                   :titleColor "#333333"
+                                                   :stroke     "#2196f3"
+                                                   :titleFont  "Inter"}
+                                         :header  {:labelFont "Inter" :titleFont "Inter" :titleColor "#333333"}
+                                         :title   {:font         "Inter"
+                                                   :subtitleFont "Inter"
+                                                   :labelFont    "Inter"
+                                                   :titleFont    "Inter"
+                                                   :titleColor   "#333333"}
+                                         :point   {:font "Inter" :stroke "#2196f3" :color "#2196f365"}
+                                         :area    {:font "Inter" :stroke "#2196f3" :color "#2196f365"}
+                                         :axis    {:domainColor "#e0e0e0"
+                                                   :grid        true
+                                                   :font        "Inter"
+                                                   :labelColor  "#666666"
+                                                   :titleFont   "Inter"
+                                                   :titleColor  "#333333"
+                                                   :labelFont   "Inter"
+                                                   :domain      false
+                                                   :gridColor   "#f5f5f5"
+                                                   :tickColor   "#e0e0e0"
+                                                   :axisFont    "Inter"}
+                                         :tooltip {:fill "#ffffff" :stroke "#e0e0e0" :strokeWidth 1 :color "#333333"}
+                                         :view    {:stroke "transparent"}}
+ :grid-selected-column-css              {:background-color "#f5f9ff" :filter "none" :box-shadow "none"}
+ :base-block-color-selected             "#f8f9fa"
+ :block-title-font-color                "#333333"
+ :base-block-color                      "#ffffff"
+ :pop-3                                 "#4caf50"
+ :editor-rim-color                      "#2196f3"
+ :base-block-filter-selected            "none"
+ :_vega-default-color-scheme             {:scheme "tableau10"}
+ :data-colors                           {"float"       "#2196f3"
+                                         "boolean"     "#4caf50"
+                                         "map"         "#ff9800"
+                                         "list"        "#2196f3"
+                                         "string"      "#4caf50"
+                                         "any"         "#2196f3"
+                                         "vector"      "#4caf50"
+                                         "keyword"     "#ff9800"
+                                         "rabbit-code" "#2196f3"
+                                         "datetime"    "#4caf50"
+                                         "integer"     "#ff9800"
+                                         "unknown"     "#2196f3"
+                                         "date"        "#4caf50"}
+ :editor-grid-selected-font-color       "#ffffff"
+ :monospaced-font                       "Inter"
+ :editor-grid-selected-background-color "#2196f3"
+ :nivo-defaults                         {:font-family "Inter"
+                                         :labels      {:text {:fill        "#333333"
+                                                              :font-size   "13px"
+                                                              :font-family "Inter"
+                                                              :font-weight 500}}
+                                         :tooltip     {:container {:background   "#ffffff"
+                                                                   :color        "#333333"
+                                                                   :text         {:fill "#333333"}
+                                                                   :fontSize     "13px"
+                                                                   :borderRadius "4px"
+                                                                   :border       "1px solid #e0e0e0"
+                                                                   :box-shadow   "0 2px 4px rgba(0,0,0,0.1)"
+                                                                   :padding      "8px 12px"}
+                                                       :basic     {:whiteSpace "pre"
+                                                                   :display    "flex"
+                                                                   :alignItems "center"}
+                                                       :tableCell {:padding "4px 8px"}}
+                                         :axis        {:legend {:text {:fill        "#333333"
+                                                                       :font-size   "13px"
+                                                                       :font-family "Inter"
+                                                                       :font-weight 500}}
+                                                       :ticks  {:line {:stroke "#e0e0e0"}
+                                                                :text {:fill "#666666" :font-weight 400}}}
+                                         :grid        {:line {:stroke          "#f5f5f5"
+                                                              :strokeWidth     1
+                                                              :strokeDasharray "none"}}}
+ :editor-outer-rim-color                "#2196f3"
+ :grid-selected-font-color              "#ffffff"
+ :block-title-selected-font-color       "#ffffff"
+ :grid-selected-background-color        "#2196f3"
+ :grid-font-color                       "#333333"
+ :canvas-background-css                 {:background "#f8f9fa" :transition "all 0.2s ease" :background-color "#f8f9fa"}
+ :editor-font-color                     "#333333"
+ :base-font                             "Inter"
+ :block-tab-selected-font-color         "#ffffff"
+ :editor-background-color               "#ffffff"
+ :editor-grid-font-color                "#333333"
+ :pop-1                                 "#666666"}
+
+

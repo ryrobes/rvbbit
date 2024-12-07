@@ -1,0 +1,99 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#d4d0c8"
+ :pop-2 "#000080"
+ :base-block-style {:box-shadow          "inset -1px -1px #404040, inset 1px 1px #dfdfdf"
+                    :border-left-color   "#ffffff"
+                    :backdrop-filter     "none"
+                    :border-right-color  "#808080"
+                    :filter              "none"
+                    :border-top-color    "#ffffff"
+                    :text-shadow         "none"
+                    :border              "2px solid"
+                    :border-bottom-color "#808080"
+                    :border-radius       "0px"}
+ :vega-defaults {:mark    {:font "IBM Plex Sans" :stroke "#000080" :color "#00008065"}
+                 :legend  {:labelFont  "IBM Plex Sans"
+                           :legendFont "IBM Plex Sans"
+                           :labelColor "#000000"
+                           :titleColor "#000000"
+                           :stroke     "#000080"
+                           :titleFont  "IBM Plex Sans"}
+                 :header  {:labelFont "IBM Plex Sans" :titleFont "IBM Plex Sans" :titleColor "#000000"}
+                 :title   {:font         "IBM Plex Sans"
+                           :subtitleFont "IBM Plex Sans"
+                           :labelFont    "IBM Plex Sans"
+                           :titleFont    "IBM Plex Sans"
+                           :titleColor   "#000000"}
+                 :point   {:font "IBM Plex Sans" :stroke "#000080" :color "#00008065"}
+                 :area    {:font "IBM Plex Sans" :stroke "#000080" :color "#00008065"}
+                 :axis    {:domainColor "#808080"
+                           :grid        true
+                           :font        "IBM Plex Sans"
+                           :labelColor  "#000000"
+                           :titleFont   "IBM Plex Sans"
+                           :titleColor  "#000000"
+                           :labelFont   "IBM Plex Sans"
+                           :domain      false
+                           :gridColor   "#c0c0c0"
+                           :tickColor   "#808080"
+                           :axisFont    "IBM Plex Sans"}
+                 :tooltip {:fill "#d4d0c8" :stroke "#808080" :strokeWidth 2 :color "#000000"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#000080" :filter "none" :box-shadow "inset 0 0 0 1px #ffffff"}
+ :base-block-color-selected "#bfb8b0"
+ :block-title-font-color "#000000"
+ :base-block-color "#d4d0c8"
+ :pop-3 "#008080"
+ :editor-rim-color "#000080"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "tableau10"}
+ :data-colors {"float"       "#000080"
+               "boolean"     "#008080"
+               "map"         "#800000"
+               "list"        "#000080"
+               "string"      "#008080"
+               "any"         "#000080"
+               "vector"      "#008080"
+               "keyword"     "#800000"
+               "rabbit-code" "#000080"
+               "datetime"    "#008080"
+               "integer"     "#800000"
+               "unknown"     "#000080"
+               "date"        "#008080"}
+ :editor-grid-selected-font-color "#ffffff"
+ :monospaced-font "IBM Plex Mono"
+ :editor-grid-selected-background-color "#000080"
+ :nivo-defaults
+   {:font-family "IBM Plex Sans"
+    :labels      {:text {:fill "#000000" :font-size "12px" :font-family "IBM Plex Sans" :font-weight 400}}
+    :tooltip     {:container {:box-shadow          "inset -1px -1px #404040, inset 1px 1px #dfdfdf"
+                              :color               "#000000"
+                              :borderRadius        "0px"
+                              :border-left-color   "#ffffff"
+                              :background          "#d4d0c8"
+                              :border-right-color  "#808080"
+                              :padding             "6px 10px"
+                              :border-top-color    "#ffffff"
+                              :fontSize            "12px"
+                              :border              "2px solid"
+                              :border-bottom-color "#808080"
+                              :text                {:fill "#000000"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 6px"}}
+    :axis        {:legend {:text {:fill "#000000" :font-size "12px" :font-family "IBM Plex Sans" :font-weight 400}}
+                  :ticks  {:line {:stroke "#808080"} :text {:fill "#000000" :font-weight 400}}}
+    :grid        {:line {:stroke "#c0c0c0" :strokeWidth 1 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#000080"
+ :grid-selected-font-color "#ffffff"
+ :block-title-selected-font-color "#ffffff"
+ :grid-selected-background-color "#000080"
+ :grid-font-color "#000000"
+ :canvas-background-css {:background "#a0a0a0" :transition "none" :background-color "#a0a0a0"}
+ :editor-font-color "#000000"
+ :base-font "IBM Plex Sans"
+ :block-tab-selected-font-color "#ffffff"
+ :editor-background-color "#d4d0c8"
+ :editor-grid-font-color "#000000"
+ :pop-1 "#404040"}
+
+

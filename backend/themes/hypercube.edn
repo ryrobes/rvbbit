@@ -1,0 +1,132 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0a0510"
+ :pop-2 "#FF2E9F"
+ :base-block-style
+   {:text-shadow "0 0 30px rgba(255, 46, 159, 0.3)"
+    :border-radius "16px"
+    :filter "none"
+    :backdrop-filter "blur(25px) saturate(180%) brightness(90%)"
+    :border "1px solid rgba(255, 255, 255, 0.1)"
+    :transform "perspective(2000px) rotateX(1deg) translateZ(10px)"
+    :transform-style "preserve-3d"
+    :box-shadow
+      "inset 0 0 50px rgba(255,255,255,0.05),
+                                     inset 0 2px 1px rgba(255,255,255,0.1),
+                                     0 20px 40px -20px rgba(0,0,0,0.5),
+                                     0 0 40px rgba(255, 46, 159, 0.2),
+                                     0 0 0 1px rgba(255, 46, 159, 0.1)"
+    :background
+      "linear-gradient(135deg, 
+                                                    rgba(255,46,159,0.15) 0%, 
+                                                    rgba(83,0,159,0.15) 50%,
+                                                    rgba(0,237,255,0.15) 100%),
+                                     radial-gradient(circle at 50% 0%,
+                                                   rgba(255,46,159,0.2) 0%,
+                                                   transparent 70%)"
+    :background-blend-mode "overlay, screen"
+    :transition "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"}
+ :vega-defaults {:mark    {:font "Plus Jakarta Sans" :stroke "#FF2E9F" :color "#FF2E9F65"}
+                 :legend  {:labelFont  "Plus Jakarta Sans"
+                           :legendFont "Plus Jakarta Sans"
+                           :labelColor "#ffffff"
+                           :titleColor "#ffffff"
+                           :stroke     "#FF2E9F"
+                           :titleFont  "Plus Jakarta Sans"}
+                 :header  {:labelFont "Plus Jakarta Sans" :titleFont "Plus Jakarta Sans" :titleColor "#ffffff"}
+                 :title   {:font         "Plus Jakarta Sans"
+                           :subtitleFont "Plus Jakarta Sans"
+                           :labelFont    "Plus Jakarta Sans"
+                           :titleFont    "Plus Jakarta Sans"
+                           :titleColor   "#ffffff"}
+                 :point   {:font "Plus Jakarta Sans" :stroke "#FF2E9F" :color "#FF2E9F65"}
+                 :area    {:font "Plus Jakarta Sans" :stroke "#FF2E9F" :color "#FF2E9F65"}
+                 :axis    {:domainColor "#FF2E9F44"
+                           :grid        true
+                           :font        "Plus Jakarta Sans"
+                           :labelColor  "#ffffff"
+                           :titleFont   "Plus Jakarta Sans"
+                           :titleColor  "#ffffff"
+                           :labelFont   "Plus Jakarta Sans"
+                           :domain      false
+                           :gridColor   "#5300FF22"
+                           :tickColor   "#FF2E9F44"
+                           :axisFont    "Plus Jakarta Sans"}
+                 :tooltip {:fill "#0a051099" :stroke "#FF2E9F" :strokeWidth 1 :color "#ffffff"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "rgba(255, 46, 159, 0.15)"
+                            :filter           "none"
+                            :backdrop-filter  "blur(30px) saturate(200%)"
+                            :box-shadow       "0 0 30px rgba(255, 46, 159, 0.3)"}
+ :base-block-color-selected "#150a20"
+ :block-title-font-color "#ffffff"
+ :base-block-color "rgba(10,5,16,0.7)"
+ :pop-3 "#00EDFF"
+ :editor-rim-color "#FF2E9F"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#FF2E9F"
+               "boolean"     "#00EDFF"
+               "map"         "#FFF500"
+               "list"        "#FF2E9F"
+               "string"      "#00EDFF"
+               "any"         "#FF2E9F"
+               "vector"      "#00EDFF"
+               "keyword"     "#FFF500"
+               "rabbit-code" "#FF2E9F"
+               "datetime"    "#00EDFF"
+               "integer"     "#FFF500"
+               "unknown"     "#FF2E9F"
+               "date"        "#00EDFF"}
+ :editor-grid-selected-font-color "#0a0510"
+ :monospaced-font "Cascadia Code"
+ :editor-grid-selected-background-color "#FF2E9F"
+ :nivo-defaults
+   {:font-family "Plus Jakarta Sans"
+    :labels {:text {:fill "#ffffff" :font-size "14px" :font-family "Plus Jakarta Sans" :font-weight 500}}
+    :tooltip
+      {:container
+         {:background "#0a051099"
+          :color "#ffffff"
+          :text {:fill "#ffffff"}
+          :fontSize "13px"
+          :borderRadius "12px"
+          :border "1px solid rgba(255, 46, 159, 0.2)"
+          :backdrop-filter "blur(20px) saturate(200%)"
+          :box-shadow
+            "0 20px 40px rgba(0,0,0,0.4),
+                                            0 0 30px rgba(255, 46, 159, 0.2)"
+          :padding "10px 14px"}
+       :basic {:whiteSpace "pre" :display "flex" :alignItems "center"}
+       :tableCell {:padding "6px 10px"}}
+    :axis {:legend {:text {:fill "#ffffff" :font-size "13px" :font-family "Plus Jakarta Sans" :font-weight 500}}
+           :ticks  {:line {:stroke "#FF2E9F60"} :text {:fill "#ffffff" :font-weight 500}}}
+    :grid {:line {:stroke "#5300FF22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#FF2E9F"
+ :grid-selected-font-color "#0a0510"
+ :block-title-selected-font-color "#0a0510"
+ :grid-selected-background-color "#FF2E9F"
+ :grid-font-color "#ffffff"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 0% 0%, #5300FF 0%, #0a0510 40%),
+                                    url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\"),
+                                    linear-gradient(45deg, #FF2E9F22 25%, transparent 25%,
+                                                         transparent 75%, #00EDFF22 75%,
+                                                         #00EDFF22),
+                                    linear-gradient(-45deg, #FFF50022 25%, transparent 25%,
+                                                          transparent 75%, #FF2E9F22 75%,
+                                                          #FF2E9F22)"
+    :background-size "100% 100%, 100% 100%, 60px 60px, 60px 60px"
+    :background-position "0 0, 0 0, 30px 30px, 0 0"
+    :background-blend-mode "normal, overlay, color-dodge, color-dodge"
+    :transition "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#0a0510"}
+ :editor-font-color "#ffffff"
+ :base-font "Plus Jakarta Sans"
+ :block-tab-selected-font-color "#0a0510"
+ :editor-background-color "#0a0510"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#5300FF"}
+
+
+

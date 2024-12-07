@@ -1,0 +1,107 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0f0f13"
+ :pop-2 "#6d39ff"
+ :base-block-style
+   {:box-shadow
+      "inset 0 0 0 1px rgba(255,255,255,0.03),                                      0 4px 32px rgba(0,0,0,0.4),                                      0 1px 2px rgba(0,0,0,0.3)"
+    :transform "perspective(2000px) translateZ(0px)"
+    :transition "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)"
+    :background
+      "linear-gradient(135deg,                                                      rgba(109, 57, 255, 0.03) 0%,                                                      rgba(15, 15, 19, 0.5) 100%)"
+    :backdrop-filter "blur(16px) brightness(110%)"
+    :filter "none"
+    :text-shadow "none"
+    :letter-spacing "0.02em"
+    :border "1px solid rgba(109, 57, 255, 0.1)"
+    :border-radius "12px"}
+ :vega-defaults {:mark    {:font "Space Grotesk" :stroke "#6d39ff" :color "#6d39ff65"}
+                 :legend  {:labelFont  "Space Grotesk"
+                           :legendFont "Space Grotesk"
+                           :labelColor "#f0f0ff"
+                           :titleColor "#f0f0ff"
+                           :stroke     "#6d39ff"
+                           :titleFont  "Space Grotesk"}
+                 :header  {:labelFont "Space Grotesk" :titleFont "Space Grotesk" :titleColor "#f0f0ff"}
+                 :title   {:font         "Space Grotesk"
+                           :subtitleFont "Space Grotesk"
+                           :labelFont    "Space Grotesk"
+                           :titleFont    "Space Grotesk"
+                           :titleColor   "#f0f0ff"}
+                 :point   {:font "Space Grotesk" :stroke "#6d39ff" :color "#6d39ff65"}
+                 :area    {:font "Space Grotesk" :stroke "#6d39ff" :color "#6d39ff65"}
+                 :axis    {:domainColor "#6d39ff44"
+                           :grid        true
+                           :font        "Space Grotesk"
+                           :labelColor  "#f0f0ff"
+                           :titleFont   "Space Grotesk"
+                           :titleColor  "#f0f0ff"
+                           :labelFont   "Space Grotesk"
+                           :domain      false
+                           :gridColor   "#f0f0ff11"
+                           :tickColor   "#6d39ff44"
+                           :axisFont    "Space Grotesk"}
+                 :tooltip {:fill "#0f0f13ee" :stroke "#6d39ff" :strokeWidth 1 :color "#f0f0ff"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#6d39ff15"
+                            :filter           "none"
+                            :backdrop-filter  "blur(20px) brightness(150%)"
+                            :box-shadow       "0 0 30px #6d39ff33"}
+ :base-block-color-selected "#17171d"
+ :block-title-font-color "#f0f0ff"
+ :base-block-color "#0f0f13ee"
+ :pop-3 "#9c6fff"
+ :editor-rim-color "#6d39ff"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#6d39ff"
+               "boolean"     "#9c6fff"
+               "map"         "#f0f0ff"
+               "list"        "#6d39ff"
+               "string"      "#9c6fff"
+               "any"         "#6d39ff"
+               "vector"      "#9c6fff"
+               "keyword"     "#f0f0ff"
+               "rabbit-code" "#6d39ff"
+               "datetime"    "#9c6fff"
+               "integer"     "#f0f0ff"
+               "unknown"     "#6d39ff"
+               "date"        "#9c6fff"}
+ :editor-grid-selected-font-color "#0f0f13"
+ :monospaced-font "JetBrains Mono"
+ :editor-grid-selected-background-color "#6d39ff"
+ :nivo-defaults
+   {:font-family "Space Grotesk"
+    :labels      {:text {:fill "#f0f0ff" :font-size "14px" :font-family "Space Grotesk" :font-weight 500}}
+    :tooltip     {:container {:box-shadow      "0 20px 40px rgba(0,0,0,0.4)"
+                              :color           "#f0f0ff"
+                              :borderRadius    "8px"
+                              :background      "#0f0f13ee"
+                              :backdrop-filter "blur(20px) brightness(120%)"
+                              :padding         "10px 14px"
+                              :fontSize        "13px"
+                              :border          "1px solid rgba(109, 57, 255, 0.2)"
+                              :text            {:fill "#f0f0ff"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "6px 10px"}}
+    :axis        {:legend {:text {:fill "#f0f0ff" :font-size "13px" :font-family "Space Grotesk" :font-weight 500}}
+                  :ticks  {:line {:stroke "#6d39ff60"} :text {:fill "#f0f0ff" :font-weight 500}}}
+    :grid        {:line {:stroke "#f0f0ff11" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#6d39ff"
+ :grid-selected-font-color "#0f0f13"
+ :block-title-selected-font-color "#0f0f13"
+ :grid-selected-background-color "#6d39ff"
+ :grid-font-color "#f0f0ff"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 50% -20%, #17171d 0%, #0f0f13 70%),                                     url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30M0 30l30 30' stroke='%236d39ff' stroke-width='1' fill='none' opacity='0.05'/%3E%3C/svg%3E\")"
+    :background-blend-mode "normal, overlay"
+    :transition "all 0.4s cubic-bezier(0.22, 1, 0.36, 1)"
+    :background-color "#0f0f13"}
+ :editor-font-color "#f0f0ff"
+ :base-font "Space Grotesk"
+ :block-tab-selected-font-color "#0f0f13"
+ :editor-background-color "#0f0f13"
+ :editor-grid-font-color "#f0f0ff"
+ :pop-1 "#17171d"}
+
+

@@ -1,0 +1,107 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1006"
+ :pop-2 "#ff4d4d"
+ :base-block-style
+   {:text-shadow "none"
+    :border-radius "0px"
+    :filter "none"
+    :backdrop-filter "blur(4px) contrast(110%)"
+    :border "1px solid #ff4d4d33"
+    :box-shadow
+      "inset 0 0 40px #00000099, 
+                                      2px 2px 0px #000000,
+                                      8px 8px 16px #00000044,
+                                      -8px -8px 16px #ff4d4d11"}
+ :vega-defaults {:mark    {:font "Zen Maru Gothic" :stroke "#ff4d4d" :color "#ff4d4d65"}
+                 :legend  {:labelFont  "Zen Maru Gothic"
+                           :legendFont "Zen Maru Gothic"
+                           :labelColor "#ffecd1"
+                           :titleColor "#ffecd1"
+                           :stroke     "#ff4d4d"
+                           :titleFont  "Zen Maru Gothic"}
+                 :header  {:labelFont "Zen Maru Gothic" :titleFont "Zen Maru Gothic" :titleColor "#ffecd1"}
+                 :title   {:font         "Zen Maru Gothic"
+                           :subtitleFont "Zen Maru Gothic"
+                           :labelFont    "Zen Maru Gothic"
+                           :titleFont    "Zen Maru Gothic"
+                           :titleColor   "#ffecd1"}
+                 :point   {:font "Zen Maru Gothic" :stroke "#ff4d4d" :color "#ff4d4d65"}
+                 :area    {:font "Zen Maru Gothic" :stroke "#ff4d4d" :color "#ff4d4d65"}
+                 :axis    {:domainColor "#ff4d4d44"
+                           :grid        true
+                           :font        "Zen Maru Gothic"
+                           :labelColor  "#ffecd1"
+                           :titleFont   "Zen Maru Gothic"
+                           :titleColor  "#ffecd1"
+                           :labelFont   "Zen Maru Gothic"
+                           :domain      false
+                           :gridColor   "#33220f55"
+                           :tickColor   "#ff4d4d44"
+                           :axisFont    "Zen Maru Gothic"}
+                 :tooltip {:fill "#1a100699" :stroke "#ff4d4d" :strokeWidth 1 :color "#ffecd1"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#ff4d4d15"
+                            :filter           "none"
+                            :backdrop-filter  "blur(3px) brightness(120%)"
+                            :box-shadow       "0 0 20px #ff4d4d22"}
+ :base-block-color-selected "#33220f"
+ :block-title-font-color "#ffecd1"
+ :base-block-color "#1a1006dd"
+ :pop-3 "#ffd700"
+ :editor-rim-color "#ff4d4d"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#ff4d4d"
+               "boolean"     "#ffd700"
+               "map"         "#ffecd1"
+               "list"        "#ff4d4d"
+               "string"      "#ffd700"
+               "any"         "#ff4d4d"
+               "vector"      "#ffd700"
+               "keyword"     "#ffecd1"
+               "rabbit-code" "#ff4d4d"
+               "datetime"    "#ffd700"
+               "integer"     "#ffecd1"
+               "unknown"     "#ff4d4d"
+               "date"        "#ffd700"}
+ :editor-grid-selected-font-color "#1a1006"
+ :monospaced-font "Zen Maru Gothic"
+ :editor-grid-selected-background-color "#ff4d4d"
+ :nivo-defaults
+   {:font-family "Zen Maru Gothic"
+    :labels      {:text {:fill "#ffecd1" :font-size "14px" :font-family "Zen Maru Gothic" :font-weight 450}}
+    :tooltip     {:container {:background      "#1a1006ee"
+                              :color           "#ffecd1"
+                              :text            {:fill "#ffecd1"}
+                              :fontSize        "13px"
+                              :borderRadius    "0px"
+                              :border          "1px solid #ff4d4d"
+                              :backdrop-filter "blur(4px)"
+                              :box-shadow      "2px 2px 0px #000000"
+                              :padding         "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#ffecd1" :font-size "13px" :font-family "Zen Maru Gothic" :font-weight 450}}
+                  :ticks  {:line {:stroke "#ff4d4d60"} :text {:fill "#ffecd1" :font-weight 450}}}
+    :grid        {:line {:stroke "#33220f55" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#ff4d4d"
+ :grid-selected-font-color "#1a1006"
+ :block-title-selected-font-color "#1a1006"
+ :grid-selected-background-color "#ff4d4d"
+ :grid-font-color "#ffecd1"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 50% 50%, #33220f 0%, #1a1006 100%),
+                                     url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ff4d4d' stroke-width='1' opacity='0.1'%3E%3Cpath d='M20 50c0-16.6 13.4-30 30-30s30 13.4 30 30-13.4 30-30 30-30-13.4-30-30zm30-15v30m-15-15h30'/%3E%3C/g%3E%3C/svg%3E\"),
+                                     url(\"data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ff4d4d' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay, soft-light, normal"
+    :transition "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#1a1006"}
+ :editor-font-color "#ffecd1"
+ :base-font "Zen Maru Gothic"
+ :block-tab-selected-font-color "#1a1006"
+ :editor-background-color "#1a1006"
+ :editor-grid-font-color "#ffecd1"
+ :pop-1 "#33220f"}
+
+

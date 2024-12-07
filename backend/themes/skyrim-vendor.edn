@@ -1,0 +1,97 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1210"
+ :pop-2 "#9b6a4c"
+ :base-block-style
+   {:text-shadow "0 0 15px #4cbb9b55"
+    :border-radius "0px"
+    :filter "none"
+    :backdrop-filter "blur(3px)"
+    :border "8px solid"
+    :border-image "linear-gradient(45deg, #614023 0%, #9b6a4c 25%, #c39b75 50%, #9b6a4c 75%, #614023 100%) 1"
+    :box-shadow
+      "inset 0 0 20px #4cbb9b22,                                        inset 0 0 30px #000000,                                       0px 0px 0px 2px #1a1210,                                       4px 4px 0px 2px #614023,                                       -2px -2px 15px #4cbb9b33"}
+ :vega-defaults {:mark {:font "Cinzel" :stroke "#9b6a4c" :color "#9b6a4c65"}
+                 :legend {:labelFont  "Cinzel"
+                          :legendFont "Cinzel"
+                          :labelColor "#c39b75"
+                          :titleColor "#c39b75"
+                          :stroke     "#9b6a4c"
+                          :titleFont  "Cinzel"}
+                 :header {:labelFont "Cinzel" :titleFont "Cinzel" :titleColor "#c39b75"}
+                 :title
+                   {:font "Cinzel" :subtitleFont "Cinzel" :labelFont "Cinzel" :titleFont "Cinzel" :titleColor "#c39b75"}
+                 :point {:font "Cinzel" :stroke "#9b6a4c" :color "#9b6a4c65"}
+                 :area {:font "Cinzel" :stroke "#9b6a4c" :color "#9b6a4c65"}
+                 :axis {:domainColor "#9b6a4c44"
+                        :grid        true
+                        :font        "Cinzel"
+                        :labelColor  "#c39b75"
+                        :titleFont   "Cinzel"
+                        :titleColor  "#c39b75"
+                        :labelFont   "Cinzel"
+                        :domain      false
+                        :gridColor   "#4cbb9b22"
+                        :tickColor   "#9b6a4c44"
+                        :axisFont    "Cinzel"}
+                 :tooltip {:fill "#1a1210ee" :stroke "#9b6a4c" :strokeWidth 2 :color "#4cbb9b"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#4cbb9b33" :filter "none" :backdrop-filter "blur(2px)" :box-shadow "0 0 15px #4cbb9b55"}
+ :base-block-color-selected "#2a2220"
+ :block-title-font-color "#c39b75"
+ :base-block-color "#1a1210dd"
+ :pop-3 "#4cbb9b"
+ :editor-rim-color "#9b6a4c"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#9b6a4c"
+               "boolean"     "#4cbb9b"
+               "map"         "#c39b75"
+               "list"        "#9b6a4c"
+               "string"      "#4cbb9b"
+               "any"         "#9b6a4c"
+               "vector"      "#4cbb9b"
+               "keyword"     "#c39b75"
+               "rabbit-code" "#9b6a4c"
+               "datetime"    "#4cbb9b"
+               "integer"     "#c39b75"
+               "unknown"     "#9b6a4c"
+               "date"        "#4cbb9b"}
+ :editor-grid-selected-font-color "#1a1210"
+ :monospaced-font "Overpass Mono"
+ :editor-grid-selected-background-color "#4cbb9b"
+ :nivo-defaults
+   {:font-family "Cinzel"
+    :labels      {:text {:fill "#c39b75" :font-size "16px" :font-family "Cinzel" :font-weight 500}}
+    :tooltip     {:container {:background   "#1a1210ee"
+                              :color        "#4cbb9b"
+                              :text         {:fill "#4cbb9b"}
+                              :fontSize     "14px"
+                              :borderRadius "0px"
+                              :border       "2px solid #9b6a4c"
+                              :box-shadow   "0 0 15px #4cbb9b33"
+                              :padding      "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#c39b75" :font-size "14px" :font-family "Cinzel" :font-weight 500}}
+                  :ticks  {:line {:stroke "#9b6a4c60"} :text {:fill "#c39b75" :font-weight 500}}}
+    :grid        {:line {:stroke "#4cbb9b22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#9b6a4c"
+ :grid-selected-font-color "#1a1210"
+ :block-title-selected-font-color "#1a1210"
+ :grid-selected-background-color "#4cbb9b"
+ :grid-font-color "#c39b75"
+ :canvas-background-css
+   {:background
+      "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239b6a4c' fill-opacity='0.1'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay"
+    :transition "all 0.3s ease"
+    :background-color "#1a1210"}
+ :editor-font-color "#c39b75"
+ :base-font "Cinzel"
+ :block-tab-selected-font-color "#1a1210"
+ :editor-background-color "#1a1210"
+ :editor-grid-font-color "#c39b75"
+ :pop-1 "#614023"}
+
+

@@ -20,6 +20,15 @@
    screen_name text NULL,
    blocks integer NULL,
    queries integer NULL,
+   theme_map text NULL,
+   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ) ;")
+
+(def create-themes
+  "create table if not exists themes
+  (file_path text NULL,
+   theme_name text NULL,
+   theme_map text NULL,
    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
    ) ;")
 

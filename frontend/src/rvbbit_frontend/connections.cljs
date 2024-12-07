@@ -331,6 +331,10 @@
                                   (let [kps       (ut/extract-patterns obody :invert-hex-color 2)
                                         logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/invert-hex-color hhex)})))]
                                     (ut/postwalk-replacer logic-kps obody)))
+          darken-walk (fn [obody]
+                         (let [kps       (ut/extract-patterns obody :darken 3)
+                               logic-kps (into {} (for [v kps] (let [[_ hhex vval] v] {v (ut/darken-hex hhex vval)})))]
+                           (ut/postwalk-replacer logic-kps obody)))
           tetrads-walk (fn [obody]
                          (let [kps       (ut/extract-patterns obody :tetrads 2)
                                logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/tetrads hhex)})))]
@@ -430,6 +434,7 @@
                           ;; (has-fn? :str)        (string-walk 4)
                           ;; (has-fn? :str)        (string-walk 5)
                           ;; (has-fn? :str)        (string-walk 6) ;; TODO REMOVE ALL THIS
+                          (has-fn? :darken)         darken-walk
                           (has-fn? :str)        string-walk
                           (has-fn? :get-in)         get-in-walk
                           (has-fn? :=)              =-walk-map2
@@ -437,6 +442,7 @@
                           (has-fn? :when)           when-walk-map2
                           (has-fn? :into)           into-walk-map2
                           (has-fn? :join)           join-walk-map2
+
                           (has-fn? :invert-hex-color) invert-hex-color-walk
                           (has-fn? :tetrads)        tetrads-walk
                           (has-fn? :complements)    complements-walk
@@ -1153,7 +1159,7 @@
 (re-frame/reg-sub
  ::puget-data-color-map
  (fn [_] (let [data-colors (theme-pull :theme/data-colors db/data-colors)
-               data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color nil))
+               data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)))
                data-colors (walk/keywordize-keys data-colors)
                color-map (assoc (walk/postwalk-replace
                                  {:integer :number
@@ -1182,7 +1188,7 @@
       (do (ut/tracked-dispatch
            [::wfx/request :default
             {:message {:kind :puget-document
-                       :text s :data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color nil))
+                       :text s :data-colors (assoc data-colors :universal-pop-color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)))
                        :width w :opts-map {:map-coll-separator :line
                                            ;:map-delimiter :line
                                            }}

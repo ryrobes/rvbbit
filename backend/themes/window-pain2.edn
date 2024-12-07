@@ -1,0 +1,112 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0a0a12"
+ :pop-2 "#5e72eb"
+ :base-block-style
+   {:box-shadow
+      "inset 0 0 50px #ffffff05,                                      inset 0 0 100px #5e72eb08,                                      0 10px 30px #00000066,                                      0 -1px 0px #ffffff22,                                      0 0 0 1px #ffffff05,                                      0 20px 40px -20px #00000088"
+    :transform "perspective(1000px) rotateX(1deg)"
+    :transition "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background
+      "linear-gradient(135deg,                                                      #0e0e1855 0%,                                                      #16162255 50%,                                                     #1e1e2c55 100%),                                      radial-gradient(circle at 50% 0%,                                                     #5e72eb11 0%,                                                     transparent 60%),                                      linear-gradient(to bottom,                                                    #ffffff03 0%,                                                    #00000022 100%)"
+    :background-blend-mode "overlay, screen, normal"
+    :backdrop-filter "blur(20px) saturate(180%)"
+    :hover
+      {:transform "perspective(1000px) rotateX(0deg) translateY(-2px)"
+       :box-shadow
+         "inset 0 0 50px #ffffff08,                                                 inset 0 0 100px #5e72eb11,                                                 0 15px 35px #00000077,                                                 0 -1px 0px #ffffff33,                                                 0 0 0 1px #ffffff08,                                                 0 25px 45px -20px #00000099"}
+    :filter "none"
+    :transform-origin "50% 0%"
+    :text-shadow "0 0 30px #5e72eb22"
+    :border "1px solid rgba(94, 114, 235, 0.1)"
+    :border-radius "12px"}
+ :vega-defaults {:mark {:font "Inter" :stroke "#5e72eb" :color "#5e72eb65"}
+                 :legend {:labelFont  "Inter"
+                          :legendFont "Inter"
+                          :labelColor "#ffffff"
+                          :titleColor "#ffffff"
+                          :stroke     "#5e72eb"
+                          :titleFont  "Inter"}
+                 :header {:labelFont "Inter" :titleFont "Inter" :titleColor "#ffffff"}
+                 :title
+                   {:font "Inter" :subtitleFont "Inter" :labelFont "Inter" :titleFont "Inter" :titleColor "#ffffff"}
+                 :point {:font "Inter" :stroke "#5e72eb" :color "#5e72eb65"}
+                 :area {:font "Inter" :stroke "#5e72eb" :color "#5e72eb65"}
+                 :axis {:domainColor "#5e72eb44"
+                        :grid        true
+                        :font        "Inter"
+                        :labelColor  "#ffffff"
+                        :titleFont   "Inter"
+                        :titleColor  "#ffffff"
+                        :labelFont   "Inter"
+                        :domain      false
+                        :gridColor   "#ffffff11"
+                        :tickColor   "#5e72eb44"
+                        :axisFont    "Inter"}
+                 :tooltip {:fill "#0a0a12ee" :stroke "#5e72eb" :strokeWidth 1 :color "#ffffff"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#5e72eb15"
+    :filter           "none"
+    :backdrop-filter  "blur(30px) saturate(200%)"
+    :box-shadow       "0 0 30px #5e72eb22,                                             inset 0 0 0 1px #5e72eb44"}
+ :base-block-color-selected "#16162a"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#0a0a12cc"
+ :pop-3 "#00fff7"
+ :editor-rim-color "#5e72eb"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#5e72eb"
+               "boolean"     "#00fff7"
+               "map"         "#ffffff"
+               "list"        "#5e72eb"
+               "string"      "#00fff7"
+               "any"         "#5e72eb"
+               "vector"      "#00fff7"
+               "keyword"     "#ffffff"
+               "rabbit-code" "#5e72eb"
+               "datetime"    "#00fff7"
+               "integer"     "#ffffff"
+               "unknown"     "#5e72eb"
+               "date"        "#00fff7"}
+ :editor-grid-selected-font-color "#0a0a12"
+ :monospaced-font "JetBrains Mono"
+ :editor-grid-selected-background-color "#5e72eb"
+ :nivo-defaults {:font-family "Inter"
+                 :labels {:text {:fill "#ffffff" :font-size "14px" :font-family "Inter" :font-weight 500}}
+                 :tooltip
+                   {:container
+                      {:box-shadow
+                         "0 15px 35px #00000088,                                             0 5px 15px #00000066"
+                       :color "#ffffff"
+                       :borderRadius "8px"
+                       :background "#0a0a12ee"
+                       :backdrop-filter "blur(20px) saturate(180%)"
+                       :padding "10px 14px"
+                       :fontSize "13px"
+                       :border "1px solid rgba(94, 114, 235, 0.2)"
+                       :text {:fill "#ffffff"}}
+                    :basic {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                    :tableCell {:padding "6px 10px"}}
+                 :axis {:legend {:text {:fill "#ffffff" :font-size "13px" :font-family "Inter" :font-weight 500}}
+                        :ticks  {:line {:stroke "#5e72eb60"} :text {:fill "#ffffff" :font-weight 500}}}
+                 :grid {:line {:stroke "#ffffff11" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#5e72eb"
+ :grid-selected-font-color "#0a0a12"
+ :block-title-selected-font-color "#0a0a12"
+ :grid-selected-background-color "#5e72eb"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background-image      "url(assets/openai-images/b64-image3-44218-56510-4k.webp)"
+                         :transition            "all 0.8s ease-in-out"
+                         :background-size       "cover"
+                         :background-blend-mode "mixed-light"
+                         :background-color      "#00000099"
+                         :background-position   "center"}
+ :editor-font-color "#ffffff"
+ :base-font "Inter"
+ :block-tab-selected-font-color "#0a0a12"
+ :editor-background-color "#0a0a12"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#16162a"}
+
+

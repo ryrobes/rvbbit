@@ -1,0 +1,99 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#252525"
+ :pop-2 "#e63946"
+ :base-block-style {:box-shadow          "inset -2px -2px 0 #151515, inset 2px 2px 0 #454545"
+                    :border-left-color   "#454545"
+                    :backdrop-filter     "none"
+                    :border-right-color  "#151515"
+                    :filter              "none"
+                    :border-top-color    "#454545"
+                    :text-shadow         "none"
+                    :border              "4px solid"
+                    :border-bottom-color "#151515"
+                    :border-radius       "0px"}
+ :vega-defaults {:mark    {:font "DIN Condensed" :stroke "#e63946" :color "#e6394665"}
+                 :legend  {:labelFont  "DIN Condensed"
+                           :legendFont "DIN Condensed"
+                           :labelColor "#ffffff"
+                           :titleColor "#ffffff"
+                           :stroke     "#e63946"
+                           :titleFont  "DIN Condensed"}
+                 :header  {:labelFont "DIN Condensed" :titleFont "DIN Condensed" :titleColor "#ffffff"}
+                 :title   {:font         "DIN Condensed"
+                           :subtitleFont "DIN Condensed"
+                           :labelFont    "DIN Condensed"
+                           :titleFont    "DIN Condensed"
+                           :titleColor   "#ffffff"}
+                 :point   {:font "DIN Condensed" :stroke "#e63946" :color "#e6394665"}
+                 :area    {:font "DIN Condensed" :stroke "#e63946" :color "#e6394665"}
+                 :axis    {:domainColor "#e6394644"
+                           :grid        true
+                           :font        "DIN Condensed"
+                           :labelColor  "#ffffff"
+                           :titleFont   "DIN Condensed"
+                           :titleColor  "#ffffff"
+                           :labelFont   "DIN Condensed"
+                           :domain      false
+                           :gridColor   "#35353522"
+                           :tickColor   "#e6394644"
+                           :axisFont    "DIN Condensed"}
+                 :tooltip {:fill "#252525" :stroke "#e63946" :strokeWidth 4 :color "#ffffff"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#e63946" :filter "none" :box-shadow "4px 4px 0 #151515"}
+ :base-block-color-selected "#353535"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#252525"
+ :pop-3 "#ffd700"
+ :editor-rim-color "#e63946"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#e63946"
+               "boolean"     "#ffd700"
+               "map"         "#ffffff"
+               "list"        "#e63946"
+               "string"      "#ffffff"
+               "any"         "#e63946"
+               "vector"      "#ffd700"
+               "keyword"     "#ffffff"
+               "rabbit-code" "#e63946"
+               "datetime"    "#ffd700"
+               "integer"     "#ffffff"
+               "unknown"     "#e63946"
+               "date"        "#ffd700"}
+ :editor-grid-selected-font-color "#ffffff"
+ :monospaced-font "DIN Condensed"
+ :editor-grid-selected-background-color "#e63946"
+ :nivo-defaults
+   {:font-family "DIN Condensed"
+    :labels      {:text {:fill "#ffffff" :font-size "16px" :font-family "DIN Condensed" :font-weight 700}}
+    :tooltip     {:container {:background   "#252525"
+                              :color        "#ffffff"
+                              :text         {:fill "#ffffff"}
+                              :fontSize     "16px"
+                              :borderRadius "0px"
+                              :border       "4px solid #e63946"
+                              :box-shadow   "4px 4px 0 #151515"
+                              :padding      "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "16px" :font-family "DIN Condensed" :font-weight 700}}
+                  :ticks  {:line {:stroke "#ffffff60"} :text {:fill "#ffffff" :font-weight 700}}}
+    :grid        {:line {:stroke "#353535" :strokeWidth 2 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#e63946"
+ :grid-selected-font-color "#ffffff"
+ :block-title-selected-font-color "#ffffff"
+ :grid-selected-background-color "#e63946"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background
+                           "repeating-linear-gradient(-45deg, #252525, #252525 20px, #353535 20px, #353535 40px)"
+                         :background-blend-mode "overlay"
+                         :transition "none"
+                         :background-color "#252525"}
+ :editor-font-color "#ffffff"
+ :base-font "DIN Condensed"
+ :block-tab-selected-font-color "#ffffff"
+ :editor-background-color "#252525"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#353535"}
+
+

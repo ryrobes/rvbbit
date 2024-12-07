@@ -1,0 +1,92 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1a2e"
+ :pop-2 "#4b6b99"
+ :base-block-style {:text-shadow     "none"
+                    :border-radius   "3px"
+                    :filter          "none"
+                    :backdrop-filter "none"
+                    :border          "1px solid #ffffff22"
+                    :box-shadow      "inset 1px 1px 0px #ffffff30, inset -1px -1px 0px #00000040, 0 2px 4px #00000066"}
+ :vega-defaults
+   {:mark {:font "Helvetica" :stroke "#4b6b99" :color "#4b6b9965"}
+    :legend {:labelFont  "Helvetica"
+             :legendFont "Helvetica"
+             :labelColor "#d0d0ea"
+             :titleColor "#d0d0ea"
+             :stroke     "#4b6b99"
+             :titleFont  "Helvetica"}
+    :header {:labelFont "Helvetica" :titleFont "Helvetica" :titleColor "#d0d0ea"}
+    :title
+      {:font "Helvetica" :subtitleFont "Helvetica" :labelFont "Helvetica" :titleFont "Helvetica" :titleColor "#d0d0ea"}
+    :point {:font "Helvetica" :stroke "#4b6b99" :color "#4b6b9965"}
+    :area {:font "Helvetica" :stroke "#4b6b99" :color "#4b6b9965"}
+    :axis {:domainColor "#ffffff22"
+           :grid        true
+           :font        "Helvetica"
+           :labelColor  "#d0d0ea"
+           :titleFont   "Helvetica"
+           :titleColor  "#d0d0ea"
+           :labelFont   "Helvetica"
+           :domain      false
+           :gridColor   "#ffffff22"
+           :tickColor   "#ffffff22"
+           :axisFont    "Helvetica"}
+    :tooltip {:fill "#2a2a40" :stroke "#4b6b99" :strokeWidth 1 :color "#d0d0ea"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#4b6b9944" :filter "none" :box-shadow "inset 0 0 20px #4b6b99"}
+ :base-block-color-selected "#2a2a40"
+ :block-title-font-color "#d0d0ea"
+ :base-block-color "#1a1a2eee"
+ :pop-3 "#7a8bB6"
+ :editor-rim-color "#4b6b99"
+ :base-block-filter-selected "drop-shadow(0 0 10px #4b6b99)"
+ :_vega-default-color-scheme {:scheme "blues"}
+ :data-colors {"float"       "#4b6b99"
+               "boolean"     "#7a8bB6"
+               "map"         "#5b7ba9"
+               "list"        "#8b9bc6"
+               "string"      "#d0d0ea"
+               "any"         "#4b6b99"
+               "vector"      "#7a8bB6"
+               "keyword"     "#5b7ba9"
+               "rabbit-code" "#4b6b99"
+               "datetime"    "#7a8bB6"
+               "integer"     "#5b7ba9"
+               "unknown"     "#4b6b99"
+               "date"        "#7a8bB6"}
+ :editor-grid-selected-font-color "#1a1a2e"
+ :monospaced-font "Chivo Mono"
+ :editor-grid-selected-background-color "#4b6b99"
+ :nivo-defaults
+   {:font-family "Helvetica"
+    :labels      {:text {:fill "#d0d0ea" :font-size "13px" :font-family "Helvetica" :font-weight 400}}
+    :tooltip     {:container {:background   "#2a2a40"
+                              :color        "#d0d0ea"
+                              :text         {:fill "#d0d0ea"}
+                              :fontSize     "13px"
+                              :borderRadius "3px"
+                              :border       "1px solid #ffffff22"
+                              :box-shadow   "inset 1px 1px 0px #ffffff30, inset -1px -1px 0px #00000040"
+                              :padding      "6px 8px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 5px"}}
+    :axis        {:legend {:text {:fill "#d0d0ea" :font-size "13px" :font-family "Helvetica" :font-weight 400}}
+                  :ticks  {:line {:stroke "#d0d0ea60"} :text {:fill "#d0d0ea60" :font-weight 400}}}
+    :grid        {:line {:stroke "#4b6b99" :strokeWidth 1 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#4b6b99"
+ :grid-selected-font-color "#1a1a2e"
+ :block-title-selected-font-color "#d0d0ea"
+ :grid-selected-background-color "#4b6b99"
+ :grid-font-color "#d0d0ea"
+ :canvas-background-css {:background-image "radial-gradient(600px circle at center center, #2a2a40 0%, #1a1a2e 100%)"
+                         :transition "all 0.3s ease-in-out"
+                         :background-blend-mode "normal"
+                         :background-color "#1a1a2e"}
+ :editor-font-color "#d0d0ea"
+ :base-font "Helvetica"
+ :block-tab-selected-font-color "#d0d0ea"
+ :editor-background-color "#1a1a2e"
+ :editor-grid-font-color "#d0d0ea"
+ :pop-1 "#2a2a40"}
+
+

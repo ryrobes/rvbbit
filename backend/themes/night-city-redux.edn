@@ -1,0 +1,106 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0a1a1f"
+ :pop-2 "#ff2e88"
+ :base-block-style
+   {:text-shadow "0 0 20px #ff2e8855"
+    :border-radius "8px"
+    :filter "none"
+    :backdrop-filter "blur(12px) brightness(130%) contrast(110%)"
+    :border "1px solid rgba(255, 46, 136, 0.2)"
+    :box-shadow
+      "inset 0 0 40px #00000099,                                        inset 0 0 80px #ff2e8808,                                       0 0 1px #ff2e88aa,                                       0 0 40px #00000088,                                       0 0 50px #00ccff22"}
+ :vega-defaults
+   {:mark {:font "Syncopate" :stroke "#ff2e88" :color "#ff2e8865"}
+    :legend {:labelFont  "Syncopate"
+             :legendFont "Syncopate"
+             :labelColor "#ffffff"
+             :titleColor "#ffffff"
+             :stroke     "#ff2e88"
+             :titleFont  "Syncopate"}
+    :header {:labelFont "Syncopate" :titleFont "Syncopate" :titleColor "#ffffff"}
+    :title
+      {:font "Syncopate" :subtitleFont "Syncopate" :labelFont "Syncopate" :titleFont "Syncopate" :titleColor "#ffffff"}
+    :point {:font "Syncopate" :stroke "#ff2e88" :color "#ff2e8865"}
+    :area {:font "Syncopate" :stroke "#ff2e88" :color "#ff2e8865"}
+    :axis {:domainColor "#ff2e8844"
+           :grid        true
+           :font        "Syncopate"
+           :labelColor  "#ffffff"
+           :titleFont   "Syncopate"
+           :titleColor  "#ffffff"
+           :labelFont   "Syncopate"
+           :domain      false
+           :gridColor   "#00ccff22"
+           :tickColor   "#ff2e8844"
+           :axisFont    "Syncopate"}
+    :tooltip {:fill "#0a1a1fdd" :stroke "#ff2e88" :strokeWidth 1 :color "#ffffff"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#ff2e8815"
+    :filter           "none"
+    :backdrop-filter  "blur(16px) brightness(150%)"
+    :box-shadow       "0 0 40px #ff2e8833,                                              inset 0 0 20px #00ccff22"}
+ :base-block-color-selected "#101f25"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#0a1a1f99"
+ :pop-3 "#00ccff"
+ :editor-rim-color "#ff2e88"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#ff2e88"
+               "boolean"     "#00ccff"
+               "map"         "#ff9c55"
+               "list"        "#ff2e88"
+               "string"      "#00ccff"
+               "any"         "#ff2e88"
+               "vector"      "#00ccff"
+               "keyword"     "#ff9c55"
+               "rabbit-code" "#ff2e88"
+               "datetime"    "#00ccff"
+               "integer"     "#ff9c55"
+               "unknown"     "#ff2e88"
+               "date"        "#00ccff"}
+ :editor-grid-selected-font-color "#0a1a1f"
+ :monospaced-font "Syncopate"
+ :editor-grid-selected-background-color "#ff2e88"
+ :nivo-defaults
+   {:font-family "Syncopate"
+    :labels {:text {:fill "#ffffff" :font-size "15px" :font-family "Syncopate" :font-weight 600}}
+    :tooltip
+      {:container
+         {:box-shadow
+            "0 0 40px #00000088,                                              0 0 50px #ff2e8822,                                              inset 0 0 20px #00ccff11"
+          :color "#ffffff"
+          :borderRadius "4px"
+          :background "#0a1a1fdd"
+          :backdrop-filter "blur(16px) brightness(130%)"
+          :padding "8px 12px"
+          :fontSize "14px"
+          :border "1px solid #ff2e88"
+          :text {:fill "#ffffff"}}
+       :basic {:whiteSpace "pre" :display "flex" :alignItems "center"}
+       :tableCell {:padding "4px 8px"}}
+    :axis {:legend {:text {:fill "#ffffff" :font-size "14px" :font-family "Syncopate" :font-weight 600}}
+           :ticks  {:line {:stroke "#ff2e8860"} :text {:fill "#ffffff" :font-weight 600}}}
+    :grid {:line {:stroke "#00ccff22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#ff2e88"
+ :grid-selected-font-color "#0a1a1f"
+ :block-title-selected-font-color "#0a1a1f"
+ :grid-selected-background-color "#ff2e88"
+ :grid-font-color "#ffffff"
+ :canvas-background-css
+   {:background "linear-gradient(180deg, rgba(10,26,31,0.7) 0%, rgba(10,26,31,0.8) 100%)"
+    :background-image
+      "url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/d9b9c9b2-b80f-4dd6-b0f9-5191aed634c9/dhhjp3z-90e69fd9-dab1-4301-a1d7-83ce1827d4d6.jpg/v1/fill/w_1188,h_673,q_70,strp/cyberpunk_2077_cityscape_wallpaper_by_jmasaryk_dhhjp3z-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9OTA2IiwicGF0aCI6IlwvZlwvZDliOWM5YjItYjgwZi00ZGQ2LWIwZjktNTE5MWFlZDYzNGM5XC9kaGhqcDN6LTkwZTY5ZmQ5LWRhYjEtNDMwMS1hMWQ3LTgzY2UxODI3ZDRkNi5qcGciLCJ3aWR0aCI6Ijw9MTYwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.Gqu0QFxH6BDjquB3z4yJ9299pvfULMbd4rqAkMos1mg)"
+    :background-blend-mode "overlay"
+    :background-size "cover"
+    :transition "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#0a1a1f"}
+ :editor-font-color "#ffffff"
+ :base-font "Syncopate"
+ :block-tab-selected-font-color "#0a1a1f"
+ :editor-background-color "#0a1a1f"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#101f25"}
+
+

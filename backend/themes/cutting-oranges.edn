@@ -1,0 +1,107 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#111118"
+ :pop-2 "#FF6B4A"
+ :base-block-style
+   {:box-shadow
+      "inset 0 1px 0 rgba(255,255,255,0.05),                                      0 8px 40px rgba(0,0,0,0.3),                                      0 2px 4px rgba(0,0,0,0.2)"
+    :transform "perspective(2000px)"
+    :transition "all 0.4s cubic-bezier(0.23, 1, 0.32, 1)"
+    :background
+      "linear-gradient(135deg,                                                      rgba(255, 107, 74, 0.03) 0%,                                                      rgba(17, 17, 24, 0.6) 100%)"
+    :backdrop-filter "blur(20px) brightness(105%)"
+    :filter "none"
+    :text-shadow "none"
+    :letter-spacing "0.01em"
+    :border "2px solid rgba(255, 107, 74, 0.1)"
+    :border-radius "24px 4px 16px 4px"}
+ :vega-defaults {:mark    {:font "Cabinet Grotesk" :stroke "#FF6B4A" :color "#FF6B4A65"}
+                 :legend  {:labelFont  "Cabinet Grotesk"
+                           :legendFont "Cabinet Grotesk"
+                           :labelColor "#ffffff"
+                           :titleColor "#ffffff"
+                           :stroke     "#FF6B4A"
+                           :titleFont  "Cabinet Grotesk"}
+                 :header  {:labelFont "Cabinet Grotesk" :titleFont "Cabinet Grotesk" :titleColor "#ffffff"}
+                 :title   {:font         "Cabinet Grotesk"
+                           :subtitleFont "Cabinet Grotesk"
+                           :labelFont    "Cabinet Grotesk"
+                           :titleFont    "Cabinet Grotesk"
+                           :titleColor   "#ffffff"}
+                 :point   {:font "Cabinet Grotesk" :stroke "#FF6B4A" :color "#FF6B4A65"}
+                 :area    {:font "Cabinet Grotesk" :stroke "#FF6B4A" :color "#FF6B4A65"}
+                 :axis    {:domainColor "#FF6B4A44"
+                           :grid        true
+                           :font        "Cabinet Grotesk"
+                           :labelColor  "#ffffff"
+                           :titleFont   "Cabinet Grotesk"
+                           :titleColor  "#ffffff"
+                           :labelFont   "Cabinet Grotesk"
+                           :domain      false
+                           :gridColor   "#ffffff11"
+                           :tickColor   "#FF6B4A44"
+                           :axisFont    "Cabinet Grotesk"}
+                 :tooltip {:fill "#111118ee" :stroke "#FF6B4A" :strokeWidth 1 :color "#ffffff"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#FF6B4A15"
+                            :filter           "none"
+                            :backdrop-filter  "blur(16px) brightness(130%)"
+                            :box-shadow       "0 0 30px #FF6B4A33"}
+ :base-block-color-selected "#1a1a24"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#111118ee"
+ :pop-3 "#FFA07A"
+ :editor-rim-color "#FF6B4A"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#FF6B4A"
+               "boolean"     "#FFA07A"
+               "map"         "#ffffff"
+               "list"        "#FF6B4A"
+               "string"      "#FFA07A"
+               "any"         "#FF6B4A"
+               "vector"      "#FFA07A"
+               "keyword"     "#ffffff"
+               "rabbit-code" "#FF6B4A"
+               "datetime"    "#FFA07A"
+               "integer"     "#ffffff"
+               "unknown"     "#FF6B4A"
+               "date"        "#FFA07A"}
+ :editor-grid-selected-font-color "#111118"
+ :monospaced-font "Fira Code"
+ :editor-grid-selected-background-color "#FF6B4A"
+ :nivo-defaults
+   {:font-family "Cabinet Grotesk"
+    :labels      {:text {:fill "#ffffff" :font-size "15px" :font-family "Cabinet Grotesk" :font-weight 500}}
+    :tooltip     {:container {:box-shadow      "0 20px 40px rgba(0,0,0,0.4)"
+                              :color           "#ffffff"
+                              :borderRadius    "12px 2px 8px 2px"
+                              :background      "#111118ee"
+                              :backdrop-filter "blur(16px) brightness(110%)"
+                              :padding         "10px 14px"
+                              :fontSize        "14px"
+                              :border          "1px solid rgba(255, 107, 74, 0.2)"
+                              :text            {:fill "#ffffff"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "6px 10px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "14px" :font-family "Cabinet Grotesk" :font-weight 500}}
+                  :ticks  {:line {:stroke "#FF6B4A60"} :text {:fill "#ffffff" :font-weight 500}}}
+    :grid        {:line {:stroke "#ffffff11" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#FF6B4A"
+ :grid-selected-font-color "#111118"
+ :block-title-selected-font-color "#111118"
+ :grid-selected-background-color "#FF6B4A"
+ :grid-font-color "#ffffff"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 30% -20%, #1a1a24 0%, #111118 70%),                                     url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='40' stroke='%23FF6B4A' stroke-width='1' fill='none' opacity='0.03'/%3E%3C/svg%3E\")"
+    :background-blend-mode "normal, overlay"
+    :transition "all 0.4s cubic-bezier(0.23, 1, 0.32, 1)"
+    :background-color "#111118"}
+ :editor-font-color "#ffffff"
+ :base-font "Cabinet Grotesk"
+ :block-tab-selected-font-color "#111118"
+ :editor-background-color "#111118"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#1a1a24"}
+
+

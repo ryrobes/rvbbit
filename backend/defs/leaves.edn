@@ -63,10 +63,10 @@
                            ]
                        (cond ;(= ttype ":field") [:data-ref]
                              ;(or (= ttype ":param") (= ttype ":where")) [:data-ref]
-                             (= ttype :query) [:data-ref :data-trigger]
-                             (= ttype :view)  [:render-trigger :data-ref]
-                             (= ttype :data)  [:render-trigger :data-ref :data-trigger] ;; repls and runners
-                             :else [:data-ref])))
+                         (= ttype :query) [:data-ref :data-trigger]
+                         (= ttype :view)  [:render-trigger :data-ref]
+                         (= ttype :data)  [:render-trigger :data-ref :data-trigger] ;; repls and runners
+                         :else [:data-ref])))
 
   :is-canvas-call? (fn [{:keys [data-key]}]
                      (= data-key :canvas))
@@ -111,20 +111,22 @@
   ;;:query-drag? [:= :drag-meta/type ":query"]
   :is-sqlite? [:= :database/name "SQLite"]
 
-  :xtdb-drawer/click [:and
-                      [:= :database/name "PostgreSQL"]
-                      [:like [:lower :connection-id] "%xtdb%"]]
+;;   :xtdb-drawer/click [:and
+;;                       ;[:= :database/name "PostgreSQL"]
+;;                       [:like [:lower :connection-id] "%xtdb%"]]
 
-  :xtdb-button/click [:and
-                      [:= :database/name "PostgreSQL"]
-                      [:like [:lower :connection-id] "%xtdb%"]]
+;;   :xtdb-button/click [:and
+;;                       ;[:= :database/name "PostgreSQL"]
+;;                       [:like [:lower :connection-id] "%xtdb%"]]
 
   :xtdb-drag/temporal [:and
-                       [:= :database/name "PostgreSQL"]
+                       ;[:= :database/name "PostgreSQL"]
                        [:like [:lower :connection-id] "%xtdb%"]]
-                       ;; ^^ until I get a better way - perhaps search the schemas for :_id field.
 
   :xtdb-drop/temporal-ops.SYSTEM_TIME.VALID_TIME [:and [:= :drag-meta/type ":xtdb-temporal"] :canvas-drop?]
+
+  :xtdb-drop/temporal-ops2.SYSTEM_TIME.VALID_TIME [:and [:= :drag-meta/type ":xtdb-temporal"] :canvas-drop?]
+
   :repl/add-as.repl-add-types    [:and [:= :runner-str ":clojure"] [:not :is-self?]]
 
   ;;:sql2/true [:= 1 1]
@@ -320,14 +322,23 @@
   :grid-buttonz2 {:everyone44 {:icon "ri-home-heart-line" :tooltip "somefsdfsdfsdf tsufsdf ytolfsdfs22222"}}
   :xtdb-button {:click {:icon "zmdi-pizza" :tooltip "button click test!"}}
   :xtdb-drag {:temporal {:icon "ri-calendar-schedule-line" :tooltip "XTDB Bi-Temporal Actions"}}
-  :xtdb-drop {:temporal-ops.SYSTEM_TIME.VALID_TIME {:color "#ffffff"
+  :xtdb-drop {:temporal-ops.SYSTEM_TIME.VALID_TIME {;:color "#ffffff"
                                                     :tooltip ["Add a connected scrubber slider for XTDB Bi-Temporal field" :*arg]
                                                     :label [[ "Temporal Scrubber" ]
                                                             [:*arg "ri-timeline-view"]
                                                             ;;"more stuff"
                                                             ]
                                                     ;:clover [:box :child [:str "stuff! " :*arg] :style {:color "red"}]
-                                                    }}
+                                                    }
+              :temporal-ops2.SYSTEM_TIME.VALID_TIME {;:color "#ffffff"
+                                                    :tooltip ["Add a calendar filter for XTDB Bi-Temporal field" :*arg]
+                                                    :label [["Temporal Calendar"]
+                                                            [:*arg "ri-calendar-2-line"]
+                                                                          ;;"more stuff"
+                                                            ]
+                                                                  ;:clover [:box :child [:str "stuff! " :*arg] :style {:color "red"}]
+                                                    }
+              }
   :action {:param-where.=.<>.>.<  {:color "#f7f77f"
                                    :label ["Param Filter" :*arg]}
            :everyone {:color "#f7f77f"

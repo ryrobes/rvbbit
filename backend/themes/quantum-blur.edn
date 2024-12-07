@@ -1,0 +1,98 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0d0b1a"
+ :pop-2 "#60fdff"
+ :base-block-style {:text-shadow     "0 0 10px #60fdff55"
+                    :border-radius   "16px"
+                    :filter          "none"
+                    :backdrop-filter "blur(12px) brightness(120%)"
+                    :border          "1px solid #ffffff15"
+                    :box-shadow      "0 0 30px #35008833, inset 0 0 20px #ffffff10, 0 0 2px #60fdff55"}
+ :vega-defaults {:mark {:font "Space Grotesk" :stroke "#60fdff" :color "#60fdff65"}
+                 :legend {:labelFont  "Space Grotesk"
+                          :legendFont "Space Grotesk"
+                          :labelColor "#60fdff"
+                          :titleColor "#60fdff"
+                          :stroke     "#60fdff55"
+                          :titleFont  "Space Grotesk"}
+                 :header {:labelFont "Space Grotesk" :titleFont "Space Grotesk" :titleColor "#60fdff"}
+                 :title {:font         "Space Grotesk"
+                         :subtitleFont "Space Grotesk"
+                         :labelFont    "Space Grotesk"
+                         :titleFont    "Space Grotesk"
+                         :titleColor   "#60fdff"}
+                 :point {:font "Space Grotesk" :stroke "#60fdff" :color "#60fdff65"}
+                 :area {:font "Space Grotesk" :stroke "#60fdff" :color "#60fdff65"}
+                 :axis {:domainColor "#60fdff22"
+                        :grid        true
+                        :font        "Space Grotesk"
+                        :labelColor  "#60fdff88"
+                        :titleFont   "Space Grotesk"
+                        :titleColor  "#60fdff"
+                        :labelFont   "Space Grotesk"
+                        :domain      false
+                        :gridColor   "#60fdff22"
+                        :tickColor   "#60fdff22"
+                        :axisFont    "Space Grotesk"}
+                 :tooltip
+                   {:fill "#0d0b1a99" :stroke "#60fdff" :strokeWidth 1 :color "#60fdff" :backdrop-filter "blur(12px)"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#60fdff22" :filter "none" :backdrop-filter "blur(8px)" :box-shadow "0 0 20px #60fdff44"}
+ :base-block-color-selected "#0d0b1a99"
+ :block-title-font-color "#60fdff"
+ :base-block-color "#11102288"
+ :pop-3 "#f0f4fd"
+ :editor-rim-color "#60fdff"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#60fdff"
+               "boolean"     "#fb5ff6"
+               "map"         "#ae8cfa"
+               "list"        "#60fdff"
+               "string"      "#ffffff"
+               "any"         "#60fdff"
+               "vector"      "#fb5ff6"
+               "keyword"     "#60fdff"
+               "rabbit-code" "#fb5ff6"
+               "datetime"    "#ae8cfa"
+               "integer"     "#60fdff"
+               "unknown"     "#fb5ff6"
+               "date"        "#ae8cfa"}
+ :editor-grid-selected-font-color "#0d0b1a"
+ :monospaced-font "JetBrains Mono"
+ :editor-grid-selected-background-color "#60fdff"
+ :nivo-defaults
+   {:font-family "Space Grotesk"
+    :labels      {:text {:fill "#60fdff" :font-size "14px" :font-family "Space Grotesk" :font-weight 500}}
+    :tooltip     {:container {:box-shadow      "0 0 30px #60fdff22"
+                              :color           "#60fdff"
+                              :borderRadius    "12px"
+                              :background      "#0d0b1acc"
+                              :backdrop-filter "blur(12px)"
+                              :padding         "8px 12px"
+                              :fontSize        "14px"
+                              :border          "1px solid #60fdff33"
+                              :text            {:fill "#60fdff"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#60fdff" :font-size "14px" :font-family "Space Grotesk" :font-weight 500}}
+                  :ticks  {:line {:stroke "#60fdff60"} :text {:fill "#60fdff90" :font-weight 500}}}
+    :grid        {:line {:stroke "#60fdff22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#60fdff"
+ :grid-selected-font-color "#0d0b1a"
+ :block-title-selected-font-color "#60fdff"
+ :grid-selected-background-color "#60fdff"
+ :grid-font-color "#60fdff"
+ :canvas-background-css {:background            "radial-gradient(circle at 50% 50%, #350088 0%, #0d0b1a 100%) "
+                         :background-blend-mode "overlay"
+                         :transition            "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                         :background-color      "#0d0b1a"}
+ :editor-font-color "#60fdff"
+ :base-font "Space Grotesk"
+ :block-tab-selected-font-color "#60fdff"
+ :editor-background-color "#0d0b1a"
+ :editor-grid-font-color "#60fdff"
+ :pop-1 "#350088"}
+
+
+

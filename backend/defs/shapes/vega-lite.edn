@@ -27,10 +27,11 @@
                      :size {:legend nil}
                      :shape {:legend nil}
                      :column {:field nil :legend nil}
-                     :color {:scale :theme/vega-default-color-scheme
-                             :legend nil
-                             :field 1 ;:y-field
-                             :type "ordinal"}}
+                    ;;  :color {:scale :theme/vega-default-color-scheme
+                    ;;          :legend nil
+                    ;;          :field 1 ;:y-field
+                    ;;          :type "ordinal"}
+                     }
                     :mark {:type "bar"
                            :tooltip {:content "encoding"}}}]
                   :data {:values :query-preview}} {:actions false}]
@@ -61,10 +62,11 @@
                     :size {:legend nil}
                     :shape {:legend nil}
                     :column {:field nil :legend nil}
-                    :color {:scale :theme/vega-default-color-scheme
-                            :legend nil
-                            :field 1 ;:y-field
-                            :type "ordinal"}}
+                    ;; :color {:scale :theme/vega-default-color-scheme
+                    ;;         :legend nil
+                    ;;         :field 1 ;:y-field
+                    ;;         :type "ordinal"}
+                    }
                    :mark {:type "bar"
                           :tooltip {:content "encoding"}}}]
                  :data {:values :query-preview}} {:actions false}]
@@ -96,10 +98,11 @@
                         :size {:legend nil}
                         :shape {:legend nil}
                         :column {:field nil :legend nil}
-                        :color {:scale :theme/vega-default-color-scheme
-                                :legend nil
-                                :field 1 ;:y-field
-                                :type "ordinal"}}
+                        ;; :color {:scale :theme/vega-default-color-scheme
+                        ;;         :legend nil
+                        ;;         :field 1 ;:y-field
+                        ;;         :type "ordinal"}
+                        }
                        :mark {:type "bar"
                               :tooltip {:content "encoding"}}}]
                      :data {:values :query-preview}} {:actions false}]
@@ -131,10 +134,11 @@
                         :size {:legend nil}
                         :shape {:legend nil}
                         :column {:field nil :legend nil}
-                        :color {:scale :theme/vega-default-color-scheme
-                                :legend nil
-                                :field 1 ;:y-field
-                                :type "ordinal"}}
+                        ;; :color {:scale :theme/vega-default-color-scheme
+                        ;;         :legend nil
+                        ;;         :field 1 ;:y-field
+                        ;;         :type "ordinal"}
+                        }
                        :mark {:type "bar"
                               :tooltip {:content "encoding"}}}]
                      :data {:values :query-preview}} {:actions false}]

@@ -1,0 +1,107 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0d0f18"
+ :pop-2 "#4fc3f7"
+ :base-block-style
+   {:text-shadow "0 0 20px #4fc3f755"
+    :border-radius "0px 16px 0px 16px"
+    :filter "none"
+    :backdrop-filter "blur(8px) contrast(110%)"
+    :border "1px solid rgba(79, 195, 247, 0.15)"
+    :border-image "linear-gradient(45deg, #17264d 0%, #4fc3f7 50%, #17264d 100%) 1"
+    :box-shadow
+      "inset 0 0 30px #00000099, 
+                                      inset 0 0 60px #4fc3f708,
+                                      0 0 1px #4fc3f7aa,
+                                      0 0 15px #00000066,
+                                      0 5px 15px #00000044"}
+ :vega-defaults
+   {:mark {:font "Fira Code" :stroke "#4fc3f7" :color "#4fc3f765"}
+    :legend {:labelFont  "Fira Code"
+             :legendFont "Fira Code"
+             :labelColor "#bce7ff"
+             :titleColor "#bce7ff"
+             :stroke     "#4fc3f7"
+             :titleFont  "Fira Code"}
+    :header {:labelFont "Fira Code" :titleFont "Fira Code" :titleColor "#bce7ff"}
+    :title
+      {:font "Fira Code" :subtitleFont "Fira Code" :labelFont "Fira Code" :titleFont "Fira Code" :titleColor "#bce7ff"}
+    :point {:font "Fira Code" :stroke "#4fc3f7" :color "#4fc3f765"}
+    :area {:font "Fira Code" :stroke "#4fc3f7" :color "#4fc3f765"}
+    :axis {:domainColor "#4fc3f744"
+           :grid        true
+           :font        "Fira Code"
+           :labelColor  "#bce7ff"
+           :titleFont   "Fira Code"
+           :titleColor  "#bce7ff"
+           :labelFont   "Fira Code"
+           :domain      false
+           :gridColor   "#17264d55"
+           :tickColor   "#4fc3f744"
+           :axisFont    "Fira Code"}
+    :tooltip {:fill "#0d0f18ee" :stroke "#4fc3f7" :strokeWidth 1 :color "#bce7ff"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#4fc3f715"
+                            :filter           "none"
+                            :backdrop-filter  "blur(4px) contrast(120%)"
+                            :box-shadow       "0 0 20px #4fc3f722, inset 0 0 20px #4fc3f711"}
+ :base-block-color-selected "#17264d"
+ :block-title-font-color "#bce7ff"
+ :base-block-color "#0d0f18ee"
+ :pop-3 "#bce7ff"
+ :editor-rim-color "#4fc3f7"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#4fc3f7"
+               "boolean"     "#bce7ff"
+               "map"         "#81d4fa"
+               "list"        "#4fc3f7"
+               "string"      "#bce7ff"
+               "any"         "#4fc3f7"
+               "vector"      "#bce7ff"
+               "keyword"     "#81d4fa"
+               "rabbit-code" "#4fc3f7"
+               "datetime"    "#bce7ff"
+               "integer"     "#81d4fa"
+               "unknown"     "#4fc3f7"
+               "date"        "#bce7ff"}
+ :editor-grid-selected-font-color "#0d0f18"
+ :monospaced-font "Fira Code"
+ :editor-grid-selected-background-color "#4fc3f7"
+ :nivo-defaults
+   {:font-family "Fira Code"
+    :labels      {:text {:fill "#bce7ff" :font-size "14px" :font-family "Fira Code" :font-weight 450}}
+    :tooltip     {:container {:background      "#0d0f18ee"
+                              :color           "#bce7ff"
+                              :text            {:fill "#bce7ff"}
+                              :fontSize        "13px"
+                              :borderRadius    "0px 8px 0px 8px"
+                              :border          "1px solid #4fc3f7"
+                              :backdrop-filter "blur(8px)"
+                              :box-shadow      "0 0 20px #4fc3f722, inset 0 0 20px #00000088"
+                              :padding         "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#bce7ff" :font-size "13px" :font-family "Fira Code" :font-weight 450}}
+                  :ticks  {:line {:stroke "#4fc3f760"} :text {:fill "#bce7ff" :font-weight 450}}}
+    :grid        {:line {:stroke "#17264d55" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#4fc3f7"
+ :grid-selected-font-color "#0d0f18"
+ :block-title-selected-font-color "#0d0f18"
+ :grid-selected-background-color "#4fc3f7"
+ :grid-font-color "#bce7ff"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 50% 50%, #17264d 0%, #0d0f18 100%),
+                                     url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%234fc3f7' stroke-width='1' opacity='0.12'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3Cpath d='M5 30h50M30 5v50'/%3E%3Ccircle cx='30' cy='30' r='10'/%3E%3C/g%3E%3C/svg%3E\"),
+                                     url(\"data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay, soft-light, normal"
+    :transition "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#0d0f18"}
+ :editor-font-color "#bce7ff"
+ :base-font "Fira Code"
+ :block-tab-selected-font-color "#0d0f18"
+ :editor-background-color "#0d0f18"
+ :editor-grid-font-color "#bce7ff"
+ :pop-1 "#17264d"}
+
+

@@ -1,0 +1,98 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1205"
+ :pop-2 "#c4a062"
+ :base-block-style {:text-shadow "none"
+                    :border-radius "0px"
+                    :filter "none"
+                    :backdrop-filter "none"
+                    :border "2px solid #c4a062"
+                    :border-image
+                      "linear-gradient(45deg, #8B6B3D 0%, #c4a062 25%, #FFD700 50%, #c4a062 75%, #8B6B3D 100%) 1"
+                    :box-shadow "inset 0 0 0 1px #1a1205, 4px 4px 0 #000000"}
+ :vega-defaults {:mark    {:font "Poiret One" :stroke "#c4a062" :color "#c4a06265"}
+                 :legend  {:labelFont  "Poiret One"
+                           :legendFont "Poiret One"
+                           :labelColor "#c4a062"
+                           :titleColor "#c4a062"
+                           :stroke     "#c4a062"
+                           :titleFont  "Poiret One"}
+                 :header  {:labelFont "Poiret One" :titleFont "Poiret One" :titleColor "#c4a062"}
+                 :title   {:font         "Poiret One"
+                           :subtitleFont "Poiret One"
+                           :labelFont    "Poiret One"
+                           :titleFont    "Poiret One"
+                           :titleColor   "#c4a062"}
+                 :point   {:font "Poiret One" :stroke "#c4a062" :color "#c4a06265"}
+                 :area    {:font "Poiret One" :stroke "#c4a062" :color "#c4a06265"}
+                 :axis    {:domainColor "#c4a06244"
+                           :grid        true
+                           :font        "Poiret One"
+                           :labelColor  "#c4a062"
+                           :titleFont   "Poiret One"
+                           :titleColor  "#c4a062"
+                           :labelFont   "Poiret One"
+                           :domain      false
+                           :gridColor   "#c4a06222"
+                           :tickColor   "#c4a06244"
+                           :axisFont    "Poiret One"}
+                 :tooltip {:fill "#1a1205" :stroke "#c4a062" :strokeWidth 2 :color "#c4a062"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#c4a062" :filter "none" :box-shadow "4px 4px 0 #000000"}
+ :base-block-color-selected "#2a2010"
+ :block-title-font-color "#c4a062"
+ :base-block-color "#1a1205"
+ :pop-3 "#FFD700"
+ :editor-rim-color "#c4a062"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#c4a062"
+               "boolean"     "#FFD700"
+               "map"         "#8B6B3D"
+               "list"        "#c4a062"
+               "string"      "#FFD700"
+               "any"         "#c4a062"
+               "vector"      "#FFD700"
+               "keyword"     "#8B6B3D"
+               "rabbit-code" "#c4a062"
+               "datetime"    "#FFD700"
+               "integer"     "#8B6B3D"
+               "unknown"     "#c4a062"
+               "date"        "#FFD700"}
+ :editor-grid-selected-font-color "#1a1205"
+ :monospaced-font "Courier Prime"
+ :editor-grid-selected-background-color "#c4a062"
+ :nivo-defaults
+   {:font-family "Poiret One"
+    :labels      {:text {:fill "#c4a062" :font-size "16px" :font-family "Poiret One" :font-weight 600}}
+    :tooltip     {:container {:background   "#1a1205"
+                              :color        "#c4a062"
+                              :text         {:fill "#c4a062"}
+                              :fontSize     "14px"
+                              :borderRadius "0px"
+                              :border       "2px solid #c4a062"
+                              :box-shadow   "4px 4px 0 #000000"
+                              :padding      "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#c4a062" :font-size "14px" :font-family "Poiret One" :font-weight 600}}
+                  :ticks  {:line {:stroke "#c4a06260"} :text {:fill "#c4a062" :font-weight 600}}}
+    :grid        {:line {:stroke "#c4a06222" :strokeWidth 2 :strokeDasharray "8 8"}}}
+ :editor-outer-rim-color "#c4a062"
+ :grid-selected-font-color "#1a1205"
+ :block-title-selected-font-color "#1a1205"
+ :grid-selected-background-color "#c4a062"
+ :grid-font-color "#c4a062"
+ :canvas-background-css
+   {:background
+      "repeating-linear-gradient(45deg, #1a1205, #1a1205 10px, #2a2010 10px, #2a2010 20px),                                      repeating-linear-gradient(-45deg, #1a1205, #1a1205 10px, #2a2010 10px, #2a2010 20px)"
+    :background-blend-mode "overlay"
+    :transition "all 0.3s ease"
+    :background-color "#1a1205"}
+ :editor-font-color "#c4a062"
+ :base-font "Poiret One"
+ :block-tab-selected-font-color "#1a1205"
+ :editor-background-color "#1a1205"
+ :editor-grid-font-color "#c4a062"
+ :pop-1 "#8B6B3D"}
+
+

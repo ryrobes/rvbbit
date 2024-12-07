@@ -25,13 +25,13 @@
                                              {:contentStyle {:backgroundColor "#00000099"
                                                              :border          "none"}
                                               :itemStyle    {:color "#ecf0f1"}
-                                              :labelStyle   {:color  :theme/editor-outer-rim-color}}]
+                                              :labelStyle   {:color  :theme/pop-1}}]
                                             [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
                                             [:> :Bar {:dataKey :y-field
                                                       :isAnimationActive false
                                                       :data      :query-preview
-                                                      :stroke    :theme/editor-outer-rim-color
-                                                      :fill      [:str :theme/editor-outer-rim-color "33"]
+                                                      :stroke    :theme/pop-1
+                                                      :fill      [:str :theme/pop-1 "33"]
                                                       :on-click [:set-recharts-param>]}]]]}
                   :base-score 1}
 
@@ -61,20 +61,20 @@
                                             {:contentStyle {:backgroundColor "#00000099"
                                                             :border          "none"}
                                              :itemStyle    {:color "#ecf0f1"}
-                                             :labelStyle   {:color  :theme/editor-outer-rim-color}}]
+                                             :labelStyle   {:color  :theme/pop-1}}]
                                            [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
                                            [:> :Line {:type "monotone"
                                                       :isAnimationActive false
                                                       :data :query-preview
                                                       :dataKey :y-field
-                                                      :stroke    :theme/editor-outer-rim-color
+                                                      :stroke    :theme/pop-1
                                                       :activeDot {:r 8} }]
                                            [:>
                                             :Scatter ;; needed for on-click to work, since Line and Area have no on-click handlers
                                             {:data    :query-preview
                                              :dataKey :y-field
                                              :isAnimationActive false
-                                             :fill    :theme/editor-outer-rim-color
+                                             :fill    :theme/pop-1
                                              :onClick [:set-recharts-param>]}]
                                            ]]}
                  :base-score 1}
@@ -105,21 +105,21 @@
                                             {:contentStyle {:backgroundColor "#00000099"
                                                             :border          "none"}
                                              :itemStyle    {:color "#ecf0f1"}
-                                             :labelStyle   {:color :theme/editor-outer-rim-color}}]
+                                             :labelStyle   {:color :theme/pop-1}}]
                                            [:> :XAxis {:dataKey :x-field :allowDuplicatedCategory false}]
                                            [:> :Area {:type "monotone"
                                                       :isAnimationActive false
                                                       :data :query-preview
                                                       :dataKey :y-field
-                                                      :stroke    :theme/editor-outer-rim-color
-                                                      :fill      [:str :theme/editor-outer-rim-color  "33"]
+                                                      :stroke    :theme/pop-1
+                                                      :fill      [:str :theme/pop-1  "33"]
                                                       :activeDot {:r 8} }]
                                            [:>
                                             :Scatter ;; needed for on-click to work, since Line and Area have no on-click handlers
                                             {:data    :query-preview
                                              :isAnimationActive false
                                              :dataKey :y-field
-                                             :fill    :theme/editor-outer-rim-color
+                                             :fill    :theme/pop-1
                                              :onClick [:set-recharts-param>]}]
                                            ]]}
                  :base-score 1}
@@ -147,8 +147,8 @@
                                                     :isAnimationActive false
                                                     :innerRadius :quarter-panel-width
                                                     :outerRadius 80
-                                                    :stroke    :theme/editor-outer-rim-color
-                                                    :fill      [:str :theme/editor-outer-rim-color  "33"]
+                                                    :stroke    :theme/pop-1
+                                                    :fill      [:str :theme/pop-1  "33"]
                                                     :label true
                                                     :on-click [:set-recharts-param>]}]
                                           [:> :Legend {}]
@@ -156,7 +156,7 @@
                                            {:contentStyle {:backgroundColor "#00000099"
                                                            :border          "none"}
                                             :itemStyle    {:color "#ecf0f1"}
-                                            :labelStyle   {:color  :theme/editor-outer-rim-color}}]]]}
+                                            :labelStyle   {:color  :theme/pop-1}}]]]}
                 :base-score 1}
 
 ;; :drop-down-filter  {:axes {:dim [:and :dimension? :is-string?
@@ -209,7 +209,7 @@
 ;;                                                 :itemStyle {:color "#ecf0f1"}
 ;;                                                 :labelStyle {:color "#3498db"}}]
 ;;                                               [:> :Scatter {:data :query-preview
-;;                                                             :fill [:str :theme/editor-outer-rim-color "66"]
+;;                                                             :fill [:str :theme/pop-1 "66"]
 ;;                                                             :on-click [:set-recharts-param>]}]]]}
 ;;                     :base-score 1}
 
@@ -246,7 +246,7 @@
 ;;                                                   [:> :Bar {:dataKey :y-field
 ;;                                                             :stackId "a"
 ;;                                                             :data :query-preview
-;;                                                             :fill [:str :theme/editor-outer-rim-color "66"]
+;;                                                             :fill [:str :theme/pop-1 "66"]
 ;;                                                             :on-click [:set-recharts-param>]}]]]}
 ;;                         :base-score 1}
 
@@ -284,13 +284,13 @@
 ;;                                                      [:> :Bar {:yAxisId "left"
 ;;                                                                :dataKey :y1-field
 ;;                                                                :data :query-preview
-;;                                                                :fill [:str :theme/editor-outer-rim-color "66"]
+;;                                                                :fill [:str :theme/pop-1 "66"]
 ;;                                                                :on-click [:set-recharts-param>]}]
 ;;                                                      [:> :Line {:yAxisId "right"
 ;;                                                                 :type "monotone"
 ;;                                                                 :dataKey :y2-field
 ;;                                                                 :data :query-preview
-;;                                                                 :stroke :theme/editor-outer-rim-color
+;;                                                                 :stroke :theme/pop-1
 ;;                                                                 :on-click [:set-recharts-param>]}]]]}
 ;;                            :base-score 1}
 

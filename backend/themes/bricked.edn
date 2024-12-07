@@ -1,0 +1,123 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a0f0a"
+ :pop-2 "#ff7b00"
+ :base-block-style
+   {:text-shadow "2px 2px 4px #00000088"
+    :border-radius "2px 6px 0px 4px"
+    :filter "none"
+    :backdrop-filter "blur(3px) contrast(120%) brightness(90%)"
+    :border "3px solid"
+    :border-image
+      "repeating-linear-gradient(45deg, #4d1800 0%, #4d1800 5%, #ff7b00 5%, #ff7b00 10%, #4d1800 10%, #4d1800 15%, transparent 15%, transparent 20%) 2"
+    :box-shadow
+      "inset 0 0 20px #00000099, 
+                                      inset -3px -3px 10px #ff7b0015,
+                                      inset 3px 3px 10px #00000044,
+                                      0 4px 0px #000000,
+                                      4px 4px 8px #00000066,
+                                      -2px -2px 4px #ff7b0022,
+                                      0 0 15px rgba(255, 123, 0, 0.1),
+                                      0 0 30px rgba(0, 0, 0, 0.2)"}
+ :vega-defaults {:mark    {:font "Share Tech Mono" :stroke "#ff7b00" :color "#ff7b0065"}
+                 :legend  {:labelFont  "Share Tech Mono"
+                           :legendFont "Share Tech Mono"
+                           :labelColor "#ffd27d"
+                           :titleColor "#ffd27d"
+                           :stroke     "#ff7b00"
+                           :titleFont  "Share Tech Mono"}
+                 :header  {:labelFont "Share Tech Mono" :titleFont "Share Tech Mono" :titleColor "#ffd27d"}
+                 :title   {:font         "Share Tech Mono"
+                           :subtitleFont "Share Tech Mono"
+                           :labelFont    "Share Tech Mono"
+                           :titleFont    "Share Tech Mono"
+                           :titleColor   "#ffd27d"}
+                 :point   {:font "Share Tech Mono" :stroke "#ff7b00" :color "#ff7b0065"}
+                 :area    {:font "Share Tech Mono" :stroke "#ff7b00" :color "#ff7b0065"}
+                 :axis    {:domainColor "#ff7b0044"
+                           :grid        true
+                           :font        "Share Tech Mono"
+                           :labelColor  "#ffd27d"
+                           :titleFont   "Share Tech Mono"
+                           :titleColor  "#ffd27d"
+                           :labelFont   "Share Tech Mono"
+                           :domain      false
+                           :gridColor   "#4d180055"
+                           :tickColor   "#ff7b0044"
+                           :axisFont    "Share Tech Mono"}
+                 :tooltip {:fill "#1a0f0aee" :stroke "#ff7b00" :strokeWidth 2 :color "#ffd27d"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#ff7b0022"
+    :filter "contrast(120%) brightness(110%)"
+    :backdrop-filter "blur(2px) brightness(130%)"
+    :box-shadow
+      "0 0 20px #ff7b0033,
+                                             inset 0 0 0 1px #ff7b0044,
+                                             inset -2px -2px 4px #00000066"}
+ :base-block-color-selected "#2a1f1a"
+ :block-title-font-color "#ffd27d"
+ :base-block-color "#1a0f0a99"
+ :pop-3 "#ffd700"
+ :editor-rim-color "#ff7b00"
+ :base-block-filter-selected "contrast(120%) brightness(110%)"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#ff7b00"
+               "boolean"     "#ffd700"
+               "map"         "#ffd27d"
+               "list"        "#ff7b00"
+               "string"      "#ffd700"
+               "any"         "#ff7b00"
+               "vector"      "#ffd700"
+               "keyword"     "#ffd27d"
+               "rabbit-code" "#ff7b00"
+               "datetime"    "#ffd700"
+               "integer"     "#ffd27d"
+               "unknown"     "#ff7b00"
+               "date"        "#ffd700"}
+ :editor-grid-selected-font-color "#1a0f0a"
+ :monospaced-font "Share Tech Mono"
+ :editor-grid-selected-background-color "#ff7b00"
+ :nivo-defaults
+   {:font-family "Share Tech Mono"
+    :labels {:text {:fill "#ffd27d" :font-size "14px" :font-family "Share Tech Mono" :font-weight 400}}
+    :tooltip
+      {:container
+         {:background "#1a0f0aee"
+          :color "#ffd27d"
+          :text {:fill "#ffd27d"}
+          :fontSize "13px"
+          :borderRadius "2px"
+          :border "1px solid #ff7b00"
+          :backdrop-filter "blur(2px) brightness(110%)"
+          :box-shadow
+            "0 4px 0 #000000, 
+                                             4px 8px 16px #00000066,
+                                             inset 0 0 10px #00000088"
+          :padding "8px 12px"}
+       :basic {:whiteSpace "pre" :display "flex" :alignItems "center"}
+       :tableCell {:padding "4px 8px"}}
+    :axis {:legend {:text {:fill "#ffd27d" :font-size "13px" :font-family "Share Tech Mono" :font-weight 400}}
+           :ticks  {:line {:stroke "#ff7b0060"} :text {:fill "#ffd27d" :font-weight 400}}}
+    :grid {:line {:stroke "#4d180055" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#ff7b00"
+ :grid-selected-font-color "#1a0f0a"
+ :block-title-selected-font-color "#1a0f0a"
+ :grid-selected-background-color "#ff7b00"
+ :grid-font-color "#ffd27d"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 30% 30%, #2a1f1a 0%, #1a0f0a 100%),
+                                     url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ff7b00' fill-opacity='0.1'%3E%3Cpath d='M0 0h100v100H0z'/%3E%3Cpath fill='%23000' d='M0 0h50v50H0z' filter='url(%23noise)'/%3E%3Cpath d='M10 10h80v80H10z' stroke='%23ff7b00' stroke-width='1' fill='none' opacity='0.2'/%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3C/g%3E%3C/svg%3E\"),
+                                     url(\"data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise2)' opacity='0.4'/%3E%3C/svg%3E\"),
+                                     url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ff7b00' stroke-width='1' opacity='0.2'%3E%3Cpath d='M0 0l30 30M30 0L0 30M60 30L30 60M30 30l30 30' stroke-dasharray='2,4'/%3E%3C/g%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay, multiply, color-burn, normal"
+    :transition "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#1a0f0a"}
+ :editor-font-color "#ffd27d"
+ :base-font "Share Tech Mono"
+ :block-tab-selected-font-color "#1a0f0a"
+ :editor-background-color "#1a0f0a"
+ :editor-grid-font-color "#ffd27d"
+ :pop-1 "#4d1800"}
+
+

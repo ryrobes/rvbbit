@@ -1,6 +1,5 @@
 
-{
-    ;;  :mapbox-point-map {:axes {:x [:or
+{;;  :mapbox-point-map {:axes {:x [:or
 ;;                                [:and :dimension?
 ;;                                 ;:reasonable-cardinality? ;;
 ;;                                 [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
@@ -37,15 +36,69 @@
 ;;                                                         :on-click [:set-recharts-param>]}]]]}
 ;;                     :base-score 1}
 
- :aacode-test {:axes {:x [:true?]}
+ :code-test {:axes {:x [:true?]}
 
                :sql-maps [{:select [[[:count [:distinct :x-field]] :dd]]
                            :from [:table]}]
 
                :runner :clojure
+               :selected-mode :text
 
                :library-shapes
                (quote (let [trig :data-hash/query-preview
                             data :data/query-preview]
                         (str :x-field :rand-int-> (rand-int 123) " counts of " :x-field " ! =" (count data) "!")))
-               :base-score 1}}
+               :base-score 1}
+
+ :mapbox-point-map  {:axes {:lat [:geo-lat?]
+                            :long [:geo-long?]}
+
+                     :sql-maps [{:select [:lat-field :long-field [[:count 1] :freq]]
+                                 :from [:table]
+                                 :group-by [:lat-field :long-field]
+                                 :where [:and
+                                         [:<> :lat-field nil]
+                                         [:<> :long-field nil]]}]
+                     :runner :clojure
+                     :selected-mode :clover
+                     :library-shapes
+                     (quote (let [ccc    :theme/editor-outer-rim-color
+                                  ddata (vec
+                                         (for [row :data/query-preview
+                                               :let [size (+ 2 (get row :freq 0))]]
+                                           {:type "Feature"
+                                            :properties {:size size :color ccc}
+                                            :geometry
+                                            {:type "Point"
+                                             :coordinates
+                                             [(get row :long-field)
+                                              (get row :lat-field)]}}))]
+                              [:> :Map
+                               {:mapboxAccessToken :settings/mapbox-token
+                                :mapStyle "mapbox://styles/mapbox/dark-v11"
+                                :interactiveLayerIds ["points"]
+                                ;; [:if [:= :*this-block* :user-sys/over-block] :_viewState :viewState]
+                                :onMoveEnd :viewport-params-fn2
+                                :initialViewState {:longitude
+                                                   :*this-block*/longitude
+                                                   :latitude :*this-block*/latitude
+                                                   :zoom :*this-block*/zoom}
+                                :style {:height :height-int
+                                        :width "100%"}
+                                :minZoom 3
+                                :maxZoom 15
+                                :projection "mercator"}
+                               [:> :Source
+                                {:id   "mapbox-data"
+                                 :type "geojson"
+                                 :data {:type     "FeatureCollection"
+                                        :features ddata}}]
+                               [:> :Layer
+                                {:id     "points"
+                                 :source "mapbox-data"
+                                 :type   "circle"
+                                 :paint  {"circle-radius" ["get" "size"]
+                                          "circle-color"  ["get" "color"]}}]]))
+                     :base-score 1}}
+
+

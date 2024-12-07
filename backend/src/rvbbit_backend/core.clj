@@ -192,6 +192,31 @@
         screen-data   (try (edn/read-string valid-edn-str) (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))]
     (convert-back-to-original screen-data)))
 
+(defn read-theme [f-path]
+  (let [theme-str    (slurp f-path)
+        valid-edn-str (convert-to-valid-edn theme-str)
+        theme-data   (try (edn/read-string valid-edn-str) (catch Exception e (ut/pp [:read-theme-error!!!!! f-path e]) {}))]
+    theme-data))
+
+
+(defn update-theme-meta [f-path]
+  (ppy/execute-in-thread-pools :update-theme-meta
+                               (fn []
+                                 (try
+                                   (let [theme-map (read-screen f-path)
+                                         theme-name (cstr/replace (cstr/lower-case (last (cstr/split (str f-path) #"/"))) ".edn" "")]
+                                     (sql-exec systemh2-db (to-sql {:delete-from [:themes] :where [:= :file_path f-path]}))
+
+                                     (sql-exec systemh2-db
+                                               (to-sql {:insert-into [:themes]
+                                                        :columns     [:file_path :theme_name :theme_map]
+                                                        :values      [[f-path theme-name (pr-str theme-map)]]}))
+                                     (ut/pp [:theme theme-name]))
+                                   (catch Throwable e
+                                     (println "Error in update-theme-meta:" (.getMessage e))
+                                     (.printStackTrace e))))))
+
+
 (defn update-screen-meta [f-path runners]
   ;(qp/slot-queue :update-screen-meta f-path
   (ppy/execute-in-thread-pools :update-screen-meta
@@ -240,8 +265,8 @@
                                      (sql-exec systemh2-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
                                      (sql-exec systemh2-db
                                                (to-sql {:insert-into [:screens]
-                                                        :columns     [:file_path :screen_name :blocks :queries]
-                                                        :values      [[f-path screen-name (count blocks) (count (keys queries))]]}))
+                                                        :columns     [:file_path :screen_name :blocks :queries :theme_map]
+                                                        :values      [[f-path screen-name (count blocks) (count (keys queries)) (pr-str theme-map)]]}))
                                      (sql-exec systemh2-db
                                                (to-sql
                                                 {:insert-into [:blocks]
@@ -275,10 +300,24 @@
 (defn update-all-screen-meta []
   (sql-exec systemh2-db (to-sql {:truncate :screens}))
   (sql-exec systemh2-db (to-sql {:truncate :blocks}))
+  ;; (sql-exec systemh2-db (to-sql {:truncate :themes}))
   (let [prefix "./screens/"
         runners (keys (dissoc (get (config/settings) :runners) :views))
-        files  (ut/get-file-vectors-simple prefix ".edn")]
-    (doseq [f files] (update-screen-meta (str prefix f) runners))))
+        files  (ut/get-file-vectors-simple prefix ".edn")
+        ;theme-files (ut/get-file-vectors-simple "./themes/" ".edn")
+        ]
+    (doseq [f files]
+      (update-screen-meta (str prefix f) runners))
+    ;; (doseq [f theme-files]
+    ;;   (update-theme-meta (str prefix f)))
+    ))
+
+(defn update-all-theme-meta []
+  (sql-exec systemh2-db (to-sql {:truncate :themes}))
+  (let [prefix "./themes/"
+        theme-files (ut/get-file-vectors-simple prefix ".edn")]
+    (doseq [f theme-files]
+      (update-theme-meta (str prefix f)))))
 
 ;; (ut/pp (update-all-screen-meta))
 ;; (ut/pp [:blocks @db/unique-block-set (count @db/unique-block-set)])
@@ -440,9 +479,16 @@
                        (let [f-path (str (get % :path))
                              f-op   (get % :type)]
                          (ut/pp [:screen-change! f-op f-path])
-                         ;(update-screen-meta f-path)
-                         (update-all-screen-meta)
-                         ))
+                         (update-all-screen-meta)))
+                    file-path)))
+
+(defn watch-themes-folder []
+  (let [file-path "./themes/"]
+    (beholder/watch #(when (cstr/ends-with? (str (get % :path)) ".edn")
+                       (let [f-path (str (get % :path))
+                             f-op   (get % :type)]
+                         (ut/pp [:theme-change! f-op f-path])
+                         (update-all-theme-meta)))
                     file-path)))
 
 (defn shape-rotation-run [f-path & [pre-filter-fn]]
@@ -782,6 +828,7 @@
   (evl/create-nrepl-server!) ;; needs to start
   (update-all-screen-meta) ;; has queue per screen
   (update-all-flow-meta) ;; has queue per flow
+  (update-all-theme-meta)
   (update-all-conn-meta)
   (wss/reload-signals-subs) ;; run once on boot
   (wss/reload-solver-subs) ;; run once on boot (needs nrepl(s) to start first...)
@@ -1101,8 +1148,8 @@
     (fpop/thaw-flow-results)
 
     (ut/pp [:creating-h2-tables "systemh2-db"])
-    ;; (sql-exec systemh2-db "drop table fields;")
     (sql-exec systemh2-db h2/create-screens)
+    (sql-exec systemh2-db h2/create-themes)
     (sql-exec systemh2-db h2/create-blocks)
     (sql-exec systemh2-db h2/create-realms)
     (sql-exec systemh2-db h2/create-fields)
@@ -1158,6 +1205,8 @@
     (defonce start-conn-watcher (watch-connections-folder))
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-screen-watcher (watch-screens-folder))
+    #_{:clj-kondo/ignore [:inline-def]}
+    (defonce start-theme-watcher (watch-themes-folder))
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-flow-watcher (watch-flows-folder))
     #_{:clj-kondo/ignore [:inline-def]}
@@ -1612,6 +1661,7 @@
                         #(do (reset! wss/shutting-down? true)
                              ;(db/close-ddb)
                              (doseq [electric-eye [start-conn-watcher start-screen-watcher start-flow-watcher macro-undo-watcher ;;watch-leaves-watcher
+                                                   start-shape-watcher start-theme-watcher
                                                    start-ai-workers-watcher start-settings-watcher start-solver-watcher ;session-file-watcher
                                                    ]]
                                (do

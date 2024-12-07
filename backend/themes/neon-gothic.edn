@@ -1,0 +1,103 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0c0420"
+ :pop-2 "#ff36d9"
+ :base-block-style
+   {:text-shadow "0 0 20px #ff36d955"
+    :border-radius "12px"
+    :filter "none"
+    :backdrop-filter "blur(16px) brightness(120%) saturate(120%)"
+    :border "1px solid rgba(255, 54, 217, 0.2)"
+    :box-shadow
+      "inset 0 0 40px #00000099,                                        inset 0 0 80px #ff36d908,                                       0 0 1px #ff36d9aa,                                       0 0 40px #00000088,                                       0 0 50px #00eaff22"}
+ :vega-defaults
+   {:mark {:font "Orbitron" :stroke "#ff36d9" :color "#ff36d965"}
+    :legend {:labelFont  "Orbitron"
+             :legendFont "Orbitron"
+             :labelColor "#ffffff"
+             :titleColor "#ffffff"
+             :stroke     "#ff36d9"
+             :titleFont  "Orbitron"}
+    :header {:labelFont "Orbitron" :titleFont "Orbitron" :titleColor "#ffffff"}
+    :title {:font "Orbitron" :subtitleFont "Orbitron" :labelFont "Orbitron" :titleFont "Orbitron" :titleColor "#ffffff"}
+    :point {:font "Orbitron" :stroke "#ff36d9" :color "#ff36d965"}
+    :area {:font "Orbitron" :stroke "#ff36d9" :color "#ff36d965"}
+    :axis {:domainColor "#ff36d944"
+           :grid        true
+           :font        "Orbitron"
+           :labelColor  "#ffffff"
+           :titleFont   "Orbitron"
+           :titleColor  "#ffffff"
+           :labelFont   "Orbitron"
+           :domain      false
+           :gridColor   "#00eaff22"
+           :tickColor   "#ff36d944"
+           :axisFont    "Orbitron"}
+    :tooltip {:fill "#0c042099" :stroke "#ff36d9" :strokeWidth 1 :color "#ffffff"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#ff36d915"
+    :filter           "none"
+    :backdrop-filter  "blur(20px) brightness(140%) saturate(140%)"
+    :box-shadow       "0 0 40px #ff36d933,                                              inset 0 0 20px #00eaff22"}
+ :base-block-color-selected "#160840"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#0c042099"
+ :pop-3 "#00eaff"
+ :editor-rim-color "#ff36d9"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#ff36d9"
+               "boolean"     "#00eaff"
+               "map"         "#ff9247"
+               "list"        "#ff36d9"
+               "string"      "#00eaff"
+               "any"         "#ff36d9"
+               "vector"      "#00eaff"
+               "keyword"     "#ff9247"
+               "rabbit-code" "#ff36d9"
+               "datetime"    "#00eaff"
+               "integer"     "#ff9247"
+               "unknown"     "#ff36d9"
+               "date"        "#00eaff"}
+ :editor-grid-selected-font-color "#0c0420"
+ :monospaced-font "Orbitron"
+ :editor-grid-selected-background-color "#ff36d9"
+ :nivo-defaults
+   {:font-family "Orbitron"
+    :labels {:text {:fill "#ffffff" :font-size "15px" :font-family "Orbitron" :font-weight 500}}
+    :tooltip
+      {:container
+         {:box-shadow
+            "0 0 40px #00000088,                                              0 0 50px #ff36d922,                                              inset 0 0 20px #00eaff11"
+          :color "#ffffff"
+          :borderRadius "8px"
+          :background "#0c042099"
+          :backdrop-filter "blur(20px) brightness(140%) saturate(140%)"
+          :padding "8px 12px"
+          :fontSize "14px"
+          :border "1px solid #ff36d9"
+          :text {:fill "#ffffff"}}
+       :basic {:whiteSpace "pre" :display "flex" :alignItems "center"}
+       :tableCell {:padding "4px 8px"}}
+    :axis {:legend {:text {:fill "#ffffff" :font-size "14px" :font-family "Orbitron" :font-weight 500}}
+           :ticks  {:line {:stroke "#ff36d960"} :text {:fill "#ffffff" :font-weight 500}}}
+    :grid {:line {:stroke "#00eaff22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#ff36d9"
+ :grid-selected-font-color "#0c0420"
+ :block-title-selected-font-color "#0c0420"
+ :grid-selected-background-color "#ff36d9"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background "linear-gradient(180deg, rgba(12,4,32,0.85) 0%, rgba(12,4,32,0.92) 100%)"
+                         :background-image "url(assets/openai-images/b64-image3-57753-98916.png)"
+                         :background-size "cover"
+                         :background-blend-mode "soft-light"
+                         :transition "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                         :background-color "#0c0420"}
+ :editor-font-color "#ffffff"
+ :base-font "Orbitron"
+ :block-tab-selected-font-color "#0c0420"
+ :editor-background-color "#0c0420"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#160840"}
+
+

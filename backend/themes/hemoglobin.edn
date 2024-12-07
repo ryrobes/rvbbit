@@ -1,0 +1,95 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0a0610"
+ :pop-2 "#ff3a68"
+ :base-block-style
+   {:text-shadow "0 0 20px #ff3a6833"
+    :border-radius "12px 4px 16px 8px"
+    :filter "none"
+    :backdrop-filter "blur(8px) contrast(120%)"
+    :border "1px solid #ff3a6855"
+    :box-shadow
+      "inset 0 0 30px #26054455,                                       inset 0 0 50px #ff3a6815,                                       0 0 15px #00000088,                                       0 2px 5px #ff3a6822,                                       0 0 0 1px #26054422"}
+ :vega-defaults
+   {:mark {:font "Rajdhani" :stroke "#ff3a68" :color "#ff3a6865"}
+    :legend {:labelFont  "Rajdhani"
+             :legendFont "Rajdhani"
+             :labelColor "#ff3a68"
+             :titleColor "#ff3a68"
+             :stroke     "#ff3a68"
+             :titleFont  "Rajdhani"}
+    :header {:labelFont "Rajdhani" :titleFont "Rajdhani" :titleColor "#ff3a68"}
+    :title {:font "Rajdhani" :subtitleFont "Rajdhani" :labelFont "Rajdhani" :titleFont "Rajdhani" :titleColor "#ff3a68"}
+    :point {:font "Rajdhani" :stroke "#ff3a68" :color "#ff3a6865"}
+    :area {:font "Rajdhani" :stroke "#ff3a68" :color "#ff3a6865"}
+    :axis {:domainColor "#ff3a6844"
+           :grid        true
+           :font        "Rajdhani"
+           :labelColor  "#ff3a68aa"
+           :titleFont   "Rajdhani"
+           :titleColor  "#ff3a68"
+           :labelFont   "Rajdhani"
+           :domain      false
+           :gridColor   "#26054422"
+           :tickColor   "#ff3a6844"
+           :axisFont    "Rajdhani"}
+    :tooltip {:fill "#0a061099" :stroke "#ff3a68" :strokeWidth 1 :backdropFilter "blur(8px)" :color "#ff3a68"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#ff3a6815" :filter "none" :backdrop-filter "blur(4px)" :box-shadow "0 0 20px #ff3a6833"}
+ :base-block-color-selected "#260544"
+ :block-title-font-color "#ff3a68"
+ :base-block-color "#0a061099"
+ :pop-3 "#fc72d0"
+ :editor-rim-color "#ff3a68"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#ff3a68"
+               "boolean"     "#fc72d0"
+               "map"         "#ff71a9"
+               "list"        "#ff3a68"
+               "string"      "#fc72d0"
+               "any"         "#ff3a68"
+               "vector"      "#fc72d0"
+               "keyword"     "#ff71a9"
+               "rabbit-code" "#ff3a68"
+               "datetime"    "#fc72d0"
+               "integer"     "#ff71a9"
+               "unknown"     "#ff3a68"
+               "date"        "#fc72d0"}
+ :editor-grid-selected-font-color "#0a0610"
+ :monospaced-font "Rajdhani"
+ :editor-grid-selected-background-color "#ff3a68"
+ :nivo-defaults
+   {:font-family "Rajdhani"
+    :labels      {:text {:fill "#ff3a68" :font-size "16px" :font-family "Rajdhani" :font-weight 600}}
+    :tooltip     {:container {:backdropFilter "blur(8px)"
+                              :box-shadow     "0 0 20px #ff3a6833"
+                              :color          "#ff3a68"
+                              :borderRadius   "8px 2px 12px 4px"
+                              :background     "#0a061099"
+                              :padding        "8px 12px"
+                              :fontSize       "14px"
+                              :border         "1px solid #ff3a6855"
+                              :text           {:fill "#ff3a68"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#ff3a68" :font-size "14px" :font-family "Rajdhani" :font-weight 600}}
+                  :ticks  {:line {:stroke "#ff3a6860"} :text {:fill "#ff3a68aa" :font-weight 600}}}
+    :grid        {:line {:stroke "#26054422" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#ff3a68"
+ :grid-selected-font-color "#0a0610"
+ :block-title-selected-font-color "#0a0610"
+ :grid-selected-background-color "#ff3a68"
+ :grid-font-color "#ff3a68"
+ :canvas-background-css {:background            "radial-gradient(circle at 50% 50%, #260544 0%, #0a0610 100%)"
+                         :background-blend-mode "overlay, color-dodge, normal"
+                         :transition            "all 0.3s ease"
+                         :background-color      "#0a0610"}
+ :editor-font-color "#ff3a68"
+ :base-font "Rajdhani"
+ :block-tab-selected-font-color "#0a0610"
+ :editor-background-color "#0a0610"
+ :editor-grid-font-color "#ff3a68"
+ :pop-1 "#260544"}
+
+

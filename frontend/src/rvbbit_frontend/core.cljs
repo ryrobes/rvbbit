@@ -245,7 +245,7 @@
                                        :client-name db/client-name}
                          :on-response [::signals/solvers-map-response]
                          :timeout     15000000}])
-  (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
+  (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows :click-param]))
                       :reinstate-fn (fn [ratom value] (swap! ratom merge value))})
   (track-mouse-activity)
   ;; (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event

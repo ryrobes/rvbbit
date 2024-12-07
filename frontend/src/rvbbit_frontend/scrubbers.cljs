@@ -160,6 +160,10 @@
              {:id "spectral" :label "spectral" :group "Diverging Schemes"}
              {:id "rainbow" :label "rainbow" :group "Cyclical Schemes"}
              {:id "sinebow" :label "sinebow" :group "Cyclical Schemes"}]}
+       [:mapStyle]  {:message "Mapbox default style URLs"
+                     :values ["mapbox://styles/mapbox/light-v11" "mapbox://styles/mapbox/dark-v11" "mapbox://styles/mapbox/streets-v12"
+                              "mapbox://styles/mapbox/satellite-v9" "mapbox://styles/mapbox/satellite-streets-v12"
+                              "mapbox://styles/mapbox/outdoors-v12"]}
        [:aggregate] {:message "vega-lite axis aggregation fn used"
                      :url     "https://vega.github.io/vega-lite/docs/aggregate.html"
                      :values  ["count" "distinct" "sum" ;"product" "mean"
@@ -167,6 +171,7 @@
        [:sort] {:message "vega-lite axis sorting attrib"
                 :url     "https://vega.github.io/vega-lite/docs/sort.html"
                 :values  ["x" "-x" "y" "-y" "ascending" "descending" "color" "-color"]}
+       [:line-style] {:message "data lineage line render style" :values ["curved-path-h" "curved-path-v" "stepped-path-h" "stepped-path-v"]}
        [:font-weight] {:message "CSS font-weight attribute (not all are supported in all fonts)"
                        :values  [100 200 300 400 500 600 700]}
        [:opacity] {:message "CSS opacity attribute" :values [0.0 0.05 1.0]}
@@ -179,12 +184,13 @@
                                                                "exclusion" "hue" "saturation" "color" "luminosity"]}
        [[:font-family] [:titleFont] [:monospaced-font] [:base-font] [:labelFont] [:legendFont]]
          {:message "font face!"
-          :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono" "Chicago Kare"
-                                    "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha" "Afacad Flux" "Space Grotesk" "Rubik" "Roboto Slab"
-                                    "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono"
-                                    "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline"
-                                    "IBM Plex Mono" "Roboto Slab" "Source Code Pro" "Pastor of Muppets" "Odor Mean Chey"
-                                    "Pastor of Muppets Flipped" "Roboto Condensed" "Fira Sans" "Fira Code" "Sono" "Chivo Mono"]))}
+          :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono" "Chicago Kare" "Chicago" "Helvetica" "Cascadia Code"
+                                    "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha" "Afacad Flux" "Space Grotesk" "Rubik" "Roboto Slab" "Plus Jakarta Sans"
+                                    "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono" "C64 Pro Mono" "C64 Pro" "VT323" "Lucida Sans Typewriter" "Gochi Hand"
+                                    "Lucida Sans" "Poiret One" "Courier Prime" "Orbitron"  "DIN Condensed" "Cinzel" "Dwemer" "Rajdhani" "Uncial Antiqua" "Zen Maru Gothic" "Outrun future"
+                                    "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline" "Audiowide" "Alice" "Inter" "SF Mono"
+                                    "IBM Plex Mono" "Roboto Slab" "Source Code Pro" "Pastor of Muppets" "Odor Mean Chey" "American Typewriter" "Cormorant Garamond" "Syncopate" "IBM Plex Sans"
+                                    "Pastor of Muppets Flipped" "Roboto Condensed" "Fira Sans" "Fira Code" "Sono" "Chivo Mono" "Cabinet Grotesk"]))}
        [[:codemirror-theme]]
          {:message "codemirror theme"
           :values  (distinct (sort ["3024-day" "bespin" "gruvbox-dark" "material" "panda-syntax" "tomorrow-night-bright"

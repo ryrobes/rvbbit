@@ -23,8 +23,12 @@
                             [:not [:like :field-name "styler_%"]] ;; ignore user-space conditional formatting fields
                             [:not [:like :field-name "%_id%"]]]]]
  ;:testto?                [:or :zipcode? :low-cardinality? :dimension?]
- :geo-lat?               [:and [:like [:lower :field-name] "lat%"] [:= :data-type "float"]]
- :geo-long?              [:and [:like [:lower :field-name] "long%"] [:= :data-type "float"]]
+ :looks-lat?             [:or [:like [:lower :field-name] "%lat%"] [:like [:lower :field-name] "lat%"] [:like [:lower :field-name] "%lat"]]
+ :looks-long?            [:or [:like [:lower :field-name] "%long%"] [:like [:lower :field-name] "long%"] [:like [:lower :field-name] "%long"]]
+;;  :geo-lat?               [:and [:like [:lower :field-name] "%lat%"] [:or [:= :data-type "float"] [:= :data-type "decimal"]]]
+;;  :geo-long?              [:and [:like [:lower :field-name] "%long%"] [:or [:= :data-type "float"] [:= :data-type "decimal"]]]
+ :geo-lat?               [:and :looks-lat? [:or [:= :data-type "float"] [:= :data-type "decimal"]]]
+ :geo-long?              [:and :looks-long? [:or [:= :data-type "float"] [:= :data-type "decimal"]]]
  :fips-state-code?       [:and [:like [:lower :field-name] "%fips_state_code%"] [:= :data-type "integer"]]
  :fips-county-code?      [:and [:like [:lower :field-name] "%fips_county_code%"] [:= :data-type "integer"]]
  :zipcode?               [:and [:like [:lower :field-name] "%zip%"] [:= :data-type "integer"]]
@@ -41,7 +45,7 @@
  :is-sqlite?             [:= :db-type "SQLite"]
  :is-year?               [:and [:= :data-type "integer"] [:like [:lower :field-name] "%year%"]]
  :is-month?              [:and [:= :data-type "integer"] [:like [:lower :field-name] "%month%"]]
- :is-rowcount?           [:and [:= :data-type "integer"] [:= :field-name "rows"]] ;; meta field inserted to generate counts by dim
+ :is-rowcount?           [:and [:= :data-type "integer"] [:or [:= :field-name "rows"] [:= :field-name "rrows"]]] ;; meta field inserted to generate counts by dim
  :not-clickhouse?        [:<> :db-type "ClickHouse"]
  :true?                  [:= 1 1]
  :false?                 [:= 45 1]

@@ -1,0 +1,99 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1a1c"
+ :pop-2 "#b38637"
+ :base-block-style
+   {:text-shadow "none"
+    :border-radius "0px"
+    :filter "none"
+    :backdrop-filter "none"
+    :border "3px solid #707070"
+    :border-image "linear-gradient(90deg, #4a4a4a 0%, #707070 25%, #a0a0a0 50%, #707070 75%, #4a4a4a 100%) 1"
+    :box-shadow
+      "inset 0 0 0 1px #000000, 
+                                      8px 8px 0 #000000,
+                                      12px 12px 15px #00000066"}
+ :vega-defaults
+   {:mark {:font "Orbitron" :stroke "#b38637" :color "#b3863765"}
+    :legend {:labelFont  "Orbitron"
+             :legendFont "Orbitron"
+             :labelColor "#b38637"
+             :titleColor "#b38637"
+             :stroke     "#b38637"
+             :titleFont  "Orbitron"}
+    :header {:labelFont "Orbitron" :titleFont "Orbitron" :titleColor "#b38637"}
+    :title {:font "Orbitron" :subtitleFont "Orbitron" :labelFont "Orbitron" :titleFont "Orbitron" :titleColor "#b38637"}
+    :point {:font "Orbitron" :stroke "#b38637" :color "#b3863765"}
+    :area {:font "Orbitron" :stroke "#b38637" :color "#b3863765"}
+    :axis {:domainColor "#70707044"
+           :grid        true
+           :font        "Orbitron"
+           :labelColor  "#b38637"
+           :titleFont   "Orbitron"
+           :titleColor  "#b38637"
+           :labelFont   "Orbitron"
+           :domain      false
+           :gridColor   "#70707022"
+           :tickColor   "#70707044"
+           :axisFont    "Orbitron"}
+    :tooltip {:fill "#1a1a1c" :stroke "#707070" :strokeWidth 3 :color "#b38637"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#707070" :filter "none" :box-shadow "4px 4px 0 #000000"}
+ :base-block-color-selected "#282830"
+ :block-title-font-color "#b38637"
+ :base-block-color "#1a1a1c"
+ :pop-3 "#d4d4d4"
+ :editor-rim-color "#707070"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#b38637"
+               "boolean"     "#d4d4d4"
+               "map"         "#707070"
+               "list"        "#b38637"
+               "string"      "#d4d4d4"
+               "any"         "#b38637"
+               "vector"      "#d4d4d4"
+               "keyword"     "#707070"
+               "rabbit-code" "#b38637"
+               "datetime"    "#d4d4d4"
+               "integer"     "#707070"
+               "unknown"     "#b38637"
+               "date"        "#d4d4d4"}
+ :editor-grid-selected-font-color "#1a1a1c"
+ :monospaced-font "IBM Plex Mono"
+ :editor-grid-selected-background-color "#707070"
+ :nivo-defaults
+   {:font-family "Orbitron"
+    :labels      {:text {:fill "#b38637" :font-size "16px" :font-family "Orbitron" :font-weight 500}}
+    :tooltip     {:container {:background   "#1a1a1c"
+                              :color        "#b38637"
+                              :text         {:fill "#b38637"}
+                              :fontSize     "14px"
+                              :borderRadius "0px"
+                              :border       "3px solid #707070"
+                              :box-shadow   "4px 4px 0 #000000"
+                              :padding      "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#b38637" :font-size "14px" :font-family "Orbitron" :font-weight 500}}
+                  :ticks  {:line {:stroke "#70707060"} :text {:fill "#b38637" :font-weight 500}}}
+    :grid        {:line {:stroke "#70707022" :strokeWidth 2 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#707070"
+ :grid-selected-font-color "#1a1a1c"
+ :block-title-selected-font-color "#1a1a1c"
+ :grid-selected-background-color "#707070"
+ :grid-font-color "#b38637"
+ :canvas-background-css
+   {:background
+      "repeating-linear-gradient(45deg, #1a1a1c, #1a1a1c 10px, #282830 10px, #282830 20px),
+                                     url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23707070' opacity='0.1'/%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay"
+    :transition "none"
+    :background-color "#1a1a1c"}
+ :editor-font-color "#b38637"
+ :base-font "Orbitron"
+ :block-tab-selected-font-color "#1a1a1c"
+ :editor-background-color "#1a1a1c"
+ :editor-grid-font-color "#b38637"
+ :pop-1 "#707070"}
+
+

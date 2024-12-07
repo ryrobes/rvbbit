@@ -1,0 +1,99 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#000911"
+ :pop-2 "#00e7ff"
+ :base-block-style {:text-shadow     "0 0 20px #00e7ff33"
+                    :border-radius   "2px"
+                    :filter          "none"
+                    :backdrop-filter "blur(20px) contrast(120%)"
+                    :border          "1px solid #00e7ff22"
+                    :box-shadow      "0 0 40px #00000088, inset 0 0 1px #ffffff22, 0 0 1px #00e7ff33"}
+ :vega-defaults {:mark {:font "Roboto Mono" :stroke "#00e7ff" :color "#00e7ff65"}
+                 :legend {:labelFont  "Roboto Mono"
+                          :legendFont "Roboto Mono"
+                          :labelColor "#ffffff"
+                          :titleColor "#ffffff"
+                          :stroke     "#00e7ff55"
+                          :titleFont  "Roboto Mono"}
+                 :header {:labelFont "Roboto Mono" :titleFont "Roboto Mono" :titleColor "#ffffff"}
+                 :title {:font         "Roboto Mono"
+                         :subtitleFont "Roboto Mono"
+                         :labelFont    "Roboto Mono"
+                         :titleFont    "Roboto Mono"
+                         :titleColor   "#ffffff"}
+                 :point {:font "Roboto Mono" :stroke "#00e7ff" :color "#00e7ff65"}
+                 :area {:font "Roboto Mono" :stroke "#00e7ff" :color "#00e7ff65"}
+                 :axis {:domainColor "#00e7ff22"
+                        :grid        true
+                        :font        "Roboto Mono"
+                        :labelColor  "#ffffff88"
+                        :titleFont   "Roboto Mono"
+                        :titleColor  "#ffffff"
+                        :labelFont   "Roboto Mono"
+                        :domain      false
+                        :gridColor   "#00e7ff11"
+                        :tickColor   "#00e7ff22"
+                        :axisFont    "Roboto Mono"}
+                 :tooltip
+                   {:fill "#00091188" :stroke "#00e7ff" :strokeWidth 1 :backdropFilter "blur(20px)" :color "#ffffff"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#00e7ff15"
+                            :filter           "none"
+                            :backdrop-filter  "blur(10px) contrast(150%)"
+                            :box-shadow       "0 0 30px #00e7ff22"}
+ :base-block-color-selected "#001822aa"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#00091188"
+ :pop-3 "#ffffff"
+ :editor-rim-color "#00e7ff"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#00e7ff"
+               "boolean"     "#ffffff"
+               "map"         "#80f3ff"
+               "list"        "#00e7ff"
+               "string"      "#ffffff"
+               "any"         "#00e7ff"
+               "vector"      "#ffffff"
+               "keyword"     "#00e7ff"
+               "rabbit-code" "#ffffff"
+               "datetime"    "#80f3ff"
+               "integer"     "#00e7ff"
+               "unknown"     "#ffffff"
+               "date"        "#80f3ff"}
+ :editor-grid-selected-font-color "#000911"
+ :monospaced-font "Roboto Mono"
+ :editor-grid-selected-background-color "#00e7ff"
+ :nivo-defaults
+   {:font-family "Roboto Mono"
+    :labels      {:text {:fill "#ffffff" :font-size "13px" :font-family "Roboto Mono" :font-weight 400}}
+    :tooltip     {:container {:backdropFilter "blur(20px)"
+                              :box-shadow     "0 0 30px #00000088"
+                              :color          "#ffffff"
+                              :borderRadius   "2px"
+                              :background     "#00091199"
+                              :padding        "8px 12px"
+                              :fontSize       "13px"
+                              :border         "1px solid #00e7ff22"
+                              :text           {:fill "#ffffff"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "13px" :font-family "Roboto Mono" :font-weight 400}}
+                  :ticks  {:line {:stroke "#ffffff60"} :text {:fill "#ffffff90" :font-weight 400}}}
+    :grid        {:line {:stroke "#00e7ff22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#00e7ff"
+ :grid-selected-font-color "#000911"
+ :block-title-selected-font-color "#ffffff"
+ :grid-selected-background-color "#00e7ff"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background            "radial-gradient(circle at 30% 30%, #002233 0%, #000911 100%)"
+                         :background-blend-mode "color-dodge"
+                         :transition            "all 0.3s ease"
+                         :background-color      "#000911"}
+ :editor-font-color "#ffffff"
+ :base-font "Roboto Mono"
+ :block-tab-selected-font-color "#ffffff"
+ :editor-background-color "#000911"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#002233"}
+
+

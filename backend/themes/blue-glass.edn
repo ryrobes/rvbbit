@@ -1,0 +1,108 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#080318"
+ :pop-2 "#4f46e5"
+ :base-block-style
+   {:transform-style "preserve-3d"
+    :box-shadow
+      "inset 0 0 50px rgba(255,255,255,0.05),                                      inset 0 2px 1px rgba(255,255,255,0.1),                                      0 20px 40px -20px rgba(0,0,0,0.5),                                      0 0 40px rgba(79, 70, 229, 0.1),                                      0 0 0 1px rgba(79, 70, 229, 0.1)"
+    :transform "perspective(2000px) rotateX(1deg) translateZ(10px)"
+    :transition "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+    :background
+      "linear-gradient(135deg,                                                      rgba(255,255,255,0.03) 0%,                                                      rgba(79,70,229,0.01) 50%,                                                     rgba(0,0,0,0.05) 100%),                                      radial-gradient(circle at 50% 0%,                                                    rgba(79,70,229,0.15) 0%,                                                    transparent 70%)"
+    :background-blend-mode "overlay, screen"
+    :backdrop-filter "blur(30px) saturate(180%)"
+    :filter "none"
+    :text-shadow "0 0 30px rgba(79, 70, 229, 0.2)"
+    :border "1px solid rgba(255, 255, 255, 0.1)"
+    :border-radius "16px"}
+ :vega-defaults {:mark    {:font "Plus Jakarta Sans" :stroke "#4f46e5" :color "#4f46e565"}
+                 :legend  {:labelFont  "Plus Jakarta Sans"
+                           :legendFont "Plus Jakarta Sans"
+                           :labelColor "#ffffff"
+                           :titleColor "#ffffff"
+                           :stroke     "#4f46e5"
+                           :titleFont  "Plus Jakarta Sans"}
+                 :header  {:labelFont "Plus Jakarta Sans" :titleFont "Plus Jakarta Sans" :titleColor "#ffffff"}
+                 :title   {:font         "Plus Jakarta Sans"
+                           :subtitleFont "Plus Jakarta Sans"
+                           :labelFont    "Plus Jakarta Sans"
+                           :titleFont    "Plus Jakarta Sans"
+                           :titleColor   "#ffffff"}
+                 :point   {:font "Plus Jakarta Sans" :stroke "#4f46e5" :color "#4f46e565"}
+                 :area    {:font "Plus Jakarta Sans" :stroke "#4f46e5" :color "#4f46e565"}
+                 :axis    {:domainColor "#4f46e544"
+                           :grid        true
+                           :font        "Plus Jakarta Sans"
+                           :labelColor  "#ffffff"
+                           :titleFont   "Plus Jakarta Sans"
+                           :titleColor  "#ffffff"
+                           :labelFont   "Plus Jakarta Sans"
+                           :domain      false
+                           :gridColor   "#ffffff11"
+                           :tickColor   "#4f46e544"
+                           :axisFont    "Plus Jakarta Sans"}
+                 :tooltip {:fill "#080318ee" :stroke "#4f46e5" :strokeWidth 1 :color "#ffffff"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "rgba(79, 70, 229, 0.15)"
+                            :filter           "none"
+                            :backdrop-filter  "blur(40px) saturate(180%)"
+                            :box-shadow       "0 0 30px rgba(79, 70, 229, 0.2)"}
+ :base-block-color-selected "#110b3a"
+ :block-title-font-color "#ffffff"
+ :base-block-color "rgba(8,3,24,0.7)"
+ :pop-3 "#22d3ee"
+ :editor-rim-color "#4f46e5"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#4f46e5"
+               "boolean"     "#22d3ee"
+               "map"         "#ffffff"
+               "list"        "#4f46e5"
+               "string"      "#22d3ee"
+               "any"         "#4f46e5"
+               "vector"      "#22d3ee"
+               "keyword"     "#ffffff"
+               "rabbit-code" "#4f46e5"
+               "datetime"    "#22d3ee"
+               "integer"     "#ffffff"
+               "unknown"     "#4f46e5"
+               "date"        "#22d3ee"}
+ :editor-grid-selected-font-color "#080318"
+ :monospaced-font "Cascadia Code"
+ :editor-grid-selected-background-color "#4f46e5"
+ :nivo-defaults
+   {:font-family "Plus Jakarta Sans"
+    :labels      {:text {:fill "#ffffff" :font-size "14px" :font-family "Plus Jakarta Sans" :font-weight 500}}
+    :tooltip     {:container {:box-shadow      "0 20px 40px rgba(0,0,0,0.4)"
+                              :color           "#ffffff"
+                              :borderRadius    "12px"
+                              :background      "#080318ee"
+                              :backdrop-filter "blur(20px) saturate(180%)"
+                              :padding         "10px 14px"
+                              :fontSize        "13px"
+                              :border          "1px solid rgba(79, 70, 229, 0.2)"
+                              :text            {:fill "#ffffff"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "6px 10px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "13px" :font-family "Plus Jakarta Sans" :font-weight 500}}
+                  :ticks  {:line {:stroke "#4f46e560"} :text {:fill "#ffffff" :font-weight 500}}}
+    :grid        {:line {:stroke "#ffffff11" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#4f46e5"
+ :grid-selected-font-color "#080318"
+ :block-title-selected-font-color "#080318"
+ :grid-selected-background-color "#4f46e5"
+ :grid-font-color "#ffffff"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 0% 0%, #1a103f 0%, #080318 40%),                                     url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E\")"
+    :background-blend-mode "normal, overlay"
+    :transition "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#080318"}
+ :editor-font-color "#ffffff"
+ :base-font "Plus Jakarta Sans"
+ :block-tab-selected-font-color "#080318"
+ :editor-background-color "#080318"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#110b3a"}
+
+

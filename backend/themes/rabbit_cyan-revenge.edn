@@ -1,0 +1,114 @@
+{:generated-from "assets/openai-images/upscaled/b64-image3-50618-36916-8k.webp"
+ :codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#000000"
+ :pop-2 "#0e2b35"
+ :base-block-style {:text-shadow     "4px 4px 4px #00000088"
+                    :border-radius   "12px 12px 12px 12px"
+                    :filter          "brightness(120%)"
+                    :backdrop-filter "brightness(35%) blur(4px)"}
+ :vega-defaults {:mark {:font "Lato" :stroke "#29c9c8" :color "#29c9c865"}
+                 :legend {:labelFont  "Lato"
+                          :legendFont "Lato"
+                          :labelColor "#ffffff99"
+                          :titleColor "#ffffff99"
+                          :stroke     "#ffffff99"
+                          :titleFont  "Lato"}
+                 :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
+                 :title {:font "Lato" :subtitleFont "Lato" :labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
+                 :point {:font "Lato" :stroke "#29c9c8" :color "#29c9c865"}
+                 :area {:font "Lato" :stroke "#29c9c8" :color "#29c9c865"}
+                 :axis {:domainColor "#ffffff22"
+                        :grid        true
+                        :font        "Lato"
+                        :labelColor  "#ffffff88"
+                        :titleFont   "Lato"
+                        :titleColor  "#ffffff99"
+                        :labelFont   "Lato"
+                        :domain      false
+                        :gridColor   "#ffffff22"
+                        :tickColor   "#ffffff22"
+                        :axisFont    "Lato"}
+                 :tooltip {:fill "white" :stroke "steelblue" :strokeWidth 1 :color "black"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#00000088" :filter "brightness(200%)"}
+ :generated-tree {:second-darkest         "#1a3a42"
+                  :highest-saturation     "#046c6c"
+                  :most-contrasting       "#8c3444"
+                  :darkest                "#0e2b35"
+                  :contrast-with-dominant "#29c9c8"
+                  :colors                 ["#b9bbc0" "#29c9c8" "#0e2b35" "#5a434c" "#118687" "#046c6c" "#649c9c"
+                                           "#8c6c6c" "#1c5c64" "#8c3444" "#1a3a42"]
+                  :most-frequent          "#649c9c"
+                  :data-colors            {"float"       "#968ebd"
+                                           "boolean"     "#4fead7"
+                                           "map"         "#c0c138"
+                                           "list"        "#8b1b60"
+                                           "string"      "#f5f5f4"
+                                           "any"         "#061abe"
+                                           "vector"      "#3cc929"
+                                           "keyword"     "#c0b9b9"
+                                           "rabbit-code" "#547766"
+                                           "datetime"    "#200091"
+                                           "integer"     "#9292af"
+                                           "unknown"     "#5b1c1c"
+                                           "date"        "#0d490d"}
+                  :dominant               "#1a3a42"
+                  :most-contrasting-dark  "#8c3444"
+                  :second-brightest       "#29c9c8"
+                  :brightest              "#b9bbc0"
+                  :most-contrasting-light "#29c9c8"}
+ :base-block-color-selected "#00030a"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#03090b99"
+ :pop-3 "#b9bbc0"
+ :editor-rim-color "#29c9c899"
+ :base-block-filter-selected "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)"
+ :_vega-default-color-scheme {:scheme "pastel2"}
+ :data-colors {"float"       "#968ebd"
+               "boolean"     "#4fead7"
+               "map"         "#c0c138"
+               "list"        "#8b1b60"
+               "string"      "#f5f5f4"
+               "any"         "#061abe"
+               "vector"      "#3cc929"
+               "keyword"     "#c0b9b9"
+               "rabbit-code" "#547766"
+               "datetime"    "#200091"
+               "integer"     "#9292af"
+               "unknown"     "#5b1c1c"
+               "date"        "#0d490d"}
+ :editor-grid-selected-font-color "#000000"
+ :monospaced-font "JetBrains Mono"
+ :editor-grid-selected-background-color "#dc9cb0"
+ :nivo-defaults
+   {:font-family "Instagram Sans"
+    :labels      {:text {:fill "#ffffff" :font-size "16px" :font-family "Instagram Sans" :font-weight 700}}
+    :tooltip     {:container {:background   "#000"
+                              :color        "#ffffff"
+                              :text         {:fill "#eeeeee"}
+                              :fontSize     "18px"
+                              :borderRadius "4px"
+                              :boxShadow    "0 1px 2px rgba(0, 0, 0, 0.55)"
+                              :padding      "5px 9px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 5px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "14px" :font-family "Instagram Sans" :font-weight 700}}
+                  :ticks  {:line {:stroke "#ffffff60"} :text {:fill "#ffffff60" :font-weight 700}}}
+    :grid        {:line {:stroke "#ffffff" :strokeWidth 0 :strokeDasharray "0 0"}}}
+ :editor-outer-rim-color "#29c9c8"
+ :grid-selected-font-color "#000000"
+ :block-title-selected-font-color "#ffffff"
+ :grid-selected-background-color "#a3d3ff"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background-image      "linear-gradient(#1a3a4270,#1a3a4212),url(images/gray-brick.png)"
+                         :transition            "all 0.6s ease-in-out"
+                         :background-blend-mode "normal"
+                         :background-color      "#424f57"}
+ :editor-font-color "#ffffff"
+ :base-font "Space Grotesk"
+ :block-tab-selected-font-color "#c9d1ff"
+ :editor-background-color "#000006"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#29c9c8"}
+
+

@@ -1,0 +1,105 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1714"
+ :pop-2 "#c17f59"
+ :base-block-style
+   {:text-shadow "none"
+    :border-radius "16px 0px 16px 0px"
+    :filter "none"
+    :backdrop-filter "blur(4px)"
+    :border "2px solid"
+    :border-image "linear-gradient(45deg, #704b3d 0%, #c17f59 50%, #704b3d 100%) 1"
+    :box-shadow
+      "inset 0 0 30px #00000077, 
+                                      inset 0 0 60px #c17f5908,
+                                      0 4px 20px #00000044"}
+ :vega-defaults {:mark    {:font "Cormorant Garamond" :stroke "#c17f59" :color "#c17f5965"}
+                 :legend  {:labelFont  "Cormorant Garamond"
+                           :legendFont "Cormorant Garamond"
+                           :labelColor "#e8d4c9"
+                           :titleColor "#e8d4c9"
+                           :stroke     "#c17f59"
+                           :titleFont  "Cormorant Garamond"}
+                 :header  {:labelFont "Cormorant Garamond" :titleFont "Cormorant Garamond" :titleColor "#e8d4c9"}
+                 :title   {:font         "Cormorant Garamond"
+                           :subtitleFont "Cormorant Garamond"
+                           :labelFont    "Cormorant Garamond"
+                           :titleFont    "Cormorant Garamond"
+                           :titleColor   "#e8d4c9"}
+                 :point   {:font "Cormorant Garamond" :stroke "#c17f59" :color "#c17f5965"}
+                 :area    {:font "Cormorant Garamond" :stroke "#c17f59" :color "#c17f5965"}
+                 :axis    {:domainColor "#c17f5944"
+                           :grid        true
+                           :font        "Cormorant Garamond"
+                           :labelColor  "#e8d4c9"
+                           :titleFont   "Cormorant Garamond"
+                           :titleColor  "#e8d4c9"
+                           :labelFont   "Cormorant Garamond"
+                           :domain      false
+                           :gridColor   "#70493d22"
+                           :tickColor   "#c17f5944"
+                           :axisFont    "Cormorant Garamond"}
+                 :tooltip {:fill "#1a1714ee" :stroke "#c17f59" :strokeWidth 1 :color "#e8d4c9"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#c17f5915" :filter "none" :backdrop-filter "blur(2px)" :box-shadow "inset 0 0 20px #c17f5922"}
+ :base-block-color-selected "#2a2724"
+ :block-title-font-color "#e8d4c9"
+ :base-block-color "#1a1714ee"
+ :pop-3 "#9b4c3f"
+ :editor-rim-color "#c17f59"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#c17f59"
+               "boolean"     "#9b4c3f"
+               "map"         "#e8d4c9"
+               "list"        "#c17f59"
+               "string"      "#9b4c3f"
+               "any"         "#c17f59"
+               "vector"      "#9b4c3f"
+               "keyword"     "#e8d4c9"
+               "rabbit-code" "#c17f59"
+               "datetime"    "#9b4c3f"
+               "integer"     "#e8d4c9"
+               "unknown"     "#c17f59"
+               "date"        "#9b4c3f"}
+ :editor-grid-selected-font-color "#1a1714"
+ :monospaced-font "Cormorant Garamond"
+ :editor-grid-selected-background-color "#c17f59"
+ :nivo-defaults
+   {:font-family "Cormorant Garamond"
+    :labels      {:text {:fill "#e8d4c9" :font-size "16px" :font-family "Cormorant Garamond" :font-weight 500}}
+    :tooltip     {:container {:background      "#1a1714ee"
+                              :color           "#e8d4c9"
+                              :text            {:fill "#e8d4c9"}
+                              :fontSize        "14px"
+                              :borderRadius    "8px 0px 8px 0px"
+                              :border          "1px solid #c17f59"
+                              :backdrop-filter "blur(4px)"
+                              :box-shadow      "0 0 20px #00000044"
+                              :padding         "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#e8d4c9" :font-size "14px" :font-family "Cormorant Garamond" :font-weight 500}}
+                  :ticks  {:line {:stroke "#c17f5960"} :text {:fill "#e8d4c9" :font-weight 500}}}
+    :grid        {:line {:stroke "#70493d22" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#c17f59"
+ :grid-selected-font-color "#1a1714"
+ :block-title-selected-font-color "#1a1714"
+ :grid-selected-background-color "#c17f59"
+ :grid-font-color "#e8d4c9"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 50% 50%, #2a2724 0%, #1a1714 100%),
+                                     url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50c0-25 20-45 45-45S95 25 95 50s-20 45-45 45S5 75 5 50' stroke='%23c17f59' stroke-width='0.5' fill='none' opacity='0.1'/%3E%3C/svg%3E\"),
+                                     url(\"data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 0C50 0 0 50 0 100s50 100 100 100s100-50 100-100S150 0 100 0' stroke='%239b4c3f' stroke-width='0.2' fill='none' opacity='0.1'/%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay, soft-light, normal"
+    :transition "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#1a1714"}
+ :editor-font-color "#e8d4c9"
+ :base-font "Cormorant Garamond"
+ :block-tab-selected-font-color "#1a1714"
+ :editor-background-color "#1a1714"
+ :editor-grid-font-color "#e8d4c9"
+ :pop-1 "#704b3d"}
+
+

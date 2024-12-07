@@ -1,0 +1,104 @@
+{:codemirror-theme                      "rvbbit-dynamic"
+ :editor-param-background-color         "#e8e8e8"
+ :pop-2                                 "#000000"
+ :base-block-style                      {:text-shadow     "none"
+                                         :border-radius   "2px"
+                                         :filter          "none"
+                                         :backdrop-filter "none"
+                                         :border          "1px solid #000000"
+                                         :box-shadow      "2px 2px 0px #000000"}
+ :vega-defaults                         {:mark    {:font "Chicago" :stroke "#666666" :color "#66666665"}
+                                         :legend  {:labelFont  "Chicago"
+                                                   :legendFont "Chicago"
+                                                   :labelColor "#000000"
+                                                   :titleColor "#000000"
+                                                   :stroke     "#000000"
+                                                   :titleFont  "Chicago"}
+                                         :header  {:labelFont "Chicago" :titleFont "Chicago" :titleColor "#000000"}
+                                         :title   {:font         "Chicago"
+                                                   :subtitleFont "Chicago"
+                                                   :labelFont    "Chicago"
+                                                   :titleFont    "Chicago"
+                                                   :titleColor   "#000000"}
+                                         :point   {:font "Chicago" :stroke "#666666" :color "#66666665"}
+                                         :area    {:font "Chicago" :stroke "#666666" :color "#66666665"}
+                                         :axis    {:domainColor "#00000022"
+                                                   :grid        true
+                                                   :font        "Chicago"
+                                                   :labelColor  "#000000"
+                                                   :titleFont   "Chicago"
+                                                   :titleColor  "#000000"
+                                                   :labelFont   "Chicago"
+                                                   :domain      false
+                                                   :gridColor   "#00000022"
+                                                   :tickColor   "#00000022"
+                                                   :axisFont    "Chicago"}
+                                         :tooltip {:fill "#ffffff" :stroke "#000000" :strokeWidth 1 :color "#000000"}
+                                         :view    {:stroke "transparent"}}
+ :grid-selected-column-css              {:background-color "#000000" :filter "none" :box-shadow "2px 2px 0px #666666"}
+ :base-block-color-selected             "#cccccc"
+ :block-title-font-color                "#000000"
+ :base-block-color                      "#dddddd"
+ :pop-3                                 "#666666"
+ :editor-rim-color                      "#000000"
+ :base-block-filter-selected            "none"
+ :_vega-default-color-scheme             {:scheme "greys"}
+ :data-colors                           {"float"       "#000000"
+                                         "boolean"     "#333333"
+                                         "map"         "#666666"
+                                         "list"        "#999999"
+                                         "string"      "#000000"
+                                         "any"         "#000000"
+                                         "vector"      "#333333"
+                                         "keyword"     "#666666"
+                                         "rabbit-code" "#000000"
+                                         "datetime"    "#333333"
+                                         "integer"     "#666666"
+                                         "unknown"     "#000000"
+                                         "date"        "#333333"}
+ :editor-grid-selected-font-color       "#ffffff"
+ :monospaced-font                       "Chicago Kare"
+ :editor-grid-selected-background-color "#000000"
+ :nivo-defaults                         {:font-family "Chicago"
+                                         :labels      {:text {:fill        "#000000"
+                                                              :font-size   "12px"
+                                                              :font-family "Chicago"
+                                                              :font-weight 400}}
+                                         :tooltip     {:container {:background   "#ffffff"
+                                                                   :color        "#000000"
+                                                                   :text         {:fill "#000000"}
+                                                                   :fontSize     "12px"
+                                                                   :borderRadius "0px"
+                                                                   :border       "1px solid #000000"
+                                                                   :box-shadow   "2px 2px 0px #000000"
+                                                                   :padding      "4px 6px"}
+                                                       :basic     {:whiteSpace "pre"
+                                                                   :display    "flex"
+                                                                   :alignItems "center"}
+                                                       :tableCell {:padding "2px 4px"}}
+                                         :axis        {:legend {:text {:fill        "#000000"
+                                                                       :font-size   "12px"
+                                                                       :font-family "Chicago"
+                                                                       :font-weight 400}}
+                                                       :ticks  {:line {:stroke "#00000060"}
+                                                                :text {:fill "#00000060" :font-weight 400}}}
+                                         :grid        {:line {:stroke          "#000000"
+                                                              :strokeWidth     1
+                                                              :strokeDasharray "none"}}}
+ :editor-outer-rim-color                "#000000"
+ :grid-selected-font-color              "#ffffff"
+ :block-title-selected-font-color       "#000000"
+ :grid-selected-background-color        "#000000"
+ :grid-font-color                       "#000000"
+ :canvas-background-css                 {:background-image      "none"
+                                         :transition            "none"
+                                         :background-blend-mode "normal"
+                                         :background-color      "#e8e8e8"}
+ :editor-font-color                     "#000000"
+ :base-font                             "Chicago"
+ :block-tab-selected-font-color         "#000000"
+ :editor-background-color               "#ffffff"
+ :editor-grid-font-color                "#000000"
+ :pop-1                                 "#666666"}
+
+

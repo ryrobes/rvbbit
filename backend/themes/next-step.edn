@@ -1,0 +1,93 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#000000"
+ :pop-2 "#666666"
+ :base-block-style {:text-shadow     "none"
+                    :border-radius   "0px"
+                    :filter          "none"
+                    :backdrop-filter "none"
+                    :border          "1px solid #666666"
+                    :box-shadow      "inset 1px 1px 0px #ffffff20, 1px 1px 0px #666666"}
+ :vega-defaults
+   {:mark {:font "Helvetica" :stroke "#505050" :color "#50505065"}
+    :legend {:labelFont  "Helvetica"
+             :legendFont "Helvetica"
+             :labelColor "#ffffff"
+             :titleColor "#ffffff"
+             :stroke     "#666666"
+             :titleFont  "Helvetica"}
+    :header {:labelFont "Helvetica" :titleFont "Helvetica" :titleColor "#ffffff"}
+    :title
+      {:font "Helvetica" :subtitleFont "Helvetica" :labelFont "Helvetica" :titleFont "Helvetica" :titleColor "#ffffff"}
+    :point {:font "Helvetica" :stroke "#505050" :color "#50505065"}
+    :area {:font "Helvetica" :stroke "#505050" :color "#50505065"}
+    :axis {:domainColor "#666666"
+           :grid        true
+           :font        "Helvetica"
+           :labelColor  "#ffffff"
+           :titleFont   "Helvetica"
+           :titleColor  "#ffffff"
+           :labelFont   "Helvetica"
+           :domain      false
+           :gridColor   "#333333"
+           :tickColor   "#666666"
+           :axisFont    "Helvetica"}
+    :tooltip {:fill "#2a2a2a" :stroke "#666666" :strokeWidth 1 :color "#ffffff"}
+    :view {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#666666" :filter "none" :box-shadow "1px 1px 0px #ffffff20"}
+ :base-block-color-selected "#2a2a2a"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#1a1a1a"
+ :pop-3 "#999999"
+ :editor-rim-color "#666666"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "greys"}
+ :data-colors {"float"       "#ffffff"
+               "boolean"     "#cccccc"
+               "map"         "#999999"
+               "list"        "#666666"
+               "string"      "#ffffff"
+               "any"         "#ffffff"
+               "vector"      "#cccccc"
+               "keyword"     "#999999"
+               "rabbit-code" "#ffffff"
+               "datetime"    "#cccccc"
+               "integer"     "#999999"
+               "unknown"     "#ffffff"
+               "date"        "#cccccc"}
+ :editor-grid-selected-font-color "#000000"
+ :monospaced-font "JetBrains Mono"
+ :editor-grid-selected-background-color "#666666"
+ :nivo-defaults
+   {:font-family "Helvetica"
+    :labels      {:text {:fill "#ffffff" :font-size "12px" :font-family "Helvetica" :font-weight 400}}
+    :tooltip     {:container {:background   "#2a2a2a"
+                              :color        "#ffffff"
+                              :text         {:fill "#ffffff"}
+                              :fontSize     "12px"
+                              :borderRadius "0px"
+                              :border       "1px solid #666666"
+                              :box-shadow   "1px 1px 0px #ffffff20"
+                              :padding      "6px 8px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 5px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "12px" :font-family "Helvetica" :font-weight 400}}
+                  :ticks  {:line {:stroke "#ffffff60"} :text {:fill "#ffffff60" :font-weight 400}}}
+    :grid        {:line {:stroke "#333333" :strokeWidth 1 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#666666"
+ :grid-selected-font-color "#000000"
+ :block-title-selected-font-color "#ffffff"
+ :grid-selected-background-color "#666666"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background-image
+                           "repeating-linear-gradient(45deg, #222222 0px, #222222 1px, #1a1a1a 1px, #1a1a1a 3px)"
+                         :transition "all 0.3s ease-in-out"
+                         :background-blend-mode "normal"
+                         :background-color "#1a1a1a"}
+ :editor-font-color "#ffffff"
+ :base-font "Helvetica"
+ :block-tab-selected-font-color "#ffffff"
+ :editor-background-color "#000000"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#333333"}
+
+

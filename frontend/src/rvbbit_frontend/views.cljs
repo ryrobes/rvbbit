@@ -278,7 +278,7 @@
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?)
-                 (conn/sql-data [k] query )
+                 (conn/sql-data [k] query  )
                  (ut/tracked-dispatch [::bricks/insert-sql-source k query])))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} ;; rows label under
      :children
@@ -314,7 +314,7 @@
                    ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
                    data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
                    unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
-               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
+               (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query  )))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [[re-com/v-box :size "auto" :children
        [[re-com/box :size "auto" :child
@@ -509,7 +509,7 @@
                                                  (str (theme-pull :theme/editor-font-color nil) 77))
                              :background-color (if sel?
                                                  ;;"#9973e0"
-                                                 (theme-pull :theme/universal-pop-color "#9973e0")
+                                                 (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                                  (theme-pull :theme/editor-background-color nil))
                              :padding-left     "5px"
                              :padding-right    "5px"} :child (str table_name " (" recos ")")])
@@ -774,7 +774,7 @@
 
 
               [re-com/v-box :size "auto" :height (px hhh)
-               :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
+               :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")
                        :overflow "hidden"} :children
                (let []
                  (for [c (range pages)]
@@ -788,10 +788,10 @@
                                          (theme-pull :theme/editor-font-color nil))
                      :background-color (if (= c recos-page)
                                          ;;"#9973e0" ;"darkcyan"
-                                         (theme-pull :theme/universal-pop-color "#9973e0")
+                                         (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                          "inherit")
-                     :border-bottom    (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
-                     :border-right     (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")}])) :width "30px"]]]))]]]]))
+                     :border-bottom    (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")
+                     :border-right     (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")}])) :width "30px"]]]))]]]]))
 
 
 
@@ -883,7 +883,7 @@
                                                  (str (theme-pull :theme/editor-font-color nil) 77))
                              :background-color (if sel?
                                                  ;;"#9973e0"
-                                                 (theme-pull :theme/universal-pop-color "#9973e0")
+                                                 (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                                  (theme-pull :theme/editor-background-color nil))
                              :padding-left     "5px"
                              :padding-right    "5px"} :child (str table_name " (" recos ")")])
@@ -1144,7 +1144,7 @@
 
 
               [re-com/v-box :size "auto" :height (px hhh)
-               :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
+               :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")
                        :overflow "hidden"} :children
                (let []
                  (for [c (range pages)]
@@ -1158,10 +1158,10 @@
                                          (theme-pull :theme/editor-font-color nil))
                      :background-color (if (= c recos-page)
                                          ;;"#9973e0" ;"darkcyan"
-                                         (theme-pull :theme/universal-pop-color "#9973e0")
+                                         (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                          "inherit")
-                     :border-bottom    (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
-                     :border-right     (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")}])) :width "30px"]]]))]]]]))
+                     :border-bottom    (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")
+                     :border-right     (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")}])) :width "30px"]]]))]]]]))
 
 (defn editor-panel-viz
   []
@@ -1394,26 +1394,39 @@
            {:color         (theme-pull :theme/editor-outer-rim-color nil) ;"orange"
             :padding-right "18px"
             :font-weight   700
-            :font-family   (theme-pull :theme/monospaced-font nil) ;"Fira Code"
-           }])]]
+            :font-family   (theme-pull :theme/monospaced-font nil)}])]]
       (if (get @param-scrubber? key-type) ;theme-scrubber?
         [re-com/box
          :size "none"
          :width (px single-width)
-         :height (px (- single-height 90))
+         :height (px (- single-height 94))
          :child
          [bricks/scrubber-panel true ; view?
           @(ut/tracked-sub ::bricks/keypaths-in-params {:key-type key-type}) key-type (get @param-search key-type) {:fm true}]
          :style {:overflow "auto"}]
         [bricks/panel-param-box key-type nil (+ 17 single-width) (- single-height 66) param-map])
 
-      [re-com/box
-       :child (str "scrubber " (if (get @param-scrubber? key-type) "on" "off"))
-       :attr {:on-click #(swap! param-scrubber? assoc key-type (not (get @param-scrubber? key-type false)))}
-       :style {:padding-left "18px"
-               :color (if (get @param-scrubber? key-type) (theme-pull :theme/universal-pop-color nil) "inherit")
-               :cursor "pointer"}]
+      [re-com/h-box
+       :style {:padding-left "8px"
+               :padding-right "8px"}
+       :justify :between :align :center
+       :children
+       [[re-com/box
+         :child (str "scrubber " (if (get @param-scrubber? key-type) "on" "off"))
+         :attr {:on-click #(swap! param-scrubber? assoc key-type (not (get @param-scrubber? key-type false)))}
+         :style {:padding-left "18px"
+                 :color (if (get @param-scrubber? key-type) (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "inherit")
+                 :cursor "pointer"}]
 
+        (when (= key-type :theme)
+          (let [theme-name (theme-pull :theme/theme-name nil)]
+            (if (and (string? theme-name) (> (count (cstr/trim theme-name)) 1))
+              [re-com/box
+               :style {:cursor "pointer"}
+               :attr {:on-click #(ut/tracked-dispatch [::http/save-theme])}
+               :child (str "save to themes/" (theme-pull :theme/theme-name nil) ".edn")]
+              [re-com/box :child "add a :theme-name key to save this theme"])))
+        ]]
 
 
       ]]))
@@ -1755,9 +1768,9 @@
                                                                 (str (theme-pull :theme/editor-font-color nil) 77))
                                             :background-color (if (= k data-key)
                                                  ;"#9973e0"
-                                                                (theme-pull :theme/universal-pop-color "#9973e0")
+                                                                (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                                          ;"inherit"
-                                                                (str (ut/invert-hex-color (theme-pull :theme/universal-pop-color "#9973e0")) 55))
+                                                                (str (ut/invert-hex-color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))) 55))
                                             :padding-right    "5px"
                                             :padding-left     "5px"} :gap "4px" :children
                                     [[re-com/box :padding "3px" :attr
@@ -1777,7 +1790,7 @@
                                                               (theme-pull :theme/editor-font-color nil))
                                           :background-color (if (= :* data-key)
                                             ;"#9973e0"
-                                                              (theme-pull :theme/universal-pop-color "#9973e0")
+                                                              (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                                               "inherit")
                                           :padding-right    "5px"
                                           :padding-left     "5px"} :gap "4px" :children
@@ -1820,7 +1833,7 @@
                                        :color            dyn-color
                                        :background-color (if (= k data-key)
                                                  ;"#9973e0"
-                                                           (theme-pull :theme/universal-pop-color "#9973e0")
+                                                           (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                                            "inherit")
                                        :padding-right    "5px"
                                        :padding-left     "5px"} :gap "4px" :children
@@ -1879,8 +1892,8 @@
                                                          (theme-pull :theme/editor-background-color nil) ;;"#000000"
                                                          (theme-pull :theme/editor-font-color nil))
                                      :background-color (if (= k data-key)
-                                                 ;"#9973e0"
-                                                         (theme-pull :theme/universal-pop-color "#9973e0")
+                                                 ;"#ffffff"  ;#9973e0"
+                                                         (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                                          "inherit")
                                      :padding-right    "5px"
                                      :padding-left     "5px"} :gap "4px" :children
@@ -1912,7 +1925,7 @@
                     ;;                                (theme-pull :theme/editor-font-color nil))
                     ;;            :background-color (if (= (last k) data-key)
                     ;;                                ;"#9973e0"
-                    ;;                                (theme-pull :theme/universal-pop-color "#9973e0")
+                    ;;                                (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                     ;;                                "inherit")
                     ;;            :padding-right    "5px"
                     ;;            :padding-left     "5px"} :gap "4px" :children
@@ -2669,9 +2682,9 @@
                 [re-com/h-box
                  :size "none" :align :center :justify :center
                  :height (px (- hh 20))
-                 :style {:border (str "3px dashed " (theme-pull :theme/universal-pop-color nil) 33)
+                 :style {:border (str "3px dashed " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))33)
                          :font-family (theme-pull :theme/monospaced-font nil)
-                         :color (theme-pull :theme/universal-pop-color nil)
+                         :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                          :border-radius "11px"
                          :padding-left "8px"
                          :overflow "hidden"
@@ -2741,7 +2754,7 @@
                                             :tooltip "clear"
                                             :on-click #(reset! db/rabbit-search-input nil)
                                             :active? false ;true
-                                            ;:color (theme-pull :theme/universal-pop-color nil)
+                                            ;:color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                             }]
                                           [custom-icon-button
                                            {:icon-name "zmdi-play"
@@ -2754,7 +2767,7 @@
                                                             (run-console-command command)
                                                             (.setValue @cm-instance ""))))
                                             :active? false
-                                            ;:color (theme-pull :theme/universal-pop-color nil)
+                                            ;:color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                             }])
 
                                         (when oai-valid? [recording-button])
@@ -3274,8 +3287,8 @@
                          :justify :center
                          :height (px single-height)
                          :width (px single-width)
-                         :style {:border (str "2px solid " (theme-pull :theme/universal-pop-color nil))
-                                 :color (theme-pull :theme/universal-pop-color nil)}
+                         :style {:border (str "2px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)))
+                                 :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))}
                          :child [re-com/v-box :children [[re-com/box
                                                           :size "auto" :align :center :justify :center
                                                           :style {:font-size "40px"}
@@ -4153,11 +4166,11 @@
                                                      :width "90px"
                                                      :child (if view-scrubbers? "scrubber on" "scrubber off")  :align :center :justify :center
                                                      :attr {:on-click #(swap! db/scrubbers assoc-in [selected-block data-key] (not view-scrubbers?))}
-                                                     :style {:color       (if view-scrubbers? (theme-pull :theme/universal-pop-color nil) "#cccccc")
+                                                     :style {:color       (if view-scrubbers? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc")
                                                              :z-index     100
                                                              :user-select "none"
                                                              :border-radius "3px"
-                                                             :border (str "1px solid " (if view-scrubbers? (theme-pull :theme/universal-pop-color nil) "#cccccc") 45)
+                                                             :border (str "1px solid " (if view-scrubbers? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc") 45)
                                                              :margin-top  (if query-box? "9px" "inherit")
                                                              :cursor      "pointer"}]
 
@@ -4166,21 +4179,21 @@
                                                      :width "90px"
                                                      :child (if honeycomb-builder? "honeycomb on" "honeycomb off") :align :center :justify :center
                                                      :attr {:on-click #(swap! db/honeycomb-builder assoc-in [selected-block data-key] (not honeycomb-builder?))}
-                                                     :style {:color       (if honeycomb-builder? (theme-pull :theme/universal-pop-color nil) "#cccccc")
+                                                     :style {:color       (if honeycomb-builder? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc")
                                                              :z-index     100
                                                              :user-select "none"
                                                              :border-radius "3px"
-                                                             :border (str "1px solid " (if honeycomb-builder? (theme-pull :theme/universal-pop-color nil) "#cccccc") 45)
+                                                             :border (str "1px solid " (if honeycomb-builder? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc") 45)
                                                              :margin-top  (if query-box? "9px" "inherit")
                                                              :cursor      "pointer"}])
 
                                                   [re-com/box :size "none" :width "90px" :child "value spy" :align :center :justify :center
                                                    :attr {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))}
-                                                   :style {:color           (if value-spy? (theme-pull :theme/universal-pop-color nil) "#cccccc")
+                                                   :style {:color           (if value-spy? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc")
                                                            :z-index         100
                                                            :user-select     "none"
                                                            :border-radius "3px"
-                                                           :border (str "1px solid " (if value-spy? (theme-pull :theme/universal-pop-color nil) "#cccccc") 45)
+                                                           :border (str "1px solid " (if value-spy? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc") 45)
                                                            :text-decoration (when (not value-spy?) "strikethrough")
                                                            :margin-top      (if query-box? "9px" "inherit")
                                                            :cursor          "pointer"}]
@@ -4188,11 +4201,11 @@
                                                   (when (ut/ne? shape-rotator-meta)
                                                   [re-com/box :size "none" :width "90px" :child "shape rotator" :align :center :justify :center
                                                    :attr {:on-click #(swap! db/shape-rotator assoc-in [selected-block data-key] (not shape-rotator?))}
-                                                   :style {:color           (if shape-rotator? (theme-pull :theme/universal-pop-color nil) "#cccccc")
+                                                   :style {:color           (if shape-rotator? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc")
                                                            :z-index         100
                                                            :user-select     "none"
                                                            :border-radius "3px"
-                                                           :border (str "1px solid " (if shape-rotator? (theme-pull :theme/universal-pop-color nil) "#cccccc") 45)
+                                                           :border (str "1px solid " (if shape-rotator? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc") 45)
                                                            :text-decoration (when (not shape-rotator?) "strikethrough")
                                                            :margin-top      (if query-box? "9px" "inherit")
                                                            :cursor          "pointer"}])
@@ -4203,7 +4216,7 @@
                                         ;;    :width "90px"
                                         ;;    :child "solver meta"
                                         ;;    :attr {:on-click #(swap! db/solver-meta-spy assoc-in [selected-block data-key] (not solver-meta-spy?))}
-                                        ;;    :style {:color           (if solver-meta-spy? (theme-pull :theme/universal-pop-color nil) "grey")
+                                        ;;    :style {:color           (if solver-meta-spy? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"grey")
                                         ;;            :z-index         100
                                         ;;            :user-select     "none"
                                         ;;            :text-decoration (when (not solver-meta-spy?) "strikethrough")
@@ -4214,7 +4227,7 @@
                                                 (when are-solver
                                                   [re-com/h-box
                                                    :gap  "6px"
-                                                   :style {:color (if solver-running? (theme-pull :theme/universal-pop-color nil) "grey")}
+                                                   :style {:color (if solver-running? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"grey")}
                                                    :children
                                                    [;[re-com/box :child (str solver-running-kw)]
                                                     ;[re-com/box :child (str "." @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [solver-running-kw]}))]
@@ -6198,7 +6211,7 @@
 (defonce canvas-ref (reagent/atom nil))
 (defonce is-drawing (reagent/atom false))
 (defonce stroke-width (reagent/atom 4))
-(defonce stroke-color (reagent/atom (or (theme-pull :theme/universal-pop-color nil) "#FF06B5")))
+(defonce stroke-color (reagent/atom (or (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "#FF06B5")))
 
 (defn send-to-chat-button []
   (let [disabled? (reagent/atom false)]
@@ -6373,7 +6386,7 @@
 ;;                    :border-radius "5px"
 ;;                    :overflow "hidden"}])])]))
 
-(def hover-state (reagent/atom {}))
+(def hover-state (reagent/atom nil))
 
 (defn dynamic-block-grid [components & [ttype]]
   (let [components (vec (remove empty? components))
@@ -6411,17 +6424,21 @@
            :padding "8px"
            :child (nth components index)
            :justify :center :align :center
-           :attr {:on-mouse-enter #(swap! hover-state assoc-in [ttype comp-hash] true)
-                  :on-mouse-leave #(swap! hover-state assoc-in [ttype comp-hash] false)}
+          ;;  :attr {:on-mouse-enter #(swap! hover-state assoc-in [ttype comp-hash] true)
+          ;;         :on-mouse-leave #(swap! hover-state assoc-in [ttype comp-hash] false)}
+           :attr {:on-click #(if (= @hover-state [ttype comp-hash])
+                               (reset! hover-state nil)
+                               (reset! hover-state [ttype comp-hash]))}
            :style {:margin "5px"
-                   :background-color (str ccc 33)
+                   :background-color (if (= @hover-state [ttype comp-hash]) (str ccc 88) (str ccc 33))
                    :border (str "3px solid " ccc)
                    :border-radius "5px"
                    :overflow "hidden"
-                   :transition "all 0.3s ease"
-                   :transform (if (get-in @hover-state [ttype comp-hash]) "scale(1.1)" "scale(1)")
-                   :z-index (if (get-in @hover-state [ttype comp-hash]) 1 0)
-                   :box-shadow (if (get-in @hover-state [ttype comp-hash])
+                   :user-select "none"
+                   ;:transition "all 0.3s ease"
+                   ;:transform (if (get-in @hover-state [ttype comp-hash]) "scale(1.1)" "scale(1)")
+                   :z-index (if (= @hover-state [ttype comp-hash]) 1 0)
+                   :box-shadow (if (= @hover-state [ttype comp-hash])
                                  "0px 10px 20px rgba(0,0,0,0.2)"
                                  "none")}])])]))
 
@@ -6454,7 +6471,7 @@
 (defn clear-state! []
   (reset! db/drop-spawn-modal? false)
   (reset! bricks/dragging-body {})
-  (reset! hover-state {})
+  (reset! hover-state nil)
   (ut/pp [:fresh-spawns-modal-clear-state!])
   (reset! db/dragged-kp [:canvas :canvas :canvas])  ;; atom watcher trigger
   (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])
@@ -6485,7 +6502,7 @@
    (js/setTimeout (fn []
                     (swap! waiting? assoc [leaf-drop leaves-kp] false)
                     (clear-state!)
-                    (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])) 500)
+                    (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])) 200)
    db))
 
 (re-frame/reg-event-db
@@ -6565,56 +6582,176 @@
              :style {:font-size "13px"}
              :child "no label"]])))
 
+;; (def attempts (atom 0))
+
 (defn spawn-button [label-map leaf-action-cat leaf-action leaves-kp & [color]]
   (let [client-name db/client-name
         leaf-drop [leaf-action-cat leaf-action]
         we-waiting? (get @waiting? [leaf-drop leaves-kp] false)
         tooltip (get label-map :tooltip "(no tooltip for leaf)")
         tooltip (when (vector? tooltip) (cstr/join " " tooltip))
-        leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})
+        ;leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})
         [src-kp tgt-kp] leaves-kp]
     ;(ut/pp [:spawn-button (str src-kp) (str tgt-kp) leaf-action-cat leaf-action])
     ;(ut/pp [:leaf-action-preview leaf-action-preview])
-    (when (and (not= leaf-action :tab-grid) (nil? leaf-action-preview))
-      (ut/pp [:leaf-preview-call {:leaf-drop leaf-drop :leaves-kp leaves-kp}])
-      (ut/tracked-dispatch [::wfx/request :default ;:secondary
-                            {:message {:kind        :run-leaf-action-preview
-                                       :src-keypath src-kp
-                                       :target-keypath tgt-kp
-                                       :dragged-kp @db/dragged-kp
-                                       :dragging-body @bricks/dragging-body
-                                       :leaf-action-cat leaf-action-cat
-                                       :leaf-action leaf-action
-                                       :client-name client-name}
-                             :on-response [::insert-leaf-action-preview leaf-drop leaves-kp]
-                             :timeout 50000}]))
+    ;; (when (and (not= leaf-action :tab-grid) (nil? leaf-action-preview))
+    ;;   (ut/pp [:leaf-preview-call {:leaf-drop leaf-drop :leaves-kp leaves-kp}])
+    ;;   (ut/tracked-dispatch [::wfx/request :default ;:secondary
+    ;;                         {:message {:kind        :run-leaf-action-preview
+    ;;                                    :src-keypath src-kp
+    ;;                                    :target-keypath tgt-kp
+    ;;                                    :dragged-kp @db/dragged-kp
+    ;;                                    :dragging-body @bricks/dragging-body
+    ;;                                    :leaf-action-cat leaf-action-cat
+    ;;                                    :leaf-action leaf-action
+    ;;                                    :client-name client-name}
+    ;;                          :on-response [::insert-leaf-action-preview leaf-drop leaves-kp]
+    ;;                          :timeout 50000}]))
     [re-com/v-box
      :align :center
      :justify :center
-     :attr {:on-click (fn []
-                        (swap! waiting? assoc [leaf-drop leaves-kp] true)
-                        (ut/tracked-dispatch
-                         [::wfx/request :default ;:secondary
-                          {:message {:kind :run-leaf-action-new ;[{:keys [client-name src-keypath target-keypath leaf-action-cat leaf-action]}]
-                                     :src-keypath src-kp
-                                     :target-keypath tgt-kp
-                                     :dragged-kp @db/dragged-kp
-                                     :dragging-body @bricks/dragging-body
-                                     :leaf-action-cat leaf-action-cat
-                                     :leaf-action leaf-action
-                                     :client-name client-name}
-                           :on-response [::insert-leaf-action-new leaf-drop leaves-kp]
-                           :timeout 50000}]))
-            :on-mouse-enter (fn []
-                              (reset! db/bar-hover-text tooltip)
-                              (reset! db/clover-leaf-previews leaf-action-preview))
-            :on-mouse-over (fn []
-                             (when (not= @db/clover-leaf-previews leaf-action-preview)
-                               (reset! db/bar-hover-text tooltip)
-                               (reset! db/clover-leaf-previews leaf-action-preview)))
-            :on-mouse-leave (fn []
-                              (reset! db/bar-hover-text nil)
-                              (reset! db/clover-leaf-previews nil))}
+    ;;  :attr {:on-click (fn []
+    ;;                     (swap! waiting? assoc [leaf-drop leaves-kp] true)
+    ;;                     (ut/tracked-dispatch
+    ;;                      [::wfx/request :default ;:secondary
+    ;;                       {:message {:kind :run-leaf-action-new ;[{:keys [client-name src-keypath target-keypath leaf-action-cat leaf-action]}]
+    ;;                                  :src-keypath src-kp
+    ;;                                  :target-keypath tgt-kp
+    ;;                                  :dragged-kp @db/dragged-kp
+    ;;                                  :dragging-body @bricks/dragging-body
+    ;;                                  :leaf-action-cat leaf-action-cat
+    ;;                                  :leaf-action leaf-action
+    ;;                                  :client-name client-name}
+    ;;                        :on-response [::insert-leaf-action-new leaf-drop leaves-kp]
+    ;;                        :timeout 50000}]))
+    ;;         :on-mouse-enter (fn []
+    ;;                           (reset! db/bar-hover-text tooltip)
+    ;;                           (reset! db/clover-leaf-previews leaf-action-preview))
+    ;;         :on-mouse-over (fn []
+    ;;                          (when (not= @db/clover-leaf-previews leaf-action-preview)
+    ;;                            (reset! db/bar-hover-text tooltip)
+    ;;                            (reset! db/clover-leaf-previews leaf-action-preview)))
+    ;;         :on-mouse-leave (fn []
+    ;;                           (reset! db/bar-hover-text nil)
+    ;;                           (reset! db/clover-leaf-previews nil))}
+          :attr {:on-double-click (fn []
+                                    (swap! waiting? assoc [leaf-drop leaves-kp] true)
+                                    (ut/tracked-dispatch
+                                     [::wfx/request :default ;:secondary
+                                      {:message {:kind :run-leaf-action-new ;[{:keys [client-name src-keypath target-keypath leaf-action-cat leaf-action]}]
+                                                 :src-keypath src-kp
+                                                 :target-keypath tgt-kp
+                                                 :dragged-kp @db/dragged-kp
+                                                 :dragging-body @bricks/dragging-body
+                                                 :leaf-action-cat leaf-action-cat
+                                                 :leaf-action leaf-action
+                                                 :client-name client-name}
+                                       :on-response [::insert-leaf-action-new leaf-drop leaves-kp]
+                                       :timeout 50000}]))
+                ;;  :on-click (fn [] (let [leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})]
+                ;;                     (when (and (not= leaf-action :tab-grid) (nil? leaf-action-preview))
+                ;;                       (ut/pp [:leaf-preview-call {:leaf-drop leaf-drop :leaves-kp leaves-kp}])
+                ;;                       (ut/tracked-dispatch [::wfx/request           :default
+                ;;                                             {:message {:kind        :run-leaf-action-preview
+                ;;                                                        :src-keypath src-kp
+                ;;                                                        :target-keypath tgt-kp
+                ;;                                                        :dragged-kp @db/dragged-kp
+                ;;                                                        :dragging-body @bricks/dragging-body
+                ;;                                                        :leaf-action-cat leaf-action-cat
+                ;;                                                        :leaf-action leaf-action
+                ;;                                                        :client-name client-name}
+                ;;                                              :on-response [::insert-leaf-action-preview leaf-drop leaves-kp]
+                ;;                                              :timeout 50000}]))
+                ;;                     ;(if (not= @db/clover-leaf-previews leaf-action-preview)
+                ;;                       ;(if
+                ;;                       ; (reset! db/clover-leaf-previews leaf-action-preview))
+
+                ;;                       (if (or (not= @db/clover-leaf-previews leaf-action-preview) (nil? @db/clover-leaf-previews))
+                ;;                         (do
+                ;;                           (reset! db/clover-leaf-previews :waiting)
+                ;;                           (let [check-interval 100  ;; Check every 100ms
+                ;;                                 max-attempts 50]    ;; Maximum 5 seconds of waiting
+                ;;                             (letfn [(wait-for-preview [attempts]
+                ;;                                       (when (<= attempts max-attempts)
+                ;;                                         (if (nil? leaf-action-preview)
+                ;;                                           (js/setTimeout #(wait-for-preview (inc attempts))
+                ;;                                                          check-interval)
+                ;;                                           (reset! db/clover-leaf-previews leaf-action-preview))))]
+                ;;                               (wait-for-preview 0))))
+                ;;                         (reset! db/clover-leaf-previews nil))
+
+                ;;                       ;(reset! db/clover-leaf-previews nil))
+                ;;                       ))
+                 :on-click (fn []
+                             (let [leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})
+                                   ;;_ (ut/pp [:click-preview? (= @db/clover-leaf-previews leaf-action-preview) leaf-action-preview])
+                                   ]
+                               (if (and (not (nil? leaf-action-preview))
+                                        (= @db/clover-leaf-previews leaf-action-preview))
+                ; If clicking the same preview again, treat as deselect
+                                 (reset! db/clover-leaf-previews nil)
+
+                ; Otherwise, load new preview
+                                 (do
+                  ; Set loading state
+                                   (reset! db/clover-leaf-previews :loading)
+
+                  ; Request preview data if needed
+                                   (when (and (not= leaf-action :tab-grid)
+                                              (nil? leaf-action-preview))
+                                     (ut/pp [:leaf-preview-call {:leaf-drop leaf-drop :leaves-kp leaves-kp}])
+                                     (ut/tracked-dispatch
+                                      [::wfx/request :default
+                                       {:message {:kind :run-leaf-action-preview
+                                                  :src-keypath src-kp
+                                                  :target-keypath tgt-kp
+                                                  :dragged-kp @db/dragged-kp
+                                                  :dragging-body @bricks/dragging-body
+                                                  :leaf-action-cat leaf-action-cat
+                                                  :leaf-action leaf-action
+                                                  :client-name client-name}
+                                        :on-response [::insert-leaf-action-preview leaf-drop leaves-kp]
+                                        :timeout 50000}]))
+
+                  ; Start watching for preview data
+                                   (let [check-interval 100
+                                         max-attempts 50
+                                         attempts (atom 0)
+                                         check-preview (fn check []
+                                                         (let [current-preview @(ut/tracked-sub ::leaf-action-preview
+                                                                                                {:leaf-drop leaf-drop :leaves-kp leaves-kp})]
+                                                           (cond
+                                          ; Preview loaded
+                                                             (some? current-preview)
+                                                             (do ;(reset! attempts 0)
+                                                               (reset! db/clover-leaf-previews current-preview))
+
+                                          ; Still waiting but under max attempts
+                                                             (< @attempts max-attempts)
+                                                             (do
+                                                               (swap! attempts inc)
+                                                               (js/setTimeout check check-interval))
+
+                                          ; Timed out
+                                                             :else
+                                                             (reset! db/clover-leaf-previews :error))))]
+
+                    ; Start checking
+                                     (check-preview))))))
+                ;;  :on-mouse-enter (fn []
+                ;;                    (reset! db/bar-hover-text tooltip)
+                ;;               ;(reset! db/clover-leaf-previews leaf-action-preview)
+                ;;                    )
+                ;;  :on-mouse-over (fn []
+                ;;                   (when (not= @db/bar-hover-text tooltip)
+                ;;                     (reset! db/bar-hover-text tooltip)
+                ;;                ;(reset! db/clover-leaf-previews leaf-action-preview)
+                ;;                     ))
+                ;;  :on-mouse-leave (fn []
+                ;;                    (reset! db/bar-hover-text nil)
+                ;;               ;(reset! db/clover-leaf-previews nil)
+                ;;                    )
+                 }
      :style {:font-weight 700 :cursor "pointer"}
      :children (if we-waiting?
                  [[re-com/md-icon-button
@@ -6735,11 +6872,12 @@
                 :children
                 [[re-com/box :child (str "dropped " (get drag-meta :type) " " (get drag-meta :target))]
                  [re-com/box :child (str " from " (get drag-meta :source-table))]]])
-        react! [@db/last-modal-viz-field @viz-modes-atom @db/clover-leaf-previews]
+        react! [@db/last-modal-viz-field @viz-modes-atom @db/clover-leaf-previews ]
         clear-state (fn []
                       (reset! db/drop-spawn-modal? false)
                       (reset! bricks/dragging-body {})
-                      (reset! hover-state {})
+                      (reset! hover-state nil)
+                      (reset! db/clover-leaf-previews nil)
                       (ut/pp [:fresh-spawns-modal-clear-state!])
                       (reset! db/dragged-kp [:canvas :canvas :canvas]) ;; atom watcher trigger
                       (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])
@@ -6787,7 +6925,7 @@
 
      ^{:key (str "fresh-spawns-" @db/dragged-kp)}
      [re-com/v-box
-      :width "650px"
+      :min-width "650px"
       :min-height "400px"
       :attr {:ref #(when %
                      (js/setTimeout
@@ -7125,6 +7263,13 @@
                                                   ;;                render-frag
                                                   ;;                 6.5 7]]])
 
+                                                   (case @db/clover-leaf-previews
+                                                     nil [:div "No preview selected"]
+                                                     :loading [:div "Loading preview..."]
+                                                     :error [:div "Failed to load preview"]
+                                                     ;; Otherwise render the actual preview data
+
+
                                                    (let [preview-panel          @db/clover-leaf-previews
                                                          selected-view          @(ut/tracked-sub ::bricks/selected-view-alpha {:panel-key preview-panel})
                                                          selected-view-type     @(ut/tracked-sub ::bricks/view-type {:panel-key preview-panel :view selected-view})
@@ -7157,6 +7302,7 @@
                                                                            [bricks/edn-code-box 400 100 (str view-body) {:font-size "10px" :font-weight 700}])]
                                                                ;@(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil ])
                                                                  ]])
+                                                   )
 
                                                    (if (and
                                                           (> reco-count 0)
@@ -7232,10 +7378,14 @@
                                                                       [re-com/box
                                                                        :min-height (px dynh)
                                                                        :child
+
                                                                        [bricks/mad-libs-shapes-modal query-id
                                                                         346
                                                                         dynh
                                                                         field [bx by]]
+
+                                                                      ;; "yoyo"
+
                                                                     ;[shape-rotator-panel tpanel shape-rotator-meta]
                                                                     ;[bricks/clover tpanel nil 9 6]
                                                                        ]))

@@ -13,7 +13,7 @@
    [re-com.validate   :refer [alert-type? string-or-hiccup? vector-of-maps?]]
    [garden.color :as    c
     :refer [analogous color? complement hex->hsl hex? hsl hsl->hex hsla invert mix rgb->hex rgb->hsl shades
-            split-complement tetrad triad]]
+            split-complement tetrad triad rgb hex->rgb as-hex]]
    [re-frame.alpha    :as rfa]
    [re-frame.core     :as re-frame]
    [reagent.core      :as reagent]
@@ -42,6 +42,19 @@
   (if (> (count full-color) 7)
     (subs full-color 0 7)
     full-color))
+
+(defn- adjust-rgb-component [component percentage]
+  (let [darkened (- component (* component (/ percentage 100.0)))]
+    (max 0 (Math/round darkened))))
+
+(defn darken-hex [hex-color percentage]
+  (try
+    (let [{:keys [red green blue]} (hex->rgb hex-color)
+          darkened-red (adjust-rgb-component red percentage)
+          darkened-green (adjust-rgb-component green percentage)
+          darkened-blue (adjust-rgb-component blue percentage)]
+      (as-hex (rgb darkened-red darkened-green darkened-blue)))
+    (catch :default _ hex-color)))
 
 (re-frame/reg-sub ;; for benchmarks
  ::client-name
@@ -996,7 +1009,7 @@
 (defn safe-key [proposed & [locals]]
   @(tracked-sub ::safe-key {:proposed proposed :locals locals}))
 
-(pp [:safe-key-test (safe-key :block-2835) (safe-key :blockddd)  (safe-key :grouped-bigfoot-sightings) (safe-key :grouped-grouped-all-offenses-5)])
+;; (pp [:safe-key-test (safe-key :block-2835) (safe-key :blockddd)  (safe-key :grouped-bigfoot-sightings) (safe-key :grouped-grouped-all-offenses-5)])
 ;; exists  :block-2835, :block-5863, :block-4635, :block-7126, :block-494, :block-rabbit, :block-1084, :block-12316',
 ;; exists  :grouped-all-offenses-3, :new-clojure-1, :grouped-bigfoot-sightings, :query-3799, :new-raw-sql, :virtual-view-flat, :grouped-grouped-all-offenses-5, :clojure-hop
 
@@ -1004,11 +1017,15 @@
 
 ;; (pp [:cc (contains? @db/reserved-view-keywords :grouped-bigfoot-sightings-1)])
 
-(defn hex-to-rgb [hex] (mapv #(js/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)]))
+(defn hex-to-rgb [hex] (try
+                         (mapv #(js/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)])
+                         (catch :default _ nil)))
 
-(defn luminance
-  [rgb]
-  (let [[r g b] (mapv #(double (/ % 255.0)) rgb) luminance (+ (* 0.2126 r) (* 0.7152 g) (* 0.0722 b))] luminance))
+(defn luminance [rgb]
+  (let [[r g b]
+        (mapv #(double (/ % 255.0)) rgb)
+        luminance
+        (+ (* 0.2126 r) (* 0.7152 g) (* 0.0722 b))] luminance))
 
 ;; (defn choose-text-color [hex]
 ;;   (let [rgb (hex-to-rgb hex) luma (luminance rgb)]
@@ -1029,12 +1046,9 @@
 (defn sort-map-by-key [m]
   (sort-by first (into [] m)))
 
-
-
 (defn get-time-format-str [] (cstr/join " " (drop 4 (drop-last 4 (splitter (str (js/Date.)) #" ")))))
 
-(defn base64-to-uint8-array
-  [base64]
+(defn base64-to-uint8-array [base64]
   (let [binary-string (.atob js/window base64)
         len           (.-length binary-string)
         bytes         (js/Uint8Array. len)]
@@ -1049,15 +1063,13 @@
 (defn ne? [x] (if (seqable? x) (boolean (seq x)) true))
 
 
-(defn base64-to-blob
-  [base64-content content-type]
+(defn base64-to-blob [base64-content content-type]
   (let [byte-array (base64-to-uint8-array base64-content)
         options    (clj->js {:type content-type})]
     (js/Blob. #js [byte-array] options)))
 
 
-(defn data-typer
-  [x] ;; exists in both block and db TODO - but they are different!!!
+(defn data-typer [x] ;; exists in both block and db TODO - but they are different!!!
   (cond
     ;; (or (and (vector? x) (cstr/includes? (str x) "#object"))
     ;;     (and (vector? x) (fn? (first x))) ;; ?
@@ -2273,6 +2285,16 @@
 
 (defn set-and-reset! [atom value delay-ms] (async/go (reset! atom value) (<! (async/timeout delay-ms)) (reset! atom nil)))
 
+(defn debounce [f wait]
+  (let [timeout (atom nil)]
+    (fn [& args]
+      (when @timeout
+        (js/clearTimeout @timeout))
+      (reset! timeout
+              (js/setTimeout
+               #(apply f args)
+               wait)))))
+
 (defn curved-path-h [x1 y1 x2 y2] (let [mx (+ x1 (/ (- x2 x1) 2)) line ["M" x1 y1 "C" mx y1 mx y2 x2 y2]] (cstr/join " " line)))
 
 (defn curved-path-v0 [x1 y1 x2 y2] (let [my (+ y1 (/ (- y2 y1) 2)) line ["M" x1 y1 "C" x1 my x2 my x2 y2]] (cstr/join " " line)))
@@ -2285,13 +2307,6 @@
         line                    ["M" x1 y1 "L" x1 y1-straight "C" x1 (+ y1-straight (/ (- y2-straight y1-straight) 2)) x2
                                  (+ y1-straight (/ (- y2-straight y1-straight) 2)) x2 y2-straight "L" x2 y2]]
     (cstr/join " " line)))
-
-
-
-
-
-
-
 
 
 (defn curved-path-v3a
@@ -2332,11 +2347,6 @@
   (cond (> y1 y2)        (curved-path-v3 x1 y1 x2 y2)
         (< (- y2 y1) 50) (curved-path-v0 x1 y1 x2 y2)
         :else            (curved-path-v1 x1 y1 x2 y2)))
-
-
-
-
-
 
 (defn stepped-path-h
   [x1 y1 x2 y2]

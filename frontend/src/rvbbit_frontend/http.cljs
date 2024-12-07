@@ -660,7 +660,7 @@
                                           data (get res :status)
                                           [_ panel-key data-key] (get (ut/flip-map @db/solver-fn-lookup) clover-kw)]
                                       (ut/tracked-dispatch [::write-repl-data-hash data-key data])
-                                      ;;(ut/pp [:solver-incoming-BATCHED! (last task-id) (get res :status)])
+                                      (ut/pp [:solver-incoming-BATCHED! (last task-id) (get res :status)])
                                       ))
 
                                   (when (and (= (first task-id) :leaf)
@@ -676,7 +676,7 @@
                   data (get result :status)
                   [_ panel-key data-key] (get (ut/flip-map @db/solver-fn-lookup) clover-kw)]
               (ut/tracked-dispatch [::write-repl-data-hash data-key data])
-              ;;(ut/pp [:solver-incoming-SINGLE! (get-in result [:task-id 0]) (get result :status)])
+              (ut/pp [:solver-incoming-SINGLE! (get-in result [:task-id 0]) (get result :status)])
               ))
 
         ;; (when (cstr/includes? (str (get db :client-name)) "beaming")
@@ -1155,6 +1155,7 @@
                          (dissoc :shape-rotations)
                          (dissoc :base-sniff-queries)
                          (dissoc :meta)
+                         (dissoc :shapes)
                          (dissoc :alerts)
                          (dissoc :audio-data-recorded) ;;; this was it
                          (dissoc :sql-str)
@@ -1185,6 +1186,58 @@
                    :response-format (ajax-edn/edn-response-format)
                    :on-success      [::success-http-save-flowset]
                    :on-failure      [::failure-http-save-flowset]}})))
+
+
+
+
+(re-frame/reg-event-db ::failure-http-save-theme
+                       (fn [db [_ result]]
+                         (let [old-status (get-in db [:http-reqs :save-theme])]
+                           (ut/tapp>> [:failure-http-save-theme result])
+                           (assoc-in db
+                                     [:http-reqs :save-theme] ; comp key from ::get-http-data
+                                     (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
+
+(re-frame/reg-event-db ::success-http-save-theme
+                       (fn [db [_ result]]
+                         (let [old-status (get-in db [:http-reqs :save-theme])]
+                           (assoc-in db
+                                     [:http-reqs :save-theme] ; comp key from ::get-http-data
+                                     (merge old-status
+                                            {;:keys       (count result)
+                                             ;:result     (select-keys result [:status :theme])
+                                             :ended-unix (.getTime (js/Date.))
+                                             :status     "success"})))))
+
+(re-frame/reg-event-fx
+ ::save-theme
+ (fn [{:keys [db]} [_]]
+   (let [method      :post
+         url         (str url-base "/save-theme")
+         image       (get-in db [:click-param :theme])
+         theme-name  (get image :theme-name (str "unnamed-theme-" (rand-int 45)))
+         request     {:image image
+                      :client-name (get db :client-name)
+                      :theme-name theme-name}
+         _ (ut/pp [:saving-theme! theme-name image])]
+     {:db         (assoc-in db [:http-reqs :save-theme] {:status "running" :url url :start-unix (.getTime (js/Date.))})
+      :http-xhrio {:method          method
+                   :uri             url
+                   :params          request
+                   :timeout         28000
+                   :format          (ajax-edn/edn-request-format)
+                   :response-format (ajax-edn/edn-response-format)
+                   :on-success      [::success-http-save-theme]
+                   :on-failure      [::failure-http-save-theme]}})))
+
+
+
+
+
+
+
+
+
 
 (re-frame/reg-event-db ::failure-http-save-flow
                        (fn [db [_ result]]
@@ -1394,6 +1447,7 @@
          snap-history-path [:click-param :client (keyword (str "macro-undo-map>" client-name-str))]
          snap-history (get-in db snap-history-path)
          new-db     (dissoc (get result :image) :resolved-queries)
+         new-click-param (assoc (get new-db :click-param) :leaf (get-in db [:click-param :leaf]))
          _ (ut/tapp>> [:new-name (get new-db :screen-name) :curr curr-screen-name :snap? snap?])]
      (-> db
          (assoc-in [:http-reqs :load-flowset]
@@ -1416,7 +1470,7 @@
          (assoc :meta (get new-db :meta))
          (assoc :screen-name (if snap? curr-screen-name (get new-db :screen-name)))
          (assoc :data (get new-db :data))
-         (assoc :click-param (get new-db :click-param))
+         (assoc :click-param new-click-param)
          (assoc-in snap-history-path snap-history)))))
 
 (re-frame/reg-event-fx

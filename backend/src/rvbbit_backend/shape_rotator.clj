@@ -406,32 +406,93 @@
                [[context shape-name axis-type] (set (map #(nth % 3) entries))]))
         (into {})))
 
- (defn create-all-chart-configs [found-fields]
-   (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
-        ; Group all entries by context first
-         by-context (group-by first found-fields)
-        ; Then for each context, get the chart types
-         context-charts (map (fn [[context entries]]
-                               [context (group-by second entries)])
-                             by-context)]
-     (vec (mapcat
-      (fn [[context chart-groups]]
-        (mapcat
-         (fn [[shape-name entries]]
-           (let [; Get the axes required for this chart type in this context
-                 required-axes (set (map #(nth % 2) entries))
-                ; Get the fields for each axis, but only for this context
-                 axis-fields (map #(vector % (get fields-by-chart-axis [context shape-name %]))
-                                  required-axes)
-                 axes-vec (vec required-axes)]
+;;  (defn create-all-chart-configs [found-fields]
+;;    (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
+;;         ; Group all entries by context first
+;;          by-context (group-by first found-fields)
+;;         ; Then for each context, get the chart types
+;;          context-charts (map (fn [[context entries]]
+;;                                [context (group-by second entries)])
+;;                              by-context)]
+;;      (vec (mapcat
+;;       (fn [[context chart-groups]]
+;;         (mapcat
+;;          (fn [[shape-name entries]]
+;;            (let [; Get the axes required for this chart type in this context
+;;                  required-axes (set (map #(nth % 2) entries))
+;;                 ; Get the fields for each axis, but only for this context
+;;                  axis-fields (map #(vector % (get fields-by-chart-axis [context shape-name %]))
+;;                                   required-axes)
+;;                  axes-vec (vec required-axes)]
 
-             (map (fn [field-combo]
-                    {:shape-name shape-name
-                     :context context
-                     :axes (zipmap axes-vec field-combo)})
-                  (apply combo/cartesian-product (map second axis-fields)))))
-         chart-groups))
-      context-charts))))
+;;              (map (fn [field-combo]
+;;                     {:shape-name shape-name
+;;                      :context context
+;;                      :axes (zipmap axes-vec field-combo)})
+;;                   (apply combo/cartesian-product (map second axis-fields)))))
+;;          chart-groups))
+;;       context-charts))))
+
+
+
+;; (defn create-all-chart-configs [found-fields]
+;;   (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
+;;         _ (ut/pp [:fields-by-chart-axis fields-by-chart-axis])
+;;         by-context (group-by first found-fields)
+;;         context-charts (map (fn [[context entries]]
+;;                               [context (group-by second entries)])
+;;                             by-context)]
+;;     (vec (mapcat
+;;           (fn [[context chart-groups]]
+;;             (mapcat
+;;              (fn [[shape-name entries]]
+;;                (let [real-required-axes (set (keys (get-in @db/shapes-map [shape-name :axes])))
+;;                      required-axes (set (map #(nth % 2) entries)) ;; derived from the fields FOUND compat, not necc ALL fields needed
+;;                      axis-fields (map #(vector % (get fields-by-chart-axis [context shape-name %]))
+;;                                       required-axes)
+;;                      axes-vec (vec required-axes)]
+;;                  (println "Debug:"
+;;                           "\nreal-required-axes:" real-required-axes
+;;                           "\nContext:" context
+;;                           "\nShape:" shape-name
+;;                           "\nRequired axes:" required-axes
+;;                           "\nAxis fields:" axis-fields)
+;;                  (map (fn [field-combo]
+;;                         {:shape-name shape-name
+;;                          :context context
+;;                          :axes (zipmap axes-vec field-combo)})
+;;                       (apply combo/cartesian-product (map second axis-fields)))))
+;;              chart-groups))
+;;           context-charts))))
+
+
+(defn create-all-chart-configs [found-fields]
+  (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
+        by-context (group-by first found-fields)
+        context-charts (map (fn [[context entries]]
+                              [context (group-by second entries)])
+                            by-context)]
+    (vec (mapcat
+          (fn [[context chart-groups]]
+            (mapcat
+             (fn [[shape-name entries]]
+               (let [real-required-axes (set (keys (get-in @db/shapes-map [shape-name :axes])))
+                     found-axes (set (map #(nth % 2) entries))]
+                 ;; Only proceed if we have all required axes
+                 (when (set/subset? real-required-axes found-axes)
+                   (let [axis-fields (map #(vector % (get fields-by-chart-axis [context shape-name %]))
+                                          real-required-axes)
+                         axes-vec (vec real-required-axes)]
+                     (->> (apply combo/cartesian-product (map second axis-fields))
+                          ;; Filter out combinations where the same field is used multiple times
+                          (filter #(= (count %) (count (set %))))
+                          (map (fn [field-combo]
+                                 {:shape-name shape-name
+                                  :context context
+                                  :axes (zipmap axes-vec field-combo)})))))))
+             chart-groups))
+          context-charts))))
+
 
 ;; {:from [:bigfoot_sightings] :select [[[:count [:distinct :nearesttown]] :cnt]]}
 
@@ -572,11 +633,13 @@
   (try
     (let [{:keys [axes context shape-name]} viz-shape-map
           this-viz-shape (get viz-shapes-defs shape-name)
-          {:keys [library-shapes sql-maps runner] :or {runner :views}} this-viz-shape
+          {:keys [library-shapes sql-maps runner selected-mode] :or {runner :views}} this-viz-shape
+          req-axes (vec (keys (get this-viz-shape :axes)))
           relevant-field-maps (get field-maps-by-context context) ;;(filterv #(= (get % :context) context) field-maps) ;; pre-index with a group-by map?
           {:keys [table-type connection-id table-name honey-hash]} (first relevant-field-maps)
 
           axes-walk (into {} (for [[k v] axes] {(keyword (str (cstr/replace (str k) ":" "") "-field")) (keyword v)}))
+          ;; _ (ut/pp [:axes-walk req-axes (vec (keys axes)) axes-walk])
           sql-table-walk {:table [(if (= table-type :query)
                                     (keyword (cstr/replace (str "query/" table-name) ":" ""))
                                     (keyword table-name)) :subq1]}
@@ -611,7 +674,8 @@
                                           (assoc-in [1 :height] :panel-height)
                                           (assoc-in [1 :padding] 4)
                                           (assoc-in [1 :background] "transparent"))
-                                      v)}))]
+                                      v)}))
+          #_ (ut/pp [:library-shapes library-shapes])]
       (merge base-block
              {runner library-shapes
               :connection-id connection-id
@@ -619,8 +683,10 @@
                               :honey-hash honey-hash
                               :items (into (vec (for [v (keys library-shapes)] [runner v]))
                                            (vec (for [v (keys queries-map)] [:queries v])))}
+              :selected-view (first (keys library-shapes))
               :name block-name
-              :queries queries-map}))
+              :queries queries-map}
+             (when selected-mode {:selected-mode {(first (keys library-shapes)) selected-mode}})))
             (catch Exception e (do (ut/pp [:materialize-viz-shape-error! e viz-shape-map]) {}))))
 
 (defn materialize-viz-shapes [combos field-maps viz-shapes-defs]
@@ -631,11 +697,13 @@
   (let [grouped (group-by :context field-maps)
         found-fields (vec (apply concat (for [[grp fields] grouped]
                                           (pmapv #(into [grp] %) (find-viz-fields fields viz-shapes-defs)))))
+        ;; _ (ut/pp [:found-fields found-fields])
         combos (create-all-chart-configs found-fields)
         combos (pmapv #(-> %
                           (assoc :fields (into [] (vals (get % :axes))))
                           (assoc :table (get-in % [:context 3]))
                           (assoc :connection-id (get-in % [:context 0]))) combos)
+        ;; _ (ut/pp [:combos1 combos])
         ;combos (filterv #(= (count (get % :fields)) (count (distinct (get % :fields)))) combos)
         ]
     combos))
@@ -647,21 +715,20 @@
       cached
       (let [combos (get-viz-shapes field-maps viz-shapes-defs)
             combos (if filter-fn (filterv filter-fn combos) combos)
+            ;; _ (ut/pp [:combos combos])
             combo-viz (materialize-viz-shapes combos field-maps viz-shapes-defs)]
         ;(swap! viz-maps-cache assoc k combo-viz)
         combo-viz))))
 
-;; (ut/pp [:field-maps (let [res (get-field-maps {:f-path "connections/bigfoot-ufos.edn"
+;; (ut/pp [:field-maps (let [res (get-field-maps {:f-path "connections/met-on-tour.edn"
 ;;                                                :shape-test-defs shape-tests
 ;;                                                :shape-attributes-defs shape-attributes
-;;                                                :honey-sql {:from [:bigfoot_sightings]
-;;                                                            :select [:class :season [[:count [:distinct :nearesttown]] :cnt]]
-;;                                                            :order-by [[2 :desc]]
-;;                                                            :group-by [:class :season]}
+;;                                                :honey-sql {:select [:latitude :longitude :location]
+;;                                                            :from   [[:locations :ssb99]]}
 ;;                                                :query-name :my-query-name-from-ui
 ;;                                                :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
 ;;                                                :pre-filter-fn nil})
-;;                           vshapes (select-keys viz-shapes [:scatter-plot :recharts-h-bar])
+;;                           vshapes @db/shapes-map ;(select-keys @db/shapes-map [:mapbox-point-map  ])
 ;;                           combos (get-viz-shapes res vshapes)
 ;;                           ;combo-viz (pmapv #(materialize-viz-shape res % viz-shapes) combos)
 ;;                           combo-viz (materialize-viz-shapes combos res vshapes)
@@ -677,7 +744,7 @@
 ;;                       ;[combo-viz (count res) (count combo-viz)]
 ;;                       ;combo-viz
 
-;;                       res
+;;                       [res (count combo-viz)]
 ;;                       )] {:width 120})
 
 

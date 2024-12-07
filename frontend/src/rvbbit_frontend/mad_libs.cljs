@@ -222,7 +222,7 @@
                [re-com/h-box :size "none" :children
                 (for [w (range charts-wide)] [reecatch [preview-container preview-maps preview-keys (+ (* h charts-wide) w)]])])]
             [re-com/v-box :size "auto" :height (px height-int) ;"380px"
-             :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66") :overflow "hidden"} :children
+             :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66") :overflow "hidden"} :children
              [[re-com/box :child
                [re-com/md-icon-button :md-icon-name "zmdi-trending-up" :on-click
                 #(do (clear-preview2-recos) (reset! mad-libs-top? (not @mad-libs-top?))) :style
@@ -233,7 +233,7 @@
                                     (str (theme-pull :theme/editor-font-color nil)))
                 :background-color (if @mad-libs-top?
                                     ;"#9973e0" ;"darkcyan"
-                                    (theme-pull :theme/universal-pop-color "#9973e0")
+                                    (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                     "inherit")} :align :center :justify :center]
               [re-com/v-box :children
                (for [[k v] sql-params-minus
@@ -249,7 +249,7 @@
                   {:font-size        "12px"
                    :background-color (if false ;@mad-libs-top?
                                        ;"#9973e0" ;"darkcyan"
-                                       (theme-pull :theme/universal-pop-color "#9973e0")
+                                       (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                        "inherit")} :align :center :justify :center])] [re-com/gap :size "2px"]
               [re-com/v-box :children
                (for [c (range pages)]
@@ -264,9 +264,9 @@
                                        (str (theme-pull :theme/editor-font-color nil) 77))
                    :background-color (if (= c recos-page)
                                        ;"#9973e0" ;"darkcyan"
-                                       (theme-pull :theme/universal-pop-color "#9973e0")
+                                       (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
                                        "inherit")
-                   :border-bottom    (str "1px dashed " (theme-pull :theme/universal-pop-color "#9973e0") "66")}])]] :width "30px"]]])]]]]))
+                   :border-bottom    (str "1px dashed " (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "66")}])]] :width "30px"]]])]]]]))
 
 
 

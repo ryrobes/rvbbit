@@ -1,0 +1,94 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1a1a"
+ :pop-2 "#3486eb"
+ :base-block-style
+   {:text-shadow "none"
+    :border-radius "2px"
+    :filter "none"
+    :backdrop-filter "blur(10px)"
+    :border "1px solid #404040"
+    :box-shadow
+      "0 1px 2px rgba(0,0,0,0.2),                                        inset 0 0 0 1px rgba(255,255,255,0.05)"}
+ :vega-defaults
+   {:mark    {:font "SF Mono" :stroke "#3486eb" :color "#3486eb65"}
+    :legend  {:labelFont  "SF Mono"
+              :legendFont "SF Mono"
+              :labelColor "#ffffff"
+              :titleColor "#ffffff"
+              :stroke     "#3486eb"
+              :titleFont  "SF Mono"}
+    :header  {:labelFont "SF Mono" :titleFont "SF Mono" :titleColor "#ffffff"}
+    :title   {:font "SF Mono" :subtitleFont "SF Mono" :labelFont "SF Mono" :titleFont "SF Mono" :titleColor "#ffffff"}
+    :point   {:font "SF Mono" :stroke "#3486eb" :color "#3486eb65"}
+    :area    {:font "SF Mono" :stroke "#3486eb" :color "#3486eb65"}
+    :axis    {:domainColor "#404040"
+              :grid        true
+              :font        "SF Mono"
+              :labelColor  "#cccccc"
+              :titleFont   "SF Mono"
+              :titleColor  "#ffffff"
+              :labelFont   "SF Mono"
+              :domain      false
+              :gridColor   "#33333355"
+              :tickColor   "#404040"
+              :axisFont    "SF Mono"}
+    :tooltip {:fill "#1a1a1acc" :stroke "#404040" :strokeWidth 1 :color "#ffffff"}
+    :view    {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#3486eb22" :filter "none" :backdrop-filter "blur(5px)" :box-shadow "inset 0 0 0 1px #3486eb55"}
+ :base-block-color-selected "#262626"
+ :block-title-font-color "#ffffff"
+ :base-block-color "#1a1a1aee"
+ :pop-3 "#cccccc"
+ :editor-rim-color "#3486eb"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "custom"}
+ :data-colors {"float"       "#3486eb"
+               "boolean"     "#cccccc"
+               "map"         "#8c8c8c"
+               "list"        "#3486eb"
+               "string"      "#cccccc"
+               "any"         "#3486eb"
+               "vector"      "#cccccc"
+               "keyword"     "#8c8c8c"
+               "rabbit-code" "#3486eb"
+               "datetime"    "#cccccc"
+               "integer"     "#8c8c8c"
+               "unknown"     "#3486eb"
+               "date"        "#cccccc"}
+ :editor-grid-selected-font-color "#ffffff"
+ :monospaced-font "SF Mono"
+ :editor-grid-selected-background-color "#3486eb"
+ :nivo-defaults
+   {:font-family "SF Mono"
+    :labels      {:text {:fill "#ffffff" :font-size "12px" :font-family "SF Mono" :font-weight 400}}
+    :tooltip     {:container {:box-shadow      "0 4px 6px rgba(0,0,0,0.3)"
+                              :color           "#ffffff"
+                              :borderRadius    "2px"
+                              :background      "#1a1a1aee"
+                              :backdrop-filter "blur(10px)"
+                              :padding         "8px 12px"
+                              :fontSize        "12px"
+                              :border          "1px solid #404040"
+                              :text            {:fill "#ffffff"}}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill "#ffffff" :font-size "12px" :font-family "SF Mono" :font-weight 400}}
+                  :ticks  {:line {:stroke "#404040"} :text {:fill "#cccccc" :font-weight 400}}}
+    :grid        {:line {:stroke "#33333355" :strokeWidth 1 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#3486eb"
+ :grid-selected-font-color "#ffffff"
+ :block-title-selected-font-color "#ffffff"
+ :grid-selected-background-color "#3486eb"
+ :grid-font-color "#ffffff"
+ :canvas-background-css {:background       "radial-gradient(circle at 50% -50%, #333333 0%, #1a1a1a 50%)"
+                         :transition       "all 0.2s ease"
+                         :background-color "#1a1a1a"}
+ :editor-font-color "#ffffff"
+ :base-font "SF Mono"
+ :block-tab-selected-font-color "#ffffff"
+ :editor-background-color "#1a1a1a"
+ :editor-grid-font-color "#ffffff"
+ :pop-1 "#333333"}
+
+

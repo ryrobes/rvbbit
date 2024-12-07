@@ -1,0 +1,103 @@
+{:codemirror-theme                      "rvbbit-dynamic"
+ :editor-param-background-color         "#ffffff"
+ :pop-2                                 "#0078d4"
+ :base-block-style                      {:text-shadow     "none"
+                                         :border-radius   "-15px"
+                                         :filter          "none"
+                                         :backdrop-filter "none"
+                                         :border          "1px solid #edebe9"
+                                         :box-shadow      "0 2px 6px rgba(0,0,0,0.05)"}
+ :vega-defaults                         {:mark    {:font "Segoe UI" :stroke "#0078d4" :color "#0078d465"}
+                                         :legend  {:labelFont  "Segoe UI"
+                                                   :legendFont "Segoe UI"
+                                                   :labelColor "#323130"
+                                                   :titleColor "#323130"
+                                                   :stroke     "#0078d4"
+                                                   :titleFont  "Segoe UI"}
+                                         :header  {:labelFont "Segoe UI" :titleFont "Segoe UI" :titleColor "#323130"}
+                                         :title   {:font         "Segoe UI"
+                                                   :subtitleFont "Segoe UI"
+                                                   :labelFont    "Segoe UI"
+                                                   :titleFont    "Segoe UI"
+                                                   :titleColor   "#323130"}
+                                         :point   {:font "Segoe UI" :stroke "#0078d4" :color "#0078d465"}
+                                         :area    {:font "Segoe UI" :stroke "#0078d4" :color "#0078d465"}
+                                         :axis    {:domainColor "#edebe9"
+                                                   :grid        true
+                                                   :font        "Segoe UI"
+                                                   :labelColor  "#605e5c"
+                                                   :titleFont   "Segoe UI"
+                                                   :titleColor  "#323130"
+                                                   :labelFont   "Segoe UI"
+                                                   :domain      false
+                                                   :gridColor   "#faf9f8"
+                                                   :tickColor   "#edebe9"
+                                                   :axisFont    "Segoe UI"}
+                                         :tooltip {:fill "#ffffff" :stroke "#edebe9" :strokeWidth 1 :color "#323130"}
+                                         :view    {:stroke "transparent"}}
+ :grid-selected-column-css              {:background-color "#f3f8fc" :filter "none" :box-shadow "none"}
+ :base-block-color-selected             "#faf9f8"
+ :block-title-font-color                "#323130"
+ :base-block-color                      "#ffffff"
+ :pop-3                                 "#107c10"
+ :editor-rim-color                      "#0078d4"
+ :base-block-filter-selected            "none"
+ :_vega-default-color-scheme             {:scheme "office"}
+ :data-colors                           {"float"       "#0078d4"
+                                         "boolean"     "#107c10"
+                                         "map"         "#d83b01"
+                                         "list"        "#0078d4"
+                                         "string"      "#107c10"
+                                         "any"         "#0078d4"
+                                         "vector"      "#107c10"
+                                         "keyword"     "#d83b01"
+                                         "rabbit-code" "#0078d4"
+                                         "datetime"    "#107c10"
+                                         "integer"     "#d83b01"
+                                         "unknown"     "#0078d4"
+                                         "date"        "#107c10"}
+ :editor-grid-selected-font-color       "#ffffff"
+ :monospaced-font                       "IBM Plex Mono"
+ :editor-grid-selected-background-color "#0078d4"
+ :nivo-defaults                         {:font-family "Segoe UI"
+                                         :labels      {:text {:fill        "#323130"
+                                                              :font-size   "13px"
+                                                              :font-family "Segoe UI"
+                                                              :font-weight 400}}
+                                         :tooltip     {:container {:background   "#ffffff"
+                                                                   :color        "#323130"
+                                                                   :text         {:fill "#323130"}
+                                                                   :fontSize     "13px"
+                                                                   :borderRadius "2px"
+                                                                   :border       "1px solid #edebe9"
+                                                                   :box-shadow   "0 2px 8px rgba(0,0,0,0.15)"
+                                                                   :padding      "8px 12px"}
+                                                       :basic     {:whiteSpace "pre"
+                                                                   :display    "flex"
+                                                                   :alignItems "center"}
+                                                       :tableCell {:padding "6px 12px"}}
+                                         :axis        {:legend {:text {:fill        "#323130"
+                                                                       :font-size   "13px"
+                                                                       :font-family "Segoe UI"
+                                                                       :font-weight 600}}
+                                                       :ticks  {:line {:stroke "#edebe9"}
+                                                                :text {:fill "#605e5c" :font-weight 400}}}
+                                         :grid        {:line {:stroke          "#faf9f8"
+                                                              :strokeWidth     1
+                                                              :strokeDasharray "none"}}}
+ :editor-outer-rim-color                "#0078d4"
+ :grid-selected-font-color              "#ffffff"
+ :block-title-selected-font-color       "#ffffff"
+ :grid-selected-background-color        "#0078d4"
+ :grid-font-color                       "#323130"
+ :canvas-background-css                 {:background       "#f3f2f1"
+                                         :transition       "all 0.1s ease-out"
+                                         :background-color "#f3f2f1"}
+ :editor-font-color                     "#323130"
+ :base-font                             "Helvetica"
+ :block-tab-selected-font-color         "#ffffff"
+ :editor-background-color               "#ffffff"
+ :editor-grid-font-color                "#323130"
+ :pop-1                                 "#605e5c"}
+
+

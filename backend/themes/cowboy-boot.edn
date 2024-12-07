@@ -1,0 +1,102 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a1412"
+ :pop-2 "#8b4513"
+ :base-block-style
+   {:text-shadow "none"
+    :border-radius "0px"
+    :filter "none"
+    :backdrop-filter "none"
+    :border "6px solid"
+    :border-image "linear-gradient(45deg, #4a3828 0%, #8b4513 25%, #b87333 50%, #8b4513 75%, #4a3828 100%) 1"
+    :box-shadow
+      "inset 0 0 20px #00000088,                                        inset 0 0 40px #4a382822,                                       0px 0px 0px 2px #1a1412,                                       4px 4px 0px 2px #4a3828"}
+ :vega-defaults {:mark    {:font "American Typewriter" :stroke "#b87333" :color "#b8733365"}
+                 :legend  {:labelFont  "American Typewriter"
+                           :legendFont "American Typewriter"
+                           :labelColor "#d4c19c"
+                           :titleColor "#d4c19c"
+                           :stroke     "#b87333"
+                           :titleFont  "American Typewriter"}
+                 :header  {:labelFont "American Typewriter" :titleFont "American Typewriter" :titleColor "#d4c19c"}
+                 :title   {:font         "American Typewriter"
+                           :subtitleFont "American Typewriter"
+                           :labelFont    "American Typewriter"
+                           :titleFont    "American Typewriter"
+                           :titleColor   "#d4c19c"}
+                 :point   {:font "American Typewriter" :stroke "#b87333" :color "#b8733365"}
+                 :area    {:font "American Typewriter" :stroke "#b87333" :color "#b8733365"}
+                 :axis    {:domainColor "#b8733344"
+                           :grid        true
+                           :font        "American Typewriter"
+                           :labelColor  "#d4c19c"
+                           :titleFont   "American Typewriter"
+                           :titleColor  "#d4c19c"
+                           :labelFont   "American Typewriter"
+                           :domain      false
+                           :gridColor   "#4a382822"
+                           :tickColor   "#b8733344"
+                           :axisFont    "American Typewriter"}
+                 :tooltip {:fill "#1a1412ee" :stroke "#b87333" :strokeWidth 2 :color "#d4c19c"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#b8733322" :filter "none" :box-shadow "inset 0 0 12px #b8733344"}
+ :base-block-color-selected "#2a2220"
+ :block-title-font-color "#d4c19c"
+ :base-block-color "#1a1412ee"
+ :pop-3 "#cd853f"
+ :editor-rim-color "#b87333"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "browns"}
+ :data-colors {"float"       "#b87333"
+               "boolean"     "#cd853f"
+               "map"         "#d4c19c"
+               "list"        "#b87333"
+               "string"      "#cd853f"
+               "any"         "#b87333"
+               "vector"      "#cd853f"
+               "keyword"     "#d4c19c"
+               "rabbit-code" "#b87333"
+               "datetime"    "#cd853f"
+               "integer"     "#d4c19c"
+               "unknown"     "#b87333"
+               "date"        "#cd853f"}
+ :editor-grid-selected-font-color "#1a1412"
+ :monospaced-font "American Typewriter"
+ :editor-grid-selected-background-color "#b87333"
+ :nivo-defaults
+   {:font-family "American Typewriter"
+    :labels      {:text {:fill "#d4c19c" :font-size "16px" :font-family "American Typewriter" :font-weight 500}}
+    :tooltip     {:container {:background   "#1a1412ee"
+                              :color        "#d4c19c"
+                              :text         {:fill "#d4c19c"}
+                              :fontSize     "14px"
+                              :borderRadius "0px"
+                              :border       "2px solid #b87333"
+                              :box-shadow   "inset 0 0 12px #00000066"
+                              :padding      "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "4px 8px"}}
+    :axis        {:legend {:text {:fill        "#d4c19c"
+                                  :font-size   "14px"
+                                  :font-family "American Typewriter"
+                                  :font-weight 500}}
+                  :ticks  {:line {:stroke "#b8733360"} :text {:fill "#d4c19c" :font-weight 500}}}
+    :grid        {:line {:stroke "#4a382822" :strokeWidth 1 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#b87333"
+ :grid-selected-font-color "#1a1412"
+ :block-title-selected-font-color "#1a1412"
+ :grid-selected-background-color "#b87333"
+ :grid-font-color "#d4c19c"
+ :canvas-background-css
+   {:background
+      "radial-gradient(circle at 50% 50%, #2a2220 0%, #1a1412 100%),                                      url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23b87333' stroke-width='1' stroke-opacity='0.1'%3E%3Cpath d='M0 50h100M50 0v100'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"
+    :background-blend-mode "overlay"
+    :transition "all 0.3s ease"
+    :background-color "#1a1412"}
+ :editor-font-color "#d4c19c"
+ :base-font "American Typewriter"
+ :block-tab-selected-font-color "#1a1412"
+ :editor-background-color "#1a1412"
+ :editor-grid-font-color "#d4c19c"
+ :pop-1 "#4a3828"}
+
+

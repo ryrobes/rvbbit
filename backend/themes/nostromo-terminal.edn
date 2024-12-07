@@ -1,0 +1,111 @@
+{:codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#001100"
+ :pop-2 "#90ee90"
+ :base-block-style
+   {:text-shadow "0 0 12px #90ee9066, 0 0 20px #90ee9033"
+    :border-radius "0px"
+    :filter "none"
+    :backdrop-filter "none"
+    :border "4px solid #335533"
+    :border-top-color "#444444"
+    :border-left-color "#444444"
+    :border-right-color "#111111"
+    :border-bottom-color "#111111"
+    :box-shadow
+      "inset 0 0 12px #90ee9022, 
+                                     inset 0 0 24px #90ee9011,
+                                     0 0 15px #90ee9022,
+                                     2px 2px 0px #000000"}
+ :vega-defaults {:mark {:font "VT323" :stroke "#90ee90" :color "#90ee9065"}
+                 :legend {:labelFont  "VT323"
+                          :legendFont "VT323"
+                          :labelColor "#90ee90"
+                          :titleColor "#90ee90"
+                          :stroke     "#90ee90"
+                          :titleFont  "VT323"}
+                 :header {:labelFont "VT323" :titleFont "VT323" :titleColor "#90ee90"}
+                 :title
+                   {:font "VT323" :subtitleFont "VT323" :labelFont "VT323" :titleFont "VT323" :titleColor "#90ee90"}
+                 :point {:font "VT323" :stroke "#90ee90" :color "#90ee9065"}
+                 :area {:font "VT323" :stroke "#90ee90" :color "#90ee9065"}
+                 :axis {:domainColor "#90ee9044"
+                        :grid        true
+                        :font        "VT323"
+                        :labelColor  "#90ee90"
+                        :titleFont   "VT323"
+                        :titleColor  "#90ee90"
+                        :labelFont   "VT323"
+                        :domain      false
+                        :gridColor   "#90ee9022"
+                        :tickColor   "#90ee9044"
+                        :axisFont    "VT323"}
+                 :tooltip {:fill "#001100" :stroke "#335533" :strokeWidth 2 :color "#90ee90"}
+                 :view {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#90ee9022"
+    :filter           "none"
+    :box-shadow       "inset 0 0 12px #90ee9044,
+                                            0 0 20px #90ee9033"}
+ :base-block-color-selected "#002200"
+ :block-title-font-color "#90ee90"
+ :base-block-color "#001100"
+ :pop-3 "#98fb98"
+ :editor-rim-color "#335533"
+ :base-block-filter-selected "none"
+ :_vega-default-color-scheme {:scheme "greens"}
+ :data-colors {"float"       "#90ee90"
+               "boolean"     "#98fb98"
+               "map"         "#8fbc8f"
+               "list"        "#90ee90"
+               "string"      "#98fb98"
+               "any"         "#90ee90"
+               "vector"      "#98fb98"
+               "keyword"     "#8fbc8f"
+               "rabbit-code" "#90ee90"
+               "datetime"    "#98fb98"
+               "integer"     "#8fbc8f"
+               "unknown"     "#90ee90"
+               "date"        "#98fb98"}
+ :editor-grid-selected-font-color "#001100"
+ :monospaced-font "VT323"
+ :editor-grid-selected-background-color "#90ee90"
+ :nivo-defaults
+   {:font-family "VT323"
+    :labels
+      {:text
+         {:fill "#90ee90" :font-size "16px" :font-family "VT323" :font-weight 400 :text-shadow "0 0 10px #90ee9066"}}
+    :tooltip
+      {:container
+         {:background "#001100"
+          :color "#90ee90"
+          :text {:fill "#90ee90"}
+          :fontSize "14px"
+          :borderRadius "0px"
+          :border "2px solid #335533"
+          :box-shadow
+            "inset 0 0 12px #90ee9022,
+                                            0 0 15px #90ee9033,
+                                            2px 2px 0px #000000"
+          :padding "8px 12px"}
+       :basic {:whiteSpace "pre" :display "flex" :alignItems "center"}
+       :tableCell {:padding "4px 8px"}}
+    :axis {:legend {:text {:fill "#90ee90" :font-size "14px" :font-family "VT323" :font-weight 400}}
+           :ticks  {:line {:stroke "#90ee9060"} :text {:fill "#90ee90" :font-weight 400}}}
+    :grid {:line {:stroke "#90ee9022" :strokeWidth 1 :strokeDasharray "none"}}}
+ :editor-outer-rim-color "#335533"
+ :grid-selected-font-color "#001100"
+ :block-title-selected-font-color "#001100"
+ :grid-selected-background-color "#90ee90"
+ :grid-font-color "#90ee90"
+ :canvas-background-css {:background       "radial-gradient(#002200 0%, #001100 100%)"
+                         :background-size  "100% 100%"
+                         :transition       "none"
+                         :background-color "#001100"}
+ :editor-font-color "#90ee90"
+ :base-font "VT323"
+ :block-tab-selected-font-color "#001100"
+ :editor-background-color "#001100"
+ :editor-grid-font-color "#90ee90"
+ :pop-1 "#002200"}
+
+
