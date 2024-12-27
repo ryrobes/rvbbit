@@ -1,0 +1,157 @@
+{"sales-seasonality"
+ {:name "Sales Seasonality Analysis"
+  :description "Comprehensive analysis of seasonal patterns and anomalies"
+  :required-fields [:date :sales :category]
+  :pipeline
+  [{:formula "time-bucket"
+    :params {:date-field :date
+             :bucket-size :month}}
+   {:formula "window-aggregation"
+    :params {:value-field :sales
+             :partition-fields [:category]
+             :order-field :bucket_start
+             :window-size 12
+             :aggregation :avg}}]}
+
+ "customer-value"
+ {:name "Customer Value Analysis"
+  :description "Customer spending patterns and segments"
+  :required-fields [:customer_id :purchase_date :amount]
+  :pipeline
+  [{:formula "running-totals"
+    :params {:value-field :amount
+             :partition-fields [:customer_id]
+             :order-field :purchase_date}}
+   {:formula "distribution-analysis"
+    :params {:value-field :running_total}}]}
+
+
+ "price-elasticity"
+  {:name "Price Elasticity Analysis"
+   :description "Analyzes price sensitivity by calculating elasticity coefficients and identifying significant variations"
+   :required-fields [:price :quantity :product :category]
+   :pipeline
+   [{:formula "relative-change"
+     :params {:value-field :price
+              :partition-fields [:product]}}
+    {:formula "relative-change"
+     :params {:value-field :quantity
+              :partition-fields [:product]}}
+    {:formula "excel-formula"
+     :params {:formula "=IF(pct_change_price != 0, pct_change_quantity / pct_change_price, 0)"
+              :result-field "elasticity"}}
+    {:formula "zscore-analysis"
+     :params {:value-field :elasticity
+              :group-fields [:category]}}]}
+
+  "cohort-retention"
+  {:name "Cohort Retention Analysis"
+   :description "Tracks customer retention patterns by purchase cohorts over time"
+   :required-fields [:customer_id :purchase_date :first_purchase_date]
+   :pipeline
+   [{:formula "excel-formula"
+     :params {:formula "=YEARMONTH(first_purchase_date)"
+              :result-field "cohort"}}
+    {:formula "excel-formula"
+     :params {:formula "=MONTHS_BETWEEN(purchase_date, first_purchase_date)"
+              :result-field "months_since_first"}}
+    {:formula "contribution-analysis"
+     :params {:value-field :customer_id
+              :group-fields [:cohort :months_since_first]}}]}
+
+  "inventory-turnover"
+  {:name "Inventory Turnover Analysis"
+   :description "Measures inventory efficiency through turnover rates and identifies category-level patterns"
+   :required-fields [:quantity_sold :inventory_on_hand :category :date]
+   :pipeline
+   [{:formula "moving-window"
+     :params {:value-field :quantity_sold
+              :window-size 30
+              :operation :sum}}
+    {:formula "excel-formula"
+     :params {:formula "=window_value / inventory_on_hand"
+              :result-field "turnover_rate"}}
+    {:formula "zscore-analysis"
+     :params {:value-field :turnover_rate
+              :group-fields [:category]}}]}
+
+  "basket-affinity"
+  {:name "Market Basket Affinity Analysis"
+   :description "Analyzes product relationships through co-occurrence patterns and lift metrics"
+   :required-fields [:order_id :product_id :related_product_id]
+   :pipeline
+   [{:formula "excel-formula"
+     :params {:formula "=COUNT(FILTER(order_id, product_id = CURRENT(product_id)))"
+              :result-field "product_frequency"}}
+    {:formula "excel-formula"
+     :params {:formula "=COUNT(FILTER(order_id, product_id = CURRENT(product_id) AND related_product_id IN SAME_ORDER))"
+              :result-field "joint_frequency"}}
+    {:formula "excel-formula"
+     :params {:formula "=joint_frequency / (product_frequency * COUNT(FILTER(order_id, product_id = related_product_id)) / COUNT(DISTINCT order_id))"
+              :result-field "lift"}}]}
+
+  "seasonal-decomposition"
+  {:name "Seasonal Pattern Decomposition"
+   :description "Decomposes time series into seasonal factors and normalized indices"
+   :required-fields [:sales :date]
+   :pipeline
+   [{:formula "moving-window"
+     :params {:value-field :sales
+              :window-size 12
+              :operation :avg}}
+    {:formula "excel-formula"
+     :params {:formula "=sales / window_value"
+              :result-field "seasonal_factor"}}
+    {:formula "excel-formula"
+     :params {:formula "=AVERAGE(FILTER(seasonal_factor, MONTH(date) = MONTH(CURRENT(date))))"
+              :result-field "seasonal_index"}}]}
+
+  "customer-lifetime-value"
+  {:name "Customer Lifetime Value Analysis"
+   :description "Calculates and segments customer value based on historical patterns and trends"
+   :required-fields [:first_purchase :last_purchase :total_revenue :customer_segment]
+   :pipeline
+   [{:formula "excel-formula"
+     :params {:formula "=DAYS_BETWEEN(first_purchase, last_purchase) / 365"
+              :result-field "customer_age"}}
+    {:formula "excel-formula"
+     :params {:formula "=total_revenue / customer_age"
+              :result-field "annual_value"}}
+    {:formula "moving-window"
+     :params {:value-field :annual_value
+              :window-size 90
+              :operation :avg}}
+    {:formula "zscore-analysis"
+     :params {:value-field :window_value
+              :group-fields [:customer_segment]}}]}
+
+  "abc-classification"
+  {:name "ABC (Pareto) Classification"
+   :description "Classifies products based on revenue contribution using Pareto principle"
+   :required-fields [:product_id :revenue]
+   :pipeline
+   [{:formula "contribution-analysis"
+     :params {:value-field :revenue
+              :group-fields [:product_id]}}
+    {:formula "excel-formula"
+     :params {:formula "=IF(running_pct <= 0.8, 'A', IF(running_pct <= 0.95, 'B', 'C'))"
+              :result-field "abc_class"}}]}
+
+  "rfm-scoring"
+  {:name "RFM (Recency-Frequency-Monetary) Scoring"
+   :description "Customer segmentation based on purchase recency, frequency, and monetary value"
+   :required-fields [:last_purchase_date :purchase_frequency :monetary_value]
+   :pipeline
+   [{:formula "excel-formula"
+     :params {:formula "=DAYS_BETWEEN(CURRENT_DATE, last_purchase_date)"
+              :result-field "recency_days"}}
+    {:formula "zscore-analysis"
+     :params {:value-field :recency_days}}
+    {:formula "zscore-analysis"
+     :params {:value-field :purchase_frequency}}
+    {:formula "zscore-analysis"
+     :params {:value-field :monetary_value}}
+    {:formula "excel-formula"
+     :params {:formula "=CONCAT(IF(recency_zscore < -0.5, '3', IF(recency_zscore < 0.5, '2', '1')), IF(frequency_zscore > 0.5, '3', IF(frequency_zscore > -0.5, '2', '1')), IF(monetary_zscore > 0.5, '3', IF(monetary_zscore > -0.5, '2', '1')))"
+              :result-field "rfm_score"}}]}}
+

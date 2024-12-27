@@ -1,0 +1,4010 @@
+{:reco-preview nil,
+ :annotate? false,
+ :default-col-widths
+ {:block-79 {:new-clojure-11-sqlized 311},
+  :block-75 {:agg-all-superstore-4-drill 211},
+  :block-76 {:agg-all-superstore-4-drill-1 211},
+  :block-71 {:all-superstore-4 100},
+  :block-81 {:grouped-all-superstore-6 105},
+  :block-73 {:all-superstore-4-drill 100},
+  :system-connections-list* {:connections-sys ##Inf},
+  :block-74 {:query8 130},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-77 {:grouped-all-superstore-4-drill 142},
+  :block-78 {:agg-grouped-all-superstore-4-drill 211},
+  :system-tables-list* {:tables-sys ##Inf}},
+ :runstream-drops nil,
+ :tabs
+ ["winter-wonder-lands"
+  "commendable snake"
+  "stupendous deer"
+  "lilac yellow jacket"
+  "meaningful ox"],
+ :selected-cols nil,
+ :server nil,
+ :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
+ :editor? false,
+ :buffy? false,
+ :memory [820064087 739129235 4294705152],
+ :client-name :fresh-diamond-nightingale-30,
+ :server-panels
+ [:block-695
+  :block-684
+  :block-79
+  :block-75
+  :block-2175
+  :block-76
+  :block-42
+  :block-5136
+  :block-71
+  :block-263
+  :block-72
+  :block-11124
+  :block-8880
+  :block-81
+  :block-44
+  :block-82
+  :block-7831
+  :block-488
+  :block-4928
+  :block-10207
+  :block-689
+  :block-41
+  :block-8676
+  :block-1892
+  :block-73
+  :block-11913
+  :block-74
+  :block-9915
+  :block-77
+  :block-80
+  :block-7724
+  :block-5189
+  :block-6676
+  :block-806
+  :block-173
+  :block-10955
+  :block-10081
+  :block-172
+  :block-78
+  :block-1400
+  :block-609
+  :block-801
+  :block-653
+  :block-350
+  :block-7349
+  :block-6951
+  :block-411
+  :block-7312
+  :block-629
+  :block-703],
+ :flow-editor? true,
+ :window {:w 1788, :h 1272},
+ :ai-worker? false,
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil]},
+ :post-meta
+ {:gen-viz-1300
+  {:profit {:distinct 51},
+   :* {:rowcount 51},
+   :sub_category {:distinct 17},
+   :region {:distinct 3},
+   :category {:distinct 3},
+   :rrows {:distinct nil}},
+  :superstore
+  {:category {:distinct 3},
+   :sales {:distinct 109},
+   :* {:rowcount 111},
+   :ship_date {:distinct 54},
+   :product_id {:distinct 108},
+   :city {:distinct 37},
+   :profit {:distinct 110},
+   :rrows {:distinct nil},
+   :state {:distinct 23},
+   :zipcode {:distinct 46},
+   :row_id {:distinct 111},
+   :region {:distinct 4},
+   :ship_mode {:distinct 3},
+   :order_id {:distinct 55},
+   :segment {:distinct 3},
+   :sub_category {:distinct 14},
+   :order_date {:distinct 54},
+   :quantity {:distinct 9},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 52},
+   :product_name {:distinct 108},
+   :customer_id {:distinct 52}},
+  :agg-all-superstore-4-drill-1
+  {:sales {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :rabbit-search-like-themes
+  {:theme_name {:distinct 87},
+   :* {:rowcount 87},
+   :theme_map {:distinct 87},
+   :rrows {:distinct nil}},
+  :agg-all-superstore-4-drill
+  {:profit {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :all-superstore-4-drill
+  {:category {:distinct 1},
+   :sales {:distinct 189},
+   :* {:rowcount 197},
+   :ship_date {:distinct 122},
+   :product_id {:distinct 157},
+   :city {:distinct 44},
+   :profit {:distinct 192},
+   :rrows {:distinct nil},
+   :state {:distinct 12},
+   :zipcode {:distinct 53},
+   :row_id {:distinct 197},
+   :region {:distinct 1},
+   :ship_mode {:distinct 4},
+   :order_id {:distinct 156},
+   :segment {:distinct 3},
+   :sub_category {:distinct 4},
+   :order_date {:distinct 117},
+   :quantity {:distinct 13},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 138},
+   :product_name {:distinct 157},
+   :customer_id {:distinct 138}},
+  :new-clojure-11-sqlized
+  {:margins {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :connections-sys
+  {:connection_id {:distinct 10},
+   :* {:rowcount 10},
+   :styler_highlight_8717ssa {:distinct 1},
+   :rrows {:distinct nil}},
+  :grouped-all-superstore-4-drill
+  {:rowcnt {:distinct 4},
+   :* {:rowcount 4},
+   :ship_mode {:distinct 4},
+   :consumer {:distinct 4},
+   :corporate {:distinct 4},
+   :home_office {:distinct 4},
+   :rrows {:distinct nil}},
+  :all-superstore-4
+  {:category {:distinct 3},
+   :sales {:distinct 4772},
+   :* {:rowcount 7671},
+   :ship_date {:distinct 1263},
+   :order_date_month {:distinct 12},
+   :product_id {:distinct 1834},
+   :city {:distinct 376},
+   :profit {:distinct 5766},
+   :rrows {:distinct nil},
+   :state {:distinct 36},
+   :zipcode {:distinct 436},
+   :row_id {:distinct 7671},
+   :order_date_day {:distinct 31},
+   :region {:distinct 3},
+   :ship_mode {:distinct 4},
+   :order_id {:distinct 3834},
+   :segment {:distinct 3},
+   :order_date_year {:distinct 4},
+   :sub_category {:distinct 17},
+   :order_date {:distinct 1169},
+   :quantity {:distinct 14},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 790},
+   :product_name {:distinct 1822},
+   :customer_id {:distinct 790}}},
+ :flow-estimates
+ {:fields-sys {:times 0.001, :run-id :fields-sys},
+  :gen-viz-1300 {:times 0.022, :run-id :gen-viz-1300},
+  :superstore {:times 0.009, :run-id :superstore},
+  :tables-sys {:times 0.002, :run-id :tables-sys},
+  :block-72-pivot1 {:times 0.206, :run-id :block-72-pivot1},
+  :agg-all-superstore-4-drill-1
+  {:times 0.009, :run-id :agg-all-superstore-4-drill-1},
+  :all-superstore-4-pvt-gen {:times 0.028, :run-id :all-superstore-4-pvt-gen},
+  :gen-viz-370 {:times 0.022, :run-id :gen-viz-370},
+  :rabbit-search-like-themes {:times 0.004, :run-id :rabbit-search-like-themes},
+  :agg-all-superstore-4-drill {:times 0.019, :run-id :agg-all-superstore-4-drill},
+  :all-superstore-4-drill {:times 0.047, :run-id :all-superstore-4-drill},
+  :agg-grouped-all-superstore-4-drill
+  {:times 0.027, :run-id :agg-grouped-all-superstore-4-drill},
+  :block-79-new-clojure-11 {:times 0.024, :run-id :block-79-new-clojure-11},
+  :new-clojure-11-sqlized {:times 0.001, :run-id :new-clojure-11-sqlized},
+  :grouped-all-superstore-6 {:times 0.003, :run-id :grouped-all-superstore-6},
+  :connections-sys {:times 0.008, :run-id :connections-sys},
+  :grouped-all-superstore-4-drill
+  {:times 0.017, :run-id :grouped-all-superstore-4-drill},
+  :all-superstore-4 {:times 0.054, :run-id :all-superstore-4},
+  :rabbit-search-like-screens {:times 0.004, :run-id :rabbit-search-like-screens},
+  :pivot1-flat {:times 0.034, :run-id :pivot1-flat},
+  :block_79_new_clojure_11__block_79_clojure_new_clojure_11_
+  {:times 0.002,
+   :run-id :block_79_new_clojure_11__block_79_clojure_new_clojure_11_},
+  :query8 {:times 0.01, :run-id :query8}},
+ :screen-name "pivot-party",
+ :panel-hashes
+ {:block-695 1666872905,
+  :block-684 1833239107,
+  :block-79 1396943949,
+  :block-75 792635452,
+  :block-2175 -515275433,
+  :block-76 -1832559858,
+  :block-42 -2125037630,
+  :block-5136 -939428243,
+  :block-71 -1015284271,
+  :block-263 1373674838,
+  :block-72 -1245871088,
+  :block-11124 1691377936,
+  :block-8880 -767281295,
+  :block-81 -168417284,
+  :block-44 1116449311,
+  :block-82 273861310,
+  :block-7831 -1733966931,
+  :block-488 -760269408,
+  :block-4928 1688538454,
+  :block-10207 1099655619,
+  :block-689 1838638432,
+  :block-41 -360542433,
+  :block-8676 1816474963,
+  :block-1892 790266792,
+  :block-73 48451308,
+  :block-11913 -945310181,
+  :block-74 1853665532,
+  :block-9915 -1038738531,
+  :block-77 287369977,
+  :block-80 1460913763,
+  :block-7724 -473728262,
+  :block-5189 735662132,
+  :block-6676 -871888662,
+  :block-806 120870544,
+  :block-173 -1067978404,
+  :block-10955 -1205664266,
+  :block-10081 -1346281765,
+  :block-172 809806661,
+  :block-78 1573971478,
+  :block-1400 1129270867,
+  :block-609 -1522476013,
+  :block-801 -1973236451,
+  :block-653 -506031765,
+  :block-350 -430783371,
+  :block-7349 1203596686,
+  :block-6951 965951937,
+  :block-411 -962085880,
+  :block-7312 1510009302,
+  :block-629 2120211186,
+  :block-703 -320845073},
+ :recos-page2 0,
+ :selected-tab "lilac yellow jacket",
+ :col-names nil,
+ :snapshots {:params {}},
+ :recos-page 0,
+ :rs-overrides-hashmap {"a-random-wow" nil},
+ :user-params-hash 836374339,
+ :grid-recos? true,
+ :session-hash -1441151085,
+ :resolved-queries
+ {:gen-viz-1300
+  {:select [[[[:avg :profit]] :profit] :sub_category :region :category],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category
+       :region
+       [[:strftime "%Y" :order_date] :order_date_year]
+       [[:strftime "%m" :order_date] :order_date_month]
+       [[:strftime "%d" :order_date] :order_date_day]],
+      :from [[:superstore :ssb99]],
+      :where
+      [:*if
+       {:region ["West" "East" "South"]}
+       [:*all= {:region ["West" "East" "South"]} [:region]]
+       [:= 1 1]],
+      :order-by [[:sales :desc] [:city :asc]]}
+     :subq1]],
+   :group-by [:sub_category :region :category]},
+  :gen-viz-1048
+  {:select [[[[:sum :quantity]] :quantity] :ship_mode],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:ship_mode]},
+  :agg-all-superstore
+  {:select [[[:sum :quantity] :quantity]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :ssb56]]},
+  :gen-viz-549
+  {:select [[[[:sum :quantity]] :quantity] :category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:category]},
+  :query1-1
+  {:select [:region [[:count 1] :rowcnt]],
+   :from [[:superstore :ctr7]],
+   :group-by [:region],
+   :order-by [[:rowcnt :desc]]},
+  :grouped-all-superstore-1
+  {:select [:segment [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :ssb50]],
+   :order-by [[:rowcnt :desc]],
+   :group-by [:segment]},
+  :agg-all-superstore-1-1
+  {:select [[[:sum :profit] :profit]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from [[:superstore :ssb99]],
+      :where [:*when #{"Central"} [:in :region #{"Central"}]]}
+     :ssb27]]},
+  :gen-viz-756-1
+  {:select [[[[:sum :sales]] :sales] :segment],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:segment]},
+  :gen-viz-1042
+  {:select [[[:count 1] :rrows] :country],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:country]},
+  :query1-2
+  {:select [:state [[:count 1] :rowcnt]],
+   :from [[:ufo_sightings :ctr5]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :agg-all-superstore-4-drill-1
+  {:select [[[:sum :sales] :sales]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from
+      [[{:select
+         [:customer_name
+          :segment
+          :zipcode
+          :profit
+          :order_date
+          :product_id
+          :ship_mode
+          :state
+          :sales
+          :city
+          :order_id
+          :customer_id
+          :category
+          :country
+          :discount
+          :row_id
+          :product_name
+          :ship_date
+          :quantity
+          :sub_category
+          :region
+          [[:strftime "%Y" :order_date] :order_date_year]
+          [[:strftime "%m" :order_date] :order_date_month]
+          [[:strftime "%d" :order_date] :order_date_day]],
+         :from [[:superstore :ssb99]],
+         :where
+         [:*if
+          {:region ["West" "East" "South"]}
+          [:*all= {:region ["West" "East" "South"]} [:region]]
+          [:= 1 1]],
+         :order-by [[:sales :desc] [:city :asc]]}
+        :aa337]],
+      :where
+      [:and
+       [:and
+        [:= :category "Furniture"]
+        [:= :region "East"]
+        [:= :order_date_year "2017"]]
+       [:= 1 1]]}
+     :ssb96]]},
+  :gen-viz-949
+  {:select [[[[:sum :sales]] :sales] :sub_category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:sub_category]},
+  :grouped-all-superstore-1-1
+  {:select [:segment [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from [[:superstore :ssb99]],
+      :where [:*when #{"Central"} [:in :region #{"Central"}]]}
+     :ssb71]],
+   :order-by [[:rowcnt :desc]],
+   :group-by [:segment]},
+  :gen-viz-370
+  {:select [[[[:sum :profit]] :profit] :order_date],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category
+       :region
+       [[:strftime "%Y" :order_date] :order_date_year]
+       [[:strftime "%m" :order_date] :order_date_month]
+       [[:strftime "%d" :order_date] :order_date_day]],
+      :from [[:superstore :ssb99]],
+      :where
+      [:*if
+       {:region ["West" "East" "South"]}
+       [:*all= {:region ["West" "East" "South"]} [:region]]
+       [:= 1 1]],
+      :order-by [[:sales :desc] [:city :asc]]}
+     :subq1]],
+   :group-by [:order_date]},
+  :new-api-call-sqlized
+  {:select
+   [:total_wows_in_movie
+    :release_date
+    :director
+    :full_line
+    :movie
+    :year
+    :video_480p
+    :poster
+    :video_1080p
+    :video_720p
+    :audio
+    :current_wow_in_movie
+    :video_360p
+    :timestamp
+    :movie_duration
+    :character],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-11-12 19:39:09",
+   :_sqlized-by [:block-10207 :api-call :new-api-call],
+   :_sqlized-hash nil,
+   :from [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]},
+  :countd-all-ufo-sightings-1
+  {:select [[[:count [:distinct :duration_hours]] :duration_hours]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb45]]},
+  :agg-new-api-call-sqlized
+  {:select [[[:sum :total_wows_in_movie] :total_wows_in_movie]],
+   :from
+   [[{:select
+      [:total_wows_in_movie
+       :release_date
+       :director
+       :full_line
+       :movie
+       :year
+       :video_480p
+       :poster
+       :video_1080p
+       :video_720p
+       :audio
+       :current_wow_in_movie
+       :video_360p
+       :timestamp
+       :movie_duration
+       :character],
+      :_sqlized-at "2024-11-12 19:39:09",
+      :_sqlized-by [:block-10207 :api-call :new-api-call],
+      :_sqlized-hash nil,
+      :from
+      [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]}
+     :ssb53]]},
+  :agg-all-superstore-4-drill
+  {:select [[[:sum :profit] :profit]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from
+      [[{:select
+         [:customer_name
+          :segment
+          :zipcode
+          :profit
+          :order_date
+          :product_id
+          :ship_mode
+          :state
+          :sales
+          :city
+          :order_id
+          :customer_id
+          :category
+          :country
+          :discount
+          :row_id
+          :product_name
+          :ship_date
+          :quantity
+          :sub_category
+          :region
+          [[:strftime "%Y" :order_date] :order_date_year]
+          [[:strftime "%m" :order_date] :order_date_month]
+          [[:strftime "%d" :order_date] :order_date_day]],
+         :from [[:superstore :ssb99]],
+         :where
+         [:*if
+          {:region ["West" "East" "South"]}
+          [:*all= {:region ["West" "East" "South"]} [:region]]
+          [:= 1 1]],
+         :order-by [[:sales :desc] [:city :asc]]}
+        :aa337]],
+      :where
+      [:and
+       [:and
+        [:= :category "Furniture"]
+        [:= :region "East"]
+        [:= :order_date_year "2017"]]
+       [:= 1 1]]}
+     :ssb33]]},
+  :gen-viz-959-1
+  {:select [[[[:sum :profit]] :profit] :category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:category]},
+  :all-superstore-4-drill
+  {:select
+   [:customer_name
+    :segment
+    :zipcode
+    :region
+    :profit
+    :order_date
+    :product_id
+    :ship_mode
+    :state
+    :sales
+    :city
+    :order_id
+    :customer_id
+    :category
+    :country
+    :discount
+    :row_id
+    :product_name
+    :ship_date
+    :quantity
+    :sub_category],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category
+       :region
+       [[:strftime "%Y" :order_date] :order_date_year]
+       [[:strftime "%m" :order_date] :order_date_month]
+       [[:strftime "%d" :order_date] :order_date_day]],
+      :from [[:superstore :ssb99]],
+      :where
+      [:*if
+       {:region ["West" "East" "South"]}
+       [:*all= {:region ["West" "East" "South"]} [:region]]
+       [:= 1 1]],
+      :order-by [[:sales :desc] [:city :asc]]}
+     :aa337]],
+   :_from [:block-72 :pivot-drill nil],
+   :where
+   [:and
+    [:and
+     [:= :category "Furniture"]
+     [:= :region "East"]
+     [:= :order_date_year "2017"]]
+    [:= 1 1]]},
+  :countd-all-ufo-sightings
+  {:select [[[:count [:distinct :state]] :state]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb10]]},
+  :all-ufo-sightings
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :ssb47]],
+   :where
+   [:*if
+    {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+    [:*all= {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]} [:state]]
+    [:= 1 1]]},
+  :grouped-all-superstore
+  {:select [:category [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :ssb70]],
+   :group-by [:category]},
+  :gen-viz-756
+  {:select [[[:count 1] :rrows] :ship_mode],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:ship_mode]},
+  :agg-grouped-all-superstore
+  {:select [[[:sum :rowcnt] :rowcnt]],
+   :from
+   [[{:select [:category [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:category
+          :city
+          :country
+          :customer_id
+          :customer_name
+          :discount
+          :order_date
+          :order_id
+          :product_id
+          :product_name
+          :profit
+          :quantity
+          :region
+          :row_id
+          :sales
+          :segment
+          :ship_date
+          :ship_mode
+          :state
+          :sub_category
+          :zipcode],
+         :from [[:superstore :ssb41]],
+         :where
+         [:and
+          [:and
+           [:*if
+            {:region ["West" "Central" "South"]}
+            [:*all= {:region ["West" "Central" "South"]} [:category]]
+            [:= 1 1]]
+           [:*if
+            {:region ["West" "Central" "South"]}
+            [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+            [:= 1 1]]]
+          [:*if
+           {:region ["West" "Central" "South"]}
+           [:*all= {:region ["West" "Central" "South"]} [:region]]
+           [:= 1 1]]]}
+        :ssb70]],
+      :group-by [:category]}
+     :ssb91]]},
+  :agg-grouped-all-superstore-4-drill
+  {:select [[[:sum :home_office] :home_office]],
+   :from
+   [[{:select [[[:count 1] :rowcnt] :ship_mode],
+      :from
+      [[{:select
+         [:customer_name
+          :segment
+          :zipcode
+          :region
+          :profit
+          :order_date
+          :product_id
+          :ship_mode
+          :state
+          :sales
+          :city
+          :order_id
+          :customer_id
+          :category
+          :country
+          :discount
+          :row_id
+          :product_name
+          :ship_date
+          :quantity
+          :sub_category],
+         :from
+         [[{:select
+            [:customer_name
+             :segment
+             :zipcode
+             :profit
+             :order_date
+             :product_id
+             :ship_mode
+             :state
+             :sales
+             :city
+             :order_id
+             :customer_id
+             :category
+             :country
+             :discount
+             :row_id
+             :product_name
+             :ship_date
+             :quantity
+             :sub_category
+             :region
+             [[:strftime "%Y" :order_date] :order_date_year]
+             [[:strftime "%m" :order_date] :order_date_month]
+             [[:strftime "%d" :order_date] :order_date_day]],
+            :from [[:superstore :ssb99]],
+            :where
+            [:*if
+             {:region ["West" "East" "South"]}
+             [:*all= {:region ["West" "East" "South"]} [:region]]
+             [:= 1 1]],
+            :order-by [[:sales :desc] [:city :asc]]}
+           :aa337]],
+         :where
+         [:and
+          [:and
+           [:= :category "Furniture"]
+           [:= :region "East"]
+           [:= :order_date_year "2017"]]
+          [:= 1 1]]}
+        :ssb87]],
+      :order-by [[:rowcnt :desc]],
+      :pivot-by
+      {:segment
+       [:count
+        {:select-distinct [:segment],
+         :from
+         [[{:select [:segment [[:count 1] :rowcnt]],
+            :from
+            [[{:select
+               [:customer_name
+                :segment
+                :zipcode
+                :region
+                :profit
+                :order_date
+                :product_id
+                :ship_mode
+                :state
+                :sales
+                :city
+                :order_id
+                :customer_id
+                :category
+                :country
+                :discount
+                :row_id
+                :product_name
+                :ship_date
+                :quantity
+                :sub_category],
+               :from
+               [[{:select
+                  [:customer_name
+                   :segment
+                   :zipcode
+                   :profit
+                   :order_date
+                   :product_id
+                   :ship_mode
+                   :state
+                   :sales
+                   :city
+                   :order_id
+                   :customer_id
+                   :category
+                   :country
+                   :discount
+                   :row_id
+                   :product_name
+                   :ship_date
+                   :quantity
+                   :sub_category
+                   :region
+                   [[:strftime "%Y" :order_date] :order_date_year]
+                   [[:strftime "%m" :order_date] :order_date_month]
+                   [[:strftime "%d" :order_date] :order_date_day]],
+                  :from [[:superstore :ssb99]],
+                  :where
+                  [:*if
+                   {:region ["West" "East" "South"]}
+                   [:*all= {:region ["West" "East" "South"]} [:region]]
+                   [:= 1 1]],
+                  :order-by [[:sales :desc] [:city :asc]]}
+                 :aa337]],
+               :where
+               [:and
+                [:and
+                 [:= :category "Furniture"]
+                 [:= :region "East"]
+                 [:= :order_date_year "2017"]]
+                [:= 1 1]]}
+              :ssb87]],
+            :order-by [[:rowcnt :desc]],
+            :group-by [:segment]}
+           :pivotq]]}]},
+      :group-by [:ship_mode]}
+     :ssb45]]},
+  :gen-viz-959
+  {:select [[[:count 1] :rrows] :sub_category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:sub_category]},
+  :new-clojure-11-sqlized
+  {:select [:margins],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-12-26 01:49:31",
+   :_sqlized-by [:block-79 :clojure :new-clojure-11],
+   :_sqlized-hash -1965006202,
+   :from [[:block_79_new_clojure_11__block_79_clojure_new_clojure_11_ :ssub4]]},
+  :gen-viz-828
+  {:select [[[:count 1] :rrows] :shape],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:shape]},
+  :agg-all-superstore-1
+  {:select [[[:sum :sales] :sales]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from [[:superstore :ssb99]],
+      :where [:*when #{"Central"} [:in :region #{"Central"}]]}
+     :ssb52]]},
+  :agg-grouped-all-superstore-1-1
+  {:select [[[:sum :rowcnt] :rowcnt]],
+   :from
+   [[{:select [:segment [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:customer_name
+          :segment
+          :zipcode
+          :region
+          :profit
+          :order_date
+          :product_id
+          :ship_mode
+          :state
+          :sales
+          :city
+          :order_id
+          :customer_id
+          :category
+          :country
+          :discount
+          :row_id
+          :product_name
+          :ship_date
+          :quantity
+          :sub_category],
+         :from [[:superstore :ssb99]],
+         :where [:*when #{"Central"} [:in :region #{"Central"}]]}
+        :ssb71]],
+      :order-by [[:rowcnt :desc]],
+      :group-by [:segment]}
+     :ssb33]]},
+  :grouped-all-superstore-6
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category
+       :region
+       [[:strftime "%Y" :order_date] :order_date_year]
+       [[:strftime "%m" :order_date] :order_date_month]
+       [[:strftime "%d" :order_date] :order_date_day]],
+      :from [[:superstore :ssb99]],
+      :where
+      [:*if
+       {:region ["West" "East" "South"]}
+       [:*all= {:region ["West" "East" "South"]} [:region]]
+       [:= 1 1]],
+      :order-by [[:sales :desc] [:city :asc]]}
+     :ssb58]],
+   :order-by [[:rowcnt :desc]],
+   :group-by [:state]},
+  :query1-3
+  {:select [[:region :label] [:region :id]],
+   :from [[:superstore :ddr45]],
+   :group-by [:region],
+   :order-by [[:region :asc]]},
+  :all-superstore
+  {:select
+   [:category
+    :city
+    :country
+    :customer_id
+    :customer_name
+    :discount
+    :order_date
+    :order_id
+    :product_id
+    :product_name
+    :profit
+    :quantity
+    :region
+    :row_id
+    :sales
+    :segment
+    :ship_date
+    :ship_mode
+    :state
+    :sub_category
+    :zipcode],
+   :from [[:superstore :ssb41]],
+   :where
+   [:and
+    [:and
+     [:*if
+      {:region ["West" "Central" "South"]}
+      [:*all= {:region ["West" "Central" "South"]} [:category]]
+      [:= 1 1]]
+     [:*if
+      {:region ["West" "Central" "South"]}
+      [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+      [:= 1 1]]]
+    [:*if
+     {:region ["West" "Central" "South"]}
+     [:*all= {:region ["West" "Central" "South"]} [:region]]
+     [:= 1 1]]]},
+  :grouped-all-superstore-4-drill
+  {:select [[[:count 1] :rowcnt] :ship_mode],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from
+      [[{:select
+         [:customer_name
+          :segment
+          :zipcode
+          :profit
+          :order_date
+          :product_id
+          :ship_mode
+          :state
+          :sales
+          :city
+          :order_id
+          :customer_id
+          :category
+          :country
+          :discount
+          :row_id
+          :product_name
+          :ship_date
+          :quantity
+          :sub_category
+          :region
+          [[:strftime "%Y" :order_date] :order_date_year]
+          [[:strftime "%m" :order_date] :order_date_month]
+          [[:strftime "%d" :order_date] :order_date_day]],
+         :from [[:superstore :ssb99]],
+         :where
+         [:*if
+          {:region ["West" "East" "South"]}
+          [:*all= {:region ["West" "East" "South"]} [:region]]
+          [:= 1 1]],
+         :order-by [[:sales :desc] [:city :asc]]}
+        :aa337]],
+      :where
+      [:and
+       [:and
+        [:= :category "Furniture"]
+        [:= :region "East"]
+        [:= :order_date_year "2017"]]
+       [:= 1 1]]}
+     :ssb87]],
+   :order-by [[:rowcnt :desc]],
+   :pivot-by
+   {:segment
+    [:count
+     {:select-distinct [:segment],
+      :from
+      [[{:select [:segment [[:count 1] :rowcnt]],
+         :from
+         [[{:select
+            [:customer_name
+             :segment
+             :zipcode
+             :region
+             :profit
+             :order_date
+             :product_id
+             :ship_mode
+             :state
+             :sales
+             :city
+             :order_id
+             :customer_id
+             :category
+             :country
+             :discount
+             :row_id
+             :product_name
+             :ship_date
+             :quantity
+             :sub_category],
+            :from
+            [[{:select
+               [:customer_name
+                :segment
+                :zipcode
+                :profit
+                :order_date
+                :product_id
+                :ship_mode
+                :state
+                :sales
+                :city
+                :order_id
+                :customer_id
+                :category
+                :country
+                :discount
+                :row_id
+                :product_name
+                :ship_date
+                :quantity
+                :sub_category
+                :region
+                [[:strftime "%Y" :order_date] :order_date_year]
+                [[:strftime "%m" :order_date] :order_date_month]
+                [[:strftime "%d" :order_date] :order_date_day]],
+               :from [[:superstore :ssb99]],
+               :where
+               [:*if
+                {:region ["West" "East" "South"]}
+                [:*all= {:region ["West" "East" "South"]} [:region]]
+                [:= 1 1]],
+               :order-by [[:sales :desc] [:city :asc]]}
+              :aa337]],
+            :where
+            [:and
+             [:and
+              [:= :category "Furniture"]
+              [:= :region "East"]
+              [:= :order_date_year "2017"]]
+             [:= 1 1]]}
+           :ssb87]],
+         :order-by [[:rowcnt :desc]],
+         :group-by [:segment]}
+        :pivotq]]}]},
+   :group-by [:ship_mode]},
+  :new-clojure-1-sqlized
+  {:select [:profit-margin],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-12-23 07:25:11",
+   :_sqlized-by [:block-2175 :clojure :new-clojure-1],
+   :_sqlized-hash nil,
+   :from [[:block_2175_new_clojure_1__block_2175_clojure_new_clojure_1_ :ssub4]]},
+  :all-superstore-4
+  {:select
+   [:customer_name
+    :segment
+    :zipcode
+    :profit
+    :order_date
+    :product_id
+    :ship_mode
+    :state
+    :sales
+    :city
+    :order_id
+    :customer_id
+    :category
+    :country
+    :discount
+    :row_id
+    :product_name
+    :ship_date
+    :quantity
+    :sub_category
+    :region
+    [[:strftime "%Y" :order_date] :order_date_year]
+    [[:strftime "%m" :order_date] :order_date_month]
+    [[:strftime "%d" :order_date] :order_date_day]],
+   :from [[:superstore :ssb99]],
+   :where
+   [:*if
+    {:region ["West" "East" "South"]}
+    [:*all= {:region ["West" "East" "South"]} [:region]]
+    [:= 1 1]],
+   :order-by [[:sales :desc] [:city :asc]]},
+  :countd-all-superstore-1
+  {:select [[[:count [:distinct :order_id]] :orders]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from [[:superstore :ssb99]],
+      :where [:*when #{"Central"} [:in :region #{"Central"}]]}
+     :ssb45]]},
+  :pivot1-flat
+  {:select
+   [:region
+    :order_date_year
+    :category
+    [[:sum :sales] :sales]
+    [[:count :*] :rowcnt]],
+   :connection-id "superstore",
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category
+       :region
+       [[:strftime "%Y" :order_date] :order_date_year]
+       [[:strftime "%m" :order_date] :order_date_month]
+       [[:strftime "%d" :order_date] :order_date_day]],
+      :from [[:superstore :ssb99]],
+      :where
+      [:*if
+       {:region ["West" "East" "South"]}
+       [:*all= {:region ["West" "East" "South"]} [:region]]
+       [:= 1 1]],
+      :order-by [[:sales :desc] [:city :asc]]}
+     :agg45]],
+   :group-by [:region :order_date_year :category]},
+  :gen-viz-994
+  {:select [[[[:sum :sales]] :sales] :category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:category],
+   :order-by [[:category :asc]]},
+  :cnt-all-superstore
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South"]}
+         [:*all= {:region ["West" "Central" "South"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South"]}
+        [:*all= {:region ["West" "Central" "South"]} [:region]]
+        [:= 1 1]]]}
+     :ssb73]]},
+  :all-superstore-1
+  {:select
+   [:customer_name
+    :segment
+    :zipcode
+    :region
+    :profit
+    :order_date
+    :product_id
+    :ship_mode
+    :state
+    :sales
+    :city
+    :order_id
+    :customer_id
+    :category
+    :country
+    :discount
+    :row_id
+    :product_name
+    :ship_date
+    :quantity
+    :sub_category],
+   :from [[:superstore :ssb99]],
+   :where [:*when #{"Central"} [:in :region #{"Central"}]]},
+  :gen-viz-932
+  {:select [[[:count 1] :rrows] :category :ship_mode],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :order_id
+       :customer_id
+       :category
+       :country
+       :discount
+       :row_id
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from [[:superstore :ssb99]],
+      :where [:*when #{"Central"} [:in :region #{"Central"}]]}
+     :subq1]],
+   :group-by [:category :ship_mode]},
+  :query8
+  {:select [:region [[:count 1] :rowcnt]],
+   :from [[:superstore :ctr37]],
+   :group-by [:region],
+   :order-by [[:rowcnt :desc]]},
+  :query1
+  {:select [:category [[:count 1] :rowcnt]],
+   :from [[:superstore :ctr15]],
+   :group-by [:category]}},
+ :panels
+ {:block-695
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-695",
+   :w 6,
+   :selected-view :countd-all-ufo-sightings,
+   :root [28 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:countd-all-ufo-sightings
+    {:select [[[:count [:distinct :state]] :state]],
+     :from [[:query/all-ufo-sightings :ssb10]]}},
+   :tab "commendable snake"},
+  :block-684
+  {:shape-rotator
+   {:context ["bigfoot-ufos" nil "none" "all-ufo-sightings"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "rrows", :x "country"},
+    :items [[:views :reech-2-2] [:queries :gen-viz-1042]],
+    :source-panel :block-11913},
+   :name "rrows, country",
+   :w 8,
+   :selected-view :reech-2-2,
+   :root [33 1],
+   :h 6,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-1042
+    {:select [[[:count 1] :rrows] :country],
+     :from [[:query/all-ufo-sightings :subq1]],
+     :group-by [:country]}},
+   :tab "commendable snake",
+   :views
+   {:reech-2-2
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :country, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :rrows,
+        :isAnimationActive false,
+        :data :gen-viz-1042,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-684},
+  :block-79
+  {:clojure
+   {:new-clojure-11
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")
+            profit :agg-all-superstore-4-drill/profit.0
+            trigger-agg-all-superstore-4-drill :data-hash/agg-all-superstore-4-drill
+            sales :agg-all-superstore-4-drill-1/sales.0
+            trigger-agg-all-superstore-4-drill-1 :data-hash/agg-all-superstore-4-drill-1]
+        [{:margins (str (subs (str (/ sales profit)) 0 4) "%")}]))},
+   :leaf-drop [:fresh :fresh-repl],
+   :name "block",
+   :w 7,
+   :selected-mode {:* :text},
+   :selected-view :new-clojure-11-sqlized,
+   :root [11 18],
+   :h 4,
+   :queries
+   {:new-clojure-11-sqlized
+    {:select [:margins],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-12-26 01:49:31",
+     :_sqlized-by [:block-79 :clojure :new-clojure-11],
+     :_sqlized-hash
+     :solver-meta/block-79-new-clojure-11>output>evald-result>value-hash,
+     :from [[:block_79_new_clojure_11__block_79_clojure_new_clojure_11_ :ssub4]]}},
+   :tab "lilac yellow jacket"},
+  :block-75
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block",
+   :w 5,
+   :selected-view :agg-all-superstore-4-drill,
+   :root [18 14],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-all-superstore-4-drill
+    {:select [[[:sum :profit] :profit]],
+     :from [[:query/all-superstore-4-drill :ssb33]]}},
+   :tab "lilac yellow jacket"},
+  :block-2175
+  {:clojure
+   {:new-clojure-1
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")
+            why? true]
+        [{:profit-margin
+          (str
+            (Math/round
+              (/ :agg-all-superstore-1/sales.0 :agg-all-superstore-1-1/profit.0))
+            "%")}]))},
+   :leaf-drop [:fresh :fresh-repl],
+   :name "block-2175",
+   :w 6,
+   :selected-mode {:* :text, :new-clojure-1 :text},
+   :selected-view :new-clojure-1-sqlized,
+   :root [22 12],
+   :h 4,
+   :connection-id "cache.db",
+   :display {:new-clojure-1 :value},
+   :queries
+   {:new-clojure-1-sqlized
+    {:select [:profit-margin],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-12-23 07:25:11",
+     :_sqlized-by [:block-2175 :clojure :new-clojure-1],
+     :_sqlized-hash
+     :solver-meta/block-2175-new-clojure-1>output>evald-result>value-hash,
+     :from
+     [[:block_2175_new_clojure_1__block_2175_clojure_new_clojure_1_ :ssub4]]}},
+   :tab "stupendous deer"},
+  :block-76
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block",
+   :w 5,
+   :selected-view :agg-all-superstore-4-drill-1,
+   :root [23 14],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-all-superstore-4-drill-1
+    {:select [[[:sum :sales] :sales]],
+     :from [[:query/all-superstore-4-drill :ssb96]]}},
+   :tab "lilac yellow jacket"},
+  :block-42
+  {:w 7,
+   :h 4,
+   :selected-view :vv3,
+   :views
+   {:vv3
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "119px", :color :theme/editor-outer-rim-color}
+     :child
+     [:str :time/minute]]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "meaningful ox",
+   :root [15 5],
+   :name "block"},
+  :block-5136
+  {:clojure
+   {:new-clojure
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 huge. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :leaf-drop [:fresh :fresh-repl],
+   :name "block-5136",
+   :w 7,
+   :selected-mode {:* :text},
+   :selected-view :new-clojure,
+   :root [34 7],
+   :h 4,
+   :tab "winter-wonder-lands"},
+  :block-71
+  {:pinned? false,
+   :leaf-drop [:sql :new-select.all],
+   :name "block",
+   :w 27,
+   :selected-view :all-superstore-4,
+   :root [0 2],
+   :h 6,
+   :connection-id "superstore",
+   :queries
+   {:all-superstore-4
+    {:select
+     [:customer_name
+      :segment
+      :zipcode
+      :profit
+      :order_date
+      :product_id
+      :ship_mode
+      :state
+      :sales
+      :city
+      :order_id
+      :customer_id
+      :category
+      :country
+      :discount
+      :row_id
+      :product_name
+      :ship_date
+      :quantity
+      :sub_category
+      :region
+      [[:strftime "%Y" :order_date] :order_date_year]
+      [[:strftime "%m" :order_date] :order_date_month]
+      [[:strftime "%d" :order_date] :order_date_day]],
+     :from [[:superstore :ssb99]],
+     :where [:*if :query8/*.clicked [:*all= :query8/*.clicked [:region]] [:= 1 1]],
+     :order-by [[:sales :desc] [:city :asc]]}},
+   :tab "lilac yellow jacket"},
+  :block-263
+  {:leaf-drop [:filter :click-table],
+   :name "block-263",
+   :w 6,
+   :selected-view :query1-2,
+   :root [1 12],
+   :h 11,
+   :drop-mutate
+   {[:panels :block-11913 :queries :all-ufo-sightings :where]
+    [:*if :query1-2/*.clicked [:*all= :query1-2/*.clicked [:state]] [:= 1 1]]},
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:query1-2
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:ufo_sightings :ctr5]],
+     :group-by [:state],
+     :order-by [[:rowcnt :desc]]}},
+   :tab "commendable snake"},
+  :block-72
+  {:leaf-drop [:pivot :new-pivot-table],
+   :name "block",
+   :w 13,
+   :selected-view :pivot1,
+   :root [5 8],
+   :h 10,
+   :connection-id "superstore",
+   :pivot
+   {:pivot1
+    {:rowset-keypath [:all-superstore-4],
+     :rowset-query [:query/all-superstore-4],
+     :row-keys [:region :order_date_year],
+     :column-keys [:category],
+     :agg-specs [[:sales :sum 0 :sales]],
+     :reaction-clover :solver-status/metadata>all-superstore-4,
+     :pivot-data-kw :pivot1-pivot,
+     :selected-agg :sales}},
+   :queries
+   {:pivot1-flat
+    {:select
+     [:region
+      :order_date_year
+      :category
+      [[:sum :sales] :sales]
+      [[:count :*] :rowcnt]],
+     :connection-id "superstore",
+     :from [[:query/all-superstore-4 :agg45]],
+     :group-by [:region :order_date_year :category]}},
+   :tab "lilac yellow jacket"},
+  :block-11124
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-11124",
+   :w 25,
+   :selected-view :all-superstore-1,
+   :root [3 3],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:all-superstore-1
+    {:select
+     [:customer_name
+      :segment
+      :zipcode
+      :region
+      :profit
+      :order_date
+      :product_id
+      :ship_mode
+      :state
+      :sales
+      :city
+      :order_id
+      :customer_id
+      :category
+      :country
+      :discount
+      :row_id
+      :product_name
+      :ship_date
+      :quantity
+      :sub_category],
+     :from [[:superstore :ssb99]],
+     :where [:*when :block-8676/region [:in :region :block-8676/region]]}},
+   :tab "stupendous deer"},
+  :block-8880
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-8880",
+   :w 6,
+   :selected-view :agg-new-api-call-sqlized,
+   :root [30 16],
+   :h 4,
+   :connection-id "cache.db",
+   :queries
+   {:agg-new-api-call-sqlized
+    {:select [[[:sum :total_wows_in_movie] :total_wows_in_movie]],
+     :from [[:query/new-api-call-sqlized :ssb53]]}},
+   :tab "commendable snake"},
+  :block-81
+  {:leaf-drop [:sql :new-group-by],
+   :name "block",
+   :w 5,
+   :selected-view :grouped-all-superstore-6,
+   :root [0 8],
+   :h 10,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore-6
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:query/all-superstore-4 :ssb58]],
+     :order-by [[:rowcnt :desc]],
+     :group-by [:state]}},
+   :tab "lilac yellow jacket"},
+  :block-44
+  {:w 7,
+   :h 4,
+   :selected-view :vv4,
+   :views
+   {:vv4
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "119px", :color :theme/editor-outer-rim-color}
+     :child
+     [:str :time/second]]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "meaningful ox",
+   :root [23 5],
+   :name "block"},
+  :block-82
+  {:shape-rotator
+   {:context ["superstore" nil "none" "all-superstore-4"],
+    :shape-name :basic-v-bar-avg,
+    :axes {:y "profit", :x "sub_category"},
+    :honey-hash 747783738,
+    :shape-set "vega-lite",
+    :items [[:views :oz-5] [:queries :gen-viz-1300]],
+    :source-panel :block-71},
+   :leaf-drop [:view :viz-reco-drop],
+   :name :block-82,
+   :w 18,
+   :selected-view :oz-5,
+   :root [33 2],
+   :h 20,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-1300
+    {:select [[[[:avg :profit]] :profit] :sub_category :region :category],
+     :from [[:query/all-superstore-4 :subq1]],
+     :group-by [:sub_category :region :category]}},
+   :tab "lilac yellow jacket",
+   :views
+   {:oz-5
+    [:vega-lite
+     {:config :theme/vega-defaults,
+      :columns 2,
+      :facet {:field :category},
+      :width "container",
+      :background "transparent",
+      :spec
+      {:encoding
+       {:y {:field :sub_category, :type "ordinal"},
+        :x {:aggregate "avg", :field :profit, :type "quantitative"},
+        :row {:field nil, :legend nil},
+        :size {:legend nil},
+        :shape {:legend nil},
+        :column {:field nil, :legend nil}},
+       :mark {:type "bar", :tooltip {:content "encoding"}}},
+      :padding 4,
+      :height :panel-height,
+      :data {:values :gen-viz-1300}}
+     {:actions false}]},
+   :bid :block-82},
+  :block-7831
+  {:leaf-drop [:filter :click-table],
+   :name "block-7831",
+   :w 6,
+   :selected-view :query1,
+   :root [2 16],
+   :h 6,
+   :drop-mutate
+   {[:panels :block-703 :queries :all-superstore :where]
+    [:*if :query1/*.clicked [:*all= :query1/*.clicked [:category]] [:= 1 1]]},
+   :connection-id "superstore",
+   :queries
+   {:query1
+    {:select [:category [[:count 1] :rowcnt]],
+     :from [[:superstore :ctr15]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands"},
+  :block-488
+  {:shape-rotator
+   {:context ["superstore" nil "none" "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "profit", :x "category"},
+    :items [[:views :reech-1-4] [:queries :gen-viz-959-1]],
+    :source-panel :block-703},
+   :name "profit, category",
+   :w 7,
+   :selected-view :reech-1-4,
+   :root [34 11],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-959-1
+    {:select [[[[:sum :profit]] :profit] :category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-4
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :category, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :profit,
+        :isAnimationActive false,
+        :data :gen-viz-959-1,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-488},
+  :block-4928
+  {:w 7,
+   :h 4,
+   :selected-view :vv1,
+   :views
+   {:vv1
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "181px"}
+     :child
+     "hi"]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "commendable snake",
+   :root [9 13],
+   :name "block-4928"},
+  :block-10207
+  {:api-call
+   {:new-api-call
+    {:endpoint "https://owen-wilson-wow-api.onrender.com/wows/random",
+     :method :get,
+     :params {:results 22},
+     :flatten? true}},
+   :leaf-drop [:fresh :fresh-api-call],
+   :name "block-10207",
+   :w 9,
+   :selected-mode {:* :text},
+   :selected-view :new-api-call-sqlized,
+   :root [19 14],
+   :h 8,
+   :queries
+   {:new-api-call-sqlized
+    {:select
+     [:total_wows_in_movie
+      :release_date
+      :director
+      :full_line
+      :movie
+      :year
+      :video_480p
+      :poster
+      :video_1080p
+      :video_720p
+      :audio
+      :current_wow_in_movie
+      :video_360p
+      :timestamp
+      :movie_duration
+      :character],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-11-12 19:39:09",
+     :_sqlized-by [:block-10207 :api-call :new-api-call],
+     :_sqlized-hash
+     :solver-meta/block-10207-new-api-call>output>evald-result>value-hash,
+     :from
+     [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]}},
+   :tab "commendable snake"},
+  :block-689
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "rrows", :x "sub_category"},
+    :items [[:views :reech-1-1] [:queries :gen-viz-959]],
+    :source-panel :block-703},
+   :name "rrows, sub_category",
+   :w 9,
+   :selected-view :reech-1-1,
+   :root [8 8],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-959
+    {:select [[[:count 1] :rrows] :sub_category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:sub_category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :sub_category, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-959,
+        :dataKey :rrows,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-959,
+        :dataKey :rrows,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-689},
+  :block-41
+  {:w 7,
+   :h 4,
+   :selected-view :vv2,
+   :views
+   {:vv2
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "119px", :color :theme/editor-outer-rim-color}
+     :child
+     [:str :time/hour]]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "meaningful ox",
+   :root [7 5],
+   :name "block"},
+  :block-8676
+  {:leaf-drop [:filter :new-multi-drop-down],
+   :name "block-8676",
+   :w 7,
+   :selected-view :mdropdown1,
+   :root [21 1],
+   :h 2,
+   :drop-mutate
+   {[:panels :block-11124 :queries :all-superstore-1 :where]
+    [:*when :block-8676/region [:in :region :block-8676/region]]},
+   :connection-id "superstore",
+   :queries
+   {:query1-3
+    {:select [[:region :label] [:region :id]],
+     :from [[:superstore :ddr45]],
+     :group-by [:region],
+     :order-by [[:region :asc]]}},
+   :tab "stupendous deer",
+   :views
+   {:mdropdown1
+    [:multi-dropdown
+     {:choices :query1-3,
+      :width :panel-width+80-px,
+      :style {:padding-top "8px", :font-size "19px"},
+      :ref :query/all-superstore-1,
+      :model :block-8676/region,
+      :field :region}]}},
+  :block-1892
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-1892",
+   :w 6,
+   :selected-view :agg-grouped-all-superstore-1-1,
+   :root [10 8],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-grouped-all-superstore-1-1
+    {:select [[[:sum :rowcnt] :rowcnt]],
+     :from [[:query/grouped-all-superstore-1-1 :ssb33]]}},
+   :tab "stupendous deer"},
+  :block-73
+  {:leaf-drop [:view :viz-reco-drop],
+   :name "block",
+   :w 15,
+   :selected-view :all-superstore-4-drill,
+   :root [18 8],
+   :h 6,
+   :connection-id "superstore",
+   :queries
+   {:all-superstore-4-drill
+    {:select
+     [:customer_name
+      :segment
+      :zipcode
+      :region
+      :profit
+      :order_date
+      :product_id
+      :ship_mode
+      :state
+      :sales
+      :city
+      :order_id
+      :customer_id
+      :category
+      :country
+      :discount
+      :row_id
+      :product_name
+      :ship_date
+      :quantity
+      :sub_category],
+     :from [[:query/all-superstore-4 :aa337]],
+     :_from [:block-72 :pivot-drill :pivot/block-72],
+     :where [:and :block-72/click-matrix [:= 1 1]]}},
+   :tab "lilac yellow jacket"},
+  :block-11913
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-11913",
+   :w 32,
+   :selected-view :all-ufo-sightings,
+   :root [1 1],
+   :h 6,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:all-ufo-sightings
+    {:select
+     [:city
+      :comments
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :id
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :ssb47]],
+     :where
+     [:*if :query1-2/*.clicked [:*all= :query1-2/*.clicked [:state]] [:= 1 1]]}},
+   :tab "commendable snake"},
+  :block-74
+  {:leaf-drop [:filter :click-table],
+   :name "block",
+   :w 6,
+   :selected-view :query8,
+   :root [27 2],
+   :h 6,
+   :drop-mutate
+   {[:panels :block-71 :queries :all-superstore-4 :where]
+    [:*if :query8/*.clicked [:*all= :query8/*.clicked [:region]] [:= 1 1]]},
+   :connection-id "superstore",
+   :queries
+   {:query8
+    {:select [:region [[:count 1] :rowcnt]],
+     :from [[:superstore :ctr37]],
+     :group-by [:region],
+     :order-by [[:rowcnt :desc]]}},
+   :tab "lilac yellow jacket"},
+  :block-9915
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-9915",
+   :w 6,
+   :selected-view :grouped-all-superstore-1-1,
+   :root [16 8],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore-1-1
+    {:select [:segment [[:count 1] :rowcnt]],
+     :from [[:query/all-superstore-1 :ssb71]],
+     :order-by [[:rowcnt :desc]],
+     :group-by [:segment]}},
+   :tab "stupendous deer"},
+  :block-77
+  {:leaf-drop [:sql :new-group-by],
+   :name "block",
+   :w 15,
+   :selected-view :grouped-all-superstore-4-drill,
+   :root [18 18],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore-4-drill
+    {:select [[[:count 1] :rowcnt] :ship_mode],
+     :from [[:query/all-superstore-4-drill :ssb87]],
+     :order-by [[:rowcnt :desc]],
+     :pivot-by
+     {:segment
+      [:count
+       {:select-distinct [:segment],
+        :from
+        [[{:select [:segment [[:count 1] :rowcnt]],
+           :from [[:query/all-superstore-4-drill :ssb87]],
+           :order-by [[:rowcnt :desc]],
+           :group-by [:segment]}
+          :pivotq]]}]},
+     :group-by [:ship_mode]}},
+   :tab "lilac yellow jacket"},
+  :block-80
+  {:shape-rotator
+   {:context ["superstore" nil "none" "all-superstore-4"],
+    :shape-name :basic-timeseries,
+    :axes {:y "profit", :x "order_date"},
+    :honey-hash -1629772122,
+    :shape-set "vega-lite",
+    :items [[:views :oz-3] [:queries :gen-viz-370]],
+    :source-panel :block-71},
+   :name "profit, order_date",
+   :w 11,
+   :selected-view :oz-3,
+   :root [0 18],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-370
+    {:select [[[[:sum :profit]] :profit] :order_date],
+     :from [[:query/all-superstore-4 :subq1]],
+     :group-by [:order_date]}},
+   :tab "lilac yellow jacket",
+   :views
+   {:oz-3
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:x {:field :order_date, :type "temporal", :sort "x"},
+         :y {:aggregate "sum", :field :profit, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :legend nil,
+          :field nil,
+          :type "ordinal"}},
+        :mark
+        {:type "area",
+         :interpolate "monotone",
+         :point "transparent",
+         :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-370},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]},
+   :bid :block-80},
+  :block-7724
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-7724",
+   :w 4,
+   :selected-view :countd-all-superstore-1,
+   :root [17 1],
+   :h 2,
+   :connection-id "superstore",
+   :queries
+   {:countd-all-superstore-1
+    {:select [[[:count [:distinct :order_id]] :orders]],
+     :from [[:query/all-superstore-1 :ssb45]]}},
+   :tab "stupendous deer"},
+  :block-5189
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-5189",
+   :w 6,
+   :selected-view :countd-all-ufo-sightings-1,
+   :root [28 11],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:countd-all-ufo-sightings-1
+    {:select [[[:count [:distinct :duration_hours]] :duration_hours]],
+     :from [[:query/all-ufo-sightings :ssb45]]}},
+   :tab "commendable snake"},
+  :block-6676
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-6676",
+   :w 7,
+   :selected-view :grouped-all-superstore-1,
+   :root [34 2],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore-1
+    {:select [:segment [[:count 1] :rowcnt]],
+     :from [[:query/all-superstore :ssb50]],
+     :order-by [[:rowcnt :desc]],
+     :group-by [:segment]}},
+   :tab "winter-wonder-lands"},
+  :block-806
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-806",
+   :w 6,
+   :selected-view :agg-all-superstore-1-1,
+   :root [22 10],
+   :h 2,
+   :connection-id "superstore",
+   :queries
+   {:agg-all-superstore-1-1
+    {:select [[[:sum :profit] :profit]], :from [[:query/all-superstore-1 :ssb27]]}},
+   :tab "stupendous deer"},
+  :block-173
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "quantity", :x "ship_mode"},
+    :items [[:views :reech-1-2] [:queries :gen-viz-1048]],
+    :source-panel :block-703},
+   :name "quantity, ship_mode",
+   :w 9,
+   :selected-view :reech-1-2,
+   :root [17 8],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-1048
+    {:select [[[[:sum :quantity]] :quantity] :ship_mode],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:ship_mode]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-2
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :ship_mode, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-1048,
+        :dataKey :quantity,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-1048,
+        :dataKey :quantity,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-173},
+  :block-10955
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-10955",
+   :w 8,
+   :selected-view :agg-all-superstore,
+   :root [26 8],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:agg-all-superstore
+    {:select [[[:sum :quantity] :quantity]],
+     :from [[:query/all-superstore :ssb56]]}},
+   :tab "winter-wonder-lands"},
+  :block-10081
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-10081",
+   :w 6,
+   :selected-view :grouped-all-superstore,
+   :root [2 8],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore
+    {:select [:category [[:count 1] :rowcnt]],
+     :from [[:query/all-superstore :ssb70]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands"},
+  :block-172
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "sales", :x "sub_category"},
+    :items [[:views :reech-6-1] [:queries :gen-viz-949]],
+    :source-panel :block-703},
+   :name "sales, sub_category",
+   :w 9,
+   :selected-view :reech-6-1,
+   :root [14 18],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-949
+    {:select [[[[:sum :sales]] :sales] :sub_category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:sub_category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-6-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :sub_category, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :sales,
+        :isAnimationActive false,
+        :data :gen-viz-949,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-172},
+  :block-78
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block",
+   :w 5,
+   :selected-view :agg-grouped-all-superstore-4-drill,
+   :root [28 14],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-grouped-all-superstore-4-drill
+    {:select [[[:sum :home_office] :home_office]],
+     :from [[:query/grouped-all-superstore-4-drill :ssb45]]}},
+   :tab "lilac yellow jacket"},
+  :block-1400
+  {:leaf-drop [:filter :click-table],
+   :name "block-1400",
+   :w 6,
+   :selected-view :query1-1,
+   :root [34 16],
+   :h 6,
+   :drop-mutate
+   {[:panels :block-703 :queries :all-superstore :where]
+    [:and
+     [:and
+      [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:category]] [:= 1 1]]
+      [:*if
+       :query1-1/*.clicked
+       [:*all= :query1-1/*.clicked [:customer_name]]
+       [:= 1 1]]]
+     [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:region]] [:= 1 1]]]},
+   :connection-id "superstore",
+   :queries
+   {:query1-1
+    {:select [:region [[:count 1] :rowcnt]],
+     :from [[:superstore :ctr7]],
+     :group-by [:region],
+     :order-by [[:rowcnt :desc]]}},
+   :tab "winter-wonder-lands"},
+  :block-609
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "sales", :x "segment"},
+    :items [[:views :reech-1-3] [:queries :gen-viz-756-1]],
+    :source-panel :block-703},
+   :name "sales, segment",
+   :w 11,
+   :selected-view :reech-1-3,
+   :root [23 18],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-756-1
+    {:select [[[[:sum :sales]] :sales] :segment],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:segment]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-3
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :segment, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :sales,
+        :isAnimationActive false,
+        :data :gen-viz-756-1,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-609},
+  :block-801
+  {:shape-rotator
+   {:context ["bigfoot-ufos" nil "none" "all-ufo-sightings"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "rrows", :x "shape"},
+    :items [[:views :reech-5-2] [:queries :gen-viz-828]],
+    :source-panel :block-11913},
+   :name "rrows, shape",
+   :w 27,
+   :selected-view :reech-5-2,
+   :root [1 7],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-828
+    {:select [[[:count 1] :rrows] :shape],
+     :from [[:query/all-ufo-sightings :subq1]],
+     :group-by [:shape]}},
+   :tab "commendable snake",
+   :views
+   {:reech-5-2
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :shape, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :rrows,
+        :isAnimationActive false,
+        :data :gen-viz-828,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-801},
+  :block-653
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "rrows", :x "ship_mode"},
+    :items [[:views :reech-5-1] [:queries :gen-viz-756]],
+    :source-panel :block-703},
+   :name "rrows, ship_mode",
+   :w 8,
+   :selected-view :reech-5-1,
+   :root [26 13],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-756
+    {:select [[[:count 1] :rrows] :ship_mode],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:ship_mode]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-5-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :ship_mode, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-756,
+        :dataKey :rrows,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-756,
+        :dataKey :rrows,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-653},
+  :block-350
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "quantity", :x "category"},
+    :items [[:views :reech-4-1] [:queries :gen-viz-549]],
+    :source-panel :block-703},
+   :name "quantity, category",
+   :w 9,
+   :selected-view :reech-4-1,
+   :root [17 13],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-549
+    {:select [[[[:sum :quantity]] :quantity] :category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-4-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :category, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-549,
+        :dataKey :quantity,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-549,
+        :dataKey :quantity,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-350},
+  :block-7349
+  {:leaf-drop [:sql :new-select.count],
+   :name "block-7349",
+   :w 6,
+   :selected-view :cnt-all-superstore,
+   :root [8 18],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:cnt-all-superstore
+    {:select [[[:count 1] :rowcnt]], :from [[:query/all-superstore :ssb73]]}},
+   :tab "winter-wonder-lands"},
+  :block-6951
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-6951",
+   :w 6,
+   :selected-view :agg-all-superstore-1,
+   :root [22 8],
+   :h 2,
+   :connection-id "superstore",
+   :queries
+   {:agg-all-superstore-1
+    {:select [[[:sum :sales] :sales]], :from [[:query/all-superstore-1 :ssb52]]}},
+   :tab "stupendous deer"},
+  :block-411
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "sales", :x "category"},
+    :items [[:views :reech-2-1] [:queries :gen-viz-994]],
+    :source-panel :block-703},
+   :name "sales, category",
+   :w 9,
+   :selected-view :reech-2-1,
+   :root [8 13],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-994
+    {:select [[[[:sum :sales]] :sales] :category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:category],
+     :order-by [[:category :asc]]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-2-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :category, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :sales,
+        :isAnimationActive false,
+        :data :gen-viz-994,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-411},
+  :block-7312
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-7312",
+   :w 6,
+   :selected-view :agg-grouped-all-superstore,
+   :root [2 12],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-grouped-all-superstore
+    {:select [[[:sum :rowcnt] :rowcnt]],
+     :from [[:query/grouped-all-superstore :ssb91]]}},
+   :tab "winter-wonder-lands"},
+  :block-629
+  {:shape-rotator
+   {:context ["superstore" nil "none" "all-superstore-1"],
+    :shape-name :basic-v-bar-color,
+    :axes {:y "rrows", :color "ship_mode", :x "category"},
+    :honey-hash -1761248646,
+    :items [[:views :oz-6-1] [:queries :gen-viz-932]],
+    :source-panel :block-11124},
+   :name "rrows, ship_mode, category",
+   :w 8,
+   :root [14 12],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-932
+    {:select [[[:count 1] :rrows] :category :ship_mode],
+     :from [[:query/all-superstore-1 :subq1]],
+     :group-by [:category :ship_mode]}},
+   :tab "stupendous deer",
+   :views
+   {:oz-6-1
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:y {:field :category, :type "ordinal"},
+         :x {:aggregate "sum", :field :rrows, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :field :ship_mode,
+          :type "ordinal"}},
+        :mark {:type "bar", :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-932},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]},
+   :bid :block-629},
+  :block-703
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-703",
+   :w 32,
+   :selected-view :all-superstore,
+   :root [2 2],
+   :h 6,
+   :connection-id "superstore",
+   :queries
+   {:all-superstore
+    {:select
+     [:category
+      :city
+      :country
+      :customer_id
+      :customer_name
+      :discount
+      :order_date
+      :order_id
+      :product_id
+      :product_name
+      :profit
+      :quantity
+      :region
+      :row_id
+      :sales
+      :segment
+      :ship_date
+      :ship_mode
+      :state
+      :sub_category
+      :zipcode],
+     :from [[:superstore :ssb41]],
+     :where
+     [:and
+      [:and
+       [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:category]] [:= 1 1]]
+       [:*if
+        :query1-1/*.clicked
+        [:*all= :query1-1/*.clicked [:customer_name]]
+        [:= 1 1]]]
+      [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:region]] [:= 1 1]]]}},
+   :tab "winter-wonder-lands"}},
+ :materialized-theme
+ {:theme-name "cosmic-rose",
+  :codemirror-theme "rvbbit-dynamic",
+  :editor-param-background-color "#0b0b0b",
+  :pop-2 "#f92f60",
+  :base-block-style
+  {:text-shadow "2px 2px 4px #f92f6044",
+   :filter "brightness(115%)",
+   :backdrop-filter "brightness(30%) blur(6px)"},
+  :vega-defaults
+  {:view {:stroke "transparent"},
+   :axis
+   {:domainColor "#f92f60",
+    :grid true,
+    :font "Lato",
+    :labelColor "#ffffff",
+    :titleFont "Lato",
+    :titleColor "#f92f60",
+    :labelFont "Lato",
+    :domain false,
+    :gridColor "#f92f6044",
+    :tickColor "#f92f60"},
+   :legend
+   {:labelFont "Lato",
+    :legendFont "Lato",
+    :labelColor "#ffffff",
+    :titleColor "#f92f60",
+    :stroke "#f92f6044",
+    :titleFont "Lato"},
+   :header
+   {:labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#f92f60",
+    :labelColor "#f2e8ff"},
+   :mark {:font "Lato"},
+   :title
+   {:font "Lato",
+    :subtitleFont "Lato",
+    :labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#f92f60"}},
+  :grid-selected-column-css
+  {:background-color "#f92f6033", :filter "brightness(180%)"},
+  :running-gif "images/running.gif",
+  :base-block-color-selected "#301833",
+  :block-title-font-color "#ffffff",
+  :base-block-color "#1a0f1b",
+  :editor-rim-color "#f92f60",
+  :base-block-filter-selected
+  "drop-shadow(0.3rem 0.3rem 0.5rem #f92f60) drop-shadow(-0.3rem -0.3rem 0.5rem #f92f60)",
+  :vega-default-color-scheme {:scheme "category20b"},
+  :data-colors
+  {"float" "#f989d7",
+   "boolean" "#f9f260",
+   "map" "#ce4c7c",
+   "list" "#9b68f9",
+   "string" "#eba8f9",
+   "any" "#ffccf9",
+   "vector" "#c264f1",
+   "keyword" "#fd96a9",
+   "rabbit-code" "#9b5bb0",
+   "datetime" "#ff5f9e",
+   "integer" "#e337a1",
+   "unknown" "#ad2a7f",
+   "date" "#7d1977"},
+  :editor-grid-selected-font-color "#1a0f1b",
+  :monospaced-font "JetBrains Mono",
+  :editor-grid-selected-background-color "#f92f60",
+  :_vega-default-color-scheme {:scheme "custom"},
+  :nivo-defaults
+  {:font-family "Lato",
+   :labels
+   {:text
+    {:fill "#ffffff", :font-size "16px", :font-family "Lato", :font-weight 700}},
+   :tooltip
+   {:container
+    {:background "#1a0f1b",
+     :color "#ffffff",
+     :text {:fill "#ffffff"},
+     :fontSize "18px",
+     :borderRadius "4px",
+     :boxShadow "0 1px 2px rgba(0, 0, 0, 0.75)",
+     :padding "5px 9px"},
+    :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+    :tableCell {:padding "3px 5px"}},
+   :axis
+   {:legend
+    {:text
+     {:fill "#ffffff", :font-size "14px", :font-family "Lato", :font-weight 700}},
+    :ticks
+    {:line {:stroke "#ffffff33"}, :text {:fill "#ffffffcc", :font-weight 700}}},
+   :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+  :editor-outer-rim-color "#f92f60",
+  :grid-selected-font-color "#1a0f1b",
+  :block-title-selected-font-color "#ffffff",
+  :grid-selected-background-color "#f92f60",
+  :grid-font-color "#ffffff",
+  :canvas-background-css
+  {:background-image "linear-gradient(#1a0f1b, #301833)",
+   :transition "all 0.6s ease-in-out",
+   :background-blend-mode "normal",
+   :background-color "#1a0f1b"},
+  :editor-font-color "#ffffff",
+  :line-style "curved-path-h",
+  :base-font "Poppins",
+  :block-tab-selected-font-color "#f92f60",
+  :editor-background-color "#0b0b0b",
+  :editor-grid-font-color "#ffffff",
+  :pop-1 "#ffa1f9"},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#f989d7",
+  "boolean" "#f9f260",
+  "map" "#ce4c7c",
+  "list" "#9b68f9",
+  "string" "#eba8f9",
+  "any" "#ffccf9",
+  "vector" "#c264f1",
+  "keyword" "#fd96a9",
+  "rabbit-code" "#9b5bb0",
+  "datetime" "#ff5f9e",
+  "integer" "#e337a1",
+  "unknown" "#ad2a7f",
+  "date" "#7d1977"},
+ :solver-fn nil,
+ :click-param
+ {:flow-fn-sys
+  {:name ":clojure-string-join",
+   :full_map
+   "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+   :description "Clojure.string's join function.",
+   :inputs "[:delimiter]",
+   :icon "zmdi-group",
+   :input_types "[:string]",
+   :output_types ":string",
+   :category ":clojure-base"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 29,
+   :block_data
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\", :border-radius [:sticky-border-radius \"12px\"], :filter \"brightness(120%)\", :backdrop-filter \"brightness(35%)\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color [:str :param/theme-dark 82], :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-blend-mode \"hard-light\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1",
+   :query_names ""},
+  :render-hash
+  {:reco-preview-c-159485295 -475050735,
+   :reco-preview-c--434686642 1721207445,
+   :reco-preview-c-734378348 -477290180,
+   :reco-preview-c-1518953695 2043671875,
+   :reco-preview-c--1223518831 828799398,
+   :reco-preview-c--1598230357 2052308365,
+   :block-79 -1135719453,
+   :block-75 -128836361,
+   :reco-preview-c--542155017 1802057813,
+   :block-2175 1003440413,
+   :reco-preview-c-1198725403 1196646072,
+   :block-76 682830356,
+   :block-42 -1456990512,
+   :reco-preview-c-1485055375 -485084393,
+   :block-5136 -93715832,
+   :block-71 2018910162,
+   :reco-preview-c-1322863945 -1050932768,
+   :reco-preview-c--1508842088 -804797445,
+   :reco-preview-c-410644504 599040242,
+   :block-72 -574240934,
+   :reco-preview-c--297542692 -13733000,
+   :reco-preview-c-1445616513 43941822,
+   :reco-preview-c-2085311067 1039596920,
+   :block-11124 -201016492,
+   :reco-preview-c-343871285 1246464953,
+   :reco-preview-c--125402682 835740632,
+   :reco-preview-c-1984651886 -1336689264,
+   :reco-preview-c--1432354326 -150230465,
+   :reco-preview-c-1480331794 -520773873,
+   :block-81 -260984067,
+   :reco-preview-c-1875821022 -1541317773,
+   :block-44 -947424234,
+   :reco-preview-c--720723782 -534722071,
+   :reco-preview-c-514741076 1938306771,
+   :block-82 798956786,
+   :reco-preview-c-156081705 -450012823,
+   :reco-preview-c--825168457 26988263,
+   :block-7831 -70784645,
+   :reco-preview-c-1716764363 45004205,
+   :reco-preview-c--603598756 717954720,
+   :reco-preview-c--347147715 -683311767,
+   :block-488 956650793,
+   :reco-preview-c-1063330421 906581473,
+   :reco-preview-c-964686320 105367898,
+   :reco-preview-c--72323185 -1182570730,
+   :reco-preview-c-1847404378 -474539583,
+   :reco-preview-c--1466115163 1554843526,
+   :reco-preview-c-1553965367 2137798282,
+   :reco-preview-c-43984673 849206633,
+   :reco-preview-c--381093440 -1164784661,
+   :reco-preview-c--2383235 1203962185,
+   :block-689 -1806039511,
+   :block-41 -1799054507,
+   :reco-preview-c-1959088766 -1308176113,
+   :reco-preview-c-1714339874 -1947193619,
+   :block-8676 -2029422858,
+   :block-1892 303893427,
+   :reco-preview-c-744457908 -152303636,
+   :block-73 2142016977,
+   :block-74 -829881913,
+   :reco-preview-c--1747850972 -1293237605,
+   :reco-preview-c--1008777902 1390086503,
+   :reco-preview-c-1212960174 247138260,
+   :reco-preview-c-1737611411 -179738044,
+   :block-9915 -430592455,
+   :reco-preview-c-1230560753 1950246624,
+   :reco-preview-c--2039663741 1669514140,
+   :reco-preview-c--2144553689 -2089623676,
+   :reco-preview-c--2003425645 -1240749094,
+   :reco-preview-c--204338705 -791137120,
+   :block-8193 -1825430840,
+   :reco-preview-c-1465831491 1392006246,
+   :reco-preview-c--579878426 742248115,
+   :reco-preview-c-892535549 1278266504,
+   :reco-preview-c-1992634227 -2128820310,
+   :block-77 -896503999,
+   :reco-preview-c-1959661448 -232187719,
+   :block-80 459011980,
+   :block-7724 1459203454,
+   :reco-preview-c--817382221 1454297449,
+   :block-6676 1401176,
+   :block-806 -422021812,
+   :block-173 -700970726,
+   :block-10955 -2044515198,
+   :reco-preview-c--1056672763 287331745,
+   :block-10081 1247040646,
+   :block-172 -1677208126,
+   :reco-preview-c--2006182540 1196967688,
+   :reco-preview-c-984656818 -1900650223,
+   :reco-preview-c-1328078220 1613828853,
+   :reco-preview-c--373204436 2048020264,
+   :reco-preview-c-1744775723 1511400364,
+   :block-78 1616342781,
+   :reco-preview-c-986942202 -1538274830,
+   :reco-preview-c-1062785398 1927771693,
+   :reco-preview-c--1903678967 1190786008,
+   :reco-preview-c--1354237777 872748916,
+   :reco-preview-c--292991041 -413700238,
+   :block-1400 -665813309,
+   :reco-preview-c--449888054 1334452633,
+   :reco-preview-c-693462444 -1655638686,
+   :reco-preview-c-554712720 1788002026,
+   :reco-preview-c--79476166 1077975611,
+   :reco-preview-c--1006707704 -1219878217,
+   :block-609 -1143987,
+   :reco-preview-c--44471951 -716827018,
+   :reco-preview-c-1408340363 1205542092,
+   :reco-preview-c-1531564167 1140986020,
+   :block-653 205845326,
+   :block-350 833452093,
+   :reco-preview-c--1521001971 -899800898,
+   :reco-preview-c-299456033 1519649797,
+   :block-7349 1534695032,
+   :block-6951 1838814585,
+   :block-411 957891182,
+   :block-7312 -1925454040,
+   :reco-preview-c-757320972 446548393,
+   :reco-preview-c-241621266 -1553748467,
+   :reco-preview-c-1049917586 -85066918,
+   :reco-preview-c-803113815 -808488213,
+   :reco-preview-c--1283687466 145222108,
+   :reco-preview-c--937291242 -1298592306,
+   :block-629 -2061962456,
+   :reco-preview-c-1373619730 -653452175,
+   :reco-preview-c--1333700373 767350813,
+   :reco-preview-c-757323199 155986778,
+   :reco-preview-c-2003375398 -60058967,
+   :reco-preview-c--1233749882 1486631626,
+   :reco-preview-c-1084201358 -123865909,
+   :reco-preview-c-1069139363 1574307574,
+   :reco-preview-c-160863612 -618826660,
+   :reco-preview-c-2022086348 -581112205,
+   :reco-preview-c--722680005 -751439351,
+   :block-703 772795314,
+   :reco-preview-c-2067746588 -1680205704,
+   :reco-preview-c-871499317 -502854478,
+   :reco-preview-c-1912892504 425617419,
+   :reco-preview-c-54928234 1261879071,
+   :reco-preview-c-234531973 -1621815862,
+   :reco-preview-c-1709296535 -99900575,
+   :block-9104 -279024505},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "cache-db",
+   :schema_cat nil,
+   :table_name "block_2175_new_clojure_1__block_2175_clojure_new_clojure_1_",
+   :rows 3,
+   :fields 4},
+  :query8.* {:region ["West" "East" "South"]},
+  :data-hash
+  {nil -999739240,
+   :query-preview-c-159485295 1114305193,
+   :query-preview-c-343871285 -916223929,
+   :fields-sys 730526605,
+   :gen-viz-1300 920173415,
+   :gen-viz-1048 -2107728219,
+   :query-preview-c-1847404378 -1506723975,
+   :query-preview-c-1212960174 181812243,
+   :query1-c--603598756 -1107101262,
+   :query-preview-c-757323199 125020555,
+   :agg-all-superstore -297162430,
+   :query-preview-c-1322863945 -174992205,
+   :gen-viz-549 -1317974754,
+   :query-preview-c--1508842088 828617448,
+   :query-preview-c-693462444 2108964386,
+   :query-preview-c-986942202 -2102356617,
+   :superstore -1729702703,
+   :tables-sys 707362278,
+   :query-preview-c-1959088766 309126164,
+   :query-preview-c-1445616513 717659430,
+   :rabbit-search-like -686782610,
+   :query1-1 -1107101262,
+   :query-preview-c-554712720 -1795082443,
+   :agg-all-superstore-4-drill-c-514741076 1931876149,
+   :query-preview-c--1283687466 -1795082443,
+   :grouped-all-superstore-1 -1789214188,
+   :query-preview-c-1230560753 -1043728955,
+   :agg-all-superstore-1-1 -2113179173,
+   :query-preview-c--1747850972 125020555,
+   :query-preview-c-1328078220 -1680909748,
+   :pivot1 -882141794,
+   :query-preview-c--434686642 -1515491126,
+   :query-preview-c-2085311067 1853371116,
+   :query-preview-c--825168457 -1043728955,
+   :query-preview-c-1709296535 125020555,
+   :query-preview-c--297542692 1620096503,
+   :query-preview-c-1959661448 309126164,
+   :query-preview-c--449888054 1114305193,
+   :gen-viz-756-1 -45482503,
+   :block_2175_new_clojure_1__block_2175_clojure_new_clojure_1_ -2024046938,
+   :query-preview-c--79476166 -1680909748,
+   :query-preview-c--1333700373 1238914867,
+   :query-preview-c--1903678967 1947285075,
+   :query-preview-c--1432354326 -1802289299,
+   :agg-all-superstore-4-drill-1 -2090269719,
+   :agg-all-superstore-4-drill-c-241621266 487017443,
+   :query-preview-c--579878426 223732136,
+   :query-preview-c-964686320 -851599826,
+   :query-preview-c--1466115163 -1795082443,
+   :query-preview-c--1006707704 1620096503,
+   :grouped-all-superstore-4-drill-c-1553965367 476460049,
+   :gen-viz-949 1761891162,
+   :query-preview-c-803113815 -1935106062,
+   :grouped-all-superstore-1-1 -559953537,
+   :query-preview-c-156081705 1382882323,
+   :query-preview-c--1354237777 1121199899,
+   :query-preview-c--1233749882 -607691661,
+   :query-preview-c-1984651886 1947285075,
+   :query-preview-c-1518953695 -1544307052,
+   :query-preview-c--1521001971 675761012,
+   :new-clojure-11 -999739240,
+   :query-preview-c--937291242 1382882323,
+   :all-superstore-c-984656818 871057004,
+   :query-preview-c-1069139363 -1224240820,
+   :query-preview-c--2006182540 1114305193,
+   :query-preview-c-871499317 125020555,
+   :query-preview-c-1198725403 1947285075,
+   :query-preview-c--2144553689 125020555,
+   :gen-viz-370 1327325119,
+   :query-preview-c-1992634227 -793781011,
+   :query-preview-c-2067746588 -1715980772,
+   :query-preview-c-744457908 -916223929,
+   :rabbit-search-like-themes 1605224927,
+   :agg-all-superstore-4-drill 1297615317,
+   :query-preview-c--722680005 125020555,
+   :query-preview-c--1056672763 352674506,
+   :all-block-2175-new-clojure-1--block-2175-clojure-new-clojure-1- 1252700981,
+   :gen-viz-959-1 644978317,
+   :query-preview-c-1084201358 -1917850872,
+   :query-preview-c-1480331794 1853371116,
+   :all-superstore-4-drill 166714692,
+   :query-preview-c-1714339874 -1343099600,
+   :query-preview-c-2022086348 1114305193,
+   :query-preview-c-1744775723 125020555,
+   :query-preview-c--2003425645 -1506723975,
+   :grouped-all-superstore -1735595004,
+   :query-preview-c-54928234 -607691661,
+   :query-preview-c--1008777902 125020555,
+   :query-preview-c-1737611411 -374768345,
+   :gen-viz-756 -1453310875,
+   :agg-grouped-all-superstore-1 -654470164,
+   :agg-grouped-all-superstore -654470164,
+   :query-preview-c--1598230357 223732136,
+   :query-preview-c-1875821022 -1506723975,
+   :query-preview-c-160863612 -851599826,
+   :query-preview-c--817382221 1853371116,
+   :agg-grouped-all-superstore-4-drill-c-1373619730 -2084497029,
+   :query-preview-c--72323185 -1917850872,
+   :agg-grouped-all-superstore-4-drill 1274110982,
+   :gen-viz-959 -184394120,
+   :pivot1-c-1049917586-flat -158251694,
+   :new-clojure-11-sqlized -936866429,
+   :grouped-all-superstore-4-c-234531973 1238696099,
+   :agg-all-superstore-1 -903080425,
+   :agg-grouped-all-superstore-1-1 124452097,
+   :grouped-all-superstore-6 114603783,
+   :query1-3 1164097011,
+   :query-preview-c-1063330421 -1515491126,
+   :tmp-529143786-hist-sys -724889738,
+   :connections-sys 1758142944,
+   :all-superstore 698220025,
+   :grouped-all-superstore-4-drill 878469466,
+   :query-preview-c--125402682 -1544307052,
+   :query-preview-c-892535549 717659430,
+   :query-preview-c--720723782 -1367935641,
+   :query-preview-c--373204436 1328533997,
+   :new-clojure-1-sqlized 1442984792,
+   :query-preview-c-410644504 -1343099600,
+   :all-superstore-4 -950172905,
+   :rabbit-search-like-screens -44030639,
+   :query-preview-c-1062785398 2108964386,
+   :query-preview-c-299456033 -388540561,
+   :countd-all-superstore-1 1330808697,
+   :query-preview-c--1223518831 -1515491126,
+   :query-preview-c--44471951 223732136,
+   :query-preview-c-1485055375 181812243,
+   :query-preview-c--2383235 -851599826,
+   :pivot1-flat 825382467,
+   :query-preview-c-1531564167 -1224240820,
+   :gen-viz-994 -1694433162,
+   :query-preview-c--204338705 2108964386,
+   :query-preview-c-43984673 125020555,
+   :query-preview-c-1465831491 181812243,
+   :cnt-all-superstore -654470164,
+   :all-superstore-1 1305675560,
+   :gen-viz-932 1574995448,
+   :block_79_new_clojure_11__block_79_clojure_new_clojure_11_ -936866429,
+   :query8 -1107101262,
+   :query-preview-c--2039663741 -2064017313,
+   :query-preview-c-734378348 -666479229,
+   :query-preview-c-757320972 -607691661,
+   :query-preview-c--542155017 1382882323,
+   :query1 -2030464101,
+   :query-preview-c-1716764363 125020555,
+   :query-preview-c--347147715 828617448},
+  :block-72
+  {:click-matrix
+   [:and
+    [:= :category "Furniture"]
+    [:= :region "East"]
+    [:= :order_date_year "2017"]]},
+  :flows-sys
+  {:flow_id "simple-python-exec",
+   :file_path "./flows/simple-python-exec.edn",
+   :last_modified "2024-01-19 10:37:23"},
+  :files-sys
+  {:file_path "./screens/rotating-theme-blank.edn",
+   :screen_name "rotating-theme-blank",
+   :blocks 14,
+   :queries 2,
+   :ts "2024-11-07 10:30:23"},
+  :chat-drag-23 {:YEAR 2017, :rows 734, :styler_highlight_group 0},
+  :offenses-drag-17
+  {:SHOOTING nil,
+   :DISTRICT "C11",
+   :INCIDENT_NUMBER "I182070943",
+   :OFFENSE_DESCRIPTION "VANDALISM",
+   :DAY_OF_WEEK "0001-01-02",
+   :MONTH 8,
+   :YEAR 2018,
+   :HOUR 0,
+   :STREET "HECLA ST",
+   :OFFENSE_CODE_GROUP "Vandalism",
+   :UCR_PART "Part Two",
+   :Long -71.06030035,
+   :REPORTING_AREA 347,
+   :Location "(42.30682138, -71.06030035)",
+   :OFFENSE_CODE 1402,
+   :Lat 42.30682138,
+   :OCCURRED_ON_DATE "2018-08-21 00:00:00.000000"},
+  :viz-tables-sys2 {:table_name :all-superstore-4},
+  :query1-1.* {:region ["West" "Central" "South"]},
+  :STREET-drag-11 {:STREET "BLUE HILL AVE", :rowcnt 7794},
+  :ufo-sightings-drag-22
+  {:duration_seconds_int 900,
+   :comments
+   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
+   :city "kaneohe",
+   :date_posted "2004-01-22",
+   :longitude -157.8036111,
+   :state "hi",
+   :duration_seconds "900",
+   :duration_hours "15 minutes",
+   :id 5,
+   :shape "light",
+   :datetime "1960-10-10 20:00:00.000000",
+   :latitude "21.4180556",
+   :country "us"},
+  :block-8676 {:region #{"Central"}},
+  :param
+  {:nutritious-periwinkle-sheep "hello from a data board!",
+   :offense "VANDALISM",
+   :float 324.444,
+   :string "this is string",
+   :selected-view-data
+   [:box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "19px", :color :theme/editor-outer-rim-color}
+    :child
+    [:str :time/second]],
+   :essential-olive-toad "from clojure boar param",
+   :poised-spring-bud-fly
+   ["import sys, random "
+    "from datetime import date"
+    ""
+    "print(\"damn son!\")"
+    "print(random.randrange(1,300))"
+    "print('{{:param/nutritious-periwinkle-sheep}}')"
+    ""
+    "today = date.today()"
+    "print(\"Today's date:\", today)"
+    ""
+    "####INTERESTING...."
+    ""
+    ""
+    ""
+    ""],
+   :selected-view [:views :vv4],
+   :keys 123,
+   :bools true,
+   :keys2 [3 4 5],
+   :selected-block :block-4928},
+  :theme
+  {:theme-name "cosmic-rose",
+   :codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#0b0b0b",
+   :pop-2 "#f92f60",
+   :base-block-style
+   {:text-shadow "2px 2px 4px #f92f6044",
+    :filter "brightness(115%)",
+    :backdrop-filter "brightness(30%) blur(6px)"},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#f92f60",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff",
+     :titleFont "Lato",
+     :titleColor "#f92f60",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#f92f6044",
+     :tickColor "#f92f60"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff",
+     :titleColor "#f92f60",
+     :stroke "#f92f6044",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#f92f60",
+     :labelColor "#f2e8ff"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#f92f60"}},
+   :grid-selected-column-css
+   {:background-color "#f92f6033", :filter "brightness(180%)"},
+   :running-gif "images/running.gif",
+   :base-block-color-selected "#301833",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#1a0f1b",
+   :editor-rim-color "#f92f60",
+   :base-block-filter-selected
+   "drop-shadow(0.3rem 0.3rem 0.5rem #f92f60) drop-shadow(-0.3rem -0.3rem 0.5rem #f92f60)",
+   :vega-default-color-scheme {:scheme "category20b"},
+   :data-colors
+   {"float" "#f989d7",
+    "boolean" "#f9f260",
+    "map" "#ce4c7c",
+    "list" "#9b68f9",
+    "string" "#eba8f9",
+    "any" "#ffccf9",
+    "vector" "#c264f1",
+    "keyword" "#fd96a9",
+    "rabbit-code" "#9b5bb0",
+    "datetime" "#ff5f9e",
+    "integer" "#e337a1",
+    "unknown" "#ad2a7f",
+    "date" "#7d1977"},
+   :editor-grid-selected-font-color "#1a0f1b",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#f92f60",
+   :_vega-default-color-scheme {:scheme "custom"},
+   :nivo-defaults
+   {:font-family "Lato",
+    :labels
+    {:text
+     {:fill "#ffffff", :font-size "16px", :font-family "Lato", :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#1a0f1b",
+      :color "#ffffff",
+      :text {:fill "#ffffff"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.75)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff", :font-size "14px", :font-family "Lato", :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff33"}, :text {:fill "#ffffffcc", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#f92f60",
+   :grid-selected-font-color "#1a0f1b",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#f92f60",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "linear-gradient(#1a0f1b, #301833)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-color "#1a0f1b"},
+   :editor-font-color "#ffffff",
+   :line-style "curved-path-h",
+   :base-font "Poppins",
+   :block-tab-selected-font-color "#f92f60",
+   :editor-background-color "#0b0b0b",
+   :editor-grid-font-color "#ffffff",
+   :pop-1 "#ffa1f9"},
+  :all-superstore-4-drill
+  {:ship_mode "Same Day", :segment "Corporate", :sales 7.36},
+  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :connections-sys {:connection_id "cache-db", :styler_highlight_8717ssa 0},
+  :narratives
+  {:base>narrative-22>theme :cyberpunk,
+   :base>narrative-22>craps "#ffffff",
+   :base>narrative-22>floatss 123.4,
+   :base>narrative-1>floaty 123.4,
+   :base>narrative-1>stuff1 "some stuff!",
+   :base>narrative-22>namer "some stuff!",
+   :base>narrative-22>vibes? true,
+   :base>narrative-22>gopv ["test" "test3" "test4"],
+   :base>narrative-22>mappy {:map 34}},
+  :sys {:selected-tab "lilac yellow jacket", :selected-tab-idx 3},
+  :kits-sys
+  {:enabled
+   [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]},
+  :query1-2.* {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]},
+  :query1.* {:category ["Technology" "Furniture"]}},
+ :selected-flow "my-new-flow6317"}

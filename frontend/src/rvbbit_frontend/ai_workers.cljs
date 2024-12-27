@@ -282,17 +282,23 @@
 
                ;:gap "10px"
                :children
-               [
-                ;; [re-com/md-icon-button :src (at)
+               [;; [re-com/md-icon-button :src (at)
                 ;;  :md-icon-name "zmdi-circle"
                 ;;  :style
                 ;;  {:color      "#dddd77" ;(theme-pull :theme/editor-outer-rim-color nil)
                 ;;   :cursor     "pointer"
                 ;;   :margin-top "-2px"
                 ;;   :font-size  "16px"}]
+
+                ;; [re-com/box
+                ;;  :style {:font-size "18px" :margin-top "3px" :margin-left "10px" :opacity 0.33}
+                ;;  :child (str "cumulative total: $" ttl-costs)]
+
                 [re-com/box
                  :style {:font-size "18px" :margin-top "3px" :margin-left "10px" :opacity 0.33}
-                 :child (str "cumulative total: $" ttl-costs)]
+                 :child (str "AI Workers disabled for this build, will be back shortly!")]
+
+
                 ;; [re-com/progress-bar
                 ;;  :striped? true
                 ;;  :bar-style {:color            (str (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil)) 67)

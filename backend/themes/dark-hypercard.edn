@@ -1,0 +1,103 @@
+{:theme-name "dark-hypercard",
+ :codemirror-theme "rvbbit-dynamic",
+ :editor-param-background-color "#121212",
+ :pop-2 "#cfcfcf",
+ :base-block-style
+ {:box-shadow "0 0 2px #cfcfcf, inset 0 0 4px #ffffff0f",
+  :filter "brightness(105%) contrast(110%)",
+  :backdrop-filter "blur(2px)"},
+ :vega-defaults
+ {:view {:stroke "transparent"},
+  :axis
+  {:domainColor "#cfcfcf",
+   :grid true,
+   :font "Chicago",
+   :labelColor "#ffffff",
+   :titleFont "Chicago",
+   :titleColor "#cfcfcf",
+   :labelFont "Chicago",
+   :domain false,
+   :gridColor "#cfcfcf40",
+   :tickColor "#cfcfcf"},
+  :legend
+  {:labelFont "Chicago",
+   :legendFont "Chicago",
+   :labelColor "#ffffff",
+   :titleColor "#cfcfcf",
+   :stroke "#cfcfcf40",
+   :titleFont "Chicago"},
+  :header {:labelFont "Chicago", :titleFont "Chicago", :titleColor "#cfcfcf"},
+  :mark {:font "Chicago"},
+  :title
+  {:font "Chicago",
+   :subtitleFont "Chicago",
+   :labelFont "Chicago",
+   :titleFont "Chicago",
+   :titleColor "#cfcfcf"}},
+ :grid-selected-column-css
+ {:background-color "#cfcfcf1a", :filter "brightness(120%)"},
+ :running-gif "images/running.gif",
+ :base-block-color-selected "#1c1c1c",
+ :block-title-font-color "#ffffff",
+ :base-block-color "#141414",
+ :editor-rim-color "#cfcfcf",
+ :base-block-filter-selected
+ "drop-shadow(0 0 0.25rem #cfcfcf) drop-shadow(0 0 0.5rem #cfcfcf)",
+ :vega-default-color-scheme {:scheme "greys"},
+ :data-colors
+ {"float" "#dfdfdf",
+  "boolean" "#bcbcbc",
+  "map" "#ececec",
+  "list" "#fafafa",
+  "string" "#f5f5f5",
+  "any" "#d4d4d4",
+  "vector" "#ececec",
+  "keyword" "#cccccc",
+  "rabbit-code" "#f0f0f0",
+  "datetime" "#999999",
+  "integer" "#bdbdbd",
+  "unknown" "#333333",
+  "date" "#4d4d4d"},
+ :editor-grid-selected-font-color "#141414",
+ :monospaced-font "Chicago",
+ :editor-grid-selected-background-color "#cfcfcf",
+ :nivo-defaults
+ {:font-family "Chicago",
+  :labels
+  {:text
+   {:fill "#ffffff", :font-size "14px", :font-family "Chicago", :font-weight 500}},
+  :tooltip
+  {:container
+   {:background "#141414",
+    :color "#ffffff",
+    :text {:fill "#ffffff"},
+    :fontSize "14px",
+    :borderRadius "2px",
+    :boxShadow "0 1px 2px rgba(207, 207, 207, 0.5)",
+    :padding "6px 10px"},
+   :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+   :tableCell {:padding "3px 5px"}},
+  :axis
+  {:legend
+   {:text
+    {:fill "#ffffff", :font-size "12px", :font-family "Chicago", :font-weight 500}},
+   :ticks
+   {:line {:stroke "#ffffff40"}, :text {:fill "#ffffffcc", :font-weight 500}}},
+  :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+ :editor-outer-rim-color "#cfcfcf",
+ :grid-selected-font-color "#141414",
+ :block-title-selected-font-color "#ffffff",
+ :grid-selected-background-color "#cfcfcf",
+ :grid-font-color "#ffffff",
+ :canvas-background-css
+ {:background-image "radial-gradient(ellipse at center, #181818 0%, #000000 80%)",
+  :transition "all 0.5s ease-in-out",
+  :background-blend-mode "multiply",
+  :background-color "#181818"},
+ :editor-font-color "#ffffff",
+ :line-style "straight-path-h",
+ :base-font "Chicago",
+ :block-tab-selected-font-color "#cfcfcf",
+ :editor-background-color "#121212",
+ :editor-grid-font-color "#ffffff",
+ :pop-1 "#ffffff"}

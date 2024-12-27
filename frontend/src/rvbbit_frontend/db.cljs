@@ -10,10 +10,16 @@
 
 (def brick-size 50)
 (def version "0.2.0-alpha")
-(def version-date "12/2024")
+(def version-date "'snow hare' dec-2024")
+
+(defonce loaded-screen? (reagent/atom false))
+(defonce post-boot? (reagent/atom false))
+(def loading-message (reagent/atom nil))
+(def final-loading-message (reagent/atom nil))
 
 (defonce client-name (gen-client-name))
 
+(def formula-search-input (reagent/atom nil))
 (def rabbit-search-input (reagent/atom nil))
 (def clover-leaf-previews (reagent/atom nil))
 (def sockets [:query1  :query2  :query3])
@@ -22,7 +28,139 @@
                      ;:panel-hash :data-hash
                      })
 
+(def messages [;; Functional programming jokes
+               :avoiding-side-effects
+               :currying-favor
+               :maintaining-immutability
+               :pursuing-purity
+               :recursing-recursively
+               :reducing-complexity
+               :mapping-over-manifolds
+               :folding-space-time
+               :evaluating-lazily
+               :composing-monads
+               :spawning-atoms
+               :dereferencing-universe
+
+               ;; SQL/Database humor
+               :normalizing-relations
+               :joining-parallel-universes
+               :indexing-infinity
+               :optimizing-queries
+               :denormalizing-normalization
+               :aggregating-aggregates
+               :materializing-views
+               :vaccuming-postgres
+               :sharding-reality
+
+               ;; Data viz references
+               :calculating-chart-chakras
+               :aligning-aesthetic-atoms
+               :balancing-bar-charts
+               :harmonizing-heatmaps
+               :plotting-world-domination
+               :calibrating-color-scales
+               :generating-gratuitous-gradients
+               :validating-vega-specs
+               :dimensioning-dimensions
+
+               ;; Classic tech loading messages
+               :warming-up-flux-capacitor
+               :reversing-polarity
+               :downloading-more-ram
+               :updating-update-updater
+               :refactoring-refactors
+               :debugging-debugger
+               :compiling-compilers
+
+               ;; Clojure-specific
+               :parenthesizing-parentheses
+               :evaluating-evaluator
+               :macro-expanding-macros
+               :vectorizing-vectors
+               :threading-threads
+               :destructuring-structures
+               :persisting-persistence
+
+               ;; Dashboard-specific
+               :calculating-calculations
+               :filtering-filters
+               :widgeting-widgets
+               :paneling-panels
+               :gridding-grids
+               :responsifying-responsiveness
+
+               ;; Meta humor
+               :loading-loading-messages
+               :generating-status-updates
+               :inventing-progress-bars
+               :simulating-work
+               :pretending-to-be-busy
+               :adding-artificial-delay
+               :finding-more-loading-messages])
+
+(defn rabbit-svg [color & [stroke]]
+  [:svg
+   {:version "1.0"
+    :xmlns "http://www.w3.org/2000/svg"
+    :width "1453.000000pt"
+    :height "794.000000pt"
+    :viewBox "0 0 1453.000000 794.000000"
+    :preserveAspectRatio "xMidYMid meet"}
+   [:g
+    {:transform "translate(0.000000,794.000000) scale(0.100000,-0.100000)"
+     :fill color
+    ; :style {:filter "drop-shadow(600px 600px 600px #000000)"}
+     :stroke-width "100px"
+     :vector-effect "non-scaling-stroke"
+     :stroke (or stroke "none")}
+    [:path
+     {:d "M3934 7694 c-248 -41 -474 -157 -660 -336 -188 -181 -305 -396 -361
+  -658 -24 -117 -24 -372 1 -488 84 -391 326 -707 674 -881 90 -45 253 -98 348
+  -112 l81 -12 -18 -71 c-17 -67 -39 -191 -54 -298 l-6 -48 -629 0 -628 0 -5
+  -302 c-5 -328 -11 -376 -74 -543 -135 -363 -432 -643 -801 -759 -145 -45 -243
+  -56 -524 -56 l-258 0 0 -1256 0 -1256 373 5 c443 6 602 23 917 98 877 208
+  1662 738 2186 1476 l66 92 976 3 c1076 4 1013 1 1279 69 224 57 461 162 659
+  291 144 93 226 159 359 290 l111 108 61 -83 c245 -332 583 -550 1005 -649 93
+  -22 95 -22 1528 -28 l1435 -5 474 -238 c260 -131 474 -237 476 -235 9 10 1115
+  2230 1115 2238 0 5 -243 131 -539 280 l-539 269 44 105 c85 200 110 347 101
+  601 -19 522 -186 991 -506 1420 -96 129 -347 380 -476 476 -382 285 -812 453
+  -1274 499 -66 6 -791 10 -2012 10 l-1909 0 0 -228 c0 -275 13 -450 45 -608 13
+  -65 23 -119 22 -121 -2 -1 -39 9 -82 22 -227 70 -427 99 -685 99 -278 0 -484
+  -32 -734 -115 -65 -22 -119 -39 -120 -37 -1 2 -12 39 -25 83 -34 119 -76 214
+  -139 315 -198 312 -505 517 -865 575 -112 18 -303 18 -413 -1z m285 -834 c164
+  -31 298 -167 331 -337 33 -167 -66 -356 -229 -436 -62 -30 -72 -32 -176 -32
+  -101 0 -115 2 -170 29 -121 59 -214 184 -234 314 -32 202 109 408 314 458 63
+  16 99 16 164 4z m6542 -1 c261 -26 495 -105 717 -241 100 -61 176 -122 281
+  -222 298 -290 465 -642 502 -1062 18 -199 -10 -301 -112 -409 -116 -123 -203
+  -140 -659 -132 -254 5 -320 9 -392 26 -370 85 -658 349 -772 708 -19 63 -86
+  450 -86 502 0 5 -285 11 -677 14 -562 4 -692 7 -758 20 -392 78 -720 324 -897
+  676 -20 40 -41 86 -47 102 l-10 29 1403 0 c914 0 1440 -4 1507 -11z m-4206
+  -862 c135 -34 232 -70 338 -125 377 -193 655 -552 754 -971 36 -157 43 -392
+  15 -556 -68 -398 -294 -747 -627 -969 -150 -100 -301 -165 -495 -214 l-105
+  -26 -1178 -3 -1178 -4 -25 -42 c-199 -338 -268 -439 -418 -614 -428 -498
+  -1038 -848 -1678 -963 l-98 -17 0 417 0 417 58 13 c182 40 445 150 620 258
+  251 156 482 381 647 632 119 180 234 444 281 643 l18 77 678 0 678 0 -5 23
+  c-2 12 -16 135 -31 272 -48 456 -21 677 121 970 70 146 158 268 280 390 196
+  196 409 317 675 385 134 34 186 39 385 35 163 -3 204 -7 290 -28z m2991 -1237
+  c150 -35 278 -108 391 -220 115 -113 163 -201 254 -462 l44 -128 1067 0 1068
+  0 270 -135 270 -135 -181 -363 c-100 -199 -182 -363 -184 -365 -2 -2 -84 38
+  -184 87 l-181 91 -1447 0 c-963 0 -1470 4 -1513 11 -333 53 -607 321 -676 658
+  -22 113 -15 287 16 386 39 126 105 239 192 331 123 130 247 203 413 245 99 25
+  276 25 381 -1z"}]
+    [:path
+     {:d "M210 1875 l0 -1255 185 0 185 0 0 1255 0 1255 -185 0 -185 0 0 -1255z"}]]])
+
 (def drag-body-map (atom {}))
+(def shape-rotation-panel (atom nil))
+(defonce viz-modes-atom (reagent/atom "quick viz"))
+(defonce data-layers-open (reagent/atom {}))
+(def render-pop? (reagent/atom {}))
+(def cache-pop? (reagent/atom #{}))
+
+(def panel-code-box-cache (reagent/atom {}))
+(def panel-string-box-cache (reagent/atom {}))
+(def panel-sql-box-cache (reagent/atom {}))
 
 (def honey-comb-cache (atom {}))
 (def clicked-parameter-key-cache (atom {}))
@@ -45,7 +183,7 @@
 (defonce drop-spawn-modal? (reagent/atom false))
 (defonce drop-spawn-package (reagent/atom {}))
 
-(def clover-cache-atom (reagent/atom {}))
+(def clover-cache-atom (atom {}))
 (def rel-kw-cache-atom (atom {}))
 
 (def canvas-scale (reagent/atom 0.7))
@@ -210,135 +348,282 @@
    "list"        "#c32148"
    "vector"      "#008080"})
 
-(def old-theme
-  {:editor-rim-color                      "#41307f"
-   :editor-font-color                     "#ffffff"
-   :editor-background-color               "#000000"
-   :editor-param-background-color         "#0b1122"
-   :editor-grid-font-color                "#ffffff"
-   :editor-grid-selected-background-color "#8879bc" ;"#bc798c"
-   :block-title-font-color                "#ffffff"
-   :block-title-selected-font-color       "#ffffff"
-   :block-tab-selected-font-color         "#FFA50087"
-   :monospaced-font                       "Fira Code"
-   :grid-selected-column-css              {:background-color "#00000088" :filter "brightness(200%)"}
-   :grid-selected-background-color        "#8879bc" ;"#bc798c"
-   :editor-grid-selected-font-color       "#000000"
-   :grid-selected-font-color              "#000000"
-   :grid-font-color                       "#ffffff"
-   :base-block-color                      "#0b1122"
-   :codemirror-theme                      "ayu-mirage"
-   :base-font                             "Alata"
-   :canvas-background-css                 {:background-image  "url(images/fake-brick.png)"
-                                           :background-repeat "repeat"
-                                           :background-color  "#47555e"}
-   :base-block-color-selected             "#0b031b"
-   :editor-outer-rim-color                "#a891ff"
-   :vega-default-color-scheme             {:scheme "magma"}
-   :vega-defaults                         {:view   {:stroke "transparent"}
-                                           :axis   {:domainColor "#ffffff22"
-                                                    :grid        true
-                                                    :labelColor  "#ffffff88"
-                                                    :titleFont   "Lato"
-                                                    :axisFont    "Lato"
-                                                    :font        "Lato"
-                                                    :titleColor  "#ffffff99"
-                                                    :labelFont   "Lato"
-                                                    :domain      false
-                                                    :gridColor   "#ffffff22"
-                                                    :tickColor   "#ffffff22"}
-                                           :legend {:labelFont  "Lato"
-                                                    :legendFont "Lato"
-                                                    :labelColor "#ffffff99"
-                                                    :titleColor "#ffffff99"
-                                                    :stroke     "#ffffff99"
-                                                    :titleFont  "Lato"}
-                                           :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
-                                           :mark   {:font "Lato"}
-                                           :title  {:font         "Lato"
-                                                    :subtitleFont "Lato"
-                                                    :labelFont    "Lato"
-                                                    :titleFont    "Lato"
-                                                    :titleColor   "#ffffff99"}}})
+;; (def old-theme
+;;   {:editor-rim-color                      "#41307f"
+;;    :editor-font-color                     "#ffffff"
+;;    :editor-background-color               "#000000"
+;;    :editor-param-background-color         "#0b1122"
+;;    :editor-grid-font-color                "#ffffff"
+;;    :editor-grid-selected-background-color "#8879bc" ;"#bc798c"
+;;    :block-title-font-color                "#ffffff"
+;;    :block-title-selected-font-color       "#ffffff"
+;;    :block-tab-selected-font-color         "#FFA50087"
+;;    :monospaced-font                       "Fira Code"
+;;    :grid-selected-column-css              {:background-color "#00000088" :filter "brightness(200%)"}
+;;    :grid-selected-background-color        "#8879bc" ;"#bc798c"
+;;    :editor-grid-selected-font-color       "#000000"
+;;    :grid-selected-font-color              "#000000"
+;;    :grid-font-color                       "#ffffff"
+;;    :base-block-color                      "#0b1122"
+;;    :codemirror-theme                      "ayu-mirage"
+;;    :base-font                             "Alata"
+;;    :canvas-background-css                 {:background-image  "url(images/fake-brick.png)"
+;;                                            :background-repeat "repeat"
+;;                                            :background-color  "#47555e"}
+;;    :base-block-color-selected             "#0b031b"
+;;    :editor-outer-rim-color                "#a891ff"
+;;    :vega-default-color-scheme             {:scheme "magma"}
+;;    :vega-defaults                         {:view   {:stroke "transparent"}
+;;                                            :axis   {:domainColor "#ffffff22"
+;;                                                     :grid        true
+;;                                                     :labelColor  "#ffffff88"
+;;                                                     :titleFont   "Lato"
+;;                                                     :axisFont    "Lato"
+;;                                                     :font        "Lato"
+;;                                                     :titleColor  "#ffffff99"
+;;                                                     :labelFont   "Lato"
+;;                                                     :domain      false
+;;                                                     :gridColor   "#ffffff22"
+;;                                                     :tickColor   "#ffffff22"}
+;;                                            :legend {:labelFont  "Lato"
+;;                                                     :legendFont "Lato"
+;;                                                     :labelColor "#ffffff99"
+;;                                                     :titleColor "#ffffff99"
+;;                                                     :stroke     "#ffffff99"
+;;                                                     :titleFont  "Lato"}
+;;                                            :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
+;;                                            :mark   {:font "Lato"}
+;;                                            :title  {:font         "Lato"
+;;                                                     :subtitleFont "Lato"
+;;                                                     :labelFont    "Lato"
+;;                                                     :titleFont    "Lato"
+;;                                                     :titleColor   "#ffffff99"}}})
 
-(def base-theme
-  (merge
-    old-theme ;; temp
-    {:theme-name                            "who ya gonna call?"
-     :codemirror-theme                      "ayu-mirage"
-     :editor-param-background-color         "#0b1122"
-     ;;;:universal-pop-color                   "#9973e0" ;;; NO
-     :vega-defaults                         {:view   {:stroke "transparent"}
-                                             :axis   {:domainColor "#ffffff22"
-                                                      :grid        true
-                                                      :font        "Lato"
-                                                      :labelColor  "#ffffff88"
-                                                      :titleFont   "Lato"
-                                                      :titleColor  "#ffffff99"
-                                                      :labelFont   "Lato"
-                                                      :domain      false
-                                                      :gridColor   "#ffffff22"
-                                                      :tickColor   "#ffffff22"
-                                                      :axisFont    "Lato"}
-                                             :legend {:labelFont  "Lato"
-                                                      :legendFont "Lato"
-                                                      :labelColor "#ffffff99"
-                                                      :titleColor "#ffffff99"
-                                                      :stroke     "#ffffff99"
-                                                      :titleFont  "Lato"}
-                                             :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
-                                             :mark   {:font "Lato"}
-                                             :title  {:font         "Lato"
-                                                      :subtitleFont "Lato"
-                                                      :labelFont    "Lato"
-                                                      :titleFont    "Lato"
-                                                      :titleColor   "#ffffff99"}}
-     :grid-selected-column-css              {:background-color "#00000088" :filter "brightness(200%)"}
-     :base-block-color-selected             "#0b031b"
-     :block-title-font-color                "#ffffff"
-     :base-block-color                      "#0b1122"
-     :editor-rim-color                      "#0b1122"
-     :vega-default-color-scheme             {:scheme "accent"}
-     :editor-grid-selected-font-color       "#ffffff"
-     :monospaced-font                       "IBM Plex Mono"
-     :editor-grid-selected-background-color "#FFA50087"
-     :data-colors                           data-colors
-     :base-block-style                      {}
-     :nivo-defaults                         {:font-family :theme/base-font
-                                             :labels      {:text {:fill        "#ffffff"
-                                                                  :font-size   "16px"
-                                                                  :font-family :theme/base-font
-                                                                  :font-weight 700}}
-                                             :tooltip     {:container {:background   "#000"
-                                                                       :color        "#ffffff"
-                                                                       :text         {:fill "#eeeeee"}
-                                                                       :fontSize     "18px"
-                                                                       :borderRadius "4px"
-                                                                       :boxShadow    "0 1px 2px rgba(0, 0, 0, 0.55)"
-                                                                       :padding      "5px 9px"}
-                                                           :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
-                                                           :tableCell {:padding "3px 5px"}}
-                                             :axis        {:legend {:text {:fill        "#ffffff"
-                                                                           :font-size   "14px"
-                                                                           :font-family :theme/base-font
-                                                                           :font-weight 700}}
-                                                           :ticks  {:line {:stroke "#ffffff60"}
-                                                                    :text {:fill "#ffffff60" :font-weight 700}}}
-                                             :grid        {:line {:stroke "#ffffff" :strokeWidth 0 :strokeDasharray "0 0"}}}
-     :editor-outer-rim-color                "#33ffb7"
-     :grid-selected-font-color              "#ffffff"
-     :block-title-selected-font-color       "#ffffff"
-     :grid-selected-background-color        "#8879bc"
-     :grid-font-color                       "#ffffff"
-     :canvas-background-css                 {:background-image  "url(images/fake-brick5.png)"
-                                             :transition        "all 0.6s ease-in-out"
-                                             :background-color  "#47555e"
-                                             :background-repeat "repeat"}
-     :editor-font-color                     "#ffffff"
-     :base-font                             "Oxygen Mono"
-     :block-tab-selected-font-color         "#FFA500"
-     :editor-background-color               "#000000"
-     :editor-grid-font-color                "#ffffff"}))
+;; (def base-theme22
+;;   (merge
+;;     old-theme ;; temp
+;;     {:theme-name                            "who ya gonna call?"
+;;      :codemirror-theme                      "ayu-mirage"
+;;      :editor-param-background-color         "#0b1122"
+;;      ;;;:universal-pop-color                   "#9973e0" ;;; NO
+;;      :vega-defaults                         {:view   {:stroke "transparent"}
+;;                                              :axis   {:domainColor "#ffffff22"
+;;                                                       :grid        true
+;;                                                       :font        "Lato"
+;;                                                       :labelColor  "#ffffff88"
+;;                                                       :titleFont   "Lato"
+;;                                                       :titleColor  "#ffffff99"
+;;                                                       :labelFont   "Lato"
+;;                                                       :domain      false
+;;                                                       :gridColor   "#ffffff22"
+;;                                                       :tickColor   "#ffffff22"
+;;                                                       :axisFont    "Lato"}
+;;                                              :legend {:labelFont  "Lato"
+;;                                                       :legendFont "Lato"
+;;                                                       :labelColor "#ffffff99"
+;;                                                       :titleColor "#ffffff99"
+;;                                                       :stroke     "#ffffff99"
+;;                                                       :titleFont  "Lato"}
+;;                                              :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
+;;                                              :mark   {:font "Lato"}
+;;                                              :title  {:font         "Lato"
+;;                                                       :subtitleFont "Lato"
+;;                                                       :labelFont    "Lato"
+;;                                                       :titleFont    "Lato"
+;;                                                       :titleColor   "#ffffff99"}}
+;;      :grid-selected-column-css              {:background-color "#00000088" :filter "brightness(200%)"}
+;;      :base-block-color-selected             "#0b031b"
+;;      :block-title-font-color                "#ffffff"
+;;      :base-block-color                      "#0b1122"
+;;      :editor-rim-color                      "#0b1122"
+;;      :vega-default-color-scheme             {:scheme "accent"}
+;;      :editor-grid-selected-font-color       "#ffffff"
+;;      :monospaced-font                       "IBM Plex Mono"
+;;      :editor-grid-selected-background-color "#FFA50087"
+;;      :data-colors                           data-colors
+;;      :base-block-style                      {}
+;;      :nivo-defaults                         {:font-family :theme/base-font
+;;                                              :labels      {:text {:fill        "#ffffff"
+;;                                                                   :font-size   "16px"
+;;                                                                   :font-family :theme/base-font
+;;                                                                   :font-weight 700}}
+;;                                              :tooltip     {:container {:background   "#000"
+;;                                                                        :color        "#ffffff"
+;;                                                                        :text         {:fill "#eeeeee"}
+;;                                                                        :fontSize     "18px"
+;;                                                                        :borderRadius "4px"
+;;                                                                        :boxShadow    "0 1px 2px rgba(0, 0, 0, 0.55)"
+;;                                                                        :padding      "5px 9px"}
+;;                                                            :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+;;                                                            :tableCell {:padding "3px 5px"}}
+;;                                              :axis        {:legend {:text {:fill        "#ffffff"
+;;                                                                            :font-size   "14px"
+;;                                                                            :font-family :theme/base-font
+;;                                                                            :font-weight 700}}
+;;                                                            :ticks  {:line {:stroke "#ffffff60"}
+;;                                                                     :text {:fill "#ffffff60" :font-weight 700}}}
+;;                                              :grid        {:line {:stroke "#ffffff" :strokeWidth 0 :strokeDasharray "0 0"}}}
+;;      :editor-outer-rim-color                "#33ffb7"
+;;      :grid-selected-font-color              "#ffffff"
+;;      :block-title-selected-font-color       "#ffffff"
+;;      :grid-selected-background-color        "#8879bc"
+;;      :grid-font-color                       "#ffffff"
+;;      :canvas-background-css                 {:background-image  "url(images/fake-brick5.png)"
+;;                                              :transition        "all 0.6s ease-in-out"
+;;                                              :background-color  "#47555e"
+;;                                              :background-repeat "repeat"}
+;;      :editor-font-color                     "#ffffff"
+;;      :base-font                             "Oxygen Mono"
+;;      :block-tab-selected-font-color         "#FFA500"
+;;      :editor-background-color               "#000000"
+;;      :editor-grid-font-color                "#ffffff"}))
+
+(def base-theme {:theme-name "simple-pastel-dark",
+                 :line-style "curved-path-h"
+                 :running-gif "images/running.gif"
+                 :codemirror-theme "rvbbit-dynamic",
+                 :editor-param-background-color "#000000",
+                 :pop-2 "#99ccff",
+                 :base-block-style
+                 {:border-radius "3px",
+                  :border "1px solid #1a1a1a",
+                  :background "#0a0a0a",
+                  :letter-spacing "0.01em"},
+                 :vega-defaults
+                 {:mark {:font "Inter", :stroke "#99ccff", :color "#99ccff65"},
+                  :legend
+                  {:labelFont "Inter",
+                   :legendFont "Inter",
+                   :labelColor "#b4b4c8",
+                   :titleColor "#b4b4c8",
+                   :stroke "#99ccff",
+                   :titleFont "Inter"},
+                  :header {:labelFont "Inter", :titleFont "Inter", :titleColor "#b4b4c8"},
+                  :title
+                  {:font "Inter",
+                   :subtitleFont "Inter",
+                   :labelFont "Inter",
+                   :titleFont "Inter",
+                   :titleColor "#b4b4c8"},
+                  :point {:font "Inter", :stroke "#99ccff", :color "#99ccff65"},
+                  :area {:font "Inter", :stroke "#99ccff", :color "#99ccff65"},
+                  :axis
+                  {:domainColor "#202020",
+                   :grid true,
+                   :font "Inter",
+                   :labelColor "#b4b4c8",
+                   :titleFont "Inter",
+                   :titleColor "#b4b4c8",
+                   :labelFont "Inter",
+                   :domain false,
+                   :gridColor "#161616",
+                   :tickColor "#202020",
+                   :axisFont "Inter"},
+                  :tooltip {:fill "#0a0a0a", :stroke "#1a1a1a", :strokeWidth 1, :color "#b4b4c8"},
+                  :view {:stroke "transparent"}},
+                 :grid-selected-column-css
+                 {:background-color "#161616", :box-shadow "inset 0 0 0 1px #99ccff"},
+                 :base-block-color-selected "#0f0f0f",
+                 :block-title-font-color "#b4b4c8",
+                 :base-block-color "#0a0a0a",
+                 :pop-3 "#ffcccc",
+                 :editor-rim-color "#1a2229",
+                 :data-colors
+                 {"float" "#99ccff",
+                  "boolean" "#ffcccc",
+                  "map" "#ccffcc",
+                  "list" "#ffffcc",
+                  "string" "#ffccff",
+                  "any" "#99ccff",
+                  "vector" "#ffcccc",
+                  "keyword" "#ccffcc",
+                  "rabbit-code" "#ffffcc",
+                  "datetime" "#ffccff",
+                  "integer" "#ccffcc",
+                  "unknown" "#99ccff",
+                  "date" "#ffcccc"},
+                 :editor-grid-selected-font-color "#0a0a0a",
+                 :monospaced-font "Fira Code",
+                 :editor-grid-selected-background-color "#99ccff",
+                 :nivo-defaults
+                 {:font-family "Inter",
+                  :labels
+                  {:text
+                   {:fill "#b4b4c8", :font-size "13px", :font-family "Inter", :font-weight 400}},
+                  :tooltip
+                  {:container
+                   {:background "#0a0a0a",
+                    :color "#b4b4c8",
+                    :text {:fill "#b4b4c8"},
+                    :fontSize "13px",
+                    :borderRadius "2px",
+                    :border "1px solid #1a1a1a",
+                    :box-shadow "0 2px 4px rgba(0,0,0,0.2)",
+                    :padding "8px 12px"},
+                   :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+                   :tableCell {:padding "4px 8px"}},
+                  :axis
+                  {:legend
+                   {:text
+                    {:fill "#b4b4c8", :font-size "13px", :font-family "Inter", :font-weight 400}},
+                   :ticks {:line {:stroke "#202020"}, :text {:fill "#b4b4c8", :font-weight 400}}},
+                  :grid {:line {:stroke "#161616", :strokeWidth 1}}},
+                 :editor-outer-rim-color "#99ccff",
+                 :grid-selected-font-color "#0a0a0a",
+                 :block-title-selected-font-color "#0a0a0a",
+                 :grid-selected-background-color "#99ccff",
+                 :grid-font-color "#b4b4c8",
+                 :canvas-background-css {:background-color "#000000"}
+                ;;  :canvas-background-css {:background-color "#00000045"
+                ;;                          :background "url(images/large-rabbit.svg)" },
+                ;;  :canvas-background-css {;:background-color "#00000045"
+                ;;                          :background "url(images/large-rabbit.svg) center center no-repeat"
+                ;;                          :background-size "800px auto"},
+                 :editor-font-color "#b4b4c8",
+                 :base-font "Inter",
+                 :block-tab-selected-font-color "#61a377",
+                 :editor-background-color "#0a0a0a",
+                 :editor-grid-font-color "#b4b4c8",
+                 :pop-1 "#e372f9"})
+
+(def nivo-colors [{:id "nivo" :label "nivo" :group "Categorical colors"}
+                  {:id "category10" :label "category10" :group "Categorical colors"}
+                  {:id "accent" :label "accent" :group "Categorical colors"}
+                  {:id "dark2" :label "dark2" :group "Categorical colors"}
+                  {:id "paired" :label "paired" :group "Categorical colors"}
+                  {:id "pastel1" :label "pastel1" :group "Categorical colors"}
+                  {:id "pastel2" :label "pastel2" :group "Categorical colors"}
+                  {:id "set1" :label "set1" :group "Categorical colors"}
+                  {:id "set2" :label "set2" :group "Categorical colors"}
+                  {:id "set3" :label "set3" :group "Categorical colors"}
+                  {:id "tableau10" :label "tableau10" :group "Categorical colors"}
+                  {:id "brown_blueGreen" :label "brown_blueGreen" :group "Diverging colors"}
+                  {:id "purpleRed_green" :label "purpleRed_green" :group "Diverging colors"}
+                  {:id "pink_yellowGreen" :label "pink_yellowGreen" :group "Diverging colors"}
+                  {:id "purple_orange" :label "purple_orange" :group "Diverging colors"}
+                  {:id "red_blue" :label "red_blue" :group "Diverging colors"}
+                  {:id "red_grey" :label "red_grey" :group "Diverging colors"}
+                  {:id "red_yellow_blue" :label "red_yellow_blue" :group "Diverging colors"}
+                  {:id "red_yellow_green" :label "red_yellow_green" :group "Diverging colors"}
+                  {:id "spectral" :label "spectral" :group "Diverging colors"}
+                  {:id "blues" :label "blues" :group "Sequential colors"}
+                  {:id "greens" :label "greens" :group "Sequential colors"}
+                  {:id "greys" :label "greys" :group "Sequential colors"}
+                  {:id "oranges" :label "oranges" :group "Sequential colors"}
+                  {:id "purples" :label "purples" :group "Sequential colors"}
+                  {:id "reds" :label "reds" :group "Sequential colors"}
+                  {:id "blue_green" :label "blue_green" :group "Sequential colors"}
+                  {:id "blue_purple" :label "blue_purple" :group "Sequential colors"}
+                  {:id "green_blue" :label "green_blue" :group "Sequential colors"}
+                  {:id "orange_red" :label "orange_red" :group "Sequential colors"}
+                  {:id "purple_blue_green" :label "purple_blue_green" :group "Sequential colors"}
+                  {:id "purple_blue" :label "purple_blue" :group "Sequential colors"}
+                  {:id "purple_red" :label "purple_red" :group "Sequential colors"}
+                  {:id "red_purple" :label "red_purple" :group "Sequential colors"}
+                  {:id "yellow_green_blue" :label "yellow_green_blue" :group "Sequential colors"}
+                  {:id "yellow_green" :label "yellow_green" :group "Sequential colors"}
+                  {:id "yellow_orange_brown" :label "yellow_orange_brown" :group "Sequential colors"}
+                  {:id "yellow_orange_red" :label "yellow_orange_red" :group "Sequential colors"}])
 
 (def default-db
   {:reco-preview       nil

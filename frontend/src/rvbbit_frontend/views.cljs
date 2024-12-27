@@ -56,6 +56,7 @@
 (defonce editor-dimensions (reagent/atom {}))
 (defonce editor-size (reagent/atom [33 10]))
 (defonce last-sizes (atom nil))
+(defonce latest-preview-spawn-fns (atom {}))
 
 (defn debounce [f interval] (let [dbnc (Debouncer. f interval)] (fn [& args] (.apply (.-fire dbnc) dbnc (to-array args)))))
 
@@ -601,7 +602,8 @@
                                     :padding-right "14px"
                                     :font-weight   400
                                     :font-size     "22px"} :child (str combo_edn)]
-                                  [bricks/clover panel-key (or selected-view :oz) ww hh]
+                                  ;;[bricks/clover panel-key (or selected-view :oz) ww hh]
+                                  @(re-frame/subscribe [::bricks/clover-cache panel-key (or selected-view :oz) ww hh])
                                   [re-com/box :size "auto" :height "40px" :justify :end :align :end :style
                                    {:padding-left "14px" :padding-right "14px" :font-weight 400 :font-size "22px"} :child
                                    (str shape_name)]]]]
@@ -974,7 +976,8 @@
                                     :padding-right "14px"
                                     :font-weight   400
                                     :font-size     "22px"} :child (str combo_edn)]
-                                  [bricks/clover panel-key (or selected-view :oz) ww hh]
+                                  ;; [bricks/clover panel-key (or selected-view :oz) ww hh]
+                                  @(re-frame/subscribe [::bricks/clover-cache panel-key (or selected-view :oz) ww hh])
                                   [re-com/box :size "auto" :height "40px" :justify :end :align :end :style
                                    {:padding-left "14px" :padding-right "14px" :font-weight 400 :font-size "22px"} :child
                                    (str shape_name)]]]]
@@ -1172,7 +1175,7 @@
         sql-params            (into {}
                                     (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
                                       {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
-                                         @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
+                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
         sql-calls             {:viz-tables-sys  {:select   [:table_name [[:count 1] :recos]]
                                                  :from     [:viz_recos_vw]
                                                  :where    [:and [:not [:like :table_name "query_preview%"]]
@@ -1192,9 +1195,7 @@
                                                             (when (not (nil? (get sql-params :viz-shapes0-sys/shape)))
                                                               [:= :shape_name :viz-shapes0-sys/shape])
                                                             [:= :table_name :viz-tables-sys/table_name]] ;; :viz-tables-sys/table_name-name
-                                                 :group-by [:combo_edn]}} ;;  (ut/tracked-subscribe
-                                                                          ;;  [::conn/clicked-parameter-key
-       ]
+                                                 :group-by [:combo_edn]}}]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
                    ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -1208,8 +1209,7 @@
         [re-com/box :size "auto" :child [bricks/magic-table :viz-shapes0-list* [:viz-shapes0-sys] 7 5 []]]]]
       [re-com/box :size "auto" :child [bricks/magic-table :viz-shapes-list* [:viz-shapes-sys] 7 10 []]]]]))
 
-(defn editor-panel-status
-  []
+(defn editor-panel-status []
   (let [;all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         sql-params  (into {}
                           (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
@@ -1245,7 +1245,7 @@
       [re-com/box :size "auto" :child [bricks/magic-table :files-list* [:files-sys]
                                        single-width-bricks ;11.5
                                        bricks-tall ;10
-                                       [:file_path :ts]]]]]))
+                                       [:file_path :ts :theme_map]]]]]))
 
 (defn editor-panel-metadata-kits
   []
@@ -2774,27 +2774,48 @@
                                         [re-com/gap :size "6px"]]]]]]]))
 
 
+(defn draggable-editor [element block-id data-key-type data-key h w]
+  (let [nname    (str "editor-" (ut/replacer block-id ":" "") "-" (ut/replacer data-key ":" ""))
+        view-key (keyword nname)
+        data {:h         h
+              :w         w
+              :drag-meta {:source-table data-key
+                          :from [block-id data-key-type data-key]
+                          :table-fields [:*]
+                          :connection-id nil
+                          :source-panel-key block-id
+                          :type :draggable-clover}
+              :views     {view-key [:editor [block-id data-key-type
+                                             ;; protect the data key from being resolved to data in clover, editor fn with fix it.
+                                             (keyword (str "_" (-> data-key str (cstr/replace ":" ""))))]]}
+              :name      nname}]
+    [bricks/draggable data "meta-menu" element]))
 
-(defn draggable-editor
-  [element block-id data-key-type data-key h w]
-  [(reagent/adapt-react-class rdnd/Draggable)
-   (let [nname    (str "editor-" (ut/replacer block-id ":" "") "-" (ut/replacer data-key ":" ""))
-         view-key (keyword nname)
-         data {:h         h
-               :w         w
-               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-               :views     {view-key [:editor [block-id data-key-type data-key]]}
-               :name      nname}]
-     {:type          "meta-menu" ;:play-port
-      :on-drag-end   #(do (reset! bricks/dragging? false))
-      :on-drag-start #(do (reset! bricks/dragging? true)
-                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
-                          (reset! bricks/dragging-body data))
-      :data          (pr-str data)})
-   [re-com/box
-    :size "none"
-    :child element
-    :style {:cursor "grab"}]])
+;; (defn draggable-editor-old
+;;   [element block-id data-key-type data-key h w]
+;;   [(reagent/adapt-react-class rdnd/Draggable)
+;;    (let [nname    (str "editor-" (ut/replacer block-id ":" "") "-" (ut/replacer data-key ":" ""))
+;;          view-key (keyword nname)
+;;          data {:h         h
+;;                :w         w
+;;                :drag-meta {:source-table data-key
+;;                            :from [block-id data-key-type data-key]
+;;                            :table-fields [:*]
+;;                            :connection-id nil
+;;                            :source-panel-key block-id
+;;                            :type :editor}
+;;                :views     {view-key [:editor [block-id data-key-type data-key]]}
+;;                :name      nname}]
+;;      {:type          "meta-menu" ;:play-port
+;;       :on-drag-end   #(do (reset! bricks/dragging? false))
+;;       :on-drag-start #(do (reset! bricks/dragging? true)
+;;                           (reset! bricks/dragging-size [(get data :w) (get data :h)])
+;;                           (reset! bricks/dragging-body data))
+;;       :data          (pr-str data)})
+;;    [re-com/box
+;;     :size "none"
+;;     :child element
+;;     :style {:cursor "grab"}]])
 
 (defn image-exists? [url callback]
   (let [img (js/Image.)]
@@ -2844,146 +2865,40 @@
 
 (def rotate-waiter (reagent/atom {}))
 
-(defn shape-rotator-panel-old [panel-key shape-rotator-meta & [hh ww]]
-  (let [{:keys [context shape-name axes items source-panel]} shape-rotator-meta
-        {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
-        react! [@rotate-waiter]
-        single-height (or hh single-height)
-        single-width (or ww single-width)
-        shape-rotations @(ut/tracked-sub ::bricks/shape-rotations {:panel-key panel-key})
-        {:keys [options recos shapes]} shape-rotations
-        recos-map (into {} (for [r recos] {(get-in r [:shape-rotator :axes]) r}))
-        converted-recos-map (into {} (for [[reco-key reco] recos-map] {reco-key (convert-reco-to-insert reco items)}))
-        ;_ (ut/pp [:recos items recos-map])
-        ;_ (ut/pp [:resolved-recos ])
-        _ (ut/pp [:options options])
-        mod-map options ;;(assoc options :*shapes shapes)
-        cols (count (keys mod-map))
-        col-width (Math/floor (/ (- single-width 20) cols))
-        options (into (sorted-map) mod-map)]
-    (when (empty? shape-rotations)
-      (ut/tracked-dispatch [::request-shape-rotation-options context shape-name panel-key source-panel]))
-    [re-com/v-box
-     :align :center :justify :center
-     :padding "10px"
-     ;:size "auto"
-     ;:style {:border "2px solid pink"}
-     :width (px single-width)
-     :children [[re-com/h-box
-                 :align :center
-                 :gap "10px"
-                 :children
-                 [(if (get-in @rotate-waiter [:*shapes shape-name] false)
-                    [re-com/md-icon-button
-                     :md-icon-name "ri-box-3-line"
-                     :class "rotate linear infinite"
-                     :style
-                     {:font-size "14px"
-                      :color "#ffffff"
-                      :transform-origin "7px 11px"}]
-                    [re-com/gap :size "10px"])
-                  [re-com/single-dropdown
-                   :choices (vec (for [s (sort-by str shapes)] {:id s :label (str s)}))
-                   ;:max-height "320px"
-                   :placeholder "(all possible shapes)" :style {:font-size "14px"}
-                   :width "300px"
-                   :model shape-name
-                   :on-change
-                   (fn [f] (let [k :*shapes
-                                 _ (swap! rotate-waiter assoc-in [k f] true)
-                                 _ (js/setTimeout (fn []
-                                                    (let [shape-rotations @(ut/tracked-sub ::bricks/shape-rotations {:panel-key panel-key})
-                                                          {:keys [options recos shapes]} shape-rotations
-                                                          recos-map (into {} (for [r recos] {(get-in r [:shape-rotator :axes]) r}))
-                                                          converted-recos-map (into {} (for [[reco-key reco] recos-map] {reco-key (convert-reco-to-insert reco items)}))
-                                                          _ (ut/pp [:opts (first (keys converted-recos-map))])
-                                                          new-axes (first (keys converted-recos-map))
-                                                          new-map (get converted-recos-map new-axes)
-                                                          assocs-map (into {} (for [kp items] {(into [:panels panel-key] kp) (get-in new-map kp)}))
-                                                          assocs-map (assoc assocs-map [:panels panel-key :shape-rotator :axes] new-axes)
-                                                          assocs-map (assoc assocs-map [:panels panel-key :name] (cstr/join ", " (vals new-axes)))
-                                                          assocs-map (assoc assocs-map [:panels panel-key :shape-rotator :shape-name] f)]
-                                                      (ut/pp [:delayed-assocs-map assocs-map])
-                                                      (ut/tracked-dispatch [::http/assoc-push-undoable assocs-map])
-                                                      (swap! rotate-waiter assoc-in [k f] false))) 2500)]
-                             (ut/tracked-dispatch [::request-shape-rotation-options context f panel-key source-panel])
-                             (ut/tracked-dispatch [::http/assoc-push-undoable {[:panels panel-key :shape-rotator :shape-name] f
-                                                                               [:panels panel-key :shape-rotator :axes] {}}])))]]]
-                [re-com/h-box
-             ;:gap "3px"
-                 :size "auto"
-                 :children (for [[k v] options]
-                             [re-com/v-box
-                              :width (px col-width)
-                              :children
-                              [[re-com/box
-                                :child (str k)
-                                :style {:color "#ffffff" :font-weight 700}]
-                               [re-com/gap :size "5px"]
-                               [re-com/box
-                                :size "none"
-                                :height (px (- single-height 75))
-                                :style {:overflow "auto"}
-                                :child [re-com/v-box
-                                        :size "auto"
-                                        :children
-                                        (for [f v
-                                              :let [selected? (= (get axes k) f)
-                                                    fa (if (= f "rrows") "(row count)" f)]]
-                                          [re-com/box
-                                           :padding "4px"
-                                           :attr (when (not selected?)
-                                                   {:on-click #(let [_ (swap! rotate-waiter assoc-in [k f] true)
-                                                                     _ (js/setTimeout (fn [] (swap! rotate-waiter assoc-in [k f] false)) 2000)
-                                                                     new-axes (assoc axes k f)
-                                                                     _ (ut/pp [:rotating panel-key shape-name :from axes new-axes])
-                                                                     new-map (get converted-recos-map (assoc axes k f))
-                                                                     assocs-map (into {} (for [kp items] {(into [:panels  panel-key]  kp) (get-in new-map kp)}))
-                                                                     assocs-map (assoc assocs-map [:panels panel-key :name] (cstr/join ", " (vals new-axes)))
-                                                                     assocs-map (assoc assocs-map [:panels panel-key :shape-rotator :axes] new-axes)
-                                                                     _ (ut/pp [:ss shape-name assocs-map converted-recos-map])]
-                                                                 (ut/tracked-dispatch [::http/assoc-push-undoable assocs-map]))})
-                                           :style (merge {:border "1px solid #ffffff25"}
-                                                         (if selected? {:color "#ffffff"} {:cursor "pointer"}))
-                                           :height "30px"
-                                           :child (if (get-in @rotate-waiter [k f] false)
-                                                    [re-com/h-box
-                                                     :gap "10px"
-                                                     :height "25px"
-                                                     :align :center
-                                                     :children
-                                                     [[re-com/box :child (str fa)]
-                                                      [re-com/md-icon-button
-                                                       :md-icon-name "ri-box-3-line"
-                                                       :class "rotate linear infinite"
-
-                                                       :style
-                                                       {:font-size "14px"
-                                                        :color "#ffffff"
-                                                        :transform-origin "7px 11px"}]]]
-                                                    [re-com/h-box
-                                                     :gap "10px"
-                                                     :height "25px"
-                                                     :align :center
-                                                     :children
-                                                     [[re-com/box :child (str fa)]
-                                                      [re-com/box :child " "]]])])]]]])]]]))
-
 (defonce shape-rotator-drawers (reagent/atom {}))
 
-(defn shape-rotator-panel [panel-key shape-rotator-meta & [hh ww]]
+(defn recos-to-pkg-map [full-recos]
+  (let [axes-combos (mapv (fn [m] (get-in m [:shape-rotator :axes])) full-recos)
+        axes (keys (first axes-combos))
+        options (into {} (for [a axes] {a (vec (distinct (map a axes-combos)))}))
+        all-shapes (vec (distinct (map (fn [m] (get-in m [:shape-rotator :shape-name])) full-recos)))]
+    {:options options
+     :recos full-recos
+     :shapes all-shapes}))
+
+;; @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
+
+(defn shape-rotator-panel [panel-key shape-rotator-meta filtered-shapes source-panel0 & [hh ww]]
   (let [{:keys [context shape-name axes items source-panel]} shape-rotator-meta
         {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         react! [@rotate-waiter @shape-rotator-drawers]
         single-height (or hh single-height)
         single-width (or ww single-width)
         shape-rotations @(ut/tracked-sub ::bricks/shape-rotations {:panel-key panel-key})
+        ;; _ (ut/pp [:rotate (str [panel-key source-panel source-panel0]) field shape-rotations])
+        ;; shape-rotations0 (if field (recos-to-pkg-map
+        ;;                            (filterv #(contains? (ut/deep-flatten %) field) (get shape-rotations :recos)))
+        ;;                     shape-rotations)
+        ;; _ (ut/pp [:rotate-post (str [panel-key source-panel source-panel0]) field shape-rotations0 ])
+        ;; filter by field TODO for modal usage
         {:keys [options recos shapes]} shape-rotations
+        shapes (or filtered-shapes shapes)
+        ;;_ (ut/pp [:shape-rotations shape-rotations])
         recos-map (into {} (for [r recos] {(get-in r [:shape-rotator :axes]) r}))
         converted-recos-map (into {} (for [[reco-key reco] recos-map] {reco-key (convert-reco-to-insert reco items)}))
         ;_ (ut/pp [:recos items recos-map])
         ;_ (ut/pp [:resolved-recos ])
-        _ (ut/pp [:options options])
+       ;; _ (ut/pp [:options options])
         mod-map (assoc options :*shapes (sort-by str shapes))
         cols (count (keys mod-map))
         col-width (Math/floor (/ (- single-width 20) cols))
@@ -3003,7 +2918,23 @@
      :size "none"
      :style {:overflow "auto"}
      :child
-     [re-com/v-box
+     (if (empty? shape-rotations)
+       [re-com/box
+        :size "auto"
+        :align :center :justify :center
+        :child [re-com/md-icon-button
+        :md-icon-name "zmdi-refresh"
+        :class "rotate linear infinite"
+        :style {:font-size "60px" ;; "22px" ;; "15px"
+                :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
+                ;:width "48px" :height "48px"
+                :transform-origin "30px 29px" ;; "11px 11px" ;; "7.5px 11px"
+                                        ; :padding "1px"
+                                        ; :margin-left "4px"
+                                        ; :margin-right "4px"
+                ;:margin-top "-3px"
+                }]]
+      [re-com/v-box
       :size "auto"
       :gap "6px"
       :children
@@ -3121,7 +3052,7 @@
                           [[re-com/box :child (str fa)
                                                                                                   ;:style {:margin-top "2px"}
                             ]
-                           [re-com/box :child " "]]])])])]])]]))
+                           [re-com/box :child " "]]])])])]])])]))
 
 (defn editor-panel
   [bricks-wide bricks-tall]
@@ -3370,28 +3301,39 @@
 
                            (let [style-map {:font-size "17px"
                                             :margin-top "-2px"
-                                            :opacity 0.88}]
+                                            :opacity 0.88}
+                                 tooltip-fn (fn [tooltip]
+                                              {:on-mouse-enter (fn []
+                                                                 (reset! db/bar-hover-text tooltip))
+                                               :on-mouse-over #(when (not= @db/bar-hover-text tooltip)
+                                                                 (reset! db/bar-hover-text tooltip))
+                                               :on-mouse-leave (fn []
+                                                                 (reset! db/bar-hover-text nil))})]
                              [re-com/h-box
                               :gap "2px"
                               :children [(if selected-block?
                                            [draggable-editor
                                             [re-com/md-icon-button
-                                             :md-icon-name "zmdi-n-1-square"
+                                             :md-icon-name "ri-code-block"
+                                             :attr (tooltip-fn "Drag code editor to the canvas")
                                              :style (merge style-map {:cursor "grab"})]
                                             selected-block data-key-type data-key
                                             (Math/floor single-height-bricks)
-                                            (Math/floor single-width-bricks)
-                                            ]
+                                            (Math/floor single-width-bricks)]
                                            [re-com/md-icon-button
-                                            :md-icon-name "zmdi-n-1-square"
+                                            :md-icon-name "ri-code-block"
                                             :style style-map])
                                          [re-com/md-icon-button
-                                          :attr {:on-click #(reset! hide-panel-2? (not @hide-panel-2?))}
-                                          :md-icon-name (if @hide-panel-2?   "zmdi-square-o" "zmdi-n-2-square")
+                                          :attr (merge
+                                                 (tooltip-fn "Show / hide the center editor panel")
+                                                 {:on-click #(reset! hide-panel-2? (not @hide-panel-2?))})
+                                          :md-icon-name (if @hide-panel-2?   "zmdi-square-o" "ri-kanban-view")
                                           :style style-map]
                                          [re-com/md-icon-button
-                                          :attr {:on-click #(reset! hide-panel-3? (not @hide-panel-3?))}
-                                          :md-icon-name (if @hide-panel-3?   "zmdi-square-o" "zmdi-n-3-square")
+                                          :attr (merge
+                                                 (tooltip-fn "Show / hide the right-side editor panel")
+                                                 {:on-click #(reset! hide-panel-3? (not @hide-panel-3?))})
+                                          :md-icon-name (if @hide-panel-3?   "zmdi-square-o" "ri-list-view")
                                           :style style-map]]])]]]]
              :style {:font-weight   500
                      :color         (theme-pull :theme/editor-font-color nil)
@@ -3647,7 +3589,12 @@
                                                                                      selected-view-type @(ut/tracked-sub ::bricks/view-type
                                                                                                                          {:panel-key selected-block
                                                                                                                           :view (get @db/data-browser-query selected-block)})
+                                                                                     xtdb? (cstr/includes? (cstr/lower-case (str @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key data-key]))) "xtdb")
                                                                                      all-block? (= (get @db/data-browser-query selected-block) :*)
+                                                                                     is-raw-sql?           @(ut/tracked-sub ::bricks/is-raw-sql?
+                                                                                                                            {:panel-key selected-block :data-key data-key})
+                                                                                     honeycomb-builder? (if (or xtdb? is-raw-sql?) false
+                                                                                                            (get-in @db/honeycomb-builder [selected-block data-key] true))
                                                                                      ;;;;selected-kp @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
                                                                                      selected-kp (if (nil? (first s-kp))
                                                                                                    nil
@@ -3659,7 +3606,7 @@
                                                                                  (cond
 
                                                                                    (and (= selected-view-type :queries) (not all-block?)
-                                                                                        (get-in @db/honeycomb-builder [selected-block data-key] true))
+                                                                                        honeycomb-builder?)
                                                                                    ;[re-com/box :child (str "editor!" selected-block " " data-key)]
 
                                                                                    [bricks/reecatch
@@ -3677,7 +3624,7 @@
                                                                                    [re-com/box :size "none"
                                                                                     :width (px single-width)
                                                                                     :height (px (- single-height 40))
-                                                                                    :child [shape-rotator-panel selected-block shape-rotator-meta]]
+                                                                                    :child [shape-rotator-panel selected-block shape-rotator-meta nil nil]]
 
 
 
@@ -3694,26 +3641,76 @@
                                                                                      data-key nil {:fm true}] :style {:overflow "auto"}]
 
                                                                                    :else (let [repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
-
+                                                                                               is-raw-sql?  @(ut/tracked-sub ::bricks/is-raw-sql?
+                                                                                                                             {:panel-key selected-block
+                                                                                                                              :data-key data-key})
                                                                                                syntax (if all-block? "clojure"
                                                                                                           (get-in block-runners-map [selected-view-type :syntax]))]
-                                                                           ;;(ut/tapp>> [selected-view-type repl? syntax])
-                                                                                           (if (or (nil? syntax) (= syntax "clojure"))
-                                                                                             (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])
-                                                                                                   react! [@db/data-browser-query @db/value-spy]
-                                                                                                   spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
-                                                                                               ^{:key (str "cm-" selected-block s-kp spy-hash   ;; important!
-                                                                                                           (get-in @db/value-spy [selected-block data-key]))}
-                                                                                               [re-com/h-box
-                                                                                                :children [;;  [bricks/reecatch
+
+                                                                                           ;;(ut/pp [:actung! selected-block data-key selected-view-type is-raw-sql? repl? syntax])
+
+                                                                                           (cond (and (or (nil? syntax) (= syntax "clojure"))
+                                                                                                      (not is-raw-sql?))
+                                                                                                 (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])
+                                                                                                       react! [@db/data-browser-query @db/value-spy]
+                                                                                                       spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
+                                                                                                   ^{:key (str "cm-" selected-block s-kp spy-hash   ;; important!
+                                                                                                               (get-in @db/value-spy [selected-block data-key]))}
+                                                                                                   [re-com/h-box
+                                                                                                    :children [;;  [bricks/reecatch
                                                                                                           ;;   [flows/alert-box selected-block data-key]]
-                                                                                                           [bricks/panel-code-box
-                                                                                                            (fn [] selected-block) ;; sneaky sneaky, react.... :/
-                                                                                                            (fn [] s-kp)
-                                                                                                            (+ 17 single-width) (- single-height 20)
-                                                                                                            (if (nil? selected-kp)
-                                                                                                              selected-panel-map
-                                                                                                              (get-in selected-panel-map selected-kp)) repl? true nil]]])
+                                                                                                          ;;  [bricks/panel-code-box
+                                                                                                          ;;   (fn [] selected-block)
+                                                                                                          ;;   (fn [] s-kp)
+                                                                                                          ;;   (+ 17 single-width) (- single-height 20)
+                                                                                                          ;;   (if (nil? selected-kp)
+                                                                                                          ;;     selected-panel-map
+                                                                                                          ;;     (get-in selected-panel-map selected-kp)) repl? true nil]
+                                                                                                               @(re-frame/subscribe
+                                                                                                                 [::bricks/panel-code-box
+                                                                                                                  (fn [] selected-block)
+                                                                                                                  (fn [] s-kp)
+                                                                                                                  (+ 17 single-width) (- single-height 20)
+                                                                                                                  (if (nil? selected-kp)
+                                                                                                                    selected-panel-map
+                                                                                                                    (get-in selected-panel-map selected-kp)) repl? true nil])]])
+
+                                                                                                 is-raw-sql?
+                                                                                                 (let [react! [@db/data-browser-query @db/value-spy]
+                                                                                                       spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")
+                                                                                                       sql-string (get-in selected-panel-map (into selected-kp [:from 0 0 1 0]))
+                                                                                                       sql-string (cstr/trim sql-string)
+                                                                                                       sql-string (if (and (cstr/ends-with? sql-string "rawsub")
+                                                                                                                           (cstr/starts-with? sql-string "("))
+                                                                                                                    (-> sql-string
+                                                                                                                        (subs 1 (- (count sql-string) 7))
+                                                                                                                        (cstr/trim)
+                                                                                                                        (subs 0 (- (count sql-string) 9)))
+                                                                                                                    sql-string)
+                                                                                                       _ (ut/pp [:sql-string? sql-string])]
+
+                                                                                                   ^{:key (str "cm-sql-string-" selected-block s-kp spy-hash   ;; important!
+                                                                                                               (get-in @db/value-spy [selected-block data-key]))}
+                                                                                                   [re-com/h-box
+                                                                                                    :children [;;  [bricks/reecatch
+                                                                                                                                                                                                           ;;   [flows/alert-box selected-block data-key]]
+                                                                                                              ;;  [bricks/panel-string-sql-box
+                                                                                                              ;;   (fn [] selected-block)
+                                                                                                              ;;   (fn [] s-kp)
+                                                                                                              ;;   (+ 17 single-width)  (- single-height 20)
+                                                                                                              ;;   sql-string
+                                                                                                              ;;   syntax
+                                                                                                              ;;   repl? true nil]
+                                                                                                               @(re-frame/subscribe
+                                                                                                                [::bricks/panel-string-sql-box
+                                                                                                                 (fn [] selected-block)
+                                                                                                                 (fn [] s-kp)
+                                                                                                                 (+ 17 single-width)  (- single-height 20)
+                                                                                                                 sql-string
+                                                                                                                 syntax
+                                                                                                                 repl? true nil])
+                                                                                                               ]])
+
 
                                                                                             ;;  [bricks/panel-string-box
                                                                                             ;;   selected-kp (+ 17 single-width) (- single-height 20)
@@ -3722,23 +3719,23 @@
                                                                                             ;;     (get-in selected-panel-map selected-kp))
                                                                                             ;;   syntax]
 
-                                                                                             (let [react! [@db/data-browser-query @db/value-spy]
-                                                                                                   spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
+                                                                                                 :else (let [react! [@db/data-browser-query @db/value-spy]
+                                                                                                             spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
 
-                                                                                               ^{:key (str "cm-string-" selected-block s-kp spy-hash   ;; important!
-                                                                                                           (get-in @db/value-spy [selected-block data-key]))}
-                                                                                               [re-com/h-box
-                                                                                                :children [;;  [bricks/reecatch
+                                                                                                         ^{:key (str "cm-string-" selected-block s-kp spy-hash   ;; important!
+                                                                                                                     (get-in @db/value-spy [selected-block data-key]))}
+                                                                                                         [re-com/h-box
+                                                                                                          :children [;;  [bricks/reecatch
                                                                                                           ;;   [flows/alert-box selected-block data-key]]
-                                                                                                           [bricks/panel-string-box
-                                                                                                            (fn [] selected-block)
-                                                                                                            (fn [] s-kp)
-                                                                                                            (+ 17 single-width)  (- single-height 20)
-                                                                                                            (if (nil? selected-kp)
-                                                                                                              selected-panel-map
-                                                                                                              (get-in selected-panel-map selected-kp))
-                                                                                                            syntax
-                                                                                                            repl? true nil]]]))))))]
+                                                                                                                     [bricks/panel-string-box
+                                                                                                                      (fn [] selected-block)
+                                                                                                                      (fn [] s-kp)
+                                                                                                                      (+ 17 single-width)  (- single-height 20)
+                                                                                                                      (if (nil? selected-kp)
+                                                                                                                        selected-panel-map
+                                                                                                                        (get-in selected-panel-map selected-kp))
+                                                                                                                      syntax
+                                                                                                                      repl? true nil]]]))))))]
             (when (and system-panel? (= @db/editor-mode :status))
               [re-com/box :child (str websocket-status) :style
                {:color        (str (theme-pull :theme/editor-font-color nil) 77) ;; "#ffffff44"
@@ -4109,14 +4106,20 @@
                                          :style {:transform "translate(0)"}
                                          :height (px (- single-height 100))
                                          :width (px single-width)
-                                         :child [bricks/clover selected-block ssp single-width-bricks (dec single-height-bricks)]])
+                                         :child
+                                         ;;[bricks/clover selected-block ssp single-width-bricks (dec single-height-bricks)]
+                                         @(re-frame/subscribe [::bricks/clover-cache selected-block ssp single-width-bricks (dec single-height-bricks)])
+                                         ])
 
                                       :else      (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions] ;; force reaction
                                                    [re-com/box :size "none"
                                                     :style {:transform "translate(0)"}
                                                     :height (px (- single-height 100))
                                                     :width (px single-width)
-                                                    :child [bricks/clover selected-block data-key  single-width-bricks (dec single-height-bricks)]]))
+                                                    :child
+                                                    ;;[bricks/clover selected-block data-key  single-width-bricks (dec single-height-bricks)]
+                                                    @(re-frame/subscribe [::bricks/clover-cache selected-block data-key  single-width-bricks (dec single-height-bricks)])
+                                                    ]))
                                 (if viz-gen? ;; dont show scrubber boolean if on viz-gen mode
                                   [re-com/box :style {:font-size "10px" :margin-left "8px"} :child
                                    (str "('viz-gen' debug - "
@@ -4129,8 +4132,11 @@
                                         " combo-hash: "
                                         (get (first mad-libs-combos) :combo_hash)
                                         ")")]
-                                  (let [view-scrubbers?       (get-in @db/scrubbers [selected-block data-key] false)
-                                        honeycomb-builder?    (get-in @db/honeycomb-builder [selected-block data-key] true)
+                                  (let [is-raw-sql?           @(ut/tracked-sub ::bricks/is-raw-sql? {:panel-key selected-block :data-key data-key})
+                                        view-scrubbers?       (get-in @db/scrubbers [selected-block data-key] false)
+                                        xtdb? (cstr/includes? (cstr/lower-case (str @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key data-key]))) "xtdb")
+                                        honeycomb-builder?    (if (or xtdb? is-raw-sql?) false
+                                                                (get-in @db/honeycomb-builder [selected-block data-key] true))
                                         value-spy?            (get-in @db/value-spy [selected-block data-key] false)
                                         shape-rotator?        (get-in @db/shape-rotator [selected-block data-key] false)
                                         ;solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
@@ -4160,32 +4166,33 @@
                                      :children [[re-com/h-box :gap "10px" :children
                                                  [
 
-                                                  (if (not= selected-view-type :queries)
-                                                    [re-com/box
-                                                     :size "none"
-                                                     :width "90px"
-                                                     :child (if view-scrubbers? "scrubber on" "scrubber off")  :align :center :justify :center
-                                                     :attr {:on-click #(swap! db/scrubbers assoc-in [selected-block data-key] (not view-scrubbers?))}
-                                                     :style {:color       (if view-scrubbers? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc")
-                                                             :z-index     100
-                                                             :user-select "none"
-                                                             :border-radius "3px"
-                                                             :border (str "1px solid " (if view-scrubbers? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc") 45)
-                                                             :margin-top  (if query-box? "9px" "inherit")
-                                                             :cursor      "pointer"}]
+                                                  (when (and (not is-raw-sql?) (not xtdb?))
+                                                    (if (not= selected-view-type :queries)
+                                                      [re-com/box
+                                                       :size "none"
+                                                       :width "90px"
+                                                       :child (if view-scrubbers? "scrubber on" "scrubber off")  :align :center :justify :center
+                                                       :attr {:on-click #(swap! db/scrubbers assoc-in [selected-block data-key] (not view-scrubbers?))}
+                                                       :style {:color       (if view-scrubbers? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "#cccccc")
+                                                               :z-index     100
+                                                               :user-select "none"
+                                                               :border-radius "3px"
+                                                               :border (str "1px solid " (if view-scrubbers? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "#cccccc") 45)
+                                                               :margin-top  (if query-box? "9px" "inherit")
+                                                               :cursor      "pointer"}]
 
-                                                    [re-com/box
-                                                     :size "none"
-                                                     :width "90px"
-                                                     :child (if honeycomb-builder? "honeycomb on" "honeycomb off") :align :center :justify :center
-                                                     :attr {:on-click #(swap! db/honeycomb-builder assoc-in [selected-block data-key] (not honeycomb-builder?))}
-                                                     :style {:color       (if honeycomb-builder? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc")
-                                                             :z-index     100
-                                                             :user-select "none"
-                                                             :border-radius "3px"
-                                                             :border (str "1px solid " (if honeycomb-builder? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))"#cccccc") 45)
-                                                             :margin-top  (if query-box? "9px" "inherit")
-                                                             :cursor      "pointer"}])
+                                                      [re-com/box
+                                                       :size "none"
+                                                       :width "90px"
+                                                       :child (if honeycomb-builder? "honeycomb on" "honeycomb off") :align :center :justify :center
+                                                       :attr {:on-click #(swap! db/honeycomb-builder assoc-in [selected-block data-key] (not honeycomb-builder?))}
+                                                       :style {:color       (if honeycomb-builder? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "#cccccc")
+                                                               :z-index     100
+                                                               :user-select "none"
+                                                               :border-radius "3px"
+                                                               :border (str "1px solid " (if honeycomb-builder? (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)) "#cccccc") 45)
+                                                               :margin-top  (if query-box? "9px" "inherit")
+                                                               :cursor      "pointer"}]))
 
                                                   [re-com/box :size "none" :width "90px" :child "value spy" :align :center :justify :center
                                                    :attr {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))}
@@ -4340,7 +4347,9 @@
                                    :transform  "translate(0)" ;; a known CSS hack for fixed position in non fixed
                                    :overflow   "auto"} :children
                                   [;[re-com/box :child (str reco-selected)]
-                                   [bricks/clover :reco-preview :oz]]]]]
+                                  ;;  [bricks/clover :reco-preview :oz]
+                                   @(re-frame/subscribe [::bricks/clover-cache :reco-preview :oz])
+                                   ]]]]
 
                                (= @db/editor-mode :realms)
                                [re-com/box :child "realms" :size "auto" :align :center :justify :center ]
@@ -4916,15 +4925,17 @@
 
 
 (defn render-icon
-  [icon & [px-size margin-top]]
+  [icon & [px-size margin-top color]]
   (if (and (ut/ne? icon) (not (nil? icon)))
     (if (or (cstr/starts-with? icon "zmdi-")
             (cstr/starts-with? icon "ri-"))
       [re-com/md-icon-button :src (at)
        :md-icon-name icon
-       :style {;:color bcolor :cursor "grab"
-               :margin-top (or margin-top  "inherit")
-               :font-size (or px-size "15px")} :attr {}]
+       :style (merge
+               {:margin-top (or margin-top  "inherit")
+                :font-size (or px-size "15px")}
+               (when color {:color color}))
+       :attr {}]
       [re-com/box :size "none" :height "24px" :child [:img {:src icon :width "100%"}]])
     " "))
 
@@ -5075,6 +5086,143 @@
     (catch :default e
       (do (ut/tapp>> [:TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)])
           (js/console.log (str :TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)))))))
+
+(def canvas-bar-waiting? (reagent/atom nil))
+(def canvas-bar-hover? (reagent/atom nil))
+
+(defn canvas-render-icon [i color]
+  ;;(ut/pp [:color color])
+  (let [fake-rect [@canvas-bar-hover?]]
+    (if (vector? i) [re-com/h-box
+                     :height "25px"
+                     :gap "3px"
+                     :children (map hop-render-icon i)]
+        (cond
+
+          (and (string? i) (cstr/includes? i ".svg"))
+          [:img {:src i
+                 :width "20px"
+                 :height "20px"
+                 :style {:filter (bricks/hex-to-filter (or color "#444444"))}}]
+
+          (and (string? i) (cstr/includes? i "."))
+          [:img {:src i :width "25px" :height "25px"}]
+
+          (and (string? i)
+               (or
+                (cstr/starts-with? i "ri-")
+                (cstr/starts-with? i "zmdi-")))
+
+          [render-icon i "18px" "0px" color]
+
+          (string? i) [re-com/box
+                       :child i
+                       :width "25px"
+                       :height "25px"
+                       :style {:color (or color "inherit")}
+                       :size "auto"
+                       :align :center
+                       :justify :center]))))
+
+(defn canvas-bar []
+  (try
+    (let [client-name-str (cstr/replace (str db/client-name) ":" "")
+          base-cat :fresh
+          leaves @(ut/tracked-sub ::bricks/get-leaf-actions-for {:leaf-kp [:canvas :canvas :canvas] :dragged-kp @db/dragged-kp})
+          leaves-map (into {} (for [[k v] (group-by first leaves)
+                                    :let [v (if (keyword? v) [v] v)]]
+                                {k (vec (for [vv v] (last vv)))}))
+          react! [@canvas-bar-waiting? @canvas-bar-hover?]
+          leaves-map (if (empty? (dissoc leaves-map :none))
+                       leaves-map
+                       (dissoc leaves-map :none)) ;; remove :none placeholder if all leaves are false
+          leaves-meta @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (str "leaf/" client-name-str ">metadata"))]})
+          leaves-vec (get leaves-map base-cat [])
+          leaves-meta (get-in leaves-meta [:action-labels base-cat])
+          combo-vec (mapv (fn [v] [v (get-in leaves-meta [v :icon] "zmdi-pizza")]) leaves-vec)
+          strjoin (fn [s] (if (vector? s) (cstr/join " " s) (str s)))]
+
+      ;; (ut/pp [::canvas-bar leaves-vec leaves-map leaves-meta combo-vec])
+
+      (when (ut/not-empty? leaves-vec)
+        [re-com/v-box
+         :style {:position "fixed"
+                 :top "50%"
+                 :right 0
+                 :z-index 999
+                 :transform "translateY(-50%)"}
+         :children
+         (for [cv (range (count combo-vec))
+               :let [ii (get combo-vec cv)
+                     ffirst? (= ii (first combo-vec))
+                     llast? (= ii (last combo-vec))
+                     [name icon] ii
+                     leaf-drop [base-cat name]
+                     tooltip (get-in leaves-meta [name :tooltip]
+                                     (str "Drop new " (strjoin (get-in leaves-meta [name :label] leaf-drop))))
+                     waiting? (= @canvas-bar-waiting? leaf-drop)
+                     hover? (= @canvas-bar-hover? leaf-drop)
+                     tooltip (strjoin tooltip)
+                     [x y] (or (ut/find-safe-position 5 7) [5 5])]
+               :when (contains? (set (keys @latest-preview-spawn-fns)) leaf-drop)]
+           [re-com/h-box
+            :align :center :justify :center
+            :height "30px"
+            :padding "4px"
+            :gap "6px"
+
+            ;; :attr
+            ;; {:on-click #(if sys-panel?
+            ;;               (ut/tracked-dispatch [::toggle-sys-panel e])
+            ;;               (ut/tracked-dispatch [::bricks/toggle-minimize-block e]))}
+            :attr
+            {:on-click (fn []
+                         (reset! canvas-bar-waiting? leaf-drop)
+                         (js/setTimeout #(reset! canvas-bar-waiting? nil) 4500)
+                         (reset! db/context-modal-pos [(* x db/brick-size) (* y db/brick-size)])
+                         ((get @latest-preview-spawn-fns leaf-drop)))
+             :on-mouse-enter (fn []
+                               (reset! db/bar-hover-text tooltip)
+                               (reset! canvas-bar-hover? leaf-drop))
+             :on-mouse-over (fn []
+                              (when (not= @db/bar-hover-text tooltip)
+                                (reset! db/bar-hover-text tooltip)
+                                (reset! canvas-bar-hover? leaf-drop)))
+             :on-mouse-leave (fn []
+                               (reset! db/bar-hover-text nil)
+                               (reset! canvas-bar-hover? nil))}
+            ;:class (when waiting? "rotate linear infinite")
+            :style
+            {:background-color "#00000099"
+             :border-radius (cond hover? "8px"
+                                  ffirst? "6px 0px 0px 0px"
+                                  llast? "0px 0px 0px 6px"
+                                  :else "0px")
+             ;:padding-left     "7px"
+             ;:border           (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil))
+             ;:padding-right    "18px"
+             :transform        (when hover? "scale(1.4)")
+             :cursor           "pointer"
+             :color            (when hover? (theme-pull :theme/editor-outer-rim-color nil))
+             :backdrop-filter  "blur(2px)"}
+            :children [;[re-com/box :child (str (true? (get @canvas-bar-waiting? leaf-drop)))]
+                       (if waiting?
+                         [re-com/md-icon-button
+                          :md-icon-name "zmdi-refresh"
+                          :class "rotate linear infinite"
+                          :style {:font-size "22px" ;; "15px"
+                                  :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
+                                  :transform-origin "11px 11px" ;; "7.5px 11px"
+                                 ; :padding "1px"
+                                 ; :margin-left "4px"
+                                 ; :margin-right "4px"
+                                  :margin-top "-3px"}]
+                         [canvas-render-icon icon (when hover? (theme-pull :theme/editor-outer-rim-color nil))])]])]))
+    (catch :default e
+      (do (ut/tapp>> [:CANVAS-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)])
+          (js/console.log (str :CANVAS-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)))))))
+
+
 
 (re-frame/reg-event-db ::set-session-loading (fn [db [_ session]] (assoc db :loading-session session)))
 
@@ -5660,6 +5808,162 @@
                                                                            :on-mouse-out #(reset! hover-text nil)}
                                                                     :child "🇺🇸🐊"]]]]]]]]]]))})))
 
+;; (re-frame/reg-sub ::loading-screen (fn [db _] (get-in db [:server :settings :default])))
+
+(def boom! (reagent/atom nil))
+(def preset! (reagent/atom nil))
+
+(defn loading-modal []
+  (let [;flipped (reagent/atom false)
+        msgs (atom (set (shuffle db/messages)))
+        react! [@hover-text @db/loading-message]
+        ;; _ (doseq [e (range 10)]
+        ;;     (js/setTimeout
+        ;;      #(do (reset! db/loading-message [(let [rr (rand-nth (vec @msgs))]
+        ;;                                         (swap! msgs disj rr)
+        ;;                                         rr)])
+        ;;           (when (= e 9)
+        ;;             (reset! db/loading-message [:rabbit-is-ready])
+        ;;             (js/setTimeout (fn [] (reset! preset! true)) 1500)
+        ;;             (js/setTimeout (fn [] (reset! boom! true)) 3500)
+        ;;             (js/setTimeout (fn [] (reset! db/loaded-screen? true)) 4000)))
+        ;;      (* e 1300)))
+        ;;loading-screen @(ut/tracked-sub ::loading-screen {})
+
+        ;; _ (do
+        ;;     (js/setTimeout (fn [] (reset! db/final-loading-message [:rabbit-is-ready...])) 15500)
+        ;;     (js/setTimeout (fn [] (reset! preset! true)) 16500)
+        ;;     (js/setTimeout (fn [] (reset! boom! true)) 18500)
+        ;;     (js/setTimeout (fn [] (reset! db/loaded-screen? true)) 19000))
+        ]
+
+
+
+    (reagent/create-class
+     {;:component-did-mount
+      ;(fn [this]
+      ;  (when false
+      ;    (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/karl_casey_white_bat_xxx_vortex.mp3" true])))
+      :reagent-render
+      (fn []
+        (let [hh @(ut/tracked-subscribe [::subs/h])
+              ww @(ut/tracked-subscribe [::subs/w])
+              w (* ww 0.45)
+              h (* hh 0.45)
+              react! [@hover-text @db/loading-message @db/final-loading-message @db/audio-data2 @db/audio-data]
+              audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
+              ;client-name db/client-name
+              cc (theme-pull :theme/editor-outer-rim-color "#fc0fc0")
+              mfont (theme-pull :theme/monospaced-font "Fira Code")
+              _     (when (and (not @db/post-boot?)
+                               (cstr/includes? (str @db/loading-message) ":panels-out-of-sync-with-server"))
+                      (js/setTimeout (fn [] (reset! db/final-loading-message [:rabbit-is-ready...])) 2500)
+                      (js/setTimeout (fn [] (reset! preset! true)) 3500)
+                      (js/setTimeout (fn [] (reset! boom! true)) 5500)
+                      (js/setTimeout (fn [] (reset! db/loaded-screen? true)) 6000)
+                      (js/setTimeout (fn [] (reset! db/post-boot? true)) 6500)
+                      (js/setTimeout (fn []
+                                       (reset! preset! false)
+                                       (reset! boom! false)) 8500)
+                      )
+              left (- (/ ww 2) (/ w 2))
+              top (- (/ hh 2) (/ h 2))]
+          [re-com/modal-panel
+           :style {:z-index 99999 :padding "0px"}
+           :src (at)
+           :wrap-nicely? false
+           :parts {:child-container
+                   {:style {:left left
+                            :background-image (when (not @boom!)
+                                                (str "linear-gradient(" (str cc "02") ", " (str cc "22") ")"))
+                            :transition "all 0.6s ease-in-out"
+                            :border-radius "20px"
+                            :width w
+                            :height h
+                            :top top
+                            :font-size "8px"
+                            :position "fixed"
+                            ;:border "1px solid white"
+                            :background-blend-mode "multiply"
+                            ;; :box-shadow (let [block-id :audio
+                            ;;                   talking-block? true]
+                            ;;               (when (and audio-playing? talking-block?)
+                            ;;                 (ut/pp [:audio (get @db/audio-data block-id 0) (get @db/audio-data2 block-id 0) ])
+                            ;;                 (str "1px 1px "
+                            ;;                      ;(px (Math/floor (get @db/audio-data2 block-id 0))) " " (px (inc (Math/ceil (get @db/audio-data block-id 0)))) " "
+                            ;;                      (px (* 1 (get @db/audio-data2 block-id)))
+                            ;;                      (str " " cc))))
+                            ;; :box-shadow (let [block-id :audio
+                            ;;                   talking-block? true
+                            ;;                   peak-value (get @db/audio-data2 block-id 0)
+                            ;;                   rms-value (get @db/audio-data block-id 0)
+                            ;;                   shadow-size (* 2 (+ 5 peak-value (* 0.5 rms-value)))]
+                            ;;               (when (and audio-playing? talking-block?)
+                            ;;                 (str "1px 1px " (px shadow-size) " " cc)))
+                            :box-shadow (let [block-id :audio
+                                              talking-block? true
+                                              peak-value (get @db/audio-data2 block-id 0)
+                                              rms-value (get @db/audio-data block-id 0)
+                                              shadow-size (* 80 (+ 0.2 peak-value (* 0.5 rms-value)))]
+                                          (when (and audio-playing? talking-block?)
+                                            (str (px (* rms-value 3.2)) " 1px " (px shadow-size) " " cc)))
+                            :border (when (not @boom!) (str "5px solid " cc))
+                            :backdrop-filter  "blur(4px)"}}}
+           :backdrop-opacity 0.77
+           :backdrop-on-click #(do
+                                 (reset! preset! false)
+                                 (reset! boom! false)
+                                 (reset! db/loaded-screen? true)
+                                 (reset! db/post-boot? true))
+           :child  [re-com/v-box
+                    :size "auto" :width (px w) :height (px h)
+                    :align :center :justify :center
+                    :gap "5px"
+                    :class (when @boom! "zoom-and-fade")
+                    :style {:color "#ffffff" }
+                    :children [
+                               (when (not @db/post-boot?)
+                                 [re-com/box
+                                  :class "heartbeat"
+                                  :align :center :justify :center
+                                  :style {:filter "drop-shadow(6px 6px 6px #000000)"
+                                          ;:border "1px solid white"
+                                          :pointer-events "none"
+                                        ;:margin-top "25px"
+                                        ;:backdrop-filter  "blur(4px)"
+                                        ;:background-blend-mode "multiply"
+                                          :height "65%" ;(px (- h 105))
+                                          :color "#ffffff"}
+                                  :child [db/rabbit-svg (str cc "45") (str cc)]])
+                               [re-com/box
+                                :size "auto"
+                                ;:justify (if @preset! :center :start)
+                                ;:align (if @preset! :center :start)
+                                :style {:font-size "22px"
+                                        :position "fixed"
+                                        :top (if @preset! (- h 60) 0)
+                                        :left 10
+                                        :overflow "hidden"
+                                        :opacity (if (or @db/post-boot? @preset!) 1.0 0.5)
+                                        :transition "all 1.3s ease"}
+                                :child [bricks/edn-box w (if @preset! 90 h) ;110
+                                        (if @db/final-loading-message
+                                          @db/final-loading-message
+                                          (cstr/join "\n"
+                                                     (take-last (Math/floor (/ h 20)) @db/loading-message))
+                                          ) (if @preset! "20px" "13px") :no false]]
+                               (when (not @boom!)
+                                 [re-com/h-box
+                                  :width (px (- w 25))
+                                  :size "auto"
+                                  :justify :between
+                                  :children [[re-com/box :child (str db/version)] [re-com/box :child (str db/version-date)]]
+                                  :style {:position "fixed"
+                                          :text-shadow "3px 3px 3px #000000"
+                                          :left 10 :bottom -33 :font-size "17px"
+                                          :font-weight 700
+                                          :font-family mfont :color cc :opacity 0.5}])]]]))})))
+
 
 
 (defn custom-icon-button [{:keys [icon-name tooltip on-click active? color class]}]
@@ -5716,13 +6020,9 @@
                :height "28px"
                :font-weight 700
                :z-index (when @db/bar-hover-text 99999999)
-               ;:display "inline-flex"
-               ;:align-items "center"
-               ;:justify-content "center"
                :text-shadow "2px 1px 3px #00000099"
                :filter "drop-shadow(2px 1px 3px #00000099)"
                :opacity (if @hovered? 1.0 0.8)
-               ;:padding-top (when (not @hovered?) "4px")
                :margin-top (if (not @hovered?) "-2px" "-9px")
                :font-size (if @hovered? "30px" "18px")
                :transition "all 0.3s ease"
@@ -5824,10 +6124,11 @@
         macro-undo-height 130
         macro-undo?     @db/macro-undo?
         annotate?     @(ut/tracked-sub ::bricks/annotate? {})
+        ui-debug? @(ut/tracked-sub ::bricks/ui-debug? {})
         ww @(ut/tracked-subscribe_ [::subs/w])
         macro-undo-limit (Math/floor (/ ww 180))
         client-name-str (cstr/replace (str client-name) ":" "")
-        baked-leaves? @(ut/tracked-subscribe_ [::bricks/baked-leaves?])
+        ;; baked-leaves? @(ut/tracked-subscribe_ [::bricks/baked-leaves?])
         macro-undos    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (str "client/macro-undo-map>" client-name-str))]})
         has-undos?     (ut/ne? macro-undos)
         left [re-com/h-box
@@ -5845,63 +6146,64 @@
               ;:gap "5px"
               :height "28px"
               :children (into
-                          [[custom-icon-button
-                            {:icon-name (if lines? "zmdi-layers" "zmdi-layers-off")
-                             :tooltip "show lineage / sub-query lines? (L)"
-                             :on-click #(ut/tracked-dispatch [::bricks/toggle-lines])
-                             :active? lines?}]
+                         [[custom-icon-button
+                           {:icon-name (if lines? "zmdi-layers" "zmdi-layers-off")
+                            :tooltip "show lineage / sub-query lines? (L)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-lines])
+                            :active? lines?}]
 
-                           [custom-icon-button
-                            {:icon-name (if peek? "zmdi-eye" "zmdi-eye-off")
-                             :tooltip "toggle peek mode (P)"
-                             :on-click #(ut/tracked-dispatch [::bricks/toggle-peek])
-                             :active? peek?}]
+                          [custom-icon-button
+                           {:icon-name (if peek? "zmdi-eye" "zmdi-eye-off")
+                            :tooltip "toggle peek mode (P)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-peek])
+                            :active? peek?}]
 
-                           [custom-icon-button
-                            {:icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off")
-                             :tooltip "toggle auto-refresh (O)"
-                             :on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])
-                             :active? auto-run?}]
+                          [custom-icon-button
+                           {:icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off")
+                            :tooltip "toggle auto-refresh (O)"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])
+                            :active? auto-run?}]
 
-                           [custom-icon-button
-                            {:icon-name "zmdi-developer-board"
-                             :tooltip "toggle external editing from ./live/* (experimental! 💀)"
-                             :on-click #(ut/tracked-dispatch [::bricks/toggle-external])
-                             :active? external?
-                             :color (if external? "red" "#ffffff")}]
+                          ;;  [custom-icon-button
+                          ;;   {:icon-name "zmdi-developer-board"
+                          ;;    :tooltip "toggle external editing from ./live/* (experimental! 💀)"
+                          ;;    :on-click #(ut/tracked-dispatch [::bricks/toggle-external])
+                          ;;    :active? external?
+                          ;;    :color (if external? "red" "#ffffff")}]
 
-                           (when has-undos?
-                             [custom-icon-button
-                              {:icon-name "ri-film-fill"
-                               :tooltip "toggle visual macro-undo"
-                               :on-click #(swap! db/macro-undo? not)
-                               :active? macro-undo?
-                               :color (if macro-undo? "cyan" "#ffffff")}])
+                          (when has-undos?
+                            [custom-icon-button
+                             {:icon-name "ri-film-fill"
+                              :tooltip "toggle visual macro-undo"
+                              :on-click #(swap! db/macro-undo? not)
+                              :active? macro-undo?
+                              :color (if macro-undo? "cyan" "#ffffff")}])
 
-                           [custom-icon-button
-                            {:icon-name "ri-camera-lens-line"
-                             :tooltip "take manual macro-undo session snap"
-                             :on-click #(ut/tracked-dispatch [::bricks/save-snap-forced])
-                             :active? false ;macro-undo?
-                             :color "#ffffff"}]
+                          [custom-icon-button
+                           {:icon-name "ri-camera-lens-line"
+                            :tooltip "take manual macro-undo session snap"
+                            :on-click #(ut/tracked-dispatch [::bricks/save-snap-forced])
+                            :active? false ;macro-undo?
+                            :color "#ffffff"}]
 
-                           [custom-icon-button
-                            {:icon-name "ri-sketching"
-                             :tooltip "toggle annotate drawing"
-                             :on-click #(ut/tracked-dispatch [::bricks/toggle-annotate])
-                             :active? annotate?
-                             :color (if annotate? "cyan" "#ffffff")}]
+                          [custom-icon-button
+                           {:icon-name "ri-sketching"
+                            :tooltip "toggle annotate drawing"
+                            :on-click #(ut/tracked-dispatch [::bricks/toggle-annotate])
+                            :active? annotate?
+                            :color (if annotate? "cyan" "#ffffff")}]
 
-                           (when selected-block?
-                             [custom-icon-button
-                              {:icon-name "zmdi-close"
-                               :tooltip "un-select block (ESC)"
-                               :on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])
-                               :active? selected-block?}])
+                          (when selected-block?
+                            [custom-icon-button
+                             {:icon-name "zmdi-close"
+                              :tooltip "un-select block (ESC)"
+                              :on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])
+                              :active? selected-block?}])
 
-                           [custom-text-display
-                            {:text (str (get websocket-status :waiting -1))
-                             :tooltip "websocket requests waiting (sql queries, etc)"}]
+                          (when ui-debug?
+                            [custom-text-display
+                             {:text (str (get websocket-status :waiting -1))
+                              :tooltip "websocket requests waiting (sql queries, etc)"}])
 
                           ;;  [custom-text-display
                           ;;   {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :secondary]) [])))
@@ -5911,109 +6213,120 @@
                           ;;   {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :leaves]) [])))
                           ;;    :tooltip "websocket requests waiting (leaves)"}]
 
-                           [custom-text-display
-                            {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :query1]) [])))
-                             :tooltip "SQL query channel 1"}]
-                           [custom-text-display
-                            {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :query2]) [])))
-                             :tooltip "SQL query channel 2"}]
-                           [custom-text-display
-                            {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :query3]) [])))
-                             :tooltip "SQL query channel 3"}]
+                          (when ui-debug?
+                            [custom-text-display
+                             {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :query1]) [])))
+                              :tooltip "SQL query channel 1"}])
 
-                           [custom-text-display
-                            {:text (ut/nf (count server-subs))
-                             :tooltip "active reactor subscriptions"}]
+                          (when ui-debug?
+                            [custom-text-display
+                             {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :query2]) [])))
+                              :tooltip "SQL query channel 2"}])
 
-                           [custom-text-display
-                            {:text (ut/nf (count things-running))
-                             :tooltip (str "active running (solvers, flows, etc), " (ut/nf (count things-running)))}]
+                          (when ui-debug?
+                            [custom-text-display
+                             {:text (str (count (or @(ut/tracked-subscribe [::wfx/pending-requests :query3]) [])))
+                              :tooltip "SQL query channel 3"}])
 
-                           (when (> (count things-running) 0)
-                             [custom-icon-button
-                              {:icon-name "zmdi-refresh"
-                               :tooltip (str "running: " things-running)
-                               :active? false
-                               :class "rotate linear infinite"
-                               :color (theme-pull :theme/editor-outer-rim-color nil)}])
+                          (when ui-debug?
+                            [custom-text-display
+                             {:text (ut/nf (count server-subs))
+                              :tooltip "active reactor subscriptions"}])
 
-                           (when (not online?)
-                             [custom-text-display
-                              {:text "RVBBIT server is offline"
-                               :tooltip "RVBBIT server is offline"}])
+                          (when ui-debug?
+                            [custom-text-display
+                             {:text (ut/nf (count things-running))
+                              :tooltip (str "active running (solvers, flows, etc), " (ut/nf (count things-running)))}])
 
-                           (let [subs @(ut/tracked-sub ::http/websocket-subs {})]
-                             [custom-text-display
-                              {:text (str (count subs))
-                               :tooltip (str "websocket subscription channels: " subs)}])
+                          (when (> (count things-running) 0)
+                            [custom-icon-button
+                             {:icon-name "zmdi-refresh"
+                              :tooltip (str "running: " things-running)
+                              :active? false
+                              :class "rotate linear infinite"
+                              :color (theme-pull :theme/editor-outer-rim-color nil)}])
 
-                           (when (ut/ne? flow-watcher-subs-grouped)
-                             [re-com/h-box
-                              :style {:padding-left "10px" :font-size "16px" :font-weight 700}
-                              :gap "8px"
-                              :children (for [[kk cnt] flow-watcher-subs-grouped]
-                                          [re-com/h-box :style
-                                           {:background-color (theme-pull :theme/editor-outer-rim-color nil)
-                                            :padding-left     "6px"
-                                            :border-radius    "5px 5px 0px 0px"
-                                            :padding-right    "6px"
-                                            :color            (theme-pull :theme/editor-background-color nil)}
-                                           :gap "5px"
-                                           :children [[re-com/box :child (str kk)]
-                                                      [re-com/box :style {:opacity 0.5} :child (str cnt)]
-                                                      [re-com/md-icon-button
-                                                       :md-icon-name "zmdi-close"
-                                                       :style {:cursor "pointer"
-                                                               :color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
-                                                               :font-size "18px"
+                          (when (not online?)
+                            [custom-text-display
+                             {:text "RVBBIT server is offline"
+                              :tooltip "RVBBIT server is offline"}])
+
+                          (when ui-debug?
+                            (let [subs @(ut/tracked-sub ::http/websocket-subs {})]
+                              [custom-text-display
+                               {:text (str (count subs))
+                                :tooltip (str "websocket subscription channels: " subs)}]))
+
+                          (when (ut/ne? flow-watcher-subs-grouped)
+                            [re-com/h-box
+                             :style {:padding-left "10px" :font-size "16px" :font-weight 700}
+                             :gap "8px"
+                             :children (for [[kk cnt] flow-watcher-subs-grouped]
+                                         [re-com/h-box :style
+                                          {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                           :padding-left     "6px"
+                                           :border-radius    "5px 5px 0px 0px"
+                                           :padding-right    "6px"
+                                           :color            (theme-pull :theme/editor-background-color nil)}
+                                          :gap "5px"
+                                          :children [[re-com/box :child (str kk)]
+                                                     [re-com/box :style {:opacity 0.5} :child (str cnt)]
+                                                     [re-com/md-icon-button
+                                                      :md-icon-name "zmdi-close"
+                                                      :style {:cursor "pointer"
+                                                              :color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                              :font-size "18px"
                                                              ;:height "10px"
                                                              ;:margin-top "-3px"
-                                                               }:on-click
-                                                       #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
-                                                            (ut/tracked-dispatch [::wfx/request :default
-                                                                                  {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
-                                                                                   :timeout 50000}]))]]])])
+                                                              }:on-click
+                                                      #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
+                                                           (ut/tracked-dispatch [::wfx/request :default
+                                                                                 {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
+                                                                                  :timeout 50000}]))]]])])
 
-                           (when oai-valid?
-                             [custom-icon-button
-                              (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
-                                {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
-                                 :tooltip "transcribe voice to :param/voice"
-                                 :on-click (if audio-recording?
-                                             #(ut/tracked-dispatch [::audio/stop-recording])
-                                             #(ut/tracked-dispatch [::audio/start-recording]))
-                                 :active? audio-recording?
-                                 :color (if audio-recording? "red" "#ffffff")})])
+                          (when oai-valid?
+                            [custom-icon-button
+                             (let [audio-recording? @(ut/tracked-subscribe_ [::audio/recording?])]
+                               {:icon-name (if audio-recording? "ri-mic-line" "ri-mic-fill")
+                                :tooltip "transcribe voice to :param/voice"
+                                :on-click (if audio-recording?
+                                            #(ut/tracked-dispatch [::audio/stop-recording])
+                                            #(ut/tracked-dispatch [::audio/start-recording]))
+                                :active? audio-recording?
+                                :color (if audio-recording? "red" "#ffffff")})])
 
-                           (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
-                             [custom-icon-button
-                              {:icon-name "zmdi-speaker"
-                               :tooltip "stop currently playing audio"
-                               :on-click #(audio/stop-audio)
-                               :active? true
-                               :color "red"}])
+                          (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
+                            [custom-icon-button
+                             {:icon-name "zmdi-speaker"
+                              :tooltip "stop currently playing audio"
+                              :on-click #(audio/stop-audio)
+                              :active? true
+                              :color "red"}])
 
-                           [custom-icon-button
-                            {:icon-name "ri-leaf-line"
-                             :tooltip "Debug: Clear Clover Cache"
-                             :on-click #(do
-                                          (reset! db/clover-cache-atom {})
-                                          (ut/tracked-dispatch [::bricks/clean-up-reco-previews]))
+                          (when ui-debug?
+                            [custom-icon-button
+                             {:icon-name "ri-leaf-line"
+                              :tooltip "Debug: Clear Clover Cache"
+                              :on-click #(do
+                                           (reset! db/clover-cache-atom {})
+                                           (ut/tracked-dispatch [::bricks/clean-up-reco-previews]))
                              ;:active? (if baked-leaves? "#98FF98" "#FFF8DC")
-                             :color "#D4A76A" ;(if baked-leaves? "#98FF98" "#D4A76A")
-                             }]
+                              :color "#D4A76A" ;(if baked-leaves? "#98FF98" "#D4A76A")
+                              }])
 
-                           (let [cnt (count (keys @db/clover-cache-atom))]
-                             [custom-text-display
-                              {:text (ut/nf cnt)
-                               :tooltip (str "clover cache keys " (ut/nf cnt))}])
+                          (when ui-debug?
+                            (let [cnt (count (keys @db/clover-cache-atom))]
+                              [custom-text-display
+                               {:text (ut/nf cnt)
+                                :tooltip (str "clover cache keys " (ut/nf cnt))}]))
 
-                           (let [kk @(ut/tracked-sub ::bricks/panel-keys {})
-                                 cntr (count (filter #(cstr/starts-with? (str %) ":reco-p") kk))
-                                 cnt (count kk)]
-                             [custom-text-display
-                              {:text (str (ut/nf cnt) "b" (ut/nf cntr))
-                               :tooltip (str "panels " (ut/nf cnt))}])
+                          (when ui-debug?
+                            (let [kk @(ut/tracked-sub ::bricks/panel-keys {})
+                                  cntr (count (filter #(cstr/starts-with? (str %) ":reco-p") kk))
+                                  cnt (count kk)]
+                              [custom-text-display
+                               {:text (str (ut/nf cnt) "b" (ut/nf cntr))
+                                :tooltip (str "panels " (ut/nf cnt))}]))
 
                           ;; (when @(ut/tracked-subscribe_ [::audio/recording?])
                           ;;   [custom-icon-button
@@ -6022,20 +6335,15 @@
                           ;;     :on-click nil
                           ;;     :active? true
                           ;;     :color "red"}])
-                           ]
-
-                          (kit-canvas-icons :* :*))
-
                           ]
+
+                         (kit-canvas-icons :* :*))]
 
         memory (let [mem @(ut/tracked-subscribe_ [::bricks/memory])]
                  (when (> (get mem 1) 0) ;; firefox, etc doesn't support this, so not point to render 0MB
                    (str
                     (ut/bytes-to-mb (get mem 1))
-                    " " "right-clickable? " (and (not @bricks/over-block?) (not @bricks/over-flow?))
-                    ))
-
-                 )
+                    (when ui-debug? (str " " "right-clickable? " (and (not @bricks/over-block?) (not @bricks/over-flow?)))))))
 
         macro-undo-bar [re-com/h-box
                         :height (if macro-undo? (px macro-undo-height) "0px")
@@ -6139,7 +6447,7 @@
                                              )
                          :backdrop-filter (when @db/bar-hover-text "blur(4px) brightness(0.35)")
                          :font-size (when @db/bar-hover-text "35px")
-                         :transition "all 0.3s ease"
+                         ;:transition "all 0.3s ease"
                          :text-shadow "2px 1px 3px #000000"
                          :color "#ffffff99"}
                  :child (str (if @db/bar-hover-text
@@ -6403,7 +6711,7 @@
         cc (theme-pull :theme/editor-outer-rim-color nil)]
 
     [re-com/v-box
-     ;:width "300px"
+     :min-width "300px"
      :children
      (for [row (range rows)]
        [re-com/h-box
@@ -6419,8 +6727,8 @@
            ;:width "auto"
            :min-width "130px"
            :width (str (Math/floor (/ 100 cols)) "%")
-           :min-height "50px"
-           ;;:height "50px"
+           ;:min-height "40px"
+           :height "46px"
            :padding "8px"
            :child (nth components index)
            :justify :center :align :center
@@ -6441,32 +6749,6 @@
                    :box-shadow (if (= @hover-state [ttype comp-hash])
                                  "0px 10px 20px rgba(0,0,0,0.2)"
                                  "none")}])])]))
-
-(defn spawn-button-old [h w data label1 label2 clear-state drag-meta & [event-vector]]
-  (let []
-    [re-com/v-box
-     :align :center :justify :center
-     :attr {:on-click (fn [_] (if event-vector
-                                (ut/tracked-dispatch event-vector)
-                                (if (nil? data)
-                                  (bricks/insert-new-block
-                                   [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
-                                    (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
-                                   w
-                                   h)
-                                  (bricks/insert-new-block
-                                   [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
-                                    (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
-                                   w
-                                   h data)))
-                        (clear-state))}
-     :style {:font-weight 700 :cursor "pointer"}
-     :children [[re-com/box
-                 :style {:font-size "13px"}
-                 :child label1]
-                [re-com/box
-                 :style {:font-size "15px"}
-                 :child label2]]]))
 
 (defn clear-state! []
   (reset! db/drop-spawn-modal? false)
@@ -6555,7 +6837,10 @@
   (let [boxes (vec (for [l label-vec
                          :let [icon? (or
                                       (cstr/starts-with? (str l) "zmdi-")
-                                      (cstr/starts-with? (str l) "ri-"))]]
+                                      (cstr/starts-with? (str l) "ri-"))
+                               last-string? (and (string? l)
+                                                 (not icon?)
+                                                 (= (last label-vec) l))]]
                      (cond
                        (vector? l) (label-cell l true)
                        icon?
@@ -6565,7 +6850,9 @@
                                 ;:margin-top "-2px"
                                 }]
                        :else [re-com/box
-                              :style {:font-size "14px"}
+                              :style {:font-size (if last-string?  "11px" "13px")
+                                      :opacity (when last-string? 0.7)
+                                      :font-weight (when last-string? 300)}
                               :child (str l)])))]
     (if h? [re-com/h-box
             :align :center :justify :center :gap "4px"
@@ -6584,14 +6871,43 @@
 
 ;; (def attempts (atom 0))
 
-(defn spawn-button [label-map leaf-action-cat leaf-action leaves-kp & [color]]
+(def current-preview-spawn-fn (atom nil))
+(def dropping-block? (reagent/atom nil))
+
+(defn spawn-button [label-map leaf-action-cat leaf-action leaves-kp & [just-drop? color]]
   (let [client-name db/client-name
         leaf-drop [leaf-action-cat leaf-action]
         we-waiting? (get @waiting? [leaf-drop leaves-kp] false)
-        tooltip (get label-map :tooltip "(no tooltip for leaf)")
-        tooltip (when (vector? tooltip) (cstr/join " " tooltip))
+        _ (when just-drop? (swap! waiting? assoc [leaf-drop leaves-kp] true))
+        strjoin (fn [s] (if (vector? s) (cstr/join " " s) (str s)))
+        tooltip (get label-map :tooltip (str "Drop new " (strjoin (get label-map :label leaf-drop))))
+        tooltip (strjoin tooltip)
         ;leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})
-        [src-kp tgt-kp] leaves-kp]
+        [src-kp tgt-kp] leaves-kp
+        spawn-fn (fn []
+                   (js/setTimeout #(do (reset! dropping-block? true)
+                                       (js/setTimeout (fn [] (reset! dropping-block? false)) 3000)) 1000)
+                   (swap! waiting? assoc [leaf-drop leaves-kp] true)
+                   (ut/tracked-dispatch
+                    [::wfx/request :default ;:secondary
+                     {:message {:kind :run-leaf-action-new
+                                :src-keypath src-kp
+                                :target-keypath tgt-kp
+                                :dragged-kp @db/dragged-kp
+                                :dragging-body @bricks/dragging-body
+                                :leaf-action-cat leaf-action-cat
+                                :leaf-action leaf-action
+                                :client-name client-name}
+                      :on-response [::insert-leaf-action-new leaf-drop leaves-kp]
+                      :timeout 50000}]))
+        _ (when just-drop? ;; if there is only one option - JUST DROP IT
+            (spawn-fn)
+            (clear-state!))
+        _ (when (not (contains? (set (keys @latest-preview-spawn-fns)) leaf-drop))
+            (swap! latest-preview-spawn-fns assoc leaf-drop spawn-fn))]
+
+
+
     ;(ut/pp [:spawn-button (str src-kp) (str tgt-kp) leaf-action-cat leaf-action])
     ;(ut/pp [:leaf-action-preview leaf-action-preview])
     ;; (when (and (not= leaf-action :tab-grid) (nil? leaf-action-preview))
@@ -6634,20 +6950,11 @@
     ;;         :on-mouse-leave (fn []
     ;;                           (reset! db/bar-hover-text nil)
     ;;                           (reset! db/clover-leaf-previews nil))}
-          :attr {:on-double-click (fn []
-                                    (swap! waiting? assoc [leaf-drop leaves-kp] true)
-                                    (ut/tracked-dispatch
-                                     [::wfx/request :default ;:secondary
-                                      {:message {:kind :run-leaf-action-new ;[{:keys [client-name src-keypath target-keypath leaf-action-cat leaf-action]}]
-                                                 :src-keypath src-kp
-                                                 :target-keypath tgt-kp
-                                                 :dragged-kp @db/dragged-kp
-                                                 :dragging-body @bricks/dragging-body
-                                                 :leaf-action-cat leaf-action-cat
-                                                 :leaf-action leaf-action
-                                                 :client-name client-name}
-                                       :on-response [::insert-leaf-action-new leaf-drop leaves-kp]
-                                       :timeout 50000}]))
+          :attr {:on-mouse-enter (fn [] (reset! db/bar-hover-text tooltip))
+                 :on-mouse-over (fn [] (when (not= @db/bar-hover-text tooltip)
+                                         (reset! db/bar-hover-text tooltip)))
+                 :on-mouse-leave (fn [] (reset! db/bar-hover-text nil))
+                 :on-double-click spawn-fn
                 ;;  :on-click (fn [] (let [leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})]
                 ;;                     (when (and (not= leaf-action :tab-grid) (nil? leaf-action-preview))
                 ;;                       (ut/pp [:leaf-preview-call {:leaf-drop leaf-drop :leaves-kp leaves-kp}])
@@ -6685,7 +6992,7 @@
                  :on-click (fn []
                              (let [leaf-action-preview @(ut/tracked-sub ::leaf-action-preview {:leaf-drop leaf-drop :leaves-kp leaves-kp})
                                    ;;_ (ut/pp [:click-preview? (= @db/clover-leaf-previews leaf-action-preview) leaf-action-preview])
-                                   ]
+                                   _ (reset! current-preview-spawn-fn spawn-fn)]
                                (if (and (not (nil? leaf-action-preview))
                                         (= @db/clover-leaf-previews leaf-action-preview))
                 ; If clicking the same preview again, treat as deselect
@@ -6819,7 +7126,8 @@
 
 
 
-(defonce viz-modes-atom (reagent/atom "quick viz"))
+
+(defonce shape-set-atom (reagent/atom nil))
 (defonce dimensions (reagent/atom {}))
 
 (defn fresh-spawn-modal []
@@ -6828,10 +7136,22 @@
         screen-w @(ut/tracked-subscribe_ [::subs/w])
         orig-left left
         orig-top top
+        ;; _ (ut/pp [:ui-debug?   @(ut/tracked-sub ::bricks/ui-debug? {})])
+        leaves @(ut/tracked-sub ::bricks/get-leaf-actions-for {:leaf-kp [:canvas :canvas :canvas] :dragged-kp @db/dragged-kp})
+        leaves-map (into {} (for [[k v] (group-by first leaves)
+                                  :let [v (if (keyword? v) [v] v)]]
+                              {k (vec (for [vv v] (last vv)))}))
+        leaves-map (if (empty? (dissoc leaves-map :none))
+                     leaves-map
+                     (dissoc leaves-map :none)) ;; remove :none placeholder if all leaves are false
+        single-option-should-just-drop? (and (not= (vec (keys leaves-map)) [:none])
+                                         (true? (= (count (flatten (vec (for [[_ v1] leaves-map] (for [vv v1] vv))))) 1)))
+        _ (ut/pp [:leaves-map! (vec (keys leaves-map)) single-option-should-just-drop?])
+
         ;left (if (> (+ left 300) screen-w) (- left (- screen-w left)) left)
         modal-zoom 1 ;.2
         dynh (max 400 (- (get @dimensions :height 0) 100))
-        bw (* 650 modal-zoom)
+        bw (* 660 modal-zoom)
         bh (* (+ 200 dynh) modal-zoom)
         left (if (> (+ left bw) screen-w) (- screen-w bw) left)
         left (if (< left 100) 100 left)
@@ -6855,13 +7175,7 @@
         bx (Math/floor (/ orig-left db/brick-size)) ;; jesus. rewrite all this TODO
         by (Math/floor (/ orig-top db/brick-size))
         ;;leaves @(ut/tracked-sub ::bricks/get-leaf-actions-for {:leaf-kp [:canvas :canvas :canvas]})
-        leaves @(ut/tracked-sub ::bricks/get-leaf-actions-for {:leaf-kp [:canvas :canvas :canvas] :dragged-kp @db/dragged-kp})
-        leaves-map (into {} (for [[k v] (group-by first leaves)
-                                  :let [v (if (keyword? v) [v] v)]]
-                              {k (vec (for [vv v] (last vv)))}))
-        leaves-map (if (empty? (dissoc leaves-map :none))
-                     leaves-map
-                     (dissoc leaves-map :none)) ;; remove :none placeholder if all leaves are false
+
         leaves-meta @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (str "leaf/" client-name-str ">metadata"))]})
         what (when (get drag-meta :type)
                [re-com/v-box
@@ -6872,19 +7186,21 @@
                 :children
                 [[re-com/box :child (str "dropped " (get drag-meta :type) " " (get drag-meta :target))]
                  [re-com/box :child (str " from " (get drag-meta :source-table))]]])
-        react! [@db/last-modal-viz-field @viz-modes-atom @db/clover-leaf-previews ]
+        react! [@db/last-modal-viz-field @db/viz-modes-atom @db/clover-leaf-previews @dropping-block?]
         clear-state (fn []
                       (reset! db/drop-spawn-modal? false)
                       (reset! bricks/dragging-body {})
                       (reset! hover-state nil)
+                      (reset! shape-set-atom nil)
                       (reset! db/clover-leaf-previews nil)
+                      (reset! db/shape-rotation-panel nil)
                       (ut/pp [:fresh-spawns-modal-clear-state!])
                       (reset! db/dragged-kp [:canvas :canvas :canvas]) ;; atom watcher trigger
                       (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])
                       (reset! bricks/reco-modal-page 0)
                       (reset! bricks/over-block? false)
                       (reset! db/drop-spawn-package {})
-                      (reset! viz-modes-atom "quick viz")
+                      (reset! db/viz-modes-atom "quick viz")
                       (reset! db/fresh-spawn-modal? false))
         ;{:keys [incoming default]} @db/drop-spawn-package
         ;{:keys [root w h data assessment]} default
@@ -6894,14 +7210,20 @@
         ttype (get-in dbody [:drag-meta :type])
         query-id (get-in dbody [:drag-meta :source-query])
         temp-panels (get @db/temp-viz-reco-panel-keys query-id)
-        tpanel (first temp-panels)
+        tpanel (or @db/shape-rotation-panel (first temp-panels))
         shape-rotator-meta @(ut/tracked-sub ::bricks/shape-rotator-block-meta {:panel-key tpanel})
         ;_ (ut/pp [:temp-panels temp-panels shape-rotator-meta])
         ;these-recos (count @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [:recos-sys2]}))
          ;pkeys @(ut/tracked-subscribe [::bricks/preview-keys2])
         viz-modes ["quick viz" "pick viz"]
          ;all-recos @(ut/tracked-sub ::bricks/reco-count-alpha {:query-key (get-in dbody [:drag-meta :source-query]) :task-id :reco})
-        field (when (= ttype :field) (ut/n- (get-in dbody [:drag-meta :target])))]
+        field (when (= ttype :field) (ut/n- (get-in dbody [:drag-meta :target])))
+        ;;_ (ut/pp [:drag-meta drag-meta])
+        recos @(ut/tracked-sub ::bricks/get-shape-viz {:dragged-kp @db/dragged-kp})
+        shape-sets (group-by (fn [r] (get-in r [:shape-rotator :shape-set])) recos)
+        shape-types (group-by (fn [r] (get-in r [:shape-rotator :shape-name])) recos)
+        reco-count (count recos)]
+
     ;;(ut/pp [:leaf-actions leaf-actions])
     [re-com/modal-panel
      :style {:z-index 99999 :padding "0px"}
@@ -6911,12 +7233,14 @@
                       {:left      left
                        :transform (str "scale(" modal-zoom ")") ;;"scale(1.25)"
                        :top       top
-                       :backdrop-filter "blur(5px)"
-                       :background-color (theme-pull :theme/base-block-color nil)
+                       :backdrop-filter (when (not @dropping-block?)  "blur(5px)")
+                       :background-color (when (not @dropping-block?) (theme-pull :theme/base-block-color nil))
                        :color (ut/choose-text-color (theme-pull :theme/base-block-color nil)) ;;(theme-pull :theme/editor-font-color nil)
                        :font-size "8px"
                        :padding "10px"
-                       :border    (str "5px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                       :border    (when (and (not @dropping-block?)
+                                             (not single-option-should-just-drop?))
+                                    (str "5px solid " (theme-pull :theme/editor-outer-rim-color nil)))
                        :position  "fixed"})}}
      :wrap-nicely? false
      :backdrop-opacity 0.63
@@ -6925,17 +7249,19 @@
 
      ^{:key (str "fresh-spawns-" @db/dragged-kp)}
      [re-com/v-box
-      :min-width "650px"
-      :min-height "400px"
-      :attr {:ref #(when %
-                     (js/setTimeout
-                      (fn [] (let [rect (get-client-rect (clj->js {:target %}))
-                                   ;_ (ut/pp [:fresh-spawn-new-size (str (select-keys rect [:height :width]))])
-                                   ]
-                               (reset! dimensions {:width (Math/ceil (:width rect))
-                                                              :height (Math/ceil (:height rect))}))) 300))}
+      :min-width (if single-option-should-just-drop? "200px" "660px")
+      :min-height (if single-option-should-just-drop? "150px" "400px")
+      ;; :attr {:ref #(when %
+      ;;                (js/setTimeout
+      ;;                 (fn [] (let [rect (get-client-rect (clj->js {:target %}))
+      ;;                              ;_ (ut/pp [:fresh-spawn-new-size (str (select-keys rect [:height :width]))])
+      ;;                              ]
+      ;;                          (reset! dimensions {:width (Math/ceil (:width rect))
+      ;;                                                         :height (Math/ceil (:height rect))}))) 300))}
       ;;:style {:filter "brightness(200%)"}
       ;;:style {:backdrop-filter "blur(4px)"}
+      :class (when (or @dropping-block?
+                    single-option-should-just-drop?) "zoom-and-fade")
       :children
       [(when what
          [re-com/box
@@ -6951,8 +7277,7 @@
       [[re-com/v-box
         :align :center
         :children
-        [
-        ;;  [re-com/box
+        [;;  [re-com/box
         ;;   ;:size "auto"
         ;;   ;:padding "10px"
         ;;   :style {:font-size "18px" :font-weight 700}
@@ -7161,7 +7486,8 @@
          ;[re-com/box :child (str leaves-map)] ;; label1 label2 leaf-action leaves-kp
          (when (empty? leaves-map)
            [re-com/box
-            :child [:img {:src "images/running.gif"
+            :width "300px"
+            :child [:img {:src (theme-pull :theme/running-gif "images/running.gif")
                           :style {:opacity 0.2}}]
             :size "auto"
             :style {;:color :theme/universal-pop-color
@@ -7171,15 +7497,23 @@
             :padding "10px"
             :align :center :justify :center])
 
-         (if (= @viz-modes-atom "pick viz")
+        ;;  (when (= (count (for [[k v1] leaves-map] (for [vv v1] vv))) 1)
+        ;;    (ut/pp [:single-option-should-just-drop!]))
+
+         (if (= @db/viz-modes-atom "pick viz")
 
            [re-com/box
             :style {:color "#ffffff33"}
-            :child [shape-rotator-panel tpanel shape-rotator-meta 440 280]]
+            :child [shape-rotator-panel tpanel shape-rotator-meta
+                    (vec (keys shape-types)) ;;(when (= (get drag-meta :type) :field) (get drag-meta :target)) ;; send field to filter rotations, IF its a field, that is
+                    nil ;(first temp-panels) ;nil ;(get drag-meta :source-panel-key)
+                    440 280]]
 
            [re-com/v-box
             :children (for [[k v1] leaves-map
-                            :let [cat-name (get-in leaves-meta [:categories k :label] (str k))]]
+                            :let [;;_ (ut/pp [:leaves-map leaves-map])
+                                  ;;single-option-should-just-drop? (true? (= (count (flatten (vec (for [[_ v1] leaves-map] (for [vv v1] vv))))) 1))
+                                  cat-name (get-in leaves-meta [:categories k :label] (str k))]]
                         [re-com/v-box
                          :children
                          [[re-com/box
@@ -7197,7 +7531,10 @@
                                         label-map (get-in leaves-meta [:by-keypath-meta [:canvas :canvas :canvas] k vv])]]
                               [spawn-button label-map k vv [(or @db/dragged-kp
                                                                 [:canvas :canvas :canvas])
-                                                            [:canvas :canvas :canvas]] color]))]]])])
+                                                            [:canvas :canvas :canvas]]
+                               single-option-should-just-drop?
+                               color
+                               ]))]]])])
 
         ;;  (when filters?
         ;;    [re-com/v-box
@@ -7216,16 +7553,14 @@
         ;;                                                     ;[spawn-button 4 5 nil "dropdown" "single select"  clear-state nil]
         ;;                                                     ;[spawn-button 4 5 nil "dropdown" "multi-select"  clear-state nil]
         ;;                           ]]]])
-
          ]]
 
-                                   (let [;table-name-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :source-query])) "-" "_"))
+                                   (when (not single-option-should-just-drop?)
+
+                                     (let [;table-name-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :source-query])) "-" "_"))
                                          ;field-str (ut/n- (cstr/replace (str (get-in dbody [:drag-meta :target])) "-" "_"))
                                          ;data-keypath [(keyword (str "reco-combo-counts." table-name-str "." field-str))]
-                                         recos @(ut/tracked-sub ::bricks/get-shape-viz {:dragged-kp @db/dragged-kp})
-                                        ;;  _ (ut/pp [:ff (str @db/dragged-kp) (count recos) ])
-                                         reco-count (count recos) ;;(get-in @(ut/tracked-sub ::conn/sql-data-alpha {:keypath data-keypath}) [0 :rowcnt])
-                                         ]
+                                           ]
                                     ;;  (ut/pp [:new-rowset (str reco-count " " table-name-str " " field-str)])
                                     ;;  (when true ;(empty? rowset)
                                     ;;    (conn/sql-data data-keypath
@@ -7235,13 +7570,13 @@
                                     ;;                    :where [:and [:like :combo_edn (str "%" field-str "%")]
                                     ;;                            [:= :table_name table-name-str]]
                                     ;;                    :from     [[:combos :uu2434daa]]} client-name))
-                                     [re-com/box
+                                       [re-com/box
                                     ;:style {:border "1px solid cyan"}
-                                      :size "auto"
-                                      :width "330px"
+                                        :size "auto"
+                                        :width "330px"
                                     ;:height "400px"
-                                      :child (or (if (and ;(map? @db/clover-leaf-previews)
-                                                          (keyword? @db/clover-leaf-previews))
+                                        :child (or (if (and ;(map? @db/clover-leaf-previews)
+                                                        (keyword? @db/clover-leaf-previews))
 
                                                   ;;  (let [qq (get @db/clover-leaf-previews :queries)
                                                   ;;        qqq (get-in @db/clover-leaf-previews [:queries (ffirst qq)])
@@ -7263,48 +7598,89 @@
                                                   ;;                render-frag
                                                   ;;                 6.5 7]]])
 
-                                                   (case @db/clover-leaf-previews
-                                                     nil [:div "No preview selected"]
-                                                     :loading [:div "Loading preview..."]
-                                                     :error [:div "Failed to load preview"]
+                                                     (case @db/clover-leaf-previews
+                                                       nil [:div "No preview selected"]
+                                                       :loading
+                                                       ;;;[re-com/box :size "auto" :justify :center :align :center :child "Loading preview..."]
+                                                       [re-com/box
+                                                        :size "auto"
+                                                        :align :center :justify :center
+                                                        :child [re-com/md-icon-button
+                                                                :md-icon-name "zmdi-refresh"
+                                                                :class "rotate linear infinite"
+                                                                :style {:font-size "60px" ;; "22px" ;; "15px"
+                                                                        :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                                       ;:width "48px" :height "48px"
+                                                                        :transform-origin "30px 29px" ;; "11px 11px" ;; "7.5px 11px"
+                                                                                               ; :padding "1px"
+                                                                                               ; :margin-left "4px"
+                                                                                               ; :margin-right "4px"
+                                                                       ;:margin-top "-3px"
+                                                                        }]]
+                                                       :error [re-com/box :size "auto" :justify :center :align :center :child "Failed to load preview!"]
                                                      ;; Otherwise render the actual preview data
 
 
-                                                   (let [preview-panel          @db/clover-leaf-previews
-                                                         selected-view          @(ut/tracked-sub ::bricks/selected-view-alpha {:panel-key preview-panel})
-                                                         selected-view-type     @(ut/tracked-sub ::bricks/view-type {:panel-key preview-panel :view selected-view})
-                                                         view-body              @(ut/tracked-sub ::bricks/panel-view {:panel-key preview-panel
-                                                                                                                     :view-key selected-view :runner selected-view-type})
-                                                         text? (and (vector? view-body) (every? string? view-body))]
-                                                     [re-com/v-box
-                                                      :size "auto"
-                                                      :padding "5px"
-                                                      :max-height "400px"
-                                                      :style {:border-radius "8px"
-                                                              :border (str "4px dashed " (theme-pull :theme/editor-outer-rim-color nil) 22)}
-                                                      :align :center :justify :between
-                                                      :gap "10px"
-                                                      :children [;[re-com/box :child (str @db/clover-leaf-previews)]
-                                                                 [re-com/box
-                                                                  :size "auto"
-                                                                  :child
+                                                       (let [preview-panel          @db/clover-leaf-previews
+                                                             selected-view          @(ut/tracked-sub ::bricks/selected-view-alpha {:panel-key preview-panel})
+                                                             selected-view-type     @(ut/tracked-sub ::bricks/view-type {:panel-key preview-panel :view selected-view})
+                                                             view-body              @(ut/tracked-sub ::bricks/panel-view {:panel-key preview-panel
+                                                                                                                          :view-key selected-view :runner selected-view-type})
+                                                             text? (and (vector? view-body) (every? string? view-body))]
+                                                         [re-com/v-box
+                                                          :size "auto"
+                                                          :gap "6px"
+                                                          :padding "5px"
+                                                           ;;:max-height "400px"
+                                                          :min-height (px dynh) ;; (max 400 (- (get @dimensions :height 0) 100))
+                                                          :children
+                                                          [[re-com/v-box
+                                                            :attr {:on-click (or @current-preview-spawn-fn (fn []))}
+                                                            :style {:border-radius "8px"
+                                                                    :cursor "pointer"
+                                                                    :border (str "4px dashed " (theme-pull :theme/editor-outer-rim-color nil) 22)}
+                                                            :align :center :justify :between
+                                                            :gap "10px"
+                                                            :children [;[re-com/box :child (str @db/clover-leaf-previews)]
+                                                                       [re-com/box
+                                                                  ;:size "auto"
+                                                                        :min-height "150px"
+                                                                        :child
                                                                   ;[bricks/clover preview-panel nil 5]
-                                                                  @(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil 5])
-                                                                  ]
-                                                                 [re-com/box
-                                                                  :padding "8px"
+                                                                        @(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil 5 5])]
+                                                                       [re-com/box
+                                                                        :padding "8px"
                                                                   ;:max-height "100px"
-                                                                  :size "auto" ;:width "330px" :height "100px"
-                                                                  :child (if text?
-                                                                           [re-com/v-box
-                                                                            :style {:font-size "11px" :font-weight 700}
-                                                                            :children (for [l view-body] [re-com/box :child (str l)])]
-                                                                           [bricks/edn-code-box 400 100 (str view-body) {:font-size "10px" :font-weight 700}])]
+                                                                        :size "auto" ;:width "330px" :height "100px"
+                                                                        :style {:border-radius "15px"
+                                                                                :margin "3px"
+                                                                                :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "09")}
+                                                                        :width "310px"
+                                                                        :child (if text?
+                                                                                 [re-com/v-box
+                                                                                  :style {:font-size "11px" :font-weight 700}
+                                                                                  :children (for [l view-body] [re-com/box :child (str l)])]
+                                                                                 [bricks/edn-code-box 300 100 (str view-body) {:font-size "12px" :font-weight 700}])]
                                                                ;@(re-frame/subscribe [::bricks/clover-cache @db/clover-leaf-previews nil ])
-                                                                 ]])
-                                                   )
+                                                                       ]]
+                                                           (when @current-preview-spawn-fn
+                                                             [re-com/box
+                                                              :size "auto"
+                                                              :width "100%"
+                                                              :max-height "38px"
+                                                              :align :center :justify :center
+                                                              :attr {:on-click @current-preview-spawn-fn}
+                                                              :style {;:border "3px solid pink"
+                                                                      :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "55")
+                                                                      :cursor "pointer"
+                                                                      :border-radius "8px"}
+                                                              :child
+                                                              [re-com/md-icon-button
+                                                               :md-icon-name "zmdi-plus" ;(if @dropping-block? "zmdi-refresh" "zmdi-plus")
+                                                               :style {:color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                                       :font-size "27px"}]])]]))
 
-                                                   (if (and
+                                                     (if (and
                                                           (> reco-count 0)
 
                                                           ;; (> @(ut/tracked-sub ::bricks/reco-count-alpha {:query-key (get-in dbody [:drag-meta :source-query])
@@ -7317,99 +7693,138 @@
                                                               (= ttype :field)))
 
 
-                                                     (let [
+                                                       (let [rel-shapes (keys shape-sets)
+                                                             _ (when (nil? @shape-set-atom) (reset! shape-set-atom (first rel-shapes)))
                                            ;running? (or (= (count pkeys) 0) (not= @db/last-modal-viz-field field))
                                            ;running? (= (count pkeys) 0)
-
-                                                           ]
+                                                             ]
                                                        ;(ut/pp [:viz-panel field dbody])
-                                                       [re-com/v-box
-                                                        :size "auto"
+                                                         [re-com/v-box
+                                                          :size "auto"
                                       ;:width "300px"
                                       ;:height "430px"
-                                                        :children [[re-com/h-box
-                                                                    :height "35px"
+                                                          :children [;;  [re-com/gap :size "13px"]
+
+                                                                  ;;  [re-com/horizontal-bar-tabs
+                                                                  ;;   :style {:font-size "13px" :font-weight 700 :outline "none"}
+                                                                  ;;   :model @shape-set-atom
+                                                                  ;;   ;:label-fn
+                                                                  ;;   :tabs (vec (for [m rel-shapes]
+                                                                  ;;                {:id m
+                                                                  ;;                 :label (str m)}))
+                                                                  ;;   :on-change #(reset! shape-set-atom %)]
+
+                                                                  ;;  [re-com/h-box
+                                                                  ;;   :size "auto"
+                                                                  ;;   :height "20px"
+                                                                  ;;   :gap "10px"
+                                                                  ;;   :children (for [r rel-shapes]
+                                                                  ;;               [re-com/box
+                                                                  ;;                :padding "3px"
+                                                                  ;;                :style {:border "1px solid pink"}
+                                                                  ;;                :child (str r)])]
+                                                                     [re-com/h-box
+                                                                      :height "35px"
                                                     ;:padding "10px"
                                                     ;;:style {:font-size "15px" :transform "translate(0)" }
-                                                                    :style {:font-size "18px" :font-weight 700 :transform "translate(0)"}
-                                                                    :align :center
-                                                                    :justify :center
-                                                                    :gap "8px"
-                                                                    :children (for [e viz-modes
-                                                                                    :let [selected? (= e @viz-modes-atom)]]
-                                                                                [re-com/box
-                                                                                 :attr {:on-click #(reset! viz-modes-atom e)}
-                                                                                 :style (if selected? {} {:opacity 0.2 :cursor "pointer"})
-                                                                                 :child (str e)])]
+                                                                      :style {:font-size "18px" :font-weight 700 :transform "translate(0)"}
+                                                                      :align :center
+                                                                      :justify :center
+                                                                      :gap "8px"
+                                                                      :children (for [e viz-modes
+                                                                                      :let [selected? (= e @db/viz-modes-atom)]]
+                                                                                  [re-com/box
+                                                                                   :attr {:on-click #(reset! db/viz-modes-atom e)}
+                                                                                   :style (if selected? {} {:opacity 0.2 :cursor "pointer"})
+                                                                                   :child (str e)])]
 
-                                                                  (if (= @viz-modes-atom "pick viz")
-                                                                    [re-com/v-box
-                                                                     :align :center
-                                                                     :justify :center
-                                                                     :style {:color "#ffffff33"
+                                                                     (if (= @db/viz-modes-atom "pick viz")
+                                                                       [re-com/v-box
+                                                                        :align :center
+                                                                        :justify :center
+                                                                        :style {:color "#ffffff33"
                                                                              ;:border "1px solid pink"
-                                                                             }
-                                                                     :gap "8px"
-                                                                     :children
-                                                                     [;;[shape-rotator-panel tpanel shape-rotator-meta 200 320]
-                                                                     [re-com/gap :size  "10px"]
-                                                                      [re-com/box
-                                                                       :attr {:on-click (fn []
-                                                                                          (swap! waiting? assoc tpanel true)
-                                                                                          (bricks/insert-new-block [bx by] 6 6 (assoc (bricks/sql-spawner-meta tpanel) :root [bx by]))
-                                                                                          (js/setTimeout (fn []
-                                                                                                           (swap! waiting? assoc tpanel false)
-                                                                                                           (clear-state)) 600))}
-                                                                       :child
-                                                                       (if (get @waiting? tpanel)
+                                                                                }
+                                                                        :gap "8px"
+                                                                        :children
+                                                                        [;;[shape-rotator-panel tpanel shape-rotator-meta 200 320]
+                                                                         [re-com/gap :size  "10px"]
                                                                          [re-com/box
-                                                                          :size "none"
-                                                                          :width (px (* 7 db/brick-size))
-                                                                          :height (px (* 6 db/brick-size))
-                                                                          :align :center :justify :center
-                                                                          :child [re-com/md-icon-button
-                                                                                  :md-icon-name "zmdi-refresh"
-                                                                                  :class "rotate linear infinite"]]
-                                                                         [bricks/clover tpanel (last (first (get shape-rotator-meta :items))) 6.5 6.5])]]]
+                                                                          :attr {:on-click (fn []
+                                                                                             (swap! waiting? assoc tpanel true)
+                                                                                             (bricks/insert-new-block [bx by] 6 6 (assoc (bricks/sql-spawner-meta tpanel) :root [bx by]))
+                                                                                             (js/setTimeout (fn []
+                                                                                                              (swap! waiting? assoc tpanel false)
+                                                                                                              (clear-state)) 600))}
+                                                                          :child
+                                                                          (if (get @waiting? tpanel)
+                                                                            [re-com/box
+                                                                             :size "none"
+                                                                             :width (px (* 7 db/brick-size))
+                                                                             :height (px (* 6 db/brick-size))
+                                                                             :align :center :justify :center
+                                                                             :child [re-com/md-icon-button
+                                                                                     :md-icon-name "zmdi-refresh"
+                                                                                     :class "rotate linear infinite"]]
+
+                                                                        ;;  [bricks/clover tpanel (last (first (get shape-rotator-meta :items))) 6.5 6.5]
+                                                                            @(re-frame/subscribe [::bricks/clover-cache tpanel (last (first (get shape-rotator-meta :items))) 6.5 6.5]))]]]
 
 
 
-                                                                    (let []
-                                                                      [re-com/box
-                                                                       :min-height (px dynh)
-                                                                       :child
+                                                                       (let []
+                                                                         [re-com/box
+                                                                          :min-height (px dynh)
+                                                                          :child
 
-                                                                       [bricks/mad-libs-shapes-modal query-id
-                                                                        346
-                                                                        dynh
-                                                                        field [bx by]]
+                                                                          [bricks/mad-libs-shapes-modal query-id
+                                                                           346
+                                                                           dynh
+                                                                           field nil [bx by]]
 
                                                                       ;; "yoyo"
 
                                                                     ;[shape-rotator-panel tpanel shape-rotator-meta]
                                                                     ;[bricks/clover tpanel nil 9 6]
-                                                                       ]))
+                                                                          ]))
 
 
 
-                                                                   (if (= @viz-modes-atom "pick viz")
-                                                                     [re-com/box
-                                                                      :align :center :justify :center
-                                                                      :style {:opacity 0.4 :font-size "11px"}
-                                                                      :child (str "(you can always further modify these settings once placed)")]
-                                                                     [re-com/v-box
-                                                                      :align :center :justify :center
-                                                                      :style {:opacity 0.4 :font-size "11px"}
-                                                                      :children [[re-com/box :child (str "(" (str (ut/nf reco-count)) " suggestion types)")]
+                                                                     (if (= @db/viz-modes-atom "pick viz")
+                                                                      ;;  [re-com/box
+                                                                      ;;   :align :center :justify :center
+                                                                      ;;   :style {:opacity 0.4 :font-size "11px"}
+                                                                      ;;   :child (str "(you can always further modify these settings once placed)")]
+
+                                                                       [re-com/box
+                                                                        :size "auto"
+                                                                        ;:width "80%"
+                                                                        :max-height "30px"
+                                                                        :align :center :justify :center
+                                                                        :attr {:on-click (fn []
+                                                                                           (swap! waiting? assoc tpanel true)
+                                                                                           (bricks/insert-new-block [bx by] 6 6 (assoc (bricks/sql-spawner-meta tpanel) :root [bx by]))
+                                                                                           (js/setTimeout (fn []
+                                                                                                            (swap! waiting? assoc tpanel false)
+                                                                                                            (clear-state)) 600))}
+                                                                        :style {;:border "3px solid pink"
+                                                                                :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "55")
+                                                                                :cursor "pointer"
+                                                                                :border-radius "8px"}
+                                                                        :child
+                                                                        [re-com/md-icon-button
+                                                                         :md-icon-name "zmdi-plus" ;(if @dropping-block? "zmdi-refresh" "zmdi-plus")
+                                                                         :style {:color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                                                 :font-size "27px"}]]
+
+                                                                       [re-com/v-box
+                                                                        :align :center :justify :center
+                                                                        :style {:opacity 0.4 :font-size "11px"}
+                                                                        :children [[re-com/box :child (str "(" (str (ut/nf reco-count)) " suggestion types)")]
                                                                                  ;[re-com/box :child "(left-click on to drop as-is, right-click to quick modify)"]
-                                                                                 ]]
+                                                                                   ]])]])
 
-
-                                                                     )
-
-                                                                   ]])
-
-                                                                    (if (empty? dbody)
+                                                       (if (empty? dbody)
 
                                                                       ;; [re-com/box
                                                                       ;;  :style {:font-size "18px"
@@ -7417,38 +7832,35 @@
                                                                       ;;          :font-weight 700 :opacity 0.2}
                                                                       ;;  :size "auto" :align :center :justify :center
                                                                       ;;  :child "(dasdasdasdasd)"]
-                                                                      [re-com/v-box
-                                                                       :min-height "400px"
+                                                         [re-com/v-box
+                                                          :min-height "400px"
                                                                        ;:width "340px"
-                                                                       :padding "5px"
-                                                                       :style {;:margin-left "10px"
+                                                          :padding "5px"
+                                                          :style {;:margin-left "10px"
                                                                                ;:border "1px solid white"
-                                                                               }
-                                                                       :children
-                                                                       [
-                                                                        ;; [re-com/box
+                                                                  }
+                                                          :children
+                                                          [;; [re-com/box
                                                                         ;;  :align :center :justify :center
                                                                         ;;  :style {:opacity 0.4 :font-size "15px"}
                                                                         ;;  :child (str "Quick Parameters")]
-                                                                        [re-com/gap :size "7px"]
+                                                           [re-com/gap :size "7px"]
 
                                                                        ; (if (empty? (cstr/trim (str @db/rabbit-search-input)))
                                                                        ;   [bricks/click-param-browser @(ut/tracked-sub ::bricks/all-click-params {}) 350 350]
-                                                                          [bricks/rabbit-search-browser 317 280]
+                                                           [bricks/rabbit-search-browser 317 280]
                                                                        ;   )
+                                                           ]]
 
-                                                                        ]]
+                                                         [re-com/v-box
+                                                          :style {:font-size "18px"
+                                                                  :color (theme-pull :theme/editor-outer-rim-color nil)
+                                                                  :font-weight 700 :opacity 0.2}
+                                                          :size "auto" :align :center :justify :center
+                                                          :children [[re-com/box :child "click option to preview"]
+                                                                     [re-com/box :child "double-click to drop"]]])))
 
-                                                                      [re-com/box
-                                                                       :style {:font-size "18px"
-                                                                               :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                                               :font-weight 700 :opacity 0.2}
-                                                                       :size "auto" :align :center :justify :center
-                                                                       :child "(no viz shape suggestions)"])
-
-                                                                    ))
-
-                                                 " ")])
+                                                   " ")]))
 
                                    ]]
 
@@ -7483,7 +7895,7 @@
         wssk @(ut/tracked-subscribe_ [::http/websocket-status])
         websocket-status (select-keys wssk [:status :datasets :panels :waiting])
         online? (true? (= (get websocket-status :status) :connected))
-        mouse-active?  (or @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 60}) (not online?))
+        mouse-active?  (or @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 900}) (not online?))
         hh @(ut/tracked-subscribe_ [::subs/h])
         ww @(ut/tracked-subscribe_ [::subs/w])
         selected-block @(ut/tracked-subscribe_ [::bricks/selected-block])
@@ -7693,6 +8105,8 @@
                              :height "100px"  ;(px (* (get @bricks/dragging-body :h) db/brick-size))
                              ])
 
+                          (when (not @db/loaded-screen?) [loading-modal])
+
                           (when (and buffy? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [buffy/chat-panel]])
 
                           (when (and ai-workers? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [aiw/chat-panel]])
@@ -7708,6 +8122,9 @@
                                               client-name screen-name]])
 
                           (when mouse-active? [bricks/reecatch [task-bar]])
+
+                          (when (and (= @db/dragged-kp [:canvas :canvas :canvas]) mouse-active?)
+                            [bricks/reecatch [canvas-bar]])
 
                           ;; (when console? [bricks/reecatch [quake-console ww]])
 

@@ -351,7 +351,7 @@
                                                                 (catch Exception _ false))
                                                           (swap! sqlized assoc table-name {:select (vec (keys (first value-data))) ;;[:*]
                                                                                            :connection-id client-name
-                                                                                           :from [[(keyword table-name) (ut/gen-sql-sql-alias)]]})
+                                                                                           :from [[(keyword table-name) :ssub4]]})
                                                           (qp/serial-slot-queue :serial-data-literal-code-intro client-name
                                                                                 (fn []
                                                                                   (insert-rowset value-data
@@ -712,7 +712,7 @@
                                                     :_sqlized-at (ut/millis-to-date-string (System/currentTimeMillis))
                                                     :_sqlized-by ui-keypath
                                                     :_sqlized-hash (keyword (str "solver-meta/" (cstr/replace (str id) ":" "") ">output>evald-result>value-hash"))
-                                                    :from [[(keyword table-name) (ut/gen-sql-sql-alias)]]}])
+                                                    :from [[(keyword table-name) :ssub4]]}])
                                     ;(qp/serial-slot-queue :sqlize-repl-rowset client-name
                        (ppy/execute-in-thread-pools-but-deliver
                         :sqlize-repl-rowset

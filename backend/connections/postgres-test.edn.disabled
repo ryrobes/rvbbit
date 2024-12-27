@@ -2,17 +2,18 @@
 {:auto-commit        true
  :read-only          true
  :connection-timeout 30000
+
  :validation-timeout 5000
  :idle-timeout       600000
  :max-lifetime       1800000
  :minimum-idle       10
  :maximum-pool-size  10
- :jdbc-url           "jdbc:postgresql://dev-box:5432/postgres"
+ :jdbc-url           "jdbc:postgresql://dev-pig-37:5432/postgres"
  :adapter            "postgresql"
  :username           "postgres"
- :password           "test"
- :database-name      "rabbit"
- :server-name        "dev-box"
+ :password           "Notofox22=="
+ :database-name      "postgres"
+ :server-name        "dev-pig-37"
  :port-number        5432
  :register-mbeans    false}
 

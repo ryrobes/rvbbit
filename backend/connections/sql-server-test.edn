@@ -1,0 +1,4 @@
+
+{:jdbc-url  "jdbc:sqlserver://dev-pig-37:1433;databaseName=rabbit;encrypt=false;username=sa;password=Notofox2=="}
+
+

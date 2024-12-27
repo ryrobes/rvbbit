@@ -1,0 +1,103 @@
+{:theme-name "petaluma-dew",
+ :codemirror-theme "rvbbit-dynamic",
+ :editor-param-background-color "#0d001a",
+ :pop-2 "#efefac",
+ :base-block-style
+ {:_box-shadow "0 0 8px #e5a9ff, 0 0 16px #ffabd8",
+  :_filter "contrast(120%) brightness(120%) saturate(130%)",
+  :backdrop-filter "blur(8px) hue-rotate(30deg)"},
+ :vega-defaults
+ {:view {:stroke "transparent"},
+  :axis
+  {:domainColor "#c4f5ff",
+   :grid true,
+   :font "Alice",
+   :labelColor "#f2e8ff",
+   :titleFont "Alice",
+   :titleColor "#ffc4f1",
+   :labelFont "Alice",
+   :domain false,
+   :gridColor "#ffffff15",
+   :tickColor "#ffc4f1"},
+  :legend
+  {:labelFont "Alice",
+   :legendFont "Alice",
+   :labelColor "#efefac",
+   :titleColor "#ffc4f1",
+   :stroke "#ffffff22",
+   :titleFont "Alice"},
+  :header {:labelFont "Alice", :titleFont "Alice", :titleColor "#ffc4f1"},
+  :mark {:font "Alice"},
+  :title
+  {:font "Alice",
+   :subtitleFont "Alice",
+   :labelFont "Alice",
+   :titleFont "Alice",
+   :titleColor "#ffc4f1"}},
+ :grid-selected-column-css
+ {:background-color "#ffabd81a", :filter "brightness(140%)"},
+ :running-gif "images/running.gif",
+ :base-block-color-selected "#120b20",
+ :block-title-font-color "#f2f2f2",
+ :base-block-color "#0f0816",
+ :editor-rim-color "#19030f",
+ :base-block-filter-selected
+ "drop-shadow(0 0 0.5rem #ffabd8) drop-shadow(0 0 1.5rem #e5a9ff)",
+ :vega-default-color-scheme {:scheme "category20b"},
+ :data-colors
+ {"float" "#e5a9ff",
+  "boolean" "#efefac",
+  "map" "#d0fcff",
+  "list" "#a9e2ff",
+  "string" "#ffc4f1",
+  "any" "#f2e8ff",
+  "vector" "#bbe6ff",
+  "keyword" "#ffd8e3",
+  "rabbit-code" "#c9fce3",
+  "datetime" "#ffe9bb",
+  "integer" "#ffc9eb",
+  "unknown" "#1c061f",
+  "date" "#f6ffd0"},
+ :editor-grid-selected-font-color "#0f0816",
+ :monospaced-font "JetBrains Mono",
+ :editor-grid-selected-background-color "#ffabd8",
+ :nivo-defaults
+ {:font-family "Alice",
+  :labels
+  {:text
+   {:fill "#f2e8ff", :font-size "15px", :font-family "Alice", :font-weight 600}},
+  :tooltip
+  {:container
+   {:background "#0f0816",
+    :color "#f2e8ff",
+    :text {:fill "#ffffff"},
+    :fontSize "14px",
+    :borderRadius "6px",
+    :boxShadow "0 3px 6px rgba(229, 169, 255, 0.3)",
+    :padding "6px 10px"},
+   :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+   :tableCell {:padding "3px 5px"}},
+  :axis
+  {:legend
+   {:text
+    {:fill "#f2e8ff", :font-size "13px", :font-family "Alice", :font-weight 600}},
+   :ticks
+   {:line {:stroke "#ffffff30"}, :text {:fill "#f2e8ffcc", :font-weight 600}}},
+  :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+ :editor-outer-rim-color "#ffabd8",
+ :grid-selected-font-color "#0f0816",
+ :block-title-selected-font-color "#ffffff",
+ :grid-selected-background-color "#ffabd8",
+ :grid-font-color "#f2f2f2",
+ :canvas-background-css
+ {:background-image "linear-gradient(#000000, #290f4077)",
+  :transition "all 0.7s ease-in-out",
+  :background-blend-mode "screen",
+  :background-color "#10071d"},
+ :editor-font-color "#f2f2f2",
+ :line-style "curved-path-h",
+ :base-font "DIN Condensed",
+ :block-tab-selected-font-color "#e5a9ff",
+ :editor-background-color "#0d001a",
+ :editor-grid-font-color "#f2f2f2",
+ :pop-1 "#ffe9bb"}

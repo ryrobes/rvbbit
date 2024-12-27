@@ -11,6 +11,7 @@
    [hikari-cp.core      :as hik]
    [honey.sql           :as honey]
    [honey.sql.helpers :as helpers]
+   [cheshire.core       :as json]
    [rvbbit-backend.util :as ut]
    [rvbbit-backend.db :as db]
    [rvbbit-backend.external :as ext]
@@ -354,7 +355,8 @@
       :max-lifetime      1800000}
      "system-reporting-db")})
 
-;;(def default-schema "base")
+(def default-schema "base")
+
 (def cache-db
   {:datasource
    @(pool-create
@@ -364,6 +366,16 @@
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
       :max-lifetime      1800000}
      "cache-db")})
+
+(def stack-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url "jdbc:duckdb:./db/stack.duck"
+      :idle-timeout      600000
+      :maximum-pool-size 200
+      :connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
+      :max-lifetime      1800000}
+     "stack-db")})
 
 (def metrics-kpi-db
   {:datasource
@@ -429,6 +441,68 @@
     (instance? java.time.Instant v) (instant->str v)
     (instance? java.sql.Timestamp v) (instant->str (.toInstant v))
     (instance? java.sql.Date v) (.toString v)
+    (instance? java.time.LocalDate v) (.toString v)
+
+    ;; ;; SQL Server specific types
+    ;; (and (try (Class/forName "microsoft.sql.DateTimeOffset") true
+    ;;           (catch ClassNotFoundException _ false))
+    ;;      (instance? (Class/forName "microsoft.sql.DateTimeOffset") v))
+    ;; (.toString v)  ;; Convert SQL Server's DateTimeOffset to string
+
+    ;; ;; For SQL Server JSON strings that are already parsed by the driver
+    ;; (and (string? v)
+    ;;      (try
+    ;;        (let [trimmed (cstr/trim v)]
+    ;;          (and (or (cstr/starts-with? trimmed "{")
+    ;;                   (cstr/starts-with? trimmed "["))
+    ;;               (or (cstr/ends-with? trimmed "}")
+    ;;                   (cstr/ends-with? trimmed "]"))
+    ;;               (json/parse-string v true)))
+    ;;        (catch Exception _ false)))
+    ;; (let [parsed (json/parse-string v true)]
+    ;;   (if (sequential? parsed)
+    ;;     (vec parsed)
+    ;;     parsed))
+
+    ;; DuckDB JSON/Struct handling
+    (instance? org.duckdb.DuckDBStruct v)
+    (let [fields (.getFields v)]
+      (if (= 1 (count fields))  ; Special case for single-value structs like {=1}
+        (.get v (first fields))  ; Just return the value
+        (str (json/generate-string  ; Otherwise handle as regular struct
+              (into {} (map (fn [k]
+                              [k (.get v k)])
+                            fields))))))
+
+    ;; PostgreSQL JSON
+    (instance? org.postgresql.util.PGobject v)
+    (let [type (.getType v)
+          value (.getValue v)]
+      (when value
+        (case type
+          ("json" "jsonb") (str
+                            (let [parsed (json/parse-string value true)]
+                              (if (sequential? parsed)
+                                (vec parsed)
+                                parsed)))
+          value)))
+
+    ;; ;; Oracle JSON handling
+    ;; (and (try (Class/forName "oracle.sql.json.OracleJsonDatum") true
+    ;;           (catch ClassNotFoundException _ false))
+    ;;      (instance? (Class/forName "oracle.sql.json.OracleJsonDatum") v))  ;; Modern Oracle JSON type
+    ;; (when v
+    ;;   (let [parsed (json/parse-string (.getString v) true)]
+    ;;     (if (sequential? parsed)
+    ;;       (vec parsed)
+    ;;       parsed)))
+
+    ;; ;;  Catch-all for any other objects
+    ;; (instance? Object v)
+    ;; (try
+    ;;   (str v)  ; Convert any object to string representation
+    ;;   (catch Exception _
+    ;;     (str "#object[" (.getName (class v)) "]")))  ; Ultra-safe fallback
     :else v))
 
 (defn asort [m order] ;; we have to ensure the order of the keys is consistent to the query, as a SQL normie would expect (and I agree!)
@@ -447,8 +521,6 @@
                                      headers))))]
     (swap! map-orders assoc query headers)
     mm))
-
-
 
 (defn sql-query
   [db-spec query & extra]

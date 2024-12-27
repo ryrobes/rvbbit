@@ -12,7 +12,9 @@
    [rvbbit-backend.util       :as ut]
    [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party :as ppy]
-   [clojure.set :as set]
+  ;;  [rvbbit-backend.cruiser    :as cruiser]
+   [datalevin.core            :as d]
+   [clojure.set               :as set]
    [rvbbit-backend.sql        :as sql
     :refer [sql-query sql-exec ghost-db to-sql pool-create system-db system-db systemh2-db]]
    [clojure.math.combinatorics :as combo]
@@ -73,11 +75,9 @@
  ; cruiser/default-derived-fields    derived-fields
  ; cruiser/default-viz-shapes)       complete-shapes
 
-;; (ut/pp db/conn-map)
 
 (defonce master-metadata (atom {})) ;; combine queries and tables?
 (defonce field-maps (atom {}))
-
 (defonce field-maps-cache (atom {}))
 (defonce viz-maps-cache (atom {}))
 (defonce honey-hashes (atom {}))
@@ -87,23 +87,34 @@
   (mapv f coll)
   )
 
+(defn db-type-from-connection-id [connection-id-str]
+  (let [pool-map (get @db/conn-map connection-id-str)]
+    (surveyor/db-typer pool-map)))
+
+;; (ut/pp (db-type-from-connection-id "xtdb-pg")) ;; "PostgreSQL"
+
 (defn general-data-type-infer [field-type]
   (let [ft (cstr/lower-case field-type)]
-    (cond (cstr/includes? ft "char")    "string"
-          (cstr/includes? ft "string")  "string"
-          (cstr/includes? ft "lob")     "string"
-          (cstr/includes? ft "text")    "string"
-          (cstr/includes? ft "time")    "datetime"
-          (cstr/includes? ft "date")    "date"
-          (cstr/includes? ft "bool")    "boolean"
-          (cstr/includes? ft "int")     "integer"
-          (cstr/includes? ft "real")    "float"
-          (cstr/includes? ft "float")   "float"
-          (cstr/includes? ft "decimal") "float"
-          (cstr/includes? ft "num")     "integer"
-          :else                         "unknown")))
+    (cond
+      (cstr/includes? ft "json")    "rabbit-code"
+      (cstr/includes? ft "map")    "rabbit-code"
+      (cstr/includes? ft "struct")    "rabbit-code"
+      (cstr/includes? ft "char")    "string"
+      (cstr/includes? ft "string")  "string"
+      (cstr/includes? ft "lob")     "string"
+      (cstr/includes? ft "text")    "string"
+      (cstr/includes? ft "time")    "datetime"
+      (cstr/includes? ft "date")    "date"
+      (cstr/includes? ft "bool")    "boolean"
+      (cstr/includes? ft "int")     "integer"
+      (cstr/includes? ft "serial")     "integer"
+      (cstr/includes? ft "real")    "float"
+      (cstr/includes? ft "float")   "float"
+      (cstr/includes? ft "decimal") "float"
+      (cstr/includes? ft "num")     "integer"
+      :else                         "unknown")))
 
-(defn general-data-type-value [v]
+(defn general-data-type-value [v] ;; deprecated taster
   (cond (string? v)  "string"
         (integer? v) "integer"
         (float? v)   "float"
@@ -141,12 +152,15 @@
     (swap! db/conn-map assoc conn-name conn)
     conn))
 
+;; (ut/pp [:gg @db/conn-map])
+
 (defn get-or-create-db-pool [f-path]
   (try
     (let [conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))
-        conn (get @db/conn-map conn-name (get @db/conn-map f-path))]
-    (if conn conn
-        (create-pool f-path)))
+          f-path (cstr/replace (str f-path) "cache.db" "cache-db") ;; for some legacy queries
+          conn (get @db/conn-map conn-name (get @db/conn-map f-path))]
+      (if conn conn
+          (create-pool f-path)))
     (catch Exception e (ut/pp [:shape-rotator :get-or-create-db-pool :f-path f-path (str e)]))))
 
 (defn flatten-jdbc-conn-meta [connect-meta db-meta]
@@ -203,22 +217,6 @@
                  :data-type (general-data-type-infer (.getColumnTypeName meta i))
                  :db-schema (if (empty? schem) "none" schem)
                  :db-catalog (if (= ccat parent-table) nil ccat)}))))))
-
-;; (defn flat-db-meta [db connect-meta]
-;;   (let [duck? (= (get connect-meta :database-name) "DuckDB") ;; doesnt support jdbc meta
-;;         fm (if duck?
-;;              (let [rrows (sql-query db (to-sql {:select [:table_name :column_name :data_type]
-;;                                                 :from [:information_schema.columns]
-;;                                                 :order-by [:table_name :column_name]} "DuckDB"))
-;;                    tables (vec (distinct (map :table_name rrows)))
-;;                    conn-id (str (get connect-meta :connection_id))
-;;                    table-rows (into {} (for [t tables] {["DuckDB" conn-id "TABLE" "none" nil t "*"]
-;;                                                         {:column_type "special"}}))
-;;                    flat (into {} (for [r rrows] {["DuckDB" conn-id "TABLE" "none" nil (get r :table_name) (get r :column_name)]
-;;                                                  {:column_type (get r :data_type)}}))]
-;;                (merge table-rows flat))
-;;              (into {} (flatten-jdbc-conn-meta connect-meta (get-jdbc-conn-meta db))))]
-;;     fm))
 
 (defn flat-db-meta [db connect-meta]
   (let [h2?   (= (get connect-meta :database-name) "H2")
@@ -312,9 +310,14 @@
   (try (edn/read-string (slurp file))
        (catch Exception _ {})))
 
-(defonce shape-tests (slread "defs/sniff-tests.edn"))
+;; (def shape-tests (slread "defs/sniff-tests.edn"))
 
 ;; (ut/pp shape-tests)
+
+
+
+;query-runstream
+;[kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache?]
 
 (defn add-shape-tests [fields-map-vector conn shape-test-defs & [base-query]]
         (vec (for [field-map fields-map-vector]
@@ -327,17 +330,22 @@
                                                                                                    [(dissoc base-query :order-by) :subq1]
                                                                                                    (keyword (get field-map :table-name)))} sql-map)
                                                  runnable? (= [{:1 1}] (sql-query ghost-db (to-sql {:select [1] :where (or when-where [:= 1 1])}) {:no-error? true}))
+                                                 ;query-runstream (resolve 'rvbbit-backend.websockets/query-runstream)
+                                                 ;conn-str (get (ut/reverse-map @db/conn-map) conn)
                                                  vval (if runnable?
                                                         (if (= fname "*") ;; for row count
                                                           (sql-query conn (to-sql sql-map-resolved) {:extra [:shape-test shape-key] :no-error? true})
-                                                          (cached-sql-query conn (to-sql sql-map-resolved))) nil)]
+                                                          ;(@query-runstream :honey-xcall [:shape-rotator (hash fields-map-vector)] sql-map-resolved true false conn-str :rvbbit -1 nil sql-map-resolved false false)
+                                                          (cached-sql-query conn (to-sql sql-map-resolved))
+                                                          ;(@query-runstream :honey-xcall [:shape-rotator (hash fields-map-vector)] sql-map-resolved true false conn-str :rvbbit -1 nil sql-map-resolved false false)
+                                                          ) nil)]
                                              {shape-key (if (get-in vval [0 :database_says]) ;; indicates sql error, return nil for now
                                                           nil
                                                           (if fetch-one?
                                                             (first (vals (first vval)))
                                                             (pmapv (ffirst (first vval)) vval)))})))))))
 
-(def shape-attributes (slread "defs/field-attributes.edn"))
+;; (def shape-attributes (slread "defs/field-attributes.edn"))
 ;; (ut/pp shape-attributes)
 
 (defn add-shape-attributes [fields-map-vector shape-attrib-defs & {:keys [min-iterations max-iterations] :or {min-iterations 3 max-iterations 20}}]
@@ -385,7 +393,7 @@
         (recur next-result current (inc iterations))))))
 
 ;(def viz-shapes (slread "defs/viz-shapes-only-recharts.edn"))
-(def viz-shapes (slread "defs/viz-shapes.edn"))
+(def viz-shapes @db/shapes-map) ;; (slread "defs/viz-shapes.edn"))
 
 (defn find-viz-fields [vector-group viz-shapes-defs]
   (let [vector-group (filterv #(not= (get % :field-name) "*") vector-group)] ;; take out special table level fields
@@ -405,66 +413,6 @@
         (map (fn [[[context shape-name axis-type] entries]]
                [[context shape-name axis-type] (set (map #(nth % 3) entries))]))
         (into {})))
-
-;;  (defn create-all-chart-configs [found-fields]
-;;    (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
-;;         ; Group all entries by context first
-;;          by-context (group-by first found-fields)
-;;         ; Then for each context, get the chart types
-;;          context-charts (map (fn [[context entries]]
-;;                                [context (group-by second entries)])
-;;                              by-context)]
-;;      (vec (mapcat
-;;       (fn [[context chart-groups]]
-;;         (mapcat
-;;          (fn [[shape-name entries]]
-;;            (let [; Get the axes required for this chart type in this context
-;;                  required-axes (set (map #(nth % 2) entries))
-;;                 ; Get the fields for each axis, but only for this context
-;;                  axis-fields (map #(vector % (get fields-by-chart-axis [context shape-name %]))
-;;                                   required-axes)
-;;                  axes-vec (vec required-axes)]
-
-;;              (map (fn [field-combo]
-;;                     {:shape-name shape-name
-;;                      :context context
-;;                      :axes (zipmap axes-vec field-combo)})
-;;                   (apply combo/cartesian-product (map second axis-fields)))))
-;;          chart-groups))
-;;       context-charts))))
-
-
-
-;; (defn create-all-chart-configs [found-fields]
-;;   (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
-;;         _ (ut/pp [:fields-by-chart-axis fields-by-chart-axis])
-;;         by-context (group-by first found-fields)
-;;         context-charts (map (fn [[context entries]]
-;;                               [context (group-by second entries)])
-;;                             by-context)]
-;;     (vec (mapcat
-;;           (fn [[context chart-groups]]
-;;             (mapcat
-;;              (fn [[shape-name entries]]
-;;                (let [real-required-axes (set (keys (get-in @db/shapes-map [shape-name :axes])))
-;;                      required-axes (set (map #(nth % 2) entries)) ;; derived from the fields FOUND compat, not necc ALL fields needed
-;;                      axis-fields (map #(vector % (get fields-by-chart-axis [context shape-name %]))
-;;                                       required-axes)
-;;                      axes-vec (vec required-axes)]
-;;                  (println "Debug:"
-;;                           "\nreal-required-axes:" real-required-axes
-;;                           "\nContext:" context
-;;                           "\nShape:" shape-name
-;;                           "\nRequired axes:" required-axes
-;;                           "\nAxis fields:" axis-fields)
-;;                  (map (fn [field-combo]
-;;                         {:shape-name shape-name
-;;                          :context context
-;;                          :axes (zipmap axes-vec field-combo)})
-;;                       (apply combo/cartesian-product (map second axis-fields)))))
-;;              chart-groups))
-;;           context-charts))))
-
 
 (defn create-all-chart-configs [found-fields]
   (let [fields-by-chart-axis (get-fields-by-chart-and-axis found-fields)
@@ -578,8 +526,8 @@
         connection-id (get (cset/map-invert @db/conn-map) conn)]
     connection-id))
 
-(defn get-field-maps [{:keys [f-path shape-test-defs shape-attributes-defs honey-sql query-name filter-fn pre-filter-fn]
-                       :or {shape-test-defs shape-tests shape-attributes-defs shape-attributes}
+(defn get-field-maps [{:keys [f-path shape-test-defs shape-attributes-defs honey-sql client-name query-name filter-fn pre-filter-fn]
+                       :or {shape-test-defs @db/sniff-test-map shape-attributes-defs @db/field-attribute-map}
                        :as args}]
   (swap! db/viz-reco-sniffs inc)
   (let [k (hash args)]
@@ -623,7 +571,18 @@
                                           (if filter-fn
                                             (filterv filter-fn with-shape-attribs)
                                             with-shape-attribs)))
-                  _ (ppy/execute-in-thread-pools :shape-rotator-to-h2! (fn [] (insert-into-fields field-maps)))]
+                  ;; _ (when client-name
+                  ;;     (ppy/execute-in-thread-pools
+                  ;;      :shape-rotator-to-leaf-atom!
+                  ;;      (fn [] (doseq [[kp field-map]
+                  ;;                     (group-by (fn [m] [client-name
+                  ;;                                        (get m :connection-id)
+                  ;;                                        (keyword (get m :table-name))
+                  ;;                                        (keyword (get m :field-name))]) field-maps)]
+                  ;;               (swap! db/leaf-field-meta-map assoc-in kp field-map)))))
+                  _ (ppy/execute-in-thread-pools
+                     :shape-rotator-to-h2!
+                     (fn [] (insert-into-fields field-maps)))]
               field-maps)]
         ;; (swap! field-maps-cache assoc k result)
         result))))
@@ -638,7 +597,14 @@
           relevant-field-maps (get field-maps-by-context context) ;;(filterv #(= (get % :context) context) field-maps) ;; pre-index with a group-by map?
           {:keys [table-type connection-id table-name honey-hash]} (first relevant-field-maps)
 
-          axes-walk (into {} (for [[k v] axes] {(keyword (str (cstr/replace (str k) ":" "") "-field")) (keyword v)}))
+          axes-walk (into {} (for [[k v] axes]
+                               {(keyword (str (cstr/replace (str k) ":" "") "-field")) (keyword v)
+                                (keyword (str "*this-block*/" (cstr/replace (str k) ":" "") "-field")) (keyword (str "*this-block*/" (str v)))
+                                (keyword (str "*this-view*/" (cstr/replace (str k) ":" "") "-field")) (keyword (str "*this-view*/" (str v)))
+                                (keyword (str (cstr/replace (str k) ":" "") "-field-str"))
+                                ;(ut/snake-case (str v))
+                                (str v)
+                                }))
           ;; _ (ut/pp [:axes-walk req-axes (vec (keys axes)) axes-walk])
           sql-table-walk {:table [(if (= table-type :query)
                                     (keyword (cstr/replace (str "query/" table-name) ":" ""))
@@ -681,6 +647,7 @@
               :connection-id connection-id
               :shape-rotator {:context context :shape-name shape-name :axes axes
                               :honey-hash honey-hash
+                              :shape-set (get this-viz-shape :shape-set)
                               :items (into (vec (for [v (keys library-shapes)] [runner v]))
                                            (vec (for [v (keys queries-map)] [:queries v])))}
               :selected-view (first (keys library-shapes))
@@ -720,11 +687,52 @@
         ;(swap! viz-maps-cache assoc k combo-viz)
         combo-viz))))
 
-;; (ut/pp [:field-maps (let [res (get-field-maps {:f-path "connections/met-on-tour.edn"
-;;                                                :shape-test-defs shape-tests
-;;                                                :shape-attributes-defs shape-attributes
-;;                                                :honey-sql {:select [:latitude :longitude :location]
-;;                                                            :from   [[:locations :ssb99]]}
+
+(defn shape-rotation-run [f-path & [pre-filter-fn]]
+  (let [connection-id (get-connection-id f-path)
+        _ (ut/pp ["🥩" :running-full-shape-rotation-job connection-id (str f-path)])
+        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] (System/currentTimeMillis))
+        conn-map (if (map? f-path) f-path (get @db/conn-map connection-id))
+        _ (sql-exec systemh2-db
+                    (to-sql {:delete-from [:fields] ;; clear last - in case a table was deleted (we clear each table before we add, but dont address orphans)
+                             :where [:= :connection_id (str connection-id)]}))
+        pre-filter-fn (when (= connection-id "systemh2-db") '(fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
+                                                                          (not= (get m :db-schema) "PG_CATALOG"))))
+        res (get-field-maps {:f-path f-path
+                                  :shape-test-defs @db/sniff-test-map ;; cruiser/default-sniff-tests
+                                  :shape-attributes-defs @db/field-attribute-map ;; cruiser/default-field-attributes
+                                  ;;:filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
+                                  :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
+        combo-viz (get-viz-shape-blocks res @db/shapes-map)
+        shapes-by (group-by (fn [m] [(get-in m [:shape-rotator :honey-hash])
+                                     (keyword (get-in m [:shape-rotator :context 3]))]) combo-viz)
+        fields-by (group-by (fn [m] [(get m :honey-hash)
+                                     (keyword (get m :table-name))]) res)
+        ;; _ (ut/pp [:kk (keys shapes-by) (keys fields-by)])
+        _ (doseq [kk (keys fields-by)
+                  :let [[honey-hash table-name-kw] kk
+                        shapes (get shapes-by kk)
+                        fields (get fields-by kk)
+                        res {:shapes shapes :fields fields}
+                        hash-key (hash [:fresh-table! connection-id table-name-kw])
+                        modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] [:fresh-table! connection-id table-name-kw])
+                                                               (get res :shapes)))]]
+            (d/transact-kv db/ddb
+                           [[:put "honeyhash-map" honey-hash res]
+                            [:put "shapes-map" hash-key modded-shapes]]))
+        ;; group by honeyhash - do artificial inserts into datalevin
+        ;; "[\"none!\" nil :Crime_Data_from_2020_to_Present]"
+        ;;_ (ut/pp ["🥩" :shape-rotator-db {:fields (take 2 res) :shapes (take 2 combo-viz)}])
+        _ (ut/pp ["🥩" :shape-rotator-fields connection-id  [:fields (count res) :viz (count combo-viz)]])
+        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
+        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
+
+
+;; (ut/pp [:field-maps (let [res (get-field-maps {:f-path "connections/superstore.edn"
+;;                                                :shape-test-defs @db/sniff-test-map ;; shape-tests
+;;                                                :shape-attributes-defs @db/field-attribute-map
+;;                                                :honey-sql {:select [:*]
+;;                                                            :from   [[:superstore :ssb99]]}
 ;;                                                :query-name :my-query-name-from-ui
 ;;                                                :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
 ;;                                                :pre-filter-fn nil})
@@ -744,7 +752,9 @@
 ;;                       ;[combo-viz (count res) (count combo-viz)]
 ;;                       ;combo-viz
 
-;;                       [res (count combo-viz)]
+;;                       ;[res combo-viz]
+;;                       res
+;;                       ;@db/shapes-map
 ;;                       )] {:width 120})
 
 

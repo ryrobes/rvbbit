@@ -452,7 +452,7 @@
                           (has-fn? :case)           case-walk)
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/") (ut/deep-template-find out-block-map)))
           templates? (ut/ne? templated-strings-vals)
-          _ (when templates? (ut/tapp>> [:replacing-string-templates-connections... templated-strings-vals out-block-map]))
+          _ (when templates? (ut/tapp>> ["➰" :replacing-string-templates-connections... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
                                    (ut/postwalk-replacer {nil ""}
                                                          (into {}
@@ -970,7 +970,8 @@
  ::sql-query-not-run-alpha?
  (fn [db {:keys [keypath query]}] ;; LOGIC HERE NEEDS TO BE THE SAME AS conn/sql-data ore shit gets
    (let [query        (ut/clean-sql-from-ui-keys query)
-         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+         ;not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))
+         not-col-sel? true]
      (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history keypath))))))))
 
 (re-frame/reg-event-db
@@ -1203,11 +1204,11 @@
                           @(ut/tracked-sub ::sql-source {:kkey (first keypath)})
                           honey-sql)
           connection-id (or (get honey-sql :connection-id) (if (nil? connection-id) "cache.db" connection-id))
-          deep-meta?    (or deeps? (get honey-sql :deep-meta?))
+          stack?    (or deeps? (get honey-sql :stack?))
           honey-sql     (ut/clean-sql-from-ui-keys honey-sql)]
-      (when (cstr/includes? (str keypath) ":kick") (ut/tapp>> [:deep-meta? keypath fields honey-sql connection-id]))
+      (when (cstr/includes? (str keypath) ":kick") (ut/tapp>> [:stack? keypath fields honey-sql connection-id]))
       (doseq [[[name f] hsql] (merge {[:rowcount :*] {:select [[[:count 1] :rowcnt]] :from [[honey-sql :subq]]}}
-                                     (if deep-meta? ;; get distinct counts and other shiz if deep-meta (sad that
+                                     (if stack? ;; get distinct counts and other shiz if deep-meta (sad that
                                        (into {}
                                              (for [field (filter #(not (cstr/starts-with? (str %) ":styler_")) (keys fields))]
                                                {[:distinct field] {:select [[[:count [:distinct field]] :distinct-values]]
@@ -1234,6 +1235,15 @@
  (fn [db [_ panel-key query-key honey-sql]]
    (let [connection-id (get-in db [:panels panel-key :connection-id])]
      (ut/tapp>> [:manual-deep-meta query-key :on connection-id])
+     (reset! deep-meta-on-deck query-key)
+     (ut/tracked-dispatch [::clear-query-history query-key])
+     db)))
+
+(re-frame/reg-event-db
+ ::materialize-query-stack
+ (fn [db [_ panel-key query-key]]
+   (let [connection-id (get-in db [:panels panel-key :connection-id])]
+     (ut/tapp>> [:materialize-query-stack query-key :on connection-id])
      (reset! deep-meta-on-deck query-key)
      (ut/tracked-dispatch [::clear-query-history query-key])
      db)))
@@ -1327,8 +1337,8 @@
   ([keypath honey-sql]
    (let [style-rules   (get honey-sql :style-rules)
          orig-honey-sql honey-sql
-         deep-meta?    (true? (= @deep-meta-on-deck (first keypath)))
-        ;;  _             (when deep-meta?
+         stack?    (true? (= @deep-meta-on-deck (first keypath)))
+        ;;  _             (when stack?
         ;;                  (ut/tapp>> [:deep-meta! (str keypath)])
         ;;                  (swap! db/running-deep-meta-on conj (first keypath)))
          sniff?        (= (get @db/sniff-deck (first keypath)) :reco)
@@ -1365,7 +1375,7 @@
        {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call)
                       :ui-keypath    keypath
                       :panel-key     panel-key
-                      :deep-meta?    deep-meta?
+                      :stack?    stack?
                       :kit-name      kit-name
                       :clover-sql    clover-sql
                       :honey-sql     honey-modded
@@ -1378,7 +1388,7 @@
         :on-timeout  [::http/timeout-response [keypath honey-sql]]
         :timeout     50000}])
 
-     (when deep-meta?
+     (when stack?
        ;(reset! db/running-deep-meta-on (vec (remove #(= % (first keypath)) @db/running-deep-meta-on)))
        (reset! deep-meta-on-deck nil)))
 
@@ -1386,6 +1396,7 @@
      (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
 
    (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql])
+   (when (not= :shape-rotation-maps-sys (first keypath)) (ut/tracked-dispatch [::clear-query-history :shape-rotation-maps-sys]))
    ;(swap! db/running-queries disj honey-sql)
    )
 
@@ -1393,8 +1404,8 @@
    (doall
      (let [style-rules   (get honey-sql :style-rules)
            orig-honey-sql honey-sql
-           deep-meta?    (true? (= @deep-meta-on-deck (first keypath)))
-          ;;  _             (when deep-meta?
+           stack?    (true? (= @deep-meta-on-deck (first keypath)))
+          ;;  _             (when stack?
           ;;                  (ut/tapp>> [:deep-metax! (str keypath)])
           ;;                  (swap! db/running-deep-meta-on conj (first keypath)))
            sniff?        (= (get @db/sniff-deck (first keypath)) :reco)
@@ -1435,7 +1446,7 @@
                                                 :panel-key     panel-key
                                                 :kit-name      kit-name
                                                 :clover-sql    clover-sql
-                                                :deep-meta?    deep-meta?
+                                                :stack?    stack?
                                                 :page          page
                                                 :client-cache? cache?
                                                 :sniff?        sniff?
@@ -1445,7 +1456,7 @@
                                   :on-response [::http/socket-response]
                                   :on-timeout  [::http/timeout-response [keypath honey-sql]]
                                   :timeout     120000}])
-           (when deep-meta?
+           (when stack?
              ;(reset! db/running-deep-meta-on (vec (remove #(= % (first keypath)) @db/running-deep-meta-on)))
              (reset! deep-meta-on-deck nil))
 
@@ -1454,6 +1465,7 @@
              (swap! db/sniff-deck dissoc (first keypath)))
 
            (ut/tracked-dispatch [::add-to-sql-history keypath orig-honey-sql])
+           (when (not= :shape-rotation-maps-sys (first keypath)) (ut/tracked-dispatch [::clear-query-history :shape-rotation-maps-sys]))
            ;(swap! db/running-queries disj honey-sql)
            )))))
 

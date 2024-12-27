@@ -22,7 +22,7 @@
                             [:not [:like :field-name "%key%"]]
                             [:not [:like :field-name "styler_%"]] ;; ignore user-space conditional formatting fields
                             [:not [:like :field-name "%_id%"]]]]]
- ;:testto?                [:or :zipcode? :low-cardinality? :dimension?]
+ ;;:testto?                [:or :zipcode? :low-cardinality? :dimension?]
  :looks-lat?             [:or [:like [:lower :field-name] "%lat%"] [:like [:lower :field-name] "lat%"] [:like [:lower :field-name] "%lat"]]
  :looks-long?            [:or [:like [:lower :field-name] "%long%"] [:like [:lower :field-name] "long%"] [:like [:lower :field-name] "%long"]]
 ;;  :geo-lat?               [:and [:like [:lower :field-name] "%lat%"] [:or [:= :data-type "float"] [:= :data-type "decimal"]]]
@@ -37,6 +37,8 @@
  :medium-cardinality?    [:and [:> :distinct-count 15] [:<= :distinct-count 30]]
  :high-cardinality?      [:>= :distinct-count 31]
  :reasonable-cardinality? [:< :distinct-count 100]
+ :facet-cardinality?     [:<= :distinct-count 15]
+ :pivot-cardinality?     [:<= :distinct-count 55]
  :is-date?               [:= :data-type "date"]
  :is-datetime?           [:= :data-type "datetime"]
  :is-integer?            [:= :data-type "integer"]
@@ -45,12 +47,15 @@
  :is-sqlite?             [:= :db-type "SQLite"]
  :is-year?               [:and [:= :data-type "integer"] [:like [:lower :field-name] "%year%"]]
  :is-month?              [:and [:= :data-type "integer"] [:like [:lower :field-name] "%month%"]]
- :is-rowcount?           [:and [:= :data-type "integer"] [:or [:= :field-name "rows"] [:= :field-name "rrows"]]] ;; meta field inserted to generate counts by dim
+ ;:is-rowcount?           [:and [:= :data-type "integer"] [:or [:= :field-name "rows"] [:= :field-name "rrows"]]] ;; meta field inserted to generate counts by dim
+ :is-rowcount?           [:or [:= :field-name "rows"] [:= :field-name "rrows"]] ;; meta field inserted to generate counts by dim
  :not-clickhouse?        [:<> :db-type "ClickHouse"]
  :true?                  [:= 1 1]
  :false?                 [:= 45 1]
- :looks-like-date?       [:like [:cast :example-value :text] "____-__-__"]
-                          ;[:like [:cast :example-value :text] "%____-__-__%"]
- :looks-like-datetime?   [:like [:cast :example-value :text] "____-__-__ %"]}
+ :looks-like-date?       [:or [:like "____-__-__"]
+                          [:like "%____-__-__%"]
+                          [:like [:lower :field-name] "%date"]
+                          [:like [:cast :example-value :text] "%____-__-__%"]]
+ :looks-like-datetime?   [:like "____-__-__ %"]}
 
 ;;; runs on the field level only atm

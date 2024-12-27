@@ -4,11 +4,13 @@
    [clojure.string :as cstr]
    [clojure.walk :as walk]
    [clojure.edn :as edn]
+   [clojure.set :as cset]
    [rvbbit-backend.sql        :as    sql
     :refer [sql-exec sql-query ghost-db system-db to-sql]]
    ;[rvbbit-backend.pool-party :as ppy]
    [rvbbit-backend.evaluator :as evl]
    [clojure.core.reducers :as r]
+   [rvbbit-backend.shape-rotator :as rota]
    [rvbbit-backend.db :as db]
    [rvbbit-backend.config :as config]
    [rvbbit-backend.util :as ut]))
@@ -184,32 +186,58 @@
 ;; (ut/pp [:ff @db/drag-body-map])
 ;; (context-map :spirited-triangular-serval-31 [:block-10470 :queries :grouped-all-superstore-2 :field :city] [:canvas :canvas :canvas])
 
+(defn get-parent-table [runner body client-name] ;; also gets tables out of views
+  (cond
+    (= runner :queries)
+    (try
+      (let [ww (first (flatten (get body :from)))]
+        (if (cstr/starts-with? (str ww) ":query/")
+          (keyword (cstr/replace (str ww) ":query/" ""))
+          ww))
+      (catch Exception _ nil))
+
+    (= runner :views)
+    (let [query-keys (vec (apply concat (for [[_ v] (get @db/client-panels client-name)
+                                              :when (get v :queries)]  (keys (get v :queries)))))
+          query-keys (into query-keys
+                           (vec (for [q query-keys] (keyword (str "query/" (cstr/replace (str q) ":" ""))))))
+          matches (cset/intersection (set query-keys) (set (ut/deep-flatten body)))]
+                              ;;  (ut/pp [:vega panel-key data-key matches query-keys])
+      (when (ut/ne? matches) (-> (first matches) (cstr/replace ":" "") (cstr/replace "query/" "") keyword)))
+
+    (= runner :pivot) (get-in body [:rowset-keypath 0]) ;; source of the pivot, not the middle flat table
+    :else nil))
+
 (defn context-map [client-name leaf-kp & [selected-kp fake-atom dbody]]
   (let [cache-key [(hash [client-name leaf-kp selected-kp fake-atom dbody]) (get @db/leaf-brute-force-last-panel-hash client-name)]
         cached-result (get @context-map-cache cache-key)]
-    (if false ;(ut/ne? cached-result)
+    (if (ut/ne? cached-result)
       cached-result
-      ;; (do (ut/pp ["💰" :cache-hit :context-map client-name leaf-kp selected-kp]) cached-result)
+      ;;(do (ut/pp ["💰" :cache-hit :context-map client-name leaf-kp selected-kp]) cached-result)
 
       (let [;;;_ (ut/pp  [:fake-atom (keys fake-atom)])
             [panel-key runner data-key _ field-name] leaf-kp
             leaf-kp [panel-key runner data-key]
             canvas-drop? (true? (or (= leaf-kp [:canvas :canvas :canvas]) (empty? leaf-kp)))
-
+            settings (dissoc @db/latest-settings-map :runners :modes)
             tab-name (get-in @db/client-panels [client-name panel-key :tab])
             outputs (into {} (for [[[_ kp] v] (get @evl/nrepl-output-atom client-name)] {kp v}))
+            block-body (get-in @db/client-panels [client-name panel-key])
+            generated? (not (nil? (get block-body :shape-rotator)))
             body  (get-in @db/client-panels [client-name panel-key runner data-key])
-            parent-table (cond
-                           (= runner :queries)
-                           (try
-                             (let [ww (first (flatten (get body :from)))]
-                               (if (cstr/starts-with? (str ww) ":query/")
-                                 (keyword (cstr/replace (str ww) ":query/" ""))
-                                 ww))
-                             (catch Exception _ nil))
-
-                           (= runner :pivot) (get-in body [:rowset-keypath 0]) ;; source of the pivot, not the middle flat table
-                           :else nil)
+            parent-table (get-parent-table runner body client-name)
+            grandparent-table (last (first
+                                     (filter #(= parent-table (second %))
+                                             (apply concat (for [[kk v] (get @db/client-panels client-name)
+                                                                 :when (get v :queries)]
+                                                             (for [[k vv] (get v :queries)]
+                                                               [kk k (try
+                                                                       (let [ww (first (flatten (get vv :from)))]
+                                                                         (if (cstr/starts-with? (str ww) ":query/")
+                                                                           (keyword (cstr/replace (str ww) ":query/" ""))
+                                                                           ww))
+                                                                       (catch Exception _ nil))]))))))
+            _ (ut/pp [:grandparent-table grandparent-table])
             dragging-kp (or selected-kp (get @db/leaf-drags-atom client-name))
             dragging? (true? (or (= leaf-kp dragging-kp) ; are WE dragging
                                  (= [panel-key runner data-key :field field-name] dragging-kp)))
@@ -220,9 +248,10 @@
             query-metadata (get-in @db/client-panels-metadata [client-name panel-key runner data-key]
                                    (get-in @db/query-metadata [client-name data-key]))
             parent-query-metadata (get-in @db/query-metadata [client-name parent-table])
+            grandparent-query-metadata (get-in @db/query-metadata [client-name grandparent-table])
             connection-id (get-in @db/client-panels (conj (into [client-name] leaf-kp) :connection-id)
                                   (get-in @db/client-panels (into [client-name] (conj [(first leaf-kp)] :connection-id))))
-
+            ;; db-type (rota/db-type-from-connection-id connection-id) ;; use get :database/* info instead
             ;; dragging-body (get-in @db/params-atom [client-name :dragging-body])
             ;; dragging-type (get-in @db/params-atom [client-name :dragging-body :drag-meta :type])
 
@@ -243,17 +272,21 @@
 
 
                     ;; this is all the field level leaves for the field in question - not the dragged field, but an individual
-                    (when field-name ;; get easy to access field meta with :field-*
-                      (merge
-                       (into {} (for [[k v]
-                                      (if fake-atom
-                                        (get-in fake-atom [:fields :by-keypath [panel-key runner data-key :field field-name]])
-                                        (get-in @db/leaf-atom [client-name :fields :by-keypath [panel-key runner data-key :field field-name]]))]
-                                  {(keyword (str "field/" (cstr/replace (str k) ":" ""))) v}))
-                       {:field
-                        (if fake-atom
-                          (get-in fake-atom [:fields :by-keypath [panel-key runner data-key :field field-name]])
-                          (get-in @db/leaf-atom [client-name :fields :by-keypath [panel-key runner data-key :field field-name]]))}))
+                    ;; (when field-name ;; get easy to access field meta with :field-*
+                    ;;   (merge
+                    ;;    (into {} (for [[k v]
+                    ;;                   ;; (if fake-atom
+                    ;;                   ;;   (get-in fake-atom [:fields :by-keypath [panel-key runner data-key :field field-name]])
+                    ;;                   ;;   (get-in @db/leaf-atom [client-name :fields :by-keypath [panel-key runner data-key :field field-name]]))
+                    ;;                   (get-in @db/leaf-field-meta-map [client-name connection-id data-key field-name])
+                    ;;                   ;; ^^ get data from field-attributes calls done earlier in query/table assessment
+                    ;;                   ]
+                    ;;               {(keyword (str "field/" (cstr/replace (str k) ":" ""))) v}))
+                    ;;    {:field (get-in @db/leaf-field-meta-map [client-name connection-id data-key field-name])
+                    ;;     ;; (if fake-atom
+                    ;;     ;;   (get-in fake-atom [:fields :by-keypath [panel-key runner data-key :field field-name]])
+                    ;;     ;;   (get-in @db/leaf-atom [client-name :fields :by-keypath [panel-key runner data-key :field field-name]]))
+                    ;;     }))
 
                     (when (= dragging-type :param)
                       (let [param-map (into {}
@@ -352,12 +385,18 @@
                      :clover-kws (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten body))
                      :connection-id connection-id
                      :metadata query-metadata
+                     :generated? (true? generated?)
+                     :grandparent-table grandparent-table
+                     :grandparent-table-str (str grandparent-table)
+                     :grandparent-metadata grandparent-query-metadata
                      :parent-metadata parent-query-metadata
                      :parent-table parent-table
+                     :parent-table-str (str parent-table)
                      :height-int (* hh 50)
                      :width-int (* ww 50)
                      :height hh
                      :width ww
+                     :settings settings
                      :panel-key panel-key
                      :block-key panel-key
                      :data-key data-key
@@ -367,9 +406,10 @@
                      :runner runner
                      :runner-str (str runner)
                      :ui-keypath [:panels panel-key runner data-key]})]
-        ;;(ut/pp ["💨" :cache-miss :context-map client-name leaf-kp selected-kp])
+        ;; (ut/pp ["💨" :pp client-name leaf-kp selected-kp settings parent-table])
+        ;(ut/pp ["💨" :cache-miss :context-map client-name leaf-kp selected-kp])
         (swap! context-map-cache assoc cache-key result)
-        ;;(ut/pp {:context-map result})
+        ;; (ut/pp {:context-map (dissoc result :settings)})
         result))))
 
 ;; Function to clear the context-map cache when needed
@@ -385,8 +425,8 @@
 (declare leaf-eval-runstream)
 
 (defn leaf-fn-eval [leaf-fn leaf-name client-name leaf-kp & [selected-kp fake-atom dbody]]
-  (let [cache-key 0 ;[(get @db/leaf-brute-force-last-panel-hash client-name) (hash fake-atom) client-name leaf-kp selected-kp] ;0 ;(hash [(context-map client-name leaf-kp selected-kp) selected-kp leaf-fn leaf-name leaf-kp])
-        cached-result nil]; (get @leaf-fn-cache cache-key)]
+  (let [cache-key 0 ;;[(get @db/leaf-brute-force-last-panel-hash client-name) (hash fake-atom) client-name leaf-kp selected-kp dbody] ;0 ;(hash [(context-map client-name leaf-kp selected-kp) selected-kp leaf-fn leaf-name leaf-kp])
+        cached-result nil] ;(get @leaf-fn-cache cache-key)]
     (if (ut/ne? cached-result)
       cached-result
       ;;(do (ut/pp ["💰" :cache-hit :leaf-fn-eval client-name leaf-kp leaf-name]) cached-result)
@@ -404,7 +444,12 @@
               _ (when    (ut/ne? outs) (ut/pp ["🥩" {:raw-repl-output [leaf-name leaf-kp] :says outs}]))
               vall       (get-in res [:evald-result :value])
               err        (get-in res [:evald-result :err])
-              result     (if err (do (ut/pp [:leaf-fn-error err]) {}) vall)]
+              ;; pretty-err (try (str leaf-name ":fn-line:" (last (cstr/split (cstr/join " " outs) "(REPL"))) (catch Exception e (str (str e) "::" err)))
+              result     (if err
+                           (do
+                            ;;  (when-let [f (requiring-resolve 'rvbbit-backend.websockets/notify-general)]
+                            ;;    (f client-name (str "leaf action failed: " (str pretty-err))))
+                             (ut/pp [:leaf-fn-error outs]) {}) vall)]
           ;(ut/pp [:leaf-fn-cache-miss-LIVE leaf-name client-name leaf-kp])
           ;(ut/pp ["💨" :cache-miss :leaf-fn-eval client-name leaf-kp leaf-name])
           (swap! leaf-fn-cache assoc cache-key result)
@@ -424,14 +469,24 @@
       ;;(do (ut/pp ["💰" :cache-hit :fn-context-map client-name src-keypath target-keypath]) cached-result)
       (let [src-keypath (if (cstr/starts-with? (str (get src-keypath 2)) ":query/")
                           (edn/read-string (cstr/replace (str src-keypath) ":query/" ":")) src-keypath)
+            settings (dissoc @db/latest-settings-map :runners :modes)
             base-src-view-kp (vec (take 3 src-keypath))
             base-src-block-kp (vec (take 1 src-keypath))
+            src-runner (get base-src-view-kp 1)
             base-target-view-kp (vec (take 3 target-keypath))
+            target-runner (get base-target-view-kp 1)
             base-target-block-kp (vec (take 1 target-keypath))
             source-view-body (get-in @db/client-panels (into [client-name] base-src-view-kp))
             target-view-body (get-in @db/client-panels (into [client-name] base-target-view-kp))
+            source-block (get-in @db/client-panels (into [client-name] base-src-block-kp))
+            target-block (get-in @db/client-panels (into [client-name] base-target-block-kp))
+            source-connection-id (get source-view-body :connection-id (get source-block :connection-id))
+            target-connection-id (get target-view-body :connection-id (get target-block :connection-id))
+            source-db-type (rota/db-type-from-connection-id source-connection-id)
+            target-db-type (rota/db-type-from-connection-id target-connection-id)
             dragging-kp   (get @db/leaf-drags-atom client-name)
             dragging-body (or dbody (get-in @db/drag-body-map [client-name dragging-kp]))
+            parent-table (get-parent-table target-runner target-view-body client-name)
             ;dragging-type (get-in dragging-body [:drag-meta :type])
             ;dragging-body (get-in @db/params-atom [client-name :dragging-body])
             ;; parent-query-metadata (get-in @db/query-metadata [client-name (get src-keypath 2)])
@@ -440,17 +495,28 @@
             ;;_ (ut/pp [:parent-query-metadata parent-query-metadata (into [client-name] base-src-view-kp) [client-name (get src-keypath 2)]])
             drag-meta (get dragging-body :drag-meta)
             result {:source-kp (into [:panels] base-src-view-kp)
-                    :source-block (get-in @db/client-panels (into [client-name] base-src-block-kp))
+                    :source-block-kp (into [:panels] base-src-block-kp)
+                    :source-block source-block
                     :source-view source-view-body
                     :source-query source-view-body
                     :source-view-body source-view-body
                     :source-query-body source-view-body
+                    :source-runner src-runner
+                    :target-runner target-runner
+                    :source-connection-id source-connection-id
+                    :target-connection-id target-connection-id
+                    :source-db-type source-db-type
+                    :target-db-type target-db-type
                     :dragging-body dragging-body
                     :drag-body dragging-body
+                    :parent-table parent-table
+                    :parent-table-str (str parent-table)
+                    :settings settings
                     :parent-query-metadata parent-query-metadata
                     :drag-meta drag-meta
                     :target-kp (into [:panels] base-target-view-kp)
-                    :target-block (get-in @db/client-panels (into [client-name] base-target-block-kp))
+                    :target-block-kp (into [:panels] base-target-block-kp)
+                    :target-block target-block
                     :target-view target-view-body
                     :target-query target-view-body
                     :source-item (last src-keypath)
@@ -486,13 +552,13 @@
       cached-result
       ;;(do (ut/pp ["💰" :cache-hit :leaf-action-fn-eval client-name src-keypath target-keypath leaf-action-cat leaf-action]) cached-result)
       (try
-        (let [clover-kw  (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten leaf-fn))
-              clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
-              leaf-fn (walk/postwalk-replace clover-lookup-map leaf-fn)
+        (let [;clover-kw  (filterv #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten leaf-fn))
+              ;clover-lookup-map (into {} (for [kw clover-kw] {kw (db/clover-lookup client-name kw)}))
+              ;leaf-fn (walk/postwalk-replace clover-lookup-map leaf-fn)
               repl-str   (str "(let [deep-flatten rvbbit-backend.util/deep-flatten
                                      pp rvbbit-backend.util/pp
                                      flatten-to-keywords rvbbit-backend.util/deep-flatten
-                                     fn-context-map (rvbbit-backend.leaves/fn-context-map " client-name src-keypath target-keypath dbody")]
+                                     fn-context-map (rvbbit-backend.leaves/fn-context-map " client-name src-keypath target-keypath dbody ")]
                                (" leaf-fn  " fn-context-map))")
               ;;_          (ut/pp [:repl-str repl-str])
               res        (evl/repl-eval repl-str "localhost" 8181 :rvbbit [] [])
@@ -500,8 +566,36 @@
               _ (when  (ut/ne? outs) (ut/pp ["🥩" {:raw-repl-output [client-name src-keypath target-keypath leaf-action-cat leaf-action] :says outs}]))
               vall       (get-in res [:evald-result :value])
               err        (get-in res [:evald-result :err])
-              result     (if err (do (ut/pp [:leaf-fn-error err])
-                                     [(clover-error-wrapper "leaf-action-fn-eval-error!" (str leaf-action-cat " " leaf-action) err leaf-fn)]) vall)]
+              ;pretty-err (try (str leaf-action-cat "/" (cstr/replace (str leaf-action) ":" "") " " (last outs)) (catch Exception e (str (str e) "::" err)))
+              ;;_ (ut/pp [:REPL-outs client-name src-keypath target-keypath outs])
+              _ (when (ut/ne? (remove empty? outs))
+                  (try
+                    (when-let [f (requiring-resolve 'rvbbit-backend.websockets/alert!)]
+                      (f client-name [:v-box
+                                      :style {:font-size "15px"}
+                                      :children [[:box
+                                                  :style {:font-size "23px"}
+                                                  :child (str leaf-action-cat "/" (cstr/replace (str leaf-action) ":" "") " says...")]
+                                                 [:v-box
+                                                  :style {:font-family :theme/monospaced-font
+                                                          :font-size "10px"}
+                                                  :children (for [o outs] [:box :child (str o)])]]]  12 (+ (* (count outs) 1) 4) 10))
+                    (catch Exception e (ut/pp [:leaf-action-fn-notify-failed (str e)]))))
+              result     (if err (do
+                                   (try
+                                     (when-let [f (requiring-resolve 'rvbbit-backend.websockets/alert!)]
+                                       (f client-name [:v-box
+                                                       :style {:font-size "15px"}
+                                                       :children [[:box
+                                                                   :style {:font-size "23px"}
+                                                                   :child (str leaf-action-cat "/" (cstr/replace (str leaf-action) ":" "") " says...")]
+                                                                  [:box :child (last outs)]
+                                                                  ;; [:box :child (str "(from leaf fn line " (cstr/replace
+                                                                  ;;                                          (last (cstr/split (str (first outs)) #"REPL:")) ")." "") " in leaves.edn)")]
+                                                                  ]]  12 4 10))
+                                     (catch Exception e (ut/pp [:leaf-action-fn-notify-failed (str e)])))
+                                   (ut/pp [:leaf-action-fn-error outs])
+                                   [(clover-error-wrapper "leaf-action-fn-eval-error!" (str leaf-action-cat " " leaf-action) err leaf-fn)]) vall)]
           ;(ut/pp ["💨" :cache-miss :leaf-action-fn-eval client-name src-keypath target-keypath leaf-action-cat leaf-action])
           (swap! leaf-fn-cache assoc cache-key (first result))
           (first result))

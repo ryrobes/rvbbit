@@ -514,7 +514,8 @@
  ::get-metadata
  (fn [db {:keys [table-key]}]
    (let [meta (get-in db [:meta table-key] {})
-         post-meta (get-in db [:meta table-key])]
+         ;post-meta (get-in db [:meta table-key])
+         ]
      ;; (if post-meta (for [[k v] meta] {k (merge v (get meta k))})) ;; lets do this later
      meta)))
 
@@ -792,7 +793,7 @@
 (defn honeycomb-builder [panel-key runner view-key h w]
   (let [query @(ut/tracked-sub ::get-query {:panel-key panel-key :runner runner :table-key view-key})
         cache-key [query (hash @dragging-body)]]
-    (if-let [cached (get @db/honey-comb-cache cache-key)]
+    (if-let [cached nil] ;(get @db/honey-comb-cache cache-key)]
       cached
       (let [hc-body (let [main-table (get-main-table query)
                           main-table (cond
@@ -805,7 +806,8 @@
                                        :else main-table)
                           used-fields (get-field-names query)
                           metadata  @(ut/tracked-sub ::get-metadata {:table-key main-table})
-                           ;; _ (ut/tapp>> [:main-table main-table metadata])
+                          ;;meta2     @(ut/tracked-subscribe [::conn/sql-metadata [main-table]])
+                          _ (ut/tapp>> [:main-table main-table metadata])
                           parsed    (honey-sql->honeycomb query metadata)
                           react! [@dyn-dropper-hover @dragging? @dragging-out?]
                             ;w (- w 20)

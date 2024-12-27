@@ -1,0 +1,2637 @@
+{:reco-preview nil,
+ :annotate? false,
+ :default-col-widths
+ {:block-61 {:new-raw-sql-2 100},
+  :block-62 {:all-superstore-3 100},
+  :block-7831 {:query1 130},
+  :system-connections-list* {:connections-sys 126},
+  :block-70 {:query7 105},
+  :block-68 {:cnt-new-raw-sql-2 211},
+  :system-fields-list* {:fields-sys 127},
+  :block-8193 {:agg-grouped-all-superstore-1 261},
+  :block-6676 {:grouped-all-superstore-1 155},
+  :block-10955 {:agg-all-superstore 361},
+  :block-10081 {:grouped-all-superstore 130},
+  :block-1400 {:query1-1 130},
+  :block-69 {:cnt-all-superstore-3 261},
+  :block-7349 {:cnt-all-superstore 261},
+  :block-7312 {:agg-grouped-all-superstore 261},
+  :system-tables-list* {:tables-sys 100},
+  :block-703 {:all-superstore 100}},
+ :runstream-drops nil,
+ :tabs ["winter-wonder-lands" "commendable snake" "stupendous deer" "hello-world"],
+ :selected-cols nil,
+ :server nil,
+ :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
+ :lines? false,
+ :editor? false,
+ :buffy? false,
+ :memory [1938324214 1840655878 4294705152],
+ :client-name :bountiful-silver-yellow-jacket-19,
+ :server-panels
+ [:block-64
+  :block-66
+  :block-67
+  :block-695
+  :block-684
+  :block-61
+  :block-5136
+  :block-263
+  :block-62
+  :block-8880
+  :block-7831
+  :block-488
+  :block-4928
+  :block-10207
+  :block-689
+  :block-11913
+  :block-70
+  :block-68
+  :block-8193
+  :block-5189
+  :block-6676
+  :block-173
+  :block-10955
+  :block-65
+  :block-10081
+  :block-172
+  :block-63
+  :block-60
+  :block-1400
+  :block-609
+  :block-69
+  :block-801
+  :block-653
+  :block-350
+  :block-7349
+  :block-411
+  :block-7312
+  :block-703],
+ :peek? false,
+ :flow-editor? true,
+ :window {:w 2244, :h 1213},
+ :ai-worker? false,
+ :quake-console? false,
+ :implicit-rowsets {:solver [nil]},
+ :post-meta
+ {:new-raw-sql-2
+  {:server_subs {:distinct 1},
+   :queue_size {:distinct 0},
+   :* {:rowcount 3},
+   :push {:distinct 1},
+   :selected_tab {:distinct 1},
+   :client_subs {:distinct 1},
+   :recent_messages_per_second {:distinct 1},
+   :uptime_seconds {:distinct 1},
+   :uptime {:distinct 1},
+   :last_seen_seconds {:distinct 1},
+   :memory {:distinct 1},
+   :screen_name {:distinct 1},
+   :rrows {:distinct nil},
+   :queue_distro {:distinct 1},
+   :ts {:distinct 1},
+   :messages_per_second {:distinct 1},
+   :client_latency {:distinct 1},
+   :ack {:distinct 1},
+   :booted_ts {:distinct 1},
+   :client_name {:distinct 1},
+   :last_seen {:distinct 1}},
+  :all-superstore-3
+  {:category {:distinct 3},
+   :sales {:distinct 4363},
+   :* {:rowcount 6511},
+   :ship_date {:distinct 1212},
+   :product_id {:distinct 1793},
+   :city {:distinct 464},
+   :profit {:distinct 5180},
+   :rrows {:distinct nil},
+   :state {:distinct 49},
+   :zipcode {:distinct 560},
+   :region {:distinct 4},
+   :ship_mode {:distinct 2},
+   :segment {:distinct 3},
+   :sub_category {:distinct 17},
+   :order_date {:distinct 1123},
+   :quantity {:distinct 14},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 779},
+   :product_name {:distinct 1780},
+   :customer_id {:distinct 779}},
+  :agg-grouped-all-superstore
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :all-superstore
+  {:category {:distinct 3},
+   :sales {:distinct 5825},
+   :* {:rowcount 9994},
+   :ship_date {:distinct 1334},
+   :product_id {:distinct 1862},
+   :city {:distinct 531},
+   :profit {:distinct 7287},
+   :rrows {:distinct nil},
+   :state {:distinct 49},
+   :zipcode {:distinct 631},
+   :row_id {:distinct 9994},
+   :region {:distinct 4},
+   :ship_mode {:distinct 4},
+   :order_id {:distinct 5009},
+   :segment {:distinct 3},
+   :sub_category {:distinct 17},
+   :order_date {:distinct 1237},
+   :quantity {:distinct 14},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 793},
+   :product_name {:distinct 1850},
+   :customer_id {:distinct 793}},
+  :rabbit-search-like-themes
+  {:theme_name {:distinct 87},
+   :* {:rowcount 87},
+   :theme_map {:distinct 87},
+   :rrows {:distinct nil}},
+  :gen-viz-949
+  {:sales {:distinct 17},
+   :* {:rowcount 17},
+   :sub_category {:distinct 17},
+   :rrows {:distinct nil}},
+  :tables-sys
+  {:* {:rowcount 9},
+   :db_schema {:distinct 1},
+   :db_catalog {:distinct 0},
+   :fields {:distinct 9},
+   :rrows {:distinct nil},
+   :rows {:distinct 7},
+   :schema_cat {:distinct 0},
+   :table_name {:distinct 9},
+   :connection_id {:distinct 1}}},
+ :flow-estimates
+ {:fields-sys {:times 0.003, :run-id :fields-sys},
+  :gen-viz-1048 {:times 0.01, :run-id :gen-viz-1048},
+  :agg-all-superstore {:times 0.007, :run-id :agg-all-superstore},
+  :cnt-all-superstore-3 {:times 0.005, :run-id :cnt-all-superstore-3},
+  :gen-viz-549 {:times 0.013, :run-id :gen-viz-549},
+  :superstore {:times 0.008, :run-id :superstore},
+  :tables-sys {:times 0.001, :run-id :tables-sys},
+  :query1-1 {:times 0.005, :run-id :query1-1},
+  :grouped-all-superstore-1 {:times 0.005, :run-id :grouped-all-superstore-1},
+  :new-raw-sql-2 {:times 0.002, :run-id :new-raw-sql-2},
+  :gen-viz-756-1 {:times 0.01, :run-id :gen-viz-756-1},
+  :block-67-new-clojure-c-8823 {:times 0.008, :run-id :block-67-new-clojure-c-8823},
+  :gen-viz-949 {:times 0.008, :run-id :gen-viz-949},
+  :block-60-new-clojure-10 {:times 0.016, :run-id :block-60-new-clojure-10},
+  :block-66-new-clojure-c-9918 {:times 0.01, :run-id :block-66-new-clojure-c-9918},
+  :rabbit-search-like-themes {:times 0.003, :run-id :rabbit-search-like-themes},
+  :gen-viz-959-1 {:times 0.006, :run-id :gen-viz-959-1},
+  :grouped-all-superstore {:times 0.01, :run-id :grouped-all-superstore},
+  :all-superstore-3 {:times 0.016, :run-id :all-superstore-3},
+  :gen-viz-756 {:times 0.009, :run-id :gen-viz-756},
+  :agg-grouped-all-superstore-1
+  {:times 0.005, :run-id :agg-grouped-all-superstore-1},
+  :agg-grouped-all-superstore {:times 0.008, :run-id :agg-grouped-all-superstore},
+  :query7 {:times 0.012, :run-id :query7},
+  :gen-viz-959 {:times 0.005, :run-id :gen-viz-959},
+  :connections-sys {:times 0.004, :run-id :connections-sys},
+  :all-superstore {:times 0.015, :run-id :all-superstore},
+  :rabbit-search-like-screens {:times 0.002, :run-id :rabbit-search-like-screens},
+  :gen-viz-994 {:times 0.012, :run-id :gen-viz-994},
+  :cnt-new-raw-sql-2 {:times 0.002, :run-id :cnt-new-raw-sql-2},
+  :cnt-all-superstore {:times 0.007, :run-id :cnt-all-superstore},
+  :query1 {:times 0.006, :run-id :query1},
+  :block-5136-new-clojure {:times 0.015, :run-id :block-5136-new-clojure}},
+ :screen-name "late-december",
+ :panel-hashes
+ {:block-64 673729834,
+  :block-66 1766492828,
+  :block-67 1351155993,
+  :block-695 1666872905,
+  :block-684 1833239107,
+  :block-61 -1158011457,
+  :block-5136 -939428243,
+  :block-263 1373674838,
+  :block-62 -1036148909,
+  :block-8880 -767281295,
+  :block-7831 -1733966931,
+  :block-488 -760269408,
+  :block-4928 1688538454,
+  :block-10207 1099655619,
+  :block-689 1838638432,
+  :block-11913 -945310181,
+  :block-70 -1784129399,
+  :block-68 -263146135,
+  :block-8193 1562989175,
+  :block-5189 735662132,
+  :block-6676 -871888662,
+  :block-173 -1067978404,
+  :block-10955 -1205664266,
+  :block-65 -199231842,
+  :block-10081 -1346281765,
+  :block-172 809806661,
+  :block-63 1039935903,
+  :block-60 -1652176331,
+  :block-1400 1129270867,
+  :block-609 -1522476013,
+  :block-69 -1268122967,
+  :block-801 -1973236451,
+  :block-653 -506031765,
+  :block-350 -430783371,
+  :block-7349 1203596686,
+  :block-411 -962085880,
+  :block-7312 1510009302,
+  :block-703 -320845073},
+ :recos-page2 0,
+ :selected-tab "hello-world",
+ :col-names nil,
+ :snapshots {:params {}},
+ :recos-page 0,
+ :rs-overrides-hashmap {"a-random-wow" nil},
+ :user-params-hash 1578780589,
+ :grid-recos? true,
+ :session-hash -162877865,
+ :resolved-queries
+ {:gen-viz-1048
+  {:select [[[[:sum :quantity]] :quantity] :ship_mode],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:ship_mode]},
+  :agg-all-superstore
+  {:select [[[:sum :quantity] :quantity]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :ssb56]]},
+  :cnt-all-superstore-3
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:customer_name
+       :segment
+       :zipcode
+       :region
+       :profit
+       :order_date
+       :product_id
+       :ship_mode
+       :state
+       :sales
+       :city
+       :customer_id
+       :category
+       :country
+       :discount
+       :product_name
+       :ship_date
+       :quantity
+       :sub_category],
+      :from [[:superstore :ssb99]],
+      :where
+      [:*if
+       {:ship_mode ["Standard Class" "Same Day"]}
+       [:*all= {:ship_mode ["Standard Class" "Same Day"]} [:ship_mode]]
+       [:= 1 1]]}
+     :ssb99]]},
+  :gen-viz-549
+  {:select [[[[:sum :quantity]] :quantity] :category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:category]},
+  :query1-1
+  {:select [:region [[:count 1] :rowcnt]],
+   :from [[:superstore :ctr7]],
+   :group-by [:region],
+   :order-by [[:rowcnt :desc]]},
+  :grouped-all-superstore-1
+  {:select [:segment [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :ssb50]],
+   :order-by [[:rowcnt :desc]],
+   :group-by [:segment]},
+  :new-raw-sql-2
+  {:select [:*],
+   :connection-id "systemh2-db",
+   :from
+   [[[:raw
+      ["(-- systemh2-db\nselect * from client_stats\nwhere client_latency > 500) rawsub"]]]]},
+  :gen-viz-756-1
+  {:select [[[[:sum :sales]] :sales] :segment],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:segment]},
+  :gen-viz-1042
+  {:select [[[:count 1] :rrows] :country],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:country]},
+  :query1-2
+  {:select [:state [[:count 1] :rowcnt]],
+   :from [[:ufo_sightings :ctr5]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :gen-viz-949
+  {:select [[[[:sum :sales]] :sales] :sub_category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:sub_category]},
+  :shape-rotation-maps-sys {:_last-run "23:05:06"},
+  :new-api-call-sqlized
+  {:select
+   [:total_wows_in_movie
+    :release_date
+    :director
+    :full_line
+    :movie
+    :year
+    :video_480p
+    :poster
+    :video_1080p
+    :video_720p
+    :audio
+    :current_wow_in_movie
+    :video_360p
+    :timestamp
+    :movie_duration
+    :character],
+   :connection-id "cache.db",
+   :_sqlized-at "2024-11-12 19:39:09",
+   :_sqlized-by [:block-10207 :api-call :new-api-call],
+   :_sqlized-hash nil,
+   :from [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]},
+  :countd-all-ufo-sightings-1
+  {:select [[[:count [:distinct :duration_hours]] :duration_hours]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb45]]},
+  :agg-new-api-call-sqlized
+  {:select [[[:sum :total_wows_in_movie] :total_wows_in_movie]],
+   :from
+   [[{:select
+      [:total_wows_in_movie
+       :release_date
+       :director
+       :full_line
+       :movie
+       :year
+       :video_480p
+       :poster
+       :video_1080p
+       :video_720p
+       :audio
+       :current_wow_in_movie
+       :video_360p
+       :timestamp
+       :movie_duration
+       :character],
+      :_sqlized-at "2024-11-12 19:39:09",
+      :_sqlized-by [:block-10207 :api-call :new-api-call],
+      :_sqlized-hash nil,
+      :from
+      [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]}
+     :ssb53]]},
+  :gen-viz-959-1
+  {:select [[[[:sum :profit]] :profit] :category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:category]},
+  :countd-all-ufo-sightings
+  {:select [[[:count [:distinct :state]] :state]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :ssb10]]},
+  :all-ufo-sightings
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :ssb47]],
+   :where
+   [:*if
+    {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+    [:*all= {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]} [:state]]
+    [:= 1 1]]},
+  :grouped-all-superstore
+  {:select [:category [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :ssb70]],
+   :group-by [:category]},
+  :all-superstore-3
+  {:select
+   [:customer_name
+    :segment
+    :zipcode
+    :region
+    :profit
+    :order_date
+    :product_id
+    :ship_mode
+    :state
+    :sales
+    :city
+    :customer_id
+    :category
+    :country
+    :discount
+    :product_name
+    :ship_date
+    :quantity
+    :sub_category],
+   :from [[:superstore :ssb99]],
+   :where
+   [:*if
+    {:ship_mode ["Standard Class" "Same Day"]}
+    [:*all= {:ship_mode ["Standard Class" "Same Day"]} [:ship_mode]]
+    [:= 1 1]]},
+  :gen-viz-756
+  {:select [[[:count 1] :rrows] :ship_mode],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:ship_mode]},
+  :agg-grouped-all-superstore-1
+  {:select [[[:sum :rowcnt] :rowcnt]],
+   :from
+   [[{:select [:category [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:category
+          :city
+          :country
+          :customer_id
+          :customer_name
+          :discount
+          :order_date
+          :order_id
+          :product_id
+          :product_name
+          :profit
+          :quantity
+          :region
+          :row_id
+          :sales
+          :segment
+          :ship_date
+          :ship_mode
+          :state
+          :sub_category
+          :zipcode],
+         :from [[:superstore :ssb41]],
+         :where
+         [:and
+          [:and
+           [:*if
+            {:region ["West" "Central" "South" "East"]}
+            [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+            [:= 1 1]]
+           [:*if
+            {:region ["West" "Central" "South" "East"]}
+            [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+            [:= 1 1]]]
+          [:*if
+           {:region ["West" "Central" "South" "East"]}
+           [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+           [:= 1 1]]]}
+        :ssb70]],
+      :group-by [:category]}
+     :ssb63]]},
+  :agg-grouped-all-superstore
+  {:select [[[:sum :rowcnt] :rowcnt]],
+   :from
+   [[{:select [:category [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:category
+          :city
+          :country
+          :customer_id
+          :customer_name
+          :discount
+          :order_date
+          :order_id
+          :product_id
+          :product_name
+          :profit
+          :quantity
+          :region
+          :row_id
+          :sales
+          :segment
+          :ship_date
+          :ship_mode
+          :state
+          :sub_category
+          :zipcode],
+         :from [[:superstore :ssb41]],
+         :where
+         [:and
+          [:and
+           [:*if
+            {:region ["West" "Central" "South" "East"]}
+            [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+            [:= 1 1]]
+           [:*if
+            {:region ["West" "Central" "South" "East"]}
+            [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+            [:= 1 1]]]
+          [:*if
+           {:region ["West" "Central" "South" "East"]}
+           [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+           [:= 1 1]]]}
+        :ssb70]],
+      :group-by [:category]}
+     :ssb91]]},
+  :query7
+  {:select [:ship_mode [[:count 1] :rowcnt]],
+   :from [[:superstore :ctr23]],
+   :group-by [:ship_mode],
+   :order-by [[:rowcnt :desc]]},
+  :gen-viz-959
+  {:select [[[:count 1] :rrows] :sub_category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:sub_category]},
+  :gen-viz-828
+  {:select [[[:count 1] :rrows] :shape],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :ssb47]],
+      :where
+      [:*if
+       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+       [:*all=
+        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
+        [:state]]
+       [:= 1 1]]}
+     :subq1]],
+   :group-by [:shape]},
+  :all-superstore
+  {:select
+   [:category
+    :city
+    :country
+    :customer_id
+    :customer_name
+    :discount
+    :order_date
+    :order_id
+    :product_id
+    :product_name
+    :profit
+    :quantity
+    :region
+    :row_id
+    :sales
+    :segment
+    :ship_date
+    :ship_mode
+    :state
+    :sub_category
+    :zipcode],
+   :from [[:superstore :ssb41]],
+   :where
+   [:and
+    [:and
+     [:*if
+      {:region ["West" "Central" "South" "East"]}
+      [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+      [:= 1 1]]
+     [:*if
+      {:region ["West" "Central" "South" "East"]}
+      [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+      [:= 1 1]]]
+    [:*if
+     {:region ["West" "Central" "South" "East"]}
+     [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+     [:= 1 1]]]},
+  :gen-viz-994
+  {:select [[[[:sum :sales]] :sales] :category],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :subq1]],
+   :group-by [:category],
+   :order-by [[:category :asc]]},
+  :cnt-new-raw-sql-2
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select [:*],
+      :from
+      [[[:raw
+         ["(-- systemh2-db\nselect * from client_stats\nwhere client_latency > 500) rawsub"]]]]}
+     :ssb99]]},
+  :cnt-all-superstore
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:category
+       :city
+       :country
+       :customer_id
+       :customer_name
+       :discount
+       :order_date
+       :order_id
+       :product_id
+       :product_name
+       :profit
+       :quantity
+       :region
+       :row_id
+       :sales
+       :segment
+       :ship_date
+       :ship_mode
+       :state
+       :sub_category
+       :zipcode],
+      :from [[:superstore :ssb41]],
+      :where
+      [:and
+       [:and
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:category]]
+         [:= 1 1]]
+        [:*if
+         {:region ["West" "Central" "South" "East"]}
+         [:*all= {:region ["West" "Central" "South" "East"]} [:customer_name]]
+         [:= 1 1]]]
+       [:*if
+        {:region ["West" "Central" "South" "East"]}
+        [:*all= {:region ["West" "Central" "South" "East"]} [:region]]
+        [:= 1 1]]]}
+     :ssb73]]},
+  :query1
+  {:select [:category [[:count 1] :rowcnt]],
+   :from [[:superstore :ctr15]],
+   :group-by [:category]}},
+ :panels
+ {nil {:queries {:shape-rotation-maps-sys {:_last-run "23:05:06"}}},
+  :block-64
+  {:h 5,
+   :w 11,
+   :views
+   {:editor-block-61-new-raw-sql-2 [:editor [:block-61 :queries :_new-raw-sql-2]]},
+   :name "block",
+   :leaf-drop [:view :generic-clover-drop],
+   :tab "stupendous deer",
+   :root [2 8]},
+  :block-66
+  {:clojure
+   {:new-clojure-c-9918
+    (let [new-clojure-10 :data/new-clojure-10
+          trigger-new-clojure-10 :data-hash/new-clojure-10]
+      new-clojure-10)},
+   :leaf-drop [:repl :data-drop],
+   :name "block",
+   :w 7,
+   :selected-mode {:* :text},
+   :selected-view :new-clojure-c-9918,
+   :root [24 2],
+   :h 4,
+   :tab "stupendous deer"},
+  :block-67
+  {:clojure
+   {:new-clojure-c-8823
+    (let [new-clojure-c-9918 :data/new-clojure-c-9918
+          trigger-new-clojure-c-9918 :data-hash/new-clojure-c-9918]
+      new-clojure-c-9918)},
+   :leaf-drop [:repl :data-drop],
+   :name "block",
+   :w 7,
+   :selected-mode {:* :text},
+   :selected-view :new-clojure-c-8823,
+   :root [33 2],
+   :h 4,
+   :tab "stupendous deer"},
+  :block-695
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-695",
+   :w 6,
+   :selected-view :countd-all-ufo-sightings,
+   :root [28 7],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:countd-all-ufo-sightings
+    {:select [[[:count [:distinct :state]] :state]],
+     :from [[:query/all-ufo-sightings :ssb10]]}},
+   :tab "commendable snake"},
+  :block-684
+  {:shape-rotator
+   {:context ["bigfoot-ufos" nil "none" "all-ufo-sightings"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "rrows", :x "country"},
+    :items [[:views :reech-2-2] [:queries :gen-viz-1042]],
+    :source-panel :block-11913},
+   :name "rrows, country",
+   :w 8,
+   :selected-view :reech-2-2,
+   :root [33 1],
+   :h 6,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-1042
+    {:select [[[:count 1] :rrows] :country],
+     :from [[:query/all-ufo-sightings :subq1]],
+     :group-by [:country]}},
+   :tab "commendable snake",
+   :views
+   {:reech-2-2
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :country, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :rrows,
+        :isAnimationActive false,
+        :data :gen-viz-1042,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-684},
+  :block-61
+  {:w 16,
+   :h 6,
+   :selected-view :new-raw-sql-2,
+   :queries
+   {:new-raw-sql-2
+    {:select [:*],
+     :connection-id "systemh2-db",
+     :from
+     [[[:raw
+        ["(-- systemh2-db\nselect * from client_stats\nwhere client_latency > 500) rawsub"]]]]}},
+   :leaf-drop [:fresh :fresh-raw-sql],
+   :tab "stupendous deer",
+   :root [15 7],
+   :name "block"},
+  :block-5136
+  {:clojure
+   {:new-clojure
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 huge. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :leaf-drop [:fresh :fresh-repl],
+   :name "block-5136",
+   :w 7,
+   :selected-mode {:* :text},
+   :selected-view :new-clojure,
+   :root [34 7],
+   :h 4,
+   :tab "winter-wonder-lands"},
+  :block-263
+  {:leaf-drop [:filter :click-table],
+   :name "block-263",
+   :w 6,
+   :selected-view :query1-2,
+   :root [1 12],
+   :h 11,
+   :drop-mutate
+   {[:panels :block-11913 :queries :all-ufo-sightings :where]
+    [:*if :query1-2/*.clicked [:*all= :query1-2/*.clicked [:state]] [:= 1 1]]},
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:query1-2
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:ufo_sightings :ctr5]],
+     :group-by [:state],
+     :order-by [[:rowcnt :desc]]}},
+   :tab "commendable snake"},
+  :block-62
+  {:leaf-drop [:sql :new-select.all],
+   :name "block",
+   :w 15,
+   :selected-view :all-superstore-3,
+   :root [20 15],
+   :h 6,
+   :connection-id "superstore",
+   :queries
+   {:all-superstore-3
+    {:select
+     [:customer_name
+      :segment
+      :zipcode
+      :region
+      :profit
+      :order_date
+      :product_id
+      :ship_mode
+      :state
+      :sales
+      :city
+      :customer_id
+      :category
+      :country
+      :discount
+      :product_name
+      :ship_date
+      :quantity
+      :sub_category],
+     :from [[:superstore :ssb99]],
+     :where
+     [:*if :query7/*.clicked [:*all= :query7/*.clicked [:ship_mode]] [:= 1 1]]}},
+   :tab "stupendous deer"},
+  :block-8880
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-8880",
+   :w 6,
+   :selected-view :agg-new-api-call-sqlized,
+   :root [30 16],
+   :h 4,
+   :connection-id "cache.db",
+   :queries
+   {:agg-new-api-call-sqlized
+    {:select [[[:sum :total_wows_in_movie] :total_wows_in_movie]],
+     :from [[:query/new-api-call-sqlized :ssb53]]}},
+   :tab "commendable snake"},
+  :block-7831
+  {:leaf-drop [:filter :click-table],
+   :name "block-7831",
+   :w 6,
+   :selected-view :query1,
+   :root [2 16],
+   :h 6,
+   :drop-mutate
+   {[:panels :block-703 :queries :all-superstore :where]
+    [:*if :query1/*.clicked [:*all= :query1/*.clicked [:category]] [:= 1 1]]},
+   :connection-id "superstore",
+   :queries
+   {:query1
+    {:select [:category [[:count 1] :rowcnt]],
+     :from [[:superstore :ctr15]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands"},
+  :block-488
+  {:shape-rotator
+   {:context ["superstore" nil "none" "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "profit", :x "category"},
+    :items [[:views :reech-1-4] [:queries :gen-viz-959-1]],
+    :source-panel :block-703},
+   :name "profit, category",
+   :w 7,
+   :selected-view :reech-1-4,
+   :root [34 11],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-959-1
+    {:select [[[[:sum :profit]] :profit] :category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-4
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :category, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :profit,
+        :isAnimationActive false,
+        :data :gen-viz-959-1,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-488},
+  :block-4928
+  {:w 7,
+   :h 4,
+   :selected-view :vv1,
+   :views
+   {:vv1
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "181px"}
+     :child
+     "hi"]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "commendable snake",
+   :root [9 13],
+   :name "block-4928"},
+  :block-10207
+  {:api-call
+   {:new-api-call
+    {:endpoint "https://owen-wilson-wow-api.onrender.com/wows/random",
+     :method :get,
+     :params {:results 22},
+     :flatten? true}},
+   :leaf-drop [:fresh :fresh-api-call],
+   :name "block-10207",
+   :w 9,
+   :selected-mode {:* :text},
+   :selected-view :new-api-call-sqlized,
+   :root [19 14],
+   :h 8,
+   :queries
+   {:new-api-call-sqlized
+    {:select
+     [:total_wows_in_movie
+      :release_date
+      :director
+      :full_line
+      :movie
+      :year
+      :video_480p
+      :poster
+      :video_1080p
+      :video_720p
+      :audio
+      :current_wow_in_movie
+      :video_360p
+      :timestamp
+      :movie_duration
+      :character],
+     :connection-id "cache.db",
+     :_sqlized-at "2024-11-12 19:39:09",
+     :_sqlized-by [:block-10207 :api-call :new-api-call],
+     :_sqlized-hash
+     :solver-meta/block-10207-new-api-call>output>evald-result>value-hash,
+     :from
+     [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]}},
+   :tab "commendable snake"},
+  :block-689
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "rrows", :x "sub_category"},
+    :items [[:views :reech-1-1] [:queries :gen-viz-959]],
+    :source-panel :block-703},
+   :name "rrows, sub_category",
+   :w 9,
+   :selected-view :reech-1-1,
+   :root [8 8],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-959
+    {:select [[[:count 1] :rrows] :sub_category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:sub_category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :sub_category, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-959,
+        :dataKey :rrows,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-959,
+        :dataKey :rrows,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-689},
+  :block-11913
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-11913",
+   :w 32,
+   :selected-view :all-ufo-sightings,
+   :root [1 1],
+   :h 6,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:all-ufo-sightings
+    {:select
+     [:city
+      :comments
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :id
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :ssb47]],
+     :where
+     [:*if :query1-2/*.clicked [:*all= :query1-2/*.clicked [:state]] [:= 1 1]]}},
+   :tab "commendable snake"},
+  :block-70
+  {:leaf-drop [:filter :click-table],
+   :name "block",
+   :w 5,
+   :selected-view :query7,
+   :root [13 21],
+   :h 5,
+   :drop-mutate
+   {[:panels :block-62 :queries :all-superstore-3 :where]
+    [:*if :query7/*.clicked [:*all= :query7/*.clicked [:ship_mode]] [:= 1 1]]},
+   :connection-id "superstore",
+   :queries
+   {:query7
+    {:select [:ship_mode [[:count 1] :rowcnt]],
+     :from [[:superstore :ctr23]],
+     :group-by [:ship_mode],
+     :order-by [[:rowcnt :desc]]}},
+   :tab "stupendous deer"},
+  :block-68
+  {:leaf-drop [:sql :new-select.count],
+   :name "block",
+   :w 5,
+   :selected-view :cnt-new-raw-sql-2,
+   :root [33 9],
+   :h 4,
+   :connection-id "systemh2-db",
+   :queries
+   {:cnt-new-raw-sql-2
+    {:select [[[:count 1] :rowcnt]], :from [[:query/new-raw-sql-2 :ssb99]]}},
+   :tab "stupendous deer"},
+  :block-8193
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-8193",
+   :w 6,
+   :selected-view :agg-grouped-all-superstore-1,
+   :root [34 22],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-grouped-all-superstore-1
+    {:select [[[:sum :rowcnt] :rowcnt]],
+     :from [[:query/grouped-all-superstore :ssb63]]}},
+   :tab "winter-wonder-lands"},
+  :block-5189
+  {:leaf-drop [:sql :count-distinct],
+   :name "block-5189",
+   :w 6,
+   :selected-view :countd-all-ufo-sightings-1,
+   :root [28 11],
+   :h 4,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:countd-all-ufo-sightings-1
+    {:select [[[:count [:distinct :duration_hours]] :duration_hours]],
+     :from [[:query/all-ufo-sightings :ssb45]]}},
+   :tab "commendable snake"},
+  :block-6676
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-6676",
+   :w 7,
+   :selected-view :grouped-all-superstore-1,
+   :root [34 2],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore-1
+    {:select [:segment [[:count 1] :rowcnt]],
+     :from [[:query/all-superstore :ssb50]],
+     :order-by [[:rowcnt :desc]],
+     :group-by [:segment]}},
+   :tab "winter-wonder-lands"},
+  :block-173
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "quantity", :x "ship_mode"},
+    :items [[:views :reech-1-2] [:queries :gen-viz-1048]],
+    :source-panel :block-703},
+   :name "quantity, ship_mode",
+   :w 9,
+   :selected-view :reech-1-2,
+   :root [17 8],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-1048
+    {:select [[[[:sum :quantity]] :quantity] :ship_mode],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:ship_mode]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-2
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :ship_mode, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-1048,
+        :dataKey :quantity,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-1048,
+        :dataKey :quantity,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-173},
+  :block-10955
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-10955",
+   :w 8,
+   :selected-view :agg-all-superstore,
+   :root [26 8],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:agg-all-superstore
+    {:select [[[:sum :quantity] :quantity]],
+     :from [[:query/all-superstore :ssb56]]}},
+   :tab "winter-wonder-lands"},
+  :block-65
+  {:h 6,
+   :w 11,
+   :views
+   {:editor-block-60-new-clojure-10
+    [:editor [:block-60 :clojure :_new-clojure-10]]},
+   :name "block",
+   :leaf-drop [:view :generic-clover-drop],
+   :tab "stupendous deer",
+   :root [1 1]},
+  :block-10081
+  {:leaf-drop [:sql :new-group-by],
+   :name "block-10081",
+   :w 6,
+   :selected-view :grouped-all-superstore,
+   :root [2 8],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:grouped-all-superstore
+    {:select [:category [[:count 1] :rowcnt]],
+     :from [[:query/all-superstore :ssb70]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands"},
+  :block-172
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "sales", :x "sub_category"},
+    :items [[:views :reech-6-1] [:queries :gen-viz-949]],
+    :source-panel :block-703},
+   :name "sales, sub_category",
+   :w 9,
+   :selected-view :reech-6-1,
+   :root [14 18],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-949
+    {:select [[[[:sum :sales]] :sales] :sub_category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:sub_category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-6-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :sub_category, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :sales,
+        :isAnimationActive false,
+        :data :gen-viz-949,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-172},
+  :block-63
+  {:h 10,
+   :w 10,
+   :views
+   {:editor-block-62-all-superstore-3
+    [:editor [:block-62 :queries :_all-superstore-3]]},
+   :name "block",
+   :leaf-drop [:view :generic-clover-drop],
+   :tab "stupendous deer",
+   :root [1 14]},
+  :block-60
+  {:clojure
+   {:new-clojure-10
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 YOOO! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :leaf-drop [:fresh :fresh-repl],
+   :name "block",
+   :w 7,
+   :selected-mode {:* :text},
+   :selected-view :new-clojure-10,
+   :root [15 2],
+   :h 4,
+   :tab "stupendous deer"},
+  :block-1400
+  {:leaf-drop [:filter :click-table],
+   :name "block-1400",
+   :w 6,
+   :selected-view :query1-1,
+   :root [34 16],
+   :h 6,
+   :drop-mutate
+   {[:panels :block-703 :queries :all-superstore :where]
+    [:and
+     [:and
+      [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:category]] [:= 1 1]]
+      [:*if
+       :query1-1/*.clicked
+       [:*all= :query1-1/*.clicked [:customer_name]]
+       [:= 1 1]]]
+     [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:region]] [:= 1 1]]]},
+   :connection-id "superstore",
+   :queries
+   {:query1-1
+    {:select [:region [[:count 1] :rowcnt]],
+     :from [[:superstore :ctr7]],
+     :group-by [:region],
+     :order-by [[:rowcnt :desc]]}},
+   :tab "winter-wonder-lands"},
+  :block-609
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "sales", :x "segment"},
+    :items [[:views :reech-1-3] [:queries :gen-viz-756-1]],
+    :source-panel :block-703},
+   :name "sales, segment",
+   :w 11,
+   :selected-view :reech-1-3,
+   :root [23 18],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-756-1
+    {:select [[[[:sum :sales]] :sales] :segment],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:segment]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-1-3
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :segment, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :sales,
+        :isAnimationActive false,
+        :data :gen-viz-756-1,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-609},
+  :block-69
+  {:leaf-drop [:sql :new-select.count],
+   :name "block",
+   :w 6,
+   :selected-view :cnt-all-superstore-3,
+   :root [36 17],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:cnt-all-superstore-3
+    {:select [[[:count 1] :rowcnt]], :from [[:query/all-superstore-3 :ssb99]]}},
+   :tab "stupendous deer"},
+  :block-801
+  {:shape-rotator
+   {:context ["bigfoot-ufos" nil "none" "all-ufo-sightings"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "rrows", :x "shape"},
+    :items [[:views :reech-5-2] [:queries :gen-viz-828]],
+    :source-panel :block-11913},
+   :name "rrows, shape",
+   :w 27,
+   :selected-view :reech-5-2,
+   :root [1 7],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-828
+    {:select [[[:count 1] :rrows] :shape],
+     :from [[:query/all-ufo-sightings :subq1]],
+     :group-by [:shape]}},
+   :tab "commendable snake",
+   :views
+   {:reech-5-2
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :shape, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :rrows,
+        :isAnimationActive false,
+        :data :gen-viz-828,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-801},
+  :block-653
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "rrows", :x "ship_mode"},
+    :items [[:views :reech-5-1] [:queries :gen-viz-756]],
+    :source-panel :block-703},
+   :name "rrows, ship_mode",
+   :w 8,
+   :selected-view :reech-5-1,
+   :root [26 13],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-756
+    {:select [[[:count 1] :rrows] :ship_mode],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:ship_mode]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-5-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :ship_mode, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-756,
+        :dataKey :rrows,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-756,
+        :dataKey :rrows,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-653},
+  :block-350
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-line,
+    :axes {:y "quantity", :x "category"},
+    :items [[:views :reech-4-1] [:queries :gen-viz-549]],
+    :source-panel :block-703},
+   :name "quantity, category",
+   :w 9,
+   :selected-view :reech-4-1,
+   :root [17 13],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-549
+    {:select [[[[:sum :quantity]] :quantity] :category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:category]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-4-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :category, :allowDuplicatedCategory false}]
+      [:>
+       :Line
+       {:type "monotone",
+        :isAnimationActive false,
+        :data :gen-viz-549,
+        :dataKey :quantity,
+        :stroke :theme/editor-outer-rim-color,
+        :activeDot {:r 8}}]
+      [:>
+       :Scatter
+       {:data :gen-viz-549,
+        :dataKey :quantity,
+        :isAnimationActive false,
+        :fill :theme/editor-outer-rim-color,
+        :onClick [:set-recharts-param>]}]]]},
+   :bid :block-350},
+  :block-7349
+  {:leaf-drop [:sql :new-select.count],
+   :name "block-7349",
+   :w 6,
+   :selected-view :cnt-all-superstore,
+   :root [8 18],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:cnt-all-superstore
+    {:select [[[:count 1] :rowcnt]], :from [[:query/all-superstore :ssb73]]}},
+   :tab "winter-wonder-lands"},
+  :block-411
+  {:shape-rotator
+   {:context ["superstore" nil nil "all-superstore"],
+    :shape-name :recharts-h-bar,
+    :axes {:y "sales", :x "category"},
+    :items [[:views :reech-2-1] [:queries :gen-viz-994]],
+    :source-panel :block-703},
+   :name "sales, category",
+   :w 9,
+   :selected-view :reech-2-1,
+   :root [8 13],
+   :h 5,
+   :connection-id "superstore",
+   :queries
+   {:gen-viz-994
+    {:select [[[[:sum :sales]] :sales] :category],
+     :from [[:query/all-superstore :subq1]],
+     :group-by [:category],
+     :order-by [[:category :asc]]}},
+   :tab "winter-wonder-lands",
+   :views
+   {:reech-2-1
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:>
+       :Tooltip
+       {:contentStyle {:backgroundColor "#00000099", :border "none"},
+        :itemStyle {:color "#ecf0f1"},
+        :labelStyle {:color "#3498db"}}]
+      [:> :XAxis {:dataKey :category, :allowDuplicatedCategory false}]
+      [:>
+       :Bar
+       {:dataKey :sales,
+        :isAnimationActive false,
+        :data :gen-viz-994,
+        :stroke :theme/editor-outer-rim-color,
+        :fill [:str :theme/editor-outer-rim-color "33"],
+        :on-click [:set-recharts-param>]}]]]},
+   :bid :block-411},
+  :block-7312
+  {:leaf-drop [:sql :new-agg.sum],
+   :name "block-7312",
+   :w 6,
+   :selected-view :agg-grouped-all-superstore,
+   :root [2 12],
+   :h 4,
+   :connection-id "superstore",
+   :queries
+   {:agg-grouped-all-superstore
+    {:select [[[:sum :rowcnt] :rowcnt]],
+     :from [[:query/grouped-all-superstore :ssb91]]}},
+   :tab "winter-wonder-lands"},
+  :block-703
+  {:leaf-drop [:sql :new-select.all],
+   :name "block-703",
+   :w 32,
+   :selected-view :all-superstore,
+   :root [2 2],
+   :h 6,
+   :connection-id "superstore",
+   :queries
+   {:all-superstore
+    {:select
+     [:category
+      :city
+      :country
+      :customer_id
+      :customer_name
+      :discount
+      :order_date
+      :order_id
+      :product_id
+      :product_name
+      :profit
+      :quantity
+      :region
+      :row_id
+      :sales
+      :segment
+      :ship_date
+      :ship_mode
+      :state
+      :sub_category
+      :zipcode],
+     :from [[:superstore :ssb41]],
+     :where
+     [:and
+      [:and
+       [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:category]] [:= 1 1]]
+       [:*if
+        :query1-1/*.clicked
+        [:*all= :query1-1/*.clicked [:customer_name]]
+        [:= 1 1]]]
+      [:*if :query1-1/*.clicked [:*all= :query1-1/*.clicked [:region]] [:= 1 1]]]}},
+   :tab "winter-wonder-lands"}},
+ :materialized-theme
+ {:theme-name "aluminum-mint",
+  :codemirror-theme "rvbbit-dynamic",
+  :editor-param-background-color "#000000",
+  :pop-2 "#050707",
+  :base-block-style
+  {:text-shadow "4px 4px 4px #00000088",
+   :filter "brightness(120%)",
+   :backdrop-filter "brightness(35%) blur(4px)"},
+  :vega-defaults
+  {:view {:stroke "transparent"},
+   :axis
+   {:domainColor "#ffffff22",
+    :grid true,
+    :font "Lato",
+    :labelColor "#ffffff88",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelFont "Lato",
+    :domain false,
+    :gridColor "#ffffff22",
+    :tickColor "#ffffff22",
+    :axisFont "Lato"},
+   :legend
+   {:labelFont "Lato",
+    :legendFont "Lato",
+    :labelColor "#ffffff99",
+    :titleColor "#ffffff99",
+    :stroke "#ffffff99",
+    :titleFont "Lato"},
+   :header
+   {:labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelColor "#f2e8ff"},
+   :mark {:font "Lato"},
+   :title
+   {:font "Lato",
+    :subtitleFont "Lato",
+    :labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99"}},
+  :grid-selected-column-css
+  {:background-color "#00000088", :filter "brightness(200%)"},
+  :running-gif "images/running.gif",
+  :base-block-color-selected "#00030a",
+  :block-title-font-color "#ffffff",
+  :base-block-color "#01010199",
+  :editor-rim-color "#8da5ae99",
+  :base-block-filter-selected
+  "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+  :vega-default-color-scheme {:scheme "category20b"},
+  :data-colors
+  {"float" "#a3a6a9",
+   "boolean" "#ae9b8f",
+   "map" "#ae9a8d",
+   "list" "#1f3b66",
+   "string" "#d7d5c4",
+   "any" "#3b797f",
+   "vector" "#7ea665",
+   "keyword" "#d6c2c4",
+   "rabbit-code" "#607865",
+   "datetime" "#3f3844",
+   "integer" "#dbb467",
+   "unknown" "#2b1547",
+   "date" "#070906"},
+  :editor-grid-selected-font-color "#000000",
+  :monospaced-font "JetBrains Mono",
+  :editor-grid-selected-background-color "#dc9cb0",
+  :_vega-default-color-scheme {:scheme "pastel2"},
+  :nivo-defaults
+  {:font-family "Instagram Sans",
+   :labels
+   {:text
+    {:fill "#ffffff",
+     :font-size "16px",
+     :font-family "Instagram Sans",
+     :font-weight 700}},
+   :tooltip
+   {:container
+    {:background "#000",
+     :color "#ffffff",
+     :text {:fill "#eeeeee"},
+     :fontSize "18px",
+     :borderRadius "4px",
+     :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+     :padding "5px 9px"},
+    :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+    :tableCell {:padding "3px 5px"}},
+   :axis
+   {:legend
+    {:text
+     {:fill "#ffffff",
+      :font-size "14px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :ticks
+    {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+   :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+  :editor-outer-rim-color "#8da5ae",
+  :grid-selected-font-color "#000000",
+  :block-title-selected-font-color "#ffffff",
+  :grid-selected-background-color "#a3d3ff",
+  :grid-font-color "#ffffff",
+  :canvas-background-css
+  {:background-image
+   "linear-gradient(#8da5ae70,#8da5ae12),url(images/gray-brick.png)",
+   :transition "all 0.6s ease-in-out",
+   :background-blend-mode "normal",
+   :background-color "#424f57"},
+  :editor-font-color "#ffffff",
+  :line-style "curved-path-h",
+  :base-font "Poppins",
+  :block-tab-selected-font-color "#c9d1ff",
+  :editor-background-color "#000006",
+  :editor-grid-font-color "#ffffff",
+  :pop-1 "#506b7e"},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#a3a6a9",
+  "boolean" "#ae9b8f",
+  "map" "#ae9a8d",
+  "list" "#1f3b66",
+  "string" "#d7d5c4",
+  "any" "#3b797f",
+  "vector" "#7ea665",
+  "keyword" "#d6c2c4",
+  "rabbit-code" "#607865",
+  "datetime" "#3f3844",
+  "integer" "#dbb467",
+  "unknown" "#2b1547",
+  "date" "#070906"},
+ :solver-fn nil,
+ :click-param
+ {:flow-fn-sys
+  {:name ":clojure-string-join",
+   :full_map
+   "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+   :description "Clojure.string's join function.",
+   :inputs "[:delimiter]",
+   :icon "zmdi-group",
+   :input_types "[:string]",
+   :output_types ":string",
+   :category ":clojure-base"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 29,
+   :block_data
+   "{:codemirror-theme \"rvbbit-dynamic\", :editor-param-background-color \"#000000\", :pop-2 :solver/colors-of-the-moment>colors>2, :base-block-style {:text-shadow \"4px 4px 4px #00000088\", :border-radius [:sticky-border-radius \"12px\"], :filter \"brightness(120%)\", :backdrop-filter \"brightness(35%)\"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color [:str :param/theme-dark 82], :editor-rim-color [:str :solver/colors-of-the-moment>second-brightest 99], :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors :solver/colors-of-the-moment>data-colors, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color :solver/colors-of-the-moment>second-brightest, :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image [:str \"url(\" :solver/wallpaper-of-the-moment \")\"], :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-blend-mode \"hard-light\", :background-position \"center\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Poppins\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\", :pop-1 :solver/colors-of-the-moment>colors>1}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1",
+   :query_names ""},
+  :render-hash
+  {:reco-preview-c--1304604038 -208031712,
+   :reco-preview-c--1437203282 367291304,
+   :block-64 -2020387490,
+   :reco-preview-c-1493745837 -1974939890,
+   :block-66 541232233,
+   :reco-preview-c-136311665 1280738163,
+   :reco-preview-c--1893274445 1225905748,
+   :block-67 -1129908000,
+   :block-61 -1266159573,
+   :reco-preview-c--542155017 -1511512628,
+   :reco-preview-c--1095661881 -1104230435,
+   :reco-preview-c--974498523 1476167793,
+   :block-5136 770669559,
+   :reco-preview-c-1882298790 953647653,
+   :reco-preview-c--1508842088 563411412,
+   :block-62 -295864742,
+   :reco-preview-c--2084306419 -13408908,
+   :reco-preview-c-215168124 -1850302678,
+   :reco-preview-c-468075746 50514774,
+   :reco-preview-c--433267488 -1858661352,
+   :reco-preview-c-156081705 -709093081,
+   :block-7831 785534830,
+   :reco-preview-c--1762567628 1291085746,
+   :reco-preview-c--347147715 -1129292042,
+   :block-488 -1875794870,
+   :block-689 1766328660,
+   :block-70 1586393458,
+   :block-68 -212019325,
+   :reco-preview-c--615402623 581351251,
+   :reco-preview-c--1563280328 1719934140,
+   :reco-preview-c--1747850972 -1338970690,
+   :reco-preview-c-1907489029 1558404725,
+   :block-8193 919410574,
+   :reco-preview-c--1828939505 -2069802437,
+   :reco-preview-c--1589047325 2111547553,
+   :reco-preview-c--1543793037 -71047088,
+   :block-6676 -1972595920,
+   :block-173 -473971284,
+   :block-10955 -1099232418,
+   :block-65 -2120929209,
+   :reco-preview-c-1259448914 821123518,
+   :reco-preview-c-1632772356 -461682121,
+   :block-10081 977699676,
+   :reco-preview-c--382821769 1924127836,
+   :block-172 -2080609415,
+   :reco-preview-c-984656818 282962400,
+   :block-63 -2128196401,
+   :block-60 1132787807,
+   :reco-preview-c-1815103254 1722788065,
+   :block-1400 1624081189,
+   :reco-preview-c--1628194406 -1894216643,
+   :block-609 -1665181408,
+   :reco-preview-c-1408340363 109008992,
+   :block-69 -1252235418,
+   :block-653 -1263545394,
+   :block-350 529254431,
+   :block-7349 1433526765,
+   :block-411 639537840,
+   :block-7312 -329345641,
+   :reco-preview-c-587975079 1502633646,
+   :reco-preview-c--937291242 -892607744,
+   :reco-preview-c--1227832312 -1173691948,
+   :reco-preview-c--1841545982 1417302022,
+   :block-703 -2059322366,
+   :reco-preview-c-1696758130 -1813527834},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "bigfoot-ufos",
+   :schema_cat nil,
+   :table_name "ufo_sightings",
+   :rows 80332,
+   :fields 15},
+  :data-hash
+  {nil 159595033,
+   :query-preview-c-1696758130 -1917850872,
+   :fields-sys 687303830,
+   :gen-viz-1048 920012366,
+   :query-preview-c--1893274445 134641042,
+   :agg-all-superstore -1755633178,
+   :new-clojure-10 1127091544,
+   :cnt-all-superstore-3 1282639802,
+   :gen-viz-549 1300831188,
+   :query-preview-c--1508842088 828617448,
+   :superstore -1729702703,
+   :tables-sys -421067991,
+   :query-preview-c-587975079 -33955596,
+   :rabbit-search-like 392480071,
+   :query-preview-c--1589047325 1382882323,
+   :query1-1 -1107101262,
+   :grouped-all-superstore-1 -307045437,
+   :new-raw-sql-2 -768424915,
+   :query-preview-c-468075746 828617448,
+   :query-preview-c--1747850972 125020555,
+   :query-preview-c-1907489029 125020555,
+   :query-preview-c--1828939505 -1744377054,
+   :gen-viz-756-1 1848901353,
+   :query-preview-c-136311665 1382882323,
+   :query-preview-c--433267488 -1744377054,
+   :query-preview-c-1632772356 178687651,
+   :new-clojure-c-8823 1127091544,
+   :gen-viz-949 -851599826,
+   :query-preview-c--1095661881 178687651,
+   :query-preview-c-156081705 1382882323,
+   :query-preview-c--1437203282 125020555,
+   :query-preview-c--382821769 -1401420875,
+   :query-preview-c--937291242 1382882323,
+   :all-superstore-c-984656818 871057004,
+   :query-preview-c--1227832312 -1744377054,
+   :new-clojure-c-9918 1127091544,
+   :query-preview-c-1259448914 -1917850872,
+   :rabbit-search-like-themes 1387041528,
+   :cnt-all-superstore-3-c--1563280328 -924564367,
+   :gen-viz-959-1 1472207517,
+   :query-preview-c-1493745837 1382882323,
+   :grouped-all-superstore -2030464101,
+   :all-superstore-3 -1403966457,
+   :gen-viz-756 -1252603284,
+   :agg-grouped-all-superstore-1 -924564367,
+   :agg-grouped-all-superstore -924564367,
+   :query7 1581042951,
+   :query-preview-c-215168124 -215594228,
+   :gen-viz-959 1382882323,
+   :connections-sys 1758142944,
+   :all-superstore 1943520345,
+   :query-preview-c--1304604038 -215594228,
+   :query-preview-c--2084306419 828617448,
+   :query-preview-c--1762567628 134641042,
+   :query1-c--1841545982 1581042951,
+   :rabbit-search-like-screens 503020726,
+   :cnt-new-raw-sql-2-c-1815103254 -1524008141,
+   :query-preview-c--1628194406 -33955596,
+   :gen-viz-994 -721205234,
+   :cnt-new-raw-sql-2 -1555332973,
+   :new-raw-sql-c-1882298790 1103049358,
+   :cnt-all-superstore -924564367,
+   :query-preview-c--615402623 -215594228,
+   :query-preview-c--542155017 1382882323,
+   :query1 -2030464101,
+   :query-preview-c--1543793037 -33955596,
+   :query-preview-c--347147715 828617448,
+   :query-preview-c--974498523 788754060},
+  :flows-sys
+  {:flow_id "simple-python-exec",
+   :file_path "./flows/simple-python-exec.edn",
+   :last_modified "2024-01-19 10:37:23"},
+  :files-sys
+  {:file_path "./screens/rotating-theme-blank.edn",
+   :screen_name "rotating-theme-blank",
+   :blocks 14,
+   :queries 2,
+   :ts "2024-11-07 10:30:23"},
+  :chat-drag-23 {:YEAR 2017, :rows 734, :styler_highlight_group 0},
+  :offenses-drag-17
+  {:SHOOTING nil,
+   :DISTRICT "C11",
+   :INCIDENT_NUMBER "I182070943",
+   :OFFENSE_DESCRIPTION "VANDALISM",
+   :DAY_OF_WEEK "0001-01-02",
+   :MONTH 8,
+   :YEAR 2018,
+   :HOUR 0,
+   :STREET "HECLA ST",
+   :OFFENSE_CODE_GROUP "Vandalism",
+   :UCR_PART "Part Two",
+   :Long -71.06030035,
+   :REPORTING_AREA 347,
+   :Location "(42.30682138, -71.06030035)",
+   :OFFENSE_CODE 1402,
+   :Lat 42.30682138,
+   :OCCURRED_ON_DATE "2018-08-21 00:00:00.000000"},
+  :viz-tables-sys2 {:table_name :all-ufo-sightings-1},
+  :query1-1.* {:region ["West" "Central" "South" "East"]},
+  :STREET-drag-11 {:STREET "BLUE HILL AVE", :rowcnt 7794},
+  :ufo-sightings-drag-22
+  {:duration_seconds_int 900,
+   :comments
+   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
+   :city "kaneohe",
+   :date_posted "2004-01-22",
+   :longitude -157.8036111,
+   :state "hi",
+   :duration_seconds "900",
+   :duration_hours "15 minutes",
+   :id 5,
+   :shape "light",
+   :datetime "1960-10-10 20:00:00.000000",
+   :latitude "21.4180556",
+   :country "us"},
+  :param
+  {:nutritious-periwinkle-sheep "hello from a data board!",
+   :offense "VANDALISM",
+   :float 324.444,
+   :string "this is string",
+   :selected-view-data nil,
+   :essential-olive-toad "from clojure boar param",
+   :poised-spring-bud-fly
+   ["import sys, random "
+    "from datetime import date"
+    ""
+    "print(\"damn son!\")"
+    "print(random.randrange(1,300))"
+    "print('{{:param/nutritious-periwinkle-sheep}}')"
+    ""
+    "today = date.today()"
+    "print(\"Today's date:\", today)"
+    ""
+    "####INTERESTING...."
+    ""
+    ""
+    ""
+    ""],
+   :selected-view nil,
+   :keys 123,
+   :bools true,
+   :keys2 [3 4 5],
+   :selected-block :block-4928},
+  :theme
+  {:theme-name "aluminum-mint",
+   :codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :pop-2 "#050707",
+   :base-block-style
+   {:text-shadow "4px 4px 4px #00000088",
+    :filter "brightness(120%)",
+    :backdrop-filter "brightness(35%) blur(4px)"},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelColor "#f2e8ff"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :running-gif "images/running.gif",
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#01010199",
+   :editor-rim-color "#8da5ae99",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "category20b"},
+   :data-colors
+   {"float" "#a3a6a9",
+    "boolean" "#ae9b8f",
+    "map" "#ae9a8d",
+    "list" "#1f3b66",
+    "string" "#d7d5c4",
+    "any" "#3b797f",
+    "vector" "#7ea665",
+    "keyword" "#d6c2c4",
+    "rabbit-code" "#607865",
+    "datetime" "#3f3844",
+    "integer" "#dbb467",
+    "unknown" "#2b1547",
+    "date" "#070906"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :_vega-default-color-scheme {:scheme "pastel2"},
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#8da5ae",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image
+    "linear-gradient(#8da5ae70,#8da5ae12),url(images/gray-brick.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :line-style "curved-path-h",
+   :base-font "Poppins",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff",
+   :pop-1 "#506b7e"},
+  :query7.* {:ship_mode ["Standard Class" "Same Day"]},
+  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :connections-sys {:connection_id "bigfoot-ufos", :styler_highlight_8717ssa 0},
+  :all-superstore nil,
+  :narratives
+  {:base>narrative-22>theme :cyberpunk,
+   :base>narrative-22>craps "#ffffff",
+   :base>narrative-22>floatss 123.4,
+   :base>narrative-1>floaty 123.4,
+   :base>narrative-1>stuff1 "some stuff!",
+   :base>narrative-22>namer "some stuff!",
+   :base>narrative-22>vibes? true,
+   :base>narrative-22>gopv ["test" "test3" "test4"],
+   :base>narrative-22>mappy {:map 34}},
+  :sys {:selected-tab "baby-blue heron", :selected-tab-idx 3},
+  :kits-sys
+  {:enabled
+   [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]},
+  :query1-2.* {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]},
+  :query1.* {:category ["Technology" "Furniture"]}},
+ :selected-flow "my-new-flow3262"}

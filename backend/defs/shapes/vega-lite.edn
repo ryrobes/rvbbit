@@ -23,18 +23,20 @@
                      :y {:aggregate "sum"
                          :field :y-field
                          :type "quantitative"}
-                     :row {:field nil :legend nil}
-                     :size {:legend nil}
-                     :shape {:legend nil}
-                     :column {:field nil :legend nil}
-                    ;;  :color {:scale :theme/vega-default-color-scheme
-                    ;;          :legend nil
-                    ;;          :field 1 ;:y-field
-                    ;;          :type "ordinal"}
-                     }
+                    ; :size {:legend nil}
+                    ; :shape {:legend nil}
+                     :color {:value [:str :theme/editor-outer-rim-color "77"]}
+                     :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                          :value :theme/editor-outer-rim-color}
+                              :value nil}
+                     :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                               :value 4}
+                                   :value 0}}
                     :mark {:type "bar"
                            :tooltip {:content "encoding"}}}]
-                  :data {:values :query-preview}} {:actions false}]
+                  :params [{:name :x-field-str :value :*this-view*/x-field}]
+                  :data {:values :query-preview}}
+                  {:actions false :renderer :canvas}]
                 :base-score 1}
 
  :basic-v-bar  {:axes {:x [:and :dimension?
@@ -58,17 +60,16 @@
                     :x {:aggregate "sum"
                         :field :y-field
                         :type "quantitative"}
-                    :row {:field nil :legend nil}
-                    :size {:legend nil}
-                    :shape {:legend nil}
-                    :column {:field nil :legend nil}
-                    ;; :color {:scale :theme/vega-default-color-scheme
-                    ;;         :legend nil
-                    ;;         :field 1 ;:y-field
-                    ;;         :type "ordinal"}
-                    }
+                    :color {:value [:str :theme/editor-outer-rim-color "77"]}
+                    :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                         :value :theme/editor-outer-rim-color}
+                             :value nil}
+                    :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                              :value 4}
+                                  :value 0}}
                    :mark {:type "bar"
                           :tooltip {:content "encoding"}}}]
+                 :params [{:name :x-field-str :value :*this-view*/x-field}]
                  :data {:values :query-preview}} {:actions false}]
                :base-score 1}
 
@@ -94,17 +95,16 @@
                         :y {:aggregate "avg"
                             :field :y-field
                             :type "quantitative"}
-                        :row {:field nil :legend nil}
-                        :size {:legend nil}
-                        :shape {:legend nil}
-                        :column {:field nil :legend nil}
-                        ;; :color {:scale :theme/vega-default-color-scheme
-                        ;;         :legend nil
-                        ;;         :field 1 ;:y-field
-                        ;;         :type "ordinal"}
-                        }
+                        :color {:value [:str :theme/editor-outer-rim-color "77"]}
+                        :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                             :value :theme/editor-outer-rim-color}
+                                 :value nil}
+                        :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                  :value 4}
+                                      :value 0}}
                        :mark {:type "bar"
                               :tooltip {:content "encoding"}}}]
+                     :params [{:name :x-field-str :value :*this-view*/x-field}]
                      :data {:values :query-preview}} {:actions false}]
                    :base-score 1}
 
@@ -130,17 +130,16 @@
                         :x {:aggregate "avg"
                             :field :y-field
                             :type "quantitative"}
-                        :row {:field nil :legend nil}
-                        :size {:legend nil}
-                        :shape {:legend nil}
-                        :column {:field nil :legend nil}
-                        ;; :color {:scale :theme/vega-default-color-scheme
-                        ;;         :legend nil
-                        ;;         :field 1 ;:y-field
-                        ;;         :type "ordinal"}
-                        }
+                        :color {:value [:str :theme/editor-outer-rim-color "77"]}
+                        :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                             :value :theme/editor-outer-rim-color}
+                                 :value nil}
+                        :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                  :value 4}
+                                      :value 0}}
                        :mark {:type "bar"
                               :tooltip {:content "encoding"}}}]
+                     :params [{:name :x-field-str :value :*this-view*/x-field}]
                      :data {:values :query-preview}} {:actions false}]
                    :base-score 1}
 
@@ -177,9 +176,16 @@
                           :color {:scale :theme/vega-default-color-scheme
                                   ;:legend nil
                                   :field :color-field
-                                  :type "ordinal"}}
+                                  :type "ordinal"}
+                          :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                               :value :theme/editor-outer-rim-color}
+                                   :value nil}
+                          :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                    :value 4}
+                                        :value 0}}
                          :mark {:type "bar"
                                 :tooltip {:content "encoding"}}}]
+                       :params [{:name :x-field-str :value :*this-view*/x-field}]
                        :data {:values :query-preview}} {:actions false}]
                      :base-score 1}
 
@@ -213,9 +219,16 @@
                           :color {:scale :theme/vega-default-color-scheme
                             ;:legend nil
                                   :field :color-field
-                                  :type "ordinal"}}
+                                  :type "ordinal"}
+                          :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                               :value :theme/editor-outer-rim-color}
+                                   :value nil}
+                          :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                    :value 4}
+                                        :value 0}}
                          :mark {:type "bar"
                                 :tooltip {:content "encoding"}}}]
+                       :params [{:name :x-field-str :value :*this-view*/x-field}]
                        :data {:values :query-preview}} {:actions false}]
                      :base-score 1}
 
@@ -253,9 +266,16 @@
                                :color {:scale :theme/vega-default-color-scheme
                                  ;:legend nil
                                        :field :color-field
-                                       :type "ordinal"}}
+                                       :type "ordinal"}
+                               :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                    :value :theme/editor-outer-rim-color}
+                                        :value nil}
+                               :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                         :value 4}
+                                             :value 0}}
                               :mark {:type "bar"
                                      :tooltip {:content "encoding"}}}]
+                            :params [{:name :x-field-str :value :*this-view*/x-field}]
                             :data {:values :query-preview}} {:actions false}]
                           :base-score 1}
 
@@ -292,9 +312,16 @@
                               :color {:scale :theme/vega-default-color-scheme
                                 ;:legend nil
                                       :field :color-field
-                                      :type "ordinal"}}
+                                      :type "ordinal"}
+                              :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                   :value :theme/editor-outer-rim-color}
+                                       :value nil}
+                              :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                        :value 4}
+                                            :value 0}}
                              :mark {:type "bar"
                                     :tooltip {:content "encoding"}}}]
+                           :params [{:name :x-field-str :value :*this-view*/x-field}]
                            :data {:values :query-preview}} {:actions false}]
                          :base-score 1}
 
@@ -331,11 +358,18 @@
                          :color {:scale :theme/vega-default-color-scheme
                                  :legend nil
                                  :field nil
-                                 :type "ordinal"}}
+                                 :type "ordinal"}
+                         :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                              :value :theme/editor-outer-rim-color}
+                                  :value nil}
+                         :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                   :value 4}
+                                       :value 0}}
                         :mark {:type "area"
                                :interpolate "monotone"
                                :point "transparent"
                                :tooltip {:content "encoding"}}}]
+                      :params [{:name :x-field-str :value :*this-view*/x-field}]
                       :data {:values :query-preview}}
                      {:actions false}]
                     :base-score 1}
@@ -375,11 +409,18 @@
                                :color {:scale :theme/vega-default-color-scheme
                                        :legend nil
                                        :field :color-field
-                                       :type "ordinal"}}
+                                       :type "ordinal"}
+                               :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                    :value :theme/editor-outer-rim-color}
+                                        :value nil}
+                               :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                         :value 4}
+                                             :value 0}}
                               :mark {:type "line"
                                      :interpolate "monotone"
                                      :point "transparent"
                                      :tooltip {:content "encoding"}}}]
+                            :params [{:name :x-field-str :value :*this-view*/x-field}]
                             :data {:values :query-preview}}
                            {:actions false}]
                           :base-score 1}
@@ -402,9 +443,16 @@
                   :y {:field :y-field :type "ordinal"}
                   :color {:field :color-field
                           :type "quantitative"
-                          :scale {:scheme "viridis"}}}
+                          :scale {:scheme "viridis"}}
+                  :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                       :value :theme/editor-outer-rim-color}
+                           :value nil}
+                  :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                            :value 4}
+                                :value 0}}
                  :mark {:type "rect"
                         :tooltip {:content "encoding"}}}]
+               :params [{:name :x-field-str :value :*this-view*/x-field}]
                :data {:values :query-preview}} {:actions false}]
              :base-score 1}
 
@@ -424,10 +472,18 @@
                     :y {:field :y-field :type "quantitative"}
                     :size {:field :size-field :type "quantitative"}
                     :color {:field :color-field :type "nominal"
-                            :scale {:scheme "category10"}}}
+                            :scale {:scheme "category10"}}
+                    :stroke {:condition {:test [:str "datum." :color-field-str " === " :color-field-str]
+                                         :value :theme/editor-outer-rim-color}
+                             :value nil}
+                    :strokeWidth {:condition {:test [:str "datum." :color-field-str " === " :color-field-str]
+                                              :value 4}
+                                  :value 0}
+                    }
                    :mark {:type "circle"
                           :opacity 0.7
                           :tooltip {:content "encoding"}}}]
+                 :params [{:name :color-field-str :value :*this-view*/color-field}]
                  :data {:values :query-preview}} {:actions false}]
                :base-score 1}
 
@@ -452,9 +508,16 @@
                               :stack "zero"}
                           :color {:field :color-field
                                   :type "nominal"
-                                  :scale {:scheme "category10b"}}}
+                                  :scale {:scheme "category10b"}}
+                          :stroke {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                               :value :theme/editor-outer-rim-color}
+                                   :value nil}
+                          :strokeWidth {:condition {:test [:str "datum." :x-field-str " === " :x-field-str]
+                                                    :value 4}
+                                        :value 0}}
                          :mark {:type "area"
                                 :tooltip {:content "encoding"}}}]
+                       :params [{:name :x-field-str :value :*this-view*/x-field}]
                        :data {:values :query-preview}} {:actions false}]
                      :base-score 1}
 

@@ -1,297 +1,165 @@
-# RⱯBBIT DYNAMIC DATASCAPES
-## Reactive Data Board & Visual Flow Platform
 
-### composability:
-> The art of creating complex systems from simple, reusable parts.
+# Rabbit: The Future of Dynamic Data Boards
 
-### feedback loop:
-> A cycle where output influences input, creating a self-reinforcing system.
+> **In a world of corporate, conservative, “safe” BI tools that keep you trapped in the 1990s, Rabbit is the daring leap into a cyberpunk, hyper-reactive future.**
 
-![alt text](docs/rvbbit-dev-mosiac.jpg)	
+Rabbit is a **hyper-composable** data platform that feels more like a **creative game engine** than a basic “dashboard” utility. Built on Clojure and SQL—but open to everyone—Rabbit gives you a direct-manipulation canvas where **drag-and-drop** meets **livecoding**, so you can shape, filter, pivot, visualize, and automate data exactly how you want.
 
-# but first, a brief interlude...
+![alt text](docs/rvbbit-dev-mosiac.jpg)
 
-<a href="https://www.youtube.com/watch?v=Rpt5yitiz1c" target="_blank">
-  <img src="docs/video-orev.jpg" alt="RVBBIT Dynamic Datascapes">
-</a>
+**We’re not just another BI tool.** We’re building for tomorrow, not yesterday. If you’re tired of wizards and locked-down “chart builders,” Rabbit’s **powerful reactive parameters**, **live code generation**, and **futuristic direct-manipulation UI** will change the way you think about data forever.
 
-## "If you want to build a ship, don't drum up people to collect wood and don't assign them tasks and work, but rather teach them to long for the endless immensity of the sea." — Antoine de Saint-Exupéry
-
-As a long-time dashboard builder, data engineer, and UI hacker - I've always wanted something in-between Tableau & building bespoke web data products to ship answers to my users. The tools were too rigid at times, and building everything from scratch can be tiresome. The eternal push/pull of DE and SWE approaches, as many who work in BI can attest to. How could I have the flexibility & re-usability of code, but the compositional freedom & direct manipulation of a builder tool? 
-
-## I didn't want my creativity limited by tool nor timeline. 
-
-To paraphrase Alan Kay, "Simple things should be simple, complex things should be possible". I wanted 'beautiful' to be possible as well.
-
-## A data platform should feel more like using a game engine than using an "app". 
-
-### So I spent the last 4 years building prototypes and trying to figure out I wanted in a tool like this - how it could work, and what actually MAKES SENSE, while also pushing the limits a bit. 
-
-Then 14+ months ago, I quit my job and set out to build it for real. 
-
-Also, I wanted a data board tool that FELT & LOOKED like it was from the future. Not from 1997 or 2004... It's the future, damnit. Where is all the glorious cyberpunk UI? I wanted to be able to make things for "Real work", but maybe also feel like you are in a hacker movie. Hey, I'm a simple man.
+> **Because data work shouldn’t be a slog through outdated dashboards.** It should feel **fun, flexible, and imaginative**—yet still get real work done. Rabbit fuses reactive logic, code-generation, and game-like composition to help you build data products you didn’t even know were possible.
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
   <img src="docs/dash-left.jpg" width="47%" />
-  <img src="docs/dash-right.jpg" width="47%" /> 
+  <img src="docs/dash-right.jpg" width="47%" />
 </div>
 
+> "The future should look like the future."
 
-Ok, enough with all the nonsense. WTF *is* it?
+---
+### Easy Things Should Be Easy, Hard Things Should Be Possible
+Rabbit’s philosophy is pure:
+- **Let simple drag-and-drop do 80% of the work.**
+- **Auto-generate** queries, formulas, or code in real time.
+- And if you need deeper power—**pop open the hood** to see (and edit) every line of code we created for you.
 
-## A highly dynamic & flexible platform for composing interactive data boards, a data workspace canvas, & flow-based programming system
+But here’s the kicker: **all** of this is built on a **user-space rules system**. Want to create your own drag-and-drop actions, your own auto-generation logic, tweak existing logic, or even support entire new paths? You can—just extend Rabbit’s rules the same way we do. **Think - more 'Unreal Engine' and less 'Fortnite'**
 
-You could even call it a "non-linear anti-notebook that puts composition and presentation front & center rather than an afterthought". Heresy!   
-[Notebook enjoyers scroll their procedural top-to-bottom rectangular fists up and down at me angrily]
 
-Did you say "Data boards"? Yes. "Dashboard" is very 1990s. 
-More Minority Report, less Office Space. Baby steps.
+---
 
-RVBBIT also draws significant inspiration from systems like Smalltalk, HyperCard, & the endless trail of breadcrumbs left by Bret Victor. Like Smalltalk, it embraces the idea of a fully malleable, live programming environment where everything is an object and can be inspected and modified. From HyperCard, the vision of an intuitive, visual programming paradigm that empowers users to create interactive, linked information systems. Yet hyper focused on building data products such as dashboards, data science views, interactive explorations, & unparalleled reactivity.
+## Highlights at a Glance
 
-Inspired by the future, borrows from the past - as all good things should. Oh, and I love Clojure and SQL, so get ready for that.
+1. **'Context Aware' Drag & Drop SQL (plus Excel Formulas!)**
+   - Drag an entire table onto your canvas instead of peacking at pills in a side panel like a strung out bird.
+   - Slice, Dice, Filter, Add to the table. Just like a data cutting board. Delicious.
+   - Apply post-SQL Excel-like formulas (or bespoke Clojure functions, or entire flows) to transform and enrich your results right on the canvas.
+   - Quickly turn data into charts, pivot tables, or interactive widgets — Rabbit’s “visual rules” help recommend what is possible.
 
-## "Low bar, High ceiling"
+2. **Tip of the Iceberg Approach**
+   - Get started with minimal clicks—no required code.
+   - As you advance, take full control by editing the automatically generated SQL, Clojure, or Rabbit's own Clover DSL.
+   - Everything remains open and inspectable—no hidden wizards or locked-down “magic. No black boxes.”
 
-The skill level of users varies, but we all still need to get sh*t done. Answers need to be found, and data value needs to be delivered to the people.
+3. **Game Engine Meets Notebook**
+   - Compose entire “data boards” by dragging in charts, queries, REPL outputs, or custom UI elements.
+   - Zoom in and out of detail: nest dashboards into each other, or transform any set of components into a reusable cards on the canvas.
+   - Keep a visual version history of every object—scrub between diffs, revert changes, or spawn new versions at will.
 
-RVBBIT helps bridge these gaps in it's overall approach to building - it helps you create in board strokes by generating "code" (SQL, view DSL, Clojure, etc) in it's cards from simple drag and drop operations. 
-The user can then modify this working code, or use other UI like value scrubbers to mutate and see the changes in a quick feedback loop cycle - this builds understanding.
-No hidden "magic", no step-by-step 'wizards' that create un-editable artifacts or configurations that are opaque.
+4. **Reactive & Flow-Based**
+   - Trigger changes with simple drag-and-drop parameter connections. A single user action can cascade into chained queries, charts, or transformations.
+   - Build out advanced automation logic with Rabbit’s flow-based system (like wiring up a circuit board for your data).
+   - **Bi-directional**: front-end sliders can update a back-end pipeline, while a server-side function can dynamically alter the user’s canvas in real-time.
+   - From simple SQL subqueries to REPL's reading API calls - data flows and has lineage. Think of the canvas as a non-linear notebook (with way more presentation flexibility).
 
+5. **Hugely Customizable & Hackable**
+   - Core systems are built on a declarative rules system that can be extended by anyone. Add new “card runners,” custom flows, Drag and Drop fucntions, Viz recommendations, or domain-specific code-gen templates.
+   - Theming is fully data-driven: you can style or re-skin your boards on the fly, or even control the theme via the output of a query!
 
+6. **Clojure-Powered (But Not Required)**
+   - For advanced users, a built-in nREPL client and live coding environment let you craft reactive experiences that go well beyond typical dashboards.
+   - Mix queries and code to define dynamic data transformations. Or ignore Clojure entirely and just drag, drop, and filter. Your call.
+   - Everything speaks "data", and all items can reference almost any other piece of data - reactively. Even between client sessions.
 
-# "Interactive data tools are feedback loop factories"
+---
 
 
+## The Bigger Vision
 
-## Ladder of Abstraction
+Rabbit aims to be the **ultimate “mixed data medium”**—a place where:
 
-In terms of Bret Victor's 'ladder of abstraction' concept:
+> “Code meets no-code. SQL meets web APIs. Complex transformations meet simple drag-and-drop. Everything is connected in a living flow graph.”
 
-| Level | Description |
-|-------|-------------|
-| Low   | Context-aware drag & drop creates basic blocks by writing queries and view DSL (query, visualize, filter, link) |
-| Medium| Blocks can be tweaked to fit needs (small changes, CSS, options, scrubbers) |
-| High  | Raw code to produce DSL or new features added wholesale via kits/solvers/flows |
+We want to empower everyone—from data analysts to software devs to domain experts—to build expressive, _living_ data boards that adapt to your workflow, instead of forcing you into rigid “dashboard” templates.
 
-This allows users to build up mastery as all components work together - a DnD created SQL rowset can control a bespoke REPL code block and vice versa. They all speak the same core language = reactive parameters.
+Try Rabbit, and experience a new approach to data composition — one that might just redefine your expectations for interactive analytics and data builders.
 
-This also has a 3rd order effect - due to RVBBIT's open systems - advanced users can extend the functionality of the platform - delivering new packaged behavior & bespoke artifacts in their own creations.
+![alt text](docs/dtf1.jpg)
+> Endlessly customizable presentation and composition.
 
-## Clojure based 
-### Data is Code, Code is Data.
+![alt text](docs/dtf2.jpg)
+> Context is King.
 
-While RVBBIT is very much a "Clojure platform" and a full-blown nREPL client, knowing Clojure is *not* a requirement. You can build an entire dashboard with only drag & drop and a SQL database - but its full flexibility is unlocked with some Clojure knowledge and some creative thinking. Shape rotators welcome.
+![alt text](docs/dtf3.jpg)
+> Observable interactive relationships.
 
-## SQL Specific Features
+---
 
-- Drag and drop SQL operations on a "cutting board" canvas
-	+ Taking a "reverse" approach to query building - users can start with full table views and then slice and dice them down to what they need as opposed to building field by field.
-	+ Easy parameter filtering, pivots, joins, etc. Reactive data triggering SQL queries has never been this flexible and powerful
-- User-space configurable viz-reco system
-	+ create programmable templates with a straightforward SQL syntax, custom attributes, and freeform views - these can then be recommended to users if the data shape fits the view definitions.
-- Cache table cross joins
-	+ A unified SQL cache layer allows joining of arbitrary queries, no matter what database they come from (or if they came from a Clojure REPL value, any other place)
+## Why Rabbit?
 
-<br/>
+### More than a Dashboard
+Most BI tools feel like a linear slog: pick from a few charts, plug in a query, and watch a static slide deck of visuals. Rabbit’s canvas is different—you can arrange, nest, and link components however you see fit, almost like building scenes in a game engine or frames in an animation tool. The data, the query, how it relates to the rest of the system is right there in from of you - like dicing carrots on a cutting board, you are in control.
 
-# "A Game Engine for Data"
+### “Tip of the Iceberg” Onboarding
+I want Rabbit to be approachable for casual users—no code needed if you don’t want to see it. But when you do, it’s all there under the surface. This eliminates the “hard ceiling” you hit with most no-code solutions: if you need more power, just pop open the code and keep building.
 
-<br/>
-<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=IhqEOnrv38E" target="_blank">
-      <img src="docs/bbs.jpg" alt="Basic SQL ops" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Basic SQL ▶</p>
-  </div>
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=OT5yBr06QII" target="_blank">
-      <img src="docs/ddd.jpg" alt="Basic SQL Viz Ops" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Basic SQL + Viz ▶</p>
-  </div>
-</div>	
+### Built for Real Data Work
+Whether you’re blending data from multiple SQL sources, performing advanced transformations in Clojure, or simply applying an Excel formula to tidy up results, Rabbit’s architecture keeps everything in sync. If you can dream it, you can prototype it—and if it works, you can ship it.
 
+---
 
+## How It Feels
 
-## The Data Desktop
+- **Futuristic UI**: Part Blade Runner, part living whiteboard, part movie Hacker terminal. If you want a more standard “light theme” or minimal aesthetic, that’s just a theme selection away.
+- **“Reactive everything”**: Slide a date picker and watch every related card update in real-time. Make a flow that triggers queries, triggers code, triggers more queries, etc. This Rabbit hole goes deep.
+- **Self-Documenting**: Every card’s code is easy to view (and revert), so everything you create remains transparent and maintainable.
 
-### The Canvas
-- Minimize cards, pin them to all tabs, turn then into docked customizable icons.
+---
 
-### Recursive Composition
-- Arrange a set of a cards in a board tab - drag that composed tab into another board, it's now it's own single card. Great for composing and organizing groups of cards that share functionality or need to be re-used (ex: a "sidebar menu" for a series of dashboard tabs)
+## Quick Start
 
-### Card History
-A visual undo log of all card changes and their code diffs. Easy to scrub between old versions or even drag them out as new cards. Works for views, code, and queries.
+1. **Install & Run**
+   - [Download the latest release](#) (or clone the repo), then launch Rabbit (Java 17+ recommended).
+   - Access it at [http://localhost:8888](http://localhost:8888).
 
-## Clojure REPL Specific Features
+2. **Connect a Database**
+   - Drop your DB connection config (Postgres, MySQL, SQLite, etc.) into `connections/`.
+   - Rabbit automatically picks it up and displays your tables (will run some metadata sniffing on boot).
 
-- Connect to any remote nREPL, or use the built in one
-- "Visualization" of common CLJ data types including visual GET-INs via dragging
-- Realtime console output, console as data
-- works seamlessly with the "clover" DSL on the canvas - server rendered structures rendered by the client
-  - write "normal" REPL code to produce renderable items, with the full power of your REPL.
-  - REPLs are the engine and the canvas is your flexible view surface
+3. **Drag & Drop Exploration**
+   - Right-click on the canvas - and your context palette will have tables, fields, params, themes to get started with.
+   - Pick a table, drag it onto your canvas. Rabbit shows the raw rows.
+   - Drag a field or a cell - and the adjacent blocks will react showing possible actions with that item - Or drop it on the canvas to see what can be created "new" with it.
+   - Apply filters, pivot, or open up the left-side formula bar for “Excel formula” post-processing steps. A "stack" of calculations on top of SQL.
+   - If a visualziation is possible with the given context, it will be displayed as an option.
 
+4. **Extend As Needed**
+   - Explore the `defs/` directory for all the EDN files that run most of Rabbit's systems. All user-space hackable.
 
-<br/>
-<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-  <div style="width: 48%; text-align: center;">
-    <img src="docs/repl-dlsl.gif"  />
-    <p style="margin-top: 10px; font-size: 21px;">Arbitrary REPL, server-generated interactive views</p>
-  </div>
-  <div style="width: 48%; text-align: center;">
-    <img src="docs/repl-dlsl22.gif"   /> 
-    <p style="margin-top: 10px; font-size: 21px;">Reactive Parameters (values) also allow cross client data access</p>
-  </div>
-</div>
-
-
-## Configurable Card "Runners"
-
-Besides the built-in runners of SQL queries and Views (UI) - the combination of arbitrary parametrized code + an integrated Flow system enables all kinds of functionality that can be packaged up as a new runners and available for users to build with. Essentially creating new Card types with new functionality.
-- Examples
-	+ A flow that hits OpenAI's DALLE3 API, with a prompt, downloads the image, saves it as a JPEG, adds Exif data, and then displays it in a generated HTML view. All the user knows is that there is an :image-generator card - they type in text (the card's 'source') and the output is an image to be used on their canvas
-	+ A custom nREPL connection that executes some arbitary code or text and returns some specific output - like a shell command, or to a Python interpreter, an R calculation - or perhaps an nREPL across the office that has special libraries and hardware to process very specific tasks. All wrapped up in a friendly interface. Just another "card" on your data board.	
-
-<br/>
-<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=9CPvZtFu2fo" target="_blank">
-      <img src="docs/rpl.jpg" alt="as a Clojure REPL client" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">as a Clojure REPL client - with SQL interaction ▶</p>
-  </div>
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=4sp151pex78" target="_blank">
-      <img src="docs/rrr.jpg" alt="Custom Card Runners" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Custom Card Runners - run anything ▶</p>
-  </div>
-</div>
-
-
-## Reactive Parameters
-
-- All cards on the front-end can utilize an entire system of reactive parameters, both from the front-end as well as the back-end. Scheduled processes can push "subscribed" values to dashboards in realtime, and front-end parameters can change back-end values. Clients are subscribed to a parameter simply by using it - the server keeps all the clients in sync.
-- An entire library of "addressable" parameters
-	+ Every Card, Stack, Board in any saved Deck
-	+ Any (live) Card or parameter from any other client(!)
-	+ The value of any step in a Flow 
-- Are universal across all objects
-	+ A custom view click action can trigger a REPL execution, which then can trigger a SQL query, which then can cascade into a chart or view update, or mutate the users canvas in some way, and so on.
-
-## Snapshots
-
-- Take an image of all the current parameters in a deck - and then swap between them like special storytelling tabs. It can even mutate block positions, visibility, theme parameters, and current tab selected.
-
-## Metrics & KPIs
-
-- Coming soon. Since, if you think about, KPIs and Metrics are just different kinds of signals and solvers.		
-
-> You could say that RVBBIT is really a "Reaction Engine" with 'useful surfaces'.
-
-## Flows
-
-- Full flow-based-programming interface with Clojure functions - to create "visual functions"
-- Custom "flow parts" can be created and reused in user space
-- Flows can be used to create custom runners (data analysis, image generation, R scripts, Python, API calls, etc)
-- Each "step" in a flow it's it's own pub/sub value (a signal and a solver, essentially)
-- Users can utilize flows without even knowing it, it's just another abstractions for getting things done. 
-
-<br/>
-<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=7JsOqQXz2gI" target="_blank">
-      <img src="docs/sigsol.jpg" alt="Signals and Solvers - Reactivity" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Signals and Solvers - Reactivity ▶</p>
-  </div>
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=nZKSIbc4x3Y" target="_blank">
-      <img src="docs/ffl.jpg" alt="Flows - Reactivity and Feedback loops" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Flows - Reactivity and Feedback loops ▶</p>
-  </div>
-</div>	
-
-## Human First, Machine Friendly
-
-- Side-effect of having a unified DSL and parameter access model is that it is not only easy to "write" to a users canvas, but also fairly easy for an LLM to read and understand (and written to).
-- If installed 'Fabric' can be used to fix cards, generate new ones, even entire decks, based on natural language descriptions and a back and forth feedback loop UX.
-
-## Extendable and Hackable
-
-- "Kits" can add new functionality to the canvas, cards, or queries
-- Runners are just functions and or flows
-- Solvers and Signals are just functions and or flows
-- The theme of the UI is itself a set of reactive parameters. CSS maps everywhere. Specific card overrides, global defaults, conditional formatting. Data-driven dynamic theme changes? Yes.
-
-## "Specializable"
-
-- I can easily envision RVBBIT "packages" that are tailored to specific industries or use cases. 
-	- Example: "JIRA for RVBBIT" with a number of pre-built cards and flows for use-cases like managing projects, tracking issues, reporting, etc.
-
-<br/>
-<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=18ZPDTYwzeA" target="_blank">
-      <img src="docs/aii.jpg" alt="Using AI to mutate the canvas" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Using AI to mutate the canvas ▶</p>
-  </div>
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=a5B3SRAD6v8" target="_blank">
-      <img src="docs/kitt.jpg" alt="User Space Kits and Plug-ins" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">User Space Kits and Plug-ins ▶</p>
-  </div>
-</div>		
-
-## Getting Started
-
-- Give it a try - I'm still working on proper documentation (for example, the entire Clover DSL is not yet documented), please open GH issues, discussions or reach out to me on [Twitter](https://twitter.com/ryrobes) if you have any questions!
-- Go to http://localhost:8888 
-- Still working on legit documentation, but for now:
-	- The ./assets/ folder - this is for user content like images, files, etc. Can be referenced as http://localhost:8888/assets/* - very useful for anything that the backend needs to read/write to that the frontend can also access.
-	- The ./defs/ folder - this is where all config EDN files are
-	- The ./connections/ folder - this is where your SQL db connections are. They are each an EDN map with JDBC connection info that gets use by a Hikari connection pool (so there can be Hikari specific settings)
-	- The ./screens/ folder - this is where screen or "deck" definitions live (in the middle of a re-naming of things)
-		- a screen can be opened on boot by going to http://localhost:8888/#/my-screen-name - or by using the floating editor panel, selecting "files" and clicking and dragging the screens row on to the canvas
-
-<br/>
-<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-  <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/watch?v=fD6WCfR1PsU" target="_blank">
-      <img src="docs/gss.jpg" alt="Video 1 Title" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Getting Started with RVBBIT ▶</p>
-  </div>
-    <div style="width: 48%; text-align: center;">
-    <a href="https://www.youtube.com/embed/rxYTSI7aenI?si=ZAC0KjDlN0NM2LJZ" target="_blank">
-      <img src="docs/harezero1.jpg" alt="User Space Kits and Plug-ins" style="width: 100%;">
-    </a>
-    <p style="margin-top: 10px; font-size: 21px;">Long-form Getting Started & Overview ▶</p>
-  </div>
-</div>	
-
-## Caveats
-
-- Use Engelbart's beautiful invention please 🐁
-- Reccommend JDK 17+
-- Only tested on Chrome ATM (Firefox works somewhat)
-- Various UI jank; being worked on
-- Lots of bugs and edge cases not sorted out yet
-- Limited SQL DB support ATM
-	Tested with SQLite, Postgres, MySQL, SQL Server, Vertica, Clickhouse, DuckDB
-	(with various quirks to each as I continute to smooth out the SQL engine) 
-- Have a laundry list of TODOs, will try and get them posted as issues or discussions so I can gauge interest / prioritize
-- No concept of users / auth yet
-- Meant to be used interally with a team that you trust (open REPLs, open shell access, etc.)
-- Several features I had previously tweeted about and are 80% done (mostly working), but were pulled to make my (self-imposed) deadline, will def surface them discussion for priorities as well
-
-
-Copyright © 2024 Ryan Robitaille
+---
+
+## FAQ & Caveats
+
+- **Which databases are supported?**
+  Tested with PostgreSQL, MySQL, SQLite, SQL Server, Vertica, ClickHouse, DuckDB. Many more should work (we rely on JDBC/Hikari).
+- **What if I don’t know Clojure?**
+  No worries—Rabbit’s drag-and-drop approach and SQL knowledge are enough to get going. Clojure is only needed for deeper customizations.
+- **Is it stable?**
+  It’s actively developed—so expect some rough edges. We welcome bug reports & ideas.
+
+---
+
+## Contributing & Future Plans
+
+Rabbit’s core is open, dynamic, and designed to be extended:
+- “Kits” for specialized functionality (e.g., AI prompts, domain-specific flows, external REPL connections).
+- More robust documentation and “drag-and-drop recipe” guides.
+- Enhanced multi-user capabilities and security layers.
+- Ongoing UI refinements (like better cross-browser support and theme-building).
+
+If you have suggestions, please open an issue or start a discussion. We’re building a community of data explorers, UI tinkerers, and hackers who want the future now.
+
+---
+
+- Built with love for composability and creativity. Inspired by the lessons of Bret Victor, Alan Kay, HyperCard, and other visionaries.
+
+---
+
+For more info, deeper tutorials, or to share your wild data experiments, hit us up on [GitHub Discussions](#) or [Twitter](https://twitter.com/ryrobes).
+
+
+> *“If you want to build a ship, teach people to long for the endless immensity of the sea.” – Antoine de Saint-Exupéry*
+
+Welcome aboard, Rabbits. Let’s build the future of data interaction together.

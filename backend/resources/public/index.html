@@ -408,7 +408,7 @@
       animation: rotation 0.4s;
     }
 
-    .rotate {
+    /* .rotate {
       animation: rotation 0.7s;
     }
 
@@ -434,7 +434,40 @@
       to {
         transform: rotate(-359deg);
       }
-    }
+    } */
+
+    .rotate {
+  animation: rotation 0.7s linear;
+  transform-origin: center center;
+  /* Optional: add this to smooth out the animation */
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotate-reverse {
+  animation: rotation-reverse 0.7s linear;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes rotation-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
 
     .linear {
       animation-timing-function: linear;
@@ -468,11 +501,182 @@
       }
     }
 
-    /* Class to Apply the Animation */
+
     .heartbeat {
       animation: heartbeat 1.5s ease-in-out infinite;
-      /* You can adjust the timing (1.5s) to speed up or slow down the pulse */
     }
+
+    /* Simple pulse */
+.pulse-debug {
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Glow pulse */
+.glow-pulse-debug {
+  animation: glowPulse 0.7s ease-in-out;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4); }
+  50% { box-shadow: 0 0 20px 10px rgba(66, 133, 244, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
+}
+
+/* 3D flip pulse */
+.flip-pulse-debug {
+  animation: flipPulse 0.6s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+@keyframes flipPulse {
+  0% { transform: perspective(400px) rotateX(0); }
+  30% { transform: perspective(400px) rotateX(-4deg) scale(1.02); }
+  60% { transform: perspective(400px) rotateX(2deg) scale(1.02); }
+  100% { transform: perspective(400px) rotateX(0); }
+}
+
+/* Subtle bounce with shadow */
+.bounce-shadow-debug {
+  animation: bounceShadow 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes bounceShadow {
+  0% { transform: translateY(0); box-shadow: 0 0 0 rgba(0,0,0,0.1); }
+  50% { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+  100% { transform: translateY(0); box-shadow: 0 0 0 rgba(0,0,0,0.1); }
+}
+
+/* Energy surge */
+.surge-debug {
+  animation: surgePulse 0.7s ease-in-out;
+  position: relative;
+}
+
+@keyframes surgePulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0);
+  }
+  30% {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 10px 20px rgba(66, 133, 244, 0.2);
+  }
+  60% {
+    transform: scale(1.02) translateY(-1px);
+    box-shadow: 0 5px 15px rgba(66, 133, 244, 0.1);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0);
+  }
+}
+
+/* Matrix-style data surge */
+.matrix-surge-debug {
+  animation: matrixSurge 0.8s ease-in-out;
+  position: relative;
+}
+
+@keyframes matrixSurge {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+  }
+  30% {
+    transform: scale(1.02) skew(-1deg);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  }
+  60% {
+    transform: scale(1.01) skew(0.5deg);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+  }
+  100% {
+    transform: scale(1) skew(0);
+    box-shadow: 0 0 0 rgba(0, 255, 0, 0);
+  }
+}
+
+/* Quick zoom twist */
+.zoom-twist-debug {
+  animation: zoomTwist 0.4s ease-in-out;
+}
+
+@keyframes zoomTwist {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.05) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Sharp pop */
+.pop-debug {
+  animation: popEffect 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes popEffect {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Tilt shake */
+.tilt-debug {
+  animation: tiltEffect 0.4s ease-in-out;
+}
+
+@keyframes tiltEffect {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Quick wave */
+.wave-debug {
+  animation: waveEffect 0.5s ease-in-out;
+}
+
+@keyframes waveEffect {
+  0% { transform: skewX(0deg); }
+  30% { transform: skewX(-2deg); }
+  60% { transform: skewX(2deg); }
+  100% { transform: skewX(0deg); }
+}
+
+/* Bounce flip */
+.bounce-flip-debug {
+  animation: bounceFlip 0.4s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+@keyframes bounceFlip {
+  0% { transform: perspective(400px) scale(1); }
+  40% { transform: perspective(400px) scale(1.02) rotateX(-3deg); }
+  70% { transform: perspective(400px) scale(0.98) rotateX(2deg); }
+  100% { transform: perspective(400px) scale(1) rotateX(0); }
+}
+
+/* Quick squeeze */
+.squeeze-debug {
+  animation: squeezeEffect 0.4s ease-in-out;
+}
+
+@keyframes squeezeEffect {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(0.95) scaleY(1.05); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+.combo-debug {
+  animation:
+    zoomTwist 0.4s ease-in-out,
+    popEffect 0.3s ease-in-out;
+}
 
 
     @font-face {

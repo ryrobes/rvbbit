@@ -23,7 +23,9 @@
 (defonce unique-view-set (atom #{}))
 
 (defn ddb-put! [coll-name kkey vval]
-  (d/transact-kv ddb [[:put coll-name kkey vval]]))
+  (try
+    (d/transact-kv ddb [[:put coll-name kkey vval]])
+    (catch Exception _ (ut/pp [:ddb-put! :error]))))
 
 (defn ddb-get [coll-name kkey]
   (d/get-value ddb coll-name kkey))
@@ -45,6 +47,16 @@
   (d/close-kv ddb))
 
 (defonce shapes-map (atom {}))
+(defonce formula-map (atom {}))
+(defonce snippet-map (atom {}))
+(defonce stacks-map (atom {}))
+(defonce latest-settings-map (atom {}))
+
+(defonce sniff-test-map (atom {}))
+(defonce flow-function-map (atom {}))
+(defonce field-attribute-map (atom {}))
+
+(defonce stack-feedback (atom {}))
 
 ;; (open-ddb "honeyhash-map") ;; start datalevin instance
 ;; (open-ddb "honeyhash-map") ;; start datalevin instance
@@ -75,6 +87,7 @@
 
 (defonce shape-rotation-status (atom {}))
 
+(defonce leaf-field-meta-map (atom {}))
 (defonce leaf-brute-force-map (atom {}))
 (defonce leaf-brute-force-last-panel-hash (atom {}))
 (defonce query-runstream-cache (atom {}))
@@ -87,7 +100,6 @@
 ;; ^^ honey-hash, {:shapes [all reco block maps] -and- :fields [field maps]}
 
 (defonce realm-atom (atom {}))
-
 (defonce viz-reco-sniffs (atom 0))
 (defonce leaf-evals (atom 0))
 

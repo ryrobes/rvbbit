@@ -3,8 +3,9 @@
  :subprotocol "vertica"
  :subname     "_mydb?defaultSchema=public"
  :user        "dbadmin"
- :password    "test"
- :host        "dev-pbox"
+ :password    "Notofox2=="
+ :host        "dev-pig-37"
  :connection-init-sql "set search_path to public"
  :port         5433}
+
 

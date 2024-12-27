@@ -36,11 +36,25 @@
   (let [debounced-update (debounce update-mouse-activity 1000)] ;; 1000 milliseconds = 1 second
     (.addEventListener js/window "mousemove" (fn [_] (debounced-update)))))
 
+(re-frame/reg-fx :reset-atom!
+                 (fn [[atom value]]
+                   (reset! atom value)))
+
 (re-frame/reg-event-db ::alt-key-down (fn [db _] (assoc db :alt-key-held? true)))
 
 (re-frame/reg-event-db ::alt-key-up (fn [db _] (assoc db :alt-key-held? false)))
 
 (re-frame/reg-event-db ::alt-key-toggle (fn [db _] (assoc db :alt-key-held? (not (get db :alt-key-held? false)))))
+
+;; (re-frame/reg-event-db ::console-log (fn [_ _]
+;;                                        (reset! db/loaded-screen? false)
+;;                                        (reset! db/final-loading-message nil) db))
+
+(re-frame/reg-event-fx ::console-log
+                       (fn [_ _]
+                         {:fx [[:reset-atom! [db/loaded-screen? false]]
+                               [:reset-atom! [db/post-boot? true]]
+                               [:reset-atom! [db/final-loading-message nil]]]}))
 
 (defn dispatch-keydown-rules []
   (ut/tracked-dispatch-sync
@@ -72,7 +86,7 @@
                              [[::bricks/panel-depth-down] [{:keyCode 70 :shiftKey true}]] ; shift-f
                              [[::flows/run-current-flowmap] [{:keyCode 70} {:keyCode 70}]] ; f f
                              ;[[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde ;; old echoes TODO bring back
-                             [[::bricks/toggle-quake-console] [{:keyCode 192}]] ; ` tilde
+                             [[::console-log] [{:keyCode 192}]] ; ` tilde
                              [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]] ;; ctrl-s
                              [[::bricks/nudge-panel :up] [{:keyCode 87}]] ; w
                              [[::bricks/nudge-panel :down] [{:keyCode 83}]] ; s
@@ -134,8 +148,9 @@
        :poll-when                [::bricks/update-flow-statuses?]
        :dispatch-event-on-start? true}
 
-      {:interval                 120 ;; was 3600
+      {:interval                 600 ;; was 3600
        :event                    [::bricks/clean-up-reco-previews]
+       :poll-when                [::bricks/clean-up-reco-previews?]
        :dispatch-event-on-start? false}
 
       {:interval                 5
@@ -230,11 +245,11 @@
   (ut/tracked-dispatch [::wfx/connect :query2 (http/options-secondary :query2)])
   (ut/tracked-dispatch [::wfx/connect :query3 (http/options-secondary :query3)])
   (ut/tracked-dispatch-sync [::wfx/request :default
-                        {:message     {:kind :get-settings
-                                       :client-name db/client-name}
-                         :on-response [::http/simple-response-boot-no-load] ;; just get settings
-                         :on-timeout  [::http/timeout-response [:boot :get-settings]]
-                         :timeout     15000}])
+                             {:message     {:kind :get-settings
+                                            :client-name db/client-name}
+                              :on-response [::http/simple-response-boot-no-load] ;; just get settings
+                              :on-timeout  [::http/timeout-response [:boot :get-settings]]
+                              :timeout     15000}])
   (ut/tracked-dispatch [::wfx/request :default
                         {:message     {:kind :signals-map
                                        :client-name db/client-name}
@@ -263,15 +278,19 @@
                :client-name db/client-name}
      :on-response [::bricks/save-sessions]
      :timeout 15000}])
-  (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
-        base-dir "./screens/"]
-    (if (>= (count url-vec) 1) ;; if we have a url with a screen, load that, oitherwise load default screen
-      (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
-      (ut/tracked-dispatch [::wfx/request :default ;:secondary ;; load default boot flowset
-                            {:message     {:kind :get-settings :client-name db/client-name}
-                             :on-response [::http/simple-response-boot]
-                             :on-timeout  [::http/timeout-response [:boot :get-settings]]
-                             :timeout     60000}])))
+
+  (js/setTimeout
+   (fn []
+     (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
+           base-dir "./screens/"]
+       (if (>= (count url-vec) 1) ;; if we have a url with a screen, load that, oitherwise load default screen
+         (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
+         (ut/tracked-dispatch [::wfx/request :default ;:secondary ;; load default boot flowset
+                               {:message     {:kind :get-settings :client-name db/client-name}
+                                :on-response [::http/simple-response-boot]
+                                :on-timeout  [::http/timeout-response [:boot :get-settings]]
+                                :timeout     60000}])))) 5000)
+
   (http/start-listening-to-url-changes)
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
   (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])

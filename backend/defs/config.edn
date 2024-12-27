@@ -9,14 +9,12 @@
 {:debug-level 1 ;; for console output. somewhat deprecated.
  :hide-sub-and-unsub-alerts? true ;;false
  :show-query-times? false
- :log-atom-sizes? false ;; expensive, only for debugging
- :viz-shapes "./defs/viz-shapes.edn" ;; "./defs/viz-shapes-only-recharts.edn"
- ;:viz-shapes "./defs/viz-shapes-only-recharts.edn"
- ;:default "./screens/frost-terminal2.edn"
- :default "./screens/winter-theme-hybrid3.edn"
- ;:default "screens/ecto-cooler-shade.edn"
+ :log-atom-sizes? true ;false ;; expensive, only for debugging
+ :ui-debug? false ;true ;false ;true
+ :render-pop? true ;; semi-expensive but enjoyable
+ :default "screens/late-december.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
- ;;    if this screen can't be read or is nil, you will get a basic blank screen with a default theme
+ ;;    if this screen can't be read or is nil, you will get a basic blank screen with a basic theme
  :harvest-on-boot? true
  ;; ^^ do a full database sniff for each connection on boot? No reason not to unless it is causing issues.
  :modes {:pre       [:pre
@@ -32,9 +30,9 @@
          :terminal  [:terminal :*data]
          :markdown  [:markdown :*data]
          :data      [:data-viewer :*data]
-         :pretty    [:pretty-box :*data]
+         ;:pretty    [:pretty-box :*data]
          :rowset    [:honeycomb {:select [:*] :from {:data :*data}} 11 9] ;; this is slow and funky. revisit?
-         :clover    [:box :child :*data]}
+         :clover    [:box :child :*data :size "auto" :justify :center :align :center :height :card-height-px :width :card-width-px]}
   ;; ^^ see clover-templates.edn, for the full clover defs mentioned here
  :runners {:queries {:default {}
                      :modes [:rowset]
@@ -53,31 +51,31 @@
                      :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
                      :icon "🍀"} ;; basic clover render
 
-           :raw-sql  {:type :nrepl
-                      :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
-                      :modes [:rowset :edn :terminal]
-                      :default "-- system-db
-select 1 as one;
--- to use rabbit reactive param keywords wrap them in {{}}
-"
-                      :syntax "sql"
-                      :ext ".sql"
-                      :hop-function? true
-                      :slice-bar? true
-                      :placeholder-on-running? true
-                      :clover-fn [:run-solver
-                                  {:signal false
-                                   :cache? false
-                                   :type :clojure
-                                   :input-map {}
-                                   :data (rvbbit-backend.websockets/run-raw-sql
-                                          {:input (str :clover-body " ")
-                                           :client-name :*client-name
-                                           :solver-name :*solver-name
-                                           :ui-keypath :*ui-keypath
-                                           :connection-id :*connection-id})}]
-                      :description "Raw, Organic, Artesial SQL Strings - fresh from the farm"
-                      :icon "ri-database-2-line"}
+;;            :raw-sql  {:type :nrepl
+;;                       :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
+;;                       :modes [:rowset :edn :terminal]
+;;                       :default "-- system-db
+;; select 1 as one;
+;; -- to use rabbit reactive param keywords wrap them in {{}}
+;; "
+;;                       :syntax "sql"
+;;                       :ext ".sql"
+;;                       :hop-function? true
+;;                       :slice-bar? true
+;;                       :placeholder-on-running? true
+;;                       :clover-fn [:run-solver
+;;                                   {:signal false
+;;                                    :cache? false
+;;                                    :type :clojure
+;;                                    :input-map {}
+;;                                    :data (rvbbit-backend.websockets/run-raw-sql
+;;                                           {:input (str :clover-body " ")
+;;                                            :client-name :*client-name
+;;                                            :solver-name :*solver-name
+;;                                            :ui-keypath :*ui-keypath
+;;                                            :connection-id :*connection-id})}]
+;;                       :description "Raw, Organic, Artesial SQL Strings - fresh from the farm"
+;;                       :icon "ri-database-2-line"}
 
            :pivot  {:type :nrepl
                       :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
@@ -535,35 +533,6 @@ select 1 as one;
                             ;;          :icon "zmdi-car"}
                             }}
 
-          ;;  :fabric {:type :nrepl
-          ;;           :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace
-          ;;           :when-expr (do (require '[clojure.java.shell :as shell])
-          ;;                          (try
-          ;;                            (zero? (:exit (shell/sh "which" "fabric")))
-          ;;                            (catch Exception _ false)))
-          ;;           :modes [:text :markdown :clover :data :terminal]
-          ;;           :default "funny tweet about rabbits and clojure"
-          ;;           :syntax "text"
-          ;;           :ext ".txt"
-          ;;           :hop-function? true
-          ;;           :slice-bar? false
-          ;;           :placeholder-on-running? true
-          ;;           :clover-fn [:run-solver
-          ;;                       {:signal false
-          ;;                        :cache? true
-          ;;                        :type :clojure
-          ;;                        :input-map {}
-          ;;                        :data (rvbbit-backend.websockets/fabric-run
-          ;;                               {:input (str :clover-body "")
-          ;;                                :client-name :*client-name
-          ;;                                :id :*id
-          ;;                                :context :*context
-          ;;                                :runner :*runner
-          ;;                                :pattern (or :*pattern "tweet")
-          ;;                                :model (or :*model "gpt-3.5-turbo")})}]
-          ;;           :description "AI framework: Uses the Fabric command line tool to access various local and remote LLM models with pre-defined 'patterns', + special context-aware RVBBIT patterns."
-          ;;           :icon "images/fbc-logo.gif"}
-
            :outliers {:type :nrepl
                       :runner {:port 45999 :host "127.0.0.1"}
                       :when-expr (do
@@ -712,6 +681,7 @@ select 1 as one;
                                             result)))}]
                    :description "Run a shell (in your default shell) command (from the ./shell-root/ dir) & return the output. Warning: executes with permissions of RVBBIT server user."
                    :icon "ri-terminal-box-line"}
+
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
                       :when-expr (do ;; optional, but you might not want it to show up in the UI if we cant connect
@@ -742,7 +712,8 @@ select 1 as one;
                                     :data :clover-body}]
                       :description "Run a Clojure expression and return the result. Uses an external nREPL server."
                       :icon "images/clojure_2.svg"}
-           :create-image {:runner {}
+
+           :create-image {:runner {} ;; example of a flow as a runner with editor values as an input
                           :modes [:clover :data :text]
                           :type :flow
                           :syntax "text"
@@ -765,48 +736,49 @@ select 1 as one;
                                     A retro future. Many rabbits eye the scene.
                                     There is a beautiful woman standing in the field, she looks upon you with kind eyes. In the style of a 1970s sci-fi movie poster."
                           :icon ["images/openai.png" "images/dalle3.png"]}
-        ;;    :python3 {:runner {}
-        ;;              :modes [:text :data  :clover :terminal]
-        ;;              :type :flow
-        ;;              :syntax "python"
-        ;;              :ext ".py"
-        ;;              :placeholder-on-running? true
-        ;;              :clover-fn [:run-solver
-        ;;                          {:signal false
-        ;;                           :cache? false
-        ;;                           :type :flow
-        ;;                           :data
-        ;;                           {:flowmap "simple-python-exec" ;; "python-test-1"
-        ;;                            :opts
-        ;;                            {:timeout 120000
-        ;;                             :overrides
-        ;;                             {:python-code-string ;;:open-input-1
-        ;;                              :clover-body}}
-        ;;                            :return :output-only}}]
-        ;;              :default ["import platform"
-        ;;                        ""
-        ;;                        "def main():"
-        ;;                        "    # Print Hello, World!"
-        ;;                        "    print(\"Hello, World!\")"
-        ;;                        "    "
-        ;;                        "    # Print Python version"
-        ;;                        "    print(f\"Python version: {platform.python_version()}\")"
-        ;;                        "    "
-        ;;                        "    # Print detailed Python version info"
-        ;;                        "    print(f\"Python version info: {platform.python_version_tuple()}\")"
-        ;;                        "    "
-        ;;                        "    # Print system information"
-        ;;                        "    print(f\"System: {platform.system()}\")"
-        ;;                        "    print(f\"Node: {platform.node()}\")"
-        ;;                        "    print(f\"Release: {platform.release()}\")"
-        ;;                        "    print(f\"Version: {platform.version()}\")"
-        ;;                        "    print(f\"Machine: {platform.machine()}\")"
-        ;;                        "    print(f\"Processor: {platform.processor()}\")"
-        ;;                        ""
-        ;;                        "if __name__ == \"__main__\":"
-        ;;                        "    main()"]
-        ;;              :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Super Experimental! (not really useful ATM)"
-        ;;              :icon "images/python.svg"}
+
+           :python3 {:runner {} ;; example of a flow as a runner with editor values as an input
+                     :modes [:text :data  :clover :terminal]
+                     :type :flow
+                     :syntax "python"
+                     :ext ".py"
+                     :placeholder-on-running? true
+                     :clover-fn [:run-solver
+                                 {:signal false
+                                  :cache? false
+                                  :type :flow
+                                  :data
+                                  {:flowmap "simple-python-exec" ;; "python-test-1"
+                                   :opts
+                                   {:timeout 120000
+                                    :overrides
+                                    {:python-code-string ;;:open-input-1
+                                     :clover-body}}
+                                   :return :output-only}}]
+                     :default ["import platform"
+                               ""
+                               "def main():"
+                               "    # Print Hello, World!"
+                               "    print(\"Hello, World!\")"
+                               "    "
+                               "    # Print Python version"
+                               "    print(f\"Python version: {platform.python_version()}\")"
+                               "    "
+                               "    # Print detailed Python version info"
+                               "    print(f\"Python version info: {platform.python_version_tuple()}\")"
+                               "    "
+                               "    # Print system information"
+                               "    print(f\"System: {platform.system()}\")"
+                               "    print(f\"Node: {platform.node()}\")"
+                               "    print(f\"Release: {platform.release()}\")"
+                               "    print(f\"Version: {platform.version()}\")"
+                               "    print(f\"Machine: {platform.machine()}\")"
+                               "    print(f\"Processor: {platform.processor()}\")"
+                               ""
+                               "if __name__ == \"__main__\":"
+                               "    main()"]
+                     :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Super Experimental! (not really useful ATM)"
+                     :icon "images/python.svg"}
            }
 
  :new-block-rand  ["Why, sometimes I've believed as many as six impossible things before breakfast."

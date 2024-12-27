@@ -1,0 +1,11 @@
+[
+ {:formula "excel-formula"
+  :description "Example Product Frequency Count"
+  :params {:formula "=COUNT(FILTER(order_id, product_id = CURRENT(product_id)))"
+           :result-field "product_frequency"}}
+
+ {:formula "clojure"
+  :description "Example Random Integer Field"
+  :params {:formula "(fn [rowset] (mapv #(assoc % :zombified (+ 5 (rand-int 45))) rowset))"}}
+
+ ]

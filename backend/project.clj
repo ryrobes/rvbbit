@@ -4,6 +4,7 @@
   :license            {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
                        :url  "https://www.eclipse.org/legal/epl-2.0/"}
   :plugins            [[lein-cljfmt "0.6.4"]
+                       [lein-eftest "0.6.0"]
                        [lein-ancient "0.6.15"]]
   :dependencies       [;[org.clojure/clojure "1.10.3"]
                        [org.clojure/clojure "1.11.4"]

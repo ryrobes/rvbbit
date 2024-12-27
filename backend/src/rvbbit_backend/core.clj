@@ -35,18 +35,19 @@
    [rvbbit-backend.leaves :as leaves]
    [rvbbit-backend.realms :as realms]
    [rvbbit-backend.h2 :as h2]
+   [rvbbit-backend.ddl :as sqlite-ddl]
    [rvbbit-backend.queue-party  :as qp]
    [rvbbit-backend.assistants :as assistants]
    [rvbbit-backend.config :as config]
    [rvbbit-backend.db :as db]
    [rvbbit-backend.freezepop :as fpop]
-   [rvbbit-backend.cruiser :as cruiser]
+  ;;  [rvbbit-backend.cruiser :as cruiser]
    ;[rvbbit-backend.embeddings :as em]
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.sql :as    sql
     :refer [pool-create sql-exec sql-query metrics-kpi-db import-db systemh2-db
-            system-db cache-db cache-db-memory
+            system-db cache-db cache-db-memory stack-db
             system-reporting-db to-sql]]
    [rvbbit-backend.util :as    ut
     :refer [ne?]]
@@ -491,46 +492,9 @@
                          (update-all-theme-meta)))
                     file-path)))
 
-(defn shape-rotation-run [f-path & [pre-filter-fn]]
-  (let [connection-id (rota/get-connection-id f-path)
-        _ (ut/pp ["🥩" :running-full-shape-rotation-job connection-id (str f-path)])
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] (System/currentTimeMillis))
-        conn-map (if (map? f-path) f-path (get @db/conn-map connection-id))
-        _ (sql-exec systemh2-db
-                  (to-sql {:delete-from [:fields] ;; clear last - in case a table was deleted (we clear each table before we add, but dont address orphans)
-                           :where [:= :connection_id (str connection-id)]}))
-        pre-filter-fn (when (= connection-id "systemh2-db") '(fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
-                                                                         (not= (get m :db-schema) "PG_CATALOG"))))
-        res (rota/get-field-maps {:f-path f-path
-                                  :shape-test-defs cruiser/default-sniff-tests
-                                  :shape-attributes-defs cruiser/default-field-attributes
-                                  ;;:filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
-                                  :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
-        combo-viz (rota/get-viz-shape-blocks res @db/shapes-map)
-        shapes-by (group-by (fn [m] [(get-in m [:shape-rotator :honey-hash])
-                                     (keyword (get-in m [:shape-rotator :context 3]))]) combo-viz)
-        fields-by (group-by (fn [m] [(get m :honey-hash)
-                                     (keyword (get m :table-name))]) res)
-        ;; _ (ut/pp [:kk (keys shapes-by) (keys fields-by)])
-        _ (doseq [kk (keys fields-by)
-                  :let [[honey-hash table-name-kw] kk
-                        shapes (get shapes-by kk)
-                        fields (get fields-by kk)
-                        res {:shapes shapes :fields fields}
-                        hash-key (hash [:fresh-table! connection-id table-name-kw])
-                        modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] [:fresh-table! connection-id table-name-kw])
-                                                               (get res :shapes)))]]
-            (d/transact-kv db/ddb
-                           [[:put "honeyhash-map" honey-hash res]
-                            [:put "shapes-map" hash-key modded-shapes]]))
-        ;; group by honeyhash - do artificial inserts into datalevin
-        ;; "[\"none!\" nil :Crime_Data_from_2020_to_Present]"
-        ;;_ (ut/pp ["🥩" :shape-rotator-db {:fields (take 2 res) :shapes (take 2 combo-viz)}])
-        _ (ut/pp ["🥩" :shape-rotator-fields [:fields (count res) :viz (count combo-viz)]])
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
 
-;; (time (shape-rotation-run "connections/bigfoot-ufos.edn"))
+
+;; (time (rota/shape-rotation-run "connections/bigfoot-ufos.edn"))
 ;; 5000 1652 1190 1208 1359 1246
 
 (defn db-sniff-solver-default [f-path conn-name]
@@ -546,13 +510,13 @@
                            [rvbbit-backend.pool-party :as ppy]
                            [rvbbit-backend.sql :as sql]))
                (let [conn (get (deref db/conn-map) :conn-name)]
-                 (shape-rotation-run :f-path))))})
+                 (rota/shape-rotation-run :f-path))))})
 
 ;; (ut/pp (db-sniff-solver-default "./connections/postgres.edn" "postgres"))
 ;; (ut/pp (keys @db/conn-map))
 ;; (ut/pp @db/shape-rotation-status)
-;; (shape-rotation-run systemh2-db)
-;; (shape-rotation-run cache-db)
+;; (rota/shape-rotation-run systemh2-db)
+;; (rota/shape-rotation-run cache-db)
 
 ;; (wss/fig-render ":db-shape-rotator" :bright-cyan) ;; :solvers :nrepl-calls :websockets
 ;; (ut/pp
@@ -597,27 +561,29 @@
       (try ;; connection errors, etc
         (do (when poolable? (swap! db/conn-map assoc conn-name conn))
             (when harvest-on-boot?
+              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run f-path)))
               ;(qp/slot-queue :schema-sniff f
-              (ppy/execute-in-thread-pools :conn-schema-sniff-serial
-                                           (fn []
-                                            ;;  (time
-                                            ;;   (cruiser/lets-give-it-a-whirl-no-viz f-path
-                                            ;;                                        conn
-                                            ;;                                        system-db
-                                            ;;                                        cruiser/default-sniff-tests
-                                            ;;                                        cruiser/default-field-attributes
-                                            ;;                                        cruiser/default-derived-fields
-                                            ;;                                        cruiser/default-viz-shapes))
-                                            ;;  (time (ut/pp [:shape-rotator-fields
-                                            ;;                (let [res (rota/get-field-maps {:f-path f-path
-                                            ;;                                                :shape-test-defs cruiser/default-sniff-tests
-                                            ;;                                                :shape-attributes-defs cruiser/default-field-attributes
-                                            ;;                                                :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
-                                            ;;                                                :pre-filter-fn nil})
-                                            ;;                      combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)]
-                                            ;;                  [:boot :fields (count res) :viz (count combo-viz)])]))
-                                             (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (shape-rotation-run f-path)))
-                                             ))))
+              ;; (ppy/execute-in-thread-pools :conn-schema-sniff-serial
+              ;;                              (fn []
+              ;;                               ;;  (time
+              ;;                               ;;   (cruiser/lets-give-it-a-whirl-no-viz f-path
+              ;;                               ;;                                        conn
+              ;;                               ;;                                        system-db
+              ;;                               ;;                                        cruiser/default-sniff-tests
+              ;;                               ;;                                        cruiser/default-field-attributes
+              ;;                               ;;                                        cruiser/default-derived-fields
+              ;;                               ;;                                        cruiser/default-viz-shapes))
+              ;;                               ;;  (time (ut/pp [:shape-rotator-fields
+              ;;                               ;;                (let [res (rota/get-field-maps {:f-path f-path
+              ;;                               ;;                                                :shape-test-defs cruiser/default-sniff-tests
+              ;;                               ;;                                                :shape-attributes-defs cruiser/default-field-attributes
+              ;;                               ;;                                                :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
+              ;;                               ;;                                                :pre-filter-fn nil})
+              ;;                               ;;                      combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)]
+              ;;                               ;;                  [:boot :fields (count res) :viz (count combo-viz)])]))
+              ;;                                (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (rota/shape-rotation-run f-path)))
+              ;;                                ))
+              ))
         (catch Exception e (do (swap! db/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))
     ;; (cruiser/clean-up-some-db-metadata current-conn-ids)
     ))
@@ -648,8 +614,7 @@
                                                           ;;                                       cruiser/default-field-attributes
                                                           ;;                                       cruiser/default-derived-fields
                                                           ;;                                       cruiser/default-viz-shapes)
-                                                           (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (shape-rotation-run conn)))
-                                                           )
+                                                           (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (rota/shape-rotation-run conn))))
             (cstr/ends-with? (str (get % :path)) ".csv") (let [f-path (str (get % :path))
                                                                f-op   (get % :type)
                                                                clients (vec (keys @wss/client-queues))]
@@ -689,6 +654,7 @@
   (reset! leaves/fn-context-map-cache {})
   (reset! wss/shape-rotation-meta-cache {})
   (reset! wss/leaf-eval-cache {})
+  (ut/pp ["🍂🍂🍂" :leaves-re-eval :clear-caches :all-clients])
   (doseq [client-name (mapv first (leaves/active-clients))]
     (wss/notify-leaf-defs-updated client-name message)
     ;;(ut/pp [:client client-name :leaf-changes :re-evaluating-leaves!])
@@ -702,7 +668,8 @@
     ;; (leaves/leaf-eval-runstream :fields client-name)
     ;; (leaves/leaf-eval-runstream :views client-name)
     ;(leaf-eval-runstream-parallel-cached client-name)
-    (ut/pp ["🍂🍂🍂" :leaves-re-eval :clear-caches client-name])))
+    ;(ut/pp ["🍂🍂🍂" :leaves-re-eval :clear-caches client-name])
+    ))
 
 ;; (clear-all-leaf-caches)
 
@@ -716,7 +683,8 @@
                        (when (or (cstr/ends-with? (str (get % :path)) "config.edn")
                                  (cstr/ends-with? (str (get % :path)) "clover-templates.edn"))
 
-                         (let [destinations (vec (keys @wss/client-queues))]
+                         (let [destinations (vec (keys @wss/client-queues))
+                               settings (wss/package-settings-for-client :rvbbit)]
                            (doseq [d destinations]
                              (wss/alert! d
                                          [:v-box :justify :center :style {:opacity 0.7} :children
@@ -725,7 +693,9 @@
                                            [:box :child (str (get % :path))]]]
                                          13 2
                                          5)
-                             (wss/kick d [:settings] (wss/package-settings-for-client :rvbbit) 1 :none (str "file updated " (get % :path)))))))
+                             #_(wss/kick d [:settings] (wss/package-settings-for-client :rvbbit) 1 :none (str "file updated " (get % :path)))
+                             (wss/client-mutate d {[:server :settings] settings} true)
+                             ))))
 
                     file-path)))
 
@@ -796,14 +766,100 @@
 ;; (ut/pp [:watch-macro-undos (get @db/params-atom :macro-undo-map)])
 ;; (ut/pp [:watch-macro-undos (keys @db/params-atom )])
 
+(defn process-formulas [formula-map]
+  (let [rows  (vec (for [[k v] formula-map] (assoc (select-keys v [:name :description :primitive :input-fields :output-fields]) :id k)))
+        srows (vec (for [r rows] (into {} (for [[k v] r] {k (str v)}))))
+        insert-sql {:insert-into [:formulas] :values srows}]
+    ;; (ut/pp [:formulas-rows srows])
+    (reset! db/formula-map formula-map)
+    (sql-exec systemh2-db (to-sql {:truncate :formulas}))
+    (sql-exec systemh2-db (to-sql insert-sql)))
+  (doseq [client-name (mapv first (leaves/active-clients))]
+    (wss/notify-general client-name "Server Formula defs have been updated")))
+
+(defn process-stacks [stacks-map]
+  (let [rows  (vec (for [[k v] stacks-map] (assoc (select-keys v [:name :description :required-fields :pipeline]) :id k)))
+        srows (vec (for [r rows] (into {} (for [[k v] r]
+                                            (if (= k :pipeline)
+                                              {k (str (vec (for [p v] (assoc p :formula-map (get @db/formula-map (get p :formula)
+                                                                                                 {:id  (str "cant find formula map!")
+                                                                                                  :name (str "cant find formula map!")})))))}
+                                              {k (str v)})))))
+        insert-sql {:insert-into [:stacks] :values srows}]
+    (reset! db/stacks-map stacks-map)
+    (sql-exec systemh2-db (to-sql {:truncate :stacks}))
+    (sql-exec systemh2-db (to-sql insert-sql))
+    (doseq [client-name (mapv first (leaves/active-clients))]
+      (wss/notify-general client-name "Server Stack defs have been updated"))))
+
+(defn process-snippets [snippet-map]
+  (let [rows  (vec (for [v snippet-map] (walk/postwalk-replace {:params :params_map}
+                                                               (select-keys v [:formula :description :params]))))
+        srows (vec (for [r rows] (into {} (for [[k v] r] {k (str v)}))))
+        insert-sql {:insert-into [:snippets] :values srows}]
+    (reset! db/snippet-map snippet-map)
+    (sql-exec systemh2-db (to-sql {:truncate :snippets}))
+    (sql-exec systemh2-db (to-sql insert-sql)))
+  (doseq [client-name (mapv first (leaves/active-clients))]
+    (wss/notify-general client-name "Server Snippet defs have been updated")))
+
+@db/snippet-map
+
+;;  just make a general fn - TODO w bored
+
+(defn process-snippets-now []
+  (let [snippets-map (try
+                     (let [ff (edn/read-string (slurp "defs/snippets.edn"))] ff)
+                     (catch Exception e (ut/pp [:error-process-snippets-now! (str e)])))]
+    (process-snippets snippets-map)))
+
+(defn process-stacks-now []
+  (let [stacks-map (try
+                     (let [ff (edn/read-string (slurp "defs/stacks.edn"))] ff)
+                     (catch Exception e (ut/pp [:error-process-stacks-now! (str e)])))]
+    (process-stacks stacks-map)))
+
+(defn process-formulas-now []
+  (let [formulas-map (try
+                       (let [ff (edn/read-string (slurp "defs/formulas.edn"))] ff)
+                       (catch Exception e (ut/pp [:error-process-formulas-now! (str e)])))]
+    (process-formulas formulas-map)))
+
+(defn process-tests-and-attributes-now []
+  (try
+    (let [ff (edn/read-string (slurp "defs/sniff-tests.edn"))]
+      (reset! db/sniff-test-map ff)
+      (ut/pp ["👃🍷" :sniff-tests-updated! (count (keys @db/sniff-test-map)) :tests]))
+    (catch Exception e (ut/pp [:error-process-tests-now! (str e)])))
+  (try
+    (let [ff (edn/read-string (slurp "defs/field-attributes.edn"))]
+      (reset! db/field-attribute-map ff)
+      (ut/pp ["⚖📟" :field-attribs-updated! (count (keys @db/field-attribute-map)) :rules]))
+    (catch Exception e (ut/pp [:error-process-field-attributes-now! (str e)])))
+  (try
+    (let [ff (edn/read-string (slurp "defs/flow-functions.edn"))]
+      (reset! db/flow-function-map ff)
+      (ut/pp ["⚖📟" :field-attribs-updated! (count (keys @db/flow-function-map)) :rules]))
+    (catch Exception e (ut/pp [:error-process-flow-functions-now! (str e)])))
+  (clear-all-leaf-caches "field rules & tests changed...")
+  (db/ddb-clear! "honeyhash-map")
+  (db/ddb-clear! "shapes-map"))
+
+;; (process-tests-and-attributes-now)
+;; (process-formulas-now)
+;; (process-stacks-now)
+;; (process-snippets-now)
+
 (defn watch-solver-files []
   (let [file-path "./defs/"]
     (beholder/watch #(ppy/execute-in-thread-pools
                       :watch-solver-files-serial
-                      (fn [] (when (and
-                                    (or (cstr/ends-with? (str (get % :path)) "signals.edn")
-                                        (cstr/ends-with? (str (get % :path)) "solvers.edn"))
-                                    (not @wss/shutting-down?))
+                      (fn [] (cond
+
+                               (and
+                                (or (cstr/ends-with? (str (get % :path)) "signals.edn")
+                                    (cstr/ends-with? (str (get % :path)) "solvers.edn"))
+                                (not @wss/shutting-down?))
                                (let [signals? (cstr/ends-with? (str (get % :path)) "signals.edn")
                                      destinations (vec (keys @wss/client-queues))
                                      map-atom (if signals? wss/signals-atom wss/solvers-atom)
@@ -820,7 +876,32 @@
                                                  [:box :child (str (get % :path))]]]
                                                13 2
                                                5)
-                                   (wss/kick d [(if signals? :signals-file :solvers-file)] @map-atom 1 :none (str "file updated " (get % :path))))))))
+                                   (wss/kick d [(if signals? :signals-file :solvers-file)] @map-atom 1 :none (str "file updated " (get % :path)))))
+
+                               (cstr/ends-with? (str (get % :path)) "formulas.edn")
+                               (try
+                                 (let [formula-map (edn/read-string (slurp (str (get % :path))))]
+                                   (process-formulas formula-map))
+                                 (catch Exception e (ut/pp [:error-watching-formulas-map! (str e)])))
+
+                               (cstr/ends-with? (str (get % :path)) "snippets.edn")
+                               (try
+                                 (let [snippets-map (edn/read-string (slurp (str (get % :path))))]
+                                   (process-snippets snippets-map))
+                                 (catch Exception e (ut/pp [:error-watching-snippets-map! (str e)])))
+
+                               (cstr/ends-with? (str (get % :path)) "stacks.edn")
+                               (try
+                                 (let [stacks-map (edn/read-string (slurp (str (get % :path))))]
+                                   (process-stacks stacks-map))
+                                 (catch Exception e (ut/pp [:error-watching-stacks-map! (str e)])))
+
+                               (or
+                                (cstr/ends-with? (str (get % :path)) "field-attributes.edn")
+                                (cstr/ends-with? (str (get % :path)) "sniff-tests.edn"))
+                               (process-tests-and-attributes-now)
+
+                               :else nil)))
                     file-path)))
 
 (defn start-services []
@@ -1091,9 +1172,46 @@
   ;;                                       :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
   ;;                                       :pre-filter-fn nil}))]))
 
+(defn create-system-reporting-tables-if-needed! [db-name]
+  (ut/pp [:creating-system-reporting-tables])
+  (sql-exec db-name sqlite-ddl/create-jvm-stats-duck)
+  (sql-exec db-name sqlite-ddl/create-client-stats-duck)
+  (sql-exec db-name sqlite-ddl/create-llm-log-duck))
 
+(defn create-sqlite-sys-tables-if-needed! [system-db]
+  (ut/pp [:creating-sys-tables])
+  (sql-exec system-db sqlite-ddl/create-jvm-stats)
+  (sql-exec system-db sqlite-ddl/create-client-stats)
+  (sql-exec system-db sqlite-ddl/create-kits)
+  (sql-exec system-db sqlite-ddl/create-screens)
+  (sql-exec system-db sqlite-ddl/create-blocks)
+  (sql-exec system-db sqlite-ddl/create-boards)
+  (sql-exec system-db sqlite-ddl/create-tests)
+  (sql-exec system-db sqlite-ddl/create-fields)
+  (sql-exec system-db sqlite-ddl/create-connections)
+  (sql-exec system-db sqlite-ddl/create-attributes)
+  (sql-exec system-db sqlite-ddl/create-found-fields)
+  (sql-exec system-db sqlite-ddl/create-combos)
+  (sql-exec system-db sqlite-ddl/create-combo-rows)
+  (sql-exec system-db sqlite-ddl/create-rules-table0)
+  (sql-exec system-db sqlite-ddl/create-rules-table1)
+  (sql-exec system-db sqlite-ddl/create-rules-table2)
+  (sql-exec system-db sqlite-ddl/create-rules-table3)
+  (sql-exec system-db sqlite-ddl/create-flow-functions)
+    ;; (sql-exec history-db sqlite-ddl/create-panel-history)
+    ;; (sql-exec history-db sqlite-ddl/create-panel-resolved-history)
+    ;; (sql-exec history-db sqlite-ddl/create-panel-materialized-history)
+    ;; (sql-exec autocomplete-db sqlite-ddl/create-client-items)
+    ;; (sql-exec realms-db sqlite-ddl/create-realms)
+  (sql-exec system-db sqlite-ddl/create-board-history)
+  (sql-exec system-db sqlite-ddl/create-errors)
+  (sql-exec system-db sqlite-ddl/create-reco-vw)
+  (sql-exec system-db sqlite-ddl/create-reco-vw2)
+  (sql-exec system-db sqlite-ddl/create-status)
+  (sql-exec system-db sqlite-ddl/create-client-memory)
+  (sql-exec system-db sqlite-ddl/create-status-vw))
 
-
+;;;  (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run stack-db)))
 
 (defn -main [& args]
   (let [] ;; [xtdb-node (xtn/start-node)]
@@ -1116,14 +1234,15 @@
     (println " ")
     (ut/print-ansi-art "data/nname.ans")
     (ut/print-ansi-art "data/rrvbbit.ans")
-    (ut/pp [:version "0.2.0" :november 2024 "Yo."])
+    (ut/pp [:version "0.2.0-alpha" :december-2024 "Snow Hare"])
     ;; (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
     (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   ;; (println " ")
   ;; (wss/fig-render "Curiouser and curiouser!" :pink)
 
    ;; create dirs for various artifacts, if not already present
-    (doseq [dir ["assets" "assets/snaps" "assets/screen-snaps" "defs/backup"
+    (ut/pp [:creating-dirs...])
+    (doseq [dir ["assets" "assets/snaps" "assets/screen-snaps" "defs/backup" "db/parquet"
                  ;; "db/xtdb-system/tx-log" "db/xtdb-system/storage"
                  "flow-logs" "flow-blocks" "flow-history" "live"]]
       (ext/create-dirs dir))
@@ -1141,10 +1260,15 @@
   ;;                                    ;; :max-cache-entries 536870912
   ;;                                   }]})
 
+
+    (ut/pp [:clearing-live-folder...])
     (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+    (ut/pp [:get-ai-workers...])
     (get-ai-workers) ;; just in case for the cold boot atom has no
 
+    (ut/pp [:create-queue-system...])
     (qp/create-slot-queue-system)
+    (ut/pp [:thaw-flow-results...])
     (fpop/thaw-flow-results)
 
     (ut/pp [:creating-h2-tables "systemh2-db"])
@@ -1152,7 +1276,10 @@
     (sql-exec systemh2-db h2/create-themes)
     (sql-exec systemh2-db h2/create-blocks)
     (sql-exec systemh2-db h2/create-realms)
+    (sql-exec systemh2-db h2/create-formulas)
+    (sql-exec systemh2-db h2/create-stacks)
     (sql-exec systemh2-db h2/create-fields)
+    (sql-exec systemh2-db h2/create-snippets)
     (sql-exec systemh2-db h2/create-fields-view)
     (sql-exec systemh2-db h2/create-panel-history)
     (sql-exec systemh2-db h2/create-panel-materialized-history)
@@ -1168,6 +1295,17 @@
     (sql-exec systemh2-db h2/create-live-schedules)
     (sql-exec systemh2-db h2/create-channel-history)
     (sql-exec systemh2-db h2/create-fn-history)
+    (sql-exec systemh2-db h2/create-shape-rotations)
+    (sql-exec systemh2-db h2/create-shape-rotation-maps)
+    (sql-exec systemh2-db "truncate table shape_rotations")
+    (sql-exec systemh2-db "truncate table shape_rotation_maps")
+    (sql-exec systemh2-db "truncate table client_memory")
+    (sql-exec systemh2-db "truncate table client_stats")
+    (sql-exec systemh2-db "truncate table client_items")
+    (sql-exec systemh2-db "truncate table jvm_stats")
+    (sql-exec systemh2-db "CREATE INDEX IF NOT EXISTS idx_shape_rotations_lookup ON shape_rotations(dragged_kp, client_name);")
+    (sql-exec systemh2-db "CREATE INDEX IF NOT EXISTS idx_shape_rotation_maps_lookup ON shape_rotation_maps(dragged_kp, client_name);")
+    (sql-exec systemh2-db "CREATE INDEX IF NOT EXISTS idx_fields_ui ON fields(connection_id, table_name, field_name);")
     ;; (sql-exec systemh2-db h2/create-ft-index)
 
     (db/open-ddb "honeyhash-map") ;; start datalevin "table" instances
@@ -1185,9 +1323,9 @@
     (sql-exec system-db "drop view  if exists user_subs_vw;")
     (sql-exec system-db "drop view  if exists latest_status;")
 
-    (cruiser/create-sqlite-sys-tables-if-needed! system-db)
+    (create-sqlite-sys-tables-if-needed! system-db)
     ;; (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
-    (cruiser/create-system-reporting-tables-if-needed! system-reporting-db)
+    (create-system-reporting-tables-if-needed! system-reporting-db)
 
     ;; (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest1)
     ;; (cruiser/create-sqlite-sys-tables-if-needed! cruiser/tmp-db-dest2)
@@ -1195,31 +1333,44 @@
     ;; (cruiser/create-sqlite-sys-tables-if-needed! systemh2-db)
 
     (merge-shape-files) ;; build db/shapes-map for upcoming shape-rotation
+    (process-tests-and-attributes-now)
+    (process-formulas-now)
+    (process-stacks-now)
+    (process-snippets-now)
 
     (when harvest-on-boot?
+      (ut/pp [:harvest-on-boot...])
       (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (update-all-conn-meta))))
 
+    (ut/pp [:start-shape-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-shape-watcher (watch-shapes-folder))
+    (ut/pp [:start-conn-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
+    (ut/pp [:start-screen-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-screen-watcher (watch-screens-folder))
+    (ut/pp [:start-theme-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-theme-watcher (watch-themes-folder))
+    (ut/pp [:start-flow-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-flow-watcher (watch-flows-folder))
+    (ut/pp [:start-settings-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-settings-watcher (watch-config-files))
+    (ut/pp [:start-solver-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-solver-watcher (watch-solver-files))
     ;; #_{:clj-kondo/ignore [:inline-def]}
     ;; (defonce session-file-watcher (wss/subscribe-to-session-changes)) ;; stopping for now. not being used at all.
+    (ut/pp [:start-macro-undo-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
-    (defonce macro-undo-watcher (watch-macro-undos))
+    (defonce start-macro-undo-watcher (watch-macro-undos))
+    (ut/pp [:start-ai-workers-watcher])
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-ai-workers-watcher (watch-ai-workers-folder))
-    #_{:clj-kondo/ignore [:inline-def]}
     ;;(defonce watch-leaves-watcher (watch-file "defs/leaves.edn" leaves/clear-all-leaf-caches))
 
   ;; temp test indexes
@@ -1228,8 +1379,11 @@
   ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name2 ON client_memory(client_name, ts);"))
   ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_ts1 ON jvm_stats(ts);"))
 
+
+
   ;; RABBIT REACTOR
   ;; boot master watchers for defined atoms
+    (ut/pp [:booting-master-reactor])
     (doseq [[type atom] db/master-reactor-atoms]
       (db/master-watch-splitter-deep type atom))
 
@@ -1263,108 +1417,17 @@
     ;;  cruiser/default-viz-shapes
     ;;  (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
 
+    ;; (rota/shape-rotation-run systemh2-db)
+
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce system-dbs ;; for default shape rotation
-      [system-db systemh2-db import-db cache-db cache-db-memory])
+      [system-db systemh2-db import-db cache-db stack-db cache-db-memory])
 
     (ppy/execute-in-thread-pools
      :shape-rotation-jobs-wrapper
      (fn [] (doseq [db system-dbs]
-              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (shape-rotation-run db))))))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "system-db"
-    ;;        system-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "flows-db"
-    ;;        flows-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "systemh2-db"
-    ;;        systemh2-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "import-db"
-    ;;        import-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "metrics-kpi-db"
-    ;;        metrics-kpi-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (cruiser/clean-up-db-metadata "cache.db")
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "cache.db"
-    ;;        cache-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (cruiser/clean-up-db-metadata "cache.db.memory")
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "cache.db.memory"
-    ;;        cache-db-memory
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "realms-db"
-    ;;        realms-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "history-db"
-    ;;        history-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-    ;; (time (cruiser/lets-give-it-a-whirl-no-viz
-    ;;        "system-reporting-db"
-    ;;        system-reporting-db
-    ;;        system-db
-    ;;        cruiser/default-sniff-tests
-    ;;        cruiser/default-field-attributes
-    ;;        cruiser/default-derived-fields
-    ;;        cruiser/default-viz-shapes))
-
-  ;;;  (reboot-reactor-and-resub)
+              (ut/pp [:sniff-on-sys-db (str db)])
+              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run db))))))
 
   ;; (start-scheduler 15
   ;;                  #(let [ddiff (- (System/currentTimeMillis)  (get-in @wss/rvbbit-client-sub-values [:unix-ms]))]
@@ -1493,8 +1556,6 @@
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
   ;;                  "Purge Idle Queues" 7200)
 
-;; (qp/cleanup-inactive-queues 0)
-
   ;;(when debug?
     (start-scheduler 1
                      #(do (swap! wss/peer-usage conj (count @wl/sockets))
@@ -1544,12 +1605,10 @@
                         (reset! leaves/context-map-cache {})
                         (reset! wss/qcache {}) ;; sql result cache
                         (reset! sql/errors [])
-                        (reset! cruiser/mutate-fn-cache {})
+                        ;(reset! cruiser/mutate-fn-cache {})
                         (reset! wss/agg-cache {})
                         (reset! ut/df-cache {}))
                      "Purge Solver & Deep-Flatten Cache" (* 3600 1))
-
-  ;; (ut/calculate-atom-size :current-size ut/df-cache)
 
   ;; (start-scheduler 1
   ;;                  #(doseq [[client-name solvers] @wss/solver-status]
@@ -1660,8 +1719,8 @@
     (shutdown/add-hook! ::the-pool-is-now-closing
                         #(do (reset! wss/shutting-down? true)
                              ;(db/close-ddb)
-                             (doseq [electric-eye [start-conn-watcher start-screen-watcher start-flow-watcher macro-undo-watcher ;;watch-leaves-watcher
-                                                   start-shape-watcher start-theme-watcher
+                             (doseq [electric-eye [start-conn-watcher start-screen-watcher start-flow-watcher ;;watch-leaves-watcher
+                                                   start-shape-watcher start-theme-watcher start-macro-undo-watcher
                                                    start-ai-workers-watcher start-settings-watcher start-solver-watcher ;session-file-watcher
                                                    ]]
                                (do
@@ -1705,11 +1764,7 @@
                            (doseq [[conn-name conn] @db/conn-map
                                    :let [cn (get conn :datasource)]]
                              (ut/ppa [:shutting-down-connection-pool conn-name cn])
-                             (sql/close-pool cn))
-                          ;;  (doseq [[conn-name conn] @sql/client-db-pools]
-                          ;;    (ut/ppa [:shutting-down-client-connection-pool (cstr/replace (str conn-name) ":" "") conn])
-                          ;;    (sql/close-pool conn))
-                           ))
+                             (sql/close-pool cn))))
 
     (shutdown/add-hook! ::cleaning-up-after-ai-workers
                         #(do (ut/pp [:cleaning-up-after-ai-workers])
@@ -1791,7 +1846,5 @@
                             10
                             1
                             5)))]
-
-      ;(Thread/sleep 3000)
 
       (ut/pp [" GO: end of main-fn "]))))

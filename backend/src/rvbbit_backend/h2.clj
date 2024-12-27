@@ -3,6 +3,35 @@
    [clojure.string      :as cstr]
    [rvbbit-backend.util :as ut]))
 
+(def create-formulas
+  "create table if not exists formulas
+  (id text NULL,
+   name text NULL,
+   description text NULL,
+   input_fields text NULL,
+   output_fields text NULL,
+   primitive boolean NULL,
+   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ) ;")
+
+(def create-snippets
+  "create table if not exists snippets
+  (formula text NULL,
+   params_map text NULL,
+   description text NULL,
+   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ) ;")
+
+(def create-stacks
+  "create table if not exists stacks
+  (id text NULL,
+   name text NULL,
+   description text NULL,
+   required_fields text NULL,
+   pipeline text NULL,
+   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ) ;")
+
 (def create-realms
   "create table if not exists realms
   (realm_name text NULL,
@@ -11,6 +40,32 @@
    block_key text NULL,
    block_type text NULL,
    block_data text NULL,
+   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ) ;")
+
+;; [rotation-hash client-name connection-id table-name shape-set shape-name k v context source-panel]
+(def create-shape-rotations
+  "create table if not exists shape_rotations
+  (dragged_kp text NULL,
+   rotation_hash text NULL,
+   client_name text NULL,
+   connection_id text NULL,
+   table_name text NULL,
+   shape_set text NULL,
+   shape_name text NULL,
+   axis_name text NULL,
+   field_name text NULL,
+   context text NULL,
+   source_panel text NULL,
+   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ) ;")
+
+(def create-shape-rotation-maps
+  "create table if not exists shape_rotation_maps
+  (dragged_kp text NULL,
+   rotation_hash text NULL,
+   client_name text NULL,
+   shape_map text NULL,
    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
    ) ;")
 

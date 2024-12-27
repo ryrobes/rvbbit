@@ -1,7 +1,7 @@
 (ns rvbbit-frontend.utility
   (:require
-   [cljs.core.async   :as    async
-    :refer [<! timeout]]
+  ;;  [cljs.core.async   :as    async
+  ;;   :refer [<! timeout]]
    [cljs.tools.reader :refer [read-string]]
    [clojure.core.reducers :as r]
    [clojure.string    :as cstr]
@@ -19,8 +19,8 @@
    [reagent.core      :as reagent]
    [talltale.core     :as tales]
    [rvbbit-frontend.db :as db]
-
    [goog.date :as gdate]
+   [cljs.core.async  :as    async :refer [chan put! <! go-loop timeout]]
    [zprint.core       :as zp]
    [goog.string       :as gstring]
    [websocket-fx.core :as wfx]
@@ -29,6 +29,8 @@
    [goog.i18n              NumberFormat]
    [goog.i18n.NumberFormat Format]
    [goog.events            EventType]))
+
+(declare pp tracked-dispatch)
 
 (defonce allowed-set #{:_id :_valid_from :_valid_to}) ;; allowed underscore keys - mostly for temporal SQL fields like in XTDB
 
@@ -89,15 +91,40 @@
  (fn [db [_ tap-edn]]
    (assoc db :taps (vec (take-last 100 (conj (get db :taps []) (conj tap-edn (str (js/Date.))) ))))))
 
-(defn tapp>>
-  [data] ;; doubletap!
-  ;;(re-frame/dispatch [::write-tap-to-db data])
-  (js/console.info (clj->js (stringify-keywords data))))
+
+
+;; (defn pp [data] ;; to stay consistent with the CLJ side
+;;   (let [pdata (vec (remove vector? (remove map? data)))
+;;         _ (reset! db/loading-message pdata)
+;;         datum (clj->js (stringify-keywords data))]
+;;     (js/console.info datum)))
+
+;; (defn pp [data] ;; to stay consistent with the CLJ side
+;;   (let [pdata (vec (remove vector? (remove map? data)))
+;;         _ (swap! db/loading-message (fn [old-msgs]
+;;                                       (vec (take-last 25 (conj (or old-msgs []) pdata)))))
+;;         datum (clj->js (stringify-keywords data))]
+;;     (js/console.info datum)))
+
+
+;; Create a single channel for message processing
+(def message-chan (chan))
+
+;; Start a single process to handle messages
+(go-loop []
+  (when-let [pdata (<! message-chan)]
+    (swap! db/loading-message (fn [old-msgs]
+                               (vec (take-last 100 (conj (or old-msgs []) pdata)))))
+    (recur)))
 
 (defn pp [data] ;; to stay consistent with the CLJ side
-  (js/console.info (clj->js (stringify-keywords data))))
+  (let [pdata (vec (remove vector? (remove map? data)))
+        datum (clj->js (stringify-keywords data))]
+    ;; Put message on channel instead of directly swapping atom
+    (put! message-chan pdata)
+    (js/console.info datum)))
 
-;; (tapp>> [:yo-fucko 123])
+(defn tapp>> [data] (pp data))
 
 (def t> tapp>>)
 
@@ -1624,7 +1651,7 @@
   [query]
   (let [res (deep-remove-keys query
                               [:cache? :col-widths :row-height :render-all?
-                               :refresh-every :page :connection-id :deep-meta? :_last-run
+                               :refresh-every :page :connection-id :stack? :_last-run
                                :clicked-row-height :style-rules])]
     res))
 
@@ -2031,28 +2058,34 @@
 
 
 
-(defn format-map [w s]
-  (let [cache-key (hash [w s])
+(defn format-map [w s & [fmt]]
+  (let [cache-key (hash [w s fmt])
         cache (get @format-map-atom cache-key)]
     (if (not (nil? cache))
       cache
-      (let [type (cond (cstr/includes? s "(")                         [:respect-nl   :justified-original]
-                       (cstr/starts-with? (cstr/trim-newline s) "[:") [:justified-original :hiccup] ;:community ;[:hiccup :justified-original]
-                       :else                                          :justified)
-            o    (zp/zprint-str s
-                                (js/Math.floor (/ w 9))
-                                {:parse-string-all? true ;; was :parse-string-all?
-                                 :style         type ;:community ;[:binding-nl :extend-nl]
-                                 :pair          {:force-nl? false}
+      (let [type (cond
+                   fmt fmt
+                   (cstr/includes? s "(")                         [:respect-nl   :justified-original]
+                   (cstr/starts-with? (cstr/trim-newline s) "[:") :community ;[:justified-original :hiccup] ;:community ;[:hiccup :justified-original]
+                   :else                                          :justified)
+            o    (if (= fmt :no) (-> (str s)
+                                     (cstr/replace #"\n" "")
+                                     (cstr/replace #"\r" "")
+                                     (cstr/replace #"[\r\n]" ""))
+                     (zp/zprint-str s
+                                    (js/Math.floor (/ w 9))
+                                    {:parse-string-all? true ;; was :parse-string-all?
+                                     :style         type ;:community ;[:binding-nl :extend-nl]
+                                     :pair          {:force-nl? false}
                                  ;:pair-fn       {:hang? true}
-                                 :map {:hang? true :comma? false :sort? false}
-                                 :pair-fn {:hang? true
+                                     :map {:hang? true :comma? false :sort? false}
+                                     :pair-fn {:hang? true
                                            ;:flow? true
-                                           }
-                                 :binding       {:force-nl? true}
-                                 :vector        {:respect-nl? true}
+                                               }
+                                     :binding       {:force-nl? true}
+                                     :vector        {:respect-nl? true}
                                  ;:map           {:comma? false :sort? false}
-                                 :parse         {:interpose "\n\n"}})]
+                                     :parse         {:interpose "\n\n"}}))]
         (swap! format-map-atom assoc cache-key o)
         o))))
 

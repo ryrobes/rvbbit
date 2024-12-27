@@ -1345,31 +1345,47 @@
       :data          (pr-str data)}) ;[bid pid]
    [re-com/box :size "auto" :child element :style {:cursor (if @dragging-port? "grabbing" "grab")}]])
 
-(defn draggable-play
-  [element flow-id]
-  [(reagent/adapt-react-class rdnd/Draggable)
-   (let [data (let [] ;subkey (str flow-id ">" (ut/replacer (str bid) #":" ""))
-                {:h         2
-                 :w         7
-                 :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-                 :views     {:flow-play [:box :align :center :justify :center :style
-                                         {:font-size    "25px"
-                                          :font-weight  700
-                                          :padding-top  "6px"
-                                          :padding-left "14px"
-                                          :margin-top   "-8px"
-                                          :color        :theme/editor-outer-rim-color
-                                          :font-family  :theme/base-font} :child
-                                         [:run-flow [(str flow-id) (str "run " flow-id)]]]}
-                 :name      "flow-play"})]
-     {:type          :flow-port
-      :on-drag-end   #(do (reset! dragging-port? false))
-      :on-drag-start #(do (reset! dragging-port? true)
-                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
-                          (reset! bricks/dragging-body data))
-      :data          (pr-str data)}) ;[bid pid]
-   [re-com/box :size "none" :child element :style {:cursor (if @dragging-port? "grabbing" "grab")}]])
+;; (defn draggable-play
+;;   [element flow-id]
+;;   [(reagent/adapt-react-class rdnd/Draggable)
+;;    (let [data (let [] ;subkey (str flow-id ">" (ut/replacer (str bid) #":" ""))
+;;                 {:h         2
+;;                  :w         7
+;;                  :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+;;                  :views     {:flow-play [:box :align :center :justify :center :style
+;;                                          {:font-size    "25px"
+;;                                           :font-weight  700
+;;                                           :padding-top  "6px"
+;;                                           :padding-left "14px"
+;;                                           :margin-top   "-8px"
+;;                                           :color        :theme/editor-outer-rim-color
+;;                                           :font-family  :theme/base-font} :child
+;;                                          [:run-flow [(str flow-id) (str "run " flow-id)]]]}
+;;                  :name      "flow-play"})]
+;;      {:type          :flow-port
+;;       :on-drag-end   #(do (reset! dragging-port? false))
+;;       :on-drag-start #(do (reset! dragging-port? true)
+;;                           (reset! bricks/dragging-size [(get data :w) (get data :h)])
+;;                           (reset! bricks/dragging-body data))
+;;       :data          (pr-str data)}) ;[bid pid]
+;;    [re-com/box :size "none" :child element :style {:cursor (if @dragging-port? "grabbing" "grab")}]])
 
+
+(defn draggable-play [element flow-id]
+  (let [data {:h         2
+              :w         7
+              :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :draggable-clover}
+              :views     {:flow-play [:box :align :center :justify :center :style
+                                      {:font-size    "25px"
+                                       :font-weight  700
+                                       :padding-top  "6px"
+                                       :padding-left "14px"
+                                       :margin-top   "-8px"
+                                       :color        :theme/editor-outer-rim-color
+                                       :font-family  :theme/base-font} :child
+                                      [:run-flow [(str flow-id) (str "run " flow-id)]]]}
+              :name      "flow-play"}]
+    [bricks/draggable data :flow-port element]))
 
 
 

@@ -449,27 +449,98 @@
         (.play audio-element)
         (draw analyser block-id)))))
 
+;; (defn draw [analyser block-id]
+;;   (let [buffer-length (.-frequencyBinCount analyser)
+;;         data-array    (js/Uint8Array. buffer-length)]
+;;     (letfn [(frame []
+;;               (when @playing?
+;;                 (.getByteTimeDomainData analyser data-array)
+;;                 (let [rms  (->> (range buffer-length)
+;;                                 (map #(- (aget data-array %) 128))
+;;                                 (map #(* % %))
+;;                                 (reduce +)
+;;                                 (/ buffer-length)
+;;                                 (js/Math.sqrt))
+;;                       rms  (if (js/isFinite rms) rms 0)
+;;                       peak (->> (range buffer-length)
+;;                                 (map #(js/Math.abs (- (aget data-array %) 128)))
+;;                                 (reduce max))]
+;;                   (swap! analyser-data assoc block-id {:rms rms :peak peak})
+;;                   (swap! db/audio-data assoc block-id rms)
+;;                   (swap! db/audio-data2 assoc block-id peak))
+;;                 (js/requestAnimationFrame frame)))]
+;;       (frame))))
+
+(def previous-values (atom {}))
+
 (defn draw [analyser block-id]
   (let [buffer-length (.-frequencyBinCount analyser)
-        data-array    (js/Uint8Array. buffer-length)]
-    (letfn [(frame []
+        data-array    (js/Uint8Array. buffer-length)
+        decay-factor  0.25
+        smoothing     0.01
+        scale-factor  0.11]  ; Added to bring values into reasonable range
+    (letfn [(smooth-value [new-value old-value]
+              (+ (* new-value smoothing)
+                 (* old-value (- 1 smoothing))))
+
+            (normalize [value]
+              (-> value
+                  (* scale-factor)    ; Scale down the value
+                  (max 0)            ; Ensure non-negative
+                  (min 1)))          ; Cap at 1
+
+            (frame []
               (when @playing?
                 (.getByteTimeDomainData analyser data-array)
-                (let [rms  (->> (range buffer-length)
-                                (map #(- (aget data-array %) 128))
-                                (map #(* % %))
-                                (reduce +)
-                                (/ buffer-length)
-                                (js/Math.sqrt))
-                      rms  (if (js/isFinite rms) rms 0)
-                      peak (->> (range buffer-length)
-                                (map #(js/Math.abs (- (aget data-array %) 128)))
-                                (reduce max))]
-                  (swap! analyser-data assoc block-id {:rms rms :peak peak})
-                  (swap! db/audio-data assoc block-id rms)
-                  (swap! db/audio-data2 assoc block-id peak))
+                (let [values (->> (range buffer-length)
+                                  (map #(- (aget data-array %) 128))
+                                  (map #(/ % 128)))
+
+                      ; Calculate RMS with scaling
+                      rms  (let [raw-rms (->> values
+                                              (map #(* % %))
+                                              (reduce +)
+                                              (/ buffer-length)
+                                              (js/Math.sqrt)
+                                              (* 100)
+                                              normalize)]
+                             (if (js/isFinite raw-rms) raw-rms 0))
+
+                      ; Calculate peak with scaling
+                      peak (->> values
+                                (map js/Math.abs)
+                                (reduce max)
+                                (* 100)
+                                normalize)
+
+                      ; Get previous values or defaults
+                      prev-values (get @previous-values block-id {:rms 0 :peak 0})
+
+                      ; Smooth and decay
+                      smoothed-rms (smooth-value rms (:rms prev-values))
+                      smoothed-peak (smooth-value peak (:peak prev-values))
+
+                      final-rms (if (< rms (:rms prev-values))
+                                  (* smoothed-rms decay-factor)
+                                  smoothed-rms)
+                      final-peak (if (< peak (:peak prev-values))
+                                   (* smoothed-peak decay-factor)
+                                   smoothed-peak)]
+
+                  ; Store new values for next frame
+                  (swap! previous-values assoc block-id
+                         {:rms final-rms :peak final-peak})
+
+                  ; Update visualization atoms with values between 0 and 1
+                  (swap! analyser-data assoc block-id
+                         {:rms final-rms :peak final-peak})
+                  (swap! db/audio-data assoc block-id final-rms)
+                  (swap! db/audio-data2 assoc block-id final-peak))
+
                 (js/requestAnimationFrame frame)))]
       (frame))))
+
+
 
 (defn stop-audio []
   (when @current-audio-element
@@ -586,7 +657,7 @@
 (re-frame/reg-event-fx
  ::text-to-speech11
  (fn [{:keys [db]} [_ block-id block-type text-to-speak & [audio-file? voice-name sequence-number]]]
-   (ut/tapp>> [:text-to-speech11 block-id block-type (count text-to-speak)])
+   (ut/tapp>> ["🎧" :text-to-speech11 block-id block-type (count text-to-speak)])
    (let [voices?    (nil? text-to-speak)
          xi-api-key (get-in db [:server :settings :elevenlabs-api-key])
          method     (if voices? :GET :POST)
@@ -601,7 +672,15 @@
          header     {"xi-api-key" xi-api-key}
          data       (if audio-file?
                       {:path text-to-speak}
-                      (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
+                      (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))
+         aturl      (let [protocol          (.-protocol js/window.location)
+                          host              (.-host js/window.location)
+                          host-without-port (cstr/replace host #":\d+$" "")
+                          new-port          "8888"]
+                      (str protocol "//" host-without-port ":" new-port "/audio"))
+         url        (if audio-file?
+                      aturl ;;"http://localhost:8888/audio"
+                      url)]
      {:db         (assoc-in db
                             [:http-reqs block-type block-id]
                             {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
@@ -649,7 +728,7 @@
 (re-frame/reg-event-fx
  ::failure-text-to-speech11
  (fn [{:keys [db]} [_ block-type block-id result]]
-   (ut/tapp>> [:failure-text-to-speech11 block-type block-id])
+   (ut/tapp>> ["🔇" :failure-text-to-speech11 block-type block-id result])
    (let [updated-db (update-in db [:http-reqs block-type block-id] merge
                                {:status "failed"
                                 :ended (ut/get-time-format-str)

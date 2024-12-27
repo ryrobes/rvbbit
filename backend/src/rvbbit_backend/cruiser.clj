@@ -540,8 +540,10 @@
        (catch Exception _ {})))
 
 (def default-flow-functions (slread "./defs/flow-functions.edn"))
-(def default-sniff-tests (slread "./defs/sniff-tests.edn"))
-(def default-field-attributes (slread "./defs/field-attributes.edn"))
+
+;; (def default-sniff-tests (slread "./defs/sniff-tests.edn"))
+;; (def default-field-attributes (slread "./defs/field-attributes.edn"))
+
 (def default-derived-fields (slread "./defs/derived-fields.edn"))
 ;; (def viz-shapes-file-str (or (get (config/settings) :viz-shapes) "./defs/viz-shapes.edn"))
 ;; (ut/pp [:using-viz-shapes-from viz-shapes-file-str])
@@ -1693,47 +1695,47 @@
 
 ;; (ut/pp @sql/client-db-pools)
 
-(defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
- ;(ppy/execute-in-thread-pools
-  ;:captured-sniff ;; (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
-  ;(fn []
-    (swap! sniffs inc)
-    (doall
-     (let [res?     (not (nil? resultset))
-           cols     (keys (first resultset))
-           tmp-dbs  (rand-nth [[tmp-db-src1 tmp-db-dest1] [tmp-db-src2 tmp-db-dest2] [tmp-db-src3 tmp-db-dest3]])
-           tmp-src  (first tmp-dbs) ;; tmp-db-src1
-           dest     (last tmp-dbs)  ;; tmp-db-dest1
-           ;;; or {:datasource (get @sql/client-db-pools client-name)} ?
-           ;tmp-db-src1 0
-           ;dest 0
-           ;_ (when res? (create-sqlite-sys-tables-if-needed! dest))
-           src-conn (if res? tmp-src src-conn)]
-       (when res? (insert-rowset resultset (last sql-filter) src-conn cols)) ;; if passed
-       ((if quick?
-          lets-give-it-a-whirl-no-viz
-          lets-give-it-a-whirl)
-        src-conn-id
-        src-conn
-        dest
-        default-sniff-tests
-        default-field-attributes
-        default-derived-fields
-        @db/shapes-map
-        sql-filter) ;[:= :table-name "viz_recos_vw"]
-       (let [sniff-rows (sql/fetch-all-tables dest quick?)
-             sniff-rows (-> sniff-rows
-                            (dissoc :rules_maps_attributes)
-                            (dissoc :rules_maps_derived_fields)
-                            (dissoc :rules_maps_tests)
-                            (dissoc :rules_maps_viz_shapes)
-                            (dissoc :status))
-             sniff-rows (dissoc sniff-rows :connections)]
-         (sql/insert-all-tables sniff-rows (last sql-filter))
-         (doseq [k (keys sniff-rows)] (sql-exec dest (to-sql {:delete-from [k]})))
-         (when res? (sql-exec src-conn
-                              ;(to-sql {:drop-table [(last sql-filter)]})
-                              (to-sql {:drop-table (keyword (last sql-filter))})
-                              )) ;)
-         nil))));))
+;; (defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
+;;  ;(ppy/execute-in-thread-pools
+;;   ;:captured-sniff ;; (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
+;;   ;(fn []
+;;     (swap! sniffs inc)
+;;     (doall
+;;      (let [res?     (not (nil? resultset))
+;;            cols     (keys (first resultset))
+;;            tmp-dbs  (rand-nth [[tmp-db-src1 tmp-db-dest1] [tmp-db-src2 tmp-db-dest2] [tmp-db-src3 tmp-db-dest3]])
+;;            tmp-src  (first tmp-dbs) ;; tmp-db-src1
+;;            dest     (last tmp-dbs)  ;; tmp-db-dest1
+;;            ;;; or {:datasource (get @sql/client-db-pools client-name)} ?
+;;            ;tmp-db-src1 0
+;;            ;dest 0
+;;            ;_ (when res? (create-sqlite-sys-tables-if-needed! dest))
+;;            src-conn (if res? tmp-src src-conn)]
+;;        (when res? (insert-rowset resultset (last sql-filter) src-conn cols)) ;; if passed
+;;        ((if quick?
+;;           lets-give-it-a-whirl-no-viz
+;;           lets-give-it-a-whirl)
+;;         src-conn-id
+;;         src-conn
+;;         dest
+;;         default-sniff-tests
+;;         default-field-attributes
+;;         default-derived-fields
+;;         @db/shapes-map
+;;         sql-filter) ;[:= :table-name "viz_recos_vw"]
+;;        (let [sniff-rows (sql/fetch-all-tables dest quick?)
+;;              sniff-rows (-> sniff-rows
+;;                             (dissoc :rules_maps_attributes)
+;;                             (dissoc :rules_maps_derived_fields)
+;;                             (dissoc :rules_maps_tests)
+;;                             (dissoc :rules_maps_viz_shapes)
+;;                             (dissoc :status))
+;;              sniff-rows (dissoc sniff-rows :connections)]
+;;          (sql/insert-all-tables sniff-rows (last sql-filter))
+;;          (doseq [k (keys sniff-rows)] (sql-exec dest (to-sql {:delete-from [k]})))
+;;          (when res? (sql-exec src-conn
+;;                               ;(to-sql {:drop-table [(last sql-filter)]})
+;;                               (to-sql {:drop-table (keyword (last sql-filter))})
+;;                               )) ;)
+;;          nil))));))
 

@@ -36,19 +36,19 @@
 ;;                                                         :on-click [:set-recharts-param>]}]]]}
 ;;                     :base-score 1}
 
- :code-test {:axes {:x [:true?]}
+;;  :code-test {:axes {:x [:true?]}
 
-               :sql-maps [{:select [[[:count [:distinct :x-field]] :dd]]
-                           :from [:table]}]
+;;                :sql-maps [{:select [[[:count [:distinct :x-field]] :dd]]
+;;                            :from [:table]}]
 
-               :runner :clojure
-               :selected-mode :text
+;;                :runner :clojure
+;;                :selected-mode :text
 
-               :library-shapes
-               (quote (let [trig :data-hash/query-preview
-                            data :data/query-preview]
-                        (str :x-field :rand-int-> (rand-int 123) " counts of " :x-field " ! =" (count data) "!")))
-               :base-score 1}
+;;                :library-shapes
+;;                (quote (let [trig :data-hash/query-preview
+;;                             data :data/query-preview]
+;;                         (str :x-field :rand-int-> (rand-int 123) " counts of " :x-field " ! =" (count data) "!")))
+;;                :base-score 1}
 
  :mapbox-point-map  {:axes {:lat [:geo-lat?]
                             :long [:geo-long?]}
@@ -62,12 +62,12 @@
                      :runner :clojure
                      :selected-mode :clover
                      :library-shapes
-                     (quote (let [ccc    :theme/editor-outer-rim-color
+                     (quote (let [c    :theme/editor-outer-rim-color
                                   ddata (vec
                                          (for [row :data/query-preview
                                                :let [size (+ 2 (get row :freq 0))]]
                                            {:type "Feature"
-                                            :properties {:size size :color ccc}
+                                            :properties {:size size :color c}
                                             :geometry
                                             {:type "Point"
                                              :coordinates

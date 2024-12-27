@@ -14,8 +14,6 @@
         (cstr/replace "-" "_")
         keyword)))
 
-
-
 (defn- pivot-case
   [field value agg-fn agg-field]
   (if (= agg-fn :count) [:case [:= field value] 1 :else 0] [:case [:= field value] agg-field :else 0]))

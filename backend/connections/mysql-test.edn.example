@@ -1,4 +1,0 @@
-
-
-{:jdbc-url "jdbc:mysql://root:test=@dev-box:3306/rabbit"}
-

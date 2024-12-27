@@ -111,7 +111,7 @@
         ;wssk @(ut/tracked-subscribe_ [::http/websocket-status])
         ;websocket-status (select-keys wssk [:status :datasets :panels :waiting])
         online? true ;(true? (= (get websocket-status :status) :connected))
-        mouse-active?  (or no-sleep? @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 60}) (not online?))
+        mouse-active?  (or no-sleep? @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 900}) (not online?))
         update-visible-range (fn [container-height scroll-top]
                                (let [{:keys [cumulative-heights max-height total-height]} (get @scroll-state id)
                                      start (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)

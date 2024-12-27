@@ -21,7 +21,7 @@
                       :data :query-preview ; :table ;data
                       :layout "vertical"
                       :groupMode "stacked" ; grouped
-                      :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                      :colors {:scheme "pastel2"} ;; :theme/vega-default-color-scheme
                       :indexBy :x-field
                       :keys [:y-field]
                       :labelTextColor "#423939"
@@ -71,7 +71,7 @@
                                                 :pivot-by [:color-field]}
                            :layout "vertical"
                            :groupMode "stacked" ; grouped
-                           :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                           :colors {:scheme "pastel2"} ;; :theme/vega-default-color-scheme
                            :indexBy :x-field
                             ;:keys [:y-field]
                            :labelTextColor "#423939"
@@ -176,7 +176,7 @@
              :arcLinkLabelsTextColor "#ffffff"}]
            :base-score 1}
 
- :scatterplot-nivo {:axes {:x [:and [:measure?] [:not :is-rowcount?]]
+ :scatterplot-nivo {:axes {:x [:and [:measure?] [:not :is-rowcount?]  ]
                                  ;:color [:and :dimension?
                                  ;        [:or :low-cardinality? :very-low-cardinality?]
                                  ;        [:or :is-string? :is-year? :is-month?]
@@ -225,7 +225,7 @@
                                 :symbolShape "circle"
                                 :effects
                                 {:on "hover" :style {:itemOpacity 1}}}]
-                     :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                     :colors {:scheme "pastel2"} ;; :theme/vega-default-color-scheme
                      :padding 1
                      :borderRadius 3
                      :width :panel-width+70
@@ -286,7 +286,7 @@
                                       :symbolShape "circle"
                                       :effects
                                       {:on "hover" :style {:itemOpacity 1}}}]
-                           :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                           :colors {:scheme "pastel2"} ;; :theme/vega-default-color-scheme
                            :padding 1
                            :borderRadius 3
                            :width :panel-width+70
@@ -344,7 +344,7 @@
                                      :symbolShape "circle"
                                      :effects
                                      {:on "hover" :style {:itemOpacity 1}}}]
-                          :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                          :colors {:scheme "pastel2"} ;; :theme/vega-default-color-scheme
                           :padding 1
                           :borderRadius 3
                           :width :panel-width+70
@@ -405,7 +405,7 @@
                                            :symbolShape "circle"
                                            :effects
                                            {:on "hover" :style {:itemOpacity 1}}}]
-                                :colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                                :colors {:scheme "pastel2"} ;; :theme/vega-default-color-scheme
                                 :padding 1
                                 :borderRadius 3
                                 :width :panel-width+70

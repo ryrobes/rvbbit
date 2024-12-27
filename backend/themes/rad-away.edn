@@ -1,0 +1,103 @@
+{:theme-name "rad-away",
+ :codemirror-theme "rvbbit-dynamic",
+ :editor-param-background-color "#0a0a0a",
+ :pop-2 "#00ffa8",
+ :base-block-style
+ {:box-shadow "inset 0 0 20px #00ffa8, 0 0 40px #00ffa8",
+  :filter "brightness(130%) saturate(140%)",
+  :backdrop-filter "blur(6px) contrast(180%)"},
+ :vega-defaults
+ {:view {:stroke "transparent"},
+  :axis
+  {:domainColor "#00ffa8",
+   :grid true,
+   :font "Lato",
+   :labelColor "#ffffff",
+   :titleFont "Lato",
+   :titleColor "#00ffa8",
+   :labelFont "Lato",
+   :domain false,
+   :gridColor "#00ffa84d",
+   :tickColor "#00ffa8"},
+  :legend
+  {:labelFont "Lato",
+   :legendFont "Lato",
+   :labelColor "#ffffff",
+   :titleColor "#00ffa8",
+   :stroke "#00ffa84d",
+   :titleFont "Lato"},
+  :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#00ffa8"},
+  :mark {:font "Lato"},
+  :title
+  {:font "Lato",
+   :subtitleFont "Lato",
+   :labelFont "Lato",
+   :titleFont "Lato",
+   :titleColor "#00ffa8"}},
+ :grid-selected-column-css
+ {:background-color "#00ffa819", :filter "brightness(160%)"},
+ :running-gif "images/running.gif",
+ :base-block-color-selected "#01160a",
+ :block-title-font-color "#ffffff",
+ :base-block-color "#000b06",
+ :editor-rim-color "#00ffa8",
+ :base-block-filter-selected
+ "drop-shadow(0 0 0.5rem #00ffa8) drop-shadow(0 0 1rem #00ffa8)",
+ :vega-default-color-scheme {:scheme "category20b"},
+ :data-colors
+ {"float" "#00d4c2",
+  "boolean" "#e2ff00",
+  "map" "#00ffa8",
+  "list" "#8aff00",
+  "string" "#ff6bf5",
+  "any" "#f0fff6",
+  "vector" "#a0ffdd",
+  "keyword" "#ff79c6",
+  "rabbit-code" "#00ffd0",
+  "datetime" "#02ad92",
+  "integer" "#ff4f69",
+  "unknown" "#2a2929",
+  "date" "#009f78"},
+ :editor-grid-selected-font-color "#000b06",
+ :monospaced-font "JetBrains Mono",
+ :editor-grid-selected-background-color "#00ffa8",
+ :nivo-defaults
+ {:font-family "Poppins",
+  :labels
+  {:text
+   {:fill "#ffffff", :font-size "16px", :font-family "Poppins", :font-weight 600}},
+  :tooltip
+  {:container
+   {:background "#000b06",
+    :color "#ffffff",
+    :text {:fill "#ffffff"},
+    :fontSize "16px",
+    :borderRadius "6px",
+    :boxShadow "0 2px 4px rgba(0, 255, 168, 0.6)",
+    :padding "6px 10px"},
+   :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+   :tableCell {:padding "3px 5px"}},
+  :axis
+  {:legend
+   {:text
+    {:fill "#ffffff", :font-size "14px", :font-family "Poppins", :font-weight 600}},
+   :ticks
+   {:line {:stroke "#ffffff40"}, :text {:fill "#ffffffaa", :font-weight 600}}},
+  :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+ :editor-outer-rim-color "#00ffa8",
+ :grid-selected-font-color "#000b06",
+ :block-title-selected-font-color "#ffffff",
+ :grid-selected-background-color "#00ffa8",
+ :grid-font-color "#ffffff",
+ :canvas-background-css
+ {:background-image "radial-gradient(circle at 50% 50%, #001f14, #000000)",
+  :transition "all 0.8s ease-in-out",
+  :background-blend-mode "overlay",
+  :background-color "#001f14"},
+ :editor-font-color "#ffffff",
+ :line-style "curved-path-h",
+ :base-font "Poppins",
+ :block-tab-selected-font-color "#00ffa8",
+ :editor-background-color "#0a0a0a",
+ :editor-grid-font-color "#ffffff",
+ :pop-1 "#ff00eb"}

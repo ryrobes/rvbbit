@@ -14,6 +14,7 @@
    [reagent.core            :as reagent]
    ;[re-pollsive.core        :as poll]
    [rvbbit-frontend.db      :as db]
+  ;; [rvbbit-frontend.scrubbers      :as scrub]
   ;;  [rvbbit-frontend.block-patrol      :as bp]
    [rvbbit-frontend.utility :as ut]
    [websocket-fx.core       :as wfx]))
@@ -93,7 +94,7 @@
         host-without-port (cstr/replace host #":\d+$" "")
         ws-port           "3030"
         url               (str protocol "://" host-without-port ":" ws-port "/ws")]
-    (ut/tapp>> [:http-ws-connect-url! url])
+    (ut/tapp>> ["🐇" :rabbit-server-connect! :default url])
     {:url           url
      :format        :edn ;;:transit-json
      :on-disconnect [::dispatch-unsubscriptions]
@@ -105,7 +106,7 @@
         host-without-port (cstr/replace host #":\d+$" "")
         ws-port           "3030"
         url               (str protocol "://" host-without-port ":" ws-port "/ws")]
-    (ut/pp [:http-ws-connect-url! socket-id url])
+    (ut/pp ["🐇" :rabbit-server-connect! socket-id url])
     {:url           url
      :format        :edn
      ;:on-disconnect [::dispatch-unsubscriptions]
@@ -660,7 +661,7 @@
                                           data (get res :status)
                                           [_ panel-key data-key] (get (ut/flip-map @db/solver-fn-lookup) clover-kw)]
                                       (ut/tracked-dispatch [::write-repl-data-hash data-key data])
-                                      (ut/pp [:solver-incoming-BATCHED! (last task-id) (get res :status)])
+                                      (ut/pp ["📦" :solver-incoming-BATCHED! (last task-id) (get res :status)])
                                       ))
 
                                   (when (and (= (first task-id) :leaf)
@@ -676,10 +677,10 @@
                   data (get result :status)
                   [_ panel-key data-key] (get (ut/flip-map @db/solver-fn-lookup) clover-kw)]
               (ut/tracked-dispatch [::write-repl-data-hash data-key data])
-              (ut/pp [:solver-incoming-SINGLE! (get-in result [:task-id 0]) (get result :status)])
+              (ut/pp ["🍞" :solver-incoming-SINGLE! (get-in result [:task-id 0]) (get result :status)])
               ))
 
-        ;; (when (cstr/includes? (str (get db :client-name)) "beaming")
+        ;; (when (cstr/includes? (str (get db :client-name)) "fresh")
         ;;   (doseq [r result-subs]
         ;;     (ut/tapp>> [:grouped-update (str (get r :task-id)) (str (get r :status)) (str r)])))
 
@@ -707,6 +708,7 @@
                 kick?                       (= ui-keypath :kick)
                 new-thread?                 (= ui-keypath :new-conversation)
                 counts?                     (= task-id :cnts)
+                duck-status?                (= task-id :duck-status)
                 heartbeat?                  (or (= task-id :heartbeat) (= task-id [:heartbeat]))
                 new-slice?                  (= task-id :new-slice)
                 push-query?                 (= task-id :push-query)
@@ -752,9 +754,9 @@
             ;; (when (not batched?)
             ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
 
-            (when push-assocs? (ut/pp [:push-assoc! (str (keys (get result :status))) (get result :status)]))
+            (when push-assocs? (ut/pp ["🕹️" :push-assocs! (str (keys (get result :status))) (get result :status)]))
 
-            (when new-thread? (ut/tapp>> [:new-thread result (get result :status)]))
+            (when new-thread? (ut/tapp>> ["🧵" :new-thread! result (get result :status)]))
 
             (swap! packets-received inc)
 
@@ -763,9 +765,9 @@
                     client-panels (set (remove nil? (filter #(not (cstr/starts-with? (str %) ":reco")) (keys (get db :panels)))))
                     diffy (cset/difference  client-panels server-panels)
                     not-in-sync? (true? (> (count diffy) 0))]
-                (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab) :subs (count (get db :flow-subs)) :server-panels (count (get-in result [:status :panel-keys]))])
+                ;; (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab) :subs (count (get db :flow-subs)) :server-panels (count (get-in result [:status :panel-keys]))])
                 (when not-in-sync?
-                  (ut/pp [:panels-out-of-sync-with-server! :resolving... (str diffy)])
+                  (ut/pp ["🌀" :panels-out-of-sync-with-server! :resolving... (str diffy)])
                   (ut/tracked-dispatch [::wfx/push :default ;:secondary
                                         {:kind :current-panels
                                          :panels   (select-keys (get db :panels) (vec diffy))
@@ -884,10 +886,12 @@
 
               settings-update? (assoc-in db [:server :settings] (get result :status))
 
+              duck-status? (assoc-in db [:duck-status ui-keypath] (get result :status))
+
               counts? (let [;emeta-map (get-in db [:meta ui-keypath])
                             ss              (get result :status)
                             post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))
-                            _ (ut/pp [:counts-incoming (get ss :*) ui-keypath ss post-meta-shape])]
+                            _ (ut/pp ["🔢" :counts-incoming (get ss :*) ui-keypath ss post-meta-shape])]
                         (-> db
                             (assoc-in [:post-meta ui-keypath] post-meta-shape)))
 
@@ -999,6 +1003,7 @@
                                meta            (merge res-meta {:fields res-meta-fields})
                                new-map         (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)]
                            (swap! db/running-queries disj (last ui-keypath))
+                           (ut/pp ["🦃" :data-in (str ui-keypath) (str repl-output) (count new-map) :rows])
                            (if (not (nil? map-order)) ;; indicates bigger problem, too risky
                              (if (and (not (nil? repl-output)) (ut/ne? repl-output))
                                (-> db
@@ -1156,10 +1161,11 @@
                          (dissoc :base-sniff-queries)
                          (dissoc :meta)
                          (dissoc :shapes)
+                         (dissoc :duck-status)
                          (dissoc :alerts)
-                         (dissoc :audio-data-recorded) ;;; this was it
+                         (dissoc :audio-data-recorded) ;;; once bitten, twice shy
                          (dissoc :sql-str)
-                         (dissoc :server)
+                         (dissoc :settings)
                          (ut/dissoc-in [:server :settings])
                          (dissoc :file-changed)
                          (assoc :panels (select-keys (get db :panels) p0)))
@@ -1432,7 +1438,9 @@
  ::failure-http-load-flowset
  (undoable)
  (fn [db [_ result]]
-   (let [old-status (get-in db [:http-reqs :load-flowset])]
+   (let [old-status (get-in db [:http-reqs :load-flowset])
+         ;_ (reset! db/loading-message ["Error loading screen!" "Blank screen loaded instead"])
+         ]
      (assoc-in db
                [:http-reqs :load-flowset] ; comp key from ::get-http-data
                (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result})))))
@@ -1448,6 +1456,8 @@
          snap-history (get-in db snap-history-path)
          new-db     (dissoc (get result :image) :resolved-queries)
          new-click-param (assoc (get new-db :click-param) :leaf (get-in db [:click-param :leaf]))
+        ; _ (reset! db/loading-message [:rendering-panels])
+        ; _ (js/setTimeout #(reset! db/loaded-screen? true) 8000)
          _ (ut/tapp>> [:new-name (get new-db :screen-name) :curr curr-screen-name :snap? snap?])]
      (-> db
          (assoc-in [:http-reqs :load-flowset]
@@ -1471,6 +1481,9 @@
          (assoc :screen-name (if snap? curr-screen-name (get new-db :screen-name)))
          (assoc :data (get new-db :data))
          (assoc :click-param new-click-param)
+         (assoc-in [:click-param :theme :vega-defaults :header :labelColor] (get-in new-click-param [:theme :vega-defaults :header :labelColor] "#f2e8ff")) ;; set as default if not exist...
+         (assoc-in [:click-param :theme :line-style] (get-in new-click-param [:theme :line-style] "curved-path-h")) ;; set as default if not exist...
+         (assoc-in [:click-param :theme :running-gif] (get-in new-click-param [:theme :running-gif] "images/running.gif")) ;; set as default if not exist...
          (assoc-in snap-history-path snap-history)))))
 
 (re-frame/reg-event-fx
@@ -1481,8 +1494,7 @@
          method  :get
          request {:file-path file-path}
          snap? (cstr/includes? file-path "assets/snaps")
-         _ (when snap?
-             (change-url (str "/" (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" ""))))]
+         _ (change-url (str "/" (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")))]
      {:db         (assoc-in db [:http-reqs :load-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})
       :http-xhrio {:method          method
                    :uri             url

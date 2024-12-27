@@ -822,53 +822,79 @@
 
 (defn history-mouse-leave [] (unhighlight-code) (reset! hover-tools-atom nil))
 
-(defn draggable-play
-  [element solver-name]
-  [(reagent/adapt-react-class rdnd/Draggable)
-   (let [data {:h         2
-               :w         7
-               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-               :views     {:solver-player [:box :align :center :justify :center :style
-                                         {:font-size    "25px"
-                                          :font-weight  700
-                                          :padding-top  "6px"
-                                          :padding-left "14px"
-                                          :margin-top   "-8px"
-                                          :color        :theme/editor-outer-rim-color
-                                          :font-family  :theme/base-font}
-                                         :child  [:click-solver [solver-name (str "run " (ut/replacer (str solver-name) ":" ""))]]]}
-               :name      (str (ut/replacer solver-name ":" "") "-player")}]
-     {:type          "meta-menu" ;:play-port
-      :on-drag-end   #(do (reset! bricks/dragging? false))
-      :on-drag-start #(do (reset! bricks/dragging? true)
-                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
-                          (reset! bricks/dragging-body data))
-      :data          (pr-str data)}) ;[bid pid]
-   [re-com/box
-    :size "none"
-    :child element
-    :style {:cursor "grab"}]])
+(defn draggable-play [element solver-name]
+  (let [data {:h         2
+              :w         7
+              :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :draggable-clover}
+              :views     {:solver-player [:box :align :center :justify :center :style
+                                          {:font-size    "25px"
+                                           :font-weight  700
+                                           :padding-top  "6px"
+                                           :padding-left "14px"
+                                           :margin-top   "-8px"
+                                           :color        :theme/editor-outer-rim-color
+                                           :font-family  :theme/base-font}
+                                          :child  [:click-solver [solver-name (str "run " (ut/replacer (str solver-name) ":" ""))]]]}
+              :name      (str (ut/replacer solver-name ":" "") "-player")}]
+    [bricks/draggable data "meta-menu" element]))
 
-(defn draggable-viewer
-  [element solver? solver-name]
-  [(reagent/adapt-react-class rdnd/Draggable)
-   (let [data {:h         (if solver? 8 3)
-               :w         6
-               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-               :views     {(if solver?
-                             :solver-viewer
-                             :signal-viewer) [:data-viewer (keyword (str (if solver? "solver/" "signal/") (ut/replacer (str solver-name) ":" "")))]}
-               :name      (str (ut/replacer solver-name ":" "") "-viewer")}]
-     {:type          "meta-menu" ;;:play-port
-      :on-drag-end   #(do (reset! bricks/dragging? false))
-      :on-drag-start #(do (reset! bricks/dragging? true)
-                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
-                          (reset! bricks/dragging-body data))
-      :data          (pr-str data)}) ;[bid pid]
-   [re-com/box
-    :size "none"
-    :child element
-    :style {:cursor "grab"}]])
+;; (defn draggable-play
+;;   [element solver-name]
+;;   [(reagent/adapt-react-class rdnd/Draggable)
+;;    (let [data {:h         2
+;;                :w         7
+;;                :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+;;                :views     {:solver-player [:box :align :center :justify :center :style
+;;                                          {:font-size    "25px"
+;;                                           :font-weight  700
+;;                                           :padding-top  "6px"
+;;                                           :padding-left "14px"
+;;                                           :margin-top   "-8px"
+;;                                           :color        :theme/editor-outer-rim-color
+;;                                           :font-family  :theme/base-font}
+;;                                          :child  [:click-solver [solver-name (str "run " (ut/replacer (str solver-name) ":" ""))]]]}
+;;                :name      (str (ut/replacer solver-name ":" "") "-player")}]
+;;      {:type          "meta-menu" ;:play-port
+;;       :on-drag-end   #(do (reset! bricks/dragging? false))
+;;       :on-drag-start #(do (reset! bricks/dragging? true)
+;;                           (reset! bricks/dragging-size [(get data :w) (get data :h)])
+;;                           (reset! bricks/dragging-body data))
+;;       :data          (pr-str data)}) ;[bid pid]
+;;    [re-com/box
+;;     :size "none"
+;;     :child element
+;;     :style {:cursor "grab"}]])
+
+(defn draggable-viewer [element solver? solver-name]
+  (let [data {:h         (if solver? 8 3)
+              :w         6
+              :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :draggable-clover}
+              :views     {(if solver?
+                            :solver-viewer
+                            :signal-viewer) [:data-viewer (keyword (str (if solver? "solver/" "signal/") (ut/replacer (str solver-name) ":" "")))]}
+              :name      (str (ut/replacer solver-name ":" "") "-viewer")}]
+    [bricks/draggable data "meta-menu" element]))
+
+;; (defn draggable-viewer
+;;   [element solver? solver-name]
+;;   [(reagent/adapt-react-class rdnd/Draggable)
+;;    (let [data {:h         (if solver? 8 3)
+;;                :w         6
+;;                :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+;;                :views     {(if solver?
+;;                              :solver-viewer
+;;                              :signal-viewer) [:data-viewer (keyword (str (if solver? "solver/" "signal/") (ut/replacer (str solver-name) ":" "")))]}
+;;                :name      (str (ut/replacer solver-name ":" "") "-viewer")}]
+;;      {:type          "meta-menu" ;;:play-port
+;;       :on-drag-end   #(do (reset! bricks/dragging? false))
+;;       :on-drag-start #(do (reset! bricks/dragging? true)
+;;                           (reset! bricks/dragging-size [(get data :w) (get data :h)])
+;;                           (reset! bricks/dragging-body data))
+;;       :data          (pr-str data)}) ;[bid pid]
+;;    [re-com/box
+;;     :size "none"
+;;     :child element
+;;     :style {:cursor "grab"}]])
 
 
 (defn edn-terminal [ww hh text id & [text?]]

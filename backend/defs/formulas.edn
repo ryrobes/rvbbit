@@ -1,0 +1,636 @@
+
+{"moving-window"
+   {:id "moving-window"
+    :name "Moving Window"
+    :description "Calculate moving window statistics"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Field to analyze"}
+                   {:name "window-size"
+                    :type :integer
+                    :default 3
+                    :description "Size of moving window"}
+                   {:name "operation"
+                    :type :enum
+                    :values [:avg :sum :min :max]
+                    :default :avg
+                    :description "Window operation to perform"}]
+    :output-fields [{:name "window_value"
+                     :type :numeric
+                     :description "Result of window calculation"}]
+    :fn (fn
+          [{:keys [data value-field window-size operation]
+            :or {window-size 3
+                 operation :avg}}]
+          (let [op-fn (case operation
+                        :avg (fn [x] (double (/ (reduce + x) (count x))))  ;; Added double conversion
+                        :sum (fn [x] (reduce + x))
+                        :min (fn [x] (apply min x))
+                        :max (fn [x] (apply max x)))]
+            (->> data
+                 (map-indexed
+                  (fn [idx row]
+                    (let [window (->> (range (- idx (dec window-size)) (inc idx))
+                                      (filter (fn [x] (and (>= x 0) (< x (count data)))))
+                                      (map (fn [x] (get (nth data x) value-field))))]
+                      (assoc row :window_value
+                             (when (seq window)
+                               (op-fn window))))))
+                 vec)))}
+
+   "dimension-bucket"
+   {:id "dimension-bucket"
+    :name "Dimension Bucketing"
+    :description "Group dimension values into buckets using various strategies"
+    :input-fields [{:name "dimension-field"
+                    :type :dimension
+                    :description "Field to bucket"}
+                   {:name "strategy"
+                    :type :enum
+                    :values [:frequency :alphabetical :custom-ranges]
+                    :default :frequency
+                    :description "Bucketing strategy"}
+                   {:name "bucket-count"
+                    :type :integer
+                    :default 5
+                    :description "Number of buckets to create"}
+                   {:name "threshold"
+                    :type :numeric
+                    :default 0.01
+                    :description "Minimum frequency threshold for frequency strategy"}]
+    :output-fields [{:name "dimension_bucket"
+                     :type :string
+                     :description "Assigned bucket name"}
+                    {:name "is_other"
+                     :type :boolean
+                     :description "Flag for values in 'Other' bucket"}]
+    :fn (fn
+          [{:keys [data dimension-field strategy bucket-count threshold]
+            :or {strategy :frequency
+                 bucket-count 5
+                 threshold 0.01}}]
+          (let [total-count (count data)
+                frequency-map (frequencies (map dimension-field data))
+
+                buckets
+                (case strategy
+                  :frequency
+                  (let [sorted-dims (sort-by (fn [x] (get frequency-map x)) > (keys frequency-map))
+                        min-count (* threshold total-count)]
+                    (->> sorted-dims
+                         (reduce (fn [{:keys [current-bucket buckets remaining-count] :as acc} dim]
+                                   (let [dim-count (get frequency-map dim)]
+                                     (if (or (< remaining-count min-count)
+                                             (>= (count buckets) (dec bucket-count)))
+                                       (update acc :buckets assoc dim "Other")
+                                       (if (< (count current-bucket) (/ total-count bucket-count))
+                                         (-> acc
+                                             (update :current-bucket conj dim)
+                                             (update :remaining-count - dim-count))
+                                         (-> acc
+                                             (update :buckets merge (zipmap current-bucket
+                                                                            (repeat (str "Bucket " (count buckets)))))
+                                             (assoc :current-bucket [dim])
+                                             (update :remaining-count - dim-count))))))
+                                 {:current-bucket []
+                                  :buckets {}
+                                  :remaining-count total-count})
+                         :buckets))
+
+                  :alphabetical
+                  (let [sorted-dims (sort (keys frequency-map))
+                        bucket-size (Math/ceil (/ (count sorted-dims) bucket-count))]
+                    (->> sorted-dims
+                         (partition-all bucket-size)
+                         (map-indexed (fn [idx dims]
+                                        [dims (str "Bucket " (inc idx))]))
+                         (reduce (fn [acc [dims bucket-name]]
+                                   (merge acc (zipmap dims (repeat bucket-name))))
+                                 {})))
+
+                  :custom-ranges
+                  (throw (ex-info "Custom ranges not yet implemented"
+                                  {:strategy strategy})))]
+
+            (->> data
+                 (map (fn [x] (assoc x
+                              :dimension_bucket (get buckets (dimension-field x))
+                              :is_other (= "Other" (get buckets (dimension-field x))))))
+                 vec)))}
+
+   "running-total"
+   {:id "running-total"
+    :name "Running Total"
+    :description "Calculate running totals and related metrics"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to accumulate"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Optional fields to partition by"}
+                   {:name "order-field"
+                    :type [:date :numeric]
+                    :description "Field to order by"}]
+    :output-fields [{:name "running_total"
+                     :type :numeric
+                     :description "Cumulative sum"}
+                    {:name "running_average"
+                     :type :numeric
+                     :description "Running average"}
+                    {:name "pct_of_total"
+                     :type :numeric
+                     :description "Percent of final total"}]
+    :fn (fn
+          [{:keys [data value-field partition-fields order-field]
+            :or {partition-fields []}}]
+          (let [partitioned (if (empty? partition-fields)
+                              [data]
+                              (partition-by (fn [x] (select-keys x partition-fields)) data))]
+            (->> partitioned
+                 (mapcat
+                  (fn [group]
+                    (let [sorted-group (sort-by order-field group)]
+                      (reductions
+                       (fn [acc row]
+                         (let [curr-total (+ (get acc :running_total 0)
+                                             (value-field row))]
+                           (assoc row
+                                  :running_total curr-total
+                                  :running_average (/ curr-total
+                                                      (inc (.indexOf sorted-group row)))
+                                  :pct_of_total (/ curr-total
+                                                   (reduce + (map value-field group))))))
+                       {:running_total 0}
+                       sorted-group))))
+                 vec)))}
+
+   "percent-of-total"
+   {:id "percent-of-total"
+    :name "Percent of Total"
+    :description "Calculate percentage of total, optionally within dimension groups"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Numeric field to calculate percentages from"}
+                   {:name "dimension-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Optional fields to group by"}]
+    :output-fields [{:name "pct_of_total"
+                     :type :numeric
+                     :description "Percentage of grand total"}
+                    {:name "pct_of_group"
+                     :type :numeric
+                     :description "Percentage within dimension group (if dimensions specified)"}]
+    :fn (fn
+          "Calculate percent of total with optional dimension grouping
+           If no dimension fields provided, calculates against grand total"
+          [{:keys [data value-field dimension-fields]
+            :or {dimension-fields []}}]
+          (let [grand-total (reduce + (map value-field data))
+                groups (if (empty? dimension-fields)
+                         {nil data}  ; Single group for grand total
+                         (group-by (fn [x] (select-keys x dimension-fields)) data))]
+            (->> data
+                 (map (fn [row]
+                        (let [group-key (if (empty? dimension-fields)
+                                          nil
+                                          (select-keys row dimension-fields))
+                              group-total (reduce + (map value-field (get groups group-key)))]
+                          (cond-> row
+                            true (assoc :pct_of_total (double (/ (value-field row) grand-total)))
+                            (not-empty dimension-fields)
+                            (assoc :pct_of_group (double (/ (value-field row) group-total)))))))
+                 vec)))}
+
+   "time-bucket"
+   {:id "time-bucket"
+    :name "Time Bucket"
+    :description "Group timestamps into regular intervals"
+    :input-fields [{:name "date-field"
+                    :type :date
+                    :description "Date/time to bucket"}
+                   {:name "bucket-size"
+                    :type :enum
+                    :values [:hour :day :week :month :quarter :year]
+                    :default :month
+                    :description "Bucket size"}]
+    :output-fields [{:name "bucket_start"
+                     :type :date
+                     :description "Start of bucket"}
+                    {:name "bucket_end"
+                     :type :date
+                     :description "End of bucket"}]
+    :fn (defn calc-time-bucket
+          "Bucket timestamps into regular intervals"
+          [{:keys [data date-field bucket-size]
+            :or {bucket-size :month}}]
+          (let [formatter (tf/formatter "yyyy-MM-dd")
+                bucket-fn (case bucket-size
+                            :hour (fn [x] (t/date-time (t/year x) (t/month x) (t/day x) (t/hour x)))
+                            :day (fn [x] (t/date-midnight (t/year x) (t/month x) (t/day x)))
+                            :week (fn [x] (t/minus x (t/days (dec (t/day-of-week x)))))
+                            :month (fn [x] (t/date-midnight (t/year x) (t/month x) 1))
+                            :quarter (fn [x] (let [month (t/month x)
+                                                   quarter-month (- month (mod (dec month) 3))]
+                                               (t/date-midnight (t/year x) quarter-month 1)))
+                            :year (fn [x] (t/date-midnight (t/year x) 1 1)))]
+            (->> data
+                 (map (fn [x]
+                         (let [dt (tf/parse formatter (date-field x))
+                               bucket-start (bucket-fn dt)
+                               bucket-end (t/minus
+                                           (case bucket-size
+                                             :hour (t/plus (bucket-fn dt) (t/hours 1))
+                                             :day (t/plus (bucket-fn dt) (t/days 1))
+                                             :week (t/plus (bucket-fn dt) (t/weeks 1))
+                                             :month (t/plus (bucket-fn dt) (t/months 1))
+                                             :quarter (t/plus (bucket-fn dt) (t/months 3))
+                                             :year (t/plus (bucket-fn dt) (t/years 1)))
+                                           (t/seconds 1))]
+                           (assoc x
+                                  :bucket_start (tf/unparse formatter bucket-start)
+                                  :bucket_end (tf/unparse formatter bucket-end)))))
+                 vec)))}
+
+   "decay-score"
+   {:id "decay-score"
+    :name "Time Decay Score"
+    :description "Calculate score with time decay"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to decay"}
+                   {:name "date-field"
+                    :type :date
+                    :description "Date for decay calculation"}
+                   {:name "half-life"
+                    :type :integer
+                    :default 30
+                    :description "Days for 50% decay"}]
+    :output-fields [{:name "decay_score"
+                     :type :numeric
+                     :description "Time-adjusted score"}]
+    :fn calc-decay-score}
+
+   "relative-change"
+   {:id "relative-change"
+    :name "Relative Change"
+    :description "Calculate changes relative to previous values"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Field to analyze"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Fields to partition by"}]
+    :output-fields [{:name "prev_value"
+                     :type :numeric
+                     :description "Previous value in sequence"}
+                    {:name "change"
+                     :type :numeric
+                     :description "Absolute change from previous"}
+                    {:name "pct_change"
+                     :type :numeric
+                     :description "Percentage change from previous"}]
+    :fn calc-relative-change}
+
+   "contribution-analysis"
+   {:id "contribution-analysis"
+    :name "Contribution Analysis"
+    :description "Analyze relative contributions and rankings"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to analyze"}
+                   {:name "group-fields"
+                    :type [:dimension]
+                    :description "Fields to group by"}]
+    :output-fields [{:name "total_in_group"
+                     :type :numeric
+                     :description "Total value within group"}
+                    {:name "pct_of_group"
+                     :type :numeric
+                     :description "Percentage of group total"}
+                    {:name "rank_in_group"
+                     :type :numeric
+                     :description "Rank within group"}]
+    :fn calc-contribution}
+
+   "zscore-analysis"
+   {:id "zscore-analysis"
+    :name "Z-Score Analysis"
+    :description "Calculate statistical significance"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to analyze"}
+                   {:name "group-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Optional grouping"}]
+    :output-fields [{:name "zscore"
+                     :type :numeric
+                     :description "Standard deviations from mean"}
+                    {:name "is_significant"
+                     :type :boolean
+                     :description "Beyond 2 standard deviations"}]
+    :fn calc-zscore}
+
+   "excel-formula"
+   {:id "excel-formula"
+    :name "Excel Formula"
+    :primitive true
+    :description "Execute Excel-style formula on data"
+    :input-fields [{:name "formula"
+                    :type :string
+                    :description "Formula string in Excel-like syntax"}
+                   {:name "result-field"
+                    :type :string
+                    :description "Name for the result column"
+                    :default "result"}]
+    :output-fields [{:name :dynamic
+                     :type :numeric
+                     :description "Result of formula calculation"}]
+    :fn (fn [{:keys [data formula result-field]
+              :or {result-field "result"}}]
+          (ppl ["🦝 Processing Excel formula:" formula :--> result-field])
+          (p/evaluate-formula formula data result-field))}
+
+
+  ;;  "clojure"
+  ;;  {:id "clojure"
+  ;;   :name "Clojure Expression"
+  ;;   :description "Execute Clojure expression on data"
+  ;;   :input-fields [{:name "formula"
+  ;;                   :type :string
+  ;;                   :description "Complete Clojure function taking rows parameter"}
+  ;;                  {:name "result-field"
+  ;;                   :type :string
+  ;;                   :description "Name for the result column"
+  ;;                   :default "result"}]
+  ;;   :output-fields [{:name :dynamic
+  ;;                    :type :any
+  ;;                    :description "Result of Clojure evaluation"}]
+  ;;   :fn (fn [{:keys [data formula result-field]
+  ;;             :or {result-field "result"}}]
+  ;;         (ppl ["🦝 Processing Clojure:" formula :--> result-field])
+  ;;         (let [expr-fn (try
+  ;;                         (eval (read-string formula))
+  ;;                         (catch Throwable e
+  ;;                           (throw (ex-info "Invalid Clojure function"
+  ;;                                           {:formula formula
+  ;;                                            :error (.getMessage e)}))))]
+  ;;           (try
+  ;;             (if (fn? expr-fn)
+  ;;               (doall (expr-fn data))
+  ;;               (throw (ex-info "Expression must evaluate to a function"
+  ;;                               {:formula formula})))
+  ;;             (catch Throwable e
+  ;;               (throw (ex-info "Error evaluating Clojure function"
+  ;;                               {:formula formula
+  ;;                                :error (.getMessage e)}))))))}
+
+
+   "clojure"
+   {:id "clojure"
+    :name "Clojure Expression"
+    :primitive true
+    :description "Execute Clojure expression on data"
+    :input-fields [{:name "formula"
+                    :type :string
+                    :description "Complete Clojure function taking rows parameter"}
+                   {:name "result-field"
+                    :type :string
+                    :description "Name for the result column"
+                    :default "result"}]
+    :output-fields [{:name :dynamic
+                     :type :any
+                     :description "Result of Clojure evaluation"}]
+    :fn (fn [{:keys [data formula result-field]
+              :or {result-field "result"}}]
+          (ppl ["🦝 Processing Clojure:" formula :--> result-field])
+          (let [expr-fn (try
+                          (eval (read-string formula))
+                          (catch Throwable e
+                            (throw (ex-info "Invalid Clojure function"
+                                            {:formula formula
+                                             :error (.getMessage e)}))))]
+            (try
+              (if (fn? expr-fn)
+             ;; Process in chunks to avoid memory pressure
+                (vec
+                 (sequence
+                  cat  ;; flatten the chunks
+                  (map expr-fn  ;; apply the function to each chunk
+                       (partition-all 1000 data))))
+                (throw (ex-info "Expression must evaluate to a function"
+                                {:formula formula})))
+              (catch Throwable e
+                (throw (ex-info "Error evaluating Clojure function"
+                                {:formula formula
+                                 :error (.getMessage e)}))))))}
+
+
+
+   "rank-analysis"
+   {:id "rank-analysis"
+    :name "Rank Analysis"
+    :description "Flexible ranking with ties and dense ranking"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to rank"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Partition fields"}
+                   {:name "rank-type"
+                    :type :enum
+                    :values [:rank :dense_rank :percent_rank :cumulative]
+                    :default :rank
+                    :description "Type of ranking"}
+                   {:name "direction"
+                    :type :enum
+                    :values [:asc :desc]
+                    :default :desc
+                    :description "Ranking direction"}]
+    :output-fields [{:name "rank_value"
+                     :type :numeric
+                     :description "Rank value"}
+                    {:name "rank_dense"
+                     :type :numeric
+                     :description "Dense rank"}
+                    {:name "percentile"
+                     :type :numeric
+                     :description "Percentile rank"}]
+    :fn calc-rank-analysis}
+
+   "period-comparison"
+   {:id "period-comparison"
+    :name "Period Comparison"
+    :description "Compare values across different time periods"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to compare"}
+                   {:name "date-field"
+                    :type :date
+                    :description "Date field"}
+                   {:name "period-type"
+                    :type :enum
+                    :values [:prior :yoy :mom :qoq :custom]
+                    :default :prior
+                    :description "Comparison type"}
+                   {:name "custom-offset"
+                    :type :integer
+                    :optional true
+                    :description "Custom periods offset"}]
+    :output-fields [{:name "comparison_value"
+                     :type :numeric
+                     :description "Value from comparison period"}
+                    {:name "absolute_change"
+                     :type :numeric
+                     :description "Absolute change"}
+                    {:name "percent_change"
+                     :type :numeric
+                     :description "Percentage change"}]
+    :fn calc-period-comparison}
+
+   "window-aggregation"
+   {:id "window-aggregation"
+    :name "Window Aggregation"
+    :description "Flexible window-based calculations"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to aggregate"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Partition fields"}
+                   {:name "order-field"
+                    :type [:date :numeric]
+                    :description "Field to order by"}
+                   {:name "window-type"
+                    :type :enum
+                    :values [:rows :range]
+                    :default :rows
+                    :description "Window type"}
+                   {:name "window-start"
+                    :type :integer
+                    :default -1
+                    :description "Window start offset"}
+                   {:name "window-end"
+                    :type :integer
+                    :default 0
+                    :description "Window end offset"}
+                   {:name "aggregation"
+                    :type :enum
+                    :values [:sum :avg :min :max :median :count :stddev]
+                    :default :sum
+                    :description "Aggregation function"}]
+    :output-fields [{:name "window_result"
+                     :type :numeric
+                     :description "Window calculation result"}]
+    :fn calc-window-aggregation}
+
+   "distribution-analysis"
+   {:id "distribution-analysis"
+    :name "Distribution Analysis"
+    :description "Analyze value distributions and patterns"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to analyze"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Partition fields"}]
+    :output-fields [{:name "quartile"
+                     :type :numeric
+                     :description "Quartile (1-4)"}
+                    {:name "decile"
+                     :type :numeric
+                     :description "Decile (1-10)"}
+                    {:name "iqr"
+                     :type :numeric
+                     :description "Inter-quartile range"}
+                    {:name "is_outlier"
+                     :type :boolean
+                     :description "IQR-based outlier detection"}]
+    :fn calc-distribution}
+
+   "running-totals"
+   {:id "running-totals"
+    :name "Running Totals"
+    :description "Cumulative calculations with flexible resets"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to accumulate"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Reset boundaries"}
+                   {:name "order-field"
+                    :type [:date :numeric]
+                    :description "Sort field"}]
+    :output-fields [{:name "running_total"
+                     :type :numeric
+                     :description "Cumulative sum"}
+                    {:name "running_average"
+                     :type :numeric
+                     :description "Cumulative average"}
+                    {:name "pct_of_total"
+                     :type :numeric
+                     :description "Running percent of total"}]
+    :fn calc-running-totals}
+
+   "pivot-transform"
+   {:id "pivot-transform"
+    :name "Pivot Transform"
+    :description "Dynamic pivot/unpivot operations with optional grouping dimensions"
+    :input-fields [{:name "value-field"
+                    :type :numeric
+                    :description "Value to pivot"}
+                   {:name "pivot-field"
+                    :type :dimension
+                    :description "Field to pivot on"}
+                   {:name "group-by-fields"
+                    :type [:dimension]
+                    :optional true
+                    :default []
+                    :description "Fields to group by before pivoting"}
+                   {:name "aggregate"
+                    :type :enum
+                    :values [:sum :avg :min :max :count]
+                    :default :sum
+                    :description "Aggregation for pivot"}]
+    :output-fields [{:name :dynamic
+                     :type :numeric
+                     :description "Pivoted values as new columns"}]
+    :fn calc-pivot}
+
+   "lag-lead-analysis"
+   {:id "lag-lead-analysis"
+    :name "Lag/Lead Analysis"
+    :description "Access previous/next values with conditions"
+    :input-fields [{:name "value-field"
+                    :type [:numeric :dimension]
+                    :description "Field to analyze"}
+                   {:name "partition-fields"
+                    :type [:dimension]
+                    :optional true
+                    :description "Partition fields"}
+                   {:name "order-field"
+                    :type [:date :numeric]
+                    :description "Sort field"}
+                   {:name "offset"
+                    :type :integer
+                    :default 1
+                    :description "Number of positions to look"}
+                   {:name "direction"
+                    :type :enum
+                    :values [:lag :lead]
+                    :default :lag
+                    :description "Look backward or forward"}]
+    :output-fields [{:name "offset_value"
+                     :type :dynamic
+                     :description "Value at offset"}
+                    {:name "is_changed"
+                     :type :boolean
+                     :description "Value changed from offset"}]
+    :fn calc-lag-lead}}

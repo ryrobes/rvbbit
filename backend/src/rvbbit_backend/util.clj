@@ -28,6 +28,7 @@
    java.time.LocalTime
    java.time.LocalDate
    [java.lang.management ManagementFactory]
+   [java.lang.reflect Array]
    [java.io BufferedReader InputStreamReader]
    java.time.ZoneId
    java.nio.ByteBuffer
@@ -101,6 +102,40 @@
   (with-open [reader (clojure.java.io/reader filename)] (doseq [line (line-seq reader)] (safe-println line))))
 
 (defn index-of [coll item] (first (keep-indexed #(when (= %2 item) %1) coll)))
+
+(defn sizeof
+  "Estimate size of object in bytes"
+  [obj]
+  (cond
+    ;; Nil
+    (nil? obj) 0
+
+    ;; Strings
+    (string? obj) (+ 24 (* 2 (count obj)))  ; 24 byte overhead + 2 bytes per char
+
+    ;; Numbers
+    (integer? obj) 16    ; Integer overhead
+    (float? obj) 16      ; Float overhead
+    (double? obj) 16     ; Double overhead
+
+    ;; Collections
+    (map? obj) (+ 48    ; Map overhead
+                  (reduce + (map sizeof (keys obj)))
+                  (reduce + (map sizeof (vals obj))))
+
+    (vector? obj) (+ 24  ; Vector overhead
+                     (reduce + (map sizeof obj)))
+
+    (seq? obj) (+ 24     ; Seq overhead
+                  (reduce + (map sizeof obj)))
+
+    ;; Dates/Times
+    (instance? java.util.Date obj) 24
+    (instance? java.time.LocalDate obj) 24
+    (instance? java.time.LocalDateTime obj) 32
+
+    ;; Default
+    :else 16))
 
 (defn current-datetime-parts
   []
@@ -236,6 +271,15 @@
                           :parse         {:interpose "\n\n"}})]
     o))
 
+(defn snake-case [s]
+  (when s
+    (let [s (str s)
+          s (cstr/replace s "-" "_")
+          parts (cstr/split s #"_")
+          parts (cons (first parts)
+                      (map cstr/capitalize (rest parts)))]
+      (apply str parts))))
+
 (defn safe-name [x] (cstr/replace (str x) ":" ""))
 
 (defn avg [nums] (when (seq nums) (Math/round (/ (reduce + nums) (double (count nums))))))
@@ -248,58 +292,10 @@
   []
   (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)] (.getSystemLoadAverage os-bean)))
 
-;; (defn get-jvm-cpu-usage []
-;;   (let [os-mxbean (ManagementFactory/getOperatingSystemMXBean)
-;;         runtime-mxbean (ManagementFactory/getRuntimeMXBean)
-;;         uptime (.getUptime runtime-mxbean)
-;;         cpu-time (if (instance? OperatingSystemMXBean os-mxbean)
-;;                    (let [os-mxbean-ext ^OperatingSystemMXBean os-mxbean]
-;;                      (.getProcessCpuTime os-mxbean-ext))
-;;                    (throw (UnsupportedOperationException. "CPU time not supported on this JVM")))]
-;;     (if (> uptime 0)
-;;       (let [cpu-usage (/ (* cpu-time 100.0) (* uptime 1000000.0))]
-;;         cpu-usage)
-;;       0.0)))
-
-;; (defn get-jvm-cpu-usage []
-;;   (let [os-mxbean (ManagementFactory/getOperatingSystemMXBean)
-;;         runtime-mxbean (ManagementFactory/getRuntimeMXBean)
-;;         uptime (.getUptime runtime-mxbean)
-;;         available-processors (.getAvailableProcessors os-mxbean)
-;;         cpu-time (if (instance? OperatingSystemMXBean os-mxbean)
-;;                    (let [os-mxbean-ext ^OperatingSystemMXBean os-mxbean]
-;;                      (.getProcessCpuTime os-mxbean-ext))
-;;                    (throw (UnsupportedOperationException. "CPU time not supported on this JVM")))]
-;;     (if (> uptime 0)
-;;       (let [cpu-usage (/ (* cpu-time 100.0) (* uptime 1000000.0 available-processors))]
-;;         cpu-usage)
-;;       0.0)))
-
 (defn get-pid []
   (let [runtime-mxbean (ManagementFactory/getRuntimeMXBean)
         jvm-name (.getName runtime-mxbean)]
     (first (clojure.string/split jvm-name #"@"))))
-
-;; (defn get-cpu-usage-unix [pid]
-;;   (let [process-builder (ProcessBuilder. ["sh" "-c" (str "top -b -n 1 | grep " pid)])
-;;         process (.start process-builder)
-;;         reader (BufferedReader. (InputStreamReader. (.getInputStream process)))]
-;;     (try
-;;       (let [output (reduce str (line-seq reader))]
-;;         (if (clojure.string/blank? output)
-;;           (throw (Exception. "CPU usage not found"))
-;;           ;; Assuming a more generic parsing strategy that doesn't rely on fixed positions
-;;           (let [parts (clojure.string/split output #"\s+")
-;;                 cpu-usage-index (->> parts
-;;                                      (map-indexed vector)
-;;                                      (filter #(re-matches #"\d+\.\d+" (second %)))
-;;                                      (first)
-;;                                      (first))]
-;;             (if cpu-usage-index
-;;               (Float/parseFloat (nth parts cpu-usage-index))
-;;               (throw (Exception. "CPU usage not found"))))))
-;;       (finally
-;;         (.close reader)))))
 
 (defn get-cpu-usage-unix [pid]
   (let [process-builder (ProcessBuilder. ["sh" "-c" (str "top -b -n 1 | grep " pid)])
@@ -730,7 +726,8 @@
       (cstr/replace " minutes" "m")
       (cstr/replace " minute" "m")
       (cstr/replace " seconds" "s")
-      (cstr/replace " second" "s")))
+      (cstr/replace " second" "s")
+      (cstr/replace "less than as" "< 1 s")))
 
 (defn nf [i] (pprint/cl-format nil "~:d" i))
 
