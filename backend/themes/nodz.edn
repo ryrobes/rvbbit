@@ -1,54 +1,86 @@
-{:codemirror-theme "rvbbit-dynamic"
+{:theme-name "nodz"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#0a0f0a"
  :pop-2 "#00ff3b"
  :base-block-style
    {:text-shadow "0 0 15px #00ff3b22"
     :border-radius "2px"
     :filter "none"
-    :backdrop-filter "brightness(120%) contrast(130%)"
+    :background-color "#00000099"
+    :backdrop-filter "brightness(60%) contrast(660%)"
     :border "1px solid #1a2f1a"
     :border-top "1px solid #00ff3b44"
     :box-shadow
       "inset 0 0 30px #00000099,                                        inset 0 0 2px #00ff3b22,                                       0 1px 3px #00000088"}
- :vega-defaults {:mark    {:font "JetBrains Mono" :stroke "#00ff3b" :color "#00ff3b65"}
-                 :legend  {:labelFont  "JetBrains Mono"
-                           :legendFont "JetBrains Mono"
-                           :labelColor "#2eff5e"
-                           :titleColor "#2eff5e"
-                           :stroke     "#00ff3b"
-                           :titleFont  "JetBrains Mono"}
-                 :header  {:labelFont "JetBrains Mono" :titleFont "JetBrains Mono" :titleColor "#2eff5e"}
-                 :title   {:font         "JetBrains Mono"
-                           :subtitleFont "JetBrains Mono"
-                           :labelFont    "JetBrains Mono"
-                           :titleFont    "JetBrains Mono"
-                           :titleColor   "#2eff5e"}
-                 :point   {:font "JetBrains Mono" :stroke "#00ff3b" :color "#00ff3b65"}
-                 :area    {:font "JetBrains Mono" :stroke "#00ff3b" :color "#00ff3b65"}
-                 :axis    {:domainColor "#1a2f1a"
-                           :grid        true
-                           :font        "JetBrains Mono"
-                           :labelColor  "#2eff5e"
-                           :titleFont   "JetBrains Mono"
-                           :titleColor  "#2eff5e"
-                           :labelFont   "JetBrains Mono"
-                           :domain      false
-                           :gridColor   "#1a2f1a55"
-                           :tickColor   "#1a2f1a"
-                           :axisFont    "JetBrains Mono"}
-                 :tooltip {:fill "#0a0f0aee" :stroke "#1a2f1a" :strokeWidth 1 :color "#2eff5e"}
-                 :view    {:stroke "transparent"}}
+ :vega-defaults
+   {:mark    {:font "JetBrains Mono" :stroke "#00ff3b" :color "#00ff3b65"}
+    :legend  {:labelFont  "JetBrains Mono"
+              :legendFont "JetBrains Mono"
+              :labelColor "#2eff5e"
+              :titleColor "#2eff5e"
+              :stroke     "#00ff3b"
+              :titleFont  "JetBrains Mono"}
+    :header  {:labelFont "JetBrains Mono" :titleFont "JetBrains Mono" :titleColor "#2eff5e" :labelColor "#f2e8ff"}
+    :title   {:font         "JetBrains Mono"
+              :subtitleFont "JetBrains Mono"
+              :labelFont    "JetBrains Mono"
+              :titleFont    "JetBrains Mono"
+              :titleColor   "#2eff5e"}
+    :point   {:font "JetBrains Mono" :stroke "#00ff3b" :color "#00ff3b65"}
+    :area    {:font "JetBrains Mono" :stroke "#00ff3b" :color "#00ff3b65"}
+    :axis    {:domainColor "#1a2f1a"
+              :grid        true
+              :font        "JetBrains Mono"
+              :labelColor  "#2eff5e"
+              :titleFont   "JetBrains Mono"
+              :titleColor  "#2eff5e"
+              :labelFont   "JetBrains Mono"
+              :domain      false
+              :gridColor   "#1a2f1a55"
+              :tickColor   "#1a2f1a"
+              :axisFont    "JetBrains Mono"}
+    :tooltip {:fill "#0a0f0aee" :stroke "#1a2f1a" :strokeWidth 1 :color "#2eff5e"}
+    :view    {:stroke "transparent"}}
  :grid-selected-column-css {:background-color "#00ff3b15"
                             :filter           "none"
                             :backdrop-filter  "brightness(140%) contrast(140%)"
                             :box-shadow       "inset 0 0 0 1px #00ff3b44"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
  :base-block-color-selected "#101410"
  :block-title-font-color "#2eff5e"
+ :universal-pop-color "#9973e0"
  :base-block-color "#0a0f0aee"
  :pop-3 "#afffbe"
  :editor-rim-color "#00ff3b"
  :base-block-filter-selected "none"
- :_vega-default-color-scheme {:scheme "custom"}
+ :vega-default-color-scheme {:scheme "category20b"}
  :data-colors {"float"       "#00ff3b"
                "boolean"     "#afffbe"
                "map"         "#2eff5e"
@@ -65,6 +97,7 @@
  :editor-grid-selected-font-color "#0a0f0a"
  :monospaced-font "JetBrains Mono"
  :editor-grid-selected-background-color "#00ff3b"
+ :_vega-default-color-scheme {:scheme "custom"}
  :nivo-defaults
    {:font-family "JetBrains Mono"
     :labels      {:text {:fill "#2eff5e" :font-size "12px" :font-family "JetBrains Mono" :font-weight 400}}
@@ -89,16 +122,15 @@
  :grid-selected-background-color "#00ff3b"
  :grid-font-color "#2eff5e"
  :canvas-background-css
-   {:background
-      "linear-gradient(180deg, #101410 0%, #0a0f0a 100%),                                      url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")"
-    :background-blend-mode "overlay"
-    :transition "all 0.2s ease"
+   {:background       "url(images/nodz2.jpg)"
+    :transition       "all 0.2s ease"
+    :filter           "brightness(1.2) sepia(1) hue-rotate(70deg) saturate(3) contrast(1.5) grayscale(10%) opacity(95%)"
+    :background-size  "cover"
     :background-color "#0a0f0a"}
  :editor-font-color "#2eff5e"
+ :line-style "curved-path-h"
  :base-font "JetBrains Mono"
  :block-tab-selected-font-color "#0a0f0a"
  :editor-background-color "#0a0f0a"
  :editor-grid-font-color "#2eff5e"
  :pop-1 "#1a2f1a"}
-
-

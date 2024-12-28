@@ -1,110 +1,89 @@
-{:theme-name "c64-pro",
- :codemirror-theme "rvbbit-dynamic",
- :editor-param-background-color "#0000aa",
- :pop-2 "#a0a0ff",
- :base-block-style
- {:text-shadow "4px 4px 12px #a0a0ff44",
-  :border-radius "0px",
-  :filter "brightness(110%)",
-  :backdrop-filter "brightness(30%) blur(0px)"},
+{:theme-name "c64-pro"
+ :codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#0000aa"
+ :pop-2 "#a0a0ff"
+ :base-block-style {:text-shadow     "4px 4px 12px #a0a0ff44"
+                    :border-radius   "0px"
+                    :filter          "brightness(110%)"
+                    :backdrop-filter "brightness(30%) blur(0px)"}
  :vega-defaults
- {:mark {:font "C64 Pro", :stroke "#0000aa", :color "#0000aa65"},
-  :legend
-  {:labelFont "C64 Pro",
-   :legendFont "C64 Pro",
-   :labelColor "#a0a0ff99",
-   :titleColor "#a0a0ff99",
-   :stroke "#a0a0ff99",
-   :titleFont "C64 Pro"},
-  :header {:labelFont "C64 Pro", :titleFont "C64 Pro", :titleColor "#a0a0ff99"},
-  :title
-  {:font "C64 Pro",
-   :subtitleFont "C64 Pro",
-   :labelFont "C64 Pro",
-   :titleFont "C64 Pro",
-   :titleColor "#a0a0ff99"},
-  :point {:font "C64 Pro", :stroke "#0000aa", :color "#0000aa65"},
-  :area {:font "C64 Pro", :stroke "#0000aa", :color "#0000aa65"},
-  :axis
-  {:domainColor "#a0a0ff22",
-   :grid true,
-   :font "C64 Pro",
-   :labelColor "#a0a0ff88",
-   :titleFont "C64 Pro",
-   :titleColor "#a0a0ff99",
-   :labelFont "C64 Pro",
-   :domain false,
-   :gridColor "#a0a0ff22",
-   :tickColor "#a0a0ff22",
-   :axisFont "C64 Pro"},
-  :tooltip {:fill "#0000aa", :stroke "#a0a0ff", :strokeWidth 1, :color "#a0a0ff"},
-  :view {:stroke "transparent"}},
- :grid-selected-column-css
- {:background-color "#0000aa88", :filter "brightness(200%) contrast(120%)"},
- :base-block-color-selected "#0000aa",
- :block-title-font-color "#a0a0ff",
- :universal-pop-color "#9973e0",
- :base-block-color "#0000aa99",
- :pop-3 "#c0c0ff",
- :editor-rim-color "#02028d",
- :base-block-filter-selected
- "drop-shadow(0.35rem 0.35rem 0.4rem #a0a0ff) drop-shadow(-0.35rem -0.35rem 0.4rem #a0a0ff)",
- :data-colors
- {"float" "#a0a0ff",
-  "boolean" "#c0c0ff",
-  "map" "#8080ff",
-  "list" "#d0d0ff",
-  "string" "#a0a0ff",
-  "any" "#a0a0ff",
-  "vector" "#8080ff",
-  "keyword" "#d0d0ff",
-  "rabbit-code" "#a0a0ff",
-  "datetime" "#c0c0ff",
-  "integer" "#8080ff",
-  "unknown" "#a0a0ff",
-  "date" "#c0c0ff"},
- :editor-grid-selected-font-color "#0000aa",
- :monospaced-font "C64 Pro Mono",
- :editor-grid-selected-background-color "#a0a0ff",
- :_vega-default-color-scheme {:scheme "blues"},
+   {:mark    {:font "C64 Pro" :stroke "#0000aa" :color "#0000aa65"}
+    :legend  {:labelFont  "C64 Pro"
+              :legendFont "C64 Pro"
+              :labelColor "#a0a0ff99"
+              :titleColor "#a0a0ff99"
+              :stroke     "#a0a0ff99"
+              :titleFont  "C64 Pro"}
+    :header  {:labelFont "C64 Pro" :titleFont "C64 Pro" :titleColor "#a0a0ff99"}
+    :title   {:font "C64 Pro" :subtitleFont "C64 Pro" :labelFont "C64 Pro" :titleFont "C64 Pro" :titleColor "#a0a0ff99"}
+    :point   {:font "C64 Pro" :stroke "#0000aa" :color "#0000aa65"}
+    :area    {:font "C64 Pro" :stroke "#0000aa" :color "#0000aa65"}
+    :axis    {:domainColor "#a0a0ff22"
+              :grid        true
+              :font        "C64 Pro"
+              :labelColor  "#a0a0ff88"
+              :titleFont   "C64 Pro"
+              :titleColor  "#a0a0ff99"
+              :labelFont   "C64 Pro"
+              :domain      false
+              :gridColor   "#a0a0ff22"
+              :tickColor   "#a0a0ff22"
+              :axisFont    "C64 Pro"}
+    :tooltip {:fill "#0000aa" :stroke "#a0a0ff" :strokeWidth 1 :color "#a0a0ff"}
+    :view    {:stroke "transparent"}}
+ :grid-selected-column-css {:background-color "#0000aa88" :filter "brightness(200%) contrast(120%)"}
+ :base-block-color-selected "#0000aa"
+ :block-title-font-color "#a0a0ff"
+ :universal-pop-color "#9973e0"
+ :base-block-color "#0000aa99"
+ :pop-3 "#c0c0ff"
+ :editor-rim-color "#02028d"
+ :base-block-filter-selected "drop-shadow(0.35rem 0.35rem 0.4rem #a0a0ff) drop-shadow(-0.35rem -0.35rem 0.4rem #a0a0ff)"
+ :data-colors {"float"       "#a0a0ff"
+               "boolean"     "#c0c0ff"
+               "map"         "#8080ff"
+               "list"        "#d0d0ff"
+               "string"      "#a0a0ff"
+               "any"         "#a0a0ff"
+               "vector"      "#8080ff"
+               "keyword"     "#d0d0ff"
+               "rabbit-code" "#a0a0ff"
+               "datetime"    "#c0c0ff"
+               "integer"     "#8080ff"
+               "unknown"     "#a0a0ff"
+               "date"        "#c0c0ff"}
+ :editor-grid-selected-font-color "#0000aa"
+ :monospaced-font "C64 Pro Mono"
+ :editor-grid-selected-background-color "#a0a0ff"
+ :_vega-default-color-scheme {:scheme "blues"}
  :nivo-defaults
- {:font-family "C64 Pro",
-  :labels
-  {:text
-   {:fill "#a0a0ff", :font-size "16px", :font-family "C64 Pro", :font-weight 400}},
-  :tooltip
-  {:container
-   {:background "#0000aa",
-    :color "#a0a0ff",
-    :text {:fill "#a0a0ff"},
-    :fontSize "18px",
-    :borderRadius "0px",
-    :boxShadow "0 1px 2px #a0a0ff55",
-    :padding "5px 9px"},
-   :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
-   :tableCell {:padding "3px 5px"}},
-  :axis
-  {:legend
-   {:text
-    {:fill "#a0a0ff", :font-size "14px", :font-family "C64 Pro", :font-weight 400}},
-   :ticks
-   {:line {:stroke "#a0a0ff60"}, :text {:fill "#a0a0ff60", :font-weight 400}}},
-  :grid {:line {:stroke "#a0a0ff", :strokeWidth 0, :strokeDasharray "4 4"}}},
- :editor-outer-rim-color "#a0a0ff",
- :grid-selected-font-color "#0000aa",
- :block-title-selected-font-color "#a0a0ff",
- :grid-selected-background-color "#a0a0ff",
- :grid-font-color "#a0a0ff",
- :canvas-background-css
- {:background-image
-  "linear-gradient(#0000aa70,#0000aa12),url(images/gray-brick.png)",
-  :transition "all 0.6s ease-in-out",
-  :background-blend-mode "multiply",
-  :background-color "#0000aa"},
- :editor-font-color "#a0a0ff",
- :line-style "stepped-path-h",
- :base-font "C64 Pro",
- :block-tab-selected-font-color "#a0a0ff",
- :editor-background-color "#0000aa",
- :editor-grid-font-color "#a0a0ff",
+   {:font-family "C64 Pro"
+    :labels      {:text {:fill "#a0a0ff" :font-size "16px" :font-family "C64 Pro" :font-weight 400}}
+    :tooltip     {:container {:background   "#0000aa"
+                              :color        "#a0a0ff"
+                              :text         {:fill "#a0a0ff"}
+                              :fontSize     "18px"
+                              :borderRadius "0px"
+                              :boxShadow    "0 1px 2px #a0a0ff55"
+                              :padding      "5px 9px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 5px"}}
+    :axis        {:legend {:text {:fill "#a0a0ff" :font-size "14px" :font-family "C64 Pro" :font-weight 400}}
+                  :ticks  {:line {:stroke "#a0a0ff60"} :text {:fill "#a0a0ff60" :font-weight 400}}}
+    :grid        {:line {:stroke "#a0a0ff" :strokeWidth 0 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#a0a0ff"
+ :grid-selected-font-color "#0000aa"
+ :block-title-selected-font-color "#a0a0ff"
+ :grid-selected-background-color "#a0a0ff"
+ :grid-font-color "#a0a0ff"
+ :canvas-background-css {:background-image      "linear-gradient(#0000aa70,#0000aa12),url(images/gray-brick.png)"
+                         :transition            "all 0.6s ease-in-out"
+                         :background-blend-mode "multiply"
+                         :background-color      "#0000aa"}
+ :editor-font-color "#a0a0ff"
+ :line-style "stepped-path-h"
+ :base-font "C64 Pro"
+ :block-tab-selected-font-color "#a0a0ff"
+ :editor-background-color "#0000aa"
+ :editor-grid-font-color "#a0a0ff"
  :pop-1 "#0000aa"}

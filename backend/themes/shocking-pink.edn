@@ -1,4 +1,6 @@
-{:codemirror-theme "rvbbit-dynamic"
+{:theme-name "shocking-pink"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#120818"
  :pop-2 "#00f6ff"
  :base-block-style {:text-shadow     "4px 4px 4px #00000088"
@@ -12,7 +14,7 @@
                           :titleColor "#ffffff99"
                           :stroke     "#ffffff99"
                           :titleFont  "Lato"}
-                 :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
+                 :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99" :labelColor "#f2e8ff"}
                  :title {:font "Lato" :subtitleFont "Lato" :labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
                  :point {:font "Lato" :stroke "#2d1833" :color "#2d183365"}
                  :area {:font "Lato" :stroke "#2d1833" :color "#2d183365"}
@@ -30,13 +32,41 @@
                  :tooltip {:fill "white" :stroke "steelblue" :strokeWidth 1 :color "black"}
                  :view {:stroke "transparent"}}
  :grid-selected-column-css {:background-color "#12081888" :filter "brightness(200%)"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
  :base-block-color-selected "#180d24"
  :block-title-font-color "#ffffff"
+ :universal-pop-color "#9973e0"
  :base-block-color "#18082499"
  :pop-3 "#d6c3d6"
  :editor-rim-color "#ff3e8d99"
  :base-block-filter-selected "drop-shadow(0.35rem 0.35rem 0.4rem #ff3e8d) drop-shadow(-0.35rem -0.35rem 0.4rem #00f6ff)"
- :_vega-default-color-scheme {:scheme "pastel2"}
+ :vega-default-color-scheme {:scheme "greys"}
  :data-colors {"float"       "#ff3e8d"
                "boolean"     "#00f6ff"
                "map"         "#9a84d2"
@@ -53,6 +83,7 @@
  :editor-grid-selected-font-color "#000000"
  :monospaced-font "JetBrains Mono"
  :editor-grid-selected-background-color "#ff3e8d"
+ :_vega-default-color-scheme {:scheme "pastel2"}
  :nivo-defaults
    {:font-family "Instagram Sans"
     :labels      {:text {:fill "#ffffff" :font-size "16px" :font-family "Instagram Sans" :font-weight 700}}
@@ -73,11 +104,13 @@
  :block-title-selected-font-color "#ffffff"
  :grid-selected-background-color "#ff3e8d"
  :grid-font-color "#ffffff"
- :canvas-background-css {:background-image      "linear-gradient(#2c183370,#2c183312),url(images/gray-brick.png)"
+ :canvas-background-css {:background-image      "linear-gradient(#2c1833,#2c183399),url(images/shk1.webp-q8.jpg)"
                          :transition            "all 0.6s ease-in-out"
+                         :background-size       "cover"
                          :background-blend-mode "normal"
                          :background-color      "#2c1833"}
  :editor-font-color "#ffffff"
+ :line-style "curved-path-h"
  :base-font "Oxygen Mono"
  :block-tab-selected-font-color "#00f6ff"
  :editor-background-color "#120818"

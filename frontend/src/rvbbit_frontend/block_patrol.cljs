@@ -71,7 +71,7 @@
          ;drag-body-map-this-tab (select-keys @db/drag-body-map dbody-keys-this)
          ;;;_ (ut/pp [:this-keys dbody-keys1 dbody-keys2 (keys @db/drag-body-map)])
          ]
-     (ut/tapp>> [:pushing-panels-to-server (count (keys panels)) (str (keys panels)) ])
+     (ut/tapp>> [(rand-nth ["🥖" "🍞" "🥐" "🥨" "🥪" "🥯"]) :pushing-panels-to-server (count (keys panels)) (str (keys panels)) ])
      {:dispatch-later
       [
       ;;  {:ms 4000
@@ -103,7 +103,7 @@
          changed-panels (select-keys changed-panels changed-panels-keys)]
     ;;  (doseq [panel-key changed-panels-keys]
     ;;    (ut/tracked-dispatch [::bricks/save-snap-block panel-key]))
-     (ut/tapp>> [:pushing-changed-panels (str changed-panels-keys)])
+     (ut/tapp>> [(rand-nth ["🥖" "🍞" "🥐" "🥨" "🥪" "🥯"]) :pushing-changed-panels (str changed-panels-keys)])
      (re-frame/dispatch [::push-panels-to-server changed-panels]))))
 
 (re-frame/reg-event-fx

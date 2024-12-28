@@ -87,7 +87,126 @@
     (int (.between ChronoUnit/DAYS d (LocalDate/now)))
     nil))
 
-;; Date formatting helpers
+;; ;; Date formatting helpers
+;; (def date-format-patterns
+;;   {"mm/dd/yyyy" "MM/dd/yyyy"
+;;    "m/d/yyyy" "M/d/yyyy"
+;;    "mmm d, yyyy" "MMM d, yyyy"
+;;    "mmmm d, yyyy" "MMMM d, yyyy"
+;;    "d-mmm" "d-MMM"
+;;    "d-mmmm" "d-MMMM"
+;;    "ddd" "EEE"
+;;    "dddd" "EEEE"
+;;    "mm/dd/yy" "MM/dd/yy"
+;;    "yyyy-mm-dd" "yyyy-MM-dd"
+;;    "hh:mm:ss" "HH:mm:ss"
+;;    "h:mm am/pm" "h:mm a"})
+
+;; (defn parse-date [value]
+;;   (try
+;;     (cond
+;;       (instance? org.joda.time.DateTime value) value
+;;       (string? value) (f/parse (f/formatter "yyyy-MM-dd HH:mm:ss") value)
+;;       :else nil)
+;;     (catch Exception _
+;;       (try
+;;         (f/parse (f/formatter "yyyy-MM-dd") value)
+;;         (catch Exception _
+;;           nil)))))
+
+;; (defn format-date [value format-str]
+;;   (let [date (parse-date value)
+;;         pattern (get date-format-patterns format-str format-str)]
+;;     (when date
+;;       (try
+;;         (f/unparse (f/formatter pattern) date)
+;;         (catch Exception _
+;;           "Invalid Format")))))
+
+;; ;; Number formatting helpers
+;; (defn format-number [value pattern]
+;;   (try
+;;     (let [num (if (string? value)
+;;                 (Double/parseDouble value)
+;;                 (double value))
+;;           ;; Simple pattern handling
+;;           formatted (cond
+;;                       (= pattern "0%") (format "%.0f%%" (* num 100))
+;;                       (= pattern "#,##0.00") (format "%,.2f" num)
+;;                       (= pattern "$#,##0.00") (format "$%,.2f" num)
+;;                       (re-matches #"0{1,}" pattern) (format (str "%0" (count pattern) "d") (int num))
+;;                       :else (format "%.2f" num))]
+;;       formatted)
+;;     (catch Exception _
+;;       "Invalid Number")))
+
+;; (defn text-format [value format-pattern]
+;;   (cond
+;;     ;; Try date formatting first
+;;     (get date-format-patterns format-pattern)
+;;     (format-date value format-pattern)
+
+;;     ;; Then try number formatting
+;;     :else
+;;     (format-number value format-pattern)))
+
+;; Format pattern parsing
+(def number-format-symbols
+  {\0 :required-digit    ; Required digit, show as 0 if none
+   \# :optional-digit    ; Optional digit, show only if present
+   \, :thousands-sep     ; Thousands separator
+   \. :decimal-point     ; Decimal point
+   \% :percentage        ; Percentage
+   \$ :currency})        ; Currency
+
+(defn parse-number-format [pattern]
+  (let [parts (str/split pattern #"[;]")  ; Split for positive;negative;zero formats
+        positive-format (first parts)]
+    {:has-currency (str/includes? positive-format "$")
+     :has-percentage (str/includes? positive-format "%")
+     :thousands-sep (str/includes? positive-format ",")
+     :decimal-places (count (re-seq #"0" (or (second (str/split positive-format #"\.")) "")))
+     :min-digits (count (re-seq #"0" (first (str/split positive-format #"\."))))
+     :pattern pattern}))
+
+(defn format-with-pattern [{:keys [has-currency has-percentage thousands-sep decimal-places]} num]
+  (let [factor (if has-percentage 100 1)
+        formatted (format (str "%"
+                             (when thousands-sep ",")
+                             "."
+                             decimal-places
+                             "f")
+                         (* num factor))
+        with-currency (if has-currency (str "$" formatted) formatted)
+        with-percent (if has-percentage (str with-currency "%") with-currency)]
+    with-percent))
+
+;; Enhanced number formatting
+(defn format-number [value pattern]
+  (try
+    (let [num (cond
+                (number? value) (double value)
+                (string? value) (Double/parseDouble value)
+                :else (throw (Exception. "Invalid number")))
+          format-specs (parse-number-format pattern)]
+
+      ;; Handle special cases first
+      (cond
+        ;; Scientific notation
+        (re-matches #"0\.0+E\+00" pattern)
+        (format "%.2E" num)
+
+        ;; Basic patterns
+        (= pattern "General")
+        (str num)
+
+        ;; Custom formatting
+        :else
+        (format-with-pattern format-specs num)))
+    (catch Exception e
+      "Invalid Number")))
+
+;; Date formatting remains the same as before
 (def date-format-patterns
   {"mm/dd/yyyy" "MM/dd/yyyy"
    "m/d/yyyy" "M/d/yyyy"
@@ -123,30 +242,15 @@
         (catch Exception _
           "Invalid Format")))))
 
-;; Number formatting helpers
-(defn format-number [value pattern]
-  (try
-    (let [num (if (string? value)
-                (Double/parseDouble value)
-                (double value))
-          ;; Simple pattern handling
-          formatted (cond
-                      (= pattern "0%") (format "%.0f%%" (* num 100))
-                      (= pattern "#,##0.00") (format "%,.2f" num)
-                      (= pattern "$#,##0.00") (format "$%,.2f" num)
-                      (re-matches #"0{1,}" pattern) (format (str "%0" (count pattern) "d") (int num))
-                      :else (format "%.2f" num))]
-      formatted)
-    (catch Exception _
-      "Invalid Number")))
-
+;; Main text-format function with pattern detection
 (defn text-format [value format-pattern]
   (cond
-    ;; Try date formatting first
-    (get date-format-patterns format-pattern)
+    ;; Detect if it's likely a date pattern
+    (or (get date-format-patterns format-pattern)
+        (re-find #"[ymdh]" format-pattern))
     (format-date value format-pattern)
 
-    ;; Then try number formatting
+    ;; Handle number patterns
     :else
     (format-number value format-pattern)))
 

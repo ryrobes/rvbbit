@@ -4,19 +4,32 @@
 ;;   |  \  \/  |__] |__] |  |     |__] |  | ___] |___    |___ |__| | \| |    | |__]
 ;;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-;; docs coming soon, doc!
+;;
 
-{:debug-level 1 ;; for console output. somewhat deprecated.
- :hide-sub-and-unsub-alerts? true ;;false
- :show-query-times? false
- :log-atom-sizes? true ;false ;; expensive, only for debugging
- :ui-debug? false ;true ;false ;true
- :render-pop? true ;; semi-expensive but enjoyable
+;; BASIC SERVER / CLIENT SETTINGS
+
+{:debug-level 1 ;; console output. somewhat deprecated. will be removed for an a-la-carte console print "type" system.
+ :hide-sub-and-unsub-alerts? true ;; client side pop-up showing reactor sub actions (debug only, annoying)
+ :show-query-times? false ;; client side pop-up alert showing SQL query times and query body (debug only, annoying)
+ :console-viz-client-sparklines? true
+ :console-viz-settings [[:cpu :mem :threads] [15] false nil]
+ ;;                     ^ types of charts to render  ^ what time segments to show (seconds) ^ show big-title ^ console-width (nil tries to autosize)
+ ;; charts availiable: - [:load :watchers :signal-reactions :mem :nrepl-calls :sql-queries :flows :leaf-evals :pool-tasks :msgs-cum :queued :tasks
+ ;;                       :threads :msgs :sql-exec :nrepl-intro-calls :clover-params :subs :pool-tasks-run :subs-client :websockets :solvers :workers
+ ;;                       :queues :viz-recos :reactions :cpu :queue-tasks :non-heap-mem]
+ :log-atom-sizes? true ;false ;; expensive, only for debugging - if enabled, see server-stats2 screen, it has it's own tab (localhost:8888/#/server-stats2)
+ :ui-debug? false ;; adds some extra counters, elements and reactions
+ :render-pop? true ;; semi-expensive but enjoyable (the 'tilt shift' upon re-rendering)
  :default "screens/late-december.edn"
  ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
- ;;    if this screen can't be read or is nil, you will get a basic blank screen with a basic theme
+ ;;    if this screen can't be read or is nil, you will get a basic blank screen with a base theme
  :harvest-on-boot? true
  ;; ^^ do a full database sniff for each connection on boot? No reason not to unless it is causing issues.
+
+
+ ;; ------------------------------------------------------------------------
+ ;; Below is advanced and I'm still writing the docs for it. To be continued.
+
  :modes {:pre       [:pre
                      {:style {:color :theme/editor-outer-rim-color
                               :background-color "#00000000"

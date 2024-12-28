@@ -3200,8 +3200,15 @@
     [bricks/reecatch
      [(if vertical? re-com/v-box re-com/h-box)
       :size "none"
-      :attr {:on-mouse-enter #(reset! bricks/over-block? true)
-             :on-mouse-leave #(reset! bricks/over-block? false)}
+      :attr {:on-mouse-enter #(do
+                                (reset! bricks/over-block? true)
+                                (reset! bricks/over-editor? true))
+             :on-mouse-over #(when (not @bricks/over-editor?)
+                               (reset! bricks/over-block? true)
+                               (reset! bricks/over-editor? true))
+             :on-mouse-leave #(do
+                                (reset! bricks/over-block? false)
+                                (reset! bricks/over-editor? false))}
       :children
 
       (if @bricks/dragging-editor?
@@ -3254,9 +3261,9 @@
                                                   {:opacity (if (= @db/editor-mode :meta) 1.0 0.4)
                                                    :cursor  "pointer"} :attr {:on-click #(reset! db/editor-mode :meta)}]
 
-                                                 [re-com/box :child (str "realms") :style
-                                                  {:opacity (if (= @db/editor-mode :realms) 1.0 0.4)
-                                                   :cursor  "pointer"} :attr {:on-click #(reset! db/editor-mode :realms)}]
+                                                ;;  [re-com/box :child (str "realms") :style
+                                                ;;   {:opacity (if (= @db/editor-mode :realms) 1.0 0.4)
+                                                ;;    :cursor  "pointer"} :attr {:on-click #(reset! db/editor-mode :realms)}]
 
                                                  [re-com/box :child (str "reactor") :style
                                                   {;:opacity (if @file-mode? 0.4 1.0)
@@ -3266,7 +3273,7 @@
                                                 ;;  [re-com/box :child (str "viz recos") :style {:opacity (if (= @db/editor-mode :vvv) 1.0 0.4) :cursor "pointer"}
                                                 ;;   :attr {:on-click #(reset! db/editor-mode :vvv)}]
 
-                                                 [re-com/box :child (str "files") :style
+                                                 [re-com/box :child (str "screens") :style
                                                   {;:opacity (if @file-mode? 1.0 0.4)
                                                    :opacity (if (= @db/editor-mode :files) 1.0 0.4)
                                                    :cursor  "pointer"} :attr {:on-click #(reset! db/editor-mode :files)}]
@@ -5829,6 +5836,7 @@
         ;;             (js/setTimeout (fn [] (reset! db/loaded-screen? true)) 4000)))
         ;;      (* e 1300)))
         ;;loading-screen @(ut/tracked-sub ::loading-screen {})
+        _ (js/setTimeout (fn [] (swap! db/loading-message conj [:rabbit-is-ready...])) 22500) ;; just in case not triggered elsewhere
 
         ;; _ (do
         ;;     (js/setTimeout (fn [] (reset! db/final-loading-message [:rabbit-is-ready...])) 15500)
@@ -5856,7 +5864,9 @@
               cc (theme-pull :theme/editor-outer-rim-color "#fc0fc0")
               mfont (theme-pull :theme/monospaced-font "Fira Code")
               _     (when (and (not @db/post-boot?)
-                               (cstr/includes? (str @db/loading-message) ":panels-out-of-sync-with-server"))
+                               (or
+                                (cstr/includes? (str @db/loading-message) ":rabbit-is-ready")
+                                (cstr/includes? (str @db/loading-message) ":panels-out-of-sync-with-server")))
                       (js/setTimeout (fn [] (reset! db/final-loading-message [:rabbit-is-ready...])) 2500)
                       (js/setTimeout (fn [] (reset! preset! true)) 3500)
                       (js/setTimeout (fn [] (reset! boom! true)) 5500)
@@ -5864,8 +5874,7 @@
                       (js/setTimeout (fn [] (reset! db/post-boot? true)) 6500)
                       (js/setTimeout (fn []
                                        (reset! preset! false)
-                                       (reset! boom! false)) 8500)
-                      )
+                                       (reset! boom! false)) 8500))
               left (- (/ ww 2) (/ w 2))
               top (- (/ hh 2) (/ h 2))]
           [re-com/modal-panel
@@ -5921,8 +5930,7 @@
                     :gap "5px"
                     :class (when @boom! "zoom-and-fade")
                     :style {:color "#ffffff" }
-                    :children [
-                               (when (not @db/post-boot?)
+                    :children [(when (not @db/post-boot?)
                                  [re-com/box
                                   :class "heartbeat"
                                   :align :center :justify :center
@@ -5950,8 +5958,7 @@
                                         (if @db/final-loading-message
                                           @db/final-loading-message
                                           (cstr/join "\n"
-                                                     (take-last (Math/floor (/ h 20)) @db/loading-message))
-                                          ) (if @preset! "20px" "13px") :no false]]
+                                                     (take-last (Math/floor (/ h 20)) @db/loading-message))) (if @preset! "20px" "13px") :no false]]
                                (when (not @boom!)
                                  [re-com/h-box
                                   :width (px (- w 25))
@@ -8000,11 +8007,15 @@
               ;;                                     (.preventDefault event))
               :on-context-menu (re-com/handler-fn #_{:clj-kondo/ignore [:unresolved-symbol]}
                                 (bricks/tag-screen-position event) ;; event is magic in
-                                                  (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
+                                                  (when (and (not @bricks/over-block?)
+                                                             (not @bricks/over-editor?)
+                                                             (not @bricks/over-flow?))
                                                     (reset! db/dragged-kp [:canvas :canvas :canvas (rand-int 1223)])
                                                     (reset! bricks/dragging-body {})
                                                     (ut/tracked-dispatch [::bricks/leaf-push [:canvas :canvas :canvas] {}])
-                                                    (reset! db/fresh-spawn-modal? true))
+                                                    ;(when (not @bricks/over-editor?)
+                                                      (reset! db/fresh-spawn-modal? true))
+                                                    ;;)
                                                   #_{:clj-kondo/ignore [:unresolved-symbol]}
                                                   (.preventDefault event))
               :on-mouse-down   #(when (= (.-button %) 1) ;; middle click
@@ -8051,10 +8062,10 @@
                                          (theme-pull :theme/editor-outer-rim-color nil)
                                         ; )
                                         66)]
-                        (merge custom-map
+                        (merge {:filter      (when (not online?) (str (get custom-map :filter) " grayscale(100%)"))}
+                               custom-map
                                {:font-family (theme-pull :theme/base-font nil)
-                                :transition  "filter 4s ease-in-out"
-                                :filter      (when (not online?) "grayscale(100%)")}
+                                :transition  "filter 4s ease-in-out"}
                                (when (or @bricks/dragging? @bricks/mouse-dragging-panel?) ;; editor? ;;(not
                                  {:background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent
                                                      "linear-gradient(0deg, "
@@ -8063,12 +8074,10 @@
                                                      cc
                                                      " 1px, transparent 8px)"
                                                      (when (get custom-map :background-image) ", ")
-                                                     (get custom-map :background-image)
-                                                     )
+                                                     (get custom-map :background-image))
                                   :background-size  (str "50px 50px, 50px 50px"
                                                          (when (get custom-map :background-size) ", ")
-                                                         (get custom-map :background-size)
-                                                         )})))
+                                                         (get custom-map :background-size))})))
                :children [(when mouse-active? [bricks/reecatch [tab-menu]])
 
                           (when (and ;(not @bricks/dragging?)

@@ -2073,6 +2073,7 @@
   (let [text-box-height 110
         text-box?       false ; true
         hist-key        (keyword (str "tmp-" (hash (first kp)) "-hist-sys")) ;;  :history-log-sys
+        okp kp
         kp              (if (some #(or (= % :viz-gen) (= % :*)) kp)
                           (vec (ut/postwalk-replacer {:* :base :viz-gen :base} (remove nil? kp)))
                           kp)
@@ -2084,7 +2085,7 @@
                                    :order-by [[:updated :desc]]
                                    :where    [:= :kp (str kp)]}}
         history-log     @(re-frame.core/subscribe [::conn/sql-data [hist-key]])]
-    (ut/tapp>> [:history-log history-log kp "!"])
+    (ut/tapp>> ["📜" :history-log history-log (str kp) "." (str okp) "!"])
     (reset! db/active-tmp-history hist-key)
     (dorun (for [[k query] sql-calls]
              (let [;query (ut/postwalk-replacer sql-params v)
@@ -2130,10 +2131,10 @@
                               hist-block-h   (+ 405 diff-height) ;; dynamic later
                               block-runners  (vec (keys (dissoc @(ut/tracked-sub ::bricks/block-runners {}) :views :queries)))
                              ; has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
-                              vkey            (try vkey (catch :default _ :nope-cant-work-key))
+                              vkey            (try (edn/read-string vkey) (catch :default _ :nope-cant-work-key))
                               temp-key       (keyword (str (ut/replacer (str vkey) #":" "") "-hist-" (hash updated) (hash data)))
                               typek          (try type (catch :default _ type))]
-                          (ut/tapp>> [:history-log diff-lines type (str diff) vkey])
+                          (ut/tapp>> ["🪶" :history-log-items diff-lines type (str diff) vkey])
                           [650 hist-block-h
                            [re-com/v-box
                             :gap "5px"
@@ -2186,6 +2187,7 @@
                                     (let [view {:virtual-view data_d}
                                           curr-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key panel_key :data-key vkey})
                                           opts-map       @(ut/tracked-sub ::bricks/view-opts-map {:panel-key panel_key :data-key vkey})
+
                                           clover-fn      @(ut/tracked-sub ::bricks/current-view-mode-clover-fn {:panel-key panel_key :data-key vkey})
                                           temp-panel-key (keyword (cstr/replace (str "hist-" panel_key vkey "-" (hash updated)) ":" ""))]
 
@@ -2193,9 +2195,12 @@
                                       @(ut/tracked-subscribe [::bricks/clover-cache temp-panel-key :virtual-view 11 7 view nil typek curr-view-mode clover-fn opts-map])
                                       )
 
-                                    (= type ":queries") (let [query {temp-key (-> data_d ;(get data_d :queries)
+                                    (= type ":queries") (let [connection-id  @(ut/tracked-sub ::bricks/lookup-connection-id-by-query-key-alpha {:query-key vkey})
+                                                              query {temp-key (-> data_d ;(get data_d :queries)
                                                                                   (dissoc :cache?)
-                                                                                  (dissoc :refresh-every))}]
+                                                                                  (assoc :connection-id connection-id)
+                                                                                  (dissoc :refresh-every))}
+                                                              _ (ut/pp [:hist vkey connection-id query])]
                                                           ;[bricks/clover panel_key temp-key 8 11 nil query]
                                                           @(ut/tracked-subscribe [::bricks/clover-cache  panel_key temp-key 8 11 nil query ])
                                                           )
@@ -2245,6 +2250,7 @@
         selected-view   @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
         client-name     db/client-name
         kp              (vec (flatten [selected-block selected-view]))
+       ;;; _ (ut/pp [:kp (str kp)])
         ;chats-vec       @(ut/tracked-subscribe [::chats kp])
         audio-playing?  @(ut/tracked-subscribe [::audio/audio-playing?])
         hh              @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when

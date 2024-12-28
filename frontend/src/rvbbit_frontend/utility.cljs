@@ -91,6 +91,19 @@
  (fn [db [_ tap-edn]]
    (assoc db :taps (vec (take-last 100 (conj (get db :taps []) (conj tap-edn (str (js/Date.))) ))))))
 
+;; (re-frame/reg-event-db
+;;  ::random-fun-log-message
+;;  (fn [db _]
+;;    (let [emoji (rand-nth db/emoji-collection)
+;;          msg (rand-nth db/messages)]
+;;      (pp [emoji msg])
+;;      db)))
+
+(re-frame/reg-event-fx
+ ::random-fun-log-message
+ (fn [_ _]
+   (pp [(rand-nth db/emoji-collection) (rand-nth db/messages)])
+   nil))
 
 
 ;; (defn pp [data] ;; to stay consistent with the CLJ side
@@ -1652,7 +1665,9 @@
   (let [res (deep-remove-keys query
                               [:cache? :col-widths :row-height :render-all?
                                :refresh-every :page :connection-id :stack? :_last-run
-                               :clicked-row-height :style-rules])]
+                               :clicked-row-height
+                               ;:style-rules
+                               ])]
     res))
 
 (defn proper-case

@@ -1,4 +1,6 @@
-{:codemirror-theme "rvbbit-dynamic"
+{:theme-name "hemoglobin"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#0a0610"
  :pop-2 "#ff3a68"
  :base-block-style
@@ -17,7 +19,7 @@
              :titleColor "#ff3a68"
              :stroke     "#ff3a68"
              :titleFont  "Rajdhani"}
-    :header {:labelFont "Rajdhani" :titleFont "Rajdhani" :titleColor "#ff3a68"}
+    :header {:labelFont "Rajdhani" :titleFont "Rajdhani" :titleColor "#ff3a68" :labelColor "#f2e8ff"}
     :title {:font "Rajdhani" :subtitleFont "Rajdhani" :labelFont "Rajdhani" :titleFont "Rajdhani" :titleColor "#ff3a68"}
     :point {:font "Rajdhani" :stroke "#ff3a68" :color "#ff3a6865"}
     :area {:font "Rajdhani" :stroke "#ff3a68" :color "#ff3a6865"}
@@ -36,13 +38,41 @@
     :view {:stroke "transparent"}}
  :grid-selected-column-css
    {:background-color "#ff3a6815" :filter "none" :backdrop-filter "blur(4px)" :box-shadow "0 0 20px #ff3a6833"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
  :base-block-color-selected "#260544"
  :block-title-font-color "#ff3a68"
+ :universal-pop-color "#9973e0"
  :base-block-color "#0a061099"
  :pop-3 "#fc72d0"
  :editor-rim-color "#ff3a68"
  :base-block-filter-selected "none"
- :_vega-default-color-scheme {:scheme "custom"}
+ :vega-default-color-scheme {:scheme "category20b"}
  :data-colors {"float"       "#ff3a68"
                "boolean"     "#fc72d0"
                "map"         "#ff71a9"
@@ -59,6 +89,7 @@
  :editor-grid-selected-font-color "#0a0610"
  :monospaced-font "Rajdhani"
  :editor-grid-selected-background-color "#ff3a68"
+ :_vega-default-color-scheme {:scheme "custom"}
  :nivo-defaults
    {:font-family "Rajdhani"
     :labels      {:text {:fill "#ff3a68" :font-size "16px" :font-family "Rajdhani" :font-weight 600}}
@@ -81,15 +112,16 @@
  :block-title-selected-font-color "#0a0610"
  :grid-selected-background-color "#ff3a68"
  :grid-font-color "#ff3a68"
- :canvas-background-css {:background            "radial-gradient(circle at 50% 50%, #260544 0%, #0a0610 100%)"
-                         :background-blend-mode "overlay, color-dodge, normal"
-                         :transition            "all 0.3s ease"
-                         :background-color      "#0a0610"}
+ :canvas-background-css
+   {:background "radial-gradient(circle at 50% 50%, #26054488 0%, #0a0610 100%),url(images/hemo2.webp-q8.jpg)"
+    :background-size "cover"
+    :background-blend-mode "overlay, color-dodge, normal"
+    :transition "all 0.3s ease"
+    :background-color "#0a0610"}
  :editor-font-color "#ff3a68"
+ :line-style "curved-path-h"
  :base-font "Rajdhani"
  :block-tab-selected-font-color "#0a0610"
  :editor-background-color "#0a0610"
  :editor-grid-font-color "#ff3a68"
  :pop-1 "#260544"}
-
-

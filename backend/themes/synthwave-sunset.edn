@@ -1,105 +1,125 @@
-{:codemirror-theme                      "rvbbit-dynamic"
- :editor-param-background-color         "#1a0933"
- :pop-2                                 "#ff00ff"
- :base-block-style                      {:text-shadow     "0 0 10px #ff00ff77, 0 0 20px #ff00ff33"
-                                         :border-radius   "6px"
-                                         :filter          "brightness(120%)"
-                                         :backdrop-filter "brightness(40%) blur(8px)"
-                                         :border          "1px solid #ff00ff33"}
- :vega-defaults                         {:mark    {:font "Audiowide" :stroke "#2a1b46" :color "#2a1b4665"}
-                                         :legend  {:labelFont  "Audiowide"
-                                                   :legendFont "Audiowide"
-                                                   :labelColor "#ff00ff99"
-                                                   :titleColor "#ff00ff99"
-                                                   :stroke     "#ff00ff99"
-                                                   :titleFont  "Audiowide"}
-                                         :header  {:labelFont  "Audiowide"
-                                                   :titleFont  "Audiowide"
-                                                   :titleColor "#ff00ff99"}
-                                         :title   {:font         "Audiowide"
-                                                   :subtitleFont "Audiowide"
-                                                   :labelFont    "Audiowide"
-                                                   :titleFont    "Audiowide"
-                                                   :titleColor   "#ff00ff99"}
-                                         :point   {:font "Audiowide" :stroke "#2a1b46" :color "#2a1b4665"}
-                                         :area    {:font "Audiowide" :stroke "#2a1b46" :color "#2a1b4665"}
-                                         :axis    {:domainColor "#ff00ff22"
-                                                   :grid        true
-                                                   :font        "Audiowide"
-                                                   :labelColor  "#ff00ff88"
-                                                   :titleFont   "Audiowide"
-                                                   :titleColor  "#ff00ff99"
-                                                   :labelFont   "Audiowide"
-                                                   :domain      false
-                                                   :gridColor   "#ff00ff22"
-                                                   :tickColor   "#ff00ff22"
-                                                   :axisFont    "Audiowide"}
-                                         :tooltip {:fill "#1a0933" :stroke "#00fff7" :strokeWidth 2 :color "#00fff7"}
-                                         :view    {:stroke "transparent"}}
- :grid-selected-column-css              {:background-color "#1a093388"
-                                         :filter           "brightness(200%) contrast(120%)"
-                                         :box-shadow       "0 0 20px #ff00ff77"}
- :base-block-color-selected             "#2a1b46"
- :block-title-font-color                "#ff00ff"
- :base-block-color                      "#1a093399"
- :pop-3                                 "#00fff7"
- :editor-rim-color                      "#ff00ff99"
- :base-block-filter-selected            "drop-shadow(0 0 15px #ff00ff) drop-shadow(0 0 30px #00fff7)"
- :_vega-default-color-scheme             {:scheme "purple-cyan"}
- :data-colors                           {"float"       "#ff00ff"
-                                         "boolean"     "#00fff7"
-                                         "map"         "#ff69b4"
-                                         "list"        "#00ffcc"
-                                         "string"      "#ff00ff"
-                                         "any"         "#ff00ff"
-                                         "vector"      "#00fff7"
-                                         "keyword"     "#ff69b4"
-                                         "rabbit-code" "#ff00ff"
-                                         "datetime"    "#00fff7"
-                                         "integer"     "#ff69b4"
-                                         "unknown"     "#ff00ff"
-                                         "date"        "#00fff7"}
- :editor-grid-selected-font-color       "#1a0933"
- :monospaced-font                       "Audiowide"
+{:theme-name "synthwave-sunset"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#1a0933"
+ :pop-2 "#ff00ff"
+ :base-block-style {:text-shadow     "0 0 10px #ff00ff77, 0 0 20px #ff00ff33"
+                    :border-radius   "6px"
+                    :filter          "brightness(120%)"
+                    :backdrop-filter "brightness(40%) blur(8px)"
+                    :border          "1px solid #ff00ff33"}
+ :vega-defaults {:mark    {:font "Audiowide" :stroke "#2a1b46" :color "#2a1b4665"}
+                 :legend  {:labelFont  "Audiowide"
+                           :legendFont "Audiowide"
+                           :labelColor "#ff00ff99"
+                           :titleColor "#ff00ff99"
+                           :stroke     "#ff00ff99"
+                           :titleFont  "Audiowide"}
+                 :header  {:labelFont "Audiowide" :titleFont "Audiowide" :titleColor "#ff00ff99" :labelColor "#f2e8ff"}
+                 :title   {:font         "Audiowide"
+                           :subtitleFont "Audiowide"
+                           :labelFont    "Audiowide"
+                           :titleFont    "Audiowide"
+                           :titleColor   "#ff00ff99"}
+                 :point   {:font "Audiowide" :stroke "#2a1b46" :color "#2a1b4665"}
+                 :area    {:font "Audiowide" :stroke "#2a1b46" :color "#2a1b4665"}
+                 :axis    {:domainColor "#ff00ff22"
+                           :grid        true
+                           :font        "Audiowide"
+                           :labelColor  "#ff00ff88"
+                           :titleFont   "Audiowide"
+                           :titleColor  "#ff00ff99"
+                           :labelFont   "Audiowide"
+                           :domain      false
+                           :gridColor   "#ff00ff22"
+                           :tickColor   "#ff00ff22"
+                           :axisFont    "Audiowide"}
+                 :tooltip {:fill "#1a0933" :stroke "#00fff7" :strokeWidth 2 :color "#00fff7"}
+                 :view    {:stroke "transparent"}}
+ :grid-selected-column-css
+   {:background-color "#1a093388" :filter "brightness(200%) contrast(120%)" :box-shadow "0 0 20px #ff00ff77"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
+ :base-block-color-selected "#2a1b46"
+ :block-title-font-color "#ff00ff"
+ :universal-pop-color "#9973e0"
+ :base-block-color "#1a093399"
+ :pop-3 "#00fff7"
+ :editor-rim-color "#ff00ff99"
+ :base-block-filter-selected "drop-shadow(0 0 15px #ff00ff) drop-shadow(0 0 30px #00fff7)"
+ :vega-default-color-scheme {:scheme "category20b"}
+ :data-colors {"float"       "#ff00ff"
+               "boolean"     "#00fff7"
+               "map"         "#ff69b4"
+               "list"        "#00ffcc"
+               "string"      "#ff00ff"
+               "any"         "#ff00ff"
+               "vector"      "#00fff7"
+               "keyword"     "#ff69b4"
+               "rabbit-code" "#ff00ff"
+               "datetime"    "#00fff7"
+               "integer"     "#ff69b4"
+               "unknown"     "#ff00ff"
+               "date"        "#00fff7"}
+ :editor-grid-selected-font-color "#1a0933"
+ :monospaced-font "Audiowide"
  :editor-grid-selected-background-color "#ff00ff"
- :nivo-defaults                         {:font-family "Audiowide"
-                                         :labels      {:text {:fill        "#ff00ff"
-                                                              :font-size   "16px"
-                                                              :font-family "Audiowide"
-                                                              :font-weight 400}}
-                                         :tooltip     {:container {:background   "#1a0933"
-                                                                   :color        "#00fff7"
-                                                                   :text         {:fill "#00fff7"}
-                                                                   :fontSize     "18px"
-                                                                   :borderRadius "6px"
-                                                                   :boxShadow    "0 0 20px #ff00ff77"
-                                                                   :padding      "8px 12px"}
-                                                       :basic     {:whiteSpace "pre"
-                                                                   :display    "flex"
-                                                                   :alignItems "center"}
-                                                       :tableCell {:padding "3px 5px"}}
-                                         :axis        {:legend {:text {:fill        "#ff00ff"
-                                                                       :font-size   "14px"
-                                                                       :font-family "Audiowide"
-                                                                       :font-weight 400}}
-                                                       :ticks  {:line {:stroke "#ff00ff60"}
-                                                                :text {:fill "#ff00ff60" :font-weight 400}}}
-                                         :grid        {:line {:stroke "#ff00ff" :strokeWidth 0 :strokeDasharray "4 4"}}}
- :editor-outer-rim-color                "#ff00ff"
- :grid-selected-font-color              "#1a0933"
- :block-title-selected-font-color       "#00fff7"
- :grid-selected-background-color        "#ff00ff"
- :grid-font-color                       "#ff00ff"
- :canvas-background-css                 {:background-image      "linear-gradient(45deg, #1a0933 0%, #2a1b46 100%)"
-                                         :transition            "all 0.6s ease-in-out"
-                                         :background-blend-mode "normal"
-                                         :backdrop-filter       "blur(8px)"
-                                         :background-color      "#1a0933"}
- :editor-font-color                     "#ff00ff"
- :base-font                             "Audiowide"
- :block-tab-selected-font-color         "#00fff7"
- :editor-background-color               "#1a0933"
- :editor-grid-font-color                "#ff00ff"
- :pop-1                                 "#2a1b46"}
-
-
+ :_vega-default-color-scheme {:scheme "purple-cyan"}
+ :nivo-defaults
+   {:font-family "Audiowide"
+    :labels      {:text {:fill "#ff00ff" :font-size "16px" :font-family "Audiowide" :font-weight 400}}
+    :tooltip     {:container {:background   "#1a0933"
+                              :color        "#00fff7"
+                              :text         {:fill "#00fff7"}
+                              :fontSize     "18px"
+                              :borderRadius "6px"
+                              :boxShadow    "0 0 20px #ff00ff77"
+                              :padding      "8px 12px"}
+                  :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
+                  :tableCell {:padding "3px 5px"}}
+    :axis        {:legend {:text {:fill "#ff00ff" :font-size "14px" :font-family "Audiowide" :font-weight 400}}
+                  :ticks  {:line {:stroke "#ff00ff60"} :text {:fill "#ff00ff60" :font-weight 400}}}
+    :grid        {:line {:stroke "#ff00ff" :strokeWidth 0 :strokeDasharray "4 4"}}}
+ :editor-outer-rim-color "#ff00ff"
+ :grid-selected-font-color "#1a0933"
+ :block-title-selected-font-color "#00fff7"
+ :grid-selected-background-color "#ff00ff"
+ :grid-font-color "#ff00ff"
+ :canvas-background-css {:background " url(images/pz1.webp-q8.jpg), linear-gradient(45deg, #1a0933 40%, #2a1b46 100%)"
+                         :transition "all 0.6s ease-in-out"
+                         :background-blend-mode "normal"
+                         :backdrop-filter "blur(8px)"
+                         :background-size "cover"
+                         :background-color "#1a0933"}
+ :editor-font-color "#ff00ff"
+ :line-style "curved-path-h"
+ :base-font "Audiowide"
+ :block-tab-selected-font-color "#00fff7"
+ :editor-background-color "#1a0933"
+ :editor-grid-font-color "#ff00ff"
+ :pop-1 "#2a1b46"}

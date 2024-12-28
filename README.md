@@ -33,7 +33,7 @@ But here’s the kicker: **all** of this is built on a **user-space rules system
 ## Highlights at a Glance
 
 1. **'Context Aware' Drag & Drop SQL (plus Excel Formulas!)**
-   - Drag an entire table onto your canvas instead of peacking at pills in a side panel like a strung out bird.
+   - Drag an entire table onto your canvas instead of pecking at pills in a side panel like a strung out bird.
    - Slice, Dice, Filter, Add to the table. Just like a data cutting board. Delicious.
    - Apply post-SQL Excel-like formulas (or bespoke Clojure functions, or entire flows) to transform and enrich your results right on the canvas.
    - Quickly turn data into charts, pivot tables, or interactive widgets — Rabbit’s “visual rules” help recommend what is possible.

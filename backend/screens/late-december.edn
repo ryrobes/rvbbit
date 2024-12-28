@@ -1,14 +1,18 @@
 {:reco-preview nil,
  :annotate? false,
  :default-col-widths
- {:block-61 {:new-raw-sql-2 100},
+ {:block-695 {:countd-all-ufo-sightings 261},
+  :block-61 {:new-raw-sql-2 100},
+  :block-263 {:query1-2 130},
   :block-62 {:all-superstore-3 100},
+  :block-8880 {:agg-new-api-call-sqlized 261},
   :block-7831 {:query1 130},
-  :system-connections-list* {:connections-sys 126},
+  :block-10207 {:new-api-call-sqlized 100},
+  :block-11913 {:all-ufo-sightings 120},
   :block-70 {:query7 105},
   :block-68 {:cnt-new-raw-sql-2 211},
-  :system-fields-list* {:fields-sys 127},
   :block-8193 {:agg-grouped-all-superstore-1 261},
+  :block-5189 {:countd-all-ufo-sightings-1 261},
   :block-6676 {:grouped-all-superstore-1 155},
   :block-10955 {:agg-all-superstore 361},
   :block-10081 {:grouped-all-superstore 130},
@@ -16,18 +20,16 @@
   :block-69 {:cnt-all-superstore-3 261},
   :block-7349 {:cnt-all-superstore 261},
   :block-7312 {:agg-grouped-all-superstore 261},
-  :system-tables-list* {:tables-sys 100},
   :block-703 {:all-superstore 100}},
  :runstream-drops nil,
- :tabs ["winter-wonder-lands" "commendable snake" "stupendous deer" "hello-world"],
- :selected-cols nil,
+ :tabs ["winter-wonder-lands" "stupendous deer" "hello-world"],
+ :selected-cols {},
  :server nil,
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
- :lines? false,
  :editor? false,
  :buffy? false,
- :memory [1938324214 1840655878 4294705152],
- :client-name :bountiful-silver-yellow-jacket-19,
+ :memory [4307542847 4077374483 4294705152],
+ :client-name :dazzling-spherical-weasel-11,
  :server-panels
  [:block-64
   :block-66
@@ -67,59 +69,89 @@
   :block-411
   :block-7312
   :block-703],
- :peek? false,
  :flow-editor? true,
- :window {:w 2244, :h 1213},
+ :window {:w 2124, :h 1216},
  :ai-worker? false,
- :quake-console? false,
- :implicit-rowsets {:solver [nil]},
+ :quake-console? true,
  :post-meta
- {:new-raw-sql-2
-  {:server_subs {:distinct 1},
+ {:cnt-all-superstore-3
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :new-raw-sql-2
+  {:server_subs {:distinct 2},
    :queue_size {:distinct 0},
    :* {:rowcount 3},
-   :push {:distinct 1},
-   :selected_tab {:distinct 1},
-   :client_subs {:distinct 1},
-   :recent_messages_per_second {:distinct 1},
-   :uptime_seconds {:distinct 1},
-   :uptime {:distinct 1},
+   :push {:distinct 2},
+   :selected_tab {:distinct 2},
+   :client_subs {:distinct 2},
+   :recent_messages_per_second {:distinct 2},
+   :uptime_seconds {:distinct 2},
+   :uptime {:distinct 2},
    :last_seen_seconds {:distinct 1},
-   :memory {:distinct 1},
-   :screen_name {:distinct 1},
+   :memory {:distinct 2},
+   :screen_name {:distinct 2},
    :rrows {:distinct nil},
    :queue_distro {:distinct 1},
    :ts {:distinct 1},
-   :messages_per_second {:distinct 1},
-   :client_latency {:distinct 1},
+   :messages_per_second {:distinct 2},
+   :client_latency {:distinct 2},
    :ack {:distinct 1},
-   :booted_ts {:distinct 1},
-   :client_name {:distinct 1},
+   :booted_ts {:distinct 2},
+   :client_name {:distinct 2},
    :last_seen {:distinct 1}},
-  :all-superstore-3
-  {:category {:distinct 3},
-   :sales {:distinct 4363},
-   :* {:rowcount 6511},
-   :ship_date {:distinct 1212},
-   :product_id {:distinct 1793},
-   :city {:distinct 464},
-   :profit {:distinct 5180},
+  :query1-2
+  {:state {:distinct 67},
+   :* {:rowcount 68},
+   :rowcnt {:distinct 68},
+   :rrows {:distinct nil}},
+  :new-api-call-sqlized
+  {:total_wows_in_movie {:distinct 6},
+   :* {:rowcount 22},
+   :release_date {:distinct 13},
+   :director {:distinct 12},
+   :full_line {:distinct 18},
    :rrows {:distinct nil},
-   :state {:distinct 49},
-   :zipcode {:distinct 560},
-   :region {:distinct 4},
-   :ship_mode {:distinct 2},
-   :segment {:distinct 3},
-   :sub_category {:distinct 17},
-   :order_date {:distinct 1123},
-   :quantity {:distinct 14},
-   :discount {:distinct 1},
-   :country {:distinct 1},
-   :customer_name {:distinct 779},
-   :product_name {:distinct 1780},
-   :customer_id {:distinct 779}},
-  :agg-grouped-all-superstore
-  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+   :movie {:distinct 13},
+   :year {:distinct 10},
+   :video_480p {:distinct 22},
+   :poster {:distinct 13},
+   :video_1080p {:distinct 22},
+   :video_720p {:distinct 22},
+   :audio {:distinct 22},
+   :current_wow_in_movie {:distinct 8},
+   :video_360p {:distinct 22},
+   :timestamp {:distinct 22},
+   :movie_duration {:distinct 12},
+   :character {:distinct 12}},
+  :countd-all-ufo-sightings-1
+  {:duration_hours {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :rabbit-search-like-themes
+  {:theme_name {:distinct 87},
+   :* {:rowcount 87},
+   :theme_map {:distinct 87},
+   :rrows {:distinct nil}},
+  :agg-new-api-call-sqlized
+  {:total_wows_in_movie {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :all-ufo-sightings
+  {:* {:rowcount 34161},
+   :duration_seconds_int {:distinct 329},
+   :comments {:distinct 34061},
+   :city {:distinct 7845},
+   :date_posted {:distinct 315},
+   :rrows {:distinct nil},
+   :longitude {:distinct 6839},
+   :state {:distinct 10},
+   :duration_seconds {:distinct 329},
+   :duration_hours {:distinct 4434},
+   :id {:distinct 34161},
+   :shape {:distinct 26},
+   :datetime {:distinct 31457},
+   :latitude {:distinct 6742},
+   :country {:distinct 3}},
+  :grouped-all-superstore
+  {:category {:distinct 3},
+   :* {:rowcount 3},
+   :rowcnt {:distinct 3},
+   :rrows {:distinct nil}},
   :all-superstore
   {:category {:distinct 3},
    :sales {:distinct 5825},
@@ -144,82 +176,38 @@
    :customer_name {:distinct 793},
    :product_name {:distinct 1850},
    :customer_id {:distinct 793}},
-  :rabbit-search-like-themes
-  {:theme_name {:distinct 87},
-   :* {:rowcount 87},
-   :theme_map {:distinct 87},
-   :rrows {:distinct nil}},
-  :gen-viz-949
-  {:sales {:distinct 17},
-   :* {:rowcount 17},
-   :sub_category {:distinct 17},
-   :rrows {:distinct nil}},
-  :tables-sys
-  {:* {:rowcount 9},
-   :db_schema {:distinct 1},
-   :db_catalog {:distinct 0},
-   :fields {:distinct 9},
-   :rrows {:distinct nil},
-   :rows {:distinct 7},
-   :schema_cat {:distinct 0},
-   :table_name {:distinct 9},
-   :connection_id {:distinct 1}}},
+  :rabbit-search-like-screens
+  {:screen_name {:distinct 33},
+   :* {:rowcount 33},
+   :file_path {:distinct 33},
+   :theme_map {:distinct 27},
+   :blocks {:distinct 25},
+   :queries {:distinct 23},
+   :rrows {:distinct nil}}},
  :flow-estimates
- {:fields-sys {:times 0.003, :run-id :fields-sys},
-  :gen-viz-1048 {:times 0.01, :run-id :gen-viz-1048},
-  :agg-all-superstore {:times 0.007, :run-id :agg-all-superstore},
-  :cnt-all-superstore-3 {:times 0.005, :run-id :cnt-all-superstore-3},
-  :gen-viz-549 {:times 0.013, :run-id :gen-viz-549},
-  :superstore {:times 0.008, :run-id :superstore},
-  :tables-sys {:times 0.001, :run-id :tables-sys},
-  :query1-1 {:times 0.005, :run-id :query1-1},
-  :grouped-all-superstore-1 {:times 0.005, :run-id :grouped-all-superstore-1},
-  :new-raw-sql-2 {:times 0.002, :run-id :new-raw-sql-2},
-  :gen-viz-756-1 {:times 0.01, :run-id :gen-viz-756-1},
-  :block-67-new-clojure-c-8823 {:times 0.008, :run-id :block-67-new-clojure-c-8823},
-  :gen-viz-949 {:times 0.008, :run-id :gen-viz-949},
-  :block-60-new-clojure-10 {:times 0.016, :run-id :block-60-new-clojure-10},
-  :block-66-new-clojure-c-9918 {:times 0.01, :run-id :block-66-new-clojure-c-9918},
+ {:cnt-all-superstore-3 {:times 0.003, :run-id :cnt-all-superstore-3},
+  :superstore {:times 0.018, :run-id :superstore},
+  :new-api-call-sqlized {:times 0.005, :run-id :new-api-call-sqlized},
   :rabbit-search-like-themes {:times 0.003, :run-id :rabbit-search-like-themes},
-  :gen-viz-959-1 {:times 0.006, :run-id :gen-viz-959-1},
-  :grouped-all-superstore {:times 0.01, :run-id :grouped-all-superstore},
-  :all-superstore-3 {:times 0.016, :run-id :all-superstore-3},
-  :gen-viz-756 {:times 0.009, :run-id :gen-viz-756},
-  :agg-grouped-all-superstore-1
-  {:times 0.005, :run-id :agg-grouped-all-superstore-1},
-  :agg-grouped-all-superstore {:times 0.008, :run-id :agg-grouped-all-superstore},
-  :query7 {:times 0.012, :run-id :query7},
-  :gen-viz-959 {:times 0.005, :run-id :gen-viz-959},
-  :connections-sys {:times 0.004, :run-id :connections-sys},
-  :all-superstore {:times 0.015, :run-id :all-superstore},
+  :agg-new-api-call-sqlized {:times 0.001, :run-id :agg-new-api-call-sqlized},
+  :all-superstore-3 {:times 0.025, :run-id :all-superstore-3},
+  :query7 {:times 0.006, :run-id :query7},
   :rabbit-search-like-screens {:times 0.002, :run-id :rabbit-search-like-screens},
-  :gen-viz-994 {:times 0.012, :run-id :gen-viz-994},
-  :cnt-new-raw-sql-2 {:times 0.002, :run-id :cnt-new-raw-sql-2},
-  :cnt-all-superstore {:times 0.007, :run-id :cnt-all-superstore},
-  :query1 {:times 0.006, :run-id :query1},
-  :block-5136-new-clojure {:times 0.015, :run-id :block-5136-new-clojure}},
+  :cnt-new-raw-sql-2 {:times 0.001, :run-id :cnt-new-raw-sql-2}},
  :screen-name "late-december",
  :panel-hashes
  {:block-64 673729834,
   :block-66 1766492828,
   :block-67 1351155993,
-  :block-695 1666872905,
-  :block-684 1833239107,
   :block-61 -1158011457,
   :block-5136 -939428243,
-  :block-263 1373674838,
   :block-62 -1036148909,
-  :block-8880 -767281295,
   :block-7831 -1733966931,
   :block-488 -760269408,
-  :block-4928 1688538454,
-  :block-10207 1099655619,
   :block-689 1838638432,
-  :block-11913 -945310181,
   :block-70 -1784129399,
   :block-68 -263146135,
   :block-8193 1562989175,
-  :block-5189 735662132,
   :block-6676 -871888662,
   :block-173 -1067978404,
   :block-10955 -1205664266,
@@ -231,7 +219,6 @@
   :block-1400 1129270867,
   :block-609 -1522476013,
   :block-69 -1268122967,
-  :block-801 -1973236451,
   :block-653 -506031765,
   :block-350 -430783371,
   :block-7349 1203596686,
@@ -240,15 +227,14 @@
   :block-703 -320845073},
  :recos-page2 0,
  :selected-tab "hello-world",
- :col-names nil,
  :snapshots {:params {}},
  :recos-page 0,
  :rs-overrides-hashmap {"a-random-wow" nil},
- :user-params-hash 1578780589,
+ :user-params-hash -560222924,
  :grid-recos? true,
- :session-hash -162877865,
  :resolved-queries
- {:gen-viz-1048
+ {nil {:_last-run "07:08:20"},
+  :gen-viz-1048
   {:select [[[[:sum :quantity]] :quantity] :ship_mode],
    :from
    [[{:select
@@ -504,38 +490,6 @@
         [:= 1 1]]]}
      :subq1]],
    :group-by [:segment]},
-  :gen-viz-1042
-  {:select [[[:count 1] :rrows] :country],
-   :from
-   [[{:select
-      [:city
-       :comments
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :id
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :ssb47]],
-      :where
-      [:*if
-       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-       [:*all=
-        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-        [:state]]
-       [:= 1 1]]}
-     :subq1]],
-   :group-by [:country]},
-  :query1-2
-  {:select [:state [[:count 1] :rowcnt]],
-   :from [[:ufo_sightings :ctr5]],
-   :group-by [:state],
-   :order-by [[:rowcnt :desc]]},
   :gen-viz-949
   {:select [[[[:sum :sales]] :sales] :sub_category],
    :from
@@ -579,82 +533,7 @@
         [:= 1 1]]]}
      :subq1]],
    :group-by [:sub_category]},
-  :shape-rotation-maps-sys {:_last-run "23:05:06"},
-  :new-api-call-sqlized
-  {:select
-   [:total_wows_in_movie
-    :release_date
-    :director
-    :full_line
-    :movie
-    :year
-    :video_480p
-    :poster
-    :video_1080p
-    :video_720p
-    :audio
-    :current_wow_in_movie
-    :video_360p
-    :timestamp
-    :movie_duration
-    :character],
-   :connection-id "cache.db",
-   :_sqlized-at "2024-11-12 19:39:09",
-   :_sqlized-by [:block-10207 :api-call :new-api-call],
-   :_sqlized-hash nil,
-   :from [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]},
-  :countd-all-ufo-sightings-1
-  {:select [[[:count [:distinct :duration_hours]] :duration_hours]],
-   :from
-   [[{:select
-      [:city
-       :comments
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :id
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :ssb47]],
-      :where
-      [:*if
-       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-       [:*all=
-        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-        [:state]]
-       [:= 1 1]]}
-     :ssb45]]},
-  :agg-new-api-call-sqlized
-  {:select [[[:sum :total_wows_in_movie] :total_wows_in_movie]],
-   :from
-   [[{:select
-      [:total_wows_in_movie
-       :release_date
-       :director
-       :full_line
-       :movie
-       :year
-       :video_480p
-       :poster
-       :video_1080p
-       :video_720p
-       :audio
-       :current_wow_in_movie
-       :video_360p
-       :timestamp
-       :movie_duration
-       :character],
-      :_sqlized-at "2024-11-12 19:39:09",
-      :_sqlized-by [:block-10207 :api-call :new-api-call],
-      :_sqlized-hash nil,
-      :from
-      [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]}
-     :ssb53]]},
+  :shape-rotation-maps-sys {:_last-run "07:08:20"},
   :gen-viz-959-1
   {:select [[[[:sum :profit]] :profit] :category],
    :from
@@ -698,53 +577,6 @@
         [:= 1 1]]]}
      :subq1]],
    :group-by [:category]},
-  :countd-all-ufo-sightings
-  {:select [[[:count [:distinct :state]] :state]],
-   :from
-   [[{:select
-      [:city
-       :comments
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :id
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :ssb47]],
-      :where
-      [:*if
-       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-       [:*all=
-        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-        [:state]]
-       [:= 1 1]]}
-     :ssb10]]},
-  :all-ufo-sightings
-  {:select
-   [:city
-    :comments
-    :country
-    :date_posted
-    :datetime
-    :duration_hours
-    :duration_seconds
-    :duration_seconds_int
-    :id
-    :latitude
-    :longitude
-    :shape
-    :state],
-   :from [[:ufo_sightings :ssb47]],
-   :where
-   [:*if
-    {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-    [:*all= {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]} [:state]]
-    [:= 1 1]]},
   :grouped-all-superstore
   {:select [:category [[:count 1] :rowcnt]],
    :from
@@ -998,33 +830,6 @@
         [:= 1 1]]]}
      :subq1]],
    :group-by [:sub_category]},
-  :gen-viz-828
-  {:select [[[:count 1] :rrows] :shape],
-   :from
-   [[{:select
-      [:city
-       :comments
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :id
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :ssb47]],
-      :where
-      [:*if
-       {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-       [:*all=
-        {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]}
-        [:state]]
-       [:= 1 1]]}
-     :subq1]],
-   :group-by [:shape]},
   :all-superstore
   {:select
    [:category
@@ -1163,7 +968,9 @@
    :from [[:superstore :ctr15]],
    :group-by [:category]}},
  :panels
- {nil {:queries {:shape-rotation-maps-sys {:_last-run "23:05:06"}}},
+ {nil
+  {:queries
+   {:shape-rotation-maps-sys {:_last-run "07:08:20"}, nil {:_last-run "07:08:20"}}},
   :block-64
   {:h 5,
    :w 11,
@@ -1201,62 +1008,6 @@
    :root [33 2],
    :h 4,
    :tab "stupendous deer"},
-  :block-695
-  {:leaf-drop [:sql :count-distinct],
-   :name "block-695",
-   :w 6,
-   :selected-view :countd-all-ufo-sightings,
-   :root [28 7],
-   :h 4,
-   :connection-id "bigfoot-ufos",
-   :queries
-   {:countd-all-ufo-sightings
-    {:select [[[:count [:distinct :state]] :state]],
-     :from [[:query/all-ufo-sightings :ssb10]]}},
-   :tab "commendable snake"},
-  :block-684
-  {:shape-rotator
-   {:context ["bigfoot-ufos" nil "none" "all-ufo-sightings"],
-    :shape-name :recharts-h-bar,
-    :axes {:y "rrows", :x "country"},
-    :items [[:views :reech-2-2] [:queries :gen-viz-1042]],
-    :source-panel :block-11913},
-   :name "rrows, country",
-   :w 8,
-   :selected-view :reech-2-2,
-   :root [33 1],
-   :h 6,
-   :connection-id "bigfoot-ufos",
-   :queries
-   {:gen-viz-1042
-    {:select [[[:count 1] :rrows] :country],
-     :from [[:query/all-ufo-sightings :subq1]],
-     :group-by [:country]}},
-   :tab "commendable snake",
-   :views
-   {:reech-2-2
-    [:>
-     :ResponsiveContainer
-     {:width "100%", :height :panel-height+50}
-     [:>
-      :ComposedChart
-      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:>
-       :Tooltip
-       {:contentStyle {:backgroundColor "#00000099", :border "none"},
-        :itemStyle {:color "#ecf0f1"},
-        :labelStyle {:color "#3498db"}}]
-      [:> :XAxis {:dataKey :country, :allowDuplicatedCategory false}]
-      [:>
-       :Bar
-       {:dataKey :rrows,
-        :isAnimationActive false,
-        :data :gen-viz-1042,
-        :stroke :theme/editor-outer-rim-color,
-        :fill [:str :theme/editor-outer-rim-color "33"],
-        :on-click [:set-recharts-param>]}]]]},
-   :bid :block-684},
   :block-61
   {:w 16,
    :h 6,
@@ -1293,24 +1044,6 @@
    :root [34 7],
    :h 4,
    :tab "winter-wonder-lands"},
-  :block-263
-  {:leaf-drop [:filter :click-table],
-   :name "block-263",
-   :w 6,
-   :selected-view :query1-2,
-   :root [1 12],
-   :h 11,
-   :drop-mutate
-   {[:panels :block-11913 :queries :all-ufo-sightings :where]
-    [:*if :query1-2/*.clicked [:*all= :query1-2/*.clicked [:state]] [:= 1 1]]},
-   :connection-id "bigfoot-ufos",
-   :queries
-   {:query1-2
-    {:select [:state [[:count 1] :rowcnt]],
-     :from [[:ufo_sightings :ctr5]],
-     :group-by [:state],
-     :order-by [[:rowcnt :desc]]}},
-   :tab "commendable snake"},
   :block-62
   {:leaf-drop [:sql :new-select.all],
    :name "block",
@@ -1345,19 +1078,6 @@
      :where
      [:*if :query7/*.clicked [:*all= :query7/*.clicked [:ship_mode]] [:= 1 1]]}},
    :tab "stupendous deer"},
-  :block-8880
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-8880",
-   :w 6,
-   :selected-view :agg-new-api-call-sqlized,
-   :root [30 16],
-   :h 4,
-   :connection-id "cache.db",
-   :queries
-   {:agg-new-api-call-sqlized
-    {:select [[[:sum :total_wows_in_movie] :total_wows_in_movie]],
-     :from [[:query/new-api-call-sqlized :ssb53]]}},
-   :tab "commendable snake"},
   :block-7831
   {:leaf-drop [:filter :click-table],
    :name "block-7831",
@@ -1418,68 +1138,6 @@
         :fill [:str :theme/editor-outer-rim-color "33"],
         :on-click [:set-recharts-param>]}]]]},
    :bid :block-488},
-  :block-4928
-  {:w 7,
-   :h 4,
-   :selected-view :vv1,
-   :views
-   {:vv1
-    [:box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "181px"}
-     :child
-     "hi"]},
-   :leaf-drop [:fresh :fresh-clover],
-   :tab "commendable snake",
-   :root [9 13],
-   :name "block-4928"},
-  :block-10207
-  {:api-call
-   {:new-api-call
-    {:endpoint "https://owen-wilson-wow-api.onrender.com/wows/random",
-     :method :get,
-     :params {:results 22},
-     :flatten? true}},
-   :leaf-drop [:fresh :fresh-api-call],
-   :name "block-10207",
-   :w 9,
-   :selected-mode {:* :text},
-   :selected-view :new-api-call-sqlized,
-   :root [19 14],
-   :h 8,
-   :queries
-   {:new-api-call-sqlized
-    {:select
-     [:total_wows_in_movie
-      :release_date
-      :director
-      :full_line
-      :movie
-      :year
-      :video_480p
-      :poster
-      :video_1080p
-      :video_720p
-      :audio
-      :current_wow_in_movie
-      :video_360p
-      :timestamp
-      :movie_duration
-      :character],
-     :connection-id "cache.db",
-     :_sqlized-at "2024-11-12 19:39:09",
-     :_sqlized-by [:block-10207 :api-call :new-api-call],
-     :_sqlized-hash
-     :solver-meta/block-10207-new-api-call>output>evald-result>value-hash,
-     :from
-     [[:block_10207_new_api_call__block_10207_api_call_new_api_call_ :zz745]]}},
-   :tab "commendable snake"},
   :block-689
   {:shape-rotator
    {:context ["superstore" nil nil "all-superstore"],
@@ -1530,34 +1188,6 @@
         :fill :theme/editor-outer-rim-color,
         :onClick [:set-recharts-param>]}]]]},
    :bid :block-689},
-  :block-11913
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-11913",
-   :w 32,
-   :selected-view :all-ufo-sightings,
-   :root [1 1],
-   :h 6,
-   :connection-id "bigfoot-ufos",
-   :queries
-   {:all-ufo-sightings
-    {:select
-     [:city
-      :comments
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :id
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :ssb47]],
-     :where
-     [:*if :query1-2/*.clicked [:*all= :query1-2/*.clicked [:state]] [:= 1 1]]}},
-   :tab "commendable snake"},
   :block-70
   {:leaf-drop [:filter :click-table],
    :name "block",
@@ -1601,19 +1231,6 @@
     {:select [[[:sum :rowcnt] :rowcnt]],
      :from [[:query/grouped-all-superstore :ssb63]]}},
    :tab "winter-wonder-lands"},
-  :block-5189
-  {:leaf-drop [:sql :count-distinct],
-   :name "block-5189",
-   :w 6,
-   :selected-view :countd-all-ufo-sightings-1,
-   :root [28 11],
-   :h 4,
-   :connection-id "bigfoot-ufos",
-   :queries
-   {:countd-all-ufo-sightings-1
-    {:select [[[:count [:distinct :duration_hours]] :duration_hours]],
-     :from [[:query/all-ufo-sightings :ssb45]]}},
-   :tab "commendable snake"},
   :block-6676
   {:leaf-drop [:sql :new-group-by],
    :name "block-6676",
@@ -1870,49 +1487,6 @@
    {:cnt-all-superstore-3
     {:select [[[:count 1] :rowcnt]], :from [[:query/all-superstore-3 :ssb99]]}},
    :tab "stupendous deer"},
-  :block-801
-  {:shape-rotator
-   {:context ["bigfoot-ufos" nil "none" "all-ufo-sightings"],
-    :shape-name :recharts-h-bar,
-    :axes {:y "rrows", :x "shape"},
-    :items [[:views :reech-5-2] [:queries :gen-viz-828]],
-    :source-panel :block-11913},
-   :name "rrows, shape",
-   :w 27,
-   :selected-view :reech-5-2,
-   :root [1 7],
-   :h 5,
-   :connection-id "bigfoot-ufos",
-   :queries
-   {:gen-viz-828
-    {:select [[[:count 1] :rrows] :shape],
-     :from [[:query/all-ufo-sightings :subq1]],
-     :group-by [:shape]}},
-   :tab "commendable snake",
-   :views
-   {:reech-5-2
-    [:>
-     :ResponsiveContainer
-     {:width "100%", :height :panel-height+50}
-     [:>
-      :ComposedChart
-      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:>
-       :Tooltip
-       {:contentStyle {:backgroundColor "#00000099", :border "none"},
-        :itemStyle {:color "#ecf0f1"},
-        :labelStyle {:color "#3498db"}}]
-      [:> :XAxis {:dataKey :shape, :allowDuplicatedCategory false}]
-      [:>
-       :Bar
-       {:dataKey :rrows,
-        :isAnimationActive false,
-        :data :gen-viz-828,
-        :stroke :theme/editor-outer-rim-color,
-        :fill [:str :theme/editor-outer-rim-color "33"],
-        :on-click [:set-recharts-param>]}]]]},
-   :bid :block-801},
   :block-653
   {:shape-rotator
    {:context ["superstore" nil nil "all-superstore"],
@@ -2282,68 +1856,77 @@
   :render-hash
   {:reco-preview-c--1304604038 -208031712,
    :reco-preview-c--1437203282 367291304,
-   :block-64 -2020387490,
+   :block-64 475209648,
    :reco-preview-c-1493745837 -1974939890,
-   :block-66 541232233,
+   :block-66 -175716309,
    :reco-preview-c-136311665 1280738163,
    :reco-preview-c--1893274445 1225905748,
-   :block-67 -1129908000,
-   :block-61 -1266159573,
+   :block-67 983093360,
+   :block-695 251825180,
+   :block-684 -356133880,
+   :block-61 1603197449,
    :reco-preview-c--542155017 -1511512628,
    :reco-preview-c--1095661881 -1104230435,
    :reco-preview-c--974498523 1476167793,
-   :block-5136 770669559,
+   :block-5136 847216939,
    :reco-preview-c-1882298790 953647653,
    :reco-preview-c--1508842088 563411412,
-   :block-62 -295864742,
+   :block-263 672353960,
+   :block-62 -569282003,
    :reco-preview-c--2084306419 -13408908,
    :reco-preview-c-215168124 -1850302678,
+   :block-8880 554623272,
    :reco-preview-c-468075746 50514774,
    :reco-preview-c--433267488 -1858661352,
    :reco-preview-c-156081705 -709093081,
-   :block-7831 785534830,
+   :block-7831 1071892815,
    :reco-preview-c--1762567628 1291085746,
    :reco-preview-c--347147715 -1129292042,
-   :block-488 -1875794870,
-   :block-689 1766328660,
-   :block-70 1586393458,
-   :block-68 -212019325,
+   :block-488 -2145323479,
+   :block-4928 -370545852,
+   :block-10207 -1664694792,
+   :block-689 366467707,
+   :block-11913 1359634023,
+   :block-70 1102510297,
+   :block-68 1827537010,
    :reco-preview-c--615402623 581351251,
    :reco-preview-c--1563280328 1719934140,
    :reco-preview-c--1747850972 -1338970690,
    :reco-preview-c-1907489029 1558404725,
-   :block-8193 919410574,
+   :block-8193 -1490563556,
    :reco-preview-c--1828939505 -2069802437,
    :reco-preview-c--1589047325 2111547553,
    :reco-preview-c--1543793037 -71047088,
-   :block-6676 -1972595920,
-   :block-173 -473971284,
-   :block-10955 -1099232418,
-   :block-65 -2120929209,
+   :block-5189 1359372162,
+   :block-6676 -741225043,
+   :block-173 1345648136,
+   :block-10955 -825569364,
+   :block-65 -1536035970,
    :reco-preview-c-1259448914 821123518,
    :reco-preview-c-1632772356 -461682121,
-   :block-10081 977699676,
+   :block-10081 -791632299,
    :reco-preview-c--382821769 1924127836,
-   :block-172 -2080609415,
+   :block-172 1846334776,
    :reco-preview-c-984656818 282962400,
-   :block-63 -2128196401,
-   :block-60 1132787807,
+   :block-63 -1195859606,
+   :block-60 1711352658,
    :reco-preview-c-1815103254 1722788065,
-   :block-1400 1624081189,
+   :block-1400 415233083,
    :reco-preview-c--1628194406 -1894216643,
-   :block-609 -1665181408,
+   :block-609 -1085855711,
    :reco-preview-c-1408340363 109008992,
-   :block-69 -1252235418,
-   :block-653 -1263545394,
-   :block-350 529254431,
-   :block-7349 1433526765,
-   :block-411 639537840,
-   :block-7312 -329345641,
+   :block-69 -699548533,
+   :block-801 -500156492,
+   :block-653 1262625101,
+   :block-350 949928286,
+   :block-7349 -357473465,
+   :block-411 1211791050,
+   :block-7312 -616637999,
    :reco-preview-c-587975079 1502633646,
    :reco-preview-c--937291242 -892607744,
    :reco-preview-c--1227832312 -1173691948,
    :reco-preview-c--1841545982 1417302022,
-   :block-703 -2059322366,
+   :block-703 598867477,
    :reco-preview-c-1696758130 -1813527834},
   :tables-sys
   {:db_schema "none",
@@ -2367,16 +1950,18 @@
    :superstore -1729702703,
    :tables-sys -421067991,
    :query-preview-c-587975079 -33955596,
-   :rabbit-search-like 392480071,
+   :rabbit-search-like 81709062,
    :query-preview-c--1589047325 1382882323,
    :query1-1 -1107101262,
    :grouped-all-superstore-1 -307045437,
-   :new-raw-sql-2 -768424915,
+   :new-raw-sql-2 1513916003,
    :query-preview-c-468075746 828617448,
    :query-preview-c--1747850972 125020555,
    :query-preview-c-1907489029 125020555,
    :query-preview-c--1828939505 -1744377054,
    :gen-viz-756-1 1848901353,
+   :gen-viz-1042 1009718895,
+   :query1-2 -1240749694,
    :query-preview-c-136311665 1382882323,
    :query-preview-c--433267488 -1744377054,
    :query-preview-c-1632772356 178687651,
@@ -2384,6 +1969,7 @@
    :gen-viz-949 -851599826,
    :query-preview-c--1095661881 178687651,
    :query-preview-c-156081705 1382882323,
+   :block_10207_new_api_call__block_10207_api_call_new_api_call_ -979865824,
    :query-preview-c--1437203282 125020555,
    :query-preview-c--382821769 -1401420875,
    :query-preview-c--937291242 1382882323,
@@ -2391,10 +1977,15 @@
    :query-preview-c--1227832312 -1744377054,
    :new-clojure-c-9918 1127091544,
    :query-preview-c-1259448914 -1917850872,
-   :rabbit-search-like-themes 1387041528,
+   :new-api-call-sqlized 1966145063,
+   :countd-all-ufo-sightings-1 -609735641,
+   :rabbit-search-like-themes -1098663731,
    :cnt-all-superstore-3-c--1563280328 -924564367,
+   :agg-new-api-call-sqlized -819709931,
    :gen-viz-959-1 1472207517,
    :query-preview-c-1493745837 1382882323,
+   :countd-all-ufo-sightings 1417233978,
+   :all-ufo-sightings -1576062818,
    :grouped-all-superstore -2030464101,
    :all-superstore-3 -1403966457,
    :gen-viz-756 -1252603284,
@@ -2403,13 +1994,15 @@
    :query7 1581042951,
    :query-preview-c-215168124 -215594228,
    :gen-viz-959 1382882323,
+   :gen-viz-828 919295485,
+   :ufo_sightings -271908508,
    :connections-sys 1758142944,
    :all-superstore 1943520345,
    :query-preview-c--1304604038 -215594228,
    :query-preview-c--2084306419 828617448,
    :query-preview-c--1762567628 134641042,
    :query1-c--1841545982 1581042951,
-   :rabbit-search-like-screens 503020726,
+   :rabbit-search-like-screens -1227568651,
    :cnt-new-raw-sql-2-c-1815103254 -1524008141,
    :query-preview-c--1628194406 -33955596,
    :gen-viz-994 -721205234,
@@ -2628,10 +2221,10 @@
    :base>narrative-22>vibes? true,
    :base>narrative-22>gopv ["test" "test3" "test4"],
    :base>narrative-22>mappy {:map 34}},
-  :sys {:selected-tab "baby-blue heron", :selected-tab-idx 3},
+  :sys {:selected-tab "hello-world", :selected-tab-idx 2},
   :kits-sys
   {:enabled
    [[:query-basics-1 :buffy] [:grab-bag :buffy] [:query-basics-1 :outliers]]},
   :query1-2.* {:state ["wa" "fl" "tx" "ny" "on" "ca" "pa" "mi" "nj" "va"]},
   :query1.* {:category ["Technology" "Furniture"]}},
- :selected-flow "my-new-flow3262"}
+ :selected-flow "my-new-flow2920"}

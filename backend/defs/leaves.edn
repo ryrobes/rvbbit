@@ -64,14 +64,15 @@
 
   :repl-add-types* (fn [{:keys [drag-field drag-meta parent-metadata]}] ;; data-ref.data-trigger.render-trigger
                      (let [ttype (get drag-meta :type)
+                           dtype (get drag-meta :data-type)
                            ;_ (pp [:drag-meta drag-meta])
                            ]
-                       (cond ;(= ttype ":field") [:data-ref]
+                       (cond (and (contains? #{"float" "string"} dtype) (= ttype :field)) [:data-ref :data-ref+sum]
                              ;(or (= ttype ":param") (= ttype ":where")) [:data-ref]
-                         (= ttype :query) [:data-ref :data-trigger]
-                         (= ttype :view)  [:render-trigger :data-ref]
-                         (= ttype :data)  [:render-trigger :data-ref :data-trigger] ;; repls and runners
-                         :else [:data-ref])))
+                             (= ttype :query) [:data-ref :data-trigger]
+                             (= ttype :view)  [:render-trigger :data-ref]
+                             (= ttype :data)  [:render-trigger :data-ref :data-trigger] ;; repls and runners
+                             :else [:data-ref])))
 
   :pivotable-dims* (fn [{:keys [drag-field drag-meta parent-metadata]}]
                      (vec
@@ -98,6 +99,19 @@
                            (or
                             (not (empty? (get-in metadata [:fields (get drag-meta :param-field)])))
                             (not (empty? (get-in metadata [:fields (get drag-field :name)])))))
+
+  :target-is-group-by?  (fn [{:keys [body]}] ;; already has group-by or is all agg
+                          (try
+                            (or
+                            ;; Has explicit group-by clause
+                             (true? (not (empty? (get body :group-by))))
+                            ;; Or all selects are aggregations
+                             (let [select-items (get body :select [])
+                                   agg-fns #{:count :sum :avg :min :max :distinct}]
+                               (and
+                                (not (empty? select-items))
+                                (every? vector? select-items))))
+                            (catch Exception _ false)))
 
   :parent-has-field?     (fn [{:keys [drag-field drag-meta parent-metadata]}]
                            (or
@@ -208,6 +222,7 @@
                                 [:or [:in :drag-field/data-type ["float" "integer" "decimal"]]]
                                 :drag-from-same-connection?
                                 :is-query?
+                                :target-is-group-by?
                                 ;[:not :is-view?]
                                 ;:parent-has-field?
                                 [:not :target-has-field?]
@@ -220,19 +235,23 @@
                      :parent-has-field?
                      [:not :target-has-field?]
                      [:not :is-self?]]
-  :sql/add-count-distinct [:add-compat-dim?]
+
+  :sql/add-count-distinct [:and
+                           :add-compat-dim?
+                           :target-is-group-by?]
+
   :sql/add-group-by [:add-compat-dim?]
 
   :vega/facet.column.row.2cols.3cols.4cols [:and
-                          :drag-field/dimension?
-                          :grandparent-has-field?
+                                            :drag-field/dimension?
+                                            :grandparent-has-field?
                           ;[:= :generated? true]
-                          :drag-field/facet-cardinality?
-                          :is-vega-lite?
-                          :drag-from-same-connection?
+                                            :drag-field/facet-cardinality?
+                                            :is-vega-lite?
+                                            :drag-from-same-connection?
                           ;:parent-has-field?
                           ;[:not :is-self?]
-                          ]
+                                            ]
 
   :pivot/add-as.column.row [:and
                             :drag-field/dimension?
@@ -533,9 +552,13 @@
 
                                    (= dtype :field) ;; field (will be BE filled)
                                    {(keyword (clojure.string/replace (str "all-" (get-in dragging-body [:drag-meta :target])) ":" ""))
-                                    (list 'mapv
-                                          (get-in dragging-body [:drag-meta :target])
-                                          (keyword (clojure.string/replace (str "data/" src-table-string) ":" "")))}
+                                    (cond (= drop-type :data-ref+sum)
+                                          (list 'apply '+ (list 'mapv
+                                                                (get-in dragging-body [:drag-meta :target])
+                                                                (keyword (clojure.string/replace (str "data/" src-table-string) ":" ""))))
+                                          :else (list 'mapv
+                                                      (get-in dragging-body [:drag-meta :target])
+                                                      (keyword (clojure.string/replace (str "data/" src-table-string) ":" ""))))}
 
                                    (= dtype :view) ;; field (will be BE filled)
                                    {(keyword (clojure.string/replace (str "render-trigger-" (get-in dragging-body [:drag-meta :target])) ":" ""))
@@ -575,7 +598,13 @@
                                     (vec new-bindings)
                                     unwrapped-view)))]
              {target-kp new-body}))}
-  :view        {:generic-clover-drop (fn [{:keys [drag-meta dragging-body]}]  ;; blocks are already constructed in the drag-body
+  :view        {:query-actions.promote.delete
+                (fn [{:keys [drag-meta target-kp dragging-body]}]  ;; blocks are already constructed in the drag-body
+                  (let [op :*arg]
+                    ;(println op target-kp)
+                    (when (= op :promote)
+                      {target-kp [:materialize-sql (last target-kp)]})))
+                :generic-clover-drop (fn [{:keys [drag-meta dragging-body]}]  ;; blocks are already constructed in the drag-body
                                        (dissoc dragging-body :drag-meta :conditionals))
                 :viz-reco-drop (fn [{:keys [drag-meta dragging-body]}]
                                  (dissoc dragging-body :drag-meta :conditionals))
@@ -684,6 +713,64 @@
                                 aa (vec (remove (fn [x] (= (first x) source-field)) (get target-query :agg-specs)))
                                 target-query (-> target-query (assoc :row-keys rr) (assoc :column-keys cc) (assoc :agg-specs aa))]
                             {target-kp target-query}))}
+
+;;          (let [existing (get-in db [:panels panel-key :queries query-key :style-rules] {})
+;;         heatmap? (true? (= clause-conform :heatmap))
+;;         rname    (keyword (str (if heatmap? "heatmap-" "highlight-") (rand-int 12345)))]
+;;     (assoc-in db
+;;               [:panels panel-key :queries query-key :style-rules]
+;;               (merge existing
+;;                      {(if (= clause-conform :heatmap) [(get-in drop-data [:drag-body :param-field]) rname] [:* rname])
+;;                       {:logic (if (= clause-conform :heatmap)
+;;                                 true
+;;                                 [(condp = clause-conform :highlight= := :highlight> :> :highlight< :<)
+;;                                  (get-in drop-data [:drag-body :param-field]) (get-in drop-data [:drag-body :param-full])])
+;;                        :style (merge {:background-color (if (= clause-conform :heatmap)
+;;                                                           [:heatmap] ;; :PuOr :11 :asc
+;;                                                           "#008b8b66")
+;;                                       :border           "1px solid #00000000"}
+;;                                      (if (= clause-conform :heatmap) {:color "#000000"} {}))}})))
+
+  :formatting {:highlight-rows.<.>.<=.>=.<>.=
+               (fn [{:keys [source-kp drag-meta source-block dragging-body source-query target-kp target-block target-query source-field]}]
+                 (let [clause-conform :*arg
+                       {:keys [param-full param-field]} drag-meta
+                       heatmap? (true? (= clause-conform :heatmap))
+                       rname    (keyword (str (if heatmap? "heatmap-" "highlight-") (rand-int 12345)))
+                       existing (get target-query :style-rules {})
+                       existing (merge existing
+                                       {(if (= clause-conform :heatmap) [source-field rname] [:* rname])
+                                        {:logic (if (= clause-conform :heatmap)
+                                                  true
+                                                  [clause-conform ;(condp = clause-conform :highlight= := :highlight> :> :highlight< :<)
+                                                   param-field param-full])
+                                         :style (merge {:background-color (if (= clause-conform :heatmap)
+                                                                            [:heatmap nil nil :asc] ;; :PuOr :11 :asc
+                                                                            :theme/pop-1)
+                                                        :border           "1px solid #00000000"}
+                                                       (if (= clause-conform :heatmap) {:color "#000000"} {}))}})
+                       target-query (assoc target-query :style-rules existing)]
+                   {target-kp target-query}))
+
+               :column-heatmap (fn [{:keys [source-kp source-block dragging-body source-query target-kp target-block target-query source-field]}]
+                                 (let [clause-conform :heatmap
+                                       heatmap? (true? (= clause-conform :heatmap))
+                                       rname    (keyword (str (if heatmap? "heatmap-" "highlight-") (rand-int 12345)))
+                                       existing (get target-query :style-rules {})
+                                       existing (merge existing
+                                                       {(if (= clause-conform :heatmap) [source-field rname] [:* rname])
+                                                        {:logic (if (= clause-conform :heatmap)
+                                                                  true
+                                                                  [(condp = clause-conform :highlight= := :highlight> :> :highlight< :<)
+                                                                   source-field (get dragging-body :param-full)])
+                                                         :style (merge {:background-color (if (= clause-conform :heatmap)
+                                                                                            [:heatmap nil nil :asc] ;; :PuOr :11 :asc
+                                                                                            "#008b8b66")
+                                                                        :border           "1px solid #00000000"}
+                                                                       (if (= clause-conform :heatmap) {:color "#000000"} {}))}})
+                                       target-query (assoc target-query :style-rules existing)]
+                                   {target-kp target-query}))}
+
   :sql    {:split-date (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field target-db-type]}]
                          (let [existing-group-by (get target-query :group-by [])
                                date-in-group-by? (some (fn [x] (= source-field x)) existing-group-by)
@@ -717,29 +804,29 @@
                                             (assoc :group-by new-group-by)))}))
 
            :pivot.pivotable-dims (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
-                                       (let [pivot-field :*arg
-                                             agg-field source-field
-                                             existing-q target-query
-                                             remove-key (fn [coll key]
-                                                          (vec (mapcat (fn [item]
-                                                                         (cond (keyword? item) (when (not= key item) [item])
-                                                                               (vector? item)  (let [last-in-vector (last item)]
-                                                                                                 (if (and (keyword? last-in-vector) (= key last-in-vector)) [] [item]))
-                                                                               :else           [item]))
-                                                                       coll)))
-                                             aggy (if (= agg-field :rowcnt) :count [:sum agg-field])
-                                             pivot-by-map {pivot-field [aggy
-                                                                        {:select-distinct [pivot-field]
-                                                                         :from            [[existing-q (keyword (str "pivotq"))]]}]}
-                                             new-query    (-> existing-q
-                                                              (assoc :pivot-by pivot-by-map)
-                                                              (assoc :select (remove-key (get existing-q :select) pivot-field))
-                                                              (assoc :group-by (remove-key (get existing-q :group-by) pivot-field)))
+                                   (let [pivot-field :*arg
+                                         agg-field source-field
+                                         existing-q target-query
+                                         remove-key (fn [coll key]
+                                                      (vec (mapcat (fn [item]
+                                                                     (cond (keyword? item) (when (not= key item) [item])
+                                                                           (vector? item)  (let [last-in-vector (last item)]
+                                                                                             (if (and (keyword? last-in-vector) (= key last-in-vector)) [] [item]))
+                                                                           :else           [item]))
+                                                                   coll)))
+                                         aggy (if (= agg-field :rowcnt) :count [:sum agg-field])
+                                         pivot-by-map {pivot-field [aggy
+                                                                    {:select-distinct [pivot-field]
+                                                                     :from            [[existing-q (keyword (str "pivotq"))]]}]}
+                                         new-query    (-> existing-q
+                                                          (assoc :pivot-by pivot-by-map)
+                                                          (assoc :select (remove-key (get existing-q :select) pivot-field))
+                                                          (assoc :group-by (remove-key (get existing-q :group-by) pivot-field)))
 
-                                             new-query    (if (empty? (get new-query :group-by)) ;; if no group by, remove it - single dim, measure pivots
-                                                            (dissoc new-query :group-by)
-                                                            new-query)]
-                                         {target-kp new-query}))
+                                         new-query    (if (empty? (get new-query :group-by)) ;; if no group by, remove it - single dim, measure pivots
+                                                        (dissoc new-query :group-by)
+                                                        new-query)]
+                                     {target-kp new-query}))
 
            :add-group-by (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
                            (let [existing-group-by (get target-query :group-by [])
@@ -761,9 +848,16 @@
                                   {target-deep-keypath-ob order-by}))
 
            :remove-field (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
-                           (let [order-by (vec (remove (fn [x] (= x source-field)) (get target-query :select [])))
-                                 target-deep-keypath-ob (conj target-kp :select)]
-                             {target-deep-keypath-ob order-by}))
+                           (let [select (vec (remove (fn [x] (or (= x source-field) (and (vector? x) (= (last x) source-field))))
+                                                     (get target-query :select [])))
+                                 order-by (vec (remove (fn [x] (or (= x source-field) (and (vector? x) (= (first x) source-field))))
+                                                       (get target-query :order-by [])))
+                                 target-query (-> target-query (assoc :select select) (assoc :order-by order-by))
+                                 target-query (if (empty? order-by) (dissoc target-query :order-by) target-query)
+                                 ;target-deep-keypath-sel (conj target-kp :select)
+                                 ;target-deep-keypath-ob (conj target-kp :order-by)
+                                 ]
+                             {target-kp target-query}))
 
            :new-select.all.count (fn [{:keys [drag-meta]}]
                                    (let [{:keys [connection-id type source-table table-fields]} drag-meta
@@ -823,6 +917,24 @@
                                                :connection-id connection-id
                                                :selected-view qname
                                                :queries {qname query}}))
+
+           :add-agg.sql-agg-types (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                                    (let [agg-type :*arg
+                                          new-select (conj (vec (get target-query :select))
+                                                           [[agg-type source-field]
+                                                            (keyword (cstr/replace (str source-field "_" agg-type) ":" ""))])
+                                          target-deep-keypath (conj target-kp :select)]
+                                      ;(println "add-agg " new-select)
+                                      {target-deep-keypath new-select}))
+
+           :add-count-distinct  (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
+                                  (let [agg-type :cntd
+                                        new-select (conj (vec (get target-query :select))
+                                                         [[:count [:distinct source-field]]
+                                                          (keyword (cstr/replace (str source-field "_" agg-type) ":" ""))])
+                                        target-deep-keypath (conj target-kp :select)]
+                                    {target-deep-keypath new-select}))
+
            :count-distinct (fn [{:keys [drag-meta]}]
                              (let [{:keys [connection-id source-query source-table target table-fields]} drag-meta
                                    qname (keyword (str "countd-"

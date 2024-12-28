@@ -1,4 +1,6 @@
-{:codemirror-theme "rvbbit-dynamic"
+{:theme-name "synthwave-winter"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#06142e"
  :pop-2 "#ff2d89"
  :base-block-style
@@ -9,46 +11,75 @@
     :border "1px solid rgba(255, 45, 137, 0.2)"
     :box-shadow
       "inset 0 0 40px #00000088,                                        inset 0 0 80px #ff2d8908,                                       0 0 1px #ff2d89aa,                                       0 0 40px #00000088,                                       0 0 50px #00e5ff22"}
- :vega-defaults {:mark    {:font "Outrun future" :stroke "#ff2d89" :color "#ff2d8965"}
-                 :legend  {:labelFont  "Outrun future"
-                           :legendFont "Outrun future"
-                           :labelColor "#ffffff"
-                           :titleColor "#ffffff"
-                           :stroke     "#ff2d89"
-                           :titleFont  "Outrun future"}
-                 :header  {:labelFont "Outrun future" :titleFont "Outrun future" :titleColor "#ffffff"}
-                 :title   {:font         "Outrun future"
-                           :subtitleFont "Outrun future"
-                           :labelFont    "Outrun future"
-                           :titleFont    "Outrun future"
-                           :titleColor   "#ffffff"}
-                 :point   {:font "Outrun future" :stroke "#ff2d89" :color "#ff2d8965"}
-                 :area    {:font "Outrun future" :stroke "#ff2d89" :color "#ff2d8965"}
-                 :axis    {:domainColor "#ff2d8944"
-                           :grid        true
-                           :font        "Outrun future"
-                           :labelColor  "#ffffff"
-                           :titleFont   "Outrun future"
-                           :titleColor  "#ffffff"
-                           :labelFont   "Outrun future"
-                           :domain      false
-                           :gridColor   "#00e5ff22"
-                           :tickColor   "#ff2d8944"
-                           :axisFont    "Outrun future"}
-                 :tooltip {:fill "#06142edd" :stroke "#ff2d89" :strokeWidth 1 :color "#ffffff"}
-                 :view    {:stroke "transparent"}}
+ :vega-defaults
+   {:mark    {:font "Outrun future" :stroke "#ff2d89" :color "#ff2d8965"}
+    :legend  {:labelFont  "Outrun future"
+              :legendFont "Outrun future"
+              :labelColor "#ffffff"
+              :titleColor "#ffffff"
+              :stroke     "#ff2d89"
+              :titleFont  "Outrun future"}
+    :header  {:labelFont "Outrun future" :titleFont "Outrun future" :titleColor "#ffffff" :labelColor "#f2e8ff"}
+    :title   {:font         "Outrun future"
+              :subtitleFont "Outrun future"
+              :labelFont    "Outrun future"
+              :titleFont    "Outrun future"
+              :titleColor   "#ffffff"}
+    :point   {:font "Outrun future" :stroke "#ff2d89" :color "#ff2d8965"}
+    :area    {:font "Outrun future" :stroke "#ff2d89" :color "#ff2d8965"}
+    :axis    {:domainColor "#ff2d8944"
+              :grid        true
+              :font        "Outrun future"
+              :labelColor  "#ffffff"
+              :titleFont   "Outrun future"
+              :titleColor  "#ffffff"
+              :labelFont   "Outrun future"
+              :domain      false
+              :gridColor   "#00e5ff22"
+              :tickColor   "#ff2d8944"
+              :axisFont    "Outrun future"}
+    :tooltip {:fill "#06142edd" :stroke "#ff2d89" :strokeWidth 1 :color "#ffffff"}
+    :view    {:stroke "transparent"}}
  :grid-selected-column-css
    {:background-color "#ff2d8915"
     :filter           "none"
     :backdrop-filter  "blur(20px) brightness(130%)"
     :box-shadow       "0 0 40px #ff2d8933,                                              inset 0 0 20px #00e5ff22"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
  :base-block-color-selected "#0a1f3d"
  :block-title-font-color "#ffffff"
+ :universal-pop-color "#9973e0"
  :base-block-color "#06142ecc"
  :pop-3 "#00e5ff"
  :editor-rim-color "#ff2d89"
  :base-block-filter-selected "none"
- :_vega-default-color-scheme {:scheme "custom"}
+ :vega-default-color-scheme {:scheme "category20b"}
  :data-colors {"float"       "#ff2d89"
                "boolean"     "#00e5ff"
                "map"         "#ffffff"
@@ -65,6 +96,7 @@
  :editor-grid-selected-font-color "#ffffff"
  :monospaced-font "Source Code Pro"
  :editor-grid-selected-background-color "#ff2d89"
+ :_vega-default-color-scheme {:scheme "custom"}
  :nivo-defaults
    {:font-family "Outrun future"
     :labels {:text {:fill "#ffffff" :font-size "15px" :font-family "Outrun future" :font-weight 400}}
@@ -90,17 +122,17 @@
  :block-title-selected-font-color "#ffffff"
  :grid-selected-background-color "#ff2d89"
  :grid-font-color "#ffffff"
- :canvas-background-css {:background "linear-gradient(180deg, rgba(6,20,46,0.85) 0%, rgba(6,20,46,0.92) 100%)"
-                         :background-blend-mode "soft-light"
-                         :background-size "cover"
-                         :background-image "url(assets/openai-images/b64-image3-8649-91720.png)"
-                         :transition "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                         :background-color "#06142e"}
+ :canvas-background-css
+   {:background-blend-mode "soft-light"
+    :background-size "cover"
+    :background
+      "url(images/synthwave-winter.webp-q8.jpg), linear-gradient(180deg, rgba(6,20,46,0.45) 0%, rgba(6,20,46,0.92) 100%)"
+    :transition "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+    :background-color "#06142e"}
  :editor-font-color "#ffffff"
+ :line-style "curved-path-h"
  :base-font "Outrun future"
  :block-tab-selected-font-color "#ffffff"
  :editor-background-color "#06142e"
  :editor-grid-font-color "#ffffff"
  :pop-1 "#0a1f3d"}
-
-

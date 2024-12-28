@@ -212,7 +212,8 @@
                                                (to-sql {:insert-into [:themes]
                                                         :columns     [:file_path :theme_name :theme_map]
                                                         :values      [[f-path theme-name (pr-str theme-map)]]}))
-                                     (ut/pp [:theme theme-name]))
+                                     ;(ut/pp [:theme theme-name])
+                                     )
                                    (catch Throwable e
                                      (println "Error in update-theme-meta:" (.getMessage e))
                                      (.printStackTrace e))))))
@@ -225,7 +226,9 @@
                                  (try
                                    (let [;file-path "./screens/"
                                          screen-data      (read-screen f-path)
+                                         no-name?         (nil? (get screen-data :screen-name))
                                          screen-name      (get screen-data :screen-name "unnamed-screen!")
+                                         screen-data      (if no-name? (assoc screen-data :screen-name screen-name) screen-data)
                                          resolved-queries (get screen-data :resolved-queries)
                                          materialized-theme (get screen-data :materialized-theme)
                                          screen-data      (if (ut/ne? resolved-queries)
@@ -528,6 +531,7 @@
 ;;           (assoc :ended (try (rvbbit-backend.util/ms-to-iso8601 (get vv :ended)) (catch Exception _ -1))))})))
 
 ;; (rvbbit-backend.util/ms-to-iso8601 (System/currentTimeMillis))
+;; (ut/pp @wss/solvers-atom)
 
 (defn update-all-conn-meta []
   (let [prefix "connections/"
@@ -546,44 +550,32 @@
                   _ (when (not solver-exist?)
                       (ut/pp [:refresh-metadata-schedule-being-created-for conn-name :as solver-name])
                       (swap! wss/solvers-atom assoc solver-name (db-sniff-solver-default f-path conn-name)) ;; TODO why does this fail now?
-                      (fpop/freeze-atom solver-edn-fp)
-                      (ut/zprint-file solver-edn-fp {:style [:justified-original] :parse-string? true
-                                                     :comment {:count? nil :wrap? nil} :width 120
-                                                     :map {:comma? false :sort? false}})
+                      ;; (fpop/freeze-atom solver-edn-fp)
+                      ;; (ut/zprint-file solver-edn-fp {:style [:justified-original] :parse-string? true
+                      ;;                                :comment {:count? nil :wrap? nil} :width 120
+                      ;;                                :map {:comma? false :sort? false}})
                       (wss/reload-solver-subs))
                   conn      (edn/read-string (slurp f-path))
                   poolable? (try (and (map? conn) (find conn :jdbc-url)) (catch Exception _ false))
                   conn      (if poolable?
                               (try {:pre-filter-fn (get conn :pre-filter-fn)
                                     :datasource @(pool-create conn (str conn-name))}
-                                   (catch Exception e (do (ut/pp [:connection-error conn-name e]) {:datasource nil})))
-                              conn)]]
+                                   (catch Exception e (do
+                                                        ;;(ut/pp [:connection-error conn-name e])
+                                                        (println (rota/make-error-box conn-name e "CONNECTION"))
+                                                        {:datasource nil})))
+                              conn)
+                  _ (when poolable? (swap! db/conn-map assoc conn-name conn))]]
       (try ;; connection errors, etc
-        (do (when poolable? (swap! db/conn-map assoc conn-name conn))
-            (when harvest-on-boot?
-              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run f-path)))
-              ;(qp/slot-queue :schema-sniff f
-              ;; (ppy/execute-in-thread-pools :conn-schema-sniff-serial
-              ;;                              (fn []
-              ;;                               ;;  (time
-              ;;                               ;;   (cruiser/lets-give-it-a-whirl-no-viz f-path
-              ;;                               ;;                                        conn
-              ;;                               ;;                                        system-db
-              ;;                               ;;                                        cruiser/default-sniff-tests
-              ;;                               ;;                                        cruiser/default-field-attributes
-              ;;                               ;;                                        cruiser/default-derived-fields
-              ;;                               ;;                                        cruiser/default-viz-shapes))
-              ;;                               ;;  (time (ut/pp [:shape-rotator-fields
-              ;;                               ;;                (let [res (rota/get-field-maps {:f-path f-path
-              ;;                               ;;                                                :shape-test-defs cruiser/default-sniff-tests
-              ;;                               ;;                                                :shape-attributes-defs cruiser/default-field-attributes
-              ;;                               ;;                                                :filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
-              ;;                               ;;                                                :pre-filter-fn nil})
-              ;;                               ;;                      combo-viz (rota/get-viz-shape-blocks res cruiser/default-viz-shapes)]
-              ;;                               ;;                  [:boot :fields (count res) :viz (count combo-viz)])]))
-              ;;                                (ppy/execute-in-thread-pools :shape-rotation-jobs-serial (fn [] (rota/shape-rotation-run f-path)))
-              ;;                                ))
-              ))
+        (let [connection-id (rota/get-connection-id f-path)
+              last-run (get-in @db/shape-rotation-status [connection-id :all :ended])
+              twenty-four-hours-ms (* 24 60 60 1000)  ; 24 hours in milliseconds
+              recently-harvested? (and last-run
+                                       (< (- (System/currentTimeMillis) last-run)
+                                          twenty-four-hours-ms))]
+          (when recently-harvested? (ut/pp ["🥔" :connection-id connection-id :was-harvested-less-than-24-hours-ago :skipping]))
+            (when (and harvest-on-boot? (not recently-harvested?))
+              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run f-path)))))
         (catch Exception e (do (swap! db/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))
     ;; (cruiser/clean-up-some-db-metadata current-conn-ids)
     ))
@@ -920,7 +912,7 @@
 (defonce scheduled-tasks (atom {}))
 
 (defn start-scheduler [secs f name-str & [delay]]
-  (ut/pp ["Starting scheduler" name-str "every" secs "seconds"])
+  (ut/pp [(rand-nth ["🕘" "🕒" "⏳" "⏰"]) :starting-scheduler name-str (str "every " (ut/format-duration-seconds secs))])
   (let [delay (or delay 0)
         task (.scheduleAtFixedRate ppy/general-scheduler-thread-pool
                                    (reify Runnable
@@ -1234,14 +1226,14 @@
     (println " ")
     (ut/print-ansi-art "data/nname.ans")
     (ut/print-ansi-art "data/rrvbbit.ans")
-    (ut/pp [:version "0.2.0-alpha" :december-2024 "Snow Hare"])
+    (ut/pp [:version "snowshoe-hare.0.2.0" :december-28-2024])
     ;; (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
     (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   ;; (println " ")
   ;; (wss/fig-render "Curiouser and curiouser!" :pink)
 
    ;; create dirs for various artifacts, if not already present
-    (ut/pp [:creating-dirs...])
+    (ut/pp ["🚽" :creating-dirs...])
     (doseq [dir ["assets" "assets/snaps" "assets/screen-snaps" "defs/backup" "db/parquet"
                  ;; "db/xtdb-system/tx-log" "db/xtdb-system/storage"
                  "flow-logs" "flow-blocks" "flow-history" "live"]]
@@ -1260,9 +1252,12 @@
   ;;                                    ;; :max-cache-entries 536870912
   ;;                                   }]})
 
-
-    (ut/pp [:clearing-live-folder...])
+    (ut/pp ["🧼" :clearing-live-folder...])
     (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+
+    (ut/pp ["🧽" :clearing-old-macro-undo-snap-folder...])
+    (shell/sh "/bin/bash" "-c" (str "rm -rf " "assets/snaps/*"))
+
     (ut/pp [:get-ai-workers...])
     (get-ai-workers) ;; just in case for the cold boot atom has no
 
@@ -1421,13 +1416,22 @@
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce system-dbs ;; for default shape rotation
-      [system-db systemh2-db import-db cache-db stack-db cache-db-memory])
+      [;system-db
+       systemh2-db
+       ;import-db
+       cache-db stack-db cache-db-memory])
 
-    (ppy/execute-in-thread-pools
-     :shape-rotation-jobs-wrapper
-     (fn [] (doseq [db system-dbs]
-              (ut/pp [:sniff-on-sys-db (str db)])
-              (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run db))))))
+    ;; (ppy/execute-in-thread-pools
+    ;;  :shape-rotation-jobs-wrapper
+    ;;  (fn [] (doseq [db system-dbs]
+    ;;           (ut/pp [:sniff-on-sys-db (str db)])
+    ;;           (ppy/execute-in-thread-pools :shape-rotation-jobs (fn [] (rota/shape-rotation-run db))))))
+
+    ;; (ut/pp [:harvesting-metadata-from-system-dbs :please-wait... ])
+    (go
+      (doseq [db system-dbs]
+        (ut/pp [:sniff-on-sys-db (str db)])
+        (ppy/execute-in-thread-pools :shape-rotation-jobs-internal (fn [] (rota/shape-rotation-run db)))))
 
   ;; (start-scheduler 15
   ;;                  #(let [ddiff (- (System/currentTimeMillis)  (get-in @wss/rvbbit-client-sub-values [:unix-ms]))]

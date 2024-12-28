@@ -524,6 +524,14 @@
 
 ;; (ut/tracked-dispatch [::update-poller-interval [:rvbbit-frontend.bricks/save-snap-periodically] 15])
 
+;;  (ut/pp [:relay @(ut/tracked-sub :rvbbit-frontend.bricks/sql-alias-replace-sub {:query {:select     [[[:sum :sales] :sales]]
+;;                                                                                      :from       [[:query/all-superstore-5 :ssb31]]
+;;                                                                                      :col-widths {:sales 356}
+;;                                                                                      :stacks     [{:formula    "=ROUND(sales)"
+;;                                                                                                    :idx        0
+;;                                                                                                    :stack-type "excel-formula"
+;;                                                                                                    :name       :sales}]}})])
+
 (re-frame/reg-event-db
  ::refresh-kits
  (fn [db [_]]
@@ -539,7 +547,16 @@
    (let [kp-value-map clover-map]
      (reduce-kv
       (fn [db keypath value]
-        (assoc-in db keypath value))
+        (let [materialize-sql? (and (vector? value) (= (first value) :materialize-sql))
+              value (if materialize-sql? (let [query-key (last value)
+                                               panel-key (first (remove nil?
+                                                                        (for [[k v] (get db :panels)]
+                                                                          (when (some #(= query-key %)
+                                                                                      (keys (get v :queries))) k))))
+                                               query (get-in db [:panels panel-key :queries query-key])
+                                               new-query @(ut/tracked-sub :rvbbit-frontend.bricks/sql-alias-replace-sub {:query query})] new-query)
+                        value)]
+          (assoc-in db keypath value)))
       db
       kp-value-map))))
 
@@ -1093,6 +1110,12 @@
 
 (defn find-bogus-keywords [m] (filter (fn [[k v]] (re-find #"[^\w?-]" (name k))) m))
 
+(re-frame/reg-event-db
+ ::set-screen-name ;; dupe from bricks. no big deal
+ (fn [db [_ screen-name]]
+   (change-url (str "/" screen-name))
+   (assoc-in db [:screen-name] (str screen-name))))
+
 (re-frame/reg-event-fx
  ::save
  (fn [{:keys [db]} [_ save-type screen-name resolved-queries materialized-theme]]
@@ -1174,6 +1197,9 @@
          image (assoc image :click-param (apply dissoc (get image :click-param) click-params-running))
          bogus-kw    (vec (find-bogus-keywords image))
          image       (apply dissoc image (map first bogus-kw))
+         no-screen-name? (or (nil? screen-name) (empty? screen-name))
+         screen-name (if no-screen-name? (cstr/replace (str client-name) ":" "") screen-name)
+         _ (when no-screen-name? (ut/tracked-dispatch [::set-screen-name screen-name]))
          request     {:image (-> image
                                  (assoc :resolved-queries resolved-queries)
                                  (assoc :materialized-theme materialized-theme))

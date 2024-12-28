@@ -96,7 +96,7 @@
  :block-title-selected-font-color "#0a0a12"
  :grid-selected-background-color "#5e72eb"
  :grid-font-color "#ffffff"
- :canvas-background-css {:background-image      "url(assets/openai-images/b64-image3-44218-56510-4k.webp)"
+ :canvas-background-css {:background-image      "url(assets/openai-images/b64-image3-44218-56510-4k.webp-q8.jpg)"
                          :transition            "all 0.8s ease-in-out"
                          :background-size       "cover"
                          :background-blend-mode "mixed-light"

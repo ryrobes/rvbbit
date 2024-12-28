@@ -90,76 +90,78 @@
                       :values  ["area" "bar" "circle" "line" "point" "rect" "rule" "square" "text" "tick"]}
        [1 :syntax] {:message "codemirror syntax highlighting - also changes how the data is stored(!)"
                     :values  ["clojure" "r" "javascript" "python" "julia" "text" "markdown"]}
+       [:renderer] {:message "vega-lite renderer to use"
+                    :values  [:svg :canvas :webgl]}
        [[:encoding :x :type] [:encoding :y :type] [:encoding :color :type]]
-         {:message "" :url "" :values ["quantitative" "temporal" "ordinal" "nominal"]}
+       {:message "" :url "" :values ["quantitative" "temporal" "ordinal" "nominal"]}
        [:scheme]
-         {:message "vega-lite color schemes / palettes"
-          :url "https://vega.github.io/vega/docs/schemes/#reference"
-          :values
-            [{:id "accent" :label "accent" :group "Categorical Schemes"}
-             {:id "category10" :label "category10" :group "Categorical Schemes"}
-             {:id "category20" :label "category20" :group "Categorical Schemes"}
-             {:id "category20b" :label "category20b" :group "Categorical Schemes"}
-             {:id "category20c" :label "category20c" :group "Categorical Schemes"}
-             {:id "dark2" :label "dark2" :group "Categorical Schemes"} {:id "paired" :label "paired" :group "Categorical Schemes"}
-             {:id "pastel1" :label "pastel1" :group "Categorical Schemes"}
-             {:id "pastel2" :label "pastel2" :group "Categorical Schemes"} {:id "set1" :label "set1" :group "Categorical Schemes"}
-             {:id "set2" :label "set2" :group "Categorical Schemes"} {:id "set3" :label "set3" :group "Categorical Schemes"}
-             {:id "tableau10" :label "tableau10" :group "Categorical Schemes"}
-             {:id "tableau20" :label "tableau20" :group "Categorical Schemes"}
-             {:id "blues" :label "blues" :group "Sequential Single-Hue Schemes"}
-             {:id "tealblues" :label "tealblues" :group "Sequential Single-Hue Schemes"}
-             {:id "teals" :label "teals" :group "Sequential Single-Hue Schemes"}
-             {:id "greens" :label "greens" :group "Sequential Single-Hue Schemes"}
-             {:id "browns" :label "browns" :group "Sequential Single-Hue Schemes"}
-             {:id "oranges" :label "oranges" :group "Sequential Single-Hue Schemes"}
-             {:id "reds" :label "reds" :group "Sequential Single-Hue Schemes"}
-             {:id "purples" :label "purples" :group "Sequential Single-Hue Schemes"}
-             {:id "warmgreys" :label "warmgreys" :group "Sequential Single-Hue Schemes"}
-             {:id "greys" :label "greys" :group "Sequential Single-Hue Schemes"}
-             {:id "viridis" :label "viridis" :group "Sequential Multi-Hue Schemes"}
-             {:id "magma" :label "magma" :group "Sequential Multi-Hue Schemes"}
-             {:id "inferno" :label "inferno" :group "Sequential Multi-Hue Schemes"}
-             {:id "plasma" :label "plasma" :group "Sequential Multi-Hue Schemes"}
-             {:id "cividis" :label "cividis" :group "Sequential Multi-Hue Schemes"}
-             {:id "turbo" :label "turbo" :group "Sequential Multi-Hue Schemes"}
-             {:id "bluegreen" :label "bluegreen" :group "Sequential Multi-Hue Schemes"}
-             {:id "bluepurple" :label "bluepurple" :group "Sequential Multi-Hue Schemes"}
-             {:id "goldgreen" :label "goldgreen" :group "Sequential Multi-Hue Schemes"}
-             {:id "goldorange" :label "goldorange" :group "Sequential Multi-Hue Schemes"}
-             {:id "goldred" :label "goldred" :group "Sequential Multi-Hue Schemes"}
-             {:id "greenblue" :label "greenblue" :group "Sequential Multi-Hue Schemes"}
-             {:id "orangered" :label "orangered" :group "Sequential Multi-Hue Schemes"}
-             {:id "purplebluegreen" :label "purplebluegreen" :group "Sequential Multi-Hue Schemes"}
-             {:id "purpleblue" :label "purpleblue" :group "Sequential Multi-Hue Schemes"}
-             {:id "purplered" :label "purplered" :group "Sequential Multi-Hue Schemes"}
-             {:id "redpurple" :label "redpurple" :group "Sequential Multi-Hue Schemes"}
-             {:id "yellowgreenblue" :label "yellowgreenblue" :group "Sequential Multi-Hue Schemes"}
-             {:id "yellowgreen" :label "yellowgreen" :group "Sequential Multi-Hue Schemes"}
-             {:id "yelloworangebrown" :label "yelloworangebrown" :group "Sequential Multi-Hue Schemes"}
-             {:id "yelloworangered" :label "yelloworangered" :group "Sequential Multi-Hue Schemes"}
-             {:id "darkblue" :label "darkblue" :group "For Dark Backgrounds"}
-             {:id "darkgold" :label "darkgold" :group "For Dark Backgrounds"}
-             {:id "darkgreen" :label "darkgreen" :group "For Dark Backgrounds"}
-             {:id "darkmulti" :label "darkmulti" :group "For Dark Backgrounds"}
-             {:id "darkred" :label "darkred" :group "For Dark Backgrounds"}
-             {:id "lightgreyred" :label "lightgreyred" :group "For Light Backgrounds"}
-             {:id "lightgreyteal" :label "lightgreyteal" :group "For Light Backgrounds"}
-             {:id "lightmulti" :label "lightmulti" :group "For Light Backgrounds"}
-             {:id "lightorange" :label "lightorange" :group "For Light Backgrounds"}
-             {:id "lighttealblue" :label "lighttealblue" :group "For Light Backgrounds"}
-             {:id "blueorange" :label "blueorange" :group "Diverging Schemes"}
-             {:id "brownbluegreen" :label "brownbluegreen" :group "Diverging Schemes"}
-             {:id "purplegreen" :label "purplegreen" :group "Diverging Schemes"}
-             {:id "pinkyellowgreen" :label "pinkyellowgreen" :group "Diverging Schemes"}
-             {:id "purpleorange" :label "purpleorange" :group "Diverging Schemes"}
-             {:id "redblue" :label "redblue" :group "Diverging Schemes"}
-             {:id "redgrey" :label "redgrey" :group "Diverging Schemes"}
-             {:id "redyellowblue" :label "redyellowblue" :group "Diverging Schemes"}
-             {:id "redyellowgreen" :label "redyellowgreen" :group "Diverging Schemes"}
-             {:id "spectral" :label "spectral" :group "Diverging Schemes"}
-             {:id "rainbow" :label "rainbow" :group "Cyclical Schemes"}
-             {:id "sinebow" :label "sinebow" :group "Cyclical Schemes"}]}
+       {:message "vega-lite color schemes / palettes"
+        :url "https://vega.github.io/vega/docs/schemes/#reference"
+        :values
+        [{:id "accent" :label "accent" :group "Categorical Schemes"}
+         {:id "category10" :label "category10" :group "Categorical Schemes"}
+         {:id "category20" :label "category20" :group "Categorical Schemes"}
+         {:id "category20b" :label "category20b" :group "Categorical Schemes"}
+         {:id "category20c" :label "category20c" :group "Categorical Schemes"}
+         {:id "dark2" :label "dark2" :group "Categorical Schemes"} {:id "paired" :label "paired" :group "Categorical Schemes"}
+         {:id "pastel1" :label "pastel1" :group "Categorical Schemes"}
+         {:id "pastel2" :label "pastel2" :group "Categorical Schemes"} {:id "set1" :label "set1" :group "Categorical Schemes"}
+         {:id "set2" :label "set2" :group "Categorical Schemes"} {:id "set3" :label "set3" :group "Categorical Schemes"}
+         {:id "tableau10" :label "tableau10" :group "Categorical Schemes"}
+         {:id "tableau20" :label "tableau20" :group "Categorical Schemes"}
+         {:id "blues" :label "blues" :group "Sequential Single-Hue Schemes"}
+         {:id "tealblues" :label "tealblues" :group "Sequential Single-Hue Schemes"}
+         {:id "teals" :label "teals" :group "Sequential Single-Hue Schemes"}
+         {:id "greens" :label "greens" :group "Sequential Single-Hue Schemes"}
+         {:id "browns" :label "browns" :group "Sequential Single-Hue Schemes"}
+         {:id "oranges" :label "oranges" :group "Sequential Single-Hue Schemes"}
+         {:id "reds" :label "reds" :group "Sequential Single-Hue Schemes"}
+         {:id "purples" :label "purples" :group "Sequential Single-Hue Schemes"}
+         {:id "warmgreys" :label "warmgreys" :group "Sequential Single-Hue Schemes"}
+         {:id "greys" :label "greys" :group "Sequential Single-Hue Schemes"}
+         {:id "viridis" :label "viridis" :group "Sequential Multi-Hue Schemes"}
+         {:id "magma" :label "magma" :group "Sequential Multi-Hue Schemes"}
+         {:id "inferno" :label "inferno" :group "Sequential Multi-Hue Schemes"}
+         {:id "plasma" :label "plasma" :group "Sequential Multi-Hue Schemes"}
+         {:id "cividis" :label "cividis" :group "Sequential Multi-Hue Schemes"}
+         {:id "turbo" :label "turbo" :group "Sequential Multi-Hue Schemes"}
+         {:id "bluegreen" :label "bluegreen" :group "Sequential Multi-Hue Schemes"}
+         {:id "bluepurple" :label "bluepurple" :group "Sequential Multi-Hue Schemes"}
+         {:id "goldgreen" :label "goldgreen" :group "Sequential Multi-Hue Schemes"}
+         {:id "goldorange" :label "goldorange" :group "Sequential Multi-Hue Schemes"}
+         {:id "goldred" :label "goldred" :group "Sequential Multi-Hue Schemes"}
+         {:id "greenblue" :label "greenblue" :group "Sequential Multi-Hue Schemes"}
+         {:id "orangered" :label "orangered" :group "Sequential Multi-Hue Schemes"}
+         {:id "purplebluegreen" :label "purplebluegreen" :group "Sequential Multi-Hue Schemes"}
+         {:id "purpleblue" :label "purpleblue" :group "Sequential Multi-Hue Schemes"}
+         {:id "purplered" :label "purplered" :group "Sequential Multi-Hue Schemes"}
+         {:id "redpurple" :label "redpurple" :group "Sequential Multi-Hue Schemes"}
+         {:id "yellowgreenblue" :label "yellowgreenblue" :group "Sequential Multi-Hue Schemes"}
+         {:id "yellowgreen" :label "yellowgreen" :group "Sequential Multi-Hue Schemes"}
+         {:id "yelloworangebrown" :label "yelloworangebrown" :group "Sequential Multi-Hue Schemes"}
+         {:id "yelloworangered" :label "yelloworangered" :group "Sequential Multi-Hue Schemes"}
+         {:id "darkblue" :label "darkblue" :group "For Dark Backgrounds"}
+         {:id "darkgold" :label "darkgold" :group "For Dark Backgrounds"}
+         {:id "darkgreen" :label "darkgreen" :group "For Dark Backgrounds"}
+         {:id "darkmulti" :label "darkmulti" :group "For Dark Backgrounds"}
+         {:id "darkred" :label "darkred" :group "For Dark Backgrounds"}
+         {:id "lightgreyred" :label "lightgreyred" :group "For Light Backgrounds"}
+         {:id "lightgreyteal" :label "lightgreyteal" :group "For Light Backgrounds"}
+         {:id "lightmulti" :label "lightmulti" :group "For Light Backgrounds"}
+         {:id "lightorange" :label "lightorange" :group "For Light Backgrounds"}
+         {:id "lighttealblue" :label "lighttealblue" :group "For Light Backgrounds"}
+         {:id "blueorange" :label "blueorange" :group "Diverging Schemes"}
+         {:id "brownbluegreen" :label "brownbluegreen" :group "Diverging Schemes"}
+         {:id "purplegreen" :label "purplegreen" :group "Diverging Schemes"}
+         {:id "pinkyellowgreen" :label "pinkyellowgreen" :group "Diverging Schemes"}
+         {:id "purpleorange" :label "purpleorange" :group "Diverging Schemes"}
+         {:id "redblue" :label "redblue" :group "Diverging Schemes"}
+         {:id "redgrey" :label "redgrey" :group "Diverging Schemes"}
+         {:id "redyellowblue" :label "redyellowblue" :group "Diverging Schemes"}
+         {:id "redyellowgreen" :label "redyellowgreen" :group "Diverging Schemes"}
+         {:id "spectral" :label "spectral" :group "Diverging Schemes"}
+         {:id "rainbow" :label "rainbow" :group "Cyclical Schemes"}
+         {:id "sinebow" :label "sinebow" :group "Cyclical Schemes"}]}
        [:mapStyle]  {:message "Mapbox default style URLs"
                      :values ["mapbox://styles/mapbox/light-v11" "mapbox://styles/mapbox/dark-v11" "mapbox://styles/mapbox/streets-v12"
                               "mapbox://styles/mapbox/satellite-v9" "mapbox://styles/mapbox/satellite-streets-v12"
@@ -183,25 +185,25 @@
                                                                "color-dodge" "color-burn" "hard-light" "soft-light" "difference"
                                                                "exclusion" "hue" "saturation" "color" "luminosity"]}
        [[:font-family] [:titleFont] [:monospaced-font] [:base-font] [:labelFont] [:legendFont]]
-         {:message "font face!"
-          :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono" "Chicago Kare" "Chicago" "Helvetica" "Cascadia Code"
-                                    "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha" "Afacad Flux" "Space Grotesk" "Rubik" "Roboto Slab" "Plus Jakarta Sans"
-                                    "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono" "C64 Pro Mono" "C64 Pro" "VT323" "Lucida Sans Typewriter" "Gochi Hand"
-                                    "Lucida Sans" "Poiret One" "Courier Prime" "Orbitron"  "DIN Condensed" "Cinzel" "Dwemer" "Rajdhani" "Uncial Antiqua" "Zen Maru Gothic" "Outrun future"
-                                    "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline" "Audiowide" "Alice" "Inter" "SF Mono"
-                                    "IBM Plex Mono" "Roboto Slab" "Source Code Pro" "Pastor of Muppets" "Odor Mean Chey" "American Typewriter" "Cormorant Garamond" "Syncopate" "IBM Plex Sans"
-                                    "Pastor of Muppets Flipped" "Roboto Condensed" "Fira Sans" "Fira Code" "Sono" "Chivo Mono" "Cabinet Grotesk"]))}
+       {:message "font face!"
+        :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono" "Chicago Kare" "Chicago" "Helvetica" "Cascadia Code"
+                                  "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha" "Afacad Flux" "Space Grotesk" "Rubik" "Roboto Slab" "Plus Jakarta Sans"
+                                  "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono" "C64 Pro Mono" "C64 Pro" "VT323" "Lucida Sans Typewriter" "Gochi Hand"
+                                  "Lucida Sans" "Poiret One" "Courier Prime" "Orbitron"  "DIN Condensed" "Cinzel" "Dwemer" "Rajdhani" "Uncial Antiqua" "Zen Maru Gothic" "Outrun future"
+                                  "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline" "Audiowide" "Alice" "Inter" "SF Mono"
+                                  "IBM Plex Mono" "Roboto Slab" "Source Code Pro" "Pastor of Muppets" "Odor Mean Chey" "American Typewriter" "Cormorant Garamond" "Syncopate" "IBM Plex Sans"
+                                  "Pastor of Muppets Flipped" "Roboto Condensed" "Fira Sans" "Fira Code" "Sono" "Chivo Mono" "Cabinet Grotesk"]))}
        [[:codemirror-theme]]
-         {:message "codemirror theme"
-          :values  (distinct (sort ["3024-day" "bespin" "gruvbox-dark" "material" "panda-syntax" "tomorrow-night-bright"
-                                    "3024-night" "blackboard" "hopscotch" "mbo" "paraiso-dark" "tomorrow-night-eighties" "abcdef"
-                                    "cobalt" "icecoder" "mdn-like" "paraiso-light" "ttcn" "ambiance-mobile" "colorforth" "idea"
-                                    "midnight" "pastel-on-dark" "twilight" "ambiance" "darcula" "isotope" "monokai" "railscasts"
-                                    "vibrant-ink" "ayu-dark-smaller" "dracula" "lesser-dark" "moxer" "rubyblue" "xq-dark"
-                                    "rvbbit-dynamic" "ayu-dark" "duotone-dark" "liquibyte" "neat" "seti" "xq-light" "ayu-mirage"
-                                    "duotone-light" "lucario" "neo" "shadowfox" "yeti" "ayu-yellow" "eclipse" "material-darker"
-                                    "night" "solarized" "yonce" "base16-dark" "elegant" "material-ocean" "nord" "ssms" "zenburn"
-                                    "base16-light" "erlang-dark" "material-palenight" "oceanic-next" "the-matrix"]))}}
+       {:message "codemirror theme"
+        :values  (distinct (sort ["3024-day" "bespin" "gruvbox-dark" "material" "panda-syntax" "tomorrow-night-bright"
+                                  "3024-night" "blackboard" "hopscotch" "mbo" "paraiso-dark" "tomorrow-night-eighties" "abcdef"
+                                  "cobalt" "icecoder" "mdn-like" "paraiso-light" "ttcn" "ambiance-mobile" "colorforth" "idea"
+                                  "midnight" "pastel-on-dark" "twilight" "ambiance" "darcula" "isotope" "monokai" "railscasts"
+                                  "vibrant-ink" "ayu-dark-smaller" "dracula" "lesser-dark" "moxer" "rubyblue" "xq-dark"
+                                  "rvbbit-dynamic" "ayu-dark" "duotone-dark" "liquibyte" "neat" "seti" "xq-light" "ayu-mirage"
+                                  "duotone-light" "lucario" "neo" "shadowfox" "yeti" "ayu-yellow" "eclipse" "material-darker"
+                                  "night" "solarized" "yonce" "base16-dark" "elegant" "material-ocean" "nord" "ssms" "zenburn"
+                                  "base16-light" "erlang-dark" "material-palenight" "oceanic-next" "the-matrix"]))}}
       canvas-overrides
       theme-parameters)))
 
@@ -1103,12 +1105,12 @@
        :font-weight-picker {:test-fn integer? :keypath-contains [:font-weight] :renderer-fn button-panel :renderer-fn-ext [100]}
        :button-panel       {:test-fn          string? ;#(or (integer? %) (cstr/ends-with? %
                             :keypath-contains (into (vec (for [[k v] (friendly-text) :when (string? (get-in v [:values 0]))] k))
-                                                    [[:font-weight] [:mark :type] [:encoding :x :type] [:encoding :y :type]
+                                                    [[:font-weight] [:renderer] [:mark :type] [:encoding :x :type] [:encoding :y :type]
                                                      [:aggregate] [:sort] [:encoding :color :type]])
                             :renderer-fn      button-panel
                             :renderer-fn-ext  []}
        :dropdown           {:test-fn          string? ;#(or (integer? %) (cstr/ends-with? %
-                            :keypath-contains [[:font-family] [:scheme] [:titleFont] [:monospaced-font] [:base-font]
+                            :keypath-contains [[:font-family] [:scheme]   [:titleFont] [:monospaced-font] [:base-font]
                                                [:codemirror-theme] [:labelFont] [:legendFont]]
                             :renderer-fn      dropdown-panel
                             :renderer-fn-ext  []}

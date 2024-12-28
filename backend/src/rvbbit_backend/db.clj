@@ -32,12 +32,9 @@
 
 (defn ddb-clear! [coll-name]
   (ut/pp ["📊🔥" :clearing-datalevin-collection coll-name])
-  (let [;dbi (d/open-dbi ddb coll-name)
-        all-keys (mapv first (d/get-range ddb coll-name [:all]))]
+  (let [all-keys (mapv first (d/get-range ddb coll-name [:all]))]
     (d/transact-kv ddb
-                   (mapv (fn [k] [:del coll-name k]) all-keys))
-    ;; (doseq [k all-keys] (d/transact-kv ddb [[:del coll-name k]]))
-    ))
+                   (mapv (fn [k] [:del coll-name k]) all-keys))))
 
 (defn open-ddb [coll-name]
   (ut/pp ["📊" :opening-datalevin-shape-rotations-collection coll-name])
@@ -85,7 +82,7 @@
 (defonce mem-usage (atom [])) ;; needs to be accessed from evaluator
 (defonce cpu-usage (atom [])) ;; needs to be accessed from evaluator
 
-(defonce shape-rotation-status (atom {}))
+(defonce shape-rotation-status (fpop/thaw-atom {} "./db/harvest-checkpoints.edn"))
 
 (defonce leaf-field-meta-map (atom {}))
 (defonce leaf-brute-force-map (atom {}))

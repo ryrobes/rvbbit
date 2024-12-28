@@ -1,248 +1,549 @@
 {:reco-preview nil,
+ :doom-modal? false,
  :annotate? false,
  :default-col-widths
- {:block-3108 {:client-memory-drag-36 132},
+ {:block-11815 {:agg-grouped-all-offenses-1 261},
+  :block-5869 {:all-offense-codes-1 130},
+  :block-7671 {:agg-grouped-all-offenses-3-1 261},
+  :block-695 {:countd-all-ufo-sightings 261},
+  :block-469 {:grouped-all-superstore-1 130},
+  :block-3452 {:grouped-all-offenses-1 130},
+  :block-2175 {:new-clojure-1-sqlized 261},
+  :block-10943 {:grouped-all-offenses-2 130},
+  :block-3412 {:all-superstore 100},
+  :block-9638 {:grouped-agg-grouped-all-offenses 130},
+  :block-263 {:query1-2 130},
+  :block-8681 {:agg-grouped-all-superstore-1 261},
+  :block-3108 {:client-memory-drag-36 132},
+  :block-10824 {:game-daily-player-summary-drag-30 ##Inf},
+  :block-1226-window {:network-analysis-sqlized 711},
+  :searches-sub-types-sys-list* {:searches-sub-types-sys ##Inf},
   :block-5159 {:reporting-market-drag-41 361},
-  :block-12050 {:gen-viz-516 127},
+  :block-10889 {:all-offenses 100},
+  :block-11124 {:all-superstore-1 100},
+  :block-5145 {:agg-all-offenses 261},
+  :block-9970 {:all-offense-codes 130},
+  :block-8880 {:agg-new-api-call-sqlized 261},
+  :block-10470 {:grouped-all-superstore-2 130},
+  :block-6855 {:agg-all-superstore 261},
+  :block-834 {:grouped-all-offenses-4 130},
+  :block-4032 {:grouped-all-superstore-3 130},
+  :block-7831 {:query1 130},
+  :block-2990 {:grouped-grouped-all-offenses-3 130},
+  :block-5158 {:agg-grouped-all-superstore-1-1 261},
+  :block-10207 {:new-api-call-sqlized 100},
+  :block-1892 {:agg-grouped-all-superstore-1-1 261},
+  :block-1226 {:network-analysis-sqlized 711},
+  :block-1881 {:agg-all-offenses-2 261},
+  :block-7866 {:agg-grouped-all-offenses-3 261},
+  :system-connections-list* {:connections-sys 126},
+  :block-11913 {:all-ufo-sightings 120, :grouped-all-superstore-4 130},
+  :realms-list* {:realms-sys 126},
+  :block-8727 {:agg-grouped-all-offenses-4 261},
+  :block-8619 {:agg-grouped-all-offenses 130},
+  :system-fields-list* {:fields-sys 127},
+  :block-11288 {:grouped-all-superstore 130},
   :block-9644 {:rowcnt-drag-14 161},
-  :reco-preview-c--412708267 {:all-realms-c--412708267 100},
+  :block-7953 {:offenses-drag-2 100},
+  :block-1667 {:agg-all-offenses-1 261},
+  :block-9915 {:grouped-all-superstore-1-1 130},
+  :realm-blocks-list* {:realm-blocks-sys ##Inf},
+  :block-8193 {:agg-grouped-all-superstore-1 261},
   :block-2618 {:client-stats-drag-36 114},
-  :block-2178 {:new-query 553},
+  :block-10902 {:grouped-all-offense-codes 130},
+  :block-7724 {:countd-all-superstore-1 161},
+  :block-5189 {:countd-all-ufo-sightings-1 261},
+  :block-6676 {:grouped-all-superstore-1 155},
+  :block-806 {:agg-all-superstore-1-1 261},
+  :files-list* {:files-sys ##Inf},
+  :block-7035 {:all-game-daily-player-summary-1k-1 108},
+  :block-10955 {:agg-all-superstore 361},
+  :realms-typev-list* {:realms-type-sys ##Inf},
+  :block-10297 {:grouped-grouped-all-offenses-5 130},
+  :block-10081 {:grouped-all-superstore 130},
+  :block-702 {:agg-grouped-all-offense-codes 261},
+  :block-1902 {:all-game-daily-player-summary-1k 100},
+  :block-1400 {:query1-1 130},
+  :blocks-list* {:blocks-sys ##Inf},
+  :block-7349 {:cnt-all-superstore 261},
+  :block-6951 {:agg-all-superstore-1 261},
+  :block-7312 {:agg-grouped-all-superstore 261},
+  :block-305 {:combos-drag-30 1461},
+  :system-tables-list* {:tables-sys 100},
+  :block-9004 {:agg-grouped-all-superstore-1-2 261},
+  :searches-types-list* {:searches-types-sys ##Inf},
   :block-10898 {:screen-type-drag-1 361},
-  :block-4941 {:all-realms 100, :new-query-1 170}},
+  :block-3255 {:grouped-all-offenses-5 130},
+  :block-10826 {:grouped-all-offenses 130},
+  :searches-rows-sys-list* {:searches-rows-sys ##Inf},
+  :block-4941 {:new-query-1 253},
+  :block-3695 {:cnt-offense-codes 261},
+  :block-10941 {:grouped-all-offenses-3 130},
+  :block-703 {:all-superstore 100}},
  :runstream-drops nil,
- :tabs
- ["generated lass of the woodlands"
-  "terminal stats"
-  "purple wallaby"
-  "delightful echidna"
-  "thriving moose"
-  "amethyst bird"
-  "globular dove"
-  "circular guinea pig"
-  "chartreuse dog"
-  "purple peafowl"
-  "short echidna"],
+ :tabs ["client stats" "terminal stats"],
  :selected-cols nil,
  :server nil,
  :runstreams {},
  :editor? false,
  :buffy? false,
- :memory [508242572 412249924 4294705152],
+ :memory [2748120235 2633997599 4294705152],
  :sched
- {:client-memory-drag-36 2206, :gen-viz-516 2206, :client-stats-drag-36 2206},
- :client-name :jovial-long-peafowl-32,
+ {:client-memory-drag-36 748,
+  :gen-viz-516 748,
+  :client-stats-drag-36 757,
+  :new-query 757},
+ :client-name :meaningful-rectangular-rhinoceros-27,
  :server-panels
- [:block-11815
+ [:block-64
+  :block-11815
+  :block-66
   :block-5869
   :block-7671
+  :block-67
+  :block-695
   :block-7838
   :block-469
+  :block-684
   :block-8670
   :block-7377
   :block-8000
   :block-6441
+  :block-61
   :block-3452
+  :block-2175
   :block-10943
   :block-3412
   :block-9638
+  :block-5136
+  :block-263
   :block-8681
   :block-7453
   :block-3108
   :block-10824
-  :block-1226-window
-  :block-5159
+  :block-62
   :block-10889
+  :block-11124
   :block-5145
   :block-9970
+  :block-8880
   :block-10470
-  :block-501
   :block-2505
-  :block-675
   :block-6855
   :block-834
   :block-5659
   :block-4032
+  :block-7831
+  :block-488
+  :block-4928
   :block-2990
   :block-5158
+  :block-10207
+  :block-689
   :block-9994
-  :block-1226
+  :block-8676
+  :block-1892
   :block-4424
   :block-1881
-  :block-4331
   :block-7866
   :block-11913
+  :block-70
   :block-8727
   :block-8619
+  :block-68
   :block-11288
   :block-8103
   :block-285
   :block-12050
-  :block-9644
   :block-10540
   :block-7953
   :block-1667
+  :block-9915
   :block-23
   :block-998
+  :block-8193
   :block-2618
   :block-10902
+  :block-7724
   :block-2178
-  :block-7035
+  :block-5189
+  :block-6676
+  :block-806
+  :block-173
+  :block-10955
+  :block-65
   :block-10297
+  :block-10081
+  :block-172
   :block-702
+  :block-63
+  :block-60
   :block-1902
+  :block-1400
   :block-384
-  :block-10908
+  :block-609
+  :block-69
+  :block-801
+  :block-653
+  :block-350
   :xtdb-val-scrub-11
   :block-12288
+  :block-7349
+  :block-6951
+  :block-411
+  :block-7312
   :block-305
+  :block-629
   :block-9004
-  :block-10898
   :block-3255
   :block-10826
-  :block-4941
   :block-3695
-  :block-10941],
+  :block-10941
+  :block-703],
  :flow-editor? true,
- :window {:w 2059, :h 1272},
+ :window {:w 2656, :h 1520},
  :ai-worker? false,
- :quake-console? false,
- :implicit-rowsets {:solver [nil]},
+ :quake-console? true,
+ :implicit-rowsets {:solver [nil], :clover [:pulled-val]},
  :post-meta
- {:realms
-  {:* {:rowcount 31},
-   :block_type {:distinct 2},
+ {:blocks-sys
+  {:* {:rowcount 5},
+   :query_names {:distinct 1},
+   :view_names {:distinct 3},
    :rrows {:distinct nil},
-   :block_data {:distinct 31},
-   :block_key {:distinct 31},
-   :ts {:distinct 1},
-   :file_path {:distinct 1},
-   :block_name {:distinct 31},
-   :realm_name {:distinct 1}},
-  :client-memory-drag-36
-  {:mem_used {:distinct 59},
-   :* {:rowcount 74},
-   :recent_messages_per_second {:distinct 6},
+   :block_data {:distinct 5},
+   :block_key {:distinct 5},
+   :block_name {:distinct 5},
+   :queries {:distinct 2},
+   :views {:distinct 3}},
+  :client_memory
+  {:mem_limit {:distinct 2},
+   :server_subs {:distinct 7},
+   :mem_used {:distinct 111},
+   :* {:rowcount 111},
+   :selected_tab {:distinct 6},
+   :client_subs {:distinct 7},
+   :recent_messages_per_second {:distinct 10},
+   :mem_time {:distinct 107},
+   :screen_name {:distinct 5},
    :rrows {:distinct nil},
-   :ts {:distinct 59},
-   :messages_per_second {:distinct 2},
-   :batches {:distinct 59},
-   :client_name {:distinct 1},
-   :ts_hour {:distinct 3},
-   :packets {:distinct 59}},
-  :gen-viz-516
-  {:mem_used {:distinct 39},
-   :* {:rowcount 50},
-   :messages_per_second {:distinct 4},
-   :ts {:distinct 39},
+   :ts {:distinct 111},
+   :messages_per_second {:distinct 5},
+   :latency {:distinct 101},
+   :batches {:distinct 111},
+   :client_name {:distinct 8},
+   :mem_total {:distinct 101},
+   :packets {:distinct 101},
+   :mem_used_mb {:distinct 111}},
+  :superstore
+  {:category {:distinct 3},
+   :sales {:distinct 109},
+   :* {:rowcount 111},
+   :ship_date {:distinct 54},
+   :product_id {:distinct 108},
+   :city {:distinct 37},
+   :profit {:distinct 110},
+   :rrows {:distinct nil},
+   :state {:distinct 23},
+   :zipcode {:distinct 46},
+   :row_id {:distinct 111},
+   :region {:distinct 4},
+   :ship_mode {:distinct 3},
+   :order_id {:distinct 55},
+   :segment {:distinct 3},
+   :sub_category {:distinct 14},
+   :order_date {:distinct 54},
+   :quantity {:distinct 9},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 52},
+   :product_name {:distinct 108},
+   :customer_id {:distinct 52}},
+  :files-sys
+  {:file_path {:distinct 33},
+   :* {:rowcount 33},
+   :screen_name {:distinct 33},
+   :blocks {:distinct 26},
+   :queries {:distinct 23},
+   :theme_map {:distinct 27},
+   :ts {:distinct 33},
    :rrows {:distinct nil}},
   :client-stats-drag-36
+  {:server_subs {:distinct 6},
+   :* {:rowcount 8},
+   :push {:distinct 8},
+   :recent_messages_per_second {:distinct 4},
+   :uptime {:distinct 6},
+   :last_seen_seconds {:distinct 3},
+   :memory {:distinct 8},
+   :rrows {:distinct nil},
+   :queue_distro {:distinct 1},
+   :styler_highlight_8717 {:distinct 2},
+   :client_latency {:distinct 8},
+   :ack {:distinct 3},
+   :client_name {:distinct 8},
+   :last_seen {:distinct 3}},
+  :offenses-drag-2
+  {:SHOOTING {:distinct 1},
+   :DISTRICT {:distinct 12},
+   :* {:rowcount 319073},
+   :INCIDENT_NUMBER {:distinct 282517},
+   :OFFENSE_DESCRIPTION {:distinct 244},
+   :DAY_OF_WEEK {:distinct 7},
+   :rrows {:distinct nil},
+   :MONTH {:distinct 12},
+   :YEAR {:distinct 4},
+   :HOUR {:distinct 24},
+   :STREET {:distinct 4657},
+   :OFFENSE_CODE_GROUP {:distinct 67},
+   :UCR_PART {:distinct 4},
+   :Long {:distinct 18178},
+   :REPORTING_AREA {:distinct 878},
+   :Location {:distinct 18194},
+   :OFFENSE_CODE {:distinct 222},
+   :Lat {:distinct 18178},
+   :OCCURRED_ON_DATE {:distinct 233229}},
+  :agg-grouped-all-offenses-3
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :block_10207_new_api_call__block_10207_api_call_new_api_call_
+  {:total_wows_in_movie {:distinct 6},
+   :* {:rowcount 22},
+   :release_date {:distinct 13},
+   :director {:distinct 12},
+   :full_line {:distinct 18},
+   :rrows {:distinct nil},
+   :movie {:distinct 13},
+   :year {:distinct 10},
+   :video_480p {:distinct 22},
+   :poster {:distinct 13},
+   :video_1080p {:distinct 22},
+   :video_720p {:distinct 22},
+   :audio {:distinct 22},
+   :current_wow_in_movie {:distinct 8},
+   :video_360p {:distinct 22},
+   :timestamp {:distinct 22},
+   :movie_duration {:distinct 12},
+   :character {:distinct 12}},
+  :grouped-all-offenses
+  {:DISTRICT {:distinct 12},
+   :* {:rowcount 13},
+   :rowcnt {:distinct 13},
+   :rrows {:distinct nil}},
+  :client_stats
   {:server_subs {:distinct 0},
-   :* {:rowcount 11},
+   :queue_size {:distinct 0},
+   :* {:rowcount 8},
    :push {:distinct 0},
+   :selected_tab {:distinct 0},
+   :client_subs {:distinct 0},
    :recent_messages_per_second {:distinct 0},
+   :uptime_seconds {:distinct 0},
    :uptime {:distinct 0},
    :last_seen_seconds {:distinct 0},
    :memory {:distinct 0},
+   :screen_name {:distinct 0},
    :rrows {:distinct nil},
    :queue_distro {:distinct 0},
-   :styler_highlight_8717 {:distinct 0},
+   :ts {:distinct 0},
+   :messages_per_second {:distinct 0},
    :client_latency {:distinct 0},
    :ack {:distinct 0},
+   :booted_ts {:distinct 0},
    :client_name {:distinct 0},
    :last_seen {:distinct 0}},
-  :new-query
-  {:mem_used {:distinct 3},
-   :* {:rowcount 4},
-   :ts_hour {:distinct 3},
+  :grouped-all-offenses-5
+  {:DISTRICT {:distinct 12},
+   :* {:rowcount 13},
+   :rowcnt {:distinct 13},
    :rrows {:distinct nil}},
-  :new-query-1
-  {:mem_used {:distinct 3},
-   :* {:rowcount 4},
-   :ts_hour {:distinct 3},
-   :rrows {:distinct nil}}},
+  :grouped-all-superstore-4
+  {:customer_name {:distinct 793},
+   :* {:rowcount 793},
+   :rowcnt {:distinct 34},
+   :rrows {:distinct nil}},
+  :agg-grouped-all-superstore-1
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :ufo_sightings
+  {:* {:rowcount 111},
+   :duration_seconds_int {:distinct 26},
+   :comments {:distinct 111},
+   :city {:distinct 102},
+   :date_posted {:distinct 69},
+   :rrows {:distinct nil},
+   :longitude {:distinct 103},
+   :state {:distinct 37},
+   :duration_seconds {:distinct 26},
+   :duration_hours {:distinct 76},
+   :id {:distinct 111},
+   :shape {:distinct 18},
+   :datetime {:distinct 103},
+   :latitude {:distinct 103},
+   :country {:distinct 4}},
+  :offenses
+  {:SHOOTING {:distinct 0},
+   :DISTRICT {:distinct 11},
+   :* {:rowcount 111},
+   :INCIDENT_NUMBER {:distinct 102},
+   :OFFENSE_DESCRIPTION {:distinct 49},
+   :DAY_OF_WEEK {:distinct 7},
+   :rrows {:distinct nil},
+   :MONTH {:distinct 2},
+   :YEAR {:distinct 1},
+   :HOUR {:distinct 15},
+   :STREET {:distinct 80},
+   :OFFENSE_CODE_GROUP {:distinct 29},
+   :UCR_PART {:distinct 3},
+   :Long {:distinct 97},
+   :REPORTING_AREA {:distinct 85},
+   :Location {:distinct 98},
+   :OFFENSE_CODE {:distinct 49},
+   :Lat {:distinct 97},
+   :OCCURRED_ON_DATE {:distinct 95}},
+  :all-superstore
+  {:category {:distinct 3},
+   :sales {:distinct 5825},
+   :* {:rowcount 9994},
+   :ship_date {:distinct 1334},
+   :product_id {:distinct 1862},
+   :city {:distinct 531},
+   :profit {:distinct 7287},
+   :rrows {:distinct nil},
+   :state {:distinct 49},
+   :zipcode {:distinct 631},
+   :row_id {:distinct 9994},
+   :region {:distinct 4},
+   :ship_mode {:distinct 4},
+   :order_id {:distinct 5009},
+   :segment {:distinct 3},
+   :sub_category {:distinct 17},
+   :order_date {:distinct 1237},
+   :quantity {:distinct 14},
+   :discount {:distinct 1},
+   :country {:distinct 1},
+   :customer_name {:distinct 793},
+   :product_name {:distinct 1850},
+   :customer_id {:distinct 793}},
+  :agg-grouped-all-offenses-3-1
+  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
+  :client-memory-drag-36
+  {:mem_used {:distinct 22},
+   :* {:rowcount 48},
+   :recent_messages_per_second {:distinct 8},
+   :rrows {:distinct nil},
+   :ts {:distinct 22},
+   :messages_per_second {:distinct 2},
+   :batches {:distinct 22},
+   :client_name {:distinct 1},
+   :ts_hour {:distinct 2},
+   :packets {:distinct 22}},
+  :all-offenses
+  {:SHOOTING {:distinct 1},
+   :DISTRICT {:distinct 12},
+   :* {:rowcount 319073},
+   :INCIDENT_NUMBER {:distinct 282517},
+   :OFFENSE_DESCRIPTION {:distinct 244},
+   :DAY_OF_WEEK {:distinct 7},
+   :rrows {:distinct nil},
+   :MONTH {:distinct 12},
+   :YEAR {:distinct 4},
+   :HOUR {:distinct 24},
+   :STREET {:distinct 4657},
+   :OFFENSE_CODE_GROUP {:distinct 67},
+   :UCR_PART {:distinct 4},
+   :Long {:distinct 18178},
+   :REPORTING_AREA {:distinct 878},
+   :Location {:distinct 18194},
+   :OFFENSE_CODE {:distinct 222},
+   :Lat {:distinct 18178},
+   :OCCURRED_ON_DATE {:distinct 233229}}},
  :flow-estimates
- {:client-memory-drag-36 {:times 0.001, :run-id :client-memory-drag-36},
-  :client_stats {:times 0.002, :run-id :client_stats},
-  :new-query {:times 0.003, :run-id :new-query},
+ {:grouped-all-offenses-3 {:times 0.382, :run-id :grouped-all-offenses-3},
+  :blocks-sys {:times 0.005, :run-id :blocks-sys},
+  :fields-sys {:times 0.001, :run-id :fields-sys},
+  :grouped-grouped-all-offenses-5
+  {:times 0.529, :run-id :grouped-grouped-all-offenses-5},
+  :all-offense-codes {:times 0.002, :run-id :all-offense-codes},
+  :agg-all-superstore {:times 0.004, :run-id :agg-all-superstore},
+  :grouped-all-offenses-1 {:times 0.233, :run-id :grouped-all-offenses-1},
+  :client_memory {:times 0.009, :run-id :client_memory},
+  :realms-sys {:times 0.001, :run-id :realms-sys},
+  :grouped-all-offenses-2 {:times 0.191, :run-id :grouped-all-offenses-2},
+  :superstore {:times 0.006, :run-id :superstore},
+  :tables-sys {:times 0.003, :run-id :tables-sys},
+  :realms-type-sys {:times 0.001, :run-id :realms-type-sys},
+  :grouped-all-superstore-1 {:times 0.006, :run-id :grouped-all-superstore-1},
+  :agg-all-offenses-1 {:times 0.123, :run-id :agg-all-offenses-1},
+  :new-query {:times 0.005, :run-id :new-query},
+  :new-query-1 {:times 0.002, :run-id :new-query-1},
+  :grouped-grouped-all-offenses-3
+  {:times 0.441, :run-id :grouped-grouped-all-offenses-3},
+  :grouped-all-superstore-3 {:times 0.017, :run-id :grouped-all-superstore-3},
+  :virtual-panel-virtual-viewmeaningful-rectangular-rhinoceros-27
+  {:times 0.016,
+   :run-id :virtual-panel-virtual-viewmeaningful-rectangular-rhinoceros-27},
+  :files-sys {:times 0.002, :run-id :files-sys},
   :client-stats-drag-36 {:times 0.001, :run-id :client-stats-drag-36},
+  :block-8000-new-clojure {:times 0.078, :run-id :block-8000-new-clojure},
+  :agg-all-offenses-2 {:times 0.138, :run-id :agg-all-offenses-2},
+  :agg-grouped-all-offenses-3 {:times 0.295, :run-id :agg-grouped-all-offenses-3},
+  :agg-all-offenses {:times 0.145, :run-id :agg-all-offenses},
+  :all-game-daily-player-summary-1k
+  {:times 0.024, :run-id :all-game-daily-player-summary-1k},
+  :grouped-all-offenses {:times 0.495, :run-id :grouped-all-offenses},
+  :client_stats {:times 0.001, :run-id :client_stats},
+  :grouped-all-superstore-2 {:times 0.006, :run-id :grouped-all-superstore-2},
+  :rabbit-search-like-themes {:times 0.002, :run-id :rabbit-search-like-themes},
+  :agg-grouped-all-offenses-4 {:times 0.235, :run-id :agg-grouped-all-offenses-4},
+  :grouped-all-offense-codes {:times 0.006, :run-id :grouped-all-offense-codes},
+  :grouped-all-offenses-5 {:times 0.578, :run-id :grouped-all-offenses-5},
+  :grouped-all-superstore-4 {:times 0.036, :run-id :grouped-all-superstore-4},
+  :grouped-all-superstore {:times 0.011, :run-id :grouped-all-superstore},
+  :realm-blocks-sys {:times 0.001, :run-id :realm-blocks-sys},
+  :agg-grouped-all-superstore-1
+  {:times 0.006, :run-id :agg-grouped-all-superstore-1},
+  :all-offense-codes-1 {:times 0.002, :run-id :all-offense-codes-1},
+  :offense_codes {:times 0.001, :run-id :offense_codes},
+  :agg-grouped-all-superstore-1-1
+  {:times 0.011, :run-id :agg-grouped-all-superstore-1-1},
+  :agg-grouped-all-offenses-1 {:times 0.23, :run-id :agg-grouped-all-offenses-1},
+  :offenses {:times 0.01, :run-id :offenses},
+  :gen-viz-764 {:times 0.169, :run-id :gen-viz-764},
+  :connections-sys {:times 0.009, :run-id :connections-sys},
+  :all-superstore {:times 0.009, :run-id :all-superstore},
+  :grouped-all-offenses-4 {:times 0.36, :run-id :grouped-all-offenses-4},
+  :new-clojure-1-sqlized {:times 0.001, :run-id :new-clojure-1-sqlized},
+  :rabbit-search-like-screens {:times 0.002, :run-id :rabbit-search-like-screens},
+  :agg-grouped-all-offenses-3-1
+  {:times 0.276, :run-id :agg-grouped-all-offenses-3-1},
+  :grouped-agg-grouped-all-offenses
+  {:times 0.332, :run-id :grouped-agg-grouped-all-offenses},
+  :agg-grouped-all-offenses {:times 0.305, :run-id :agg-grouped-all-offenses},
+  :client-memory-drag-36 {:times 0.001, :run-id :client-memory-drag-36},
+  :all-offenses {:times 0.019, :run-id :all-offenses},
   :gen-viz-516 {:times 0.002, :run-id :gen-viz-516},
-  :rabbit-search-like {:times 0.01, :run-id :rabbit-search-like},
-  :new-query-1 {:times 0.001, :run-id :new-query-1}},
+  :agg-grouped-all-superstore-1-2
+  {:times 0.025, :run-id :agg-grouped-all-superstore-1-2}},
  :screen-name "basic-client-stats",
  :panel-hashes
- {:block-11815 1956066986,
-  :block-5869 1680318101,
-  :block-7671 23751180,
-  :block-7838 -1987091657,
-  :block-469 736726145,
-  :block-8670 -1729722037,
-  :block-7377 837983287,
+ {:block-7838 -1987091657,
+  :block-8670 -959826999,
+  :block-7377 -1165762329,
   :block-8000 279065675,
-  :block-6441 1318249148,
-  :block-3452 1708989936,
-  :block-10943 1503492881,
-  :block-3412 -699006963,
-  :block-9638 1853537599,
-  :block-8681 1571810690,
-  :block-7453 1028784509,
-  :block-3108 534816278,
-  :block-10824 604661495,
-  :block-1226-window 2071427679,
-  :block-5159 152434049,
-  :block-10889 -1431104336,
-  :block-5145 789238868,
-  :block-9970 1566267718,
-  :block-10470 2116018615,
-  :block-501 -770802180,
-  :block-2505 -197603678,
-  :block-675 -190245538,
-  :block-6855 1001120757,
-  :block-834 -1171670529,
-  :block-5659 -534582281,
-  :block-4032 -1635994342,
-  :block-2990 -238448386,
-  :block-5158 938647326,
-  :block-9994 -71625886,
-  :block-1226 1645758722,
-  :block-4424 1141076126,
-  :block-1881 -819844558,
-  :block-4331 -1204833969,
-  :block-7866 1307775985,
-  :block-11913 -1537180370,
-  :block-8727 -566073836,
-  :block-8619 -559286969,
-  :block-11288 1148092962,
-  :block-8103 -2084723892,
-  :block-285 987646976,
-  :block-12050 207213774,
-  :block-9644 174781924,
-  :block-10540 -2103852768,
-  :block-7953 726341912,
-  :block-1667 -791954968,
-  :block-23 658083465,
-  :block-998 -1595168924,
-  :block-2618 -447649816,
-  :block-10902 1867151557,
-  :block-2178 311264599,
-  :block-7035 266904066,
-  :block-10297 -1413461270,
-  :block-702 -684281261,
-  :block-1902 -1308890856,
+  :block-6441 891528405,
+  :block-7453 2059201088,
+  :block-3108 -1018549023,
+  :block-2505 1780416330,
+  :block-5659 -236914590,
+  :block-9994 -541734113,
+  :block-4424 -277031396,
+  :block-285 -67724591,
+  :block-12050 -1002949368,
+  :block-2618 1044802103,
+  :block-2178 1012005658,
   :block-384 -2128421274,
-  :block-10908 1080645176,
-  :xtdb-val-scrub-11 -1940727349,
-  :block-12288 -33447274,
-  :block-305 368670978,
-  :block-9004 -53550419,
-  :block-10898 -1832904811,
-  :block-3255 -1374385628,
-  :block-10826 678420119,
-  :block-4941 869136980,
-  :block-3695 -776305775,
-  :block-10941 6587675},
+  :block-12288 -837594982},
  :recos-page2 0,
- :selected-tab "generated lass of the woodlands",
+ :selected-tab "client stats",
  :col-names nil,
  :snapshots
  {:params
@@ -898,1061 +1199,12 @@
      :block-342 {:country nil}}}}},
  :recos-page 0,
  :rs-overrides-hashmap {},
- :user-params-hash 1255728749,
+ :user-params-hash -620225235,
  :grid-recos? true,
- :session-hash -912374612,
+ :session-hash -2023680651,
  :resolved-queries
- {nil {:_last-run "07:46:10"},
-  :grouped-all-offenses-3
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb5]],
-   :group-by [:DISTRICT]},
-  :grouped-grouped-all-offenses-5
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb93]],
-      :group-by [:DISTRICT]}
-     :ssb92]],
-   :group-by [:DISTRICT]},
-  :all-offense-codes {:select [:CODE :NAME], :from [[:offense_codes :ssb21]]},
-  :agg-all-superstore
-  {:select [[[:count :row_id] :row_id]],
-   :from
-   [[{:select
-      [:category
-       :city
-       :country
-       :customer_id
-       :customer_name
-       :discount
-       :order_date
-       :order_id
-       :product_id
-       :product_name
-       :profit
-       :quantity
-       :region
-       :row_id
-       :sales
-       :segment
-       :ship_date
-       :ship_mode
-       :state
-       :sub_category
-       :zipcode],
-      :from [[:superstore :ssb75]]}
-     :ssb71]]},
-  :grouped-all-offenses-1
-  {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb98]],
-   :group-by [:OFFENSE_CODE_GROUP]},
-  :screen-type-drag-1
-  {:_sqlize-hash 918369995,
-   :select [:screen_type [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:screen_type
-       :day_of_week
-       :station_family
-       :audience_type
-       :daypart
-       :ue
-       :audience_thousands
-       :tarp
-       :reporting_market
-       :share_to
-       :network
-       :period
-       :total_minutes_millions
-       :total_minutes_percent
-       :demographic
-       :viewing_type
-       :daypart_total_seconds],
-      :_sqlized-at "2024-10-17 00:25:27",
-      :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash 918369995,
-      :from
-      [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-        :ii785]]}
-     :oo4]],
-   :group-by [:screen_type],
-   :order-by [[:rowcnt :desc]]},
-  :grouped-all-offenses-2
-  {:select [:OFFENSE_DESCRIPTION [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb17]],
-   :group-by [:OFFENSE_DESCRIPTION]},
-  :grouped-all-superstore-1
-  {:select [:category [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:category
-       :city
-       :country
-       :customer_id
-       :customer_name
-       :discount
-       :order_date
-       :order_id
-       :product_id
-       :product_name
-       :profit
-       :quantity
-       :region
-       :row_id
-       :sales
-       :segment
-       :ship_date
-       :ship_mode
-       :state
-       :sub_category
-       :zipcode],
-      :from [[:superstore :ssb75]]}
-     :ssb33]],
-   :group-by [:category]},
-  :agg-all-offenses-1
-  {:select [[[:sum :HOUR] :HOUR]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb58]]},
-  :new-query
-  {:cache? false,
-   :where [:= :client_name :*client-name-str],
-   :limit 126,
-   :group-by [:ts_hour],
-   :_last-run "07:45:36",
-   :refresh-every 10,
-   :from
-   [{:select
-     [:client_name
-      :recent_messages_per_second
-      :messages_per_second
-      :mem_used
-      [[:substring :ts 1 15] :ts_hour]
-      :batches
-      :packets
-      :ts],
-     :where [:= :client_name :*client-name-str],
-     :from [[:client_memory :ee183]],
-     :order-by [[:mem_time :desc]]}],
-   :order-by [[:ts_hour :desc]],
-   :connection-id "systemh2-db",
-   :select [[[:avg :mem_used] :mem_used] :ts_hour],
-   :post-process-fn
-   (fn [x]
-     (vec
-       (for
-         [idx
-          (range (count x))
-          :let
-          [rx
-           (vec (reverse x))
-           prev-row
-           (get rx (- idx 1) {:mem_used 0})
-           row
-           (get rx idx {:mem_used 0})
-           pre-mb
-           (/ (get prev-row :mem_used) 1048576)
-           mb
-           (/ (get row :mem_used) 1048576)
-           diff
-           (rvbbit-backend.util/rnd (- mb pre-mb) 0)
-           pos
-           (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-         (merge
-           row
-           {:diff
-            (if (= idx 0)
-              (str (rvbbit-backend.util/rnd mb 0) " MB")
-              (str pos diff))}))))},
-  :all-game-daily-player-summary-1k-1
-  {:select
-   [:_id :achievements :player_id :player_level :playtime_minutes :revenue :vdate],
-   :from [[:game_daily_player_summary_1k :ssb26]]},
-  :new-query-1
-  {:cache? false,
-   :where [:= :client_name :*client-name-str],
-   :limit 126,
-   :group-by [:ts_hour],
-   :from
-   [{:select
-     [:client_name
-      :recent_messages_per_second
-      :messages_per_second
-      :mem_used
-      [[:substring :ts 1 15] :ts_hour]
-      :batches
-      :packets
-      :ts],
-     :where [:= :client_name :*client-name-str],
-     :from [[:client_memory :ee183]],
-     :order-by [[:mem_time :desc]]}],
-   :order-by [[:ts_hour :desc]],
-   :connection-id "systemh2-db",
-   :select [[[:avg :mem_used] :mem_used] :ts_hour],
-   :post-process-fn
-   (fn [x]
-     (vec
-       (for
-         [idx
-          (range (count x))
-          :let
-          [rx
-           (vec (reverse x))
-           prev-row
-           (get rx (- idx 1) {:mem_used 0})
-           row
-           (get rx idx {:mem_used 0})
-           pre-mb
-           (/ (get prev-row :mem_used) 1048576)
-           mb
-           (/ (get row :mem_used) 1048576)
-           diff
-           (rvbbit-backend.util/rnd (- mb pre-mb) 0)
-           pos
-           (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-         (merge
-           row
-           {:diff
-            (if (= idx 0)
-              (str (rvbbit-backend.util/rnd mb 0) " MB")
-              (str pos diff))}))))},
-  :network-analysis-sqlized
-  {:select [:database_says],
-   :connection-id "cache.db",
-   :_sqlized-at "2024-10-20 21:34:16",
-   :_sqlized-by [:block-1226 :api-call :network-analysis],
-   :_sqlized-hash 918369995,
-   :from
-   [[:block_1226_network_analysis__block_1226_api_call_network_analysis_ :gg606]]},
-  :grouped-grouped-all-offenses-3
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb5]],
-      :group-by [:DISTRICT]}
-     :ssb81]],
-   :group-by [:DISTRICT]},
-  :grouped-all-superstore-3
-  {:select [:customer_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:category
-       :city
-       :country
-       :customer_id
-       :customer_name
-       :discount
-       :order_date
-       :order_id
-       :product_id
-       :product_name
-       :profit
-       :quantity
-       :region
-       :row_id
-       :sales
-       :segment
-       :ship_date
-       :ship_mode
-       :state
-       :sub_category
-       :zipcode],
-      :from [[:superstore :ssb75]]}
-     :ssb9]],
-   :group-by [:customer_name]},
-  :client-stats-drag-36
-  {:select
-   [:ack
-    :client_latency
-    :client_name
-    :last_seen
-    :last_seen_seconds
-    :memory
-    :recent_messages_per_second
-    :push
-    :queue_distro
-    :server_subs
-    :uptime],
-   :from [[:client_stats :gg588]],
-   :refresh-every 10,
-   :cache? false,
-   :_last-run "07:46:25",
-   :col-widths
-   {:ack 81,
-    :client_latency 141,
-    :client_name 261,
-    :memory 81,
-    :push 91,
-    :server_subs 111,
-    :uptime 201,
-    :last_seen 171},
-   :order-by [[:last_seen_seconds :asc]],
-   :style-rules
-   {[:* :highlight-8717]
-    {:logic [:= :client_name :*client-name-str],
-     :style {:border "1px solid #cac18255"}}}},
-  :agg-all-offenses-2
-  {:select [[[:sum :HOUR] :HOUR]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb77]]},
-  :gen-viz-591
-  {:select [[[[:sum :daypart_total_seconds]] :daypart_total_seconds] :network],
-   :from
-   [[{:select
-      [:screen_type
-       :day_of_week
-       :station_family
-       :audience_type
-       :daypart
-       :ue
-       :audience_thousands
-       :tarp
-       :reporting_market
-       :share_to
-       :network
-       :period
-       :total_minutes_millions
-       :total_minutes_percent
-       :demographic
-       :viewing_type
-       :daypart_total_seconds],
-      :_sqlized-at "2024-10-17 00:25:27",
-      :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash 918369995,
-      :from
-      [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-        :ii785]]}
-     :uu964]],
-   :group-by [:network]},
-  :offenses-drag-2
-  {:select
-   [:DAY_OF_WEEK
-    :DISTRICT
-    :HOUR
-    :INCIDENT_NUMBER
-    :Lat
-    :Location
-    :Long
-    :MONTH
-    :OCCURRED_ON_DATE
-    :OFFENSE_CODE
-    :OFFENSE_CODE_GROUP
-    :OFFENSE_DESCRIPTION
-    :REPORTING_AREA
-    :SHOOTING
-    :STREET
-    :UCR_PART
-    :YEAR],
-   :from [[:offenses :zz560]]},
-  :agg-grouped-all-offenses-3
-  {:select [[[:sum :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb5]],
-      :group-by [:DISTRICT]}
-     :ssb64]]},
-  :gen-viz-702
-  {:select
-   [[[[:sum :total_minutes_percent]] :total_minutes_percent] :audience_type],
-   :from
-   [[{:select
-      [:screen_type
-       :day_of_week
-       :station_family
-       :audience_type
-       :daypart
-       :ue
-       :audience_thousands
-       :tarp
-       :reporting_market
-       :share_to
-       :network
-       :period
-       :total_minutes_millions
-       :total_minutes_percent
-       :demographic
-       :viewing_type
-       :daypart_total_seconds],
-      :_sqlized-at "2024-10-17 00:25:27",
-      :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash 918369995,
-      :from
-      [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-        :ii785]]}
-     :hh558]],
-   :group-by [:audience_type]},
-  :agg-all-offenses
-  {:select [[[:sum :HOUR] :HOUR]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb25]]},
-  :all-game-daily-player-summary-1k
-  {:select
-   [:_id :achievements :player_id :player_level :playtime_minutes :revenue :vdate],
-   :from [[:game_daily_player_summary_1k :ssb89]]},
-  :grouped-all-offenses
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb11]],
-   :group-by [:DISTRICT]},
-  :bounds
-  {:select [:vmin :smin [[:raw "CURRENT_DATE"] :mmax]],
-   :from
-   [[{:select
-      [[[:raw "min(_valid_from::date)"] :vmin]
-       [[:raw "min(_system_from::date)"] :smin]],
-      :from [[:game_daily_player_summary :ss1 :for :all :valid_time]]}
-     :tt45]]},
-  :grouped-all-superstore-2
-  {:select [:city [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:category
-       :city
-       :country
-       :customer_id
-       :customer_name
-       :discount
-       :order_date
-       :order_id
-       :product_id
-       :product_name
-       :profit
-       :quantity
-       :region
-       :row_id
-       :sales
-       :segment
-       :ship_date
-       :ship_mode
-       :state
-       :sub_category
-       :zipcode],
-      :from [[:superstore :ssb75]]}
-     :ssb79]],
-   :group-by [:city]},
-  :game-daily-player-summary-drag-30
-  {:select
-   [:_id :achievements :player_id :player_level :playtime_minutes :revenue :vdate],
-   :from
-   [[:game_daily_player_summary :hh796 :for :valid-time :as-of-date "2024-04-08"]]},
-  :agg-grouped-all-offenses-4
-  {:select [[[:sum :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb17]],
-      :group-by [:DISTRICT]}
-     :ssb71]]},
-  :grouped-all-offense-codes
-  {:select [:NAME [[:count 1] :rowcnt]],
-   :from [[{:select [:CODE :NAME], :from [[:offense_codes :ssb21]]} :ssb86]],
-   :group-by [:NAME]},
-  :grouped-all-offenses-5
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb93]],
-   :group-by [:DISTRICT]},
-  :grouped-all-superstore-4
-  {:select [:customer_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:category
-       :city
-       :country
-       :customer_id
-       :customer_name
-       :discount
-       :order_date
-       :order_id
-       :product_id
-       :product_name
-       :profit
-       :quantity
-       :region
-       :row_id
-       :sales
-       :segment
-       :ship_date
-       :ship_mode
-       :state
-       :sub_category
-       :zipcode],
-      :from [[:superstore :ssb75]]}
-     :ssb47]],
-   :group-by [:customer_name]},
-  :agg-grouped-all-offense-codes
-  {:select [[[:sum :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:NAME [[:count 1] :rowcnt]],
-      :from [[{:select [:CODE :NAME], :from [[:offense_codes :ssb21]]} :ssb86]],
-      :group-by [:NAME]}
-     :ssb7]]},
-  :grouped-all-superstore
-  {:select [:country [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:category
-       :city
-       :country
-       :customer_id
-       :customer_name
-       :discount
-       :order_date
-       :order_id
-       :product_id
-       :product_name
-       :profit
-       :quantity
-       :region
-       :row_id
-       :sales
-       :segment
-       :ship_date
-       :ship_mode
-       :state
-       :sub_category
-       :zipcode],
-      :from [[:superstore :ssb75]]}
-     :ssb65]],
-   :group-by [:country]},
-  :agg-grouped-all-superstore-1
-  {:select [[[:count :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:category [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:category
-          :city
-          :country
-          :customer_id
-          :customer_name
-          :discount
-          :order_date
-          :order_id
-          :product_id
-          :product_name
-          :profit
-          :quantity
-          :region
-          :row_id
-          :sales
-          :segment
-          :ship_date
-          :ship_mode
-          :state
-          :sub_category
-          :zipcode],
-         :from [[:superstore :ssb75]]}
-        :ssb33]],
-      :group-by [:category]}
-     :ssb34]]},
-  :cnt-offense-codes
-  {:select [[[:count 1] :rowcnt]], :from [[:offense_codes :ssb50]]},
-  :all-offense-codes-1 {:select [:CODE :NAME], :from [[:offense_codes :ssb88]]},
-  :agg-grouped-all-superstore-1-1
-  {:select [[[:sum :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:category [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:category
-          :city
-          :country
-          :customer_id
-          :customer_name
-          :discount
-          :order_date
-          :order_id
-          :product_id
-          :product_name
-          :profit
-          :quantity
-          :region
-          :row_id
-          :sales
-          :segment
-          :ship_date
-          :ship_mode
-          :state
-          :sub_category
-          :zipcode],
-         :from [[:superstore :ssb75]]}
-        :ssb33]],
-      :group-by [:category]}
-     :ssb35]]},
-  :agg-grouped-all-offenses-1
-  {:select [[[:sum :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb98]],
-      :group-by [:OFFENSE_CODE_GROUP]}
-     :ssb28]]},
-  :gen-viz-764
-  {:select [[[[:count 1]] :rrows] :DAY_OF_WEEK],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :hh890]],
-   :group-by [:DAY_OF_WEEK]},
-  :reporting-market-drag-41
-  {:_sqlize-hash 918369995,
-   :select [:reporting_market [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:screen_type
-       :day_of_week
-       :station_family
-       :audience_type
-       :daypart
-       :ue
-       :audience_thousands
-       :tarp
-       :reporting_market
-       :share_to
-       :network
-       :period
-       :total_minutes_millions
-       :total_minutes_percent
-       :demographic
-       :viewing_type
-       :daypart_total_seconds],
-      :_sqlized-at "2024-10-17 00:25:27",
-      :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash 918369995,
-      :from
-      [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-        :ii785]]}
-     :uu721]],
-   :group-by [:reporting_market],
-   :order-by [[:rowcnt :desc]]},
-  :all-superstore
-  {:select
-   [:category
-    :city
-    :country
-    :customer_id
-    :customer_name
-    :discount
-    :order_date
-    :order_id
-    :product_id
-    :product_name
-    :profit
-    :quantity
-    :region
-    :row_id
-    :sales
-    :segment
-    :ship_date
-    :ship_mode
-    :state
-    :sub_category
-    :zipcode],
-   :from [[:superstore :ssb75]]},
-  :grouped-all-offenses-4
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:DAY_OF_WEEK
-       :DISTRICT
-       :HOUR
-       :INCIDENT_NUMBER
-       :Lat
-       :Location
-       :Long
-       :MONTH
-       :OCCURRED_ON_DATE
-       :OFFENSE_CODE
-       :OFFENSE_CODE_GROUP
-       :OFFENSE_DESCRIPTION
-       :REPORTING_AREA
-       :SHOOTING
-       :STREET
-       :UCR_PART
-       :YEAR],
-      :from [[:offenses :ssb96]]}
-     :ssb17]],
-   :group-by [:DISTRICT]},
-  :agg-grouped-all-offenses-3-1
-  {:select [[[:sum :rowcnt] :rowcnt]],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb5]],
-      :group-by [:DISTRICT]}
-     :ssb43]]},
-  :grouped-agg-grouped-all-offenses
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from
-   [[{:select [[[:sum :rowcnt] :rowcnt] :DISTRICT],
-      :from
-      [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-         :from
-         [[{:select
-            [:DAY_OF_WEEK
-             :DISTRICT
-             :HOUR
-             :INCIDENT_NUMBER
-             :Lat
-             :Location
-             :Long
-             :MONTH
-             :OCCURRED_ON_DATE
-             :OFFENSE_CODE
-             :OFFENSE_CODE_GROUP
-             :OFFENSE_DESCRIPTION
-             :REPORTING_AREA
-             :SHOOTING
-             :STREET
-             :UCR_PART
-             :YEAR],
-            :from [[:offenses :ssb96]]}
-           :ssb11]],
-         :group-by [:DISTRICT]}
-        :ssb69]],
-      :group-by [:DISTRICT]}
-     :ssb24]],
-   :group-by [:DISTRICT]},
-  :combos-drag-30
-  {:select
-   [:combo_edn
-    :combo_hash
-    :conditionals
-    :connection_id
-    :context_hash
-    :h
-    :key_hashes
-    :key_hashes_hash
-    :query_map
-    :query_map_str
-    :runner
-    :score
-    :selected_view
-    :shape_name
-    :table_name
-    :uuid
-    :viz_map
-    :w],
-   :from [[:combos :gg323]],
-   :_last-run "15:10:17"},
-  :agg-grouped-all-offenses
-  {:select [[[:sum :rowcnt] :rowcnt] :DISTRICT],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:DAY_OF_WEEK
-          :DISTRICT
-          :HOUR
-          :INCIDENT_NUMBER
-          :Lat
-          :Location
-          :Long
-          :MONTH
-          :OCCURRED_ON_DATE
-          :OFFENSE_CODE
-          :OFFENSE_CODE_GROUP
-          :OFFENSE_DESCRIPTION
-          :REPORTING_AREA
-          :SHOOTING
-          :STREET
-          :UCR_PART
-          :YEAR],
-         :from [[:offenses :ssb96]]}
-        :ssb11]],
-      :group-by [:DISTRICT]}
-     :ssb69]],
-   :group-by [:DISTRICT]},
+ {:shape-rotation-maps-sys {:_last-run "13:39:06"},
+  nil {:_last-run "13:38:59"},
   :client-memory-drag-36
   {:select
    [:client_name
@@ -1967,35 +1219,15 @@
    :from [[:client_memory :ee183]],
    :refresh-every 20,
    :cache? false,
-   :_last-run "07:46:15",
+   :_last-run "13:38:40",
    :order-by [[:mem_time :desc]]},
-  :all-offenses
-  {:select
-   [:DAY_OF_WEEK
-    :DISTRICT
-    :HOUR
-    :INCIDENT_NUMBER
-    :Lat
-    :Location
-    :Long
-    :MONTH
-    :OCCURRED_ON_DATE
-    :OFFENSE_CODE
-    :OFFENSE_CODE_GROUP
-    :OFFENSE_DESCRIPTION
-    :REPORTING_AREA
-    :SHOOTING
-    :STREET
-    :UCR_PART
-    :YEAR],
-   :from [[:offenses :ssb96]]},
   :gen-viz-516
   {:cache? false,
    :where
    [:and [:> :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
    :limit 50,
    :group-by [:ts],
-   :_last-run "07:46:15",
+   :_last-run "13:38:40",
    :refresh-every 20,
    :from
    [{:select
@@ -2021,122 +1253,91 @@
      (vec
        (reverse
          (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
-  :agg-grouped-all-superstore-1-2
-  {:select [[[:avg :rowcnt] :rowcnt]],
+  :client-stats-drag-36
+  {:select
+   [:ack
+    :client_latency
+    :client_name
+    :last_seen
+    :last_seen_seconds
+    :memory
+    :recent_messages_per_second
+    :push
+    :queue_distro
+    :server_subs
+    :uptime],
+   :from [[:client_stats :gg588]],
+   :refresh-every 10,
+   :cache? false,
+   :_last-run "13:39:05",
+   :col-widths
+   {:ack 81,
+    :client_latency 141,
+    :client_name 261,
+    :memory 81,
+    :push 91,
+    :server_subs 111,
+    :uptime 201,
+    :last_seen 171},
+   :order-by [[:last_seen_seconds :asc]],
+   :style-rules
+   {[:* :highlight-8717]
+    {:logic [:= :client_name :*client-name-str],
+     :style {:border "1px solid #cac18255"}}}},
+  :new-query
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 126,
+   :group-by [:ts_hour],
+   :_last-run "13:39:05",
+   :refresh-every 10,
    :from
-   [[{:select [:category [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:category
-          :city
-          :country
-          :customer_id
-          :customer_name
-          :discount
-          :order_date
-          :order_id
-          :product_id
-          :product_name
-          :profit
-          :quantity
-          :region
-          :row_id
-          :sales
-          :segment
-          :ship_date
-          :ship_mode
-          :state
-          :sub_category
-          :zipcode],
-         :from [[:superstore :ssb75]]}
-        :ssb33]],
-      :group-by [:category]}
-     :ssb77]]},
-  :rowcnt-drag-14
-  {:select [[[:sum :rowcnt] :rowcnt_sum]],
-   :from
-   [[{:select [:screen_type [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:screen_type
-          :day_of_week
-          :station_family
-          :audience_type
-          :daypart
-          :ue
-          :audience_thousands
-          :tarp
-          :reporting_market
-          :share_to
-          :network
-          :period
-          :total_minutes_millions
-          :total_minutes_percent
-          :demographic
-          :viewing_type
-          :daypart_total_seconds],
-         :_sqlized-at "2024-10-17 00:25:27",
-         :_sqlized-by [:block-1226 :api-call :network-analysis],
-         :_sqlized-hash 918369995,
-         :from
-         [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-           :ii785]]}
-        :oo4]],
-      :group-by [:screen_type],
-      :order-by [[:rowcnt :desc]]}
-     :tt780]]},
-  :drop-pivot-flat
-  {:select [:day_of_week :daypart [[:count :*] :rowcnt]],
-   :connection-id "cache.db",
-   :from
-   [[{:select [:database_says],
-      :_sqlized-at "2024-10-20 21:34:16",
-      :_sqlized-by [:block-1226 :api-call :network-analysis],
-      :_sqlized-hash 918369995,
-      :from
-      [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-        :gg606]]}
-     :agg45]],
-   :group-by [:day_of_week :daypart]}},
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      [[:substring :ts 1 15] :ts_hour]
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts_hour :desc]],
+   :connection-id "systemh2-db",
+   :select [[[:avg :mem_used] :mem_used] :ts_hour],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (for
+         [idx
+          (range (count x))
+          :let
+          [rx
+           (vec (reverse x))
+           prev-row
+           (get rx (- idx 1) {:mem_used 0})
+           row
+           (get rx idx {:mem_used 0})
+           pre-mb
+           (/ (get prev-row :mem_used) 1048576)
+           mb
+           (/ (get row :mem_used) 1048576)
+           diff
+           (rvbbit-backend.util/rnd (- mb pre-mb) 0)
+           pos
+           (cond (> diff 0) "+" (< diff 0) "" :else "")]]
+         (merge
+           row
+           {:diff
+            (if (= idx 0)
+              (str (rvbbit-backend.util/rnd mb 0) " MB")
+              (str pos diff))}))))}},
  :panels
- {nil {:queries {nil {:_last-run "07:46:10"}}},
-  :block-11815
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-11815",
-   :w 6,
-   :selected-view :agg-grouped-all-offenses-1,
-   :root [14 14],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-grouped-all-offenses-1
-    {:select [[[:sum :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-offenses-1 :ssb28]]}},
-   :tab "circular guinea pig"},
-  :block-5869
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-5869",
-   :w 6,
-   :selected-view :all-offense-codes-1,
-   :root [1 1],
-   :h 5,
-   :connection-id "boston-crime",
-   :queries
-   {:all-offense-codes-1 {:select [:CODE :NAME], :from [[:offense_codes :ssb88]]}},
-   :tab "circular guinea pig"},
-  :block-7671
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-7671",
-   :w 6,
-   :selected-view :agg-grouped-all-offenses-3-1,
-   :root [37 7],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-grouped-all-offenses-3-1
-    {:select [[[:sum :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-offenses-3 :ssb43]]}},
-   :tab "circular guinea pig"},
+ {nil
+  {:queries
+   {:shape-rotation-maps-sys {:_last-run "13:39:06"}, nil {:_last-run "13:38:59"}}},
   :block-7838
   {:h 8,
    :w 11,
@@ -2145,25 +1346,11 @@
    :name "editor-block-8000-new-clojure",
    :root [26 1],
    :tab "terminal stats"},
-  :block-469
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-469",
-   :w 6,
-   :selected-view :grouped-all-superstore-1,
-   :root [15 8],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:grouped-all-superstore-1
-    {:select [:category [[:count 1] :rowcnt]],
-     :from [[:query/all-superstore :ssb33]],
-     :group-by [:category]}},
-   :tab "globular dove"},
   :block-8670
   {:h 5,
    :w 12,
    :root [28 21],
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :selected-view :hi,
    :name "block-8670",
    :views
@@ -2193,7 +1380,7 @@
    :root [23 21],
    :h 3,
    :queries {},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:cell-drop-5164
     [:v-box
@@ -2265,7 +1452,7 @@
   {:h 2,
    :w 13,
    :root [1 17],
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :selected-view :hi,
    :name "block-6441",
    :views
@@ -2289,95 +1476,6 @@
      [:string :time/now]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
-  :block-3452
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-3452",
-   :w 6,
-   :selected-view :grouped-all-offenses-1,
-   :root [8 14],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offenses-1
-    {:select [:OFFENSE_CODE_GROUP [[:count 1] :rowcnt]],
-     :from [[:query/all-offenses :ssb98]],
-     :group-by [:OFFENSE_CODE_GROUP]}},
-   :tab "circular guinea pig"},
-  :block-10943
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-10943",
-   :w 6,
-   :selected-view :grouped-all-offenses-2,
-   :root [1 10],
-   :h 8,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offenses-2
-    {:select [:OFFENSE_DESCRIPTION [[:count 1] :rowcnt]],
-     :from [[:query/all-offenses :ssb17]],
-     :group-by [:OFFENSE_DESCRIPTION]}},
-   :tab "circular guinea pig"},
-  :block-3412
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-3412",
-   :w 35,
-   :selected-view :all-superstore,
-   :root [1 1],
-   :h 6,
-   :connection-id "superstore",
-   :queries
-   {:all-superstore
-    {:select
-     [:category
-      :city
-      :country
-      :customer_id
-      :customer_name
-      :discount
-      :order_date
-      :order_id
-      :product_id
-      :product_name
-      :profit
-      :quantity
-      :region
-      :row_id
-      :sales
-      :segment
-      :ship_date
-      :ship_mode
-      :state
-      :sub_category
-      :zipcode],
-     :from [[:superstore :ssb75]]}},
-   :tab "globular dove"},
-  :block-9638
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-9638",
-   :w 6,
-   :selected-view :grouped-agg-grouped-all-offenses,
-   :root [20 9],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-agg-grouped-all-offenses
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/agg-grouped-all-offenses :ssb24]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
-  :block-8681
-  {:leaf-drop [:sql :new-agg.count],
-   :name "block-8681",
-   :w 6,
-   :selected-view :agg-grouped-all-superstore-1,
-   :root [15 13],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:agg-grouped-all-superstore-1
-    {:select [[[:count :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-superstore-1 :ssb34]]}},
-   :tab "globular dove"},
   :block-7453
   {:name "block-7453",
    :w 5,
@@ -2385,7 +1483,7 @@
    :root [23 24],
    :h 2,
    :queries {},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:cell-drop-2732
     [:v-box
@@ -2427,345 +1525,11 @@
      :from [[:client_memory :ee183]],
      :refresh-every 20,
      :cache? false,
-     :_last-run "07:46:15",
+     :_last-run "13:38:40",
      :order-by [[:mem_time :desc]]}},
    :root [1 21],
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :selected-view :client-memory-drag-36},
-  :block-10824
-  {:h 7,
-   :w 16,
-   :connection-id "xtdb-pg",
-   :name "select-all-game_daily_player_summary",
-   :queries
-   {:game-daily-player-summary-drag-30
-    {:select
-     [:_id
-      :achievements
-      :player_id
-      :player_level
-      :playtime_minutes
-      :revenue
-      :vdate],
-     :from
-     [[:game_daily_player_summary
-       :hh796
-       :for
-       :valid-time
-       :as-of-date
-       :xtdb-val-scrub-11/valid-date-slider]]},
-    :bounds
-    {:select [:vmin :smin [[:raw "CURRENT_DATE"] :mmax]],
-     :from
-     [[{:select
-        [[[:raw "min(_valid_from::date)"] :vmin]
-         [[:raw "min(_system_from::date)"] :smin]],
-        :from [[:game_daily_player_summary :ss1 :for :all :valid_time]]}
-       :tt45]]}},
-   :root [2 3],
-   :tab "delightful echidna",
-   :selected-view :game-daily-player-summary-drag-30},
-  :block-1226-window
-  {:icon-view
-   {:h 1,
-    :w 1,
-    :view
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :width
-     "50px"
-     :height
-     "50px"
-     :padding
-     "5px"
-     :size
-     "auto"
-     :style
-     {:font-size "10px", :filter "drop-shadow(0 0 0.75rem #2b0d55)"}
-     :child
-     "Network Analysis"]},
-   :api-call
-   {:network-analysis
-    {:endpoint "https://test.dash8.day8.com.au/api/reports/network-analysis",
-     :params
-     {:periods :dash8/periods,
-      :demographics :dash8/demographics,
-      :viewing_types :dash8/viewing_types,
-      :grouping [:join "," [:or! [:*this-block* :groups] ["network"]]],
-      :reporting_markets :dash8/reporting_markets,
-      :audience_types :dash8/audience_types,
-      :dayparts :dash8/dayparts,
-      :networks :dash8/networks,
-      :end_date "2024-04-25",
-      :start_date "2024-04-23",
-      :include_spill :dash8/include_spill,
-      :screen_types :dash8/screen_types,
-      :station_families :dash8/station_families},
-     :post-process-fn
-     (fn [output]
-       (let [data0 (first (get output :results)) {:keys [fields data]} data0]
-         (mapv (fn [d] (zipmap (mapv (fn [z] (keyword (:id z))) fields) d)) data))),
-     :method :get,
-     :headers {"Authorization" [:str "Bearer " :settings/dash8-token]},
-     :flatten? false}},
-   :pinned? false,
-   :name "Network Analysis",
-   :w 15,
-   :dash8-meta
-   {:source-key :network-analysis,
-    :report-id "network-analysis",
-    :available_facets
-    ["period"
-     "demographic"
-     "master_daypart"
-     "screen_type"
-     "day_of_week"
-     "share_to"],
-    :required-dims ["network"],
-    :dimensions
-    ["reporting_market"
-     "period"
-     "demographic"
-     "network"
-     "station_family"
-     "master_daypart"
-     "daypart"
-     "viewing_type"
-     "audience_type"
-     "screen_type"
-     "day_of_week"
-     "share_to"],
-    :filters
-    {:periods {:name "Report Periods", :required? false, :data-type "array"},
-     :demographics {:name "Demographics", :required? false, :data-type "array"},
-     :viewing_types {:name "Viewing Types", :required? false, :data-type "array"},
-     :reporting_markets
-     {:name "Reporting Markets", :required? false, :data-type "array"},
-     :audience_types {:name "Audience Types", :required? false, :data-type "array"},
-     :dayparts {:name "Dayparts", :required? false, :data-type "array"},
-     :networks {:name "Networks", :required? false, :data-type "array"},
-     :end_date {:name "End Date", :required? false, :data-type "date"},
-     :start_date {:name "Start Date", :required? false, :data-type "date"},
-     :include_spill {:name "Include Spill", :required? false, :data-type "boolean"},
-     :screen_types {:name "Screen Types", :required? false, :data-type "array"},
-     :station_families
-     {:name "Station Families", :required? false, :data-type "array"}},
-    :measures
-    ["total_minutes_millions" "total_minutes_percent" "audience_thousands" "tarp"]},
-   :window "spawned-from-icon-of_:block-1226",
-   :realm-type "data",
-   :z 21,
-   :block-key ":network-analysis",
-   :selected-view :network-analysis-sqlized,
-   :root [4 2],
-   :h 9,
-   :iconized? true,
-   :queries
-   {:network-analysis-sqlized
-    {:select
-     [:screen_type
-      :day_of_week
-      :station_family
-      :audience_type
-      :daypart
-      :ue
-      :audience_thousands
-      :tarp
-      :reporting_market
-      :share_to
-      :network
-      :period
-      :total_minutes_millions
-      :total_minutes_percent
-      :demographic
-      :viewing_type
-      :daypart_total_seconds],
-     :connection-id "cache.db",
-     :_sqlized-at "2024-10-17 00:25:27",
-     :_sqlized-by [:block-1226 :api-call :network-analysis],
-     :_sqlized-hash
-     :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-     :from
-     [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-       :ii785]]}},
-   :tab "thriving moose",
-   :views {}},
-  :block-5159
-  {:h 5,
-   :w 8,
-   :connection-id "cache.db",
-   :name "drag-from-Network Analysis",
-   :queries
-   {:reporting-market-drag-41
-    {:_sqlize-hash
-     :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-     :select [:reporting_market [[:count 1] :rowcnt]],
-     :from
-     [[{:select
-        [:screen_type
-         :day_of_week
-         :station_family
-         :audience_type
-         :daypart
-         :ue
-         :audience_thousands
-         :tarp
-         :reporting_market
-         :share_to
-         :network
-         :period
-         :total_minutes_millions
-         :total_minutes_percent
-         :demographic
-         :viewing_type
-         :daypart_total_seconds],
-        :_sqlized-at "2024-10-17 00:25:27",
-        :_sqlized-by [:block-1226 :api-call :network-analysis],
-        :_sqlized-hash
-        :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-        :from
-        [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-          :ii785]]}
-       :uu721]],
-     :group-by [:reporting_market],
-     :order-by [[:rowcnt :desc]]}},
-   :root [18 14],
-   :tab "thriving moose"},
-  :block-10889
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-10889",
-   :w 14,
-   :selected-view :all-offenses,
-   :root [8 2],
-   :h 6,
-   :connection-id "boston-crime",
-   :queries
-   {:all-offenses
-    {:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :ssb96]]}},
-   :tab "circular guinea pig"},
-  :block-5145
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-5145",
-   :w 6,
-   :selected-view :agg-all-offenses,
-   :root [1 6],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-all-offenses
-    {:select [[[:sum :HOUR] :HOUR]], :from [[:query/all-offenses :ssb25]]}},
-   :tab "circular guinea pig"},
-  :block-9970
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-9970",
-   :w 6,
-   :selected-view :all-offense-codes,
-   :root [22 15],
-   :h 6,
-   :connection-id "boston-crime",
-   :queries
-   {:all-offense-codes {:select [:CODE :NAME], :from [[:offense_codes :ssb21]]}},
-   :tab "globular dove"},
-  :block-10470
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-10470",
-   :w 6,
-   :selected-view :grouped-all-superstore-2,
-   :root [1 13],
-   :h 7,
-   :connection-id "superstore",
-   :queries
-   {:grouped-all-superstore-2
-    {:select [:city [[:count 1] :rowcnt]],
-     :from [[:query/all-superstore :ssb79]],
-     :group-by [:city]}},
-   :tab "globular dove"},
-  :block-501
-  {:mad-libs-combo-hash ["1742893853" "superstore_drag_13"],
-   :name "recharts_h_bar - \"audience_type, total_minutes_percent\" - 341",
-   :w 9,
-   :selected-view :reech,
-   :root [11 12],
-   :h 5,
-   :connection-id "cache.db",
-   :queries
-   {:gen-viz-702
-    {:select
-     [[[[:sum :total_minutes_percent]] :total_minutes_percent] :audience_type],
-     :from
-     [[{:select
-        [:screen_type
-         :day_of_week
-         :station_family
-         :audience_type
-         :daypart
-         :ue
-         :audience_thousands
-         :tarp
-         :reporting_market
-         :share_to
-         :network
-         :period
-         :total_minutes_millions
-         :total_minutes_percent
-         :demographic
-         :viewing_type
-         :daypart_total_seconds],
-        :_sqlized-at "2024-10-17 00:25:27",
-        :_sqlized-by [:block-1226 :api-call :network-analysis],
-        :_sqlized-hash
-        :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-        :from
-        [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-          :ii785]]}
-       :hh558]],
-     :group-by [:audience_type]}},
-   :tab "thriving moose",
-   :conditionals nil,
-   :views
-   {:reech
-    [:>
-     :ResponsiveContainer
-     {:width "100%", :height :panel-height+50}
-     [:>
-      :ComposedChart
-      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:>
-       :Tooltip
-       {:contentStyle {:backgroundColor "#00000099", :border "none"},
-        :itemStyle {:color "#ecf0f1"},
-        :labelStyle {:color "#3498db"}}]
-      [:> :XAxis {:dataKey :audience_type, :allowDuplicatedCategory false}]
-      [:>
-       :Bar
-       {:dataKey :total_minutes_percent,
-        :isAnimationActive false,
-        :data :gen-viz-702,
-        :stroke :theme/editor-outer-rim-color,
-        :fill [:str :theme/editor-outer-rim-color "33"],
-        :on-click [:set-recharts-param>]}]]]}},
   :block-2505
   {:name "client latency callout",
    :w 5,
@@ -2773,7 +1537,7 @@
    :root [35 7],
    :h 3,
    :queries {},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:hi
     [:v-box
@@ -2796,96 +1560,6 @@
        :child
        "client latency (ms)"]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
-  :block-675
-  {:mad-libs-combo-hash ["662161667" "superstore_drag_13"],
-   :name "recharts_h_bar - \"daypart_total_seconds, network\" - 622",
-   :w 9,
-   :selected-view :reech,
-   :root [19 2],
-   :h 5,
-   :connection-id "cache.db",
-   :queries
-   {:gen-viz-591
-    {:select [[[[:sum :daypart_total_seconds]] :daypart_total_seconds] :network],
-     :from
-     [[{:select
-        [:screen_type
-         :day_of_week
-         :station_family
-         :audience_type
-         :daypart
-         :ue
-         :audience_thousands
-         :tarp
-         :reporting_market
-         :share_to
-         :network
-         :period
-         :total_minutes_millions
-         :total_minutes_percent
-         :demographic
-         :viewing_type
-         :daypart_total_seconds],
-        :_sqlized-at "2024-10-17 00:25:27",
-        :_sqlized-by [:block-1226 :api-call :network-analysis],
-        :_sqlized-hash
-        :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-        :from
-        [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-          :ii785]]}
-       :uu964]],
-     :group-by [:network]}},
-   :tab "thriving moose",
-   :conditionals nil,
-   :views
-   {:reech
-    [:>
-     :ResponsiveContainer
-     {:width "100%", :height :panel-height+50}
-     [:>
-      :ComposedChart
-      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:>
-       :Tooltip
-       {:contentStyle {:backgroundColor "#00000099", :border "none"},
-        :itemStyle {:color "#ecf0f1"},
-        :labelStyle {:color "#3498db"}}]
-      [:> :XAxis {:dataKey :network, :allowDuplicatedCategory false}]
-      [:>
-       :Bar
-       {:dataKey :daypart_total_seconds,
-        :isAnimationActive false,
-        :data :gen-viz-591,
-        :stroke :theme/editor-outer-rim-color,
-        :fill [:str :theme/editor-outer-rim-color "33"],
-        :on-click [:set-recharts-param>]}]]]}},
-  :block-6855
-  {:leaf-drop [:sql :new-agg.count],
-   :name "block-6855",
-   :w 6,
-   :selected-view :agg-all-superstore,
-   :root [8 8],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:agg-all-superstore
-    {:select [[[:count :row_id] :row_id]], :from [[:query/all-superstore :ssb71]]}},
-   :tab "globular dove"},
-  :block-834
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-834",
-   :w 6,
-   :selected-view :grouped-all-offenses-4,
-   :root [23 13],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offenses-4
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/all-offenses :ssb17]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
   :block-5659
   {:name "block-5659",
    :w 5,
@@ -2893,7 +1567,7 @@
    :root [35 10],
    :h 3,
    :queries {},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:hi
     [:v-box
@@ -2916,47 +1590,6 @@
        :child
        "messages/sec (all)"]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
-  :block-4032
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-4032",
-   :w 6,
-   :selected-view :grouped-all-superstore-3,
-   :root [22 7],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:grouped-all-superstore-3
-    {:select [:customer_name [[:count 1] :rowcnt]],
-     :from [[:query/all-superstore :ssb9]],
-     :group-by [:customer_name]}},
-   :tab "globular dove"},
-  :block-2990
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-2990",
-   :w 6,
-   :selected-view :grouped-grouped-all-offenses-3,
-   :root [30 17],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-grouped-all-offenses-3
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/grouped-all-offenses-3 :ssb81]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
-  :block-5158
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-5158",
-   :w 6,
-   :selected-view :agg-grouped-all-superstore-1-1,
-   :root [15 18],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:agg-grouped-all-superstore-1-1
-    {:select [[[:sum :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-superstore-1 :ssb35]]}},
-   :tab "globular dove"},
   :block-9994
   {:name "block-9994",
    :w 5,
@@ -2964,7 +1597,7 @@
    :root [35 1],
    :h 3,
    :queries {},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:cell-drop-11937
     [:v-box
@@ -2986,119 +1619,11 @@
        {:font-size "18px", :margin-top "-10px"}
        :child
        "messages/sec (recent)"]]]}},
-  :block-1226
-  {:icon-view
-   {:h 1,
-    :w 1,
-    :view
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :width
-     "50px"
-     :height
-     "50px"
-     :padding
-     "5px"
-     :size
-     "auto"
-     :style
-     {:font-size "10px", :filter "drop-shadow(0 0 0.75rem #2b0d55)"}
-     :child
-     "Network Analysis"]},
-   :api-call
-   {:network-analysis
-    {:endpoint "https://test.dash8.day8.com.au/api/reports/network-analysis",
-     :params
-     {:periods :dash8/periods,
-      :demographics :dash8/demographics,
-      :viewing_types :dash8/viewing_types,
-      :grouping [:join "," [:or! [:*this-block* :groups] ["network"]]],
-      :reporting_markets :dash8/reporting_markets,
-      :audience_types :dash8/audience_types,
-      :dayparts :dash8/dayparts,
-      :networks :dash8/networks,
-      :end_date "2024-04-25",
-      :start_date "2024-04-23",
-      :include_spill :dash8/include_spill,
-      :screen_types :dash8/screen_types,
-      :station_families :dash8/station_families},
-     :post-process-fn
-     (fn [output]
-       (let [data0 (first (get output :results)) {:keys [fields data]} data0]
-         (mapv (fn [d] (zipmap (mapv (fn [z] (keyword (:id z))) fields) d)) data))),
-     :method :get,
-     :headers {"Authorization" [:str "Bearer " :settings/dash8-token]},
-     :flatten? false}},
-   :name "Network Analysis",
-   :w 15,
-   :dash8-meta
-   {:source-key :network-analysis,
-    :report-id "network-analysis",
-    :available_facets
-    ["period"
-     "demographic"
-     "master_daypart"
-     "screen_type"
-     "day_of_week"
-     "share_to"],
-    :required-dims ["network"],
-    :dimensions
-    ["reporting_market"
-     "period"
-     "demographic"
-     "network"
-     "station_family"
-     "master_daypart"
-     "daypart"
-     "viewing_type"
-     "audience_type"
-     "screen_type"
-     "day_of_week"
-     "share_to"],
-    :filters
-    {:periods {:name "Report Periods", :required? false, :data-type "array"},
-     :demographics {:name "Demographics", :required? false, :data-type "array"},
-     :viewing_types {:name "Viewing Types", :required? false, :data-type "array"},
-     :reporting_markets
-     {:name "Reporting Markets", :required? false, :data-type "array"},
-     :audience_types {:name "Audience Types", :required? false, :data-type "array"},
-     :dayparts {:name "Dayparts", :required? false, :data-type "array"},
-     :networks {:name "Networks", :required? false, :data-type "array"},
-     :end_date {:name "End Date", :required? false, :data-type "date"},
-     :start_date {:name "Start Date", :required? false, :data-type "date"},
-     :include_spill {:name "Include Spill", :required? false, :data-type "boolean"},
-     :screen_types {:name "Screen Types", :required? false, :data-type "array"},
-     :station_families
-     {:name "Station Families", :required? false, :data-type "array"}},
-    :measures
-    ["total_minutes_millions" "total_minutes_percent" "audience_thousands" "tarp"]},
-   :realm-type "data",
-   :block-key ":network-analysis",
-   :selected-view :network-analysis-sqlized,
-   :root [2 2],
-   :h 9,
-   :iconized? true,
-   :queries
-   {:network-analysis-sqlized
-    {:select [:database_says],
-     :connection-id "cache.db",
-     :_sqlized-at "2024-10-20 21:34:16",
-     :_sqlized-by [:block-1226 :api-call :network-analysis],
-     :_sqlized-hash
-     :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-     :from
-     [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-       :gg606]]}},
-   :tab "thriving moose",
-   :views {}},
   :block-4424
   {:h 2,
    :w 13,
    :root [1 19],
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :selected-view :cell-drop-4478,
    :name "block-4424",
    :views
@@ -3119,106 +1644,6 @@
      :child
      [:str "client uptime: " :client/*client-name*>stats>uptime]]},
    :queries {}},
-  :block-1881
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-1881",
-   :w 6,
-   :selected-view :agg-all-offenses-2,
-   :root [30 12],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-all-offenses-2
-    {:select [[[:sum :HOUR] :HOUR]], :from [[:query/all-offenses :ssb77]]}},
-   :tab "circular guinea pig"},
-  :block-4331
-  {:name "block-4331",
-   :w 9,
-   :selected-mode {:hare-vw-4 :edn},
-   :selected-view :hare-vw-4,
-   :root [41 1],
-   :h 18,
-   :queries {},
-   :tab "generated lass of the woodlands",
-   :views {:hare-vw-4 [:app-db [:click-param :leaf]]}},
-  :block-7866
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-7866",
-   :w 6,
-   :selected-view :agg-grouped-all-offenses-3,
-   :root [30 2],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-grouped-all-offenses-3
-    {:select [[[:sum :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-offenses-3 :ssb64]]}},
-   :tab "circular guinea pig"},
-  :block-11913
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-11913",
-   :w 6,
-   :selected-view :grouped-all-superstore-4,
-   :root [6 21],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:grouped-all-superstore-4
-    {:select [:customer_name [[:count 1] :rowcnt]],
-     :from [[:query/all-superstore :ssb47]],
-     :group-by [:customer_name]}},
-   :tab "globular dove"},
-  :block-8727
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-8727",
-   :w 6,
-   :selected-view :agg-grouped-all-offenses-4,
-   :root [23 18],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-grouped-all-offenses-4
-    {:select [[[:sum :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-offenses-4 :ssb71]]}},
-   :tab "circular guinea pig"},
-  :block-8619
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-8619",
-   :w 6,
-   :selected-view :agg-grouped-all-offenses,
-   :root [14 9],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-grouped-all-offenses
-    {:select [[[:sum :rowcnt] :rowcnt] :DISTRICT],
-     :from [[:query/grouped-all-offenses :ssb69]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
-  :block-11288
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-11288",
-   :w 6,
-   :selected-view :grouped-all-superstore,
-   :root [1 8],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:grouped-all-superstore
-    {:select [:country [[:count 1] :rowcnt]],
-     :from [[:query/all-superstore :ssb65]],
-     :group-by [:country]}},
-   :tab "globular dove"},
-  :block-8103
-  {:name "views-block-8103",
-   :w 13,
-   :selected-view :clover-hop,
-   :root [3 2],
-   :h 12,
-   :opts {:clover-hop {}},
-   :tab "purple wallaby",
-   :minimized? false,
-   :views {:clover-hop [:data-viewer [:app-db [:flow-subs]]]}},
   :block-285
   {:name "block-285",
    :w 5,
@@ -3226,7 +1651,7 @@
    :root [35 4],
    :h 3,
    :queries {},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:cell-drop-7398
     [:v-box
@@ -3262,7 +1687,7 @@
      [:and [:> :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
      :limit 50,
      :group-by [:ts],
-     :_last-run "07:46:15",
+     :_last-run "13:38:40",
      :refresh-every 20,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
@@ -3276,7 +1701,7 @@
        (vec
          (reverse
            (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :views
    {:every-45-seconds
     [:>
@@ -3337,145 +1762,6 @@
         :fill "#00000000",
         :stroke-width 3,
         :stroke "#82ca9d"}]]]}},
-  :block-9644
-  {:h 4,
-   :w 4,
-   :connection-id "cache.db",
-   :name "drag-from-drag-from-Network Analysis",
-   :queries
-   {:rowcnt-drag-14
-    {:select [[[:sum :rowcnt] :rowcnt_sum]],
-     :from [[:query/screen-type-drag-1 :tt780]]}},
-   :root [29 2],
-   :tab "thriving moose"},
-  :block-10540
-  {:h 3,
-   :w 9,
-   :root [17 4],
-   :tab "purple wallaby",
-   :selected-view :hare-vw-2,
-   :name "block-10540",
-   :views
-   {:hare-vw-2
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "21px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:str :ai-worker/threads-for>engaging-salmon-human-0]]},
-   :queries {}},
-  :block-7953
-  {:h 7,
-   :w 30,
-   :connection-id "boston-crime",
-   :name "select-all-offenses",
-   :queries
-   {:offenses-drag-2
-    {:select
-     [:DAY_OF_WEEK
-      :DISTRICT
-      :HOUR
-      :INCIDENT_NUMBER
-      :Lat
-      :Location
-      :Long
-      :MONTH
-      :OCCURRED_ON_DATE
-      :OFFENSE_CODE
-      :OFFENSE_CODE_GROUP
-      :OFFENSE_DESCRIPTION
-      :REPORTING_AREA
-      :SHOOTING
-      :STREET
-      :UCR_PART
-      :YEAR],
-     :from [[:offenses :zz560]]}},
-   :root [17 16],
-   :tab "purple wallaby"},
-  :block-1667
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-1667",
-   :w 6,
-   :selected-view :agg-all-offenses-1,
-   :root [23 7],
-   :h 5,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-all-offenses-1
-    {:select [[[:sum :HOUR] :HOUR]], :from [[:query/all-offenses :ssb58]]}},
-   :tab "circular guinea pig"},
-  :block-23
-  {:h 3,
-   :w 11,
-   :root [3 16],
-   :tab "purple wallaby",
-   :selected-view :hare-vw-1,
-   :name "block-23",
-   :views
-   {:hare-vw-1
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "21px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family "Odor Mean Chey"}
-     :child
-     "Accelerated world. Accelerated nervous system to go with it."]},
-   :queries {}},
-  :block-998
-  {:mad-libs-combo-hash ["1038918937" "superstore_drag_13"],
-   :name "recharts_h_bar - \"DAY_OF_WEEK, rrows\" - 523",
-   :w 9,
-   :selected-view :reech,
-   :root [11 18],
-   :h 5,
-   :connection-id "boston-crime",
-   :queries
-   {:gen-viz-764
-    {:select [[[[:count 1]] :rrows] :DAY_OF_WEEK],
-     :from [[:query/all-offenses :hh890]],
-     :group-by [:DAY_OF_WEEK]}},
-   :tab "circular guinea pig",
-   :conditionals nil,
-   :views
-   {:reech
-    [:>
-     :ResponsiveContainer
-     {:width "100%", :height :panel-height+50}
-     [:>
-      :ComposedChart
-      {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:>
-       :Tooltip
-       {:contentStyle {:backgroundColor "#00000099", :border "none"},
-        :itemStyle {:color "#ecf0f1"},
-        :labelStyle {:color "#3498db"}}]
-      [:> :XAxis {:dataKey :DAY_OF_WEEK, :allowDuplicatedCategory false}]
-      [:>
-       :Bar
-       {:dataKey :rrows,
-        :isAnimationActive false,
-        :data :gen-viz-764,
-        :stroke :theme/editor-outer-rim-color,
-        :fill [:str :theme/editor-outer-rim-color "33"],
-        :on-click [:set-recharts-param>]}]]]}},
   :block-2618
   {:h 8,
    :w 26,
@@ -3498,7 +1784,7 @@
      :from [[:client_stats :gg588]],
      :refresh-every 10,
      :cache? false,
-     :_last-run "07:46:25",
+     :_last-run "13:39:05",
      :col-widths
      {:ack 81,
       :client_latency 141,
@@ -3514,26 +1800,12 @@
       {:logic [:= :client_name :*client-name-str],
        :style {:border "1px solid #cac18255"}}}}},
    :root [14 13],
-   :tab "generated lass of the woodlands"},
-  :block-10902
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-10902",
-   :w 6,
-   :selected-view :grouped-all-offense-codes,
-   :root [22 11],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offense-codes
-    {:select [:NAME [[:count 1] :rowcnt]],
-     :from [[:query/all-offense-codes :ssb86]],
-     :group-by [:NAME]}},
-   :tab "globular dove"},
+   :tab "client stats"},
   :block-2178
   {:h 6,
    :w 34,
    :root [1 7],
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :selected-view :every-10-min-avg,
    :name "block-2178",
    :views
@@ -3576,7 +1848,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 126,
      :group-by [:ts_hour],
-     :_last-run "07:45:36",
+     :_last-run "13:39:05",
      :refresh-every 10,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts_hour :desc]],
@@ -3609,73 +1881,6 @@
               (if (= idx 0)
                 (str (rvbbit-backend.util/rnd mb 0) " MB")
                 (str pos diff))}))))}}},
-  :block-7035
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-7035",
-   :w 16,
-   :selected-view :all-game-daily-player-summary-1k-1,
-   :root [1 2],
-   :h 6,
-   :connection-id "xtdb-pg",
-   :queries
-   {:all-game-daily-player-summary-1k-1
-    {:select
-     [:_id
-      :achievements
-      :player_id
-      :player_level
-      :playtime_minutes
-      :revenue
-      :vdate],
-     :from [[:game_daily_player_summary_1k :ssb26]]}},
-   :tab "purple peafowl"},
-  :block-10297
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-10297",
-   :w 6,
-   :selected-view :grouped-grouped-all-offenses-5,
-   :root [37 12],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-grouped-all-offenses-5
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/grouped-all-offenses-5 :ssb92]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
-  :block-702
-  {:leaf-drop [:sql :new-agg.sum],
-   :name "block-702",
-   :w 6,
-   :selected-view :agg-grouped-all-offense-codes,
-   :root [29 20],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:agg-grouped-all-offense-codes
-    {:select [[[:sum :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-offense-codes :ssb7]]}},
-   :tab "globular dove"},
-  :block-1902
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-1902",
-   :w 9,
-   :selected-view :all-game-daily-player-summary-1k,
-   :root [1 18],
-   :h 4,
-   :connection-id "xtdb-pg",
-   :queries
-   {:all-game-daily-player-summary-1k
-    {:select
-     [:_id
-      :achievements
-      :player_id
-      :player_level
-      :playtime_minutes
-      :revenue
-      :vdate],
-     :from [[:game_daily_player_summary_1k :ssb89]]}},
-   :tab "circular guinea pig"},
   :block-384
   {:name "block-384",
    :w 11,
@@ -3686,116 +1891,11 @@
    :queries {},
    :tab "terminal stats",
    :views {:pulled-val [:solver-meta/block-8000-new-clojure>history]}},
-  :block-10908
-  {:h 5,
-   :w 8,
-   :selected-view :drop-pivot,
-   :tab "thriving moose",
-   :root [2 12],
-   :pivot
-   {:drop-pivot
-    {:rowset-keypath [:network-analysis-sqlized],
-     :rowset-query
-     [{:select
-       [:screen_type
-        :day_of_week
-        :station_family
-        :audience_type
-        :daypart
-        :ue
-        :audience_thousands
-        :tarp
-        :reporting_market
-        :share_to
-        :network
-        :period
-        :total_minutes_millions
-        :total_minutes_percent
-        :demographic
-        :viewing_type
-        :daypart_total_seconds],
-       :_sqlized-at "2024-10-17 00:25:27",
-       :_sqlized-by [:block-1226 :api-call :network-analysis],
-       :_sqlized-hash
-       :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-       :from
-       [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-         :ii785]]}],
-     :row-keys [:day_of_week],
-     :column-keys ["all" :daypart],
-     :agg-specs [],
-     :reaction-clover nil,
-     :pivot-data-kw :drop-pivot-pivot}},
-   :queries
-   {:drop-pivot-flat
-    {:select [:day_of_week :daypart [[:count :*] :rowcnt]],
-     :connection-id "cache.db",
-     :from [[:query/network-analysis-sqlized :agg45]],
-     :group-by [:day_of_week :daypart]}}},
-  :xtdb-val-scrub-11
-  {:h 2,
-   :w 6,
-   :bid :xtdb-val-scrub-11,
-   :drop-mutate
-   {[:panels :block-10824 :queries :game-daily-player-summary-drag-30]
-    {:select
-     [:_id
-      :achievements
-      :player_id
-      :player_level
-      :playtime_minutes
-      :revenue
-      :vdate],
-     :from
-     [[:game_daily_player_summary
-       :hh796
-       :for
-       :valid-time
-       :as-of-date
-       :xtdb-val-scrub-11/valid-date-slider]]},
-    [:click-param :bounds :go!] :done,
-    [:panels :block-10824 :queries :bounds]
-    {:select [:vmin :smin [[:raw "CURRENT_DATE"] :mmax]],
-     :from
-     [[{:select
-        [[[:raw "min(_valid_from::date)"] :vmin]
-         [[:raw "min(_system_from::date)"] :smin]],
-        :from [[:game_daily_player_summary :ss1 :for :all :valid_time]]}
-       :tt45]]},
-    [:panels :block-10824 :selected-view] :game-daily-player-summary-drag-30},
-   :views
-   {:valid-time-scrub
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "21px",
-      :font-weight 700,
-      :padding-top "6px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:date-slider
-      :valid-date-slider
-      :bounds/vmin.0
-      :bounds/mmax.0
-      1
-      250
-      [:or! [:xtdb-val-scrub-11 :valid-date-slider] "2024-10-20"]
-      "yyyy-MM-dd"
-      "MMM dd, yyyy"
-      ":valid-time :as-of-date"]]},
-   :name "dragged-clover",
-   :root [19 3],
-   :tab "delightful echidna"},
   :block-12288
   {:h 4,
    :w 13,
    :root [1 13],
-   :tab "generated lass of the woodlands",
+   :tab "client stats",
    :selected-view :hi,
    :name "block-12288",
    :views
@@ -3818,191 +1918,7 @@
      :child
      [:string :time/second]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
-  :block-305
-  {:h 7,
-   :w 30,
-   :connection-id :unreal-pear-wren-40,
-   :name "select-all-combos",
-   :queries
-   {:combos-drag-30
-    {:select
-     [:combo_edn
-      :combo_hash
-      :conditionals
-      :connection_id
-      :context_hash
-      :h
-      :key_hashes
-      :key_hashes_hash
-      :query_map
-      :query_map_str
-      :runner
-      :score
-      :selected_view
-      :shape_name
-      :table_name
-      :uuid
-      :viz_map
-      :w],
-     :from [[:combos :gg323]],
-     :_last-run "15:10:17"}},
-   :root [17 8],
-   :tab "purple wallaby"},
-  :block-9004
-  {:leaf-drop [:sql :new-agg.avg],
-   :name "block-9004",
-   :w 6,
-   :selected-view :agg-grouped-all-superstore-1-2,
-   :root [8 13],
-   :h 4,
-   :connection-id "superstore",
-   :queries
-   {:agg-grouped-all-superstore-1-2
-    {:select [[[:avg :rowcnt] :rowcnt]],
-     :from [[:query/grouped-all-superstore-1 :ssb77]]}},
-   :tab "globular dove"},
-  :block-10898
-  {:h 5,
-   :w 8,
-   :connection-id "cache.db",
-   :name "drag-from-Network Analysis",
-   :queries
-   {:screen-type-drag-1
-    {:_sqlize-hash
-     :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-     :select [:screen_type [[:count 1] :rowcnt]],
-     :from
-     [[{:select
-        [:screen_type
-         :day_of_week
-         :station_family
-         :audience_type
-         :daypart
-         :ue
-         :audience_thousands
-         :tarp
-         :reporting_market
-         :share_to
-         :network
-         :period
-         :total_minutes_millions
-         :total_minutes_percent
-         :demographic
-         :viewing_type
-         :daypart_total_seconds],
-        :_sqlized-at "2024-10-17 00:25:27",
-        :_sqlized-by [:block-1226 :api-call :network-analysis],
-        :_sqlized-hash
-        :solver-meta/block-1226-network-analysis>output>evald-result>value-hash,
-        :from
-        [[:block_1226_network_analysis__block_1226_api_call_network_analysis_
-          :ii785]]}
-       :oo4]],
-     :group-by [:screen_type],
-     :order-by [[:rowcnt :desc]]}},
-   :root [21 8],
-   :tab "thriving moose"},
-  :block-3255
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-3255",
-   :w 6,
-   :selected-view :grouped-all-offenses-5,
-   :root [30 7],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offenses-5
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/all-offenses :ssb93]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
-  :block-10826
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-10826",
-   :w 6,
-   :selected-view :grouped-all-offenses,
-   :root [8 9],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offenses
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/all-offenses :ssb11]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"},
-  :block-4941
-  {:leaf-drop [:sql :new-select.all],
-   :name "block-4941",
-   :w 16,
-   :selected-view :new-query-1,
-   :root [2 4],
-   :h 6,
-   :connection-id "systemh2-db",
-   :queries
-   {:new-query-1
-    {:cache? false,
-     :where [:= :client_name :*client-name-str],
-     :limit 126,
-     :group-by [:ts_hour],
-     :from [:query/client-memory-drag-36],
-     :order-by [[:ts_hour :desc]],
-     :connection-id "systemh2-db",
-     :select [[[:avg :mem_used] :mem_used] :ts_hour],
-     :post-process-fn
-     (fn [x]
-       (vec
-         (for
-           [idx
-            (range (count x))
-            :let
-            [rx
-             (vec (reverse x))
-             prev-row
-             (get rx (- idx 1) {:mem_used 0})
-             row
-             (get rx idx {:mem_used 0})
-             pre-mb
-             (/ (get prev-row :mem_used) 1048576)
-             mb
-             (/ (get row :mem_used) 1048576)
-             diff
-             (rvbbit-backend.util/rnd (- mb pre-mb) 0)
-             pos
-             (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-           (merge
-             row
-             {:diff
-              (if (= idx 0)
-                (str (rvbbit-backend.util/rnd mb 0) " MB")
-                (str pos diff))}))))}},
-   :tab "thriving moose"},
-  :block-3695
-  {:leaf-drop [:sql :new-select.count],
-   :name "block-3695",
-   :w 6,
-   :selected-view :cnt-offense-codes,
-   :root [29 15],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:cnt-offense-codes
-    {:select [[[:count 1] :rowcnt]], :from [[:offense_codes :ssb50]]}},
-   :tab "globular dove"},
-  :block-10941
-  {:leaf-drop [:sql :new-group-by],
-   :name "block-10941",
-   :w 6,
-   :selected-view :grouped-all-offenses-3,
-   :root [23 2],
-   :h 4,
-   :connection-id "boston-crime",
-   :queries
-   {:grouped-all-offenses-3
-    {:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:query/all-offenses :ssb5]],
-     :group-by [:DISTRICT]}},
-   :tab "circular guinea pig"}},
+   :queries {}}},
  :materialized-theme
  {:codemirror-theme "rvbbit-dynamic",
   :editor-param-background-color "#000000",
@@ -4028,7 +1944,11 @@
     :titleColor "#ffffff99",
     :stroke "#ffffff99",
     :titleFont "Lato"},
-   :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+   :header
+   {:labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelColor "#f2e8ff"},
    :mark {:font "Lato"},
    :title
    {:font "Lato",
@@ -4038,6 +1958,7 @@
     :titleColor "#ffffff99"}},
   :grid-selected-column-css
   {:background-color "#00000088", :filter "brightness(200%)"},
+  :running-gif "images/running.gif",
   :base-block-color-selected "#091536",
   :block-title-font-color "#ffffff",
   :base-block-color "#0b0f2180",
@@ -4105,6 +2026,7 @@
    :background-blend-mode "normal",
    :background-color "#424f57"},
   :editor-font-color "#ffffff",
+  :line-style "curved-path-h",
   :base-font "Instagram Sans",
   :block-tab-selected-font-color "#c9d1ff",
   :editor-background-color "#000006",
@@ -4129,8 +2051,7 @@
   "nil" "#eeeeee"},
  :solver-fn nil,
  :click-param
- {:grouped-all-offenses-3 nil,
-  :blocks-sys
+ {:blocks-sys
   {:block_key ":*theme*",
    :block_name "(meta: this screen's theme)",
    :queries 0,
@@ -4141,6 +2062,93 @@
    ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
    :query_names ""},
   :realms-sys {:realm_name ":dash8"},
+  :render-hash
+  {:block-11815 -2112184020,
+   :block-5869 1921542058,
+   :block-7671 -1625056861,
+   :block-7838 -1063240553,
+   :block-469 -405453145,
+   :block-8670 -1895289279,
+   :block-7377 -29261886,
+   :block-8000 -350756981,
+   :block-3452 -1522995690,
+   :block-10943 211384161,
+   :block-3412 1804838558,
+   :block-9638 2060077921,
+   :block-5136 -1260751101,
+   :block-8681 -492928568,
+   :block-7453 -445975934,
+   :block-3108 2049124858,
+   :block-10824 -1439812161,
+   :block-1226-window 2089497908,
+   :block-5159 -617274640,
+   :block-10889 -878305769,
+   :block-5145 -19086706,
+   :block-9970 -1792165078,
+   :block-10470 -1787682784,
+   :block-501 1958592943,
+   :block-2505 1134254528,
+   :block-675 -1619576870,
+   :block-6855 -1875388961,
+   :block-834 71380992,
+   :block-5659 -1318757913,
+   :block-4032 760771332,
+   :block-7831 -1491487087,
+   :block-488 132117360,
+   :block-2990 730182561,
+   :block-5158 -375589397,
+   :block-689 162692768,
+   :block-9994 -129448629,
+   :block-1226 1576259257,
+   :block-4424 154836034,
+   :block-1881 1574630048,
+   :block-4331 594087454,
+   :block-7866 -835073390,
+   :block-11913 -1142686672,
+   :block-8727 -1691587122,
+   :block-8619 296921370,
+   :block-11288 -613131982,
+   :block-8103 1212635680,
+   :block-285 874209820,
+   :block-12050 -415764851,
+   :block-9644 1587999197,
+   :block-10540 -601781734,
+   :block-7953 811877002,
+   :block-1667 -405487118,
+   :block-23 1255572886,
+   :block-998 -1072785599,
+   :block-8193 785042936,
+   :block-2618 985358101,
+   :block-10902 -342095608,
+   :block-2178 -566197443,
+   :block-6676 950012757,
+   :block-173 248423351,
+   :block-7035 929679235,
+   :block-10955 1308998442,
+   :block-10297 -679571912,
+   :block-10081 1436362862,
+   :block-172 -830539956,
+   :block-702 8664963,
+   :block-1902 1701653441,
+   :block-1400 449559541,
+   :block-384 -50053633,
+   :block-609 1917739963,
+   :block-653 1544510895,
+   :block-350 -1906737314,
+   :block-10908 -1973561120,
+   :xtdb-val-scrub-11 444720668,
+   :block-7349 1561035939,
+   :block-411 123022883,
+   :block-7312 -921046503,
+   :block-305 1165704681,
+   :block-9004 197968539,
+   :block-10898 -1795788391,
+   :block-3255 866665667,
+   :block-10826 2107373933,
+   :block-4941 560111096,
+   :block-3695 1699844351,
+   :block-10941 486849899,
+   :block-703 -1470042098},
   :grouped-all-offenses-2 {:OFFENSE_DESCRIPTION "A&B ON POLICE OFFICER", :rowcnt 3},
   :tables-sys
   {:db_schema "public",
@@ -4150,10 +2158,75 @@
    :table_name "game_daily_player_summary_1k",
    :fields 8},
   :realms-type-sys {:block_type "filter", :cnt 20},
+  :data-hash
+  {nil -1652801366,
+   :grouped-all-offenses-3 -410083272,
+   :blocks-sys 2072928602,
+   :grouped-grouped-all-offenses-5 1493405184,
+   :game_daily_player_summary -913183019,
+   :all-offense-codes 1976922113,
+   :agg-all-superstore -1364426632,
+   :grouped-all-offenses-1 -1578798670,
+   :client_memory 1627783528,
+   :screen-type-drag-1 -1236632591,
+   :grouped-all-offenses-2 -1626705085,
+   :superstore -1729702703,
+   :combos 619197464,
+   :game_daily_player_summary_1k -913183019,
+   :grouped-all-superstore-1 -2030464101,
+   :agg-all-offenses-1 580012475,
+   :new-query 485876950,
+   :network-analysis -522454394,
+   :all-game-daily-player-summary-1k-1 2050675814,
+   :new-query-1 -891751817,
+   :network-analysis-sqlized 2020149549,
+   :grouped-grouped-all-offenses-3 1493405184,
+   :grouped-all-superstore-3 -1326997085,
+   :files-sys -1991486530,
+   :client-stats-drag-36 -580293214,
+   :agg-all-offenses-2 580012475,
+   :gen-viz-591 -1658277147,
+   :offenses-drag-2 -985052635,
+   :agg-grouped-all-offenses-3 1657545427,
+   :gen-viz-702 -134869969,
+   :agg-all-offenses 580012475,
+   :all-game-daily-player-summary-1k 2050675814,
+   :grouped-all-offenses -410083272,
+   :client_stats 852478649,
+   :bounds -41230648,
+   :grouped-all-superstore-2 341169804,
+   :game-daily-player-summary-drag-30 -2017569654,
+   :agg-grouped-all-offenses-4 1657545427,
+   :grouped-all-offense-codes 226837071,
+   :grouped-all-offenses-5 -410083272,
+   :grouped-all-superstore-4 -1326997085,
+   :agg-grouped-all-offense-codes 336376038,
+   :grouped-all-superstore -1831995164,
+   :agg-grouped-all-superstore-1 -1555332973,
+   :cnt-offense-codes 336376038,
+   :all-offense-codes-1 1976922113,
+   :offense_codes 2090870252,
+   :block_1226_network_analysis__block_1226_api_call_network_analysis_ 919055136,
+   :agg-grouped-all-superstore-1-1 -924564367,
+   :agg-grouped-all-offenses-1 1657545427,
+   :offenses -634447600,
+   :gen-viz-764 1641052884,
+   :reporting-market-drag-41 193742860,
+   :all-superstore 1943520345,
+   :grouped-all-offenses-4 -410083272,
+   :agg-grouped-all-offenses-3-1 1657545427,
+   :grouped-agg-grouped-all-offenses 1493405184,
+   :combos-drag-30 619197464,
+   :agg-grouped-all-offenses -410083272,
+   :client-memory-drag-36 1040799565,
+   :all-offenses -985052635,
+   :gen-viz-516 -1045217167,
+   :agg-grouped-all-superstore-1-2 510236691,
+   :rowcnt-drag-14 -638659407,
+   :drop-pivot-flat -1548281514},
   :block-307 {:country nil},
   :viz-shapes0-sys2 {:shape "drop_down_filter"},
   :dash8 {:end_date "2024-04-01", :start_date "2024-04-27"},
-  :grouped-all-superstore-3 nil,
   :flows-sys
   {:flow_id "a-random-wow",
    :file_path "./flows/a-random-wow.edn",
@@ -4179,43 +2252,8 @@
    :last_seen "19 seconds"},
   :block-12 {:country nil},
   :param
-  {:selected-view [:queries :new-query],
-   :selected-view-data
-   {:cache? false,
-    :where [:= :client_name :*client-name-str],
-    :limit 126,
-    :group-by [:ts_hour],
-    :_last-run "07:41:04",
-    :refresh-every 10,
-    :from [:query/client-memory-drag-36],
-    :order-by [[:ts_hour :desc]],
-    :connection-id "systemh2-db",
-    :select [[[:avg :mem_used] :mem_used] :ts_hour],
-    :post-process-fn
-    (fn [x]
-      (vec
-        (for
-          [idx
-           (range (count x))
-           :let
-           [rx
-            (vec (reverse x))
-            prev-row
-            (get rx (- idx 1) {:mem_used 0})
-            row
-            (get rx idx {:mem_used 0})
-            pre-mb
-            (/ (get prev-row :mem_used) 1048576)
-            mb
-            (/ (get row :mem_used) 1048576)
-            diff
-            (Math/round (- mb pre-mb) 0)
-            pos
-            (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-          (merge
-            row
-            {:diff
-             (if (= idx 0) (str (Math/round mb 0) " MB") (str pos diff))}))))},
+  {:selected-view nil,
+   :selected-view-data nil,
    :selected-block :block-2178,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
@@ -4261,7 +2299,11 @@
      :titleColor "#ffffff99",
      :stroke "#ffffff99",
      :titleFont "Lato"},
-    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :header
+    {:labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelColor "#f2e8ff"},
     :mark {:font "Lato"},
     :title
     {:font "Lato",
@@ -4271,6 +2313,7 @@
      :titleColor "#ffffff99"}},
    :grid-selected-column-css
    {:background-color "#00000088", :filter "brightness(200%)"},
+   :running-gif "images/running.gif",
    :base-block-color-selected "#091536",
    :block-title-font-color "#ffffff",
    :base-block-color "#0b0f2180",
@@ -4338,6 +2381,7 @@
     :background-blend-mode "normal",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
+   :line-style "curved-path-h",
    :base-font "Instagram Sans",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
@@ -4352,8 +2396,6 @@
   {:database_name "PostgreSQL",
    :connection_id "xtdb-pg",
    :styler_highlight_8717ssa 0},
-  :all-superstore nil,
-  :grouped-all-offenses-4 nil,
   :sys {:selected-tab "generated lass of the woodlands", :selected-tab-idx 0},
   :xtdb-val-scrub-11 {:valid-date-slider "2024-04-08"},
   :block-678 {:sub_category "Copiers"},
@@ -4365,143 +2407,5 @@
    :batches 3349,
    :packets 47211,
    :ts "2024-05-13 21:53:16"},
-  :all-offenses nil,
   :block-342 {:country nil}},
- :selected-flow "my-new-flow743",
- :shapes
- {[:fresh-table! "realms-db" :realms]
-  [{:h 5,
-    :w 9,
-    :selected-view :reech,
-    :views
-    {:reech
-     [:>
-      :ResponsiveContainer
-      {:width "100%", :height :panel-height+50}
-      [:>
-       :ComposedChart
-       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-       [:>
-        :Tooltip
-        {:contentStyle {:backgroundColor "#00000099", :border "none"},
-         :itemStyle {:color "#ecf0f1"},
-         :labelStyle {:color :theme/editor-outer-rim-color}}]
-       [:> :XAxis {:dataKey :file_path, :allowDuplicatedCategory false}]
-       [:>
-        :Bar
-        {:dataKey :rrows,
-         :isAnimationActive false,
-         :data :query-preview,
-         :stroke :theme/editor-outer-rim-color,
-         :fill [:str :theme/editor-outer-rim-color "33"],
-         :on-click [:set-recharts-param>]}]]]},
-    :connection-id "realms-db",
-    :shape-rotator
-    {:context ["realms-db" nil "none" "realms"],
-     :shape-name :recharts-h-bar,
-     :axes {:y "rrows", :x "file_path"},
-     :honey-hash 806865728,
-     :items [[:views :reech] [:queries :query-preview]],
-     :source-panel [:fresh-table! "realms-db" :realms]},
-    :name "rrows, file_path",
-    :queries
-    {:query-preview
-     {:select [[[:count 1] :rrows] :file_path],
-      :from [[:realms :subq1]],
-      :group-by [:file_path]}}}
-   {:h 5,
-    :w 9,
-    :selected-view :reech,
-    :views
-    {:reech
-     [:>
-      :ResponsiveContainer
-      {:width "100%", :height :panel-height+50}
-      [:>
-       :ComposedChart
-       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-       [:>
-        :Tooltip
-        {:contentStyle {:backgroundColor "#00000099", :border "none"},
-         :itemStyle {:color "#ecf0f1"},
-         :labelStyle {:color :theme/editor-outer-rim-color}}]
-       [:> :XAxis {:dataKey :file_path, :allowDuplicatedCategory false}]
-       [:>
-        :Line
-        {:type "monotone",
-         :isAnimationActive false,
-         :data :query-preview,
-         :dataKey :rrows,
-         :stroke :theme/editor-outer-rim-color,
-         :activeDot {:r 8}}]
-       [:>
-        :Scatter
-        {:data :query-preview,
-         :dataKey :rrows,
-         :isAnimationActive false,
-         :fill :theme/editor-outer-rim-color,
-         :onClick [:set-recharts-param>]}]]]},
-    :connection-id "realms-db",
-    :shape-rotator
-    {:context ["realms-db" nil "none" "realms"],
-     :shape-name :recharts-line,
-     :axes {:y "rrows", :x "file_path"},
-     :honey-hash 806865728,
-     :items [[:views :reech] [:queries :query-preview]],
-     :source-panel [:fresh-table! "realms-db" :realms]},
-    :name "rrows, file_path",
-    :queries
-    {:query-preview
-     {:select [[[:count 1] :rrows] :file_path],
-      :from [[:realms :subq1]],
-      :group-by [:file_path]}}}
-   {:h 5,
-    :w 9,
-    :selected-view :reech,
-    :views
-    {:reech
-     [:>
-      :ResponsiveContainer
-      {:width "100%", :height :panel-height+50}
-      [:>
-       :ComposedChart
-       {:data [], :margin {:top 5, :bottom 5, :right 30, :left 20}}
-       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-       [:>
-        :Tooltip
-        {:contentStyle {:backgroundColor "#00000099", :border "none"},
-         :itemStyle {:color "#ecf0f1"},
-         :labelStyle {:color :theme/editor-outer-rim-color}}]
-       [:> :XAxis {:dataKey :file_path, :allowDuplicatedCategory false}]
-       [:>
-        :Area
-        {:type "monotone",
-         :isAnimationActive false,
-         :data :query-preview,
-         :dataKey :rrows,
-         :stroke :theme/editor-outer-rim-color,
-         :fill [:str :theme/editor-outer-rim-color "33"],
-         :activeDot {:r 8}}]
-       [:>
-        :Scatter
-        {:data :query-preview,
-         :isAnimationActive false,
-         :dataKey :rrows,
-         :fill :theme/editor-outer-rim-color,
-         :onClick [:set-recharts-param>]}]]]},
-    :connection-id "realms-db",
-    :shape-rotator
-    {:context ["realms-db" nil "none" "realms"],
-     :shape-name :recharts-area,
-     :axes {:y "rrows", :x "file_path"},
-     :honey-hash 806865728,
-     :items [[:views :reech] [:queries :query-preview]],
-     :source-panel [:fresh-table! "realms-db" :realms]},
-    :name "rrows, file_path",
-    :queries
-    {:query-preview
-     {:select [[[:count 1] :rrows] :file_path],
-      :from [[:realms :subq1]],
-      :group-by [:file_path]}}}]}}
+ :selected-flow "my-new-flow1336"}

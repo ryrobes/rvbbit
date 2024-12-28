@@ -63,6 +63,7 @@ mkdir -p "../$DIR_NAME/db"
 cp -r defs "../$DIR_NAME/defs"
 mv "../$DIR_NAME/defs/empty-secrets.edn" "../$DIR_NAME/defs/secrets.edn"
 cp -r flows "../$DIR_NAME/flows"
+cp -r themes "../$DIR_NAME/themes"
 cp -r extras "../$DIR_NAME/extras"
 cp -r resources "../$DIR_NAME/resources"
 cp -r screens "../$DIR_NAME/screens"
@@ -100,14 +101,14 @@ draw_bordered_text "done. go to ./backend/ or ./$DIR_NAME/  and run ./run-rabbit
 echo ""
 
 # link back so shadow-cljs can see server assets w/o pedestal routes
-cd ../frontend/resources/public  
+cd ../frontend/resources/public
 ln -s ../../../backend/assets assets
 cd ../../../
 
 # draw_bordered_text "building Docker image..."
 # cd ..
 # docker build --no-cache -t rvbbit .
-# docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root:/app/ rvbbit 
+# docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root:/app/ rvbbit
 # docker pull ghcr.io/ryrobes/rvbbit:latest
 # docker run -d -p 8888:8888 -p 3030:3030 -p 8181:8181 -v rvbbit-root2:/app/ ghcr.io/ryrobes/rvbbit:latest
 

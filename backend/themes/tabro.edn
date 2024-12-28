@@ -42,7 +42,7 @@
  :pop-3                                 "#4caf50"
  :editor-rim-color                      "#2196f3"
  :base-block-filter-selected            "none"
- :_vega-default-color-scheme             {:scheme "tableau10"}
+ :_vega-default-color-scheme            {:scheme "tableau10"}
  :data-colors                           {"float"       "#2196f3"
                                          "boolean"     "#4caf50"
                                          "map"         "#ff9800"

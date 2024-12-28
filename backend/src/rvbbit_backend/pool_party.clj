@@ -30,7 +30,7 @@
 ;; (defonce general-scheduler-thread-pool
 ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
-  ;; (defonce custom-watcher-thread-master-pool 
+  ;; (defonce custom-watcher-thread-master-pool
   ;;   (Executors/newFixedThreadPool 32))
 ;; (defonce custom-watcher-thread-master-pool ;; master watchers
 ;;   (ThreadPoolExecutor. 10 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
@@ -41,7 +41,7 @@
 ;;   (ThreadPoolExecutor. 10 1000 60 TimeUnit/SECONDS (SynchronousQueue.)))
 
 ;; (defonce custom-watcher-thread-pool ;; if pool is 100% full, will fallback to parent callers thread pool instead of rejection
-;;   (ThreadPoolExecutor. 10 2000 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
+;;   (ThreadPoolExecutor. 10 2000 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
 
 
@@ -109,7 +109,7 @@
       (if-let [queue (@dyn-pools name)]
         queue
         (let [new-queue (create-cached-thread-pool name)]
-          (ut/pp [:*creating-thread-pool-for name])
+          (ut/pp ["⛓" :*creating-thread-pool-for name])
           (swap! dyn-pools assoc name new-queue)
           new-queue)))))
 

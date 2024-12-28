@@ -88,7 +88,7 @@
  :grid-selected-background-color "#ff36d9"
  :grid-font-color "#ffffff"
  :canvas-background-css {:background "linear-gradient(180deg, rgba(12,4,32,0.85) 0%, rgba(12,4,32,0.92) 100%)"
-                         :background-image "url(assets/openai-images/b64-image3-57753-98916.png)"
+                         :background-image "url(assets/openai-images/b64-image3-57753-98916.png-q8.jpg)"
                          :background-size "cover"
                          :background-blend-mode "soft-light"
                          :transition "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"

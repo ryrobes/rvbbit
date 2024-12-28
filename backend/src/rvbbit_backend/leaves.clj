@@ -237,7 +237,7 @@
                                                                            (keyword (cstr/replace (str ww) ":query/" ""))
                                                                            ww))
                                                                        (catch Exception _ nil))]))))))
-            _ (ut/pp [:grandparent-table grandparent-table])
+            ;; _ (ut/pp [:grandparent-table grandparent-table])
             dragging-kp (or selected-kp (get @db/leaf-drags-atom client-name))
             dragging? (true? (or (= leaf-kp dragging-kp) ; are WE dragging
                                  (= [panel-key runner data-key :field field-name] dragging-kp)))

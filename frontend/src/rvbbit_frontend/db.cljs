@@ -9,8 +9,8 @@
     (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (def brick-size 50)
-(def version "0.2.0-alpha")
-(def version-date "'snow hare' dec-2024")
+(def version "snowshoe-hare.0.2.0")
+(def version-date "december-28-2024")
 
 (defonce loaded-screen? (reagent/atom false))
 (defonce post-boot? (reagent/atom false))
@@ -23,81 +23,122 @@
 (def rabbit-search-input (reagent/atom nil))
 (def clover-leaf-previews (reagent/atom nil))
 (def sockets [:query1  :query2  :query3])
-(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data :incoming :solver-status :ai-worker :clover-gen :leaf :actions
+(def reactor-types #{:flow :screen :time :signal :server :ext-param :solver :*data
+                     :incoming :solver-status :ai-worker :clover-gen :leaf :actions
                      :solver-meta :kit-status :kit :repl-ns :flow-status :signal-history :panel :client :settings
                      ;:panel-hash :data-hash
                      })
 
-(def messages [;; Functional programming jokes
-               :avoiding-side-effects
-               :currying-favor
-               :maintaining-immutability
-               :pursuing-purity
-               :recursing-recursively
-               :reducing-complexity
-               :mapping-over-manifolds
-               :folding-space-time
-               :evaluating-lazily
-               :composing-monads
-               :spawning-atoms
-               :dereferencing-universe
+(def emoji-collection
+  ["🦊" "🌸" "🍜"
+   "🐇" "🥕" "🌱"
+   "🦀" "🌊" "🏖️"
+   "🦉" "🌙" "⭐"
+   "🐸" "🍄" "🌿"
+   "🦝" "🗑️" "✨"
+   "🐢" "🌴" "🥥"
+   "🦥" "🌳" "🍃"
+   "🦩" "🌺" "💗"
+   "🐠" "🐋" "🌊"
+   "🦜" "🍉"
+   "🦁" "🌞" "🦒"
+   "🐼" "🎋" "🥢"
+   "🦄" "🌟" "🍭"
+   "🐉" "🏯" "🎋"
+   "🦦" "🐟" "💦"
+   "🦔" "🍎" "🍂"
+   "🐌" "🍄" "🌧️"
+   "🦚" "💎" "🌺"
+   "🐝" "🌼" "🍯"
+   "🦋" "🌸"
+   "🐙" "🌊" "💫"
+   "🦕" "🌿" "🗿"
+   "🦘" "🌿" "🦘"
+   "🐪" "🏜️" "⭐"
+   "🦭" "🐟" "❄️"
+   "🦩" "💕" "🌸"
+   "🐳" "🌊" "🐋"
+   "🦖" "🌋" "🔥"
+   "🦡" "🌲" "🌛"])
 
-               ;; SQL/Database humor
-               :normalizing-relations
-               :joining-parallel-universes
-               :indexing-infinity
-               :optimizing-queries
-               :denormalizing-normalization
-               :aggregating-aggregates
-               :materializing-views
-               :vaccuming-postgres
-               :sharding-reality
+(def messages
+  [;; Functional programming jokes
+   :avoiding-side-effects?
+   :currying-favor
+   :maintaining-immutability
+   :pursuing-purity
+   :recursing-recursively
+   :reducing-complexity
+   :mapping-over-manifolds
+   :folding-space-time
+   :evaluating-lazily
 
-               ;; Data viz references
-               :calculating-chart-chakras
-               :aligning-aesthetic-atoms
-               :balancing-bar-charts
-               :harmonizing-heatmaps
-               :plotting-world-domination
-               :calibrating-color-scales
-               :generating-gratuitous-gradients
-               :validating-vega-specs
-               :dimensioning-dimensions
+   :spawning-atoms
+   :dereferencing-universe
+   :proving-functions-are-just-expensive-closures
+   :untangling-recursive-dreams-within-dreams
+   :teaching-pure-functions-to-lie
+   :quantum-currying-in-parallel-universes
+   :folding-origami-in-fourth-dimensional-space
+   :discovering-monad-shaped-holes-in-reality
+   :feeding-infinity-to-lazy-evaluators
 
-               ;; Classic tech loading messages
-               :warming-up-flux-capacitor
-               :reversing-polarity
-               :downloading-more-ram
-               :updating-update-updater
-               :refactoring-refactors
-               :debugging-debugger
-               :compiling-compilers
+   ;; Database cosmic horror
+   :teaching-postgres-forbidden-knowledge
+   :normalizing-relationships-with-elder-gods
+   :indexing-memories-that-never-existed
+   :querying-the-void-between-joins
+   :sharding-the-multiverse-for-better-throughput
 
-               ;; Clojure-specific
-               :parenthesizing-parentheses
-               :evaluating-evaluator
-               :macro-expanding-macros
-               :vectorizing-vectors
-               :threading-threads
-               :destructuring-structures
-               :persisting-persistence
+   ;; Cyberpunk data viz
+   :hijacking-neural-datapaths
+   :synthesizing-illegal-color-spaces
+   :rendering-impossible-geometries
+   :calibrating-retinal-bandwidth
+   :optimizing-wetware-interfaces
 
-               ;; Dashboard-specific
-               :calculating-calculations
-               :filtering-filters
-               :widgeting-widgets
-               :paneling-panels
-               :gridding-grids
-               :responsifying-responsiveness
+   ;; Tech/sci-fi mashups
+   :reticulating-quantum-splines
+   :defragmenting-temporal-cache
+   :patching-universe-simulation
+   :compiling-artificial-dreams
+   :downloading-consciousness-updates
+   :overclocking-reality-engine
 
-               ;; Meta humor
-               :loading-loading-messages
-               :generating-status-updates
-               :inventing-progress-bars
-               :simulating-work
-               :pretending-to-be-busy
-               :adding-artificial-delay
-               :finding-more-loading-messages])
+   ;; Wonderland tech
+   :debugging-cheshire-cat-smiles
+   :calculating-exact-degree-of-madness
+   :redefining-unbirthday-protocols
+   :synchronizing-rabbit-hole-endpoints
+   :optimizing-tea-party-entropy
+
+   ;; Clojure cosmic horror
+   :awakening-ancient-parentheses
+   :summoning-elder-macros
+   :threading-needles-through-spacetime
+   :eval-ing-expressions-that-should-not-be
+
+   ;; Delightfully absurd
+   :convincing-pixels-to-dance
+   :negotiating-with-rogue-algorithms
+   :measuring-speed-of-dark
+   :calculating-probability-of-improbability
+   :teaching-silence-to-sing
+   :unboxing-schrödingers-cache
+   :dividing-by-zero-for-science
+
+   ;; Meta weirdness
+   :generating-more-genuine-artificial-progress
+   :simulating-simulation-simulators
+   :accelerating-time-perception-matrices
+   :loading-alternative-loading-realities
+   :upgrading-upgrade-upgraders
+   :generating-status-updates
+   :inventing-progress-bars
+   :simulating-work
+   :pretending-to-be-busy
+   :adding-artificial-delay
+   :finding-more-loading-messages])
 
 (defn rabbit-svg [color & [stroke]]
   [:svg

@@ -2436,11 +2436,11 @@
                                                     :values (vec (distinct (map (fn [v] [(get v 0) (get v 1) (get v 2) (last v)]) compact-relevant-shapes)))}))
                             (when pre-bake?
                               (push-to-client [query-id] [:reco-status query-id] client-name 1 :reco :done reco-count-post 0))
-                            (ut/pp [(if pre-bake? "🍖🥧" "🍖") :sql-shapes-inserted! [client-name dragged-kp] reco-count-post (count compact-relevant-shapes)])))))
+                            #_(ut/pp [(if pre-bake? "🍖🥧" "🍖") :sql-shapes-inserted! [client-name dragged-kp] reco-count-post (count compact-relevant-shapes)])))))
 
               #_(ut/pp [:take-5-compact-relevant-shapes (take 5 compact-relevant-shapes)])
               recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) relevant-shapes)
-              _ (ut/pp ["🧀" :shape-rotator-DRAG field-name :honey-hash-cached-loaded client-name data-key (count relevant-shapes) :/ reco-count :viz-cnt (count recos-for-grouped)])
+              #_ (ut/pp ["🧀" :shape-rotator-DRAG field-name :honey-hash-cached-loaded client-name data-key (count relevant-shapes) :/ reco-count :viz-cnt (count recos-for-grouped)])
               one-of-each (mapv (fn [[_ v]] (first v)) recos-for-grouped)]
           (client-mutate client-name {[:shapes dragged-kp] one-of-each} true))))))
 
@@ -5747,8 +5747,7 @@
                                                                                                               ;; set
                                                                                                               ;; "last-value"
     ))
-(defn reload-solver-subs
-  []
+(defn reload-solver-subs []
   (let [_             (sub-to-value :rvbbit :time/unix-ms true)
         parts         (vec (for [[solver-name {:keys [signal]}] @solvers-atom]
                              [solver-name
@@ -5759,9 +5758,9 @@
         to-remove     (vec (filter #(cstr/starts-with? (str %) ":solver/")
                                    (cset/difference (set curr-keyparts) (set all-keyparts))))]
     (ut/pretty-spit (str "./defs/backup/solvers." (System/currentTimeMillis) ".edn") @solvers-atom)
-    (ut/pp [:reload-solver-subs! {:parts parts :curr-keypaths curr-keyparts :all-keyparts all-keyparts :to-remove to-remove}])
+    #_(ut/pp [:reload-solver-subs! {:parts parts :curr-keypaths curr-keyparts :all-keyparts all-keyparts :to-remove to-remove}])
     (doseq [kk all-keyparts]
-      (ut/pp [:solver-sub-to kk])
+      #_(ut/pp [:solver-sub-to kk])
       (sub-to-value :rvbbit kk true))
     #_(doseq [signal (keys @solvers-atom)] ;; (re)process everythiung since we just got updated
         (ut/pp [:re-processing-solver signal]) ;; as if it was brand new... like an initial sub
@@ -6608,7 +6607,7 @@
                                                              shapes))
                    hash-key (hash [client-name panel-key (first ui-keypath)])]
                (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-               (ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
+               #_(ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
                        client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
              ;(swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
                (db/ddb-put! "shapes-map" hash-key modded-shapes)
@@ -6642,7 +6641,7 @@
                                                           (get res :shapes)))
                    hash-key (hash [client-name panel-key (first ui-keypath)])]
                (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-               (ut/pp ["🧀" :shape-rotator-run (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
+               #_(ut/pp ["🧀" :shape-rotator-run (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
                        client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
              ;;(swap! db/shapes-result-map-by-honey-hash assoc honey-hash res) ;; multi-client cache
              ;(db/ddb-put! "honeyhash-map" honey-hash res)
@@ -6716,6 +6715,7 @@
   [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache? & [stack?]]
   (doall ;; TODO - all this logic can be wrapped up in a much better package. Q4 lets unwrap the logic and reroll
    (let [;;_ (ut/pp [:honey-sql honey-sql])
+         honey-sql (ut/deep-remove-keys honey-sql [:style-rules])
          og-honey-sql honey-sql
          stack-maps (get honey-sql :stacks)
          stack-maps? (pos? (count stack-maps))
@@ -8926,6 +8926,8 @@
                           {k (conj v true)}))]
     (merge base-avg summed)))
 
+;; (ut/pp (filterv #(not (cstr/ends-with? (str %) "+")) (keys ( stats-keywords))))
+
 ;; (defn get-stats [kkey agg num]
 ;;   (let [stat (get (stats-keywords) kkey)]
 ;;     (let [[data-vec kkey sym] stat]
@@ -9109,20 +9111,25 @@
         reset-code "\u001b[0m"]
     (println)
     (ut/pp [:active-clients (count (keys client-maps)) :max-spark-line-width (str (ut/format-duration-seconds-compact (* 15 cwidth)))])
+    (println "------------------------------------------------------------------------------------------------------------------------")
     (mapv
      (fn [[cid x]]
        (let [color-index (mod (hash cid) (count colors))
              color (nth colors color-index)
+             cc (fn [s] (str color (str s) reset-code))
              mem-vec (mapv :mem-mb (get @client-metrics cid))
              spark-vec (take-last cwidth mem-vec)]
-         (ut/pp [(str color "web-client-" (.indexOf clients-vec [cid x]) reset-code) {:acks (:ack x) :seen (:last-seen-seconds-ago x)
-                       :mem [(ut/nf (:memory x)) (str "μ " (ut/nf (ut/avg mem-vec)))] :subs (:client-subs x) :latency (get @dynamic-timeouts cid) :screen (:screen-name x)
-                       :up (:uptime x) :mps (:messages-per-second x)} (str color (str cid) reset-code)])
+         (ut/pp [(str color "web-client-" (.indexOf clients-vec [cid x]) reset-code)
+                 (cc (cstr/replace
+                      (str {:acks (:ack x) :seen (:last-seen-seconds-ago x)
+                  :mem [(ut/nf (:memory x)) (str "μ " (ut/nf (ut/avg mem-vec)))] :subs (:client-subs x) :latency (get @dynamic-timeouts cid) :screen (:screen-name x)
+                  :up (:uptime x) :mps (:messages-per-second x)}) "\"" "'")) cid])
          (try (if (ut/ne? mem-vec)
                 (println (str color (sparkline spark-vec) reset-code))
                 (println (str color "(no data)" reset-code)))
               (catch Exception _ (println (str color "(data error*)" reset-code))))))
      client-maps)
+    (println "------------------------------------------------------------------------------------------------------------------------")
     (println)))
 
 ;; (print-client-stats-vector)
@@ -9257,7 +9264,6 @@
             _ (swap! db/server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))
             ;flow-status-map (flow-statuses) ;; <--- important, has side effects, TODO refactor into timed instead of hitched to jvm console stats output
             ;pool-sizes (query-pool-sizes)
-
             ]
 
         ;; (ut/pp [:post-cli-rows (count cli-rows)])
@@ -9359,12 +9365,19 @@
         ;;(ut/pp [:latency-adaptations @dynamic-timeouts])
 
                   ;; [kks & [freqs label? width limit?]]
-        (draw-stats [:cpu :mem ; :threads :websockets ;:viz-recos :leaf-evals
-                     ] [15] false nil true)
+        ;; (draw-stats [:cpu :mem ; :threads :websockets ;:viz-recos :leaf-evals
+        ;;              ][15] false nil true)
+
+        (let [[kks freqs label? width]
+              (get @db/latest-settings-map :console-viz-settings [])]
+          (draw-stats (or kks [:cpu :mem]) (or freqs [15]) (or label? false) width true))
+
+        ;; ([kks & [freqs label? width limit?]]
 
         ;; (draw-stats [:cpu :mem :threads] [15] false nil false)
 
-        ;; (print-client-stats-vector) ;; bad ass sparklines !
+        (when (get @db/latest-settings-map :console-viz-client-sparklines? false)
+          (print-client-stats-vector)) ;; bad ass sparklines !
 
         ;(ut/pp [:repl-introspections @evl/repl-introspection-atom])
 

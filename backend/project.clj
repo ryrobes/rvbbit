@@ -1,4 +1,4 @@
-(defproject rvbbit-backend "0.2.0-alpha"
+(defproject rvbbit-backend "snowshoe-hare.0.2.0"
   :description        "RVBBIT - Dynamic Datascapes, by Ryan Robitaille"
   :url                "https://github.com/ryrobes/rvbbit"
   :license            {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"

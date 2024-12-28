@@ -42,7 +42,7 @@
  :pop-3                                 "#666666"
  :editor-rim-color                      "#000000"
  :base-block-filter-selected            "none"
- :_vega-default-color-scheme             {:scheme "greys"}
+ :_vega-default-color-scheme            {:scheme "greys"}
  :data-colors                           {"float"       "#000000"
                                          "boolean"     "#333333"
                                          "map"         "#666666"

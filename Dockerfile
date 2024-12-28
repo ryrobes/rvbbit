@@ -1,5 +1,4 @@
-##FROM openjdk:17-jre-slim
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 # Install additional packages
 RUN apt-get update && apt-get install -y \
@@ -9,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     npm \
     nodejs \
     imagemagick \
-    golang-go \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,7 +16,9 @@ WORKDIR /app
 #COPY docker-staging/* .
 # Copy all necessary files and delete unnecessary ones in a single RUN command
 COPY docker-staging/rvbbit.jar .
+COPY docker-staging/run-rabbit.sh .
 COPY docker-staging/defs ./defs
+COPY docker-staging/themes ./themes
 COPY docker-staging/connections ./connections
 COPY docker-staging/assets ./assets
 COPY docker-staging/resources ./resources
@@ -45,10 +45,11 @@ RUN mkdir ./db \
 # Create a startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'echo "Running additional startup commands..."' >> /start.sh && \
-    echo 'go install github.com/danielmiessler/fabric@latest' >> /start.sh && \
     echo 'cd extras/node-colorthief ; npm install ; cd ../..' >> /start.sh && \
     echo 'echo "Starting RVBBIT..."' >> /start.sh && \
-    echo 'exec java -jar rvbbit.jar' >> /start.sh && \
+    echo 'chmod 777 ./run-rabbit.sh' >> /start.sh && \
+    #echo 'exec java -jar rvbbit.jar' >> /start.sh && \
+    echo 'exec ./run-rabbit.sh' >> /start.sh && \
     chmod +x /start.sh
 
 # Use the startup script as the entry point

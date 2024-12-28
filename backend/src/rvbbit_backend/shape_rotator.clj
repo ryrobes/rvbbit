@@ -139,6 +139,8 @@
      :connection-id    (path-to-connection-id f-path)
      :connection-str   connection-str}))
 
+(declare make-error-box)
+
 (defn create-pool [f-path]
   (let [conn-name (path-to-connection-id f-path) ;;(str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))
         conn      (cond (and (string? f-path)  (cstr/includes? (str f-path) "system")) system-db
@@ -147,7 +149,10 @@
         conn      (if poolable?
                     (try {:pre-filter-fn (get conn :pre-filter-fn)
                           :datasource @(pool-create conn (str conn-name "-pool"))}
-                         (catch Exception e (do (ut/pp [:connection-error conn-name e]) {:datasource nil})))
+                         (catch Exception e (do
+                                              ;;(ut/pp [:connection-error conn-name e])
+                                              (println (make-error-box conn-name e "CONNECTION"))
+                                              {:datasource nil})))
                     conn)]
     (swap! db/conn-map assoc conn-name conn)
     conn))
@@ -687,45 +692,96 @@
         ;(swap! viz-maps-cache assoc k combo-viz)
         combo-viz))))
 
+(defn make-error-box [msg f-path ttype]
+  (let [cwidth (ut/get-terminal-width)
+        border-color "\u001b[38;5;196m"   ; bright red
+        title-color  "\u001b[38;5;219m"   ; pink
+        text-color   "\u001b[38;5;255m"   ; bright white
+        cyan-man     "\u001b[96m"         ; bright cyan
+        reset        "\u001b[0m"
+        inner-width (- cwidth 4)
+        separator (str border-color "║" reset)
+        top (str border-color "╔" (apply str (repeat inner-width "═")) "╗" reset)
+        bottom (str border-color "╚" (apply str (repeat inner-width "═")) "╝" reset)
+        title-line (format "%s║%s 🛢️ DATABASE %s ERROR ⚡ %s%s║%s"
+                           border-color
+                           title-color
+                           ttype
+                           (apply str (repeat (- inner-width 33) " ")) ;; 31
+                           border-color
+                           reset)
+        path-line (format "%s║%s Path: %s%s%s║%s"
+                          border-color
+                          cyan-man ;text-color
+                          f-path
+                          (apply str (repeat (- inner-width 7 (count (str f-path))) " "))
+                          border-color
+                          reset)
+        error-line (format "%s║%s Error: %s%s%s║%s"
+                           border-color
+                           text-color
+                           msg
+                           (apply str (repeat (- inner-width 8 (count (str msg))) " "))
+                           border-color
+                           reset)]
+    (str "\n" top "\n"
+         title-line "\n"
+         path-line "\n"
+         error-line "\n"
+         bottom "\n")))
+
+
 
 (defn shape-rotation-run [f-path & [pre-filter-fn]]
-  (let [connection-id (get-connection-id f-path)
-        _ (ut/pp ["🥩" :running-full-shape-rotation-job connection-id (str f-path)])
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] (System/currentTimeMillis))
-        conn-map (if (map? f-path) f-path (get @db/conn-map connection-id))
-        _ (sql-exec systemh2-db
-                    (to-sql {:delete-from [:fields] ;; clear last - in case a table was deleted (we clear each table before we add, but dont address orphans)
-                             :where [:= :connection_id (str connection-id)]}))
-        pre-filter-fn (when (= connection-id "systemh2-db") '(fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
-                                                                          (not= (get m :db-schema) "PG_CATALOG"))))
-        res (get-field-maps {:f-path f-path
-                                  :shape-test-defs @db/sniff-test-map ;; cruiser/default-sniff-tests
-                                  :shape-attributes-defs @db/field-attribute-map ;; cruiser/default-field-attributes
+  (try
+    (let [connection-id (get-connection-id f-path)
+          _ (ut/pp ["🥩" :running-full-shape-rotation-job connection-id (str f-path)])
+          startedms (System/currentTimeMillis)
+          _ (swap! db/shape-rotation-status assoc-in [connection-id :all :started] startedms)
+          conn-map (if (map? f-path) f-path (get @db/conn-map connection-id))
+          _ (sql-exec systemh2-db
+                      (to-sql {:delete-from [:fields] ;; clear last - in case a table was deleted (we clear each table before we add, but dont address orphans)
+                               :where [:= :connection_id (str connection-id)]}))
+          pre-filter-fn (when (= connection-id "systemh2-db") '(fn [m] (and (not= (get m :db-schema) "INFORMATION_SCHEMA")
+                                                                            (not= (get m :db-schema) "PG_CATALOG"))))
+          res (get-field-maps {:f-path f-path
+                               :shape-test-defs @db/sniff-test-map ;; cruiser/default-sniff-tests
+                               :shape-attributes-defs @db/field-attribute-map ;; cruiser/default-field-attributes
                                   ;;:filter-fn nil ;(fn [m] (true? (get m :very-low-cardinality?)))
-                                  :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
-        combo-viz (get-viz-shape-blocks res @db/shapes-map)
-        shapes-by (group-by (fn [m] [(get-in m [:shape-rotator :honey-hash])
-                                     (keyword (get-in m [:shape-rotator :context 3]))]) combo-viz)
-        fields-by (group-by (fn [m] [(get m :honey-hash)
-                                     (keyword (get m :table-name))]) res)
+                               :pre-filter-fn (or pre-filter-fn (get conn-map :pre-filter-fn))})
+          combo-viz (get-viz-shape-blocks res @db/shapes-map)
+          shapes-by (group-by (fn [m] [(get-in m [:shape-rotator :honey-hash])
+                                       (keyword (get-in m [:shape-rotator :context 3]))]) combo-viz)
+          fields-by (group-by (fn [m] [(get m :honey-hash)
+                                       (keyword (get m :table-name))]) res)
         ;; _ (ut/pp [:kk (keys shapes-by) (keys fields-by)])
-        _ (doseq [kk (keys fields-by)
-                  :let [[honey-hash table-name-kw] kk
-                        shapes (get shapes-by kk)
-                        fields (get fields-by kk)
-                        res {:shapes shapes :fields fields}
-                        hash-key (hash [:fresh-table! connection-id table-name-kw])
-                        modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] [:fresh-table! connection-id table-name-kw])
-                                                               (get res :shapes)))]]
-            (d/transact-kv db/ddb
-                           [[:put "honeyhash-map" honey-hash res]
-                            [:put "shapes-map" hash-key modded-shapes]]))
+          _ (doseq [kk (keys fields-by)
+                    :let [[honey-hash table-name-kw] kk
+                          shapes (get shapes-by kk)
+                          fields (get fields-by kk)
+                          res {:shapes shapes :fields fields}
+                          hash-key (hash [:fresh-table! connection-id table-name-kw])
+                          modded-shapes (assoc res :shapes (mapv #(assoc-in % [:shape-rotator :source-panel] [:fresh-table! connection-id table-name-kw])
+                                                                 (get res :shapes)))]]
+              (d/transact-kv db/ddb
+                             [[:put "honeyhash-map" honey-hash res]
+                              [:put "shapes-map" hash-key modded-shapes]]))
         ;; group by honeyhash - do artificial inserts into datalevin
         ;; "[\"none!\" nil :Crime_Data_from_2020_to_Present]"
         ;;_ (ut/pp ["🥩" :shape-rotator-db {:fields (take 2 res) :shapes (take 2 combo-viz)}])
-        _ (ut/pp ["🥩" :shape-rotator-fields connection-id  [:fields (count res) :viz (count combo-viz)]])
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
-        _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))]))
+          _ (ut/pp ["🥩" :full-shape-rotation-job-done connection-id (str f-path)
+                    [:fields (count res) :viz (count combo-viz)
+                     :took (try
+                             (ut/format-duration-seconds (/ (- (System/currentTimeMillis) startedms) 1000))
+                             (catch Exception _ -1))]])
+          _ (swap! db/shape-rotation-status assoc-in [connection-id :all :ended] (System/currentTimeMillis))
+          _ (swap! db/shape-rotation-status assoc-in [connection-id :all :viz-combos] (count combo-viz))])
+    (catch Throwable e
+      ;; (ut/pp ["🛢️☠️☠️☠️" :shape-rotation-run-error f-path :DB-issue-generally (str e)])
+      (do
+        (println (make-error-box (str e) f-path "*METADATA*"))
+        (Thread/sleep 1200))
+      )))
 
 
 ;; (ut/pp [:field-maps (let [res (get-field-maps {:f-path "connections/superstore.edn"

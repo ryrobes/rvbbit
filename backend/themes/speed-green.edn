@@ -40,7 +40,7 @@
  :pop-3                                 "#00cc99"
  :editor-rim-color                      "#00ff66"
  :base-block-filter-selected            "none"
- :_vega-default-color-scheme             {:scheme "custom"}
+ :_vega-default-color-scheme            {:scheme "custom"}
  :data-colors                           {"float"       "#00ff66"
                                          "boolean"     "#00cc99"
                                          "map"         "#b4b4c8"

@@ -1,0 +1,69 @@
+{:theme-name "ice-fishing"
+ :codemirror-theme "rvbbit-dynamic"
+ :editor-param-background-color "#372a48"
+ :vega-defaults {:view   {:stroke "transparent"}
+                 :axis   {:domainColor "#00000022"
+                          :grid        true
+                          :font        "Open Sans"
+                          :labelColor  "#00000088"
+                          :titleFont   "Open Sans"
+                          :titleColor  "#000000"
+                          :labelFont   "Open Sans"
+                          :domain      true
+                          :gridColor   "#00000022"
+                          :tickColor   "#000000"
+                          :axisFont    "Open Sans"}
+                 :legend {:labelFont  "Open Sans"
+                          :legendFont "Open Sans"
+                          :labelColor "#000000"
+                          :titleColor "#00000099"
+                          :stroke     "#00000099"
+                          :titleFont  "Open Sans"}
+                 :header {:labelFont "Open Sans" :titleFont "Open Sans" :titleColor "#000000" :labelColor "#f2e8ff"}
+                 :mark   {:font "Open Sans"}
+                 :title  {:font         "Open Sans"
+                          :subtitleFont "Open Sans"
+                          :labelFont    "Open Sans"
+                          :titleFont    "Open Sans"
+                          :titleColor   "#00000099"}}
+ :running-gif "images/running.gif"
+ :base-block-color-selected "#a8d1e2"
+ :block-title-font-color "#000000"
+ :base-block-color "#fffefe99"
+ :editor-rim-color "#2e0c34"
+ :base-block-filter-selected "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)"
+ :vega-default-color-scheme {:scheme "paired"}
+ :data-colors {"float"       "#a7d2cb"
+               "boolean"     "#f7cac9"
+               "map"         "#b5e7a0"
+               "list"        "#e6a4b4"
+               "string"      "#c5e1a5"
+               "rowset"      "#d5e5a3"
+               "any"         "#e6ee9c"
+               "vector"      "#80cbc4"
+               "keyword"     "#b3e5fc"
+               "rabbit-code" "#f8bbd0"
+               "datetime"    "#c5cae9"
+               "integer"     "#b3e5fc"
+               "unknown"     "#ffe0b2"
+               "date"        "#bbdefb"
+               "rabbitsql"   "#f8bbd0"
+               "nil"         "#e0e0e0"}
+ :editor-grid-selected-font-color "#000000"
+ :monospaced-font "Overpass Mono"
+ :editor-grid-selected-background-color "#d475f0"
+ :editor-outer-rim-color "#2b0d55"
+ :grid-selected-font-color "#ffffff"
+ :block-title-selected-font-color "#000000"
+ :grid-selected-background-color "#444cf755"
+ :grid-font-color "#000000"
+ :canvas-background-css {:background-image      "url(images/fake-brick3.png)"
+                         :background-blend-mode "luminosity"
+                         :background-repeat     "repeat"
+                         :background-size       "auto auto"
+                         :background-color      "#47555e"}
+ :line-style "curved-path-h"
+ :base-font "Instagram Sans"
+ :block-tab-selected-font-color "#777777"
+ :grid-column-css {:text-shadow "#00000088 1px 1px 1px" :filter ""}
+ :editor-grid-font-color "#e5e5e5"}

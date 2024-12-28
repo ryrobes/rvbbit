@@ -1,99 +1,93 @@
-{:codemirror-theme "rvbbit-dynamic",
- :editor-param-background-color "#000000",
- :pop-2 "#99ccff",
- :base-block-style
- {:border-radius "3px",
-  :border "1px solid #1a1a1a",
-  :background "#0a0a0a",
-  :letter-spacing "0.01em"},
- :vega-defaults
- {:mark {:font "Inter", :stroke "#99ccff", :color "#99ccff65"},
-  :legend
-  {:labelFont "Inter",
-   :legendFont "Inter",
-   :labelColor "#b4b4c8",
-   :titleColor "#b4b4c8",
-   :stroke "#99ccff",
-   :titleFont "Inter"},
-  :header {:labelFont "Inter", :titleFont "Inter", :titleColor "#b4b4c8"},
-  :title
-  {:font "Inter",
-   :subtitleFont "Inter",
-   :labelFont "Inter",
-   :titleFont "Inter",
-   :titleColor "#b4b4c8"},
-  :point {:font "Inter", :stroke "#99ccff", :color "#99ccff65"},
-  :area {:font "Inter", :stroke "#99ccff", :color "#99ccff65"},
-  :axis
-  {:domainColor "#202020",
-   :grid true,
-   :font "Inter",
-   :labelColor "#b4b4c8",
-   :titleFont "Inter",
-   :titleColor "#b4b4c8",
-   :labelFont "Inter",
-   :domain false,
-   :gridColor "#161616",
-   :tickColor "#202020",
-   :axisFont "Inter"},
-  :tooltip {:fill "#0a0a0a", :stroke "#1a1a1a", :strokeWidth 1, :color "#b4b4c8"},
-  :view {:stroke "transparent"}},
- :grid-selected-column-css
- {:background-color "#161616", :box-shadow "inset 0 0 0 1px #99ccff"},
- :base-block-color-selected "#0f0f0f",
- :block-title-font-color "#b4b4c8",
- :base-block-color "#0a0a0a",
- :pop-3 "#ffcccc",
- :editor-rim-color "#1a2229",
- :data-colors
- {"float" "#99ccff",
-  "boolean" "#ffcccc",
-  "map" "#ccffcc",
-  "list" "#ffffcc",
-  "string" "#ffccff",
-  "any" "#99ccff",
-  "vector" "#ffcccc",
-  "keyword" "#ccffcc",
-  "rabbit-code" "#ffffcc",
-  "datetime" "#ffccff",
-  "integer" "#ccffcc",
-  "unknown" "#99ccff",
-  "date" "#ffcccc"},
- :editor-grid-selected-font-color "#0a0a0a",
- :monospaced-font "Fira Code",
- :editor-grid-selected-background-color "#99ccff",
- :nivo-defaults
- {:font-family "Inter",
-  :labels
-  {:text
-   {:fill "#b4b4c8", :font-size "13px", :font-family "Inter", :font-weight 400}},
-  :tooltip
-  {:container
-   {:background "#0a0a0a",
-    :color "#b4b4c8",
-    :text {:fill "#b4b4c8"},
-    :fontSize "13px",
-    :borderRadius "2px",
-    :border "1px solid #1a1a1a",
-    :box-shadow "0 2px 4px rgba(0,0,0,0.2)",
-    :padding "8px 12px"},
-   :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
-   :tableCell {:padding "4px 8px"}},
-  :axis
-  {:legend
-   {:text
-    {:fill "#b4b4c8", :font-size "13px", :font-family "Inter", :font-weight 400}},
-   :ticks {:line {:stroke "#202020"}, :text {:fill "#b4b4c8", :font-weight 400}}},
-  :grid {:line {:stroke "#161616", :strokeWidth 1}}},
- :editor-outer-rim-color "#99ccff",
- :grid-selected-font-color "#0a0a0a",
- :block-title-selected-font-color "#0a0a0a",
- :grid-selected-background-color "#99ccff",
- :grid-font-color "#b4b4c8",
- :canvas-background-css {:background-color "#000000"},
- :editor-font-color "#b4b4c8",
- :base-font "Inter",
- :block-tab-selected-font-color "#0a0a0a",
- :editor-background-color "#0a0a0a",
- :editor-grid-font-color "#b4b4c8",
- :pop-1 "#e372f9"}
+{:codemirror-theme                      "rvbbit-dynamic"
+ :editor-param-background-color         "#000000"
+ :pop-2                                 "#99ccff"
+ :base-block-style                      {:border-radius  "3px"
+                                         :border         "1px solid #1a1a1a"
+                                         :background     "#0a0a0a"
+                                         :letter-spacing "0.01em"}
+ :vega-defaults                         {:mark    {:font "Inter" :stroke "#99ccff" :color "#99ccff65"}
+                                         :legend  {:labelFont  "Inter"
+                                                   :legendFont "Inter"
+                                                   :labelColor "#b4b4c8"
+                                                   :titleColor "#b4b4c8"
+                                                   :stroke     "#99ccff"
+                                                   :titleFont  "Inter"}
+                                         :header  {:labelFont "Inter" :titleFont "Inter" :titleColor "#b4b4c8"}
+                                         :title   {:font         "Inter"
+                                                   :subtitleFont "Inter"
+                                                   :labelFont    "Inter"
+                                                   :titleFont    "Inter"
+                                                   :titleColor   "#b4b4c8"}
+                                         :point   {:font "Inter" :stroke "#99ccff" :color "#99ccff65"}
+                                         :area    {:font "Inter" :stroke "#99ccff" :color "#99ccff65"}
+                                         :axis    {:domainColor "#202020"
+                                                   :grid        true
+                                                   :font        "Inter"
+                                                   :labelColor  "#b4b4c8"
+                                                   :titleFont   "Inter"
+                                                   :titleColor  "#b4b4c8"
+                                                   :labelFont   "Inter"
+                                                   :domain      false
+                                                   :gridColor   "#161616"
+                                                   :tickColor   "#202020"
+                                                   :axisFont    "Inter"}
+                                         :tooltip {:fill "#0a0a0a" :stroke "#1a1a1a" :strokeWidth 1 :color "#b4b4c8"}
+                                         :view    {:stroke "transparent"}}
+ :grid-selected-column-css              {:background-color "#161616" :box-shadow "inset 0 0 0 1px #99ccff"}
+ :base-block-color-selected             "#0f0f0f"
+ :block-title-font-color                "#b4b4c8"
+ :base-block-color                      "#0a0a0a"
+ :pop-3                                 "#ffcccc"
+ :editor-rim-color                      "#1a2229"
+ :data-colors                           {"float"       "#99ccff"
+                                         "boolean"     "#ffcccc"
+                                         "map"         "#ccffcc"
+                                         "list"        "#ffffcc"
+                                         "string"      "#ffccff"
+                                         "any"         "#99ccff"
+                                         "vector"      "#ffcccc"
+                                         "keyword"     "#ccffcc"
+                                         "rabbit-code" "#ffffcc"
+                                         "datetime"    "#ffccff"
+                                         "integer"     "#ccffcc"
+                                         "unknown"     "#99ccff"
+                                         "date"        "#ffcccc"}
+ :editor-grid-selected-font-color       "#0a0a0a"
+ :monospaced-font                       "Fira Code"
+ :editor-grid-selected-background-color "#99ccff"
+ :nivo-defaults                         {:font-family "Inter"
+                                         :labels      {:text {:fill        "#b4b4c8"
+                                                              :font-size   "13px"
+                                                              :font-family "Inter"
+                                                              :font-weight 400}}
+                                         :tooltip     {:container {:background   "#0a0a0a"
+                                                                   :color        "#b4b4c8"
+                                                                   :text         {:fill "#b4b4c8"}
+                                                                   :fontSize     "13px"
+                                                                   :borderRadius "2px"
+                                                                   :border       "1px solid #1a1a1a"
+                                                                   :box-shadow   "0 2px 4px rgba(0,0,0,0.2)"
+                                                                   :padding      "8px 12px"}
+                                                       :basic     {:whiteSpace "pre"
+                                                                   :display    "flex"
+                                                                   :alignItems "center"}
+                                                       :tableCell {:padding "4px 8px"}}
+                                         :axis        {:legend {:text {:fill        "#b4b4c8"
+                                                                       :font-size   "13px"
+                                                                       :font-family "Inter"
+                                                                       :font-weight 400}}
+                                                       :ticks  {:line {:stroke "#202020"}
+                                                                :text {:fill "#b4b4c8" :font-weight 400}}}
+                                         :grid        {:line {:stroke "#161616" :strokeWidth 1}}}
+ :editor-outer-rim-color                "#99ccff"
+ :grid-selected-font-color              "#0a0a0a"
+ :block-title-selected-font-color       "#0a0a0a"
+ :grid-selected-background-color        "#99ccff"
+ :grid-font-color                       "#b4b4c8"
+ :canvas-background-css                 {:background-color "#000000"}
+ :editor-font-color                     "#b4b4c8"
+ :base-font                             "Inter"
+ :block-tab-selected-font-color         "#0a0a0a"
+ :editor-background-color               "#0a0a0a"
+ :editor-grid-font-color                "#b4b4c8"
+ :pop-1                                 "#e372f9"}

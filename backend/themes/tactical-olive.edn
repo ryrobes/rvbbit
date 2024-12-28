@@ -1,4 +1,6 @@
-{:codemirror-theme "rvbbit-dynamic"
+{:theme-name "tactical-olive"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#1a1d14"
  :pop-2 "#a5ff00"
  :base-block-style {:text-shadow "0 0 10px #a5ff0033"
@@ -8,43 +10,72 @@
                     :border "1px solid #4b5320"
                     :border-left "4px solid #a5ff00"
                     :box-shadow "inset 0 0 20px #00000088,                                      0 2px 4px #00000066"}
- :vega-defaults {:mark    {:font "Share Tech Mono" :stroke "#a5ff00" :color "#a5ff0065"}
-                 :legend  {:labelFont  "Share Tech Mono"
-                           :legendFont "Share Tech Mono"
-                           :labelColor "#d5e6c3"
-                           :titleColor "#d5e6c3"
-                           :stroke     "#a5ff00"
-                           :titleFont  "Share Tech Mono"}
-                 :header  {:labelFont "Share Tech Mono" :titleFont "Share Tech Mono" :titleColor "#d5e6c3"}
-                 :title   {:font         "Share Tech Mono"
-                           :subtitleFont "Share Tech Mono"
-                           :labelFont    "Share Tech Mono"
-                           :titleFont    "Share Tech Mono"
-                           :titleColor   "#d5e6c3"}
-                 :point   {:font "Share Tech Mono" :stroke "#a5ff00" :color "#a5ff0065"}
-                 :area    {:font "Share Tech Mono" :stroke "#a5ff00" :color "#a5ff0065"}
-                 :axis    {:domainColor "#4b5320"
-                           :grid        true
-                           :font        "Share Tech Mono"
-                           :labelColor  "#d5e6c3"
-                           :titleFont   "Share Tech Mono"
-                           :titleColor  "#d5e6c3"
-                           :labelFont   "Share Tech Mono"
-                           :domain      false
-                           :gridColor   "#4b532044"
-                           :tickColor   "#4b5320"
-                           :axisFont    "Share Tech Mono"}
-                 :tooltip {:fill "#1a1d14ee" :stroke "#4b5320" :strokeWidth 1 :color "#d5e6c3"}
-                 :view    {:stroke "transparent"}}
+ :vega-defaults
+   {:mark    {:font "Share Tech Mono" :stroke "#a5ff00" :color "#a5ff0065"}
+    :legend  {:labelFont  "Share Tech Mono"
+              :legendFont "Share Tech Mono"
+              :labelColor "#d5e6c3"
+              :titleColor "#d5e6c3"
+              :stroke     "#a5ff00"
+              :titleFont  "Share Tech Mono"}
+    :header  {:labelFont "Share Tech Mono" :titleFont "Share Tech Mono" :titleColor "#d5e6c3" :labelColor "#f2e8ff"}
+    :title   {:font         "Share Tech Mono"
+              :subtitleFont "Share Tech Mono"
+              :labelFont    "Share Tech Mono"
+              :titleFont    "Share Tech Mono"
+              :titleColor   "#d5e6c3"}
+    :point   {:font "Share Tech Mono" :stroke "#a5ff00" :color "#a5ff0065"}
+    :area    {:font "Share Tech Mono" :stroke "#a5ff00" :color "#a5ff0065"}
+    :axis    {:domainColor "#4b5320"
+              :grid        true
+              :font        "Share Tech Mono"
+              :labelColor  "#d5e6c3"
+              :titleFont   "Share Tech Mono"
+              :titleColor  "#d5e6c3"
+              :labelFont   "Share Tech Mono"
+              :domain      false
+              :gridColor   "#4b532044"
+              :tickColor   "#4b5320"
+              :axisFont    "Share Tech Mono"}
+    :tooltip {:fill "#1a1d14ee" :stroke "#4b5320" :strokeWidth 1 :color "#d5e6c3"}
+    :view    {:stroke "transparent"}}
  :grid-selected-column-css
    {:background-color "#a5ff0015" :filter "none" :backdrop-filter "blur(2px)" :box-shadow "inset 0 0 0 1px #a5ff0044"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
  :base-block-color-selected "#242914"
  :block-title-font-color "#d5e6c3"
+ :universal-pop-color "#9973e0"
  :base-block-color "#1a1d14ee"
  :pop-3 "#ffb300"
  :editor-rim-color "#a5ff00"
  :base-block-filter-selected "none"
- :_vega-default-color-scheme {:scheme "custom"}
+ :vega-default-color-scheme {:scheme "category20b"}
  :data-colors {"float"       "#a5ff00"
                "boolean"     "#ffb300"
                "map"         "#d5e6c3"
@@ -61,6 +92,7 @@
  :editor-grid-selected-font-color "#1a1d14"
  :monospaced-font "Share Tech Mono"
  :editor-grid-selected-background-color "#a5ff00"
+ :_vega-default-color-scheme {:scheme "custom"}
  :nivo-defaults
    {:font-family "Share Tech Mono"
     :labels      {:text {:fill "#d5e6c3" :font-size "13px" :font-family "Share Tech Mono" :font-weight 400}}
@@ -86,15 +118,15 @@
  :grid-font-color "#d5e6c3"
  :canvas-background-css
    {:background
-      "linear-gradient(180deg, #242914 0%, #1a1d14 100%),                                     url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' stroke='%234b5320' stroke-width='1' fill='none' opacity='0.2'/%3E%3C/svg%3E\")"
+      "linear-gradient(180deg, #242914 33%, #1a1d14 100%),                                     url(images/olive1.webp-q8.jpg)"
     :background-blend-mode "overlay"
+    :background-size "cover"
     :transition "all 0.2s ease"
     :background-color "#1a1d14"}
  :editor-font-color "#d5e6c3"
+ :line-style "curved-path-h"
  :base-font "Share Tech Mono"
  :block-tab-selected-font-color "#1a1d14"
  :editor-background-color "#1a1d14"
  :editor-grid-font-color "#d5e6c3"
  :pop-1 "#4b5320"}
-
-

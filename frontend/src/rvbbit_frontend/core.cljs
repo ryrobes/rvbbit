@@ -84,6 +84,7 @@
                              [[::bricks/stretch-panel :shorter] [{:keyCode 87 :shiftKey true}]] ; shift-w
                              [[::bricks/panel-depth-up] [{:keyCode 82 :shiftKey true}]] ; shift-r
                              [[::bricks/panel-depth-down] [{:keyCode 70 :shiftKey true}]] ; shift-f
+                             [[::bricks/random-theme] [{:keyCode 82 :shiftKey false :ctrlKey true}]] ; ctrl-r
                              [[::flows/run-current-flowmap] [{:keyCode 70} {:keyCode 70}]] ; f f
                              ;[[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde ;; old echoes TODO bring back
                              [[::console-log] [{:keyCode 192}]] ; ` tilde
@@ -95,6 +96,7 @@
                              [[::alt-key-toggle] [{:keyCode 86}]] ;; v
                              [[::alt-key-down] [{:keyCode 67}]]] ;; alt key down
       :prevent-default-keys [{:keyCode 32} {:keyCode 86} {:keyCode 46 :shiftKey true} {:keyCode 83 :ctrlKey true}
+                             {:keyCode 82 :shiftKey false :ctrlKey true}
                              {:keyCode 83 :shiftKey false :ctrlKey true} {:keyCode 9} {:keyCode 70 :ctrlKey true}]}]))
 
 
@@ -210,6 +212,10 @@
       ;; {:interval 1000
       ;;  :event [::bricks/update-metadata-tabs]
       ;;  :dispatch-event-on-start? false}
+
+       {:interval                 45
+        :event                    [::ut/random-fun-log-message]
+        :dispatch-event-on-start? false}
 
       ;; {:interval                 5 ;; too much when recos gets big? filter?
       ;;  :event                    [::bricks/update-reco-previews]

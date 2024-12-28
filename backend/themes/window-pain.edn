@@ -1,4 +1,6 @@
-{:codemirror-theme "rvbbit-dynamic"
+{:theme-name "window-pain"
+ :generated-from "assets/openai-images/b64-image3-15885-10529.png"
+ :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#0a0a12"
  :pop-2 "#5e72eb"
  :base-block-style
@@ -26,7 +28,7 @@
                           :titleColor "#ffffff"
                           :stroke     "#5e72eb"
                           :titleFont  "Inter"}
-                 :header {:labelFont "Inter" :titleFont "Inter" :titleColor "#ffffff"}
+                 :header {:labelFont "Inter" :titleFont "Inter" :titleColor "#ffffff" :labelColor "#f2e8ff"}
                  :title
                    {:font "Inter" :subtitleFont "Inter" :labelFont "Inter" :titleFont "Inter" :titleColor "#ffffff"}
                  :point {:font "Inter" :stroke "#5e72eb" :color "#5e72eb65"}
@@ -49,13 +51,41 @@
     :filter           "none"
     :backdrop-filter  "blur(30px) saturate(200%)"
     :box-shadow       "0 0 30px #5e72eb22,                                             inset 0 0 0 1px #5e72eb44"}
+ :running-gif "images/running.gif"
+ :generated-tree {:second-darkest         "#1e1a3b"
+                  :highest-saturation     "#9e126c"
+                  :most-contrasting       "#d896ee"
+                  :darkest                "#130f25"
+                  :contrast-with-dominant "#d896ee"
+                  :colors                 ["#416bc6" "#b844a8" "#130f25" "#245c9c" "#5e398c" "#2b2d61" "#9e126c"
+                                           "#5c1c6c" "#d896ee" "#0c344c" "#1e1a3b"]
+                  :most-frequent          "#2b2d61"
+                  :data-colors            {"float"       "#74e1a2"
+                                           "boolean"     "#3f46c0"
+                                           "map"         "#44b86b"
+                                           "list"        "#961a57"
+                                           "string"      "#fefaf9"
+                                           "any"         "#303e85"
+                                           "vector"      "#1f5eda"
+                                           "keyword"     "#b5ee96"
+                                           "rabbit-code" "#df6505"
+                                           "datetime"    "#6b0716"
+                                           "integer"     "#71b4d6"
+                                           "unknown"     "#501f1d"
+                                           "date"        "#153210"}
+                  :dominant               "#1e1a3b"
+                  :most-contrasting-dark  "#9e126c"
+                  :second-brightest       "#b844a8"
+                  :brightest              "#d896ee"
+                  :most-contrasting-light "#d896ee"}
  :base-block-color-selected "#16162a"
  :block-title-font-color "#ffffff"
+ :universal-pop-color "#9973e0"
  :base-block-color "#0a0a12cc"
  :pop-3 "#00fff7"
  :editor-rim-color "#5e72eb"
  :base-block-filter-selected "none"
- :_vega-default-color-scheme {:scheme "custom"}
+ :vega-default-color-scheme {:scheme "category20b"}
  :data-colors {"float"       "#5e72eb"
                "boolean"     "#00fff7"
                "map"         "#ffffff"
@@ -72,6 +102,7 @@
  :editor-grid-selected-font-color "#0a0a12"
  :monospaced-font "JetBrains Mono"
  :editor-grid-selected-background-color "#5e72eb"
+ :_vega-default-color-scheme {:scheme "custom"}
  :nivo-defaults {:font-family "Inter"
                  :labels {:text {:fill "#ffffff" :font-size "14px" :font-family "Inter" :font-weight 500}}
                  :tooltip
@@ -98,18 +129,17 @@
  :grid-font-color "#ffffff"
  :canvas-background-css
    {:background
-      "radial-gradient(circle at 50% 0%, #1a1a2a 0%, #0a0a12 100%),                                     url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' stroke='%235e72eb' stroke-width='1' fill='none' opacity='0.1'/%3E%3C/svg%3E\"),                                     linear-gradient(45deg, #5e72eb05 25%, transparent 25%,                                                          transparent 75%, #5e72eb05 75%,                                                          #5e72eb05),                                     linear-gradient(-45deg, #5e72eb05 25%, transparent 25%,                                                           transparent 75%, #5e72eb05 75%,                                                           #5e72eb05)"
-    :background-size "100% 100%, 60px 60px, 60px 60px, 60px 60px"
+      "radial-gradient(circle at 50% 0%, #1a1a2a 0%, #0a0a12 100%),                                     url(images/hall1.webp-q8.jpg)"
+    :background-size "cover"
     :background-position "0 0, 0 0, 30px 30px, 0 0"
-    :background-blend-mode "normal, overlay, difference, difference"
+    :background-blend-mode "hard-light"
     :transition "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
     :animation "subtleShift 60s infinite linear"
     :background-color "#0a0a12"}
  :editor-font-color "#ffffff"
+ :line-style "curved-path-h"
  :base-font "Inter"
  :block-tab-selected-font-color "#0a0a12"
  :editor-background-color "#0a0a12"
  :editor-grid-font-color "#ffffff"
  :pop-1 "#16162a"}
-
-
