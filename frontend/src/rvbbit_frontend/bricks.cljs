@@ -20694,22 +20694,29 @@
                                           ;;           "rotate(" rotation "deg)")))
                                      ;;             )
                                      :transform-style "preserve-3d" ;; important for tab embedding!
-                                     :box-shadow (when (= brick-vec-key @db/speaking)
-                                                   (let [block-id       brick-vec-key ;:audio
-                                                         talking-block? true]
-                                                     (cond (and audio-playing? talking-block?)
-                                                           (str
-                                                            "1px 1px "
-                                                     ;"1px " (px (* 10 (+ 0.1 (get @db/audio-data block-id)))) " "
-                                                            (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
-                                                            " "        (theme-pull :theme/editor-outer-rim-color nil))
-                                                    ;; (str "1px 1px " (px (* 70
-                                                    ;;                        (+ 0.1
-                                                    ;;                           (- (get @db/audio-data2 block-id)
-                                                    ;;                              (get @db/audio-data block-id)))))
-                                                    ;;   " "  (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)))
+                                    ;;  :box-shadow (when (= brick-vec-key @db/speaking)
+                                    ;;                (let [block-id       brick-vec-key ;:audio
+                                    ;;                      talking-block? true]
+                                    ;;                  (cond (and audio-playing? talking-block?)
+                                    ;;                        (str
+                                    ;;                         "1px 1px "
+                                    ;;                  ;"1px " (px (* 10 (+ 0.1 (get @db/audio-data block-id)))) " "
+                                    ;;                         (px (* 90 (+ 0.1 (get @db/audio-data block-id))))
+                                    ;;                         " "        (theme-pull :theme/editor-outer-rim-color nil))
+                                    ;;                 ;; (str "1px 1px " (px (* 70
+                                    ;;                 ;;                        (+ 0.1
+                                    ;;                 ;;                           (- (get @db/audio-data2 block-id)
+                                    ;;                 ;;                              (get @db/audio-data block-id)))))
+                                    ;;                 ;;   " "  (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil)))
 
-                                                           :else                               "none")))
+                                    ;;                        :else                               "none")))
+                                     :box-shadow (when (and (= brick-vec-key @db/speaking) audio-playing?)
+                                                   (let [block-id brick-vec-key ;:audio
+                                                         peak-value (get @db/audio-data2 block-id 0)
+                                                         rms-value (get @db/audio-data block-id 0)
+                                                         cc (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                         shadow-size (* 80 (+ 0.2 peak-value (* 0.5 rms-value)))]
+                                                     (str (px (* rms-value 3.2)) " 1px " (px shadow-size) " " cc)))
                                     ;; :transition "border 0.6s ease-in-out, border-top 0.6s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out, transform 0.3s ease-in-out"
                                      ;:transition "all 0.6s ease-in-out"
                                      :transition "transform 0.4s ease-in-out, border 0.6s ease-in-out, color 0.6s ease-in-out, background-color 0.6s ease-in-out"

@@ -69,7 +69,7 @@
                (ut/pp ["  " :freezing-atom file-path size-in-mb-rounded :mb]))
              (catch Exception e
                (ut/pp [:freeze-atom-error!!!! file-path e]))))
-         (dissoc @managed-atoms "./defs/solvers.edn" "./defs/signals.edn") ;; dont freeze these, since we manage them manually
+         (dissoc @managed-atoms "defs/solvers.edn" "defs/signals.edn") ;; dont freeze these, since we manage them manually
          )))
 
 
@@ -81,7 +81,7 @@
    (fn [] (let [a (get @managed-atoms file-path)]
             (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))))
 
-;; (freeze-atom "./defs/solvers.edn")
+;; (freeze-atom "defs/solvers.edn")
 ;; (ut/pp  (keys @managed-atoms))
 
 ;; (defn write-transit [data]
@@ -117,4 +117,4 @@
 
 ;; (defn freeze-flow-results []
 ;;   (with-open [wtr (io/writer "./data/atoms/flow-db-results-atom.edn")]
-;;     (binding [*out* wtr] (prn @flow-db/results-atom)))) 
+;;     (binding [*out* wtr] (prn @flow-db/results-atom))))

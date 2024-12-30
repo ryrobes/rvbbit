@@ -89,10 +89,11 @@
 ;;  (ut/tracked-dispatch [::update-panels-hash])
 
 (defn options [x]
-  (let [protocol          "ws"
+  (let [[protocol ws-port] (get @re-frame.db/app-db :wss-config ["ws" 3030])
+        ;protocol          "ws"
         host              (.-host js/window.location)
         host-without-port (cstr/replace host #":\d+$" "")
-        ws-port           "3030"
+        ;ws-port           "3030"
         url               (str protocol "://" host-without-port ":" ws-port "/ws")]
     (ut/tapp>> ["🐇" :rabbit-server-connect! :default url])
     {:url           url
@@ -101,10 +102,11 @@
      :on-connect    [::dispatch-subscriptions x]}))
 
 (defn options-secondary [socket-id]
-  (let [protocol          "ws"
+  (let [[protocol ws-port] (get @re-frame.db/app-db :wss-config ["ws" 3030])
+        ;protocol          "ws"
         host              (.-host js/window.location)
         host-without-port (cstr/replace host #":\d+$" "")
-        ws-port           "3030"
+        ;ws-port           "3030"
         url               (str protocol "://" host-without-port ":" ws-port "/ws")]
     (ut/pp ["🐇" :rabbit-server-connect! socket-id url])
     {:url           url
@@ -782,7 +784,11 @@
                     client-panels (set (remove nil? (filter #(not (cstr/starts-with? (str %) ":reco")) (keys (get db :panels)))))
                     diffy (cset/difference  client-panels server-panels)
                     not-in-sync? (true? (> (count diffy) 0))]
-                ;; (ut/tapp>> [:heart-beat-ack! :tab (get db :selected-tab) :subs (count (get db :flow-subs)) :server-panels (count (get-in result [:status :panel-keys]))])
+                (ut/tapp>> ["🫀" :heart-beat-ack!
+                            (str (js/Date))
+                            ;:tab (get db :selected-tab)
+                            :subs (count (get db :flow-subs))
+                            :server-panels (count (get-in result [:status :panel-keys]))])
                 (when not-in-sync?
                   (ut/pp ["🌀" :panels-out-of-sync-with-server! :resolving... (str diffy)])
                   (ut/tracked-dispatch [::wfx/push :default ;:secondary
@@ -1261,6 +1267,54 @@
                    :response-format (ajax-edn/edn-response-format)
                    :on-success      [::success-http-save-theme]
                    :on-failure      [::failure-http-save-theme]}})))
+
+
+
+
+
+
+(re-frame/reg-event-db ::failure-http-wss-config
+                       (fn [db [_ result]]
+                         (let [old-status (get-in db [:http-reqs :wss-config])]
+                           (ut/tapp>> [:failure-http-wss-config result])
+                           (-> db
+                               (assoc :wss-config result)
+                               (assoc-in
+                                [:http-reqs :wss-config] ; comp key from ::get-http-data
+                                (merge old-status {:status "failed" :ended-unix (.getTime (js/Date.)) :message result}))))))
+
+(re-frame/reg-event-db ::success-http-wss-config
+                       (fn [db [_ result]]
+                         (let [old-status (get-in db [:http-reqs :wss-config])
+                               #_ (ut/pp ["🔒 " :fetched-wss-config!])]
+                           (-> db
+                               (assoc :wss-config result)
+                               (assoc-in
+                                [:http-reqs :wss-config]
+                                (merge old-status
+                                       {;:keys       (count result)
+                                        ;:result     (select-keys result [:status :theme])
+                                        :ended-unix (.getTime (js/Date.))
+                                        :status     "success"}))))))
+
+(re-frame/reg-event-fx
+ ::wss-config
+ (fn [{:keys [db]} [_]]
+   (let [method      :get
+         url         (str url-base "/wss-config")
+         _ (ut/pp ["🔒 " :fetching-wss-config])]
+     {:db         (assoc-in db [:http-reqs :wss-config] {:status "running" :url url :start-unix (.getTime (js/Date.))})
+      :http-xhrio {:method          method
+                   :uri             url
+                   ;:params          request
+                   :timeout         28000
+                   :format          (ajax-edn/edn-request-format)
+                   :response-format (ajax-edn/edn-response-format)
+                   :on-success      [::success-http-wss-config]
+                   :on-failure      [::failure-http-wss-config]}})))
+
+
+
 
 
 

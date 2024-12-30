@@ -118,10 +118,10 @@
   {:datasource
    @(pool-create
      {:adapter    "h2"
-      :url        "jdbc:h2:file:./db/systemh2-db;MODE=PostgreSQL;DATABASE_TO_UPPER=false;CACHE_SIZE=131072;WRITE_DELAY=500;PAGE_SIZE=4096;LOCK_MODE=0;COMPRESS=TRUE;MAX_MEMORY_ROWS=100000;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1;QUERY_CACHE_SIZE=8;"
+      :url        "jdbc:h2:file:./db/systemh2-db;MODE=PostgreSQL;DATABASE_TO_UPPER=false;CACHE_SIZE=32768;WRITE_DELAY=500;PAGE_SIZE=4096;LOCK_MODE=0;COMPRESS=TRUE;MAX_MEMORY_ROWS=10000;LOCK_TIMEOUT=10000;DB_CLOSE_DELAY=-1;QUERY_CACHE_SIZE=8;"
       :username   "sa"
       :password   ""
-      :maximum-pool-size 100}
+      :maximum-pool-size 50}
      "systemh2-db")})
 
 ;;       ;;:url   "jdbc:h2:file:./db/systemh2-db?MODE=PostgreSQL&DATABASE_TO_UPPER=false&AUTO_SERVER=TRUE&CACHE_SIZE=65536&COMPRESS=TRUE&WRITE_DELAY=500&PAGE_SIZE=4096"

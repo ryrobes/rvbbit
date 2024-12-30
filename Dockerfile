@@ -4,11 +4,15 @@ FROM eclipse-temurin:21-jre-jammy
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
+    bash \
     exiftool \
-    npm \
-    nodejs \
+#    npm \
+#    nodejs \
     imagemagick \
+    nano \
     procps \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -18,6 +22,7 @@ WORKDIR /app
 COPY docker-staging/rvbbit.jar .
 COPY docker-staging/run-rabbit.sh .
 COPY docker-staging/defs ./defs
+COPY docker-staging/ai-workers ./ai-workers
 COPY docker-staging/themes ./themes
 COPY docker-staging/connections ./connections
 COPY docker-staging/assets ./assets
@@ -27,6 +32,8 @@ COPY docker-staging/flows ./flows
 COPY docker-staging/extras ./extras
 COPY docker-staging/screens ./screens
 COPY docker-staging/user.clj ./user.clj
+
+RUN useradd -r -m rabbit
 
 RUN mkdir ./db \
     # && rm -rf ./assets/data-exports \
@@ -45,12 +52,15 @@ RUN mkdir ./db \
 # Create a startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'echo "Running additional startup commands..."' >> /start.sh && \
-    echo 'cd extras/node-colorthief ; npm install ; cd ../..' >> /start.sh && \
+    echo 'cd extras/node-colorthief ; npm install ; ./test-me.sh ; node --version ; cd ../..' >> /start.sh && \
     echo 'echo "Starting RVBBIT..."' >> /start.sh && \
     echo 'chmod 777 ./run-rabbit.sh' >> /start.sh && \
     #echo 'exec java -jar rvbbit.jar' >> /start.sh && \
     echo 'exec ./run-rabbit.sh' >> /start.sh && \
     chmod +x /start.sh
+
+RUN chown -R rabbit:rabbit /app
+USER rabbit
 
 # Use the startup script as the entry point
 ENTRYPOINT ["/start.sh"]

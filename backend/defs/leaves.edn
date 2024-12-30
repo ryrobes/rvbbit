@@ -1118,15 +1118,15 @@
                                                      :from
                                                      [[[:raw
                                                         [(str "(-- systemh2-db
-                                                               select * from
-                                                               client_stats c1) rawsub")]]]]}}})
+select * from
+client_stats c1) rawsub")]]]]}}})
 
 
            :fresh-shell (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
                           {:w 7 :h 4
                            :selected-view :new-shell
                            :selected-mode {:* :text}
-                           :shell  {:new-shell ["pwd ; whoami "]}})
+                           :shell  {:new-shell ["pwd ; whoami ; uname -s -m"]}})
            :fresh-api-call (fn [{:keys [source-kp source-block source-query target-kp target-block target-query source-field]}]
                              {:w 7 :h 4
                               :selected-view :new-api-call

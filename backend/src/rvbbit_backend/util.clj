@@ -956,7 +956,7 @@
     ;;(pp [:zprinted file-path])
     ))
 
-;; (zprint-file "./defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
+;; (zprint-file "defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
 
 (defn millis-to-date-string
   [millis]
@@ -976,8 +976,16 @@
 
 ;;(defn deep-flatten [x] (if (coll? x) (mapcat deep-flatten x) [x]))
 
+;; (defn deep-flatten [x]
+;;   (vec (filter keyword? (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x}))))
+
 (defn deep-flatten [x]
-  (vec (filter keyword? (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x}))))
+  (let [flat (fn flat [x acc]
+               (cond
+                 (keyword? x) (conj! acc x)
+                 (coll? x) (reduce #(flat %2 %1) acc x)
+                 :else acc))]
+    (vec (into #{} (persistent! (flat x (transient [])))))))
 
 (def df-cache (atom {}))
 

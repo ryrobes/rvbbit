@@ -182,9 +182,9 @@
 ;; (defonce last-signals-atom-stamp (fpop/thaw-atom {} "./data/atoms/last-signals-atom-stamp.edn"))
 ;; (defonce panels-atom (fpop/thaw-atom {} "./data/atoms/panels-atom.edn"))
 ;; (defonce solver-status (atom {}))
-(defonce signals-atom (fpop/thaw-atom {} "./defs/signals.edn"))
-(defonce rules-atom (fpop/thaw-atom {} "./defs/rules.edn"))
-(defonce solvers-atom (fpop/thaw-atom {} "./defs/solvers.edn"))
+(defonce signals-atom (fpop/thaw-atom {} "defs/signals.edn"))
+(defonce rules-atom (fpop/thaw-atom {} "defs/rules.edn"))
+(defonce solvers-atom (fpop/thaw-atom {} "defs/solvers.edn"))
 (defonce solvers-cache-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/solvers-cache.msgpack.transit"))
 (defonce solvers-cache-hits-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/solvers-cache-hits.msgpack.transit"))
 ;; (defonce last-solvers-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-atom.edn"))
@@ -1911,7 +1911,7 @@
         ;;     (ut/pp [valid-runners-map valid-runners]))
         settings (assoc settings :runners (select-keys (get settings :runners) valid-runners))
         settings (merge (ut/deep-remove-keys settings [:when-fn :kit-expr :when-expr])
-                        {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
+                        {:clover-templates (edn/read-string (slurp "defs/clover-templates.edn"))
                          :kits    {} ;;config/kit-fns
                          :screens (vec (map :screen_name
                                             (sql-query system-db
@@ -2404,39 +2404,107 @@
                                            (contains? (set (ut/deep-flatten %)) field-name)) (get done-shapes :shapes))
                                 :else (filterv #(contains? (set (ut/deep-flatten %)) field-name) (get done-shapes :shapes)))
               _ (when (ut/ne? relevant-shapes)
+                  ;; (ppy/execute-in-thread-pools
+                  ;;  :sql-drag-rotations
+                  ;;  (fn [] (let [compact-relevant-shapes (vec (apply concat
+                  ;;                                                   (for [{:keys [shape-rotator] :as full-shape} relevant-shapes]
+                  ;;                                                     (let [{:keys [context shape-name axes shape-set honey-hash items source-panel]} shape-rotator
+                  ;;                                                           [connection-id _ _ table-name] context
+                  ;;                                                           rotation-hash (hash [shape-rotator client-name])]
+                  ;;                                                       (for [[k v] axes]
+                  ;;                                                         (mapv str [dragged-kp rotation-hash client-name connection-id
+                  ;;                                                                    table-name shape-set shape-name k v context source-panel full-shape]))))))
+                  ;;               reco-count-post (count relevant-shapes)]
+                  ;;           (sql-exec systemh2-db (to-sql
+                  ;;                                  {:delete-from [:shape_rotations]
+                  ;;                                   :where [:and
+                  ;;                                           [:= :dragged_kp (str dragged-kp)]
+                  ;;                                           [:= :client_name (str client-name)]]}))
+                  ;;           (sql-exec systemh2-db (to-sql
+                  ;;                                  {:delete-from [:shape_rotation_maps]
+                  ;;                                   :where [:and
+                  ;;                                           [:= :dragged_kp (str dragged-kp)]
+                  ;;                                           [:= :client_name (str client-name)]]}))
+                  ;;           (sql-exec systemh2-db (to-sql
+                  ;;                                  {:insert-into [:shape_rotations]
+                  ;;                                   :columns [:dragged_kp :rotation_hash :client_name :connection_id :table_name
+                  ;;                                             :shape_set :shape_name :axis_name :field_name :context :source_panel]
+                  ;;                                   :values (mapv drop-last compact-relevant-shapes)}))
+                  ;;           (sql-exec systemh2-db (to-sql
+                  ;;                                  {:insert-into [:shape_rotation_maps]
+                  ;;                                   :columns [:dragged_kp :rotation_hash :client_name :shape_map]
+                  ;;                                   :values (vec (distinct (map (fn [v] [(get v 0) (get v 1) (get v 2) (last v)]) compact-relevant-shapes)))}))
+                  ;;           (when pre-bake?
+                  ;;             (push-to-client [query-id] [:reco-status query-id] client-name 1 :reco :done reco-count-post 0))
+                  ;;           #_(ut/pp [(if pre-bake? "🍖🥧" "🍖") :sql-shapes-inserted! [client-name dragged-kp] reco-count-post (count compact-relevant-shapes)]))))
+
                   (ppy/execute-in-thread-pools
                    :sql-drag-rotations
-                   (fn [] (let [compact-relevant-shapes (vec (apply concat
-                                                                    (for [{:keys [shape-rotator] :as full-shape} relevant-shapes]
-                                                                      (let [{:keys [context shape-name axes shape-set honey-hash items source-panel]} shape-rotator
-                                                                            [connection-id _ _ table-name] context
-                                                                            rotation-hash (hash [shape-rotator client-name])]
-                                                                        (for [[k v] axes]
-                                                                          (mapv str [dragged-kp rotation-hash client-name connection-id
-                                                                                     table-name shape-set shape-name k v context source-panel full-shape]))))))
-                                reco-count-post (count relevant-shapes)]
-                            (sql-exec systemh2-db (to-sql
-                                                   {:delete-from [:shape_rotations]
-                                                    :where [:and
-                                                            [:= :dragged_kp (str dragged-kp)]
-                                                            [:= :client_name (str client-name)]]}))
-                            (sql-exec systemh2-db (to-sql
-                                                   {:delete-from [:shape_rotation_maps]
-                                                    :where [:and
-                                                            [:= :dragged_kp (str dragged-kp)]
-                                                            [:= :client_name (str client-name)]]}))
-                            (sql-exec systemh2-db (to-sql
-                                                   {:insert-into [:shape_rotations]
-                                                    :columns [:dragged_kp :rotation_hash :client_name :connection_id :table_name
-                                                              :shape_set :shape_name :axis_name :field_name :context :source_panel]
-                                                    :values (mapv drop-last compact-relevant-shapes)}))
-                            (sql-exec systemh2-db (to-sql
-                                                   {:insert-into [:shape_rotation_maps]
-                                                    :columns [:dragged_kp :rotation_hash :client_name :shape_map]
-                                                    :values (vec (distinct (map (fn [v] [(get v 0) (get v 1) (get v 2) (last v)]) compact-relevant-shapes)))}))
-                            (when pre-bake?
-                              (push-to-client [query-id] [:reco-status query-id] client-name 1 :reco :done reco-count-post 0))
-                            #_(ut/pp [(if pre-bake? "🍖🥧" "🍖") :sql-shapes-inserted! [client-name dragged-kp] reco-count-post (count compact-relevant-shapes)])))))
+                   (fn []
+                     (let [batch-size 500  ; adjust this based on your typical data size
+                           reco-count-post (count relevant-shapes)]
+
+                       ;; Delete operations first
+                       (sql-exec systemh2-db (to-sql
+                                              {:delete-from [:shape_rotations]
+                                               :where [:and
+                                                       [:= :dragged_kp (str dragged-kp)]
+                                                       [:= :client_name (str client-name)]]}))
+                       (sql-exec systemh2-db (to-sql
+                                              {:delete-from [:shape_rotation_maps]
+                                               :where [:and
+                                                       [:= :dragged_kp (str dragged-kp)]
+                                                       [:= :client_name (str client-name)]]}))
+
+                       ;; Process and insert shapes in batches
+                       (doseq [shape-batch (partition-all batch-size relevant-shapes)]
+                         ;; Prepare rotation rows
+                         (let [rotation-rows (vec
+                                              (for [{:keys [shape-rotator] :as full-shape} shape-batch
+                                                    :let [{:keys [context shape-name axes shape-set source-panel]} shape-rotator
+                                                          [connection-id _ _ table-name] context
+                                                          rotation-hash (hash [shape-rotator client-name])]
+                                                    [k v] axes]
+                                                [(str dragged-kp)
+                                                 (str rotation-hash)
+                                                 (str client-name)
+                                                 (str connection-id)
+                                                 (str table-name)
+                                                 (str shape-set)
+                                                 (str shape-name)
+                                                 (str k)
+                                                 (str v)
+                                                 (str context)
+                                                 (str source-panel)]))]
+
+                           ;; Insert rotation batch
+                           (when (seq rotation-rows)
+                             (sql-exec systemh2-db (to-sql
+                                                    {:insert-into [:shape_rotations]
+                                                     :columns [:dragged_kp :rotation_hash :client_name :connection_id
+                                                               :table_name :shape_set :shape_name :axis_name
+                                                               :field_name :context :source_panel]
+                                                     :values rotation-rows}))))
+
+                         ;; Prepare and insert map rows separately to manage memory
+                         (let [map-rows (vec
+                                         (for [{:keys [shape-rotator] :as full-shape} shape-batch
+                                               :let [rotation-hash (hash [shape-rotator client-name])]]
+                                           [(str dragged-kp)
+                                            (str rotation-hash)
+                                            (str client-name)
+                                            (pr-str full-shape)]))]
+
+                           (when (seq map-rows)
+                             (sql-exec systemh2-db (to-sql
+                                                    {:insert-into [:shape_rotation_maps]
+                                                     :columns [:dragged_kp :rotation_hash :client_name :shape_map]
+                                                     :values map-rows})))))
+
+                       (when pre-bake?
+                         (push-to-client [query-id] [:reco-status query-id] client-name 1 :reco :done reco-count-post 0)))))
+
+                            )
 
               #_(ut/pp [:take-5-compact-relevant-shapes (take 5 compact-relevant-shapes)])
               recos-for-grouped (group-by (fn [m] (get-in m [:shape-rotator :shape-name])) relevant-shapes)
@@ -2882,9 +2950,9 @@
 
 (defn load-and-cache-grid-actions []
   (when (nil? @grid-actions-cache)
-    (let [base-grid-actions (try (edn/read-string (slurp "./defs/custom-grid-actions.edn"))
+    (let [base-grid-actions (try (edn/read-string (slurp "defs/custom-grid-actions.edn"))
                                  (catch Exception _
-                                   (do (ut/pp [:*realm-custom-grid-actions :read-error :in "./defs/custom-grid-actions.edn"])
+                                   (do (ut/pp [:*realm-custom-grid-actions :read-error :in "defs/custom-grid-actions.edn"])
                                        {})))
           realm-folders (filter #(.isDirectory %) (file-seq (clojure.java.io/file "./realms")))
           _ (ut/pp [:*realm-custom-grid-actions :realm-folders (map #(.getName %) realm-folders)])
@@ -2933,9 +3001,9 @@
         hb?      (= sub-task [:heartbeat])
         grid-actions nil ;(when hb? (load-and-cache-grid-actions))
         ;; grid-actions (when hb? ;;; should probably cache all this and NOT run it every 15 seconds, but for now it is helpful for dev changes
-        ;;               (let [base-grid-actions (try (edn/read-string (slurp "./defs/custom-grid-actions.edn"))
+        ;;               (let [base-grid-actions (try (edn/read-string (slurp "defs/custom-grid-actions.edn"))
         ;;                                           (catch Exception _
-        ;;                                             (do (ut/pp [:*realm-custom-grid-actions :read-error :in "./defs/custom-grid-actions.edn"])
+        ;;                                             (do (ut/pp [:*realm-custom-grid-actions :read-error :in "defs/custom-grid-actions.edn"])
         ;;                                                 {})))
         ;;                    realm-folders (filter #(.isDirectory %) (file-seq (clojure.java.io/file "./realms")))
         ;;                    _ (ut/pp [:*realm-custom-grid-actions :realm-folders (map #(.getName %) realm-folders)])
@@ -2967,7 +3035,7 @@
                              panel-keys    (vec (keys (get @db/client-panels cid)))
                              runners       (get (config/settings) :runners)
                               ;; _ (ut/pp [:heartbeat cid])
-                            ;;  grid-actions  (try (edn/read-string (slurp "./defs/custom-grid-actions.edn"))
+                            ;;  grid-actions  (try (edn/read-string (slurp "defs/custom-grid-actions.edn"))
                             ;;                     (catch Exception _ (do (ut/pp [:custom-grid-actions :read-error]) {})))
 
                              ;;; this all needs to be moved out of heartbeat and into server-side panel-update side effects - 10/22/24
@@ -5632,7 +5700,7 @@
         curr-keyparts (vec (keys (get @db/atoms-and-watchers :rvbbit)))
         all-keyparts  (vec (distinct (ut/deep-flatten (map last parts))))
         to-remove     (vec (cset/difference (set curr-keyparts) (set all-keyparts)))]
-    (ut/pretty-spit (str "./defs/backup/signals." (System/currentTimeMillis) ".edn") @signals-atom)
+    (ut/pretty-spit (str "defs/backup/signals." (System/currentTimeMillis) ".edn") @signals-atom)
     (reset! signal-parts-atom parts) ;; faster than running it every time - since we need it
     (ut/pp [:reload-signals-subs! parts curr-keyparts all-keyparts {:remove! to-remove}])
     (doseq [rm to-remove] ;; clean up ones we dont need to watch anymore
@@ -5757,7 +5825,7 @@
         all-keyparts  (vec (distinct (ut/deep-flatten (map last parts))))
         to-remove     (vec (filter #(cstr/starts-with? (str %) ":solver/")
                                    (cset/difference (set curr-keyparts) (set all-keyparts))))]
-    (ut/pretty-spit (str "./defs/backup/solvers." (System/currentTimeMillis) ".edn") @solvers-atom)
+    (ut/pretty-spit (str "defs/backup/solvers." (System/currentTimeMillis) ".edn") @solvers-atom)
     #_(ut/pp [:reload-solver-subs! {:parts parts :curr-keypaths curr-keyparts :all-keyparts all-keyparts :to-remove to-remove}])
     (doseq [kk all-keyparts]
       #_(ut/pp [:solver-sub-to kk])
@@ -6607,7 +6675,7 @@
                                                              shapes))
                    hash-key (hash [client-name panel-key (first ui-keypath)])]
                (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-               #_(ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
+               (ut/pp ["🧀🐀" :shape-rotator (when system-query? :SYSTEM-QUERY) :honey-hash-cached-loaded
                        client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
              ;(swap! db/shapes-result-map assoc-in [client-name panel-key (first ui-keypath)] modded-shapes)
                (db/ddb-put! "shapes-map" hash-key modded-shapes)
@@ -6622,7 +6690,7 @@
                #_(push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :done reco-count 0))
 
            ;; non honeyhash cache
-             (let [;;_ (ut/pp [:hh client-name honey-hash (str honey-sql)])
+             (let [;;_ (ut/pp [:hh-cache-miss client-name honey-hash (str honey-sql)])
                    {fields-ms :elapsed-ms fields :result} (ut/timed-exec
                                                            (rota/get-field-maps
                                                             {:f-path connection-id ;target-db
@@ -6641,7 +6709,7 @@
                                                           (get res :shapes)))
                    hash-key (hash [client-name panel-key (first ui-keypath)])]
                (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts field-counts)
-               #_(ut/pp ["🧀" :shape-rotator-run (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
+               (ut/pp ["🧀" :shape-rotator-run (when system-query? :SYSTEM-QUERY) (+ fields-ms shapes-ms) :ms [fields-ms shapes-ms]
                        client-name (first ui-keypath) reco-count :viz-cnt (get-in fields [0 :total-rows]) :rows :hk hash-key])
              ;;(swap! db/shapes-result-map-by-honey-hash assoc honey-hash res) ;; multi-client cache
              ;(db/ddb-put! "honeyhash-map" honey-hash res)
@@ -7306,22 +7374,24 @@
                     ;;  \/  |  /__    |    |  | |  \  |    |      |    |__| |  \    |  | |___ |___  .
 
                     ;; (almost) everyone gets shape rotated  ;;
-                    (when (or sniffable? ;; manual sniff. almost completely unneeded now?
-                              (and ;;;false
+                    (if (or sniffable? ;; manual sniff. almost completely unneeded now?
+                            (and ;;;false
                                ;(not= connection-id "system-db")
-                               ;(not (cstr/includes? (str connection-id) "system"))
-                               (not (cstr/ends-with? (str (first ui-keypath)) "-search-like"))
-                               (not error-result?)
-                               (not= connection-id client-name)
-                               (not= client-name :rvbbit)
-                               (not (cstr/includes? (str panel-key) "reco-preview"))
-                               (not (cstr/includes? (str cache-table-name) "query_preview"))
-                               (not (cstr/includes? (str cache-table-name) "query-preview"))
-                               (not (cstr/starts-with? (str cache-table-name) "kick"))
-                               (not= connection-id (cstr/replace (str client-name) ":" ""))
+                             (not (cstr/includes? (str connection-id) "system"))
+                             (not (cstr/ends-with? (str (first ui-keypath)) "-search-like"))
+                             (not error-result?)
+                             (not= connection-id client-name)
+                             (not= client-name :rvbbit)
+                             (not (cstr/includes? (str panel-key) "reco-preview"))
+                             (not (cstr/includes? (str cache-table-name) "query_preview"))
+                             (not (cstr/includes? (str cache-table-name) "query-preview"))
+                             (not (cstr/starts-with? (str cache-table-name) "kick"))
+                             (not= connection-id (cstr/replace (str client-name) ":" ""))
                                ;(not (some #(= % [client-name (hash (select-keys honey-sql [:select :from :group-by]))]) @auto-viz-runs))
-                               ))
-                      (query-shape-rotation client-name panel-key ui-keypath connection-id honey-hash honey-sql row-count))
+                             ))
+                      (query-shape-rotation client-name panel-key ui-keypath connection-id honey-hash honey-sql row-count)
+                      (let [row-cnt (get honey-meta :rowcount)] ;; we still want to send row counts....
+                        (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts {:* row-cnt})))
 
 
                     (when (and (not error-result?) duck-shadow? stack?)
@@ -7347,7 +7417,7 @@
                                                             (let [modded-meta (-> (get output :result-meta)
                                                                                   (assoc :original-honey (get output :original-honey))
                                                                                   (assoc :connection-id (get output :connection-id)))
-                                                                  solver-edn-fp "./defs/solvers.edn"
+                                                                  solver-edn-fp "defs/solvers.edn"
                                                                   materialize-solver-name (keyword (str "materialize-" (cstr/replace (str (first ui-keypath)) ":" "")))
                                                                   cli-cache-table-name (keyword (cstr/replace (str "cached-" (ut/unkeyword cache-table-name)) "_" "-"))
                                                                   resultv (vec (for [r result] (assoc r :rrows 1)))
@@ -7788,6 +7858,15 @@
           1.6
           8))
 
+(defn msg-notify [client-name msg]
+  (alert! client-name
+          [:v-box :justify :center :style {:opacity 0.6}
+           :children [[:box :style {:font-weight 700 :font-size "13px"}
+                       :child msg]]]
+          10
+          0.6
+          8))
+
 (defn save-alert-notification-pre [client-name nname fpath flow?]
   (alert! client-name
           [:v-box :justify :center :style
@@ -7800,60 +7879,64 @@
 
 (defn save [request]
   (ut/pp [:save-coming-in])
-  (try (let [screen-name    (get-in request [:edn-params :screen-name])
-             client-name    (get-in request [:edn-params :client-name] "unknown")
-             file-base-name (ut/sanitize-name (str screen-name))
-             file-path      (str "./screens/" file-base-name ".edn")
-             fpath          (ut/abs-file-path file-path)]
-         (save-alert-notification-pre client-name screen-name nil false)
-         (do (ut/pp [:saved-file file-path])
-             (try (ut/pretty-spit file-path (get-in request [:edn-params :image]))
-                  (catch Throwable e
-                    (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
-                        (spit file-path (get-in request [:edn-params :image])))))
-             (save-alert-notification client-name screen-name fpath false)))
-       (catch Exception e
-         (do
-           (ut/pp [:error-saving-screen-outer (get-in request [:edn-params :screen-name])
-                   (get-in request [:edn-params :client-name] "unknown") e])
-           (alert! (get-in request [:edn-params :client-name] "unknown")
-                   [:v-box :justify :center :style {:opacity 0.6}
-                    :children [[:box :style {:font-weight 700 :font-size "13px"}
-                                :child (str "error saving " (get-in request [:edn-params :screen-name]) "...")]
-                               [:box :style {:font-weight 700 :font-size "13px"}
-                                :child (str e)]]]
-                   10
-                   0.6
-                   8))))
+  (if (not (get @db/latest-settings-map :saving-disabled? false))
+    (try (let [screen-name    (get-in request [:edn-params :screen-name])
+               client-name    (get-in request [:edn-params :client-name] "unknown")
+               file-base-name (ut/sanitize-name (str screen-name))
+               file-path      (str "./screens/" file-base-name ".edn")
+               fpath          (ut/abs-file-path file-path)]
+           (save-alert-notification-pre client-name screen-name nil false)
+           (do (ut/pp [:saved-file file-path])
+               (try (ut/pretty-spit file-path (get-in request [:edn-params :image]))
+                    (catch Throwable e
+                      (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
+                          (spit file-path (get-in request [:edn-params :image])))))
+               (save-alert-notification client-name screen-name fpath false)))
+         (catch Exception e
+           (do
+             (ut/pp [:error-saving-screen-outer (get-in request [:edn-params :screen-name])
+                     (get-in request [:edn-params :client-name] "unknown") e])
+             (alert! (get-in request [:edn-params :client-name] "unknown")
+                     [:v-box :justify :center :style {:opacity 0.6}
+                      :children [[:box :style {:font-weight 700 :font-size "13px"}
+                                  :child (str "error saving " (get-in request [:edn-params :screen-name]) "...")]
+                                 [:box :style {:font-weight 700 :font-size "13px"}
+                                  :child (str e)]]]
+                     10
+                     0.6
+                     8))))
+    (msg-notify (get-in request [:edn-params :client-name] "unknown") "Saving disabled."))
   (send-edn-success {:status "saved" :screen (first (get request :edn-params))}))
 
 (defn save-theme [request]
   (ut/pp [:save-theme-coming-in])
-  (try (let [theme-name    (get-in request [:edn-params :theme-name])
-             client-name    (get-in request [:edn-params :client-name] "unknown")
-             file-base-name (ut/sanitize-name (str theme-name))
-             file-path      (str "./themes/" file-base-name ".edn")
-             fpath          (ut/abs-file-path file-path)]
-         (save-alert-notification-pre client-name theme-name nil false)
-         (do (ut/pp [:saved-theme-file file-path])
-             (try (ut/pretty-spit file-path (get-in request [:edn-params :image]))
-                  (catch Throwable e
-                    (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
-                        (spit file-path (get-in request [:edn-params :image])))))
-             (save-alert-notification client-name theme-name fpath false true)))
-       (catch Exception e
-         (do
-           (ut/pp [:error-saving-theme-outer (get-in request [:edn-params :theme-name])
-                   (get-in request [:edn-params :client-name] "unknown") e])
-           (alert! (get-in request [:edn-params :client-name] "unknown")
-                   [:v-box :justify :center :style {:opacity 0.6}
-                    :children [[:box :style {:font-weight 700 :font-size "13px"}
-                                :child (str "error saving " (get-in request [:edn-params :theme-name]) "...")]
-                               [:box :style {:font-weight 700 :font-size "13px"}
-                                :child (str e)]]]
-                   10
-                   0.6
-                   8))))
+  (if (not (get @db/latest-settings-map :saving-disabled? false))
+    (try (let [theme-name    (get-in request [:edn-params :theme-name])
+               client-name    (get-in request [:edn-params :client-name] "unknown")
+               file-base-name (ut/sanitize-name (str theme-name))
+               file-path      (str "./themes/" file-base-name ".edn")
+               fpath          (ut/abs-file-path file-path)]
+           (save-alert-notification-pre client-name theme-name nil false)
+           (do (ut/pp [:saved-theme-file file-path])
+               (try (ut/pretty-spit file-path (get-in request [:edn-params :image]))
+                    (catch Throwable e
+                      (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
+                          (spit file-path (get-in request [:edn-params :image])))))
+               (save-alert-notification client-name theme-name fpath false true)))
+         (catch Exception e
+           (do
+             (ut/pp [:error-saving-theme-outer (get-in request [:edn-params :theme-name])
+                     (get-in request [:edn-params :client-name] "unknown") e])
+             (alert! (get-in request [:edn-params :client-name] "unknown")
+                     [:v-box :justify :center :style {:opacity 0.6}
+                      :children [[:box :style {:font-weight 700 :font-size "13px"}
+                                  :child (str "error saving " (get-in request [:edn-params :theme-name]) "...")]
+                                 [:box :style {:font-weight 700 :font-size "13px"}
+                                  :child (str e)]]]
+                     10
+                     0.6
+                     8))))
+    (msg-notify (get-in request [:edn-params :client-name] "unknown") "Saving disabled."))
   (send-edn-success {:status "saved" :screen (first (get request :edn-params))}))
 
 (defn save-snap [request]
@@ -7894,17 +7977,22 @@
   (send-edn-success {:status "screen-snap-saved" }))
 
 (defn save-flow [request]
-  (time (do (let [screen-name    (get-in request [:edn-params :flow-id]) ;(ut/generate-name) ;
-                  client-name    (get-in request [:edn-params :client-name] "unknown")
-                  file-base-name (ut/sanitize-name (str screen-name))
-                  file-path      (str "./flows/" file-base-name ".edn")
-                  fpath          (ut/abs-file-path file-path)]
-              (save-alert-notification-pre client-name screen-name nil false)
-              (do (ut/pp [:saved-flow file-path])
-                  (ut/pretty-spit file-path (get-in request [:edn-params :image]) 125)
-                  (save-alert-notification client-name screen-name fpath true)))))
+  (if (not (get @db/latest-settings-map :saving-disabled? false))
+    (time (do (let [screen-name    (get-in request [:edn-params :flow-id]) ;(ut/generate-name) ;
+                    client-name    (get-in request [:edn-params :client-name] "unknown")
+                    file-base-name (ut/sanitize-name (str screen-name))
+                    file-path      (str "./flows/" file-base-name ".edn")
+                    fpath          (ut/abs-file-path file-path)]
+                (save-alert-notification-pre client-name screen-name nil false)
+                (do (ut/pp [:saved-flow file-path])
+                    (ut/pretty-spit file-path (get-in request [:edn-params :image]) 125)
+                    (save-alert-notification client-name screen-name fpath true)))))
+    (msg-notify (get-in request [:edn-params :client-name] "unknown") "Saving disabled."))
   (send-edn-success {:status "saved" :flow (first (get request :edn-params))}))
 
+(defn wss-config [request]
+  (let [wss-config (get @db/latest-settings-map :wss-config ["ws" 3030])]
+    (send-edn-success wss-config)))
 
 (defn load-screen [request]
   (let [file-path      (or (get-in request [:edn-params :file-path]) (get-in request [:query-params :file-path]))
@@ -9233,6 +9321,8 @@
             queries-since-last (- (+ @q-calls @q-calls2)
                                   (+ (get @last-stats-row :queries_run 0) (get @last-stats-row :internal_queries_run 0)))
             as-double (fn [x] (Double/parseDouble (clojure.pprint/cl-format nil "~,2f" x)))
+            server-name   (try (.getHostName (java.net.InetAddress/getLocalHost))
+                               (catch Exception _ "unknown"))
             jvm-stats-vals
             {:used_memory_mb             mm
              :messages                   @all-pushes
@@ -9262,6 +9352,7 @@
             _ (reset! last-stats-row jvm-stats-vals)
             insert-sql {:insert-into [:jvm_stats] :values [jvm-stats-vals]}
             _ (swap! db/server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))
+            _ (swap! db/server-atom assoc :server-name server-name)
             ;flow-status-map (flow-statuses) ;; <--- important, has side effects, TODO refactor into timed instead of hitched to jvm console stats output
             ;pool-sizes (query-pool-sizes)
             ]
@@ -9640,6 +9731,7 @@
     ["/save-screen-snap" :post (conj common-interceptors `save-screen-snap)]
     ["/save-csv" :post (conj common-interceptors `save-csv)]
     ["/load" :get (conj common-interceptors `load-screen)]
+    ["/wss-config" :get (conj common-interceptors `wss-config)]
     ["/audio" :post (conj common-interceptors `get-audio)]
     ["/load-flow" :get (conj common-interceptors `load-flow)]
     ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]

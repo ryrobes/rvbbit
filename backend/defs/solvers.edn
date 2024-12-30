@@ -21,22 +21,25 @@
    {:signal :signal/changed-wallpaper?
     :type   :clojure
     :cache? false
-    :data   (do
-              (ns mp3-finder.core
-                (:require [clojure.java.io :as io]))
-              (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
-              (defn is-mp3? "Checks if the given file object is an MP3 file." [file] (.endsWith (.getName file) ".mp3"))
-              (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
-              (defn get-file-name "Gets the name of a file object." [file] (.getName file))
-              (defn find-random-mp3
-                [start-dir]
-                (let [mp3-files (->> (file-seq (io/file start-dir))
-                                     (filter is-file?)
-                                     (filter is-mp3?)
-                                     (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
-                                     (into []))]
-                  (if (seq mp3-files) (rand-nth mp3-files) nil)))
-              [:play-click-custom (find-random-mp3 "~/Music")])}
+    :data   (do (ns mp3-finder.core
+                  (:require [clojure.java.io :as io]))
+                (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
+                (defn is-mp3?
+                  "Checks if the given file object is an MP3 file."
+                  [file]
+                  (.endsWith (.getName file) ".mp3"))
+                (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
+                (defn get-file-name "Gets the name of a file object." [file] (.getName file))
+                (defn find-random-mp3
+                  [start-dir]
+                  (let [mp3-files (->> (file-seq (io/file start-dir))
+                                       (filter is-file?)
+                                       (filter is-mp3?)
+                                       (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
+                                       (into []))]
+                    (if (seq mp3-files) (rand-nth mp3-files) nil)))
+                ;[:play-click-custom (find-random-mp3 "~/Music")]
+                [:play-click-custom (find-random-mp3 (str (System/getProperty "user.home") "/Music"))])}
  :get-my-colors {:signal    false
                  :cache?    true
                  :type      :flow

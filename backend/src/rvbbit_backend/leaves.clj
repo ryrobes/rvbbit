@@ -621,7 +621,7 @@
 (defn load-leaf-meta []
   (if (ut/ne? @leaf-fns-cache)
     @leaf-fns-cache
-    (let [file-content (slurp "./defs/leaves.edn")
+    (let [file-content (slurp "defs/leaves.edn")
           leaf-fns (edn/read-string file-content)]
       (reset! leaf-fns-cache leaf-fns)
       leaf-fns)))
@@ -674,7 +674,7 @@
 
 ;; (defn load-leaf-fns [client-name view-kp dragging-kp]
 ;;   (try
-;;     (let [;;file-content (slurp "./defs/leaves.edn")
+;;     (let [;;file-content (slurp "defs/leaves.edn")
 ;;           leaf-fns (load-leaf-meta) ;; (edn/read-string file-content)
 ;;           {:keys [views fields actions-fns action-labels]} leaf-fns
 ;;           single-layer-expand (fn [vv] (into {} (for [[k v] vv]

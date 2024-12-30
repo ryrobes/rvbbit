@@ -539,13 +539,13 @@
   (try (edn/read-string (slurp file)) ;; just in case the file is empty or can't parse as EDN
        (catch Exception _ {})))
 
-(def default-flow-functions (slread "./defs/flow-functions.edn"))
+(def default-flow-functions (slread "defs/flow-functions.edn"))
 
-;; (def default-sniff-tests (slread "./defs/sniff-tests.edn"))
-;; (def default-field-attributes (slread "./defs/field-attributes.edn"))
+;; (def default-sniff-tests (slread "defs/sniff-tests.edn"))
+;; (def default-field-attributes (slread "defs/field-attributes.edn"))
 
-(def default-derived-fields (slread "./defs/derived-fields.edn"))
-;; (def viz-shapes-file-str (or (get (config/settings) :viz-shapes) "./defs/viz-shapes.edn"))
+(def default-derived-fields (slread "defs/derived-fields.edn"))
+;; (def viz-shapes-file-str (or (get (config/settings) :viz-shapes) "defs/viz-shapes.edn"))
 ;; (ut/pp [:using-viz-shapes-from viz-shapes-file-str])
 ;; (def default-viz-shapes (slread viz-shapes-file-str))
 

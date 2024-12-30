@@ -61,6 +61,7 @@ cp -r connections "../$DIR_NAME/connections"
 cp -r data "../$DIR_NAME/data"
 mkdir -p "../$DIR_NAME/db"
 cp -r defs "../$DIR_NAME/defs"
+cp -r ai-workers "../$DIR_NAME/ai-workers"
 mv "../$DIR_NAME/defs/empty-secrets.edn" "../$DIR_NAME/defs/secrets.edn"
 cp -r flows "../$DIR_NAME/flows"
 cp -r themes "../$DIR_NAME/themes"
@@ -88,7 +89,8 @@ mkdir -p "../$DIR_NAME/assets/data-exports"
 mkdir -p ../docker-staging
 
 rm -rf "../$DIR_NAME.zip"
-zip -rq "../$DIR_NAME.zip" "../$DIR_NAME/"
+## zip -rq "../$DIR_NAME.zip" "../$DIR_NAME/"
+(cd .. && zip -rq "$DIR_NAME.zip" "$DIR_NAME")
 
 cd "../$DIR_NAME"
 cp -r * ../docker-staging/

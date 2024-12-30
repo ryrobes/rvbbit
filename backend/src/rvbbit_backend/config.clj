@@ -34,11 +34,11 @@
 ;;                 (for [[kk vv] (get v :packages)] {kk (merge (merge (dissoc v :packages) {:kit-name kk :package-name k}) vv)})))))
 
 ;; (defn settings []
-;;   (let [config (try (read-string (slurp "./defs/config.edn"))
+;;   (let [config (try (read-string (slurp "defs/config.edn"))
 ;;                     (catch Exception e
 ;;                       (do (println [:ERROR! "defs/config.edn cannot be read!!! This is bad, please address."])
 ;;                           {:error (str e) :debug-level 1})))
-;;         sec-edn "./defs/secrets.edn"
+;;         sec-edn "defs/secrets.edn"
 ;;         secrets (try (read-string (slurp sec-edn))
 ;;                      (catch Exception _
 ;;                        {:no-secrets-file-found-at sec-edn}))
@@ -110,11 +110,11 @@
 (def openai-cache (atom {:api-key nil :org-id nil :models nil}))
 
 (defn settings []
-  (let [config (try (read-string (slurp "./defs/config.edn"))
+  (let [config (try (read-string (slurp "defs/config.edn"))
                     (catch Exception e
                       (do (println [:ERROR! "defs/config.edn cannot be read!!! This is bad, please address."])
                           {:error (str e) :debug-level 1})))
-        sec-edn "./defs/secrets.edn"
+        sec-edn "defs/secrets.edn"
         secrets (try (read-string (slurp sec-edn))
                      (catch Exception _
                        {:no-secrets-file-found-at sec-edn}))

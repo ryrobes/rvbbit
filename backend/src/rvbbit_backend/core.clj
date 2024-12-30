@@ -442,7 +442,7 @@
      file-path)))
 
 (defn merge-shape-files []
-  (let [file-path "./defs/shapes/"
+  (let [file-path "defs/shapes/"
         files (->> (ut/get-file-vectors-simple file-path ".edn")
                    (sort-by str))
         merged-shapes (reduce
@@ -464,7 +464,7 @@
 ;; (ut/pp (keys (merge-shape-files)))
 
 (defn watch-shapes-folder []
-  (let [file-path "./defs/shapes/"]
+  (let [file-path "defs/shapes/"]
     (beholder/watch
      (fn [event]
        (when (and (= (:type event) :modify)
@@ -666,7 +666,7 @@
 ;; (clear-all-leaf-caches)
 
 (defn watch-config-files []
-  (let [file-path "./defs/"]
+  (let [file-path "defs/"]
     (beholder/watch #(do
                        (when (cstr/ends-with? (str (get % :path)) "leaves.edn")
                          (ut/pp ["🍂" :leaves.edn-changed! "🌰 🍂 🐿️"])
@@ -843,7 +843,7 @@
 ;; (process-snippets-now)
 
 (defn watch-solver-files []
-  (let [file-path "./defs/"]
+  (let [file-path "defs/"]
     (beholder/watch #(ppy/execute-in-thread-pools
                       :watch-solver-files-serial
                       (fn [] (cond
@@ -1227,6 +1227,7 @@
     (ut/print-ansi-art "data/nname.ans")
     (ut/print-ansi-art "data/rrvbbit.ans")
     (ut/pp [:version "snowshoe-hare.0.2.0" :december-28-2024])
+    (wss/package-settings-for-client :rvbbit) ;; to populate the latest-settings-map atom asap
     ;; (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
     (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
   ;; (println " ")
@@ -1791,8 +1792,8 @@
                              (fpop/freeze-atoms)
                              (ut/ppa [:freezing-flow-results-atom])
                              (fpop/freeze-flow-results)
-                             (ut/zprint-file "./defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
-                             (ut/zprint-file "./defs/solvers.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
+                             (ut/zprint-file "defs/signals.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
+                             (ut/zprint-file "defs/solvers.edn" {:style [:justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 120 :map {:comma? false :sort? false}})
                            ;(ut/ppa [:clearing-cache-db])
                            ;(shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
                              (shell/sh "/bin/bash" "-c" (str "rm " "flow-logs/*"))

@@ -1,25 +1,26 @@
 (ns rvbbit-frontend.core
   (:require
-    [clojure.string          :as cstr]
-    [day8.re-frame.undo      :as undo]
-    [re-frame.core           :as re-frame]
-    [re-pollsive.core        :as poll]
-    [re-pressed.core         :as rp]
-    [reagent.core            :as reagent]
-    [reagent.dom             :as rdom]
-    [rvbbit-frontend.audio   :as audio]
-    [rvbbit-frontend.bricks  :as bricks]
-    [rvbbit-frontend.config  :as config]
-    [rvbbit-frontend.db      :as db]
-    [rvbbit-frontend.events  :as events]
-    [rvbbit-frontend.block-patrol  :as bp]
-    [rvbbit-frontend.flows   :as flows]
-    [rvbbit-frontend.http    :as http]
-    [rvbbit-frontend.signals :as signals]
-    [rvbbit-frontend.subs    :as subs]
-    [rvbbit-frontend.utility :as ut]
-    [rvbbit-frontend.views   :as views]
-    [websocket-fx.core       :as wfx]))
+   [cljs.core.async         :refer [go chan <! put! timeout]]
+   [clojure.string          :as cstr]
+   [day8.re-frame.undo      :as undo]
+   [re-frame.core           :as re-frame]
+   [re-pollsive.core        :as poll]
+   [re-pressed.core         :as rp]
+   [reagent.core            :as reagent]
+   [reagent.dom             :as rdom]
+   [rvbbit-frontend.audio   :as audio]
+   [rvbbit-frontend.bricks  :as bricks]
+   [rvbbit-frontend.config  :as config]
+   [rvbbit-frontend.db      :as db]
+   [rvbbit-frontend.events  :as events]
+   [rvbbit-frontend.block-patrol  :as bp]
+   [rvbbit-frontend.flows   :as flows]
+   [rvbbit-frontend.http    :as http]
+   [rvbbit-frontend.signals :as signals]
+   [rvbbit-frontend.subs    :as subs]
+   [rvbbit-frontend.utility :as ut]
+   [rvbbit-frontend.views   :as views]
+   [websocket-fx.core       :as wfx]))
 
 (defn dev-setup [] (when config/debug? (println "dev mode")))
 
@@ -213,7 +214,7 @@
       ;;  :event [::bricks/update-metadata-tabs]
       ;;  :dispatch-event-on-start? false}
 
-       {:interval                 45
+       {:interval                 300
         :event                    [::ut/random-fun-log-message]
         :dispatch-event-on-start? false}
 
@@ -231,6 +232,24 @@
        :poll-when                [::bricks/bg-status?] ;; @db/editor-mode
        :dispatch-event-on-start? false}]]))
 
+(defn wait-for-wss-config []
+  (let [c (chan)]
+    (re-frame/dispatch-sync [::http/wss-config])
+    (go
+      (loop []
+        (let [config (get @re-frame.db/app-db :wss-config)]
+          (cond
+            (vector? config) (do (put! c true)
+                                 (ut/pp ["🗝" :websocket-config-aquired! (str config)])
+                                 ;(.close c)
+                                 )
+            (= config "failed") (do (put! c false)
+                                    ;(.close c)
+                                    )
+            :else (do (<! (timeout 100))
+                      (recur))))))
+    c))
+
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
   (reset! db/clover-cache-atom {})
@@ -241,72 +260,75 @@
 (def g-key-down? (atom false))
 
 (defn init []
-  (set! (.-title js/document) (str "Rabbit is dreaming..."))
+  (set! (.-title js/document) (str "🐇 Rabbit is dreaming... 🌙"))
   (ut/tracked-dispatch-sync [::events/initialize-db])
   (ut/tracked-dispatch [::bricks/set-client-name db/client-name])
-  (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options db/client-name)])
-  ;(ut/tracked-dispatch [::wfx/connect :secondary (http/options-secondary :secondary)])
-  ;(ut/tracked-dispatch [::wfx/connect :leaves (http/options-secondary :leaves)])
-  (ut/tracked-dispatch [::wfx/connect :query1 (http/options-secondary :query1)])
-  (ut/tracked-dispatch [::wfx/connect :query2 (http/options-secondary :query2)])
-  (ut/tracked-dispatch [::wfx/connect :query3 (http/options-secondary :query3)])
-  (ut/tracked-dispatch-sync [::wfx/request :default
-                             {:message     {:kind :get-settings
-                                            :client-name db/client-name}
-                              :on-response [::http/simple-response-boot-no-load] ;; just get settings
-                              :on-timeout  [::http/timeout-response [:boot :get-settings]]
-                              :timeout     15000}])
-  (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :signals-map
-                                       :client-name db/client-name}
-                         :on-response [::signals/signals-map-response]
-                         :timeout     15000000}])
-  (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :solvers-map
-                                       :client-name db/client-name}
-                         :on-response [::signals/solvers-map-response]
-                         :timeout     15000000}])
-  (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows :click-param]))
-                      :reinstate-fn (fn [ratom value] (swap! ratom merge value))})
-  (track-mouse-activity)
-  ;; (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
-  ;;                    (when (and (= (.-keyCode event) 71) (not @g-key-down?))
-  ;;                      (reset! g-key-down? true)
-  ;;                      (reset! flows/drop-toggle? (not @flows/drop-toggle?))))
-  ;;       release-fn (fn [event] (when (= (.-keyCode event) 71)
-  ;;                                (reset! g-key-down? false)
-  ;;                                (reset! flows/drop-toggle? false)))]
-  ;;   (.addEventListener js/window "keydown" press-fn)
-  ;;   (.addEventListener js/window "keyup" release-fn))
-  (ut/tracked-dispatch
-   [::wfx/request :default
-    {:message {:kind :session-snaps
-               :client-name db/client-name}
-     :on-response [::bricks/save-sessions]
-     :timeout 15000}])
 
-  (js/setTimeout
-   (fn []
-     (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
-           base-dir "./screens/"]
-       (if (>= (count url-vec) 1) ;; if we have a url with a screen, load that, oitherwise load default screen
-         (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
-         (ut/tracked-dispatch [::wfx/request :default ;:secondary ;; load default boot flowset
-                               {:message     {:kind :get-settings :client-name db/client-name}
-                                :on-response [::http/simple-response-boot]
-                                :on-timeout  [::http/timeout-response [:boot :get-settings]]
-                                :timeout     60000}])))) 5000)
+  (go
+    (let [_ (<! (wait-for-wss-config))]  ;; need websocket data before we connect and sub to all the things
+      (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options db/client-name)])
+      ;(ut/tracked-dispatch [::wfx/connect :secondary (http/options-secondary :secondary)])
+      ;(ut/tracked-dispatch [::wfx/connect :leaves (http/options-secondary :leaves)])
+      (ut/tracked-dispatch [::wfx/connect :query1 (http/options-secondary :query1)])
+      (ut/tracked-dispatch [::wfx/connect :query2 (http/options-secondary :query2)])
+      (ut/tracked-dispatch [::wfx/connect :query3 (http/options-secondary :query3)])
+      (ut/tracked-dispatch-sync [::wfx/request :default
+                                 {:message     {:kind :get-settings
+                                                :client-name db/client-name}
+                                  :on-response [::http/simple-response-boot-no-load] ;; just get settings
+                                  :on-timeout  [::http/timeout-response [:boot :get-settings]]
+                                  :timeout     15000}])
+      (ut/tracked-dispatch [::wfx/request :default
+                            {:message     {:kind :signals-map
+                                           :client-name db/client-name}
+                             :on-response [::signals/signals-map-response]
+                             :timeout     15000000}])
+      (ut/tracked-dispatch [::wfx/request :default
+                            {:message     {:kind :solvers-map
+                                           :client-name db/client-name}
+                             :on-response [::signals/solvers-map-response]
+                             :timeout     15000000}])
+      (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows :click-param]))
+                          :reinstate-fn (fn [ratom value] (swap! ratom merge value))})
+      (track-mouse-activity)
+    ;; (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
+    ;;                    (when (and (= (.-keyCode event) 71) (not @g-key-down?))
+    ;;                      (reset! g-key-down? true)
+    ;;                      (reset! flows/drop-toggle? (not @flows/drop-toggle?))))
+    ;;       release-fn (fn [event] (when (= (.-keyCode event) 71)
+    ;;                                (reset! g-key-down? false)
+    ;;                                (reset! flows/drop-toggle? false)))]
+    ;;   (.addEventListener js/window "keydown" press-fn)
+    ;;   (.addEventListener js/window "keyup" release-fn))
+      (ut/tracked-dispatch
+       [::wfx/request :default
+        {:message {:kind :session-snaps
+                   :client-name db/client-name}
+         :on-response [::bricks/save-sessions]
+         :timeout 15000}])
 
-  (http/start-listening-to-url-changes)
-  (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
-  (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])
-  (ut/tracked-dispatch [::poll/init])
-  (ut/tracked-dispatch [::subs/window-fx-watcher])
-  (ut/dispatch-delay 7000 [::audio/text-to-speech11 :audio :elevenlabs nil])
-  ;; ^^ get voices if avail, but wait to make sure we have the api key from the server first
-  (ut/dispatch-delay 4000 [::bricks/leaf-push [:canvas :canvas :canvas] {}])
-  (dispatch-poller-rules)
-  (dispatch-keyup-rules)
-  (dispatch-keydown-rules)
-  (dev-setup)
-  (mount-root))
+      (js/setTimeout
+       (fn []
+         (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
+               base-dir "./screens/"]
+           (if (>= (count url-vec) 1) ;; if we have a url with a screen, load that, oitherwise load default screen
+             (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
+             (ut/tracked-dispatch [::wfx/request :default ;:secondary ;; load default boot flowset
+                                   {:message     {:kind :get-settings :client-name db/client-name}
+                                    :on-response [::http/simple-response-boot]
+                                    :on-timeout  [::http/timeout-response [:boot :get-settings]]
+                                    :timeout     60000}])))) 5000)
+
+      (http/start-listening-to-url-changes)
+      (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
+      (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])
+      (ut/tracked-dispatch [::poll/init])
+      (ut/tracked-dispatch [::subs/window-fx-watcher])
+      (ut/dispatch-delay 7000 [::audio/text-to-speech11 :audio :elevenlabs nil])
+    ;; ^^ get voices if avail, but wait to make sure we have the api key from the server first
+      (ut/dispatch-delay 4000 [::bricks/leaf-push [:canvas :canvas :canvas] {}])
+      (dispatch-poller-rules)
+      (dispatch-keyup-rules)
+      (dispatch-keydown-rules)
+      (dev-setup)
+      (mount-root))))

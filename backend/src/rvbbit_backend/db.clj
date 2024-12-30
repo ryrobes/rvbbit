@@ -1004,7 +1004,7 @@
 
 ;;; hooks
 ;; (def subscriptions (atom {}))
-;; ;;  (fpop/thaw-atom {} "./defs/rest-subscriptions.edn")
+;; ;;  (fpop/thaw-atom {} "defs/rest-subscriptions.edn")
 
 ;; (defn subscribe-hook [type-keyword keypath-keyword callback-url]
 ;;   (let [kkey (keyword (cstr/replace (str type-keyword "/" keypath-keyword) ":" ""))]
@@ -1016,7 +1016,7 @@
 ;;     (swap! subscriptions update kkey disj callback-url)
 ;;     (ut/ppln [:unsubscribed kkey callback-url])))
 
-(def subscriptions (fpop/thaw-atom {} "./defs/rest-subscriptions.edn"))
+(def subscriptions (fpop/thaw-atom {} "defs/rest-subscriptions.edn"))
 
 (defn trigger-hooks [key new-value]
   (when-let [callbacks (get @subscriptions key)]

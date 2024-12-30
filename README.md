@@ -110,12 +110,21 @@ Whether you’re blending data from multiple SQL sources, performing advanced tr
 
 ## Quick Start
 
-1. **Install & Run**
-   - [Download the latest release](#) (or clone the repo), then launch Rabbit (Java 17+ recommended).
+0. **Experimental Public Demo**
+   - Go to [https://run.rabbit.com/](https://run.rabbit.com/)
+   - (Instances are wiped periodically to limit abuse)
+
+1. **Install & Run Locally**
+   - Download the latest release - unzip it, and launch run-rabbit.sh - (Java 21 required).
    - Access it at [http://localhost:8888](http://localhost:8888).
 
+   **Docker Image (the best way to try it out)**
+   - Grab the image: `docker pull ghcr.io/ryrobes/rvbbit:latest`
+   - Example usage:
+      `docker run -d -p 8888:8888 -p 3030:3030 -v "defs:/app/defs" -v "connections:/app/connections" ghcr.io/ryrobes/rvbbit:latest`
+
 2. **Connect a Database**
-   - Drop your DB connection config (Postgres, MySQL, SQLite, etc.) into `connections/`.
+   - Drop your DB connection config (Postgres, MySQL, SQLite, etc.) into `connections/`. Look at the example EDN files, it's a JDBC def (w Hikari Connection Pool) def.
    - Rabbit automatically picks it up and displays your tables (will run some metadata sniffing on boot).
 
 3. **Drag & Drop Exploration**
@@ -127,6 +136,7 @@ Whether you’re blending data from multiple SQL sources, performing advanced tr
 
 4. **Extend As Needed**
    - Explore the `defs/` directory for all the EDN files that run most of Rabbit's systems. All user-space hackable.
+      - Many more docs coming on all this!
 
 ---
 
@@ -144,16 +154,16 @@ Whether you’re blending data from multiple SQL sources, performing advanced tr
 ## Contributing & Future Plans
 
 Rabbit’s core is open, dynamic, and designed to be extended:
-- “Kits” for specialized functionality (e.g., AI prompts, domain-specific flows, external REPL connections).
 - More robust documentation and “drag-and-drop recipe” guides.
 - Enhanced multi-user capabilities and security layers.
 - Ongoing UI refinements (like better cross-browser support and theme-building).
+
 
 If you have suggestions, please open an issue or start a discussion. We’re building a community of data explorers, UI tinkerers, and hackers who want the future now.
 
 ---
 
-- Built with love for composability and creativity. Inspired by the lessons of Bret Victor, Alan Kay, HyperCard, and other visionaries.
+ >Built with love for composability and creativity. Inspired by the lessons of Bret Victor, Alan Kay, HyperCard, and others.
 
 ---
 

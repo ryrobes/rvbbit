@@ -5557,7 +5557,7 @@
                      (let [tt :tt]
                        (with-out-str
                          (fig-render ":system-stats" :bright-cyan) ;; :solvers :nrepl-calls :websockets
-                         (draw-stats [:cpu :mem :threads :clients :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 5.66)) true))))}
+                         (draw-stats [:cpu :mem :threads :websockets :flows :solvers :nrepl-calls] [:freq] false (Math/floor (/ :ww 5.66)) true))))}
 
          (= @selected-stats-page :db-shape-rotator)
          {:signal false
@@ -6130,8 +6130,8 @@
         oai-valid?      @(ut/tracked-sub ::bricks/openai-key-valid? {})
         macro-undo-height 130
         macro-undo?     @db/macro-undo?
-        annotate?     @(ut/tracked-sub ::bricks/annotate? {})
-        ui-debug? @(ut/tracked-sub ::bricks/ui-debug? {})
+        annotate?       @(ut/tracked-sub ::bricks/annotate? {})
+        ui-debug?       @(ut/tracked-sub ::bricks/ui-debug? {})
         ww @(ut/tracked-subscribe_ [::subs/w])
         macro-undo-limit (Math/floor (/ ww 180))
         client-name-str (cstr/replace (str client-name) ":" "")
@@ -6404,10 +6404,11 @@
                             :tooltip "refresh all visible SQL queries"
                             :on-click #(ut/tracked-dispatch [::bricks/refresh-all])}]
 
-                          [custom-icon-button
-                           {:icon-name "zmdi-save"
-                            :tooltip "save board (Ctrl-S)"
-                            :on-click #(ut/tracked-dispatch [::http/save :skinny screen-name])}]
+                          (when (not (get-in @re-frame.db/app-db [:server :settings :saving-disabled?] false))
+                            [custom-icon-button
+                             {:icon-name "zmdi-save"
+                              :tooltip "save board (Ctrl-S)"
+                              :on-click #(ut/tracked-dispatch [::http/save :skinny screen-name])}])
 
 
 
@@ -7991,6 +7992,7 @@
        :attr {:id              "base-canvas"
               :on-click        #(do (reset! bricks/over-block? false)
                                     (reset! db/bar-hover-text nil)
+                                    (reset! bricks/over-editor? false)
                                     ;(reset! bricks/over-block nil)
                                     (reset! db/last-mouse-activity (js/Date.))
                                     (reset! bricks/over-flow? false))
