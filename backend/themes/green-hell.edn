@@ -104,7 +104,7 @@
  :block-title-selected-font-color "#ffffff"
  :grid-selected-background-color "#ff8c00"
  :grid-font-color "#ffffff"
- :canvas-background-css {:background-image      "linear-gradient(#1a332070,#1a332012),url(images/greenh1.webp-q10.jpg)"
+ :canvas-background-css {:background-image      "linear-gradient(#1a332070,#1a332012),url(assets/openai-images/greenh1.webp-q10.jpg)"
                          :transition            "all 0.6s ease-in-out"
                          :background-blend-mode "normal"
                          :background-size       "cover"

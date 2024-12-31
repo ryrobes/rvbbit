@@ -115,7 +115,7 @@
  :grid-selected-background-color        "#ffabd8"
  :grid-font-color                       "#f2f2f2"
  :canvas-background-css                 {:background-image
-                                           "linear-gradient(#00000099, #290f40), url(images/dew1.webp-q8.jpg)"
+                                           "linear-gradient(#00000099, #290f40), url(assets/openai-images/dew1.webp-q8.jpg)"
                                          :transition "all 0.7s ease-in-out"
                                          :background-blend-mode "multiply"
                                          :background-size "cover"

@@ -120,6 +120,7 @@
  (fn [_ [_ x]]
    (reset! db/last-mouse-activity (js/Date.)) ;; just to juice the mouse timer
    (reset! db/running-queries #{})
+   (js/setTimeout (fn [] (reset! db/running-queries #{})) 15000) ;; reset the laggers also
    {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
                  [::update-panels-hash] ;; expensive to re-pop the server data for client panels
                  [::wfx/request :default
@@ -1012,6 +1013,14 @@
                            (ut/tapp>> [:websocket-timeout! client-name result what-req])
                            db)))
 
+(re-frame/reg-event-db ::query-timeout-response
+                       (fn [db [_ keypath honey-sql]]
+                         (let [client-name (get db :client-name)]
+                           (swap! db/running-queries disj honey-sql)
+                           (ut/tapp>> ["☠︎︎" :query-websocket-request-timeout! (str keypath) honey-sql])
+                           db)))
+
+
 (re-frame/reg-event-db ::socket-response
                        (fn [db [_ result]]
                          (let [ui-keypath      (get result :ui-keypath)
@@ -1544,7 +1553,7 @@
                    (merge old-status {:result result
                                       :ended-unix (.getTime (js/Date.))
                                       :status "success"}))
-         (assoc :query-history (get new-db :query-history))
+         ;(assoc :query-history (get new-db :query-history))
          (ut/dissoc-in [:query-history :blocks-sys])
          (ut/dissoc-in [:query-history :fields-sys])
          (ut/dissoc-in [:query-history :tables-sys])
@@ -1559,7 +1568,7 @@
          (assoc :selected-block "none!")
          (assoc :meta (get new-db :meta))
          (assoc :screen-name (if snap? curr-screen-name (get new-db :screen-name)))
-         (assoc :data (get new-db :data))
+         ;(assoc :data (get new-db :data))
          (assoc :click-param new-click-param)
          (assoc-in [:click-param :theme :vega-defaults :header :labelColor] (get-in new-click-param [:theme :vega-defaults :header :labelColor] "#f2e8ff")) ;; set as default if not exist...
          (assoc-in [:click-param :theme :line-style] (get-in new-click-param [:theme :line-style] "curved-path-h")) ;; set as default if not exist...

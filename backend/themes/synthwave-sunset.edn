@@ -110,7 +110,7 @@
  :block-title-selected-font-color "#00fff7"
  :grid-selected-background-color "#ff00ff"
  :grid-font-color "#ff00ff"
- :canvas-background-css {:background " url(images/pz1.webp-q8.jpg), linear-gradient(45deg, #1a0933 40%, #2a1b46 100%)"
+ :canvas-background-css {:background " url(assets/openai-images/pz1.webp-q8.jpg), linear-gradient(45deg, #1a0933 40%, #2a1b46 100%)"
                          :transition "all 0.6s ease-in-out"
                          :background-blend-mode "normal"
                          :backdrop-filter "blur(8px)"

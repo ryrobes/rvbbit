@@ -120,6 +120,7 @@
 
 (defonce sys-load (atom []))
 (defonce thread-usage (atom []))
+(defonce client-usage (atom []))
 
 (defonce non-heap-mem-usage (atom []))
 ;(defonce time-usage (atom []))
@@ -7389,9 +7390,12 @@
                              (not= connection-id (cstr/replace (str client-name) ":" ""))
                                ;(not (some #(= % [client-name (hash (select-keys honey-sql [:select :from :group-by]))]) @auto-viz-runs))
                              ))
-                      (query-shape-rotation client-name panel-key ui-keypath connection-id honey-hash honey-sql row-count)
-                      (let [row-cnt (get honey-meta :rowcount)] ;; we still want to send row counts....
-                        (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts {:* row-cnt})))
+                      (query-shape-rotation client-name panel-key ui-keypath connection-id honey-hash honey-sql row-count) ;; has its own threadpool async
+                      (ppy/execute-in-thread-pools
+                       :row-count-only-party
+                       (fn [] (let [row-cnt (get (first (sql-query target-db (to-sql {:select [[[:count 1] :rowcnt]]
+                                                                                      :from   [[(dissoc honey-sql :limit) :subq]]}))) :rowcnt)] ;; we still want to send row counts....
+                                (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts {:* row-cnt})))))
 
 
                     (when (and (not error-result?) duck-shadow? stack?)
@@ -8984,7 +8988,8 @@
                   :msgs-cum [@push-usage "messages/sec" "client 'pushes'"]
                   :load [@sys-load "system load" "load"]
                   :websockets [@peer-usage "websocket connections" "peers"]
-                  ;;:clients TODO get actual connected client counts
+                  :clients [@client-usage "live unique clients" "users"]
+                  :users [@client-usage "live unique clients" "users"]
                   :threads [@thread-usage "total threads" "threads"]
                   :watchers [@watcher-usage "total watcher" "watchers"]
                   :subs [@sub-usage "unique subs" "subs"]

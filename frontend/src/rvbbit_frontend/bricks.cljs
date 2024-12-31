@@ -2032,14 +2032,22 @@
  (fn [db [_ theme-map & [theme-name]]]
    (ut/pp ["🎨" :changing-theme theme-name])
    (if (ut/ne? theme-map)
-     (-> db (assoc-in
-             [:click-param :theme]
-             (merge (apply dissoc (get-in db [:click-param :theme])
-                           (vec (keys db/base-theme))) theme-map
-                    (when theme-name {:theme-name theme-name})))
+     (-> db
+         (assoc-in [:click-param :theme]
+                   (merge (apply dissoc (get-in db [:click-param :theme])
+                                 (vec (keys db/base-theme))) theme-map
+                          (when theme-name {:theme-name theme-name})))
          (assoc-in [:click-param :theme :line-style] (get theme-map :line-style "curved-path-h")) ;; set as default if not exist...
          (assoc-in [:click-param :theme :vega-defaults :header :labelColor] (get-in theme-map [:vega-defaults :header :labelColor] "#f2e8ff"))
-         (assoc-in [:click-param :theme :running-gif] (get theme-map :running-gif "images/running.gif")))
+         (assoc-in [:click-param :theme :running-gif] (get theme-map :running-gif "images/running.gif"))
+
+         (assoc-in [:click-param :stored-theme] ;; in case we are hover previewing... (since :theme would already be set to the new one)
+                   (merge (apply dissoc (get-in db [:click-param :stored-theme])
+                                 (vec (keys db/base-theme))) theme-map
+                          (when theme-name {:theme-name theme-name})))
+         (assoc-in [:click-param :stored-theme :line-style] (get theme-map :line-style "curved-path-h")) ;; set as default if not exist...
+         (assoc-in [:click-param :stored-theme :vega-defaults :header :labelColor] (get-in theme-map [:vega-defaults :header :labelColor] "#f2e8ff"))
+         (assoc-in [:click-param :stored-theme :running-gif] (get theme-map :running-gif "images/running.gif")))
      db)))
 
 (def theme-cache (atom #{}))
@@ -5622,6 +5630,50 @@
  (fn [db _]
    (get-in db [:click-param :theme])))
 
+(re-frame/reg-event-fx
+ ::hover-preview-theme
+ (fn [{:keys [db]} [_ preview-theme-map on?]]
+   (let [current-theme (get-in db [:click-param :theme])]
+     (if on?
+       ;; Store current theme and set preview theme after delay
+       {:db (assoc db :theme-debounce? true)  ; Set debounce at root level
+        :dispatch-later [{:ms 1100  ; Longer delay before applying theme
+                          :dispatch [::apply-preview-theme preview-theme-map current-theme]}]}
+
+       ;; Restore original theme immediately when mouse leaves
+       {:db (-> db
+                (assoc-in [:click-param :theme] (get-in db [:click-param :stored-theme]))
+                (update :click-param #(dissoc % :stored-theme))
+                (assoc :theme-debounce? false))}))))
+
+;; New event to actually apply the theme after delay
+(re-frame/reg-event-fx
+ ::apply-preview-theme
+ (fn [{:keys [db]} [_ preview-theme-map current-theme]]
+   {:db (-> db
+            (assoc-in [:click-param :stored-theme] current-theme)
+            (assoc-in [:click-param :theme] preview-theme-map)
+            (assoc :theme-debounce? false))}))
+
+;; Subscription for debounce state
+(re-frame/reg-sub
+ ::theme-debounce?
+ (fn [db _]
+   (get db :theme-debounce?)))
+
+;; Make sure this handler returns a valid db
+(re-frame/reg-event-db
+ ::set-theme-debounce
+ (fn [db [_ active?]]
+   (assoc db :theme-debounce? (boolean active?))))
+
+(re-frame/reg-sub
+ ::theme-debounce?
+ (fn [db _]
+   (get db :theme-debounce?)))
+
+(def theme-animation (reagent/atom nil))
+
 (defn search-box-result-pill-screens [context-key ttype]
   (let [[connection-id file-path _ table-name field-name data_type total_rows distinct_count data] context-key
         screen? (= @rabbit-search-tab :screens)
@@ -5629,8 +5681,10 @@
         ;file-path (when screen? data)
         theme-map (when theme? data) ;;(when theme? (try (edn/read-string data) (catch :default _ (ut/pp [:error-reading-theme-string (str data) context-key]))))
         hovered? (= @rabbit-search-hover context-key)
+        animate? (= @theme-animation context-key)
         ;; curr-theme (when theme? @(ut/tracked-sub ::raw-theme {}))
         ;; theme-selected? (when theme? (= curr-theme theme-map))
+        debounced? @(ut/tracked-sub ::theme-debounce? {})
         theme-map-r (resolver/logic-and-params theme-map nil)
         tooltip (str (if (= ttype :themes)
                        (str "Click to apply " table-name " theme (will overwrite current theme)")
@@ -5666,23 +5720,36 @@
       :height "40px"
       :size "auto"
       :justify :between
+      :class (when animate? "pop-debug")
       :attr (merge
              {:on-mouse-enter (fn [] (reset! rabbit-search-hover context-key)
+                                (when (and theme? (= ttype :themes)) (when-not debounced?
+                                                          (ut/tracked-dispatch [::hover-preview-theme theme-map true])))
                                 (reset! db/bar-hover-text tooltip))
               :on-mouse-over #(when (not= @rabbit-search-hover context-key)
                                 (reset! db/bar-hover-text tooltip)
                                 (reset! rabbit-search-hover context-key))
               :on-mouse-leave (fn [] (reset! rabbit-search-hover nil)
+                                (when (and theme? (= ttype :themes)) (ut/tracked-dispatch [::hover-preview-theme theme-map false]))
                                 (reset! db/bar-hover-text nil))}
             ;;  (if (and (map? theme-map) theme?)
             ;;    {:on-click #(ut/tracked-dispatch [::overwrite-theme theme-map table-name])}
             ;;    {:on-click #(ut/tracked-dispatch [::http/load file-path])})
              (if screen?
-               {:on-click #(ut/tracked-dispatch [::http/load file-path])}
-               {:on-click #(ut/tracked-dispatch [::overwrite-theme theme-map table-name])}
+               {:on-click #(do
+                             (ut/tracked-dispatch [::http/load file-path])
+                             (reset! theme-animation context-key)
+                             (reset! rabbit-search-hover nil)
+                             (js/setTimeout (fn [] (reset! theme-animation nil)) 3000))}
+               {:on-click #(do
+                             (ut/tracked-dispatch [::overwrite-theme theme-map table-name])
+                             (reset! theme-animation context-key)
+                             (js/setTimeout (fn [] (reset! theme-animation nil)) 3000))}
                ))
       :style (merge
               {:border (str "1px solid " dcolor)
+               ;:transform-style "preserve-3d"
+               ;:perspective "1000px"
                :cursor "pointer"
                :color dcolor}
               (when theme? {:font-family (get theme-map-r :base-font)
@@ -10049,12 +10116,14 @@
   [data prefix] ;; prefix as in "theme/"  etc.
   (let [kw-tag (keyword (str (ut/replacer prefix "/" "") "-autocomplete-gen"))
         resolved-data (resolver/logic-and-params data kw-tag)] ;; if it was a fn, we need the result kp, not the request kp...
-    (vec (distinct (flatten (for [[k v] resolved-data]
+    (try
+      (vec (distinct (flatten (for [[k v] resolved-data]
                               (if (or (map? v) (vector? v))
                                 (conj (for [ee (ut/kvpaths v)]
                                         (str (keyword (ut/replacer (str prefix k ">" (cstr/join ">" ee)) ":" ""))))
                                       (str (keyword (str prefix (ut/unkeyword k)))))
-                                (str (keyword (str prefix (ut/unkeyword k)))))))))))
+                                (str (keyword (str prefix (ut/unkeyword k)))))))))
+      (catch :default _ []))))
 
 (re-frame/reg-event-db
  ::update-user-params-hash
@@ -13509,8 +13578,10 @@
    (let [all-condis {:condi (into {} (for [[_ v] (get db :panels)] (into {} (for [[kk vv] (get v :conditionals)] {kk vv}))))}
          clicks     (get-in db [:click-param])
          cc         (merge clicks all-condis)]
-     (vec (remove empty?
-                  (for [[k v] cc] (into {} (for [[kk vv] v] {(keyword (str (ut/safe-name k) "/" (ut/safe-name kk))) vv}))))))))
+     (try
+       (vec (remove empty?
+                  (for [[k v] cc] (into {} (for [[kk vv] v] {(keyword (str (ut/safe-name k) "/" (ut/safe-name kk))) vv})))))
+       (catch :default _ {})))))
 
 ;; (defn update-click-params-snapshot []
 ;;   (let [current-params @(ut/tracked-sub ::all-click-params {})]
@@ -17063,7 +17134,7 @@
   (let [in-editor? (not (nil? override-view))
         kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type in-editor?])
         cc (get @ut/clover-walk-singles-map kk)]
-    (if false ;;(ut/ne? cc)
+    (if false ;(ut/ne? cc)
       cc
       (let [in-editor? (not (nil? override-view))
             walk-map
@@ -17078,6 +17149,7 @@
               :multi-dropdown #(multi-dropdown (try (assoc % :panel-key panel-key) (catch :default _ %)))
               :atom #(reagent/atom %)
               :get get
+              ;;;:base-domain (fn [] (try (str (-> js/window.location .-hostname (clojure.string/replace #"^www\." ""))) (catch :default _ "error!")))
               ;;:edn #(edn-box (+ px-width-int 70) (+ px-height-int 55) %)
               :edn (fn [x] (let [viewer (choose-viewer (pr-str x))] ;; should we virtualize?
                              (if (= viewer :virtualized)
@@ -17733,6 +17805,7 @@
               :date->str ut/goog-date->str
               :str->date ut/str->goog-date
               :number (fn [x] (str (nf x)))
+              :round-number (fn [x] (str (nf (Math/round x))))
               :percent (fn [x] (str (nf x) "%"))
               :spacer re-com/gap
               :datepicker re-com/datepicker

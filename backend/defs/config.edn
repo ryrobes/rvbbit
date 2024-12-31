@@ -12,17 +12,19 @@
  :hide-sub-and-unsub-alerts? true ;; client side pop-up showing reactor sub actions (debug only, annoying)
  :show-query-times? false ;; client side pop-up alert showing SQL query times and query body (debug only, annoying)
  :console-viz-client-sparklines? true
- :console-viz-settings [[:cpu :mem :threads] [15] false nil]
+ :console-viz-settings [[:cpu :mem :threads :users] [15] false nil]
  ;;                     ^ types of charts to render  ^ what time segments to show (seconds) ^ show big-title ^ console-width (nil tries to autosize)
  ;; charts availiable: - [:load :watchers :signal-reactions :mem :nrepl-calls :sql-queries :flows :leaf-evals :pool-tasks :msgs-cum :queued :tasks
  ;;                       :threads :msgs :sql-exec :nrepl-intro-calls :clover-params :subs :pool-tasks-run :subs-client :websockets :solvers :workers
  ;;                       :queues :viz-recos :reactions :cpu :queue-tasks :non-heap-mem]
+ ;; They will be AVERAGE by default, but can be SUM if you add a + on to the keyword. i.e. :subs+
  :log-atom-sizes? false ;; expensive, only for debugging - if enabled, see server-stats2 screen, it has it's own tab (localhost:8888/#/server-stats2)
  :ui-debug? false ;; adds some extra counters, elements and reactions
  :render-pop? true ;; semi-expensive but enjoyable (the 'tilt shift' upon re-rendering)
  :default "screens/late-december.edn"
- ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
- ;;    if this screen can't be read or is nil, you will get a basic blank screen with a base theme
+   ;; ^^ if no screen given in URL, load this one. the "start page" essentially.
+   ;;    if this screen can't be read or is nil, you will get a basic blank screen with a base theme
+ ;:timezone "America/New_York" ;; if invalid or missing, will default to system TZ
  :harvest-on-boot? true
  ;; ^^ do a full database sniff for each connection on boot? No reason not to unless it is causing issues.
  ;;:saving-disabled? true

@@ -1445,7 +1445,7 @@
 
     (start-scheduler 1
                      #(try
-                        (let [ddate (ut/current-datetime-parts)
+                        (let [ddate (ut/current-datetime-parts (get @db/latest-settings-map :timezone))
                               stamp (System/currentTimeMillis)
                               ddate (-> ddate
                                         (assoc (keyword (str "second=" (get ddate :second))) stamp)
@@ -1564,6 +1564,7 @@
   ;;(when debug?
     (start-scheduler 1
                      #(do (swap! wss/peer-usage conj (count @wl/sockets))
+                          (swap! wss/client-usage conj (count (leaves/active-clients)))
                           (swap! wss/push-usage conj @wss/all-pushes)
                           (swap! wss/viz-reco-usage conj @db/viz-reco-sniffs)
                           (swap! wss/leaf-eval-usage conj @db/leaf-evals)

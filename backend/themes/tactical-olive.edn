@@ -118,7 +118,7 @@
  :grid-font-color "#d5e6c3"
  :canvas-background-css
    {:background
-      "linear-gradient(180deg, #242914 33%, #1a1d14 100%),                                     url(images/olive1.webp-q8.jpg)"
+      "linear-gradient(180deg, #242914 33%, #1a1d14 100%),                                     url(assets/openai-images/olive1.webp-q8.jpg)"
     :background-blend-mode "overlay"
     :background-size "cover"
     :transition "all 0.2s ease"

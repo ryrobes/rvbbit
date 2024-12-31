@@ -41,6 +41,8 @@
                  (fn [[atom value]]
                    (reset! atom value)))
 
+(re-frame/reg-event-db ::set-domain (fn [db [_ domain]] (assoc-in db [:click-param :param :domain] domain)))
+
 (re-frame/reg-event-db ::alt-key-down (fn [db _] (assoc db :alt-key-held? true)))
 
 (re-frame/reg-event-db ::alt-key-up (fn [db _] (assoc db :alt-key-held? false)))
@@ -267,6 +269,7 @@
   (go
     (let [_ (<! (wait-for-wss-config))]  ;; need websocket data before we connect and sub to all the things
       (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options db/client-name)])
+      (ut/dispatch-delay 9000 [::set-domain (try (str (-> js/window.location .-hostname (clojure.string/replace #"^www\." ""))) (catch :default _ "error!"))])
       ;(ut/tracked-dispatch [::wfx/connect :secondary (http/options-secondary :secondary)])
       ;(ut/tracked-dispatch [::wfx/connect :leaves (http/options-secondary :leaves)])
       (ut/tracked-dispatch [::wfx/connect :query1 (http/options-secondary :query1)])

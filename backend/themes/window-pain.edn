@@ -129,7 +129,7 @@
  :grid-font-color "#ffffff"
  :canvas-background-css
    {:background
-      "radial-gradient(circle at 50% 0%, #1a1a2a 0%, #0a0a12 100%),                                     url(images/hall1.webp-q8.jpg)"
+      "radial-gradient(circle at 50% 0%, #1a1a2a 0%, #0a0a12 100%),                                     url(assets/openai-images/hall1.webp-q8.jpg)"
     :background-size "cover"
     :background-position "0 0, 0 0, 30px 30px, 0 0"
     :background-blend-mode "hard-light"

@@ -122,7 +122,7 @@
  :grid-selected-background-color "#00ff3b"
  :grid-font-color "#2eff5e"
  :canvas-background-css
-   {:background       "url(images/nodz2.jpg)"
+   {:background       "url(assets/openai-images/nodz2.jpg)"
     :transition       "all 0.2s ease"
     :filter           "brightness(1.2) sepia(1) hue-rotate(70deg) saturate(3) contrast(1.5) grayscale(10%) opacity(95%)"
     :background-size  "cover"

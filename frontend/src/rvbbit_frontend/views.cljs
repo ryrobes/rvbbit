@@ -7194,7 +7194,7 @@
                 :children
                 [[re-com/box :child (str "dropped " (get drag-meta :type) " " (get drag-meta :target))]
                  [re-com/box :child (str " from " (get drag-meta :source-table))]]])
-        react! [@db/last-modal-viz-field @db/viz-modes-atom @db/clover-leaf-previews @dropping-block?]
+        react! [@db/last-modal-viz-field @db/viz-modes-atom @db/clover-leaf-previews @dropping-block? @bricks/rabbit-search-hover]
         clear-state (fn []
                       (reset! db/drop-spawn-modal? false)
                       (reset! bricks/dragging-body {})
@@ -7508,41 +7508,51 @@
         ;;  (when (= (count (for [[k v1] leaves-map] (for [vv v1] vv))) 1)
         ;;    (ut/pp [:single-option-should-just-drop!]))
 
-         (if (= @db/viz-modes-atom "pick viz")
+         (cond (= @db/viz-modes-atom "pick viz")
 
-           [re-com/box
-            :style {:color "#ffffff33"}
-            :child [shape-rotator-panel tpanel shape-rotator-meta
-                    (vec (keys shape-types)) ;;(when (= (get drag-meta :type) :field) (get drag-meta :target)) ;; send field to filter rotations, IF its a field, that is
-                    nil ;(first temp-panels) ;nil ;(get drag-meta :source-panel-key)
-                    440 280]]
+               [re-com/box
+                :style {:color "#ffffff33"}
+                :child [shape-rotator-panel tpanel shape-rotator-meta
+                        (vec (keys shape-types)) ;;(when (= (get drag-meta :type) :field) (get drag-meta :target)) ;; send field to filter rotations, IF its a field, that is
+                        nil ;(first temp-panels) ;nil ;(get drag-meta :source-panel-key)
+                        440 280]]
 
-           [re-com/v-box
-            :children (for [[k v1] leaves-map
-                            :let [;;_ (ut/pp [:leaves-map leaves-map])
+              ;;  (= (get @bricks/rabbit-search-hover 5) "screen")
+              ;;  (let [screen-name (first @bricks/rabbit-search-hover)]
+              ;;    [re-com/v-box
+              ;;     :padding "10px"
+              ;;     :align :center :justify :center
+              ;;     :width "303px"
+              ;;     :children [[re-com/box :child (str screen-name) :style {:font-size "22px"}]
+              ;;                [re-com/box :child [:img {:src (str "assets/screen-snaps/" screen-name ".jpg")}]]
+              ;;                [re-com/box :child "(click to open, will replace current screen contents)"]]])
+
+               :else
+               [re-com/v-box
+                :children (for [[k v1] leaves-map
+                                :let [;;_ (ut/pp [:leaves-map leaves-map])
                                   ;;single-option-should-just-drop? (true? (= (count (flatten (vec (for [[_ v1] leaves-map] (for [vv v1] vv))))) 1))
-                                  cat-name (get-in leaves-meta [:categories k :label] (str k))]]
-                        [re-com/v-box
-                         :children
-                         [[re-com/box
-                           :style {:font-size "18px" :font-weight 700  :margin-top "10px"}
-                           :height "35px"
-                           :align :center
-                           :justify :center
-                           :child (str cat-name)]
-                          [dynamic-block-grid
-                           (vec
-                            (for [vv v1
-                                  :let [color (get-in leaves-meta [:action-labels k vv :color] ;; action color overrides cat color
-                                                      (get-in leaves-meta [:categories k :color]
-                                                              (theme-pull :theme/editor-outer-rim-color nil)))
-                                        label-map (get-in leaves-meta [:by-keypath-meta [:canvas :canvas :canvas] k vv])]]
-                              [spawn-button label-map k vv [(or @db/dragged-kp
-                                                                [:canvas :canvas :canvas])
-                                                            [:canvas :canvas :canvas]]
-                               single-option-should-just-drop?
-                               color
-                               ]))]]])])
+                                      cat-name (get-in leaves-meta [:categories k :label] (str k))]]
+                            [re-com/v-box
+                             :children
+                             [[re-com/box
+                               :style {:font-size "18px" :font-weight 700  :margin-top "10px"}
+                               :height "35px"
+                               :align :center
+                               :justify :center
+                               :child (str cat-name)]
+                              [dynamic-block-grid
+                               (vec
+                                (for [vv v1
+                                      :let [color (get-in leaves-meta [:action-labels k vv :color] ;; action color overrides cat color
+                                                          (get-in leaves-meta [:categories k :color]
+                                                                  (theme-pull :theme/editor-outer-rim-color nil)))
+                                            label-map (get-in leaves-meta [:by-keypath-meta [:canvas :canvas :canvas] k vv])]]
+                                  [spawn-button label-map k vv [(or @db/dragged-kp
+                                                                    [:canvas :canvas :canvas])
+                                                                [:canvas :canvas :canvas]]
+                                   single-option-should-just-drop?
+                                   color]))]]])])
 
         ;;  (when filters?
         ;;    [re-com/v-box
@@ -8083,8 +8093,8 @@
                :children [(when mouse-active? [bricks/reecatch [tab-menu]])
 
                           (when (and ;(not @bricks/dragging?)
-                                     (or @db/drop-spawn-modal?
-                                         @db/fresh-spawn-modal?))
+                                 (or @db/drop-spawn-modal?
+                                     @db/fresh-spawn-modal?))
                             [bricks/reecatch [fresh-spawn-modal]])
 
                           ;;(when @db/drop-spawn-modal? [bricks/reecatch [bricks/drop-spawn-modal]])
@@ -8095,6 +8105,19 @@
                             [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
 
                           (when session? [session-modal])
+
+                          (when (= (get @bricks/rabbit-search-hover 5) "screen")
+                            (let [screen-name (first @bricks/rabbit-search-hover)]
+                              ;;[:img {:src (str "assets/screen-snaps/" screen-name ".jpg")}]
+                              [:img {:src (str "assets/screen-snaps/" screen-name ".jpg")
+                                     :class "screen-snap-fade"
+                                     :style {:position "fixed"
+                                             :top 0
+                                             :left 0
+                                             :width "100%"
+                                             :height "100%"
+                                             :z-index 100
+                                             :object-fit "contain"}}]))
 
                           (when doom? [doom-modal])
 

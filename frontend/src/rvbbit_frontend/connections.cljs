@@ -1385,7 +1385,7 @@
                       :sniff?        sniff? ;; on used for ext tables
                       :client-name   client-name}
         :on-response [::http/socket-response]
-        :on-timeout  [::http/timeout-response [keypath honey-sql]]
+        :on-timeout  [::http/query-timeout-response [keypath honey-sql]]
         :timeout     50000}])
 
      (when stack?
@@ -1454,7 +1454,7 @@
                                                 :connection-id connection-id
                                                 :client-name   client-name}
                                   :on-response [::http/socket-response]
-                                  :on-timeout  [::http/timeout-response [keypath honey-sql]]
+                                  :on-timeout  [::http/query-timeout-response [keypath honey-sql]]
                                   :timeout     120000}])
            (when stack?
              ;(reset! db/running-deep-meta-on (vec (remove #(= % (first keypath)) @db/running-deep-meta-on)))

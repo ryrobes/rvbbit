@@ -1,71 +1,52 @@
 {:reco-preview nil,
  :annotate? false,
+ :wss-config ["ws" 3030],
+ :leaf-preview
+ {[:fresh :fresh-clover]
+  {[[:canvas :canvas :canvas 862] [:canvas :canvas :canvas]]
+   :reco-preview-c--1759830261}},
  :default-col-widths
  {:block-494 {:jvm-stats-drag-40 100},
-  :block-1956 {:cpu-query1 102},
-  :block-10778 {:gen-viz-1002 102},
   :block-8179 {:client-stats-drag-33 141},
-  :block-7876 {:new-query 170},
-  :block-8356 {:query-291 311},
-  :block-9727 {:gen-viz-553 170},
-  :block-11587 {:status-drag-28 100},
-  :block-2784 {:status-drag-0 100},
-  :block-3438 {:new-query-1 100},
-  :block-901 {:gen-viz-1002-clone-38 487},
-  :block-2388 {:query-6018 311},
-  :block-2762 {:query-11325 361},
-  :block-6431 {:query-4704 311},
-  :block-7837 {:tests-drag-12 1461}},
+  :block-3438 {:new-query-1 100}},
  :runstream-drops nil,
  :tabs
- ["welcome to the party pal"
-  "reassuring sand dollar"
-  "byzantium rabbit"
-  "orange hornet"
-  "victorious lion"
-  "excellent wolf"
-  "color test"
-  "sys atom sizes"],
+ ["welcome to the party pal" "byzantium rabbit" "color test" "sys atom sizes"],
  :auto-run? false,
  :selected-cols nil,
  :server nil,
  :runstreams nil,
  :editor? false,
  :buffy? false,
- :memory [1081414299 955701687 4294705152],
+ :memory [1209562720 1148935560 4294705152],
  :sched
- {:gen-viz-553 700,
-  :new-query 368,
-  :cpu-query1 991,
-  :new-query-1 55,
-  :client-stats-drag-33 51,
-  :jvm-stats-drag-40 640,
-  :gen-viz-1002 953,
-  :query-291 1334,
-  :gen-viz-1002-clone-38 1460},
- :client-name :ecstatic-octohedral-porpoise-26,
+ {:jvm-stats-drag-40 106,
+  :cpu-query1 106,
+  :gen-viz-1002 106,
+  :client-stats-drag-33 81,
+  :new-query 106,
+  :gen-viz-553 106,
+  :new-query-1 289,
+  :gen-viz-1002-clone-38 106},
+ :client-name :knowledgeable-rectangular-zebra-44,
  :server-panels
  [:block-494
-  :block-2676
   :block-1956
   :block-9173
   :block-4808
+  :block
   :block-10778
   :block-1242
   :block-8179
-  :block-12071
   :block-397
   :block-7876
-  :block-8356
   :block-7568
   :block-9727
-  :block-11587
   :block-6697
-  :block-9547
+  :block-1
   :block-6590
   :block-7598
   :block-3628
-  :block-2784
   :block-981
   :block-5568
   :block-3438
@@ -76,23 +57,17 @@
   :block-12161
   :block-3218
   :block-7665
-  :block-7259
   :block-10151
-  :block-2388
   :block-9347
   :block-8619
   :block-5806
   :block-11070
   :block-4109
-  :block-11754
   :block-8083
-  :block-2762
-  :block-9142
   :block-10067
-  :block-6431
   :block-8394
   :block-1650
-  :block-7837
+  :block-2
   :block-4603],
  :flow-editor? true,
  :window {:w 3340, :h 1710},
@@ -100,140 +75,86 @@
  :quake-console? false,
  :implicit-rowsets {:solver [nil]},
  :post-meta
- {:cpu-query1
-  {:used_memory_mb {:distinct 0},
-   :* {:rowcount 53},
-   :cpu_usage {:distinct 0},
-   :mps {:distinct 0},
-   :ts1 {:distinct 0},
-   :rrows {:distinct nil}},
-  :gen-viz-1002
-  {:used_memory_mb {:distinct 0},
-   :* {:rowcount 6},
-   :cpu_usage {:distinct 0},
-   :mps {:distinct 0},
-   :ts1 {:distinct 0},
-   :rrows {:distinct nil}},
-  :gen-viz-553
-  {:thread_count {:distinct 0},
-   :* {:rowcount 0},
-   :clients {:distinct 0},
-   :ts {:distinct 0},
-   :rrows {:distinct nil}},
-  :gen-viz-1002-clone-38
-  {:used_memory_mb {:distinct 2},
-   :* {:rowcount 2},
-   :ts1 {:distinct 2},
-   :rrows {:distinct nil}},
-  :status-drag-0
-  {:* {:rowcount 245},
-   :queries_run {:distinct 245},
-   :recent_messages_per_second {:distinct 234},
-   :uptime_seconds {:distinct 245},
-   :queries_per_second {:distinct 7},
-   :recent_batches {:distinct 245},
-   :rrows {:distinct nil},
-   :sql_cache_size {:distinct 1},
-   :ts {:distinct 245},
-   :subscriptions {:distinct 10},
-   :messages_per_second {:distinct 235},
-   :messages {:distinct 245},
-   :sniffs_run {:distinct 1},
-   :sys_load {:distinct 214},
-   :recent_batches_per_second {:distinct 75},
-   :batches {:distinct 245},
-   :unix_ms {:distinct 245},
-   :used_memory_mb {:distinct 229},
-   :recent_queries_run {:distinct 96},
-   :thread_count {:distinct 60},
-   :internal_queries_run {:distinct 1},
-   :open_flow_channels {:distinct 1},
-   :ws_peers {:distinct 2},
-   :recent_messages {:distinct 245},
-   :recent_queries_per_second {:distinct 105},
-   :batches_per_second {:distinct 98},
-   :seconds_since_last_update {:distinct 3}}},
+ {:gen-viz-1002-clone-38 {:* {:rowcount 2}},
+  :jvm_stats {:* {:rowcount 111}},
+  :new-query-1 {:* {:rowcount 50}},
+  :client-stats-drag-33 {:* {:rowcount 3}},
+  :rabbit-search-like-themes {:* {:rowcount 92}}},
  :flow-estimates
- {:gen-viz-553 {:times 0.001, :run-id :gen-viz-553},
+ {:gen-viz-553 {:times 0.002, :run-id :gen-viz-553},
   :new-query {:times 0.003, :run-id :new-query},
-  :cpu-query1 {:times 0.001, :run-id :cpu-query1},
-  :new-query-1 {:times 0.001, :run-id :new-query-1},
-  :client-stats-drag-33 {:times 0.002, :run-id :client-stats-drag-33},
-  :jvm-stats-drag-40 {:times 0.001, :run-id :jvm-stats-drag-40},
-  :block-8083-new-clojure-2 {:times 0.022, :run-id :block-8083-new-clojure-2},
+  :cpu-query1 {:times 0.003, :run-id :cpu-query1},
+  :new-query-1 {:times 0.005, :run-id :new-query-1},
+  :client-stats-drag-33 {:times 0.001, :run-id :client-stats-drag-33},
+  :cnt-33 {:times 0.001, :run-id :cnt-33},
+  :jvm-stats-drag-40 {:times 0.01, :run-id :jvm-stats-drag-40},
+  :block-8083-new-clojure-2 {:times 0.019, :run-id :block-8083-new-clojure-2},
   :gen-viz-1002 {:times 0.002, :run-id :gen-viz-1002},
-  :jvm_stats {:times 0.003, :run-id :jvm_stats},
-  :block-1430-new-clojure-1 {:times 0.017, :run-id :block-1430-new-clojure-1},
+  :jvm_stats {:times 0.011, :run-id :jvm_stats},
+  :block-1430-new-clojure-1 {:times 0.012, :run-id :block-1430-new-clojure-1},
   :client_stats {:times 0.001, :run-id :client_stats},
-  :block-7259-new-clojure-3 {:times 25.009, :run-id :block-7259-new-clojure-3},
-  :gen-viz-1002-clone-38 {:times 0.002, :run-id :gen-viz-1002-clone-38}},
+  :rabbit-search-like-themes {:times 0.002, :run-id :rabbit-search-like-themes},
+  :gen-viz-1002-clone-38 {:times 0.005, :run-id :gen-viz-1002-clone-38},
+  :rabbit-search-like-screens {:times 0.001, :run-id :rabbit-search-like-screens}},
  :screen-name "server-stats",
  :panel-hashes
  {:block-494 1212357626,
-  :block-2676 -1649969815,
   :block-1956 502953063,
   :block-9173 -337685260,
-  :block-4808 -1606463538,
+  :block-4808 492063643,
+  :block 623313073,
   :block-10778 -1060431343,
   :block-1242 -1023168918,
   :block-8179 1578763389,
-  :block-12071 -1187219746,
   :block-397 -823059942,
   :block-7876 -725330856,
-  :block-8356 293391251,
   :block-7568 -1439900519,
   :block-9727 1008470233,
-  :block-11587 -1124666024,
   :block-6697 -1522891165,
-  :block-9547 -1966759962,
+  :block-1 -1414162259,
   :block-6590 946615337,
   :block-7598 -935131558,
   :block-3628 -221386650,
-  :block-2784 1195213082,
   :block-981 -1020607748,
   :block-5568 976110977,
   :block-3438 -392881343,
   :block-10180 -679799823,
-  :block-3719 -1190566009,
+  :block-3719 -1406452178,
   :block-1430 1968213366,
   :block-901 -1918912509,
   :block-12161 40667626,
   :block-3218 -1351091716,
   :block-7665 -1514652861,
-  :block-7259 1277130997,
   :block-10151 -557746862,
-  :block-2388 131052715,
   :block-9347 1966697699,
-  :block-8619 20409506,
+  :block-8619 -1134959655,
   :block-5806 1308202612,
-  :block-11070 1438689134,
-  :block-4109 -2037862850,
-  :block-11754 2024700044,
-  :block-8083 -354974320,
-  :block-2762 2093970473,
-  :block-9142 899803603,
-  :block-10067 -333329444,
-  :block-6431 1432972201,
+  :block-11070 454658604,
+  :block-4109 -864370447,
+  :block-8083 468568373,
+  :reco-preview-c--1759830261 287603443,
+  :block-10067 -1151666386,
   :block-8394 -1296322521,
   :block-1650 1821330306,
-  :block-7837 1288316158,
-  :block-4603 -388167532},
+  :block-2 1322895200,
+  :block-4603 1352117369,
+  :reco-preview-c--273244492 188992421},
  :recos-page2 0,
  :selected-tab "welcome to the party pal",
  :col-names nil,
  :snapshots nil,
  :recos-page 0,
  :rs-overrides-hashmap {},
- :user-params-hash -927445568,
+ :user-params-hash 198135441,
  :grid-recos? true,
- :session-hash -1390860668,
+ :session-hash 969319368,
  :resolved-queries
- {nil {:_last-run "08:22:28"},
+ {nil {:_last-run "09:31:27"},
   :gen-viz-553
   {:cache? false,
    :limit 18,
    :group-by [:ts],
-   :_last-run "07:59:52",
+   :_last-run "09:26:24",
    :refresh-every 45,
    :from
    [[{:select
@@ -263,13 +184,12 @@
     [[:avg :ws_peers] :clients]
     [[:substring :ts 1 15] :ts]],
    :post-process-fn reverse},
-  :status-drag-0 {:select [:*], :from [[:jvm_stats :zz596]], :_last-run "23:25:13"},
   :new-query
   {:cache? false,
    :where [:= :client_name :*client-name-str],
    :limit 45,
    :group-by [:ts_hour],
-   :_last-run "18:42:52",
+   :_last-run "09:26:24",
    :refresh-every 45,
    :from
    [{:select
@@ -317,7 +237,7 @@
   {:cache? false,
    :limit 180,
    :group-by [:ts1],
-   :_last-run "18:42:52",
+   :_last-run "09:26:24",
    :refresh-every 45,
    :from
    [{:select
@@ -380,16 +300,16 @@
    {[:sys_load :heatmap-7696]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#3ad7c9" "#1d2e4b"] 20 :desc],
+     {:background-color [:heatmap ["#d4a4ec" "#180928"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}},
     [:recent_messages_per_second :heatmap-2888]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#a44444" nil] 20 :desc],
+     {:background-color [:heatmap ["#c41464" nil] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "18:42:52",
+   :_last-run "09:26:24",
    :refresh-every 45,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
@@ -412,7 +332,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "07:48:00",
+   :_last-run "09:26:24",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -472,37 +392,24 @@
     :started
     :ts],
    :from [[:flow_history :hh810]]},
-  :query-4704
-  {:select [:test_name [[:count 1] :rowcnt]],
+  :cnt-33
+  {:select [[[:count 1] :rowcnt]],
    :from
    [[{:select
-      [:connection_id
-       :context_hash
-       :data_type
-       :db_catalog
-       :db_schema
-       :db_type
-       :derived_calc
-       :derived_name
-       :field_name
-       :field_type
-       :is_sample
-       :key_hash
-       :run_id
-       :table_name
-       :table_type
-       :test_name
-       :test_raw_val
-       :test_sql
-       :test_val_float
-       :test_val_integer
-       :test_val_string
-       :updated],
-      :from [[:tests :aa558]]}
-     :mm899]],
-   :group-by [:test_name],
-   :order-by [[:test_name :asc]],
-   :_last-run "17:58:40"},
+      [:ack
+       :client_latency
+       :client_name
+       :client_subs
+       :last_seen
+       :last_seen_seconds
+       :push
+       :recent_messages_per_second
+       :server_subs
+       :memory
+       :ts],
+      :order-by [[:client_name :asc]],
+      :from [[:client_stats :ww254]]}
+     :ssb99]]},
   :jvm-stats-drag-40
   {:select
    [:sql_cache_size
@@ -525,13 +432,13 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[:ts1 :desc]],
-   :_last-run "08:00:02",
+   :_last-run "09:26:23",
    :where [:>= :recent_batches_per_second 0]},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [4],
-   :_last-run "18:42:52",
+   :_last-run "09:26:24",
    :refresh-every 45,
    :from
    [{:select
@@ -584,131 +491,12 @@
          (merge
            row
            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
-  :status-drag-28 {:select [:*], :from [[:client_stats :aa377]]},
-  :tests-drag-12
-  {:select
-   [:connection_id
-    :context_hash
-    :data_type
-    :db_catalog
-    :db_schema
-    :db_type
-    :derived_calc
-    :derived_name
-    :field_name
-    :field_type
-    :is_sample
-    :key_hash
-    :run_id
-    :table_name
-    :table_type
-    :test_name
-    :test_raw_val
-    :test_sql
-    :test_val_float
-    :test_val_integer
-    :test_val_string
-    :updated],
-   :from [[:tests :aa558]],
-   :where
-   [:*when
-    {:test_name "total_rows", :rowcnt 77}
-    [:*all= {:test_name "total_rows", :rowcnt 77} [:test_name]]],
-   :_last-run "17:58:37"},
-  :query-11325
-  {:select [:table_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:attribute_name
-       :attribute_value
-       :connection_id
-       :context_hash
-       :db_catalog
-       :db_schema
-       :db_type
-       :derived_calc
-       :derived_name
-       :field_name
-       :key_hash
-       :run_id
-       :table_name
-       :table_type
-       :updated],
-      :from [[:attributes :mm879]],
-      :where
-      [:*when
-       {:attribute_name "is_sqlite?", :rowcnt 1618}
-       [:*all= {:attribute_name "is_sqlite?", :rowcnt 1618} [:attribute_name]]],
-      :order-by [[:table_name :asc]]}
-     :mm340]],
-   :group-by [:table_name],
-   :order-by [[:table_name :asc]],
-   :col-widths {:rowcnt 100, :table_name 240},
-   :_last-run "17:58:42"},
-  :query-291
-  {:select [[[:count 1] :rowcnt]],
-   :cache? false,
-   :refresh-every 19,
-   :from
-   [[{:select
-      [:connection_id
-       :context_hash
-       :data_type
-       :db_catalog
-       :db_schema
-       :db_type
-       :derived_calc
-       :derived_name
-       :field_name
-       :field_type
-       :is_sample
-       :key_hash
-       :run_id
-       :table_name
-       :table_type
-       :test_name
-       :test_raw_val
-       :test_sql
-       :test_val_float
-       :test_val_integer
-       :test_val_string
-       :updated],
-      :from [[:tests :aa558]],
-      :where
-      [:*when
-       {:test_name "total_rows", :rowcnt 77}
-       [:*all= {:test_name "total_rows", :rowcnt 77} [:test_name]]]}
-     :ee553]],
-   :_last-run "22:50:26"},
-  :query-6018
-  {:select [:attribute_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:attribute_name
-       :attribute_value
-       :connection_id
-       :context_hash
-       :db_catalog
-       :db_schema
-       :db_type
-       :derived_calc
-       :derived_name
-       :field_name
-       :key_hash
-       :run_id
-       :table_name
-       :table_type
-       :updated],
-      :from [[:attributes :mm879]]}
-     :bb504]],
-   :group-by [:attribute_name],
-   :order-by [[:attribute_name :asc]],
-   :_last-run "17:58:41"},
+  :shape-rotation-maps-sys {:_last-run "09:30:05"},
   :gen-viz-1002-clone-38
   {:cache? false,
    :limit 24,
    :group-by [:ts1],
-   :_last-run "08:05:19",
+   :_last-run "09:26:24",
    :refresh-every 45,
    :from
    [[{:group-by [:ts1],
@@ -760,7 +548,9 @@
               (str (rvbbit-backend.util/rnd mb 0) " MB")
               (str pos diff))}))))}},
  :panels
- {nil {:queries {nil {:_last-run "08:22:28"}}},
+ {nil
+  {:queries
+   {:shape-rotation-maps-sys {:_last-run "09:30:05"}, nil {:_last-run "09:31:27"}}},
   :block-494
   {:name "select-all-jvm_stats",
    :w 18,
@@ -793,37 +583,10 @@
      :cache? false,
      :from [[:jvm_stats :kke192]],
      :order-by [[:ts1 :desc]],
-     :_last-run "08:00:02",
+     :_last-run "09:26:23",
      :where [:>= :recent_batches_per_second 0]}},
    :tab "welcome to the party pal",
    :minimized? false},
-  :block-2676
-  {:h 4,
-   :w 5,
-   :root [5 5],
-   :tab "orange hornet",
-   :selected-view :hi,
-   :name "block-2676",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2676.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"]},
-   :queries {}},
   :block-1956
   {:name "block-1956",
    :w 23,
@@ -836,7 +599,7 @@
     {:cache? false,
      :limit 180,
      :group-by [:ts1],
-     :_last-run "18:42:52",
+     :_last-run "09:26:24",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[:ts1 :desc]],
@@ -949,7 +712,7 @@
    :tab "sys atom sizes"},
   :block-4808
   {:name "client latency callout",
-   :w 4,
+   :w 6,
    :block-key ":block-2505",
    :selected-view :hi,
    :root [32 17],
@@ -979,6 +742,39 @@
        {:font-size "18px", :margin-top "-10px"}
        :child
        "client latency (ms)"]]]}},
+  :block
+  {:leaf-drop [:sql :new-select.count],
+   :name "block",
+   :w 5,
+   :selected-view :hey,
+   :root [15 1],
+   :h 3,
+   :connection-id "systemh2-db",
+   :queries
+   {:cnt-33
+    {:select [[[:count 1] :rowcnt]], :from [[:query/client-stats-drag-33 :ssb99]]}},
+   :tab "welcome to the party pal",
+   :views
+   {:hey
+    [:v-box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "56px",
+      :color :param/theme-color1,
+      :font-weight 700,
+      :transition "all 0.6s ease-in-out"}
+     :children
+     [[:box :child [:number :cnt-33/rowcnt.0]]
+      [:box
+       :style
+       {:font-size "18px", :margin-top "-10px"}
+       :child
+       "active clients"]]]}},
   :block-10778
   {:mad-libs-combo-hash ["-221538232" "jvm_stats_drag_40"],
    :clojure {:new-clojure (vec (for [e (range :time/second)] (str (+ e 12) "!")))},
@@ -1010,7 +806,7 @@
     {:cache? false,
      :limit 18,
      :group-by [4],
-     :_last-run "18:42:52",
+     :_last-run "09:26:24",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[4 :desc]],
@@ -1186,7 +982,7 @@
      :refresh-every 20,
      :order-by [[:client_name :asc]],
      :from [[:client_stats :ww254]],
-     :_last-run "07:48:00",
+     :_last-run "09:26:24",
      :style-rules
      {[:* :highlight-8717]
       {:logic [:= :client_name :*client-name-str],
@@ -1204,35 +1000,6 @@
    :root [0 17],
    :tab "welcome to the party pal",
    :z 3},
-  :block-12071
-  {:h 3,
-   :w 5,
-   :root [20 1],
-   :tab "welcome to the party pal",
-   :selected-view :hi,
-   :name "block-12071",
-   :views
-   {:hi
-    [:v-box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "56px",
-      :color :param/theme-color2,
-      :font-weight 700,
-      :transition "all 0.6s ease-in-out"}
-     :children
-     [[:box :child [:number :jvm-stats-drag-40/recent_batches_per_second.0]]
-      [:box
-       :style
-       {:font-size "18px", :margin-top "-10px"}
-       :child
-       "recent batches-per-sec"]]]},
-   :queries {}},
   :block-397
   {:h 5,
    :w 8,
@@ -1256,7 +1023,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 45,
      :group-by [:ts_hour],
-     :_last-run "18:42:52",
+     :_last-run "09:26:24",
      :refresh-every :param/refresh-timer,
      :from
      [{:select
@@ -1334,41 +1101,6 @@
          :fill :param/theme-color1,
          :style {:font-size "18px", :font-weight 700},
          :position "top"}]]]]}},
-  :block-8356
-  {:name "block-8356",
-   :w 7,
-   :selected-view :query-291,
-   :root [37 2],
-   :h 5,
-   :connection-id "systemh2-db",
-   :queries
-   {:query-291
-    {:select [[[:count 1] :rowcnt]],
-     :cache? false,
-     :refresh-every 19,
-     :from [[:query/tests-drag-12 :ee553]],
-     :_last-run "22:50:26"}},
-   :tab "reassuring sand dollar",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-8356.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-7568
   {:h 7,
    :w 30,
@@ -1420,7 +1152,7 @@
     {:cache? false,
      :limit 18,
      :group-by [:ts],
-     :_last-run "07:59:52",
+     :_last-run "09:26:24",
      :refresh-every :param/refresh-timer,
      :from [[:query/jvm-stats-drag-40 :aa45]],
      :order-by [[:ts :desc]],
@@ -1499,14 +1231,6 @@
         :fill "#00000000",
         :stroke-width 2,
         :stroke :param/theme-color2}]]]}},
-  :block-11587
-  {:h 7,
-   :w 32,
-   :connection-id "systemh2-db",
-   :name "select-all-status",
-   :queries {:status-drag-28 {:select [:*], :from [[:client_stats :aa377]]}},
-   :root [0 10],
-   :tab "reassuring sand dollar"},
   :block-6697
   {:h 9,
    :w 6,
@@ -1515,33 +1239,43 @@
    :name ":param/theme-split-complement",
    :views {:param-val [:data-viewer :param/theme-split-complement]},
    :queries {}},
-  :block-9547
-  {:h 4,
-   :w 5,
-   :root [0 5],
-   :tab "orange hornet",
-   :selected-view :hi,
-   :name "block-9547",
+  :block-1
+  {:w 11,
+   :h 2,
+   :selected-view :server-name,
    :views
-   {:hi
+   {:vv1
     [:box
+     :size
+     "auto"
      :align
      :center
      :justify
      :center
-     :attr
-     {:id ":block-9547.:hi"}
      :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
+     {:font-size "19px", :color :theme/editor-outer-rim-color}
      :child
-     "hi!"]},
-   :queries {}},
+     "We're all mad here."],
+    :server-name
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "30px",
+      :color :param/theme-color2,
+      :font-weight 700,
+      :margin-top "7px",
+      :transition "all 0.6s ease-in-out"}
+     :child
+     [:str :param/domain]]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "welcome to the party pal",
+   :root [48 1],
+   :name "block"},
   :block-6590
   {:clojure
    {:new-clojure-4
@@ -1596,16 +1330,6 @@
      "If you don't know where you are going any road can take you there."]}},
   :block-7598 {:root [13 18]},
   :block-3628 {:root [20 21]},
-  :block-2784
-  {:h 7,
-   :w 43,
-   :connection-id "systemh2-db",
-   :name "select-all-status",
-   :queries
-   {:status-drag-0
-    {:select [:*], :from [[:jvm_stats :zz596]], :_last-run "23:25:13"}},
-   :root [0 17],
-   :tab "reassuring sand dollar"},
   :block-981
   {:h 3,
    :w 6,
@@ -1680,7 +1404,7 @@
          :desc],
         :border "1px solid #00000000",
         :color "#ffffff"}}},
-     :_last-run "18:42:52",
+     :_last-run "09:26:24",
      :refresh-every :param/refresh-timer,
      :from [[:jvm_stats :zz596]],
      :order-by [[:ts :desc]],
@@ -1715,10 +1439,10 @@
    :tab "welcome to the party pal"},
   :block-3719
   {:name "callout client msgs",
-   :w 4,
+   :w 5,
    :block-key ":block-9994",
    :selected-view :cell-drop-11937,
-   :root [44 17],
+   :root [54 17],
    :h 3,
    :file-path "./screens/blackberries3-narrow2.edn",
    :queries {},
@@ -1801,7 +1525,7 @@
     {:cache? false,
      :limit 24,
      :group-by [:ts1],
-     :_last-run "08:05:19",
+     :_last-run "09:26:24",
      :refresh-every :param/refresh-timer,
      :from
      [[{:group-by [:ts1],
@@ -1981,99 +1705,7 @@
    :name "block-7665",
    :views {:hi [:data-viewer [:tetrads :solver/colors-of-the-moment>brightest]]},
    :queries {}},
-  :block-7259
-  {:clojure
-   {:new-clojure-3
-    (do
-      (let [clojure-version (clojure-version)
-            jvm-version (System/getProperty "java.version")]
-        (doseq [e (range 5)] (Thread/sleep 5000) (println "ITS A SHITSHOW! " e "!"))
-        (str
-          "🐇🥕 YO! Internal RVBBIT nREPL. Clojure "
-          clojure-version
-          " on "
-          jvm-version
-          " JVM tech"
-          " 🥕🐇")))},
-   :name "block-7259",
-   :w 5,
-   :selected-view :new-clojure-3,
-   :root [60 1],
-   :h 4,
-   :display {:new-clojure-3 :value},
-   :queries {},
-   :tab "welcome to the party pal",
-   :views
-   {:hare-vw-1
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "21px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "It's no use going back to yesterday, because I was a different person then."]}},
   :block-10151 {:root [13 21]},
-  :block-2388
-  {:name "block-2388",
-   :w 7,
-   :selected-view :query-6018,
-   :root [32 10],
-   :h 7,
-   :connection-id "systemh2-db",
-   :queries
-   {:query-6018
-    {:select [:attribute_name [[:count 1] :rowcnt]],
-     :from
-     [[{:select
-        [:attribute_name
-         :attribute_value
-         :connection_id
-         :context_hash
-         :db_catalog
-         :db_schema
-         :db_type
-         :derived_calc
-         :derived_name
-         :field_name
-         :key_hash
-         :run_id
-         :table_name
-         :table_type
-         :updated],
-        :from [[:attributes :mm879]]}
-       :bb504]],
-     :group-by [:attribute_name],
-     :order-by [[:attribute_name :asc]],
-     :_last-run "17:58:41"}},
-   :tab "reassuring sand dollar",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2388.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-9347
   {:h 20,
    :w 10,
@@ -2106,8 +1738,7 @@
       :transition "all 0.6s ease-in-out"}
      :children
      [[:box :child [:number :jvm-stats-drag-40/used_memory_mb.0]]
-      [:box :style {:font-size "18px", :margin-top "-10px"} :child "server mb"]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+      [:box :style {:font-size "18px", :margin-top "-10px"} :child "server mb"]]]},
    :queries {}},
   :block-5806
   {:h 14,
@@ -2145,15 +1776,14 @@
        :style
        {:font-size "18px", :margin-top "-10px"}
        :child
-       "server threads"]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+       "server threads"]]]},
    :queries {}},
   :block-4109
   {:name "callout client mb",
-   :w 4,
+   :w 6,
    :block-key ":block-285",
    :selected-view :cell-drop-7398,
-   :root [40 17],
+   :root [38 17],
    :h 3,
    :file-path "./screens/blackberries3-narrow2.edn",
    :queries {},
@@ -2173,43 +1803,12 @@
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
-     [[:box :child [:number :client/*client-name*>stats>memory]]
+     [[:box :child [:round-number :client/*client-name*>stats>memory]]
       [:box
        :style
        {:font-size "18px", :margin-top "-15px"}
        :child
        "client js used (mb)"]]]}},
-  :block-11754
-  {:name "callout client msgps",
-   :w 4,
-   :block-key ":block-5659",
-   :selected-view :hi,
-   :root [36 17],
-   :h 3,
-   :file-path "./screens/blackberries3-narrow2.edn",
-   :queries {},
-   :tab "welcome to the party pal",
-   :views
-   {:hi
-    [:v-box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size "56px",
-      :color :param/theme-color2,
-      :font-weight 700,
-      :transition "all 0.6s ease-in-out"}
-     :children
-     [[:box :child [:string :client/*client-name*>stats>messages-per-second]]
-      [:box
-       :style
-       {:font-size "18px", :margin-top "-10px"}
-       :child
-       "messages/sec (all)"]]]}},
   :block-8083
   {:clojure
    {:new-clojure-2
@@ -2238,101 +1837,15 @@
    :w 11,
    :selected-mode {:new-clojure-2 :data},
    :selected-view :new-clojure-2,
-   :root [48 1],
-   :h 19,
+   :root [48 3],
+   :h 14,
    :queries {},
    :tab "welcome to the party pal",
    :views {}},
-  :block-2762
-  {:name "block-2762",
-   :w 8,
-   :selected-view :query-11325,
-   :root [39 10],
-   :h 7,
-   :connection-id "systemh2-db",
-   :queries
-   {:query-11325
-    {:select [:table_name [[:count 1] :rowcnt]],
-     :from
-     [[{:select
-        [:attribute_name
-         :attribute_value
-         :connection_id
-         :context_hash
-         :db_catalog
-         :db_schema
-         :db_type
-         :derived_calc
-         :derived_name
-         :field_name
-         :key_hash
-         :run_id
-         :table_name
-         :table_type
-         :updated],
-        :from [[:attributes :mm879]],
-        :where
-        [:*when
-         {:attribute_name "is_sqlite?", :rowcnt 1618}
-         [:*all= {:attribute_name "is_sqlite?", :rowcnt 1618} [:attribute_name]]],
-        :order-by [[:table_name :asc]]}
-       :mm340]],
-     :group-by [:table_name],
-     :order-by [[:table_name :asc]],
-     :col-widths {:rowcnt 100, :table_name 240},
-     :_last-run "17:58:42"}},
-   :tab "reassuring sand dollar",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2762.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
-  :block-9142
-  {:h 4,
-   :w 5,
-   :root [0 1],
-   :tab "orange hornet",
-   :selected-view :hi,
-   :name "block-9142",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-9142.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"]},
-   :queries {}},
   :block-10067
   {:h 3,
    :w 5,
-   :root [15 1],
+   :root [20 1],
    :tab "welcome to the party pal",
    :selected-view :hi,
    :name "block-10067",
@@ -2356,69 +1869,8 @@
        :style
        {:font-size "18px", :margin-top "-10px"}
        :child
-       "recent msg-per-sec"]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+       "recent msg-per-sec"]]]},
    :queries {}},
-  :block-6431
-  {:name "block-6431",
-   :w 7,
-   :selected-view :query-4704,
-   :root [30 2],
-   :h 8,
-   :connection-id "systemh2-db",
-   :queries
-   {:query-4704
-    {:select [:test_name [[:count 1] :rowcnt]],
-     :from
-     [[{:select
-        [:connection_id
-         :context_hash
-         :data_type
-         :db_catalog
-         :db_schema
-         :db_type
-         :derived_calc
-         :derived_name
-         :field_name
-         :field_type
-         :is_sample
-         :key_hash
-         :run_id
-         :table_name
-         :table_type
-         :test_name
-         :test_raw_val
-         :test_sql
-         :test_val_float
-         :test_val_integer
-         :test_val_string
-         :updated],
-        :from [[:tests :aa558]]}
-       :mm899]],
-     :group-by [:test_name],
-     :order-by [[:test_name :asc]],
-     :_last-run "17:58:40"}},
-   :tab "reassuring sand dollar",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-6431.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-8394
   {:h 9,
    :w 6,
@@ -2452,42 +1904,31 @@
      :child
      [:str :solver/wallpaper-of-the-moment]]},
    :queries {}},
-  :block-7837
-  {:h 8,
-   :w 30,
-   :connection-id "systemh2-db",
-   :name "select-all-tests",
-   :queries
-   {:tests-drag-12
-    {:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_sample
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :test_name
-      :test_raw_val
-      :test_sql
-      :test_val_float
-      :test_val_integer
-      :test_val_string
-      :updated],
-     :from [[:tests :aa558]],
-     :where
-     [:*when :query-4704/*.clicked [:*all= :query-4704/*.clicked [:test_name]]],
-     :_last-run "17:58:37"}},
-   :root [0 2],
-   :tab "reassuring sand dollar"},
+  :block-2
+  {:w 10,
+   :h 3,
+   :selected-view :vv2,
+   :views
+   {:vv2
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :color :param/theme-color2,
+      :font-weight 700,
+      :margin-top "31px",
+      :transition "all 0.6s ease-in-out"}
+     :child
+     :*client-name-str]},
+   :leaf-drop [:fresh :fresh-clover],
+   :tab "welcome to the party pal",
+   :root [44 17],
+   :name "block"},
   :block-4603
   {:h 3,
    :w 4,
@@ -2511,17 +1952,12 @@
       :transition "all 0.6s ease-in-out"}
      :children
      [[:box :child [:number :jvm-stats-drag-40/ws_peers.0]]
-      [:box
-       :style
-       {:font-size "18px", :margin-top "-10px"}
-       :child
-       "live clients"]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+      [:box :style {:font-size "18px", :margin-top "-10px"} :child "websockets"]]]},
    :queries {}}},
  :materialized-theme
  {:codemirror-theme "rvbbit-dynamic",
   :editor-param-background-color "#000000",
-  :pop-2 "#3ad7c9",
+  :pop-2 "#c42ca4",
   :base-block-style
   {:text-shadow "4px 4px 4px #00000088",
    :border-radius "12px 12px 12px 12px",
@@ -2548,7 +1984,11 @@
     :titleColor "#ffffff99",
     :stroke "#ffffff99",
     :titleFont "Lato"},
-   :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+   :header
+   {:labelFont "Lato",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelColor "#f2e8ff"},
    :mark {:font "Lato"},
    :title
    {:font "Lato",
@@ -2558,27 +1998,28 @@
     :titleColor "#ffffff99"}},
   :grid-selected-column-css
   {:background-color "#00000088", :filter "brightness(200%)"},
+  :running-gif "images/running.gif",
   :base-block-color-selected "#00030a",
   :block-title-font-color "#ffffff",
-  :base-block-color "#1d2e4b82",
-  :editor-rim-color "#ca9cad99",
+  :base-block-color "#18092882",
+  :editor-rim-color "#0da9d399",
   :base-block-filter-selected
   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
   :vega-default-color-scheme {:scheme "pastel2"},
   :data-colors
-  {"float" "#73cbef",
-   "boolean" "#897dba",
-   "map" "#6363ca",
-   "list" "#c41a2c",
-   "string" "#e8f0e0",
-   "any" "#628481",
-   "vector" "#5ad73a",
-   "keyword" "#c9ca9c",
-   "rabbit-code" "#2174e2",
-   "datetime" "#2b4387",
-   "integer" "#be84bc",
-   "unknown" "#7a3a2c",
-   "date" "#38671f"},
+  {"float" "#d87489",
+   "boolean" "#24fffd",
+   "map" "#1cfcd5",
+   "list" "#a49011",
+   "string" "#ffffff",
+   "any" "#d04f00",
+   "vector" "#8d00e6",
+   "keyword" "#d5eca4",
+   "rabbit-code" "#0dd36e",
+   "datetime" "#72139f",
+   "integer" "#ab50e7",
+   "unknown" "#0c8c26",
+   "date" "#073822"},
   :editor-grid-selected-font-color "#000000",
   :monospaced-font "JetBrains Mono",
   :editor-grid-selected-background-color "#dc9cb0",
@@ -2611,40 +2052,41 @@
     :ticks
     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-  :editor-outer-rim-color "#ca9cad",
+  :editor-outer-rim-color "#0da9d3",
   :grid-selected-font-color "#000000",
   :block-title-selected-font-color "#ffffff",
   :grid-selected-background-color "#a3d3ff",
   :grid-font-color "#ffffff",
   :canvas-background-css
   {:background-image
-   "url(assets/openai-images/b64-image3-78620-89206-4k.webp-q10.jpg)",
+   "url(assets/openai-images/b64-image3-66502-83873-4k.webp-q10.jpg)",
    :transition "all 0.8s ease-in-out",
    :background-size "cover",
    :background-blend-mode "hard-light",
    :background-position "center",
    :background-color "#424f5700"},
   :editor-font-color "#ffffff",
+  :line-style "curved-path-h",
   :base-font "Poppins",
   :block-tab-selected-font-color "#c9d1ff",
   :editor-background-color "#000006",
   :editor-grid-font-color "#ffffff",
-  :pop-1 "#1d2e4b"},
+  :pop-1 "#122764"},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#73cbef",
-  "boolean" "#897dba",
-  "map" "#6363ca",
-  "list" "#c41a2c",
-  "string" "#e8f0e0",
-  "any" "#628481",
-  "vector" "#5ad73a",
-  "keyword" "#c9ca9c",
-  "rabbit-code" "#2174e2",
-  "datetime" "#2b4387",
-  "integer" "#be84bc",
-  "unknown" "#7a3a2c",
-  "date" "#38671f"},
+ {"float" "#d87489",
+  "boolean" "#24fffd",
+  "map" "#1cfcd5",
+  "list" "#a49011",
+  "string" "#ffffff",
+  "any" "#d04f00",
+  "vector" "#8d00e6",
+  "keyword" "#d5eca4",
+  "rabbit-code" "#0dd36e",
+  "datetime" "#72139f",
+  "integer" "#ab50e7",
+  "unknown" "#0c8c26",
+  "date" "#073822"},
  :solver-fn nil,
  :click-param
  {:blocks-sys
@@ -2658,6 +2100,57 @@
    ":codemirror-theme :editor-param-background-color :pop-2 :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color :pop-1",
    :query_names ""},
   :db-conn-drag-13.* {:db_conn [":honey-format"]},
+  :render-hash
+  {:block-494 641025247,
+   :block-2676 -1361379395,
+   :block-1956 -1684323669,
+   :block-9173 341139118,
+   :block-4808 1410131799,
+   :block 1233944181,
+   :block-1242 187430372,
+   :block-8179 -437896859,
+   :block-12071 -1071283754,
+   :block-397 212179235,
+   :block-7876 1056691938,
+   :block-8356 1645799682,
+   :block-7568 -1223640206,
+   :block-9727 1779017501,
+   :block-11587 -1463692069,
+   :block-6697 570457148,
+   :block-1 21061705,
+   :block-9547 -1671987350,
+   :block-6590 -701347443,
+   :block-2784 1553075196,
+   :block-981 892463129,
+   :block-3438 -1590550172,
+   :block-10180 781742917,
+   :block-3719 91347326,
+   :block-901 -468526927,
+   :block-12161 39528686,
+   :block-3218 695689701,
+   :block-7665 -1764147847,
+   :block-7259 -809048244,
+   :block-2388 699820586,
+   :block-9347 -1654526164,
+   :block-8619 758782266,
+   :block-5806 1116091544,
+   :block-11070 -1981582890,
+   :block-4109 962461118,
+   :block-11754 -1455830205,
+   :block-8083 -387782292,
+   :block-2762 -2050021177,
+   :block-9142 -271358562,
+   :reco-preview-c-1645295585 -1252144634,
+   :block-10067 1429804565,
+   :block-6431 120079542,
+   :reco-preview-c--490369712 -1586339425,
+   :block-8394 1949651721,
+   :block-1650 515744023,
+   :reco-preview-c--1238819333 635890714,
+   :block-2 -1548495214,
+   :block-7837 -65943252,
+   :block-4603 580617505,
+   :reco-preview-c--273244492 -1801714125},
   :tables-sys
   {:db_schema "none",
    :db_catalog nil,
@@ -2665,6 +2158,40 @@
    :schema_cat nil,
    :table_name "flow_history",
    :fields 15},
+  :data-hash
+  {nil -657937605,
+   :new-clojure-1 1360910898,
+   :fields-sys -2017569654,
+   :gen-viz-553 -1157131247,
+   :status-drag-0 -305466848,
+   :tables-sys -2017569654,
+   :rabbit-search-like 745140692,
+   :new-query 312899013,
+   :cpu-query1 952763654,
+   :new-query-1 1966005534,
+   :tests 1808645554,
+   :client-stats-drag-33 958041395,
+   :jvm-stats-drag-39 -305466848,
+   :flow-history-drag-38 1414818590,
+   :cnt-33 1620917624,
+   :cnt-client-stats-drag-33 -637515650,
+   :query-4704 528330850,
+   :jvm-stats-drag-40 1423761796,
+   :gen-viz-1002 469425786,
+   :cnt-client-stats-drag-33-c-1645295585 -637515650,
+   :jvm_stats 891823259,
+   :new-clojure-2 -1114532735,
+   :status-drag-28 1751517515,
+   :tests-drag-12 512081645,
+   :client_stats -842875583,
+   :rabbit-search-like-themes -288219868,
+   :flow_history 1414818590,
+   :query-11325 -17758563,
+   :query-291 -2073750396,
+   :connections-sys 1559621138,
+   :query-6018 806287814,
+   :gen-viz-1002-clone-38 -52771241,
+   :rabbit-search-like-screens -503378741},
   :new-query-1
   {:queries_run 75638,
    :recent_messages_per_second 31.59,
@@ -2689,6 +2216,7 @@
    :recent_queries_per_second 1.73,
    :seconds_since_last_update 15},
   :error-str-drag-13.* {},
+  :cnt-client-stats-drag-33 {:rowcnt 1},
   :query-4704 {:test_name "total_rows", :rowcnt 77},
   :jvm-stats-drag-40
   {:ts1 "2024-07-09 23:59:14",
@@ -2729,33 +2257,23 @@
    :theme-split-complement
    [:split-complements :solver/colors-of-the-moment>dominant],
    :selected-view-data
-   [:>
-    :ResponsiveContainer
-    {:width "100%", :height :panel-height+50}
-    [:>
-     :BarChart
-     {:data :gen-viz-1002-clone-38,
-      :margin {:top 5, :bottom 5, :right 30, :left 20}}
-     [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-     [:> :Tooltip]
-     [:> :XAxis {:dataKey :ts}]
-     [:>
-      :Bar
-      {:type "monotone",
-       :dataKey :used_memory_mb,
-       :stroke :param/theme-color1,
-       :activeDot {:r 8}}]
-     [:>
-      :LabelList
-      {:dataKey :diff,
-       :fill :param/theme-color1,
-       :style {:font-size "13px", :font-weight 700},
-       :position "top"}]]],
+   [:box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "19px", :color :theme/editor-outer-rim-color}
+    :child
+    "Who in the world am I? Ah, that's the great puzzle..."],
    :tt :solver/colors-of-the-moment>data-colors,
-   :selected-view [:views :reech-copy-16],
+   :selected-view [:views :vv2],
    :theme-color4 :param/theme-tetrads>3,
    :_theme-color4 :solver/colors-of-the-moment>colors>1,
    :theme-tetrads [:tetrads :solver/colors-of-the-moment>brightest],
+   :domain "localhost",
    :_theme-color3 :solver/colors-of-the-moment>dominant,
    :selected-block :block-6590},
   :theme
@@ -2788,7 +2306,11 @@
      :titleColor "#ffffff99",
      :stroke "#ffffff99",
      :titleFont "Lato"},
-    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :header
+    {:labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelColor "#f2e8ff"},
     :mark {:font "Lato"},
     :title
     {:font "Lato",
@@ -2798,6 +2320,7 @@
      :titleColor "#ffffff99"}},
    :grid-selected-column-css
    {:background-color "#00000088", :filter "brightness(200%)"},
+   :running-gif "images/running.gif",
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
    :base-block-color [:str :param/theme-dark 82],
@@ -2851,18 +2374,17 @@
     :background-position "center",
     :background-color "#424f5700"},
    :editor-font-color "#ffffff",
+   :line-style "curved-path-h",
    :base-font "Poppins",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff",
    :pop-1 :solver/colors-of-the-moment>colors>1},
   :query-11325 {:table_name "nypd_arrest_data_drag_16", :rowcnt 20},
-  :flow-runner nil,
   :connections-sys
   {:database_name "*cache-db*",
    :connection_id "flows-db",
    :styler_highlight_8717ssa 0},
   :query-6018 {:attribute_name "is_sqlite?", :rowcnt 1618},
-  :sys {:selected-tab "welcome to the party pal", :selected-tab-idx 0},
-  :tracker nil},
- :selected-flow "my-new-flow6351"}
+  :sys {:selected-tab "welcome to the party pal", :selected-tab-idx 0}},
+ :selected-flow "my-new-flow4943"}

@@ -113,7 +113,7 @@
  :grid-selected-background-color "#ff3a68"
  :grid-font-color "#ff3a68"
  :canvas-background-css
-   {:background "radial-gradient(circle at 50% 50%, #26054488 0%, #0a0610 100%),url(images/hemo2.webp-q8.jpg)"
+   {:background "radial-gradient(circle at 50% 50%, #26054488 0%, #0a0610 100%),url(assets/openai-images/hemo2.webp-q8.jpg)"
     :background-size "cover"
     :background-blend-mode "overlay, color-dodge, normal"
     :transition "all 0.3s ease"

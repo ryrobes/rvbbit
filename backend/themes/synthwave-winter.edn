@@ -126,7 +126,7 @@
    {:background-blend-mode "soft-light"
     :background-size "cover"
     :background
-      "url(images/synthwave-winter.webp-q8.jpg), linear-gradient(180deg, rgba(6,20,46,0.45) 0%, rgba(6,20,46,0.92) 100%)"
+      "url(assets/openai-images/synthwave-winter.webp-q8.jpg), linear-gradient(180deg, rgba(6,20,46,0.45) 0%, rgba(6,20,46,0.92) 100%)"
     :transition "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
     :background-color "#06142e"}
  :editor-font-color "#ffffff"

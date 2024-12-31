@@ -110,7 +110,7 @@
  :block-title-selected-font-color "#ffffff"
  :grid-selected-background-color "#0078d4"
  :grid-font-color "#323130"
- :canvas-background-css {:background       "url(images/corpo1.webp-q10.jpg)"
+ :canvas-background-css {:background       "url(assets/openai-images/corpo1.webp-q10.jpg)"
                          :transition       "all 0.1s ease-out"
                          :background-size  "cover"
                          :background-color "#f3f2f1"}

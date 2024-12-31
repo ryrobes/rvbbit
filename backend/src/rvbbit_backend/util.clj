@@ -137,10 +137,56 @@
     ;; Default
     :else 16))
 
+;; (defn current-datetime-parts []
+;;   (try (let [now               (java.time.ZonedDateTime/now)
+;;              day-of-week       (.getDayOfWeek now)
+;;              month             (.getMonth now)
+;;              day               (.getDayOfMonth now)
+;;              nth               (case (mod day 10)
+;;                                  1 (if (= day 11) "th" "st")
+;;                                  2 (if (= day 12) "th" "nd")
+;;                                  3 (if (= day 13) "th" "rd")
+;;                                  "th")
+;;              formatter-day     (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "'")
+;;                                                                              java.util.Locale/US)
+;;              formatter         (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mma")
+;;                                                                              java.util.Locale/US)
+;;              formatter-seconds (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mm:ssa")
+;;                                                                              java.util.Locale/US)
+;;              now-day-str       (.format formatter-day now)
+;;              now-str           (.format formatter now)
+;;              now-seconds-str   (.format formatter-seconds now)]
+;;          {:year            (.getYear now)
+;;           :month           (.getMonthValue now)
+;;           :month-name      (.name month)
+;;           :day             day
+;;           :unix-ms         (System/currentTimeMillis)
+;;           :day-of-week-int (.getValue day-of-week)
+;;           :day-of-week     (.name day-of-week)
+;;           :hour            (.getHour now)
+;;           :minute          (.getMinute now)
+;;           :second          (.getSecond now)
+;;           :quarter         (inc (quot (.getMonthValue now) 4))
+;;           :am-pm           (if (< (.getHour now) 12) "AM" "PM")
+;;           :now             now-str
+;;           :now-day         now-day-str
+;;           :now-seconds     now-seconds-str
+;;           :nth             nth})
+;;        (catch Throwable e {:time-atom-error (str "Error! " e)})))
+
 (defn current-datetime-parts
-  []
-  (try (let [now               (java.time.ZonedDateTime/now)
-             day-of-week       (.getDayOfWeek now)
+  ([] (current-datetime-parts nil))
+  ([timezone]
+   (let [now (try
+               (if timezone
+                 (do
+                   (java.time.ZonedDateTime/now (java.time.ZoneId/of timezone)))
+                 (java.time.ZonedDateTime/now))
+               (catch Throwable e
+                 (pp [:bad-timezone! timezone "! wut? " "Falling back to system timezone. See 'TZ Identifier' strings at: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones ('America/New_York', etc)"])
+                 (java.time.ZonedDateTime/now)))]
+     (try
+       (let [day-of-week       (.getDayOfWeek now)
              month             (.getMonth now)
              day               (.getDayOfMonth now)
              nth               (case (mod day 10)
@@ -172,8 +218,9 @@
           :now             now-str
           :now-day         now-day-str
           :now-seconds     now-seconds-str
+          :timezone        (.getId (.getZone now))
           :nth             nth})
-       (catch Throwable e {:time-atom-error (str "Error! " e)})))
+       (catch Throwable e {:time-atom-error (str "Error! " e)})))))
 
 (defn limit-coll [coll limit]
   (if (seq? coll)
