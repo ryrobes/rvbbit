@@ -1889,7 +1889,12 @@
 (re-frame/reg-sub
  ::auto-run-and-connected?
  (fn [db]
-   (and (= (get-in db [:websocket-fx.core/sockets :default :status]) :connected) (get db :auto-run? true))))
+   (and (= (get-in db [:websocket-fx.core/sockets :default :status]) :connected)
+        (not (and ;; if a block is selected AND editor is open - stop auto-run...
+              (true? (get db :editor?))
+              (not (or (= (get db :selected-block) "none!")
+                       (nil? (get db :selected-block))))))
+        (get db :auto-run? true))))
 
 (re-frame/reg-sub
  ::bg-status?
@@ -5313,7 +5318,7 @@
         tooltip (str (if table?
                        (str "Drag out table " table-name " for options.")
                        (str "Drag out field " field-name " for options.")))]
-    (ut/pp [:fields data_type table-name table-fields (Math/ceil (* (count table-fields) 1.5))])
+    ;; (ut/pp [:fields data_type table-name table-fields (Math/ceil (* (count table-fields) 1.5))])
 
     [draggable
      (if table?
@@ -5723,14 +5728,14 @@
       :class (when animate? "pop-debug")
       :attr (merge
              {:on-mouse-enter (fn [] (reset! rabbit-search-hover context-key)
-                                (when (and theme? (= ttype :themes)) (when-not debounced?
-                                                          (ut/tracked-dispatch [::hover-preview-theme theme-map true])))
+                                ;; (when (and theme? (= ttype :themes)) (when-not debounced?
+                                ;;                           (ut/tracked-dispatch [::hover-preview-theme theme-map true])))
                                 (reset! db/bar-hover-text tooltip))
               :on-mouse-over #(when (not= @rabbit-search-hover context-key)
                                 (reset! db/bar-hover-text tooltip)
                                 (reset! rabbit-search-hover context-key))
               :on-mouse-leave (fn [] (reset! rabbit-search-hover nil)
-                                (when (and theme? (= ttype :themes)) (ut/tracked-dispatch [::hover-preview-theme theme-map false]))
+                                ;; (when (and theme? (= ttype :themes)) (ut/tracked-dispatch [::hover-preview-theme theme-map false]))
                                 (reset! db/bar-hover-text nil))}
             ;;  (if (and (map? theme-map) theme?)
             ;;    {:on-click #(ut/tracked-dispatch [::overwrite-theme theme-map table-name])}
@@ -5795,7 +5800,7 @@
 
 (def params-cache (reagent/atom []))
 
-(defn rabbit-search-browser [width-int height-int]
+(defn rabbit-search-browser [width-int height-int & [hide?]]
   (let [like-syntax (str "%" (cstr/replace (str @db/rabbit-search-input) " " "%") "%")
         sql-calls {:rabbit-search-like {:select [[:context_key :QUERY] :data_type :total_rows :distinct_count :table_fields]
                                         :from [:fields]
@@ -5845,10 +5850,10 @@
         resl  (mapv #(into (get % :QUERY) ;(edn/read-string (get % :QUERY))
                            [(get % :data_type) (get % :total_rows) (get % :distinct_count) (get % :table_fields)])
                     field-search)
-        _ (ut/pp [:res1 resl field-search])
+        ;; _ (ut/pp ["🐇🔍" :pulling-rabbit-search-data :tables (count resl) :fields (count field-search)])
         ;tables (filterv #(= (get % 4) "*") resl)
         tables (try (filterv #(not (nil? (get % 8))) (distinct (map #(-> (vec %) (assoc 4 "*") (assoc 5 "*") (assoc 7 "*")) resl))) (catch :default _ [[]]))
-        screen-themes (filterv #(not (cstr/includes? (str (get % :theme_map)) ":param/")) screens)
+        screen-themes [] ;; (filterv #(not (cstr/includes? (str (get % :theme_map)) ":param/")) screens)
         screens (mapv (fn [{:keys [screen_name theme_map blocks file_path queries]}]
                         [screen_name file_path "" screen_name "" "screen" blocks queries theme_map]) screens)
         screen-themes (mapv (fn [{:keys [screen_name theme_map]}]
@@ -5879,103 +5884,103 @@
       (let [data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
             unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
         (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query "systemh2-db"))))
-    [re-com/v-box
-     :height (px height-int)
-     :width (px width-int)
+
+    (when (not hide?)
+      [re-com/v-box
+       :height (px height-int)
+       :width (px width-int)
      ;:style {:border "1px solid pink"}
      ;:align :center ;:justify :center
-     :children
-     [[re-com/h-box
+       :children
+       [[re-com/h-box
        ;:justify :between
        ;:size "auto"
-       :align :center
-       :height "19px"
-       :size "none"
-       :style {;:border "1px solid red"
-               :margin-top "8px"
+         :align :center
+         :height "19px"
+         :size "none"
+         :style {;:border "1px solid red"
+                 :margin-top "8px"
                ;:padding-left "5px"
-               }
-       :children (for [e [:tables :fields :params :screens :themes]
-                       :let [selected? (= e @rabbit-search-tab)]]
-                   [re-com/v-box
-                    :attr {:on-click #(reset! rabbit-search-tab e)}
+                 }
+         :children (for [e [:tables :fields :params :screens :themes]
+                         :let [selected? (= e @rabbit-search-tab)]]
+                     [re-com/v-box
+                      :attr {:on-click #(reset! rabbit-search-tab e)}
                     ;:height "30px"
-                    :style (merge
-                            {;:border "1px solid white"
+                      :style (merge
+                              {;:border "1px solid white"
                              ;:opacity 0.4
-                             :margin-top "-8px"
-                             :color (str (theme-pull :theme/editor-outer-rim-color nil) 55)
-                             :font-weight 700
-                             :cursor "pointer"
-                             :font-size "12px"}
-                            (when selected? {;:opacity 1
-                                             :color (str (theme-pull :theme/editor-outer-rim-color nil))}))
-                    :size "auto" :align :center :justify :center
+                               :margin-top "-8px"
+                               :color (str (theme-pull :theme/editor-outer-rim-color nil) 55)
+                               :font-weight 700
+                               :cursor "pointer"
+                               :font-size "12px"}
+                              (when selected? {;:opacity 1
+                                               :color (str (theme-pull :theme/editor-outer-rim-color nil))}))
+                      :size "auto" :align :center :justify :center
                     ;:padding "5px"
-                    :children [[re-com/box :child (str e)]
-                               [re-com/box
-                                :style {:font-size "11px" :font-weight 500 :margin-top "-2px"}
-                                :child (str "(" (get counts-map e) ")")]]])]
+                      :children [[re-com/box :child (str e)]
+                                 [re-com/box
+                                  :style {:font-size "11px" :font-weight 500 :margin-top "-2px"}
+                                  :child (str "(" (get counts-map e) ")")]]])]
       ;; [re-com/box
       ;;  :style {:font-size "22px"
       ;;          }
       ;;  :child (str @db/rabbit-search-input)]
-      [re-com/box
-       :width (px width-int)
-       :height (px (- height-int 29))
-       :style {;:border "1px solid orange"
+        [re-com/box
+         :width (px width-int)
+         :height (px (- height-int 29))
+         :style {;:border "1px solid orange"
                ;:margin-top "4px"
                ;:overflow "auto"
-               }
-       :child
+                 }
+         :child
       ;;  [re-com/v-box
       ;;          :children (for [r (if (= :tables @rabbit-search-tab) tables fields)]
       ;;                      [search-box-result-pill r])]
-       (let [row-boxes (cond (= :tables @rabbit-search-tab) tables
-                             (= :fields @rabbit-search-tab) fields
-                             (= :screens @rabbit-search-tab) screens
-                             (= :themes @rabbit-search-tab) themes
-                             :else params)
-             results? (> (count row-boxes) 0)]
-         (cond
-           waiting? [re-com/box
-                     :size "auto" :align :center  :justify :center
-                     :child [re-com/md-icon-button
-                             :md-icon-name "zmdi-refresh"
-                             :class "rotate linear infinite"
-                             :style {:font-size "50px"
-                                     :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
-                                     :transform-origin "25px 25px"
-                                     :padding "0px"
+         (let [row-boxes (cond (= :tables @rabbit-search-tab) tables
+                               (= :fields @rabbit-search-tab) fields
+                               (= :screens @rabbit-search-tab) screens
+                               (= :themes @rabbit-search-tab) themes
+                               :else params)
+               results? (> (count row-boxes) 0)]
+           (cond
+             waiting? [re-com/box
+                       :size "auto" :align :center  :justify :center
+                       :child [re-com/md-icon-button
+                               :md-icon-name "zmdi-refresh"
+                               :class "rotate linear infinite"
+                               :style {:font-size "50px"
+                                       :color (theme-pull :theme/universal-pop-color (theme-pull :theme/editor-outer-rim-color nil))
+                                       :transform-origin "25px 25px"
+                                       :padding "0px"
                                      ;:margin-top "10px"
                                      ;:margin-right "10px"
-                                     }]]
+                                       }]]
 
-           results?
-           [vbunny/virtual-v-box
-            :height (px (- height-int 30))
-            :width (px width-int)
-            :no-sleep? true
-            :id (str "rabbit-browser" @rabbit-search-tab)
-            :children (cond
-                        (= :params @rabbit-search-tab)  (for [r row-boxes] [(- width-int 18) 44 r])
+             results?
+             [vbunny/virtual-v-box
+              :height (px (- height-int 30))
+              :width (px width-int)
+              :no-sleep? true
+              :id (str "rabbit-browser" @rabbit-search-tab)
+              :children (cond
+                          (= :params @rabbit-search-tab)  (for [r row-boxes] [(- width-int 18) 44 r])
 
-                        (or
-                         (= :tables @rabbit-search-tab)
-                         (= :fields @rabbit-search-tab)) (for [r row-boxes] [(- width-int 18) 44 [search-box-result-pill r]])
+                          (or
+                           (= :tables @rabbit-search-tab)
+                           (= :fields @rabbit-search-tab)) (for [r row-boxes] [(- width-int 18) 44 [search-box-result-pill r]])
 
-                        :else (for [r row-boxes] [(- width-int 18) 44 [search-box-result-pill-screens r @rabbit-search-tab]]))]
-           :else [re-com/box
-                  :size "auto"
-                  :align :center :justify :center
-                  :height (px (- height-int 30))
-                  :width (px width-int)
-                  :style {:font-size "16px"
-                          :font-weight 700
-                          :color (str (theme-pull :theme/editor-outer-rim-color nil) 55)}
-                  :child (str "(nothing LIKE '" like-syntax "')")]))
-       ]
-      ]]))
+                          :else (for [r row-boxes] [(- width-int 18) 44 [search-box-result-pill-screens r @rabbit-search-tab]]))]
+             :else [re-com/box
+                    :size "auto"
+                    :align :center :justify :center
+                    :height (px (- height-int 30))
+                    :width (px width-int)
+                    :style {:font-size "16px"
+                            :font-weight 700
+                            :color (str (theme-pull :theme/editor-outer-rim-color nil) 55)}
+                    :child (str "(nothing LIKE '" like-syntax "')")]))]]])))
 
 (defn click-param-browser ;; has a very annoying scrolling problem. I've wasted too much time on this bullshit though - TODO vbunny issue.
   [click-params width-int height-int]
@@ -17134,7 +17139,7 @@
   (let [in-editor? (not (nil? override-view))
         kk (hash [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view output-type in-editor?])
         cc (get @ut/clover-walk-singles-map kk)]
-    (if false ;(ut/ne? cc)
+    (if (ut/ne? cc)
       cc
       (let [in-editor? (not (nil? override-view))
             walk-map
@@ -19378,8 +19383,8 @@
          panel-data (get-in db [:panels panel-key])
          selected-view (or override-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}))
          runner @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
-         debug-ui? (get-in db [:server :settings :ui-debug?])
-         render-pop? (get-in db [:server :settings :render-pop?])
+         debug-ui? (and (not db/headless?) (get-in db [:server :settings :ui-debug?]))
+         render-pop? (and (not db/headless?) (get-in db [:server :settings :render-pop?]))
          panel-data (if (not= runner :views)
                       (dissoc panel-data :root :h :w)
                       (dissoc panel-data :root))
@@ -20413,7 +20418,7 @@
         mouse-active?  @(ut/tracked-sub ::ut/is-mouse-active-alpha? {:seconds 900})
         full-no-ui?    @(ut/tracked-sub ::full-no-ui? {})
         no-user?       (or full-no-ui? (not mouse-active?))
-        full-no-ui?    (and no-user? online?)
+        full-no-ui?    (and no-user? online?) ;; or db/headless?
 
         brick-roots    (if tab
                          @(ut/tracked-sub ::all-roots-tab {:tab tab})

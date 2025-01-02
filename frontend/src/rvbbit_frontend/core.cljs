@@ -313,9 +313,10 @@
       (js/setTimeout
        (fn []
          (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
-               base-dir "./screens/"]
+               base-dir "./screens/"
+               theme (when (not= (first url-vec) (last url-vec)) (last url-vec))]
            (if (>= (count url-vec) 1) ;; if we have a url with a screen, load that, oitherwise load default screen
-             (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
+             (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn") theme])
              (ut/tracked-dispatch [::wfx/request :default ;:secondary ;; load default boot flowset
                                    {:message     {:kind :get-settings :client-name db/client-name}
                                     :on-response [::http/simple-response-boot]

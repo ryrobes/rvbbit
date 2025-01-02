@@ -77,7 +77,7 @@
         filepath        (str base-dir "/" client-name-str)
         file            (str filepath "/" table-name (when meta? ".meta") ".transit")
         abs-filepath (.toString (.toAbsolutePath (Paths/get file (into-array String []))))]
-    (when (cstr/includes? (str client-name) "respected") (ut/pp [:save-transit abs-filepath [client-name query-key (if meta? :meta-file :file)]]))
+    ;; (when (cstr/includes? (str client-name) "respected") (ut/pp [:save-transit abs-filepath [client-name query-key (if meta? :meta-file :file)]]))
     (swap! transit-file-mapping assoc-in [client-name query-key (if meta? :meta-file :file)] abs-filepath)
     (create-dirs filepath)
     (with-open [out (io/output-stream file)] (transit/write (transit/writer out :msgpack) data))

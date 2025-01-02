@@ -9,6 +9,24 @@ fi
 
 # If we're here, we're safe-ish.
 
+BUILD_NUMBER=0
+BUILD_NUMBER_FILE="build_number.txt"
+if [ -f "$BUILD_NUMBER_FILE" ]; then
+    BUILD_NUMBER=$(cat "$BUILD_NUMBER_FILE")
+fi
+
+# Increment the build number
+BUILD_NUMBER=$((BUILD_NUMBER + 1))
+
+# Save the new build number
+echo "$BUILD_NUMBER" > "$BUILD_NUMBER_FILE"
+
+BUILD_ID=$(date +%s)
+BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+
+echo "(ns rvbbit-frontend.build-id) (def build-id \"$BUILD_ID\") (def build-date \"$BUILD_DATE\") (def build-number $BUILD_NUMBER)" > frontend/src/rvbbit_frontend/build_id.cljs
+echo "(ns rvbbit-backend.build-id) (def build-id \"$BUILD_ID\") (def build-date \"$BUILD_DATE\") (def build-number $BUILD_NUMBER)" > backend/src/rvbbit_backend/build_id.clj
+
 export LEIN_SNAPSHOTS_IN_RELEASE=true ## for now, until we have a better build process. besides, most of the snapshot deps are mine.
 
 draw_bordered_text() {

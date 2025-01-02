@@ -4,8 +4,10 @@
    [talltale.core :as tales]
    [clojure.string :as cstr]))
 
+(def headless? (boolean (.. js/navigator -webdriver)))
+
 (defn gen-client-name []
-  (let [names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal)]]
+  (let [names [(if headless? "*headless" (tales/quality)) (rand-nth [(tales/shape) (tales/color)]) (tales/animal)]]
     (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (def brick-size 50)

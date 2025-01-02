@@ -185,10 +185,17 @@
    (let [url-vec  (if (and (cstr/includes? new-url "#") (> (count (ut/splitter new-url "#")) 1))
                     (ut/splitter (last (ut/splitter new-url "#")) "/")
                     [])
+         url-vec (vec (remove empty? url-vec))
          base-dir "./screens/"
-         screen   (str base-dir (last url-vec) ".edn")]
-     (ut/tapp>> [:url-changed new-url url-vec :loading-new-screen])
-     (ut/tracked-dispatch [::load screen])
+         theme (when (not= (first url-vec) (last url-vec)) (last url-vec))
+         screen   (str base-dir (first url-vec) ".edn")
+         ;new-url new-url
+         ;theme? (not (cstr/ends-with? screen ".edn"))
+         ;theme-name (or theme (when theme? (last (cstr/split (str screen) #"\\"))))
+         ;file-path (if theme? (cstr/replace (str file-path) (str "/" theme-name) "") file-path)
+         new-url (if  (> (count url-vec) 1) (cstr/replace (str new-url) (str "/" theme) "") new-url)]
+     (ut/tapp>> [:url-changed new-url url-vec screen :loading-new-screen theme])
+     (ut/tracked-dispatch [::load screen theme])
      (assoc db :current-url new-url))))
 
 (re-frame/reg-event-db
@@ -1198,6 +1205,7 @@
                          (dissoc :shape-rotations)
                          (dissoc :base-sniff-queries)
                          (dissoc :meta)
+                         (dissoc :editor?)
                          (dissoc :shapes)
                          (dissoc :duck-status)
                          (dissoc :alerts)
@@ -1562,6 +1570,7 @@
          (assoc :runstreams (get new-db :runstreams))
          (assoc :runstream-drops (get new-db :runstream-drops))
          (assoc :panels (get new-db :panels))
+         (assoc :editor? (get new-db :editor? false))
          (assoc :tabs (get new-db :tabs))
          (assoc :snapshots (get new-db :snapshots))
          (assoc :selected-tab (get new-db :selected-tab))
@@ -1577,11 +1586,14 @@
 
 (re-frame/reg-event-fx
  ::load
- (fn [{:keys [db]} [_ file-path]]
-   (ut/tapp>> [:loads? file-path])
+ (fn [{:keys [db]} [_ file-path theme-name]]
    (let [url     (str url-base "/load")
+         ;theme? (not (cstr/ends-with? file-path ".edn"))
+         ;theme-name (or theme-name (when theme? (last (cstr/split (str file-path) #"\\"))))
+         ;file-path (if theme? (cstr/replace (str file-path) (str "/" theme-name) "") file-path)
+         _ (ut/pp ["🎮" :loading-screen file-path :theme-override? theme-name])
          method  :get
-         request {:file-path file-path}
+         request {:file-path file-path :theme theme-name}
          snap? (cstr/includes? file-path "assets/snaps")
          _ (change-url (str "/" (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")))]
      {:db         (assoc-in db [:http-reqs :load-flowset] {:status "running" :url url :start-unix (.getTime (js/Date.))})

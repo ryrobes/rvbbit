@@ -183,9 +183,9 @@
 ;; (defonce last-signals-atom-stamp (fpop/thaw-atom {} "./data/atoms/last-signals-atom-stamp.edn"))
 ;; (defonce panels-atom (fpop/thaw-atom {} "./data/atoms/panels-atom.edn"))
 ;; (defonce solver-status (atom {}))
-(defonce signals-atom (fpop/thaw-atom {} "defs/signals.edn"))
-(defonce rules-atom (fpop/thaw-atom {} "defs/rules.edn"))
-(defonce solvers-atom (fpop/thaw-atom {} "defs/solvers.edn"))
+(defonce signals-atom (fpop/thaw-atom {} "./defs/signals.edn"))
+(defonce rules-atom (fpop/thaw-atom {} "./defs/rules.edn"))
+(defonce solvers-atom (fpop/thaw-atom {} "./defs/solvers.edn"))
 (defonce solvers-cache-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/solvers-cache.msgpack.transit"))
 (defonce solvers-cache-hits-atom (atom {})) ;(fpop/thaw-atom {} "./data/atoms/solvers-cache-hits.msgpack.transit"))
 ;; (defonce last-solvers-atom (fpop/thaw-atom {} "./data/atoms/last-solvers-atom.edn"))
@@ -1920,6 +1920,7 @@
                                                                 :from     [[:screens :jj24a7a]]
                                                                 :group-by [:screen_name]
                                                                 :order-by [[1 :asc]]}))))})]
+    (reset! ut/terminal-width (get-in settings [:console-viz-settings 3] nil))
     (reset! db/latest-settings-map settings)
     settings))
 
@@ -7381,6 +7382,7 @@
                              (not (cstr/includes? (str connection-id) "system"))
                              (not (cstr/ends-with? (str (first ui-keypath)) "-search-like"))
                              (not error-result?)
+                             (not (cstr/includes? (str client-name) "*headless"))
                              (not= connection-id client-name)
                              (not= client-name :rvbbit)
                              (not (cstr/includes? (str panel-key) "reco-preview"))
@@ -7887,7 +7889,7 @@
     (try (let [screen-name    (get-in request [:edn-params :screen-name])
                client-name    (get-in request [:edn-params :client-name] "unknown")
                file-base-name (ut/sanitize-name (str screen-name))
-               file-path      (str "./screens/" file-base-name ".edn")
+               file-path      (str "screens/" file-base-name ".edn")
                fpath          (ut/abs-file-path file-path)]
            (save-alert-notification-pre client-name screen-name nil false)
            (do (ut/pp [:saved-file file-path])
@@ -7951,8 +7953,8 @@
              client-name (cstr/replace (str client-name) ":" "")
              nname       (str client-name "-" ttime)
              session     (assoc session :screen-name nname)
-             file-path   (str "./assets/snaps/" nname ".jpg")
-             sess-path   (str "./assets/snaps/" nname ".edn")]
+             file-path   (str "assets/snaps/" nname ".jpg")
+             sess-path   (str "assets/snaps/" nname ".edn")]
          (spit sess-path session)
          (ut/save-base64-to-jpeg image file-path))
        (catch Exception e (ut/pp [:save-snap-error e])))
@@ -7965,7 +7967,7 @@
              client-name (cstr/replace (str client-name) ":" "")
              panel-key   (cstr/replace (str panel-key) ":" "")
              nname       (str panel-key)
-             folder-path (str "./assets/snaps/" client-name "/")
+             folder-path (str "assets/snaps/" client-name "/")
              file-path   (str folder-path nname ".jpg")]
          (ext/create-dirs folder-path)
          (ut/save-base64-to-jpeg image file-path))
@@ -7975,7 +7977,7 @@
 (defn save-screen-snap [request]
   (try (let [image       (get-in request [:edn-params :image])
              screen-name (get-in request [:edn-params :screen-name] "unknown")
-             file-path   (str "./assets/screen-snaps/" screen-name ".jpg")]
+             file-path   (str "assets/screen-snaps/" screen-name ".jpg")]
          (ut/save-base64-to-jpeg image file-path))
        (catch Exception e (ut/pp [:save-snap-error e])))
   (send-edn-success {:status "screen-snap-saved" }))
@@ -8000,8 +8002,15 @@
 
 (defn load-screen [request]
   (let [file-path      (or (get-in request [:edn-params :file-path]) (get-in request [:query-params :file-path]))
-        flow-data-file (edn/read-string (slurp file-path))]
-    (ut/ppln [:loading-screen-from-file file-path])
+        theme          (or (get-in request [:edn-params :theme]) (get-in request [:query-params :theme]))
+        theme-map      (when theme (get @db/themes-map theme))
+        flow-data-file (edn/read-string (slurp file-path))
+        flow-data-file (if (and (ut/ne? theme) theme-map)
+                         (-> flow-data-file
+                             (assoc-in [:click-param :theme] theme-map)
+                             (assoc :editor? true))
+                         flow-data-file)]
+    (ut/pp ["🍱" :loading-screen-from-file file-path theme])
     (send-edn-success {:image flow-data-file})))
 
 (defn load-flow [request]
@@ -9232,6 +9241,10 @@
 
 ;; (ut/pp (sparkline (take-last 120 (mapv :mem-mb (get @client-metrics :super-elliptic-snake-32)))))
 
+;;  (ut/pp (filterv #(cstr/includes? (str %) "client_stats") @sql/errors))
+
+;; (ut/pp (client-statuses))
+
 (defn jvm-stats []
   (when (not @shutting-down?)
     (try
@@ -9314,7 +9327,7 @@
                (merge
                 {:client-name (str k) :uptime-seconds uptime-seconds :messages-per-second msg-per-second :uptime uptime-str}
                 (assoc v :queue-distro (pr-str queue-distro)))))
-            ;; _ (ut/pp [:cli-rows cli-rows])
+            ;;;_ (ut/pp [:cli-rows cli-rows])
             _ (doseq [cli-row cli-rows]
                 (swap! db/params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
             insert-cli {:insert-into [:client_stats] :values cli-rows}

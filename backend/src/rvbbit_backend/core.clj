@@ -14,6 +14,7 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.java.shell :as shell]
    [datalevin.core :as d]
+   [rvbbit-backend.build-id :as build]
    ;[clojure.math.combinatorics :as combo]
    [rvbbit-backend.pool-party :as ppy]
    [clojure.pprint :as ppt]
@@ -206,6 +207,7 @@
                                  (try
                                    (let [theme-map (read-screen f-path)
                                          theme-name (cstr/replace (cstr/lower-case (last (cstr/split (str f-path) #"/"))) ".edn" "")]
+                                     (swap! db/themes-map assoc theme-name theme-map)
                                      (sql-exec systemh2-db (to-sql {:delete-from [:themes] :where [:= :file_path f-path]}))
 
                                      (sql-exec systemh2-db
@@ -224,7 +226,7 @@
   (ppy/execute-in-thread-pools :update-screen-meta
                                (fn []
                                  (try
-                                   (let [;file-path "./screens/"
+                                   (let [;file-path "screens/"
                                          screen-data      (read-screen f-path)
                                          no-name?         (nil? (get screen-data :screen-name))
                                          screen-name      (get screen-data :screen-name "unnamed-screen!")
@@ -301,27 +303,106 @@
                                      (println "Error in update-screen-meta:" (.getMessage e))
                                      (.printStackTrace e))))))
 
-(defn update-all-screen-meta []
+;; (defn get-offline-screenshot [screen-name target-folder]
+;;   (let [timeout-ms 120000
+;;         _ (ut/pp ["🖼️" :no-snap? :attempting-screenshot screen-name])
+;;         future-process (future
+;;                          (try
+;;                            (let [result (shell/sh "node" "extras/node-playwright/get-screenshots.js"
+;;                                                   "-w" "60" "-o" target-folder ;; "assets/screen-snaps"
+;;                                                   ;;"-W" "3840" "-H" "2160"
+;;                                                   "-i" (str "http://localhost:8888/#/" screen-name))]
+;;                              (when (= (:exit result) 1)
+;;                                (ut/pp [:offline-screenshot-result screen-name
+;;                                        :exit (:exit result)
+;;                                        :out (not-empty (:out result))
+;;                                        :err (not-empty (:err result))]))
+;;                              result)
+;;                            (catch Exception e
+;;                              (ut/pp [::offline-screenshot-error screen-name (.getMessage e)])
+;;                              {:exit 1 :err (str "Error: " (.getMessage e))})))]
+;;     ;(ppy/execute-in-thread-pools :playwright-serial
+;;     (qp/serial-slot-queue :playwright-serial :serial-queues
+;;                                  (fn []
+;;                                    (ut/pp [:starting-playwright-job screen-name])
+;;                                    (try
+;;                                      (let [result (deref future-process timeout-ms
+;;                                                          {:exit 1 :err "Command timed out"})]
+;;                                        (ut/pp [:playwright-job-completed screen-name :result result])
+;;                                        result)
+;;                                      (finally
+;;                                        (ut/pp [:cancelling-future screen-name])
+;;                                        (future-cancel future-process)))))))
+
+(defn get-offline-screenshot [screen-name target-folder]
+  (let [timeout-ms 120000]
+    ;;(qp/serial-slot-queue :playwright-serial :serial-queues
+    (ppy/execute-in-thread-pools :playwright-serial
+                          (fn []
+                            (ut/pp [:starting-playwright-job screen-name])
+                            (let [future-process
+                                  (future
+                                    (try
+                                      (let [result (shell/sh "node" "extras/node-playwright/get-screenshots.js"
+                                                             "-w" "50" "-o" target-folder
+                                                             "-i" (str "http://localhost:8280/#/" screen-name))]
+                                        (when (= (:exit result) 1)
+                                          (ut/pp [:offline-screenshot-result screen-name
+                                                  :exit (:exit result)
+                                                  :out (not-empty (:out result))
+                                                  :err (not-empty (:err result))]))
+                                        result)
+                                      (catch Exception e
+                                        (ut/pp [::offline-screenshot-error screen-name (.getMessage e)])
+                                        {:exit 1 :err (str "Error: " (.getMessage e))})))]
+                              (try
+                                (let [result (deref future-process timeout-ms
+                                                    {:exit 1 :err "Command timed out"})]
+                                  (ut/pp [:playwright-job-completed screen-name :result result])
+                                  result)
+                                (finally
+                                  (ut/pp [:cancelling-future screen-name])
+                                  (future-cancel future-process))))))))
+
+(defn update-all-screen-meta [ & [changed-f-path]]
   (sql-exec systemh2-db (to-sql {:truncate :screens}))
   (sql-exec systemh2-db (to-sql {:truncate :blocks}))
   ;; (sql-exec systemh2-db (to-sql {:truncate :themes}))
-  (let [prefix "./screens/"
+  (let [prefix "screens/"
         runners (keys (dissoc (get (config/settings) :runners) :views))
         files  (ut/get-file-vectors-simple prefix ".edn")
         ;theme-files (ut/get-file-vectors-simple "./themes/" ".edn")
         ]
     (doseq [f files]
-      (update-screen-meta (str prefix f) runners))
+      (let [screen-name (first (cstr/split (str f) #"\."))
+            snap-path (str "assets/screen-snaps/" screen-name ".jpg")
+            changed? (cstr/ends-with? (str changed-f-path) (str f))
+            snap-exists? (.exists (io/file snap-path))]
+        (when (or changed? (not snap-exists?))
+          (get-offline-screenshot screen-name "assets/screen-snaps"))
+        (ut/pp [:screen-file screen-name :snap-exists? snap-exists?])
+        (update-screen-meta (str prefix f) runners)))
     ;; (doseq [f theme-files]
     ;;   (update-theme-meta (str prefix f)))
     ))
 
-(defn update-all-theme-meta []
+;; (update-all-screen-meta)
+
+(defn update-all-theme-meta [ & [changed-f-path]]
   (sql-exec systemh2-db (to-sql {:truncate :themes}))
   (let [prefix "./themes/"
         theme-files (ut/get-file-vectors-simple prefix ".edn")]
     (doseq [f theme-files]
-      (update-theme-meta (str prefix f)))))
+      (let [theme-name (first (cstr/split (str f) #"\."))
+            snap-path (str "assets/theme-snaps/" theme-name ".jpg")
+            changed? (cstr/ends-with? (str changed-f-path) (str f))
+            snap-exists? (.exists (io/file snap-path))]
+        ;; (ut/pp [:theme-meta theme-name changed? snap-exists?])
+        (when (or changed? (not snap-exists?))
+          (get-offline-screenshot (str "test-board/" theme-name) "assets/theme-snaps"))
+        (update-theme-meta (str prefix f))))))
+
+;; (update-all-theme-meta)
 
 ;; (ut/pp (update-all-screen-meta))
 ;; (ut/pp [:blocks @db/unique-block-set (count @db/unique-block-set)])
@@ -478,12 +559,12 @@
      file-path)))
 
 (defn watch-screens-folder []
-  (let [file-path "./screens/"]
+  (let [file-path "screens/"]
     (beholder/watch #(when (cstr/ends-with? (str (get % :path)) ".edn")
                        (let [f-path (str (get % :path))
                              f-op   (get % :type)]
                          (ut/pp [:screen-change! f-op f-path])
-                         (update-all-screen-meta)))
+                         (update-all-screen-meta f-path)))
                     file-path)))
 
 (defn watch-themes-folder []
@@ -492,7 +573,7 @@
                        (let [f-path (str (get % :path))
                              f-op   (get % :type)]
                          (ut/pp [:theme-change! f-op f-path])
-                         (update-all-theme-meta)))
+                         (update-all-theme-meta f-path)))
                     file-path)))
 
 
@@ -515,7 +596,7 @@
                (let [conn (get (deref db/conn-map) :conn-name)]
                  (rota/shape-rotation-run :f-path))))})
 
-;; (ut/pp (db-sniff-solver-default "./connections/postgres.edn" "postgres"))
+;; (ut/pp (db-sniff-solver-default "connections/postgres.edn" "postgres"))
 ;; (ut/pp (keys @db/conn-map))
 ;; (ut/pp @db/shape-rotation-status)
 ;; (rota/shape-rotation-run systemh2-db)
@@ -583,7 +664,7 @@
 ;; (update-all-conn-meta)
 
 (defn watch-connections-folder []
-  (let [file-path "./connections/"]
+  (let [file-path "connections/"]
     (beholder/watch
      #(cond (cstr/ends-with? (str (get % :path)) ".edn") (let [f-path    (str (get % :path))
                                                                f-op      (get % :type)
@@ -901,7 +982,11 @@
   (evl/create-nrepl-server!) ;; needs to start
   (update-all-screen-meta) ;; has queue per screen
   (update-all-flow-meta) ;; has queue per flow
-  (update-all-theme-meta)
+  ;; (update-all-theme-meta)
+  (ppy/execute-in-thread-pools :delayed-theme-meta
+                               (fn []
+                                 (Thread/sleep 60000)
+                                 (update-all-theme-meta)))
   (update-all-conn-meta)
   (wss/reload-signals-subs) ;; run once on boot
   (wss/reload-solver-subs) ;; run once on boot (needs nrepl(s) to start first...)
@@ -1226,7 +1311,7 @@
     (println " ")
     (ut/print-ansi-art "data/nname.ans")
     (ut/print-ansi-art "data/rrvbbit.ans")
-    (ut/pp [:version "snowshoe-hare.0.2.0" :december-28-2024])
+    (ut/pp [:version "snowshoe-hare.0.2.0" build/build-date :build (str build/build-id "-" build/build-number)])
     (wss/package-settings-for-client :rvbbit) ;; to populate the latest-settings-map atom asap
     ;; (ut/pp [:pre-alpha "lots of bugs, lots of things to do - but, and I hope you'll agree.. lots of potential."])
     (ut/pp ["Ryan Robitaille" "@ryrobes" ["rvbbit.com" "ryrob.es"] "ryan.robitaille@gmail.com"])
@@ -1261,6 +1346,8 @@
 
     (ut/pp [:get-ai-workers...])
     (get-ai-workers) ;; just in case for the cold boot atom has no
+
+    ;; (ut/print-ansi-art "data/logo.ans")
 
     (ut/pp [:create-queue-system...])
     (qp/create-slot-queue-system)

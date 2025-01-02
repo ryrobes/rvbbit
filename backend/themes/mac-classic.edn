@@ -90,7 +90,7 @@
  :block-title-selected-font-color       "#000000"
  :grid-selected-background-color        "#000000"
  :grid-font-color                       "#000000"
- :canvas-background-css                 {:background-image      "none"
+ :canvas-background-css                 {:background-image      "url(assets/backgrounds/Grey_Icons.jpg"
                                          :transition            "none"
                                          :background-blend-mode "normal"
                                          :background-color      "#e8e8e8"}

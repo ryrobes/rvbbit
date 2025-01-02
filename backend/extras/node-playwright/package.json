@@ -1,0 +1,10 @@
+{
+  "name": "playwright-screenshots",
+  "version": "1.0.0",
+  "description": "Take screenshots of web pages using Playwright for RVBBIT",
+  "main": "get-screenshots.js",
+  "dependencies": {
+    "playwright": "^1.41.2",
+    "yargs": "^17.7.2"
+  }
+}

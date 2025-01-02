@@ -36,6 +36,7 @@
    [rvbbit-frontend.buffy   :as buffy]
    [rvbbit-frontend.ai-workers   :as aiw]
    [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.build-id :as build]
    [rvbbit-frontend.db      :as db]
    [rvbbit-frontend.flows   :as flows]
    [rvbbit-frontend.http    :as http]
@@ -3169,9 +3170,9 @@
         reco-preview        @(ut/tracked-subscribe [::bricks/reco-preview])
         reco-selected?      (not (nil? reco-selected))
         mad-libs-combo?     (ut/ne? (get selected-panel-map :mad-libs-combo-hash))
-        mad-libs-combos     (when mad-libs-combo?
-                              @(ut/tracked-subscribe [::bricks/get-combo-rows selected-block
-                                                      (get selected-panel-map :mad-libs-combo-hash)]))
+        ;; mad-libs-combos     (when mad-libs-combo?
+        ;;                       @(ut/tracked-subscribe [::bricks/get-combo-rows selected-block
+        ;;                                               (get selected-panel-map :mad-libs-combo-hash)]))
         ;; _ (ut/tapp>> [:mad-libs-combo? reco-selected? mad-libs-combo? mad-libs-combos (str (get selected-panel-map :mad-libs-combo-hash)) selected-block])
         data-key-type       @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
         screen-name         (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
@@ -3900,7 +3901,7 @@
                     :background  (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")}]
 
 
-                  [block-layer-tabs selected-block data-key data-key-type mad-libs-combos runners sql-calls block-runners-map views views? runners? queries?]
+                  [block-layer-tabs selected-block data-key data-key-type nil runners sql-calls block-runners-map views views? runners? queries?]
 
                 ;[re-com/gap :size (px single-width) :style {:z-index 1}]
 
@@ -4129,16 +4130,18 @@
                                                     ]))
                                 (if viz-gen? ;; dont show scrubber boolean if on viz-gen mode
                                   [re-com/box :style {:font-size "10px" :margin-left "8px"} :child
-                                   (str "('viz-gen' debug - "
-                                        (count mad-libs-combos)
-                                        " c-rows, "
-                                        (count (distinct (map :axes mad-libs-combos)))
-                                        " axes, "
-                                        (count (distinct (map :combo_hash mad-libs-combos)))
-                                        " combos, "
-                                        " combo-hash: "
-                                        (get (first mad-libs-combos) :combo_hash)
-                                        ")")]
+                                   "no"
+                                  ;;  (str "('viz-gen' debug - "
+                                  ;;       (count mad-libs-combos)
+                                  ;;       " c-rows, "
+                                  ;;       (count (distinct (map :axes mad-libs-combos)))
+                                  ;;       " axes, "
+                                  ;;       (count (distinct (map :combo_hash mad-libs-combos)))
+                                  ;;       " combos, "
+                                  ;;       " combo-hash: "
+                                  ;;       (get (first mad-libs-combos) :combo_hash)
+                                  ;;       ")")
+                                   ]
                                   (let [is-raw-sql?           @(ut/tracked-sub ::bricks/is-raw-sql? {:panel-key selected-block :data-key data-key})
                                         view-scrubbers?       (get-in @db/scrubbers [selected-block data-key] false)
                                         xtdb? (cstr/includes? (cstr/lower-case (str @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key data-key]))) "xtdb")
@@ -5964,7 +5967,29 @@
                                   :width (px (- w 25))
                                   :size "auto"
                                   :justify :between
-                                  :children [[re-com/box :child (str db/version)] [re-com/box :child (str db/version-date)]]
+                                  :children [[re-com/box :child (str db/version)]
+                                             [re-com/h-box
+                                              :align :center
+                                              :gap "10px"
+                                              :children
+                                              [[re-com/box
+                                                :style {:font-size "13px"}
+                                                :child (str build/build-date)]
+                                               [re-com/box
+                                                :style {:font-size "13px"}
+                                                :child (str build/build-id "-" build/build-number)]
+                                               [re-com/v-box
+                                                :size "none"
+                                                :style {:border-radius "20px"
+                                                        ;:opacity 0.5
+                                                        :overflow "hidden" :background-color cc}
+                                                :width "20px" :height "20px"
+                                                :children [
+                                                           [re-com/box :child "🐇" :width "25px" :height "25px"
+                                                            :style {:background-color (ut/invert-hex-color cc)
+                                                                    :font-size "14px"
+                                                                    :margin-left "-1px" :margin-top "0px"}]
+                                                           [bricks/rabbit-search-browser 20 20 true]]]]]]
                                   :style {:position "fixed"
                                           :text-shadow "3px 3px 3px #000000"
                                           :left 10 :bottom -33 :font-size "17px"
@@ -6133,6 +6158,8 @@
         annotate?       @(ut/tracked-sub ::bricks/annotate? {})
         ui-debug?       @(ut/tracked-sub ::bricks/ui-debug? {})
         ww @(ut/tracked-subscribe_ [::subs/w])
+        is-autorun? @(ut/tracked-sub ::bricks/auto-run-and-connected? {})
+        autorun-disabled? (and (not is-autorun?) auto-run?)
         macro-undo-limit (Math/floor (/ ww 180))
         client-name-str (cstr/replace (str client-name) ":" "")
         ;; baked-leaves? @(ut/tracked-subscribe_ [::bricks/baked-leaves?])
@@ -6166,8 +6193,12 @@
                             :active? peek?}]
 
                           [custom-icon-button
-                           {:icon-name (if auto-run? "zmdi-refresh-sync" "zmdi-refresh-sync-off")
-                            :tooltip "toggle auto-refresh (O)"
+                           {:icon-name (cond
+                                         autorun-disabled? "zmdi-refresh-sync-alert"
+                                         auto-run? "zmdi-refresh-sync"
+                                         :else "zmdi-refresh-sync-off")
+                            :tooltip (str "toggle auto-refresh (O)" (when autorun-disabled? "**disabled when editing**"))
+                            :color (if autorun-disabled? "red" "inherit")
                             :on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])
                             :active? auto-run?}]
 
@@ -7183,6 +7214,9 @@
         bx (Math/floor (/ orig-left db/brick-size)) ;; jesus. rewrite all this TODO
         by (Math/floor (/ orig-top db/brick-size))
         ;;leaves @(ut/tracked-sub ::bricks/get-leaf-actions-for {:leaf-kp [:canvas :canvas :canvas]})
+        preview-images-up? (or
+                            (= (get @bricks/rabbit-search-hover 5) "theme-map")
+                            (= (get @bricks/rabbit-search-hover 5) "screen"))
 
         leaves-meta @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (str "leaf/" client-name-str ">metadata"))]})
         what (when (get drag-meta :type)
@@ -7251,7 +7285,7 @@
                                     (str "5px solid " (theme-pull :theme/editor-outer-rim-color nil)))
                        :position  "fixed"})}}
      :wrap-nicely? false
-     :backdrop-opacity 0.63
+     :backdrop-opacity (if preview-images-up? 0 0.63)
      :backdrop-on-click clear-state ;;(if (not @over-spawn-modal) clear-state (fn []))
      :child
 
@@ -8002,6 +8036,7 @@
        :attr {:id              "base-canvas"
               :on-click        #(do (reset! bricks/over-block? false)
                                     (reset! db/bar-hover-text nil)
+                                    ;; (when (true? @db/macro-undo?) (reset! db/macro-undo? false))
                                     (reset! bricks/over-editor? false)
                                     ;(reset! bricks/over-block nil)
                                     (reset! db/last-mouse-activity (js/Date.))
@@ -8106,18 +8141,24 @@
 
                           (when session? [session-modal])
 
-                          (when (= (get @bricks/rabbit-search-hover 5) "screen")
-                            (let [screen-name (first @bricks/rabbit-search-hover)]
-                              ;;[:img {:src (str "assets/screen-snaps/" screen-name ".jpg")}]
-                              [:img {:src (str "assets/screen-snaps/" screen-name ".jpg")
+                          (when (or
+                                 (= (get @bricks/rabbit-search-hover 5) "theme-map")
+                                 (= (get @bricks/rabbit-search-hover 5) "screen"))
+                            (let [screen-name (first @bricks/rabbit-search-hover)
+                                  tt (cstr/replace (str (get @bricks/rabbit-search-hover 5)) "-map" "")
+                                  #_(ut/pp [:hover-preview tt screen-name @bricks/rabbit-search-hover])]
+                              [:img {:src (str "assets/" tt "-snaps/" screen-name ".jpg")
                                      :class "screen-snap-fade"
                                      :style {:position "fixed"
                                              :top 0
                                              :left 0
-                                             :width "100%"
-                                             :height "100%"
+                                             :width "auto"
+                                             :height "auto"
                                              :z-index 100
-                                             :object-fit "contain"}}]))
+                                             :max-width "none"
+                                             :max-height "none"
+                                             :object-fit "cover"
+                                             :transform-origin "top left"}}]))
 
                           (when doom? [doom-modal])
 

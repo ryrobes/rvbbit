@@ -1,34 +1,30 @@
 {:reco-preview nil,
  :annotate? false,
  :wss-config ["ws" 3030],
- :leaf-preview
- {[:fresh :fresh-clover]
-  {[[:canvas :canvas :canvas 862] [:canvas :canvas :canvas]]
-   :reco-preview-c--1759830261}},
  :default-col-widths
  {:block-494 {:jvm-stats-drag-40 100},
   :block-8179 {:client-stats-drag-33 141},
-  :block-3438 {:new-query-1 100}},
+  :block {:cnt-33 496},
+  :block-901 {:gen-viz-1002-clone-38 165}},
  :runstream-drops nil,
  :tabs
  ["welcome to the party pal" "byzantium rabbit" "color test" "sys atom sizes"],
- :auto-run? false,
+ :auto-run? true,
  :selected-cols nil,
  :server nil,
  :runstreams nil,
  :editor? false,
  :buffy? false,
- :memory [1209562720 1148935560 4294705152],
+ :memory [462374815 394840643 4294705152],
  :sched
- {:jvm-stats-drag-40 106,
-  :cpu-query1 106,
-  :gen-viz-1002 106,
-  :client-stats-drag-33 81,
-  :new-query 106,
-  :gen-viz-553 106,
-  :new-query-1 289,
-  :gen-viz-1002-clone-38 106},
- :client-name :knowledgeable-rectangular-zebra-44,
+ {:cnt-33 3284,
+  :jvm-stats-drag-40 3314,
+  :gen-viz-1002 3314,
+  :new-query 3314,
+  :gen-viz-553 3314,
+  :client-stats-drag-33 3289,
+  :gen-viz-1002-clone-38 3314},
+ :client-name :effervescent-slate-gray-hippopotamus-23,
  :server-panels
  [:block-494
   :block-1956
@@ -70,39 +66,34 @@
   :block-2
   :block-4603],
  :flow-editor? true,
- :window {:w 3340, :h 1710},
+ :window {:w 2146, :h 1208},
  :ai-worker? false,
  :quake-console? false,
  :implicit-rowsets {:solver [nil]},
  :post-meta
- {:gen-viz-1002-clone-38 {:* {:rowcount 2}},
-  :jvm_stats {:* {:rowcount 111}},
-  :new-query-1 {:* {:rowcount 50}},
+ {:cnt-33 {:* {:rowcount 1}},
+  :gen-viz-1002 {:* {:rowcount 3}},
   :client-stats-drag-33 {:* {:rowcount 3}},
-  :rabbit-search-like-themes {:* {:rowcount 92}}},
+  :new-query {:* {:rowcount 0}},
+  :gen-viz-553 {:* {:rowcount 1}},
+  :gen-viz-1002-clone-38 {:* {:rowcount 2}}},
  :flow-estimates
  {:gen-viz-553 {:times 0.002, :run-id :gen-viz-553},
-  :new-query {:times 0.003, :run-id :new-query},
-  :cpu-query1 {:times 0.003, :run-id :cpu-query1},
-  :new-query-1 {:times 0.005, :run-id :new-query-1},
+  :new-query {:times 0.001, :run-id :new-query},
   :client-stats-drag-33 {:times 0.001, :run-id :client-stats-drag-33},
   :cnt-33 {:times 0.001, :run-id :cnt-33},
-  :jvm-stats-drag-40 {:times 0.01, :run-id :jvm-stats-drag-40},
-  :block-8083-new-clojure-2 {:times 0.019, :run-id :block-8083-new-clojure-2},
+  :jvm-stats-drag-40 {:times 0.001, :run-id :jvm-stats-drag-40},
   :gen-viz-1002 {:times 0.002, :run-id :gen-viz-1002},
-  :jvm_stats {:times 0.011, :run-id :jvm_stats},
-  :block-1430-new-clojure-1 {:times 0.012, :run-id :block-1430-new-clojure-1},
-  :client_stats {:times 0.001, :run-id :client_stats},
-  :rabbit-search-like-themes {:times 0.002, :run-id :rabbit-search-like-themes},
-  :gen-viz-1002-clone-38 {:times 0.005, :run-id :gen-viz-1002-clone-38},
-  :rabbit-search-like-screens {:times 0.001, :run-id :rabbit-search-like-screens}},
+  :jvm_stats {:times 0.001, :run-id :jvm_stats},
+  :block-1430-new-clojure-1 {:times 0.014, :run-id :block-1430-new-clojure-1},
+  :gen-viz-1002-clone-38 {:times 0.002, :run-id :gen-viz-1002-clone-38}},
  :screen-name "server-stats",
  :panel-hashes
  {:block-494 1212357626,
   :block-1956 502953063,
   :block-9173 -337685260,
   :block-4808 492063643,
-  :block 623313073,
+  :block 423392314,
   :block-10778 -1060431343,
   :block-1242 -1023168918,
   :block-8179 1578763389,
@@ -121,7 +112,7 @@
   :block-10180 -679799823,
   :block-3719 -1406452178,
   :block-1430 1968213366,
-  :block-901 -1918912509,
+  :block-901 -598521416,
   :block-12161 40667626,
   :block-3218 -1351091716,
   :block-7665 -1514652861,
@@ -132,29 +123,26 @@
   :block-11070 454658604,
   :block-4109 -864370447,
   :block-8083 468568373,
-  :reco-preview-c--1759830261 287603443,
   :block-10067 -1151666386,
   :block-8394 -1296322521,
   :block-1650 1821330306,
   :block-2 1322895200,
-  :block-4603 1352117369,
-  :reco-preview-c--273244492 188992421},
+  :block-4603 1352117369},
  :recos-page2 0,
  :selected-tab "welcome to the party pal",
  :col-names nil,
  :snapshots nil,
  :recos-page 0,
  :rs-overrides-hashmap {},
- :user-params-hash 198135441,
+ :user-params-hash -1582780213,
  :grid-recos? true,
- :session-hash 969319368,
+ :session-hash -289995879,
  :resolved-queries
- {nil {:_last-run "09:31:27"},
-  :gen-viz-553
+ {:gen-viz-553
   {:cache? false,
    :limit 18,
    :group-by [:ts],
-   :_last-run "09:26:24",
+   :_last-run "05:08:00",
    :refresh-every 45,
    :from
    [[{:select
@@ -189,7 +177,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 45,
    :group-by [:ts_hour],
-   :_last-run "09:26:24",
+   :_last-run "05:08:00",
    :refresh-every 45,
    :from
    [{:select
@@ -300,13 +288,13 @@
    {[:sys_load :heatmap-7696]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#d4a4ec" "#180928"] 20 :desc],
+     {:background-color [:heatmap ["#bbb5ca" "#1c2841"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}},
     [:recent_messages_per_second :heatmap-2888]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#c41464" nil] 20 :desc],
+     {:background-color [:heatmap ["#543464" nil] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
    :_last-run "09:26:24",
@@ -332,7 +320,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "09:26:24",
+   :_last-run "05:08:00",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -394,6 +382,7 @@
    :from [[:flow_history :hh810]]},
   :cnt-33
   {:select [[[:count 1] :rowcnt]],
+   :refresh-every 35,
    :from
    [[{:select
       [:ack
@@ -409,7 +398,8 @@
        :ts],
       :order-by [[:client_name :asc]],
       :from [[:client_stats :ww254]]}
-     :ssb99]]},
+     :ssb99]],
+   :_last-run "05:07:40"},
   :jvm-stats-drag-40
   {:select
    [:sql_cache_size
@@ -432,13 +422,13 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[:ts1 :desc]],
-   :_last-run "09:26:23",
+   :_last-run "05:08:00",
    :where [:>= :recent_batches_per_second 0]},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [4],
-   :_last-run "09:26:24",
+   :_last-run "05:08:00",
    :refresh-every 45,
    :from
    [{:select
@@ -491,12 +481,12 @@
          (merge
            row
            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
-  :shape-rotation-maps-sys {:_last-run "09:30:05"},
+  :shape-rotation-maps-sys {:_last-run "05:08:01"},
   :gen-viz-1002-clone-38
   {:cache? false,
    :limit 24,
    :group-by [:ts1],
-   :_last-run "09:26:24",
+   :_last-run "05:08:00",
    :refresh-every 45,
    :from
    [[{:group-by [:ts1],
@@ -519,7 +509,7 @@
    :order-by [[:ts1 :desc]],
    :select
    [[[:round [:avg :used_memory_mb]] :used_memory_mb]
-    [[:raw "to_char(ts1, 'DD-HH')"] :ts1]],
+    [[:raw "to_char(ts1, 'YY-MM-DD-HH')"] :ts1]],
    :post-process-fn
    (fn [x]
      (vec
@@ -548,9 +538,7 @@
               (str (rvbbit-backend.util/rnd mb 0) " MB")
               (str pos diff))}))))}},
  :panels
- {nil
-  {:queries
-   {:shape-rotation-maps-sys {:_last-run "09:30:05"}, nil {:_last-run "09:31:27"}}},
+ {nil {:queries {:shape-rotation-maps-sys {:_last-run "05:08:01"}}},
   :block-494
   {:name "select-all-jvm_stats",
    :w 18,
@@ -583,7 +571,7 @@
      :cache? false,
      :from [[:jvm_stats :kke192]],
      :order-by [[:ts1 :desc]],
-     :_last-run "09:26:23",
+     :_last-run "05:08:00",
      :where [:>= :recent_batches_per_second 0]}},
    :tab "welcome to the party pal",
    :minimized? false},
@@ -752,7 +740,10 @@
    :connection-id "systemh2-db",
    :queries
    {:cnt-33
-    {:select [[[:count 1] :rowcnt]], :from [[:query/client-stats-drag-33 :ssb99]]}},
+    {:select [[[:count 1] :rowcnt]],
+     :refresh-every 35,
+     :from [[:query/client-stats-drag-33 :ssb99]],
+     :_last-run "05:07:40"}},
    :tab "welcome to the party pal",
    :views
    {:hey
@@ -806,7 +797,7 @@
     {:cache? false,
      :limit 18,
      :group-by [4],
-     :_last-run "09:26:24",
+     :_last-run "05:08:00",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[4 :desc]],
@@ -982,7 +973,7 @@
      :refresh-every 20,
      :order-by [[:client_name :asc]],
      :from [[:client_stats :ww254]],
-     :_last-run "09:26:24",
+     :_last-run "05:08:00",
      :style-rules
      {[:* :highlight-8717]
       {:logic [:= :client_name :*client-name-str],
@@ -1023,7 +1014,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 45,
      :group-by [:ts_hour],
-     :_last-run "09:26:24",
+     :_last-run "05:08:00",
      :refresh-every :param/refresh-timer,
      :from
      [{:select
@@ -1152,7 +1143,7 @@
     {:cache? false,
      :limit 18,
      :group-by [:ts],
-     :_last-run "09:26:24",
+     :_last-run "05:08:00",
      :refresh-every :param/refresh-timer,
      :from [[:query/jvm-stats-drag-40 :aa45]],
      :order-by [[:ts :desc]],
@@ -1185,7 +1176,7 @@
        :XAxis
        {:dataKey :ts,
         :label
-        {:value "10 min avgs: threads/clients (last 3 hours)",
+        {:value "10 min avgs: threads/websockets (last 3 hours)",
          :fill :param/theme-color1,
          :style {:font-size "15px", :font-weight 700},
          :position "middle",
@@ -1195,7 +1186,7 @@
        :YAxis
        {:yAxisId "left",
         :label
-        {:value "clients",
+        {:value "websockets",
          :angle -90,
          :fill :param/theme-color1,
          :style {:font-size "15px", :font-weight 700},
@@ -1525,7 +1516,7 @@
     {:cache? false,
      :limit 24,
      :group-by [:ts1],
-     :_last-run "09:26:24",
+     :_last-run "05:08:00",
      :refresh-every :param/refresh-timer,
      :from
      [[{:group-by [:ts1],
@@ -1548,7 +1539,7 @@
      :order-by [[:ts1 :desc]],
      :select
      [[[:round [:avg :used_memory_mb]] :used_memory_mb]
-      [[:raw "to_char(ts1, 'DD-HH')"] :ts1]],
+      [[:raw "to_char(ts1, 'YY-MM-DD-HH')"] :ts1]],
      :post-process-fn
      (fn [x]
        (vec
@@ -1957,7 +1948,7 @@
  :materialized-theme
  {:codemirror-theme "rvbbit-dynamic",
   :editor-param-background-color "#000000",
-  :pop-2 "#c42ca4",
+  :pop-2 "#497a92",
   :base-block-style
   {:text-shadow "4px 4px 4px #00000088",
    :border-radius "12px 12px 12px 12px",
@@ -2001,25 +1992,25 @@
   :running-gif "images/running.gif",
   :base-block-color-selected "#00030a",
   :block-title-font-color "#ffffff",
-  :base-block-color "#18092882",
-  :editor-rim-color "#0da9d399",
+  :base-block-color "#1c284182",
+  :editor-rim-color "#57bcd499",
   :base-block-filter-selected
   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
   :vega-default-color-scheme {:scheme "pastel2"},
   :data-colors
-  {"float" "#d87489",
-   "boolean" "#24fffd",
-   "map" "#1cfcd5",
-   "list" "#a49011",
-   "string" "#ffffff",
-   "any" "#d04f00",
-   "vector" "#8d00e6",
-   "keyword" "#d5eca4",
-   "rabbit-code" "#0dd36e",
-   "datetime" "#72139f",
-   "integer" "#ab50e7",
-   "unknown" "#0c8c26",
-   "date" "#073822"},
+  {"float" "#cabcb5",
+   "boolean" "#7d96cb",
+   "map" "#b78091",
+   "list" "#7c4394",
+   "string" "#f9faf7",
+   "any" "#4e58b3",
+   "vector" "#8dd457",
+   "keyword" "#97bced",
+   "rabbit-code" "#61bb8a",
+   "datetime" "#883d46",
+   "integer" "#a9a1c0",
+   "unknown" "#70342d",
+   "date" "#57591f"},
   :editor-grid-selected-font-color "#000000",
   :monospaced-font "JetBrains Mono",
   :editor-grid-selected-background-color "#dc9cb0",
@@ -2052,14 +2043,14 @@
     :ticks
     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-  :editor-outer-rim-color "#0da9d3",
+  :editor-outer-rim-color "#57bcd4",
   :grid-selected-font-color "#000000",
   :block-title-selected-font-color "#ffffff",
   :grid-selected-background-color "#a3d3ff",
   :grid-font-color "#ffffff",
   :canvas-background-css
   {:background-image
-   "url(assets/openai-images/b64-image3-66502-83873-4k.webp-q10.jpg)",
+   "url(assets/openai-images/b64-image3-36658-80014-4k.webp-q10.jpg)",
    :transition "all 0.8s ease-in-out",
    :background-size "cover",
    :background-blend-mode "hard-light",
@@ -2071,22 +2062,22 @@
   :block-tab-selected-font-color "#c9d1ff",
   :editor-background-color "#000006",
   :editor-grid-font-color "#ffffff",
-  :pop-1 "#122764"},
+  :pop-1 "#bbb5ca"},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#d87489",
-  "boolean" "#24fffd",
-  "map" "#1cfcd5",
-  "list" "#a49011",
-  "string" "#ffffff",
-  "any" "#d04f00",
-  "vector" "#8d00e6",
-  "keyword" "#d5eca4",
-  "rabbit-code" "#0dd36e",
-  "datetime" "#72139f",
-  "integer" "#ab50e7",
-  "unknown" "#0c8c26",
-  "date" "#073822"},
+ {"float" "#cabcb5",
+  "boolean" "#7d96cb",
+  "map" "#b78091",
+  "list" "#7c4394",
+  "string" "#f9faf7",
+  "any" "#4e58b3",
+  "vector" "#8dd457",
+  "keyword" "#97bced",
+  "rabbit-code" "#61bb8a",
+  "datetime" "#883d46",
+  "integer" "#a9a1c0",
+  "unknown" "#70342d",
+  "date" "#57591f"},
  :solver-fn nil,
  :click-param
  {:blocks-sys
@@ -2101,20 +2092,20 @@
    :query_names ""},
   :db-conn-drag-13.* {:db_conn [":honey-format"]},
   :render-hash
-  {:block-494 641025247,
+  {:block-494 -1769653290,
    :block-2676 -1361379395,
    :block-1956 -1684323669,
    :block-9173 341139118,
-   :block-4808 1410131799,
-   :block 1233944181,
+   :block-4808 -928398559,
+   :block -1118959631,
    :block-1242 187430372,
-   :block-8179 -437896859,
+   :block-8179 -1088352993,
    :block-12071 -1071283754,
    :block-397 212179235,
-   :block-7876 1056691938,
+   :block-7876 85852469,
    :block-8356 1645799682,
    :block-7568 -1223640206,
-   :block-9727 1779017501,
+   :block-9727 1548572668,
    :block-11587 -1463692069,
    :block-6697 570457148,
    :block-1 21061705,
@@ -2123,25 +2114,25 @@
    :block-2784 1553075196,
    :block-981 892463129,
    :block-3438 -1590550172,
-   :block-10180 781742917,
+   :block-10180 -609529859,
    :block-3719 91347326,
-   :block-901 -468526927,
-   :block-12161 39528686,
-   :block-3218 695689701,
+   :block-901 -683447852,
+   :block-12161 -1725162659,
+   :block-3218 1492576046,
    :block-7665 -1764147847,
    :block-7259 -809048244,
    :block-2388 699820586,
    :block-9347 -1654526164,
-   :block-8619 758782266,
+   :block-8619 1647531169,
    :block-5806 1116091544,
-   :block-11070 -1981582890,
-   :block-4109 962461118,
+   :block-11070 -1381382778,
+   :block-4109 -1228967038,
    :block-11754 -1455830205,
    :block-8083 -387782292,
    :block-2762 -2050021177,
    :block-9142 -271358562,
    :reco-preview-c-1645295585 -1252144634,
-   :block-10067 1429804565,
+   :block-10067 2026639782,
    :block-6431 120079542,
    :reco-preview-c--490369712 -1586339425,
    :block-8394 1949651721,
@@ -2149,7 +2140,7 @@
    :reco-preview-c--1238819333 635890714,
    :block-2 -1548495214,
    :block-7837 -65943252,
-   :block-4603 580617505,
+   :block-4603 -960386564,
    :reco-preview-c--273244492 -1801714125},
   :tables-sys
   {:db_schema "none",
@@ -2159,38 +2150,38 @@
    :table_name "flow_history",
    :fields 15},
   :data-hash
-  {nil -657937605,
-   :new-clojure-1 1360910898,
+  {nil 1171642006,
+   :new-clojure-1 -1587688542,
    :fields-sys -2017569654,
-   :gen-viz-553 -1157131247,
+   :gen-viz-553 528341068,
    :status-drag-0 -305466848,
    :tables-sys -2017569654,
    :rabbit-search-like 745140692,
-   :new-query 312899013,
+   :new-query -21696252,
    :cpu-query1 952763654,
    :new-query-1 1966005534,
    :tests 1808645554,
-   :client-stats-drag-33 958041395,
+   :client-stats-drag-33 2127253523,
    :jvm-stats-drag-39 -305466848,
    :flow-history-drag-38 1414818590,
-   :cnt-33 1620917624,
+   :cnt-33 -1555332973,
    :cnt-client-stats-drag-33 -637515650,
    :query-4704 528330850,
-   :jvm-stats-drag-40 1423761796,
-   :gen-viz-1002 469425786,
+   :jvm-stats-drag-40 -923181423,
+   :gen-viz-1002 -60791850,
    :cnt-client-stats-drag-33-c-1645295585 -637515650,
-   :jvm_stats 891823259,
+   :jvm_stats -2017569654,
    :new-clojure-2 -1114532735,
    :status-drag-28 1751517515,
    :tests-drag-12 512081645,
-   :client_stats -842875583,
+   :client_stats -2017569654,
    :rabbit-search-like-themes -288219868,
    :flow_history 1414818590,
    :query-11325 -17758563,
    :query-291 -2073750396,
    :connections-sys 1559621138,
    :query-6018 806287814,
-   :gen-viz-1002-clone-38 -52771241,
+   :gen-viz-1002-clone-38 -776107753,
    :rabbit-search-like-screens -503378741},
   :new-query-1
   {:queries_run 75638,
@@ -2257,19 +2248,62 @@
    :theme-split-complement
    [:split-complements :solver/colors-of-the-moment>dominant],
    :selected-view-data
-   [:box
-    :size
-    "auto"
-    :align
-    :center
-    :justify
-    :center
-    :style
-    {:font-size "19px", :color :theme/editor-outer-rim-color}
-    :child
-    "Who in the world am I? Ah, that's the great puzzle..."],
+   {:cache? false,
+    :limit 24,
+    :group-by [:ts1],
+    :_last-run "09:26:24",
+    :refresh-every :param/refresh-timer,
+    :from
+    [[{:group-by [:ts1],
+       :from
+       [{:select
+         [:sql_cache_size
+          :thread_count
+          [:ts :ts1]
+          [[:substr :ts 0 16] :ts]
+          :queries_run
+          :sniffs_run
+          :internal_queries_run
+          :used_memory_mb
+          :ws_peers],
+         :from [[:jvm_stats :kke192]],
+         :order-by [[:ts1 :desc]]}],
+       :order-by [[:ts :asc]],
+       :select [[[[:avg :used_memory_mb]] :used_memory_mb] :ts1]}
+      :mm308]],
+    :order-by [[:ts1 :desc]],
+    :select
+    [[[:round [:avg :used_memory_mb]] :used_memory_mb]
+     [[:raw "to_char(ts1, 'DD-HH')"] :ts1]],
+    :post-process-fn
+    (fn [x]
+      (vec
+        (for
+          [idx
+           (range (count x))
+           :let
+           [rx
+            (vec (reverse x))
+            prev-row
+            (get rx (- idx 1) {:used_memory_mb 0})
+            row
+            (get rx idx {:used_memory_mb 0})
+            pre-mb
+            (get prev-row :used_memory_mb)
+            mb
+            (get row :used_memory_mb)
+            diff
+            (rvbbit-backend.util/rnd (- mb pre-mb) 0)
+            pos
+            (cond (> diff 0) "+" (< diff 0) "" :else "")]]
+          (merge
+            row
+            {:diff
+             (if (= idx 0)
+               (str (rvbbit-backend.util/rnd mb 0) " MB")
+               (str pos diff))}))))},
    :tt :solver/colors-of-the-moment>data-colors,
-   :selected-view [:views :vv2],
+   :selected-view [:queries :gen-viz-1002-clone-38],
    :theme-color4 :param/theme-tetrads>3,
    :_theme-color4 :solver/colors-of-the-moment>colors>1,
    :theme-tetrads [:tetrads :solver/colors-of-the-moment>brightest],
@@ -2387,4 +2421,4 @@
    :styler_highlight_8717ssa 0},
   :query-6018 {:attribute_name "is_sqlite?", :rowcnt 1618},
   :sys {:selected-tab "welcome to the party pal", :selected-tab-idx 0}},
- :selected-flow "my-new-flow4943"}
+ :selected-flow "my-new-flow773"}

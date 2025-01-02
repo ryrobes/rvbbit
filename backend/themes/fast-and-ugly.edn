@@ -2,7 +2,6 @@
  :codemirror-theme "rvbbit-dynamic"
  :editor-param-background-color "#0b1122"
  :pop-2 :solver/colors-of-the-moment>colors>2
- :base-block-style {}
  :vega-defaults {:view {:stroke "transparent"}
                  :axis {:domainColor "#ffffff22"
                         :grid        true

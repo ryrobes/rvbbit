@@ -44,6 +44,7 @@
   (d/close-kv ddb))
 
 (defonce shapes-map (atom {}))
+(defonce themes-map (atom {}))
 (defonce formula-map (atom {}))
 (defonce snippet-map (atom {}))
 (defonce stacks-map (atom {}))
@@ -82,7 +83,7 @@
 (defonce mem-usage (atom [])) ;; needs to be accessed from evaluator
 (defonce cpu-usage (atom [])) ;; needs to be accessed from evaluator
 
-(defonce shape-rotation-status (fpop/thaw-atom {} "./db/harvest-checkpoints.edn"))
+(defonce shape-rotation-status (fpop/thaw-atom {} "db/harvest-checkpoints.edn"))
 
 (defonce leaf-field-meta-map (atom {}))
 (defonce leaf-brute-force-map (atom {}))
@@ -1016,7 +1017,7 @@
 ;;     (swap! subscriptions update kkey disj callback-url)
 ;;     (ut/ppln [:unsubscribed kkey callback-url])))
 
-(def subscriptions (fpop/thaw-atom {} "defs/rest-subscriptions.edn"))
+(def subscriptions (fpop/thaw-atom {} "./defs/rest-subscriptions.edn"))
 
 (defn trigger-hooks [key new-value]
   (when-let [callbacks (get @subscriptions key)]

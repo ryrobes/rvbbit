@@ -1,6 +1,5 @@
 FROM eclipse-temurin:21-jre-jammy
 
-# Install additional packages
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -11,14 +10,19 @@ RUN apt-get update && apt-get install -y \
     imagemagick \
     nano \
     procps \
+    ca-certificates fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libcups2 \
+    libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 \
+    libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
+    libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release xdg-utils \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
+#    && npm install playwright \
+#    && npx playwright install chromium \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 #COPY docker-staging/* .
-# Copy all necessary files and delete unnecessary ones in a single RUN command
 COPY docker-staging/rvbbit.jar .
 COPY docker-staging/run-rabbit.sh .
 COPY docker-staging/defs ./defs
@@ -46,21 +50,21 @@ RUN mkdir ./db \
     # && mkdir ./assets/data-exports \
     && mkdir ./shell-root
 
-# # Specify the command to run your application
-# CMD ["java", "-jar", "rvbbit.jar"]
-
-# Create a startup script
-RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'echo "Running additional startup commands..."' >> /start.sh && \
-    echo 'cd extras/node-colorthief ; npm install ; ./test-me.sh ; node --version ; cd ../..' >> /start.sh && \
-    echo 'echo "Starting RVBBIT..."' >> /start.sh && \
+RUN echo '#!/bin/bash' > /start.sh && \
+#    echo 'trap "kill -TERM \$PID" TERM INT' >> /start.sh && \
+    echo 'cd extras/node-colorthief ; npm install ; ./test-me.sh ; cd ../..' >> /start.sh && \
+    echo 'cd extras/node-playwright ; npm install ; ./test-me.sh ; cd ../..' >> /start.sh && \
+#    echo 'echo "Starting RVBBIT..."' >> /start.sh && \
     echo 'chmod 777 ./run-rabbit.sh' >> /start.sh && \
-    #echo 'exec java -jar rvbbit.jar' >> /start.sh && \
-    echo 'exec ./run-rabbit.sh' >> /start.sh && \
+#    echo './run-rabbit.sh & PID=$!' >> /start.sh && \
+#    echo 'wait $PID' >> /start.sh && \
     chmod +x /start.sh
 
 RUN chown -R rabbit:rabbit /app
 USER rabbit
 
-# Use the startup script as the entry point
-ENTRYPOINT ["/start.sh"]
+RUN cd extras/node-colorthief ; npm install ; ./test-me.sh ; node --version ; cd ../..
+RUN cd extras/node-playwright ; npm install ; ./test-me.sh ; node --version ; cd ../..
+
+##ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "/start.sh && exec java -Xss1536k --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -jar rvbbit.jar"]

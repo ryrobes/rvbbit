@@ -11,10 +11,10 @@
 {:debug-level 1 ;; console output. somewhat deprecated. will be removed for an a-la-carte console print "type" system.
  :hide-sub-and-unsub-alerts? true ;; client side pop-up showing reactor sub actions (debug only, annoying)
  :show-query-times? false ;; client side pop-up alert showing SQL query times and query body (debug only, annoying)
- :console-viz-client-sparklines? true
+ :console-viz-client-sparklines? true ;; tracking memory usage of connected clients small chunky ANSI "sparklines"
  :console-viz-settings [[:cpu :mem :threads :users] [15] false nil]
  ;;                     ^ types of charts to render  ^ what time segments to show (seconds) ^ show big-title ^ console-width (nil tries to autosize)
- ;; charts availiable: - [:load :watchers :signal-reactions :mem :nrepl-calls :sql-queries :flows :leaf-evals :pool-tasks :msgs-cum :queued :tasks
+ ;; charts availiable: - [:load :watchers :signal-reactions :mem :nrepl-calls :sql-queries :flows :leaf-evals :pool-tasks :msgs-cum :queued :tasks :users
  ;;                       :threads :msgs :sql-exec :nrepl-intro-calls :clover-params :subs :pool-tasks-run :subs-client :websockets :solvers :workers
  ;;                       :queues :viz-recos :reactions :cpu :queue-tasks :non-heap-mem]
  ;; They will be AVERAGE by default, but can be SUM if you add a + on to the keyword. i.e. :subs+

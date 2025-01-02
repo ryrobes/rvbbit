@@ -295,9 +295,10 @@
   (let [a (get @managed-atoms file-path)]
     (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
 
-
+(defonce terminal-width (atom nil))
 (def terminal (TerminalFactory/get))
-(defn get-terminal-width [] (try (.getWidth terminal) (catch Throwable _ 85)))
+(defn get-terminal-width [] (or @terminal-width
+                                (try (.getWidth terminal) (catch Throwable _ 85))))
 
 ;; (defn get-terminal-width []
 ;;   (let [terminal (TerminalFactory/get)]

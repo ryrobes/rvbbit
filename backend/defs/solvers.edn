@@ -17,29 +17,35 @@
                                                    (map (fn [x] (.getName x))))]
                                   (println (count files))
                                   (vec (for [f files] {:filename (str f)})))}
+ :refresh-met-on-tour {:signal :signal/daily-at-9am
+                       :type   :clojure
+                       :cache? false
+                       :data   (do (ns rvbbit-backend.core
+                                     (:require [rvbbit-backend.websockets :as wss]
+                                               [rvbbit-backend.pool-party :as ppy]
+                                               [rvbbit-backend.sql :as sql]))
+                                   (let [conn (get (deref db/conn-map) "met-on-tour")]
+                                     (rota/shape-rotation-run "connections/met-on-tour.edn")))}
  :random-mp3
    {:signal :signal/changed-wallpaper?
     :type   :clojure
     :cache? false
-    :data   (do (ns mp3-finder.core
-                  (:require [clojure.java.io :as io]))
-                (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
-                (defn is-mp3?
-                  "Checks if the given file object is an MP3 file."
-                  [file]
-                  (.endsWith (.getName file) ".mp3"))
-                (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
-                (defn get-file-name "Gets the name of a file object." [file] (.getName file))
-                (defn find-random-mp3
-                  [start-dir]
-                  (let [mp3-files (->> (file-seq (io/file start-dir))
-                                       (filter is-file?)
-                                       (filter is-mp3?)
-                                       (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
-                                       (into []))]
-                    (if (seq mp3-files) (rand-nth mp3-files) nil)))
-                ;[:play-click-custom (find-random-mp3 "~/Music")]
-                [:play-click-custom (find-random-mp3 (str (System/getProperty "user.home") "/Music"))])}
+    :data   (do
+              (ns mp3-finder.core
+                (:require [clojure.java.io :as io]))
+              (defn is-file? "Checks if the given file object is a file (not a directory)." [file] (.isFile file))
+              (defn is-mp3? "Checks if the given file object is an MP3 file." [file] (.endsWith (.getName file) ".mp3"))
+              (defn get-absolute-path "Gets the absolute path of a file object." [file] (.getAbsolutePath file))
+              (defn get-file-name "Gets the name of a file object." [file] (.getName file))
+              (defn find-random-mp3
+                [start-dir]
+                (let [mp3-files (->> (file-seq (io/file start-dir))
+                                     (filter is-file?)
+                                     (filter is-mp3?)
+                                     (map (fn [file] [(get-absolute-path file) (get-file-name file)]))
+                                     (into []))]
+                  (if (seq mp3-files) (rand-nth mp3-files) nil)))
+              [:play-click-custom (find-random-mp3 (str (System/getProperty "user.home") "/Music"))])}
  :get-my-colors {:signal    false
                  :cache?    true
                  :type      :flow
@@ -65,6 +71,15 @@
                    :cache?    true
                    :input-map {:some-string "HEYa!" :some-number 123}
                    :data      (str :some-string (+ 123 :some-number))}
+ :refresh-superstore {:signal :signal/daily-at-9am
+                      :type   :clojure
+                      :cache? false
+                      :data   (do (ns rvbbit-backend.core
+                                    (:require [rvbbit-backend.websockets :as wss]
+                                              [rvbbit-backend.pool-party :as ppy]
+                                              [rvbbit-backend.sql :as sql]))
+                                  (let [conn (get (deref db/conn-map) "superstore")]
+                                    (rota/shape-rotation-run "connections/superstore.edn")))}
  :sql-solver-1
    {:signal :signal/every-5-minutes
     :type :sql
@@ -80,6 +95,15 @@
        :select          [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts]
        :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}}
  :static-data {:signal false :type :clojure :data [(apply + [1 2 3])]}
+ :refresh-boston-crime {:signal :signal/daily-at-9am
+                        :type   :clojure
+                        :cache? false
+                        :data   (do (ns rvbbit-backend.core
+                                      (:require [rvbbit-backend.websockets :as wss]
+                                                [rvbbit-backend.pool-party :as ppy]
+                                                [rvbbit-backend.sql :as sql]))
+                                    (let [conn (get (deref db/conn-map) "boston-crime")]
+                                      (rota/shape-rotation-run "connections/boston-crime.edn")))}
  :png-wallpaper? {:signal :signal/changed-wallpaper?
                   :type   :clojure
                   :cache? true
@@ -97,4 +121,13 @@
                        image-paths    (map (fn [x] (.getPath x)) image-files)
                        relative-paths (map (fn [x] (.substring x (count (.getPath dir)))) image-paths)]
                    (str relative-dir (when (seq relative-paths) (rand-nth relative-paths)))))}
+ :refresh-bigfoot-ufos {:signal :signal/daily-at-9am
+                        :type   :clojure
+                        :cache? false
+                        :data   (do (ns rvbbit-backend.core
+                                      (:require [rvbbit-backend.websockets :as wss]
+                                                [rvbbit-backend.pool-party :as ppy]
+                                                [rvbbit-backend.sql :as sql]))
+                                    (let [conn (get (deref db/conn-map) "bigfoot-ufos")]
+                                      (rota/shape-rotation-run "connections/bigfoot-ufos.edn")))}
  :dazzling-gnu-solver {:signal :signal/hourly? :type :clojure :cache? true :data (+ 1 2 3 90 (rand-int 124345))}}

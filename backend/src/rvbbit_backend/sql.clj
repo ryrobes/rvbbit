@@ -160,7 +160,7 @@
 ;; (def system-db
 ;;   {:datasource
 ;;    @(pool-create
-;;      {:jdbc-url "jdbc:h2:./db/system.h2?MVCC=TRUE&DATABASE_TO_UPPER=FALSE"
+;;      {:jdbc-url "jdbc:h2:db/system.h2?MVCC=TRUE&DATABASE_TO_UPPER=FALSE"
 ;;       :idle-timeout      600000
 ;;       ;:maximum-pool-size 5 ;20
 ;;       :max-lifetime      1800000}
@@ -190,7 +190,7 @@
 ;; (def system-db ;; duck test
 ;;   {:datasource
 ;;    @(pool-create
-;;      {:jdbc-url "jdbc:duckdb:./db/system.duck"
+;;      {:jdbc-url "jdbc:duckdb:db/system.duck"
 ;;       ;:driver-class-name "org.duckdb.DuckDBDriver"
 ;;       :idle-timeout      600000
 ;;       :maximum-pool-size 20
@@ -338,7 +338,7 @@
 ;; (def realms-db
 ;;   {:datasource
 ;;    @(pool-create
-;;      {:jdbc-url "jdbc:duckdb:./db/realms.duck"
+;;      {:jdbc-url "jdbc:duckdb:db/realms.duck"
 ;;       :idle-timeout      600000
 ;;       :maximum-pool-size 200
 ;;       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
@@ -348,7 +348,7 @@
 (def system-reporting-db
   {:datasource
    @(pool-create
-     {:jdbc-url "jdbc:duckdb:./db/system-reporting.duck"
+     {:jdbc-url "jdbc:duckdb:db/system-reporting.duck"
       :idle-timeout      600000
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
@@ -360,7 +360,7 @@
 (def cache-db
   {:datasource
    @(pool-create
-     {:jdbc-url "jdbc:duckdb:./db/cache.duck"
+     {:jdbc-url "jdbc:duckdb:db/cache.duck"
       :idle-timeout      600000
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
@@ -370,7 +370,7 @@
 (def stack-db
   {:datasource
    @(pool-create
-     {:jdbc-url "jdbc:duckdb:./db/stack.duck"
+     {:jdbc-url "jdbc:duckdb:db/stack.duck"
       :idle-timeout      600000
       :maximum-pool-size 200
       :connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")
@@ -380,7 +380,7 @@
 (def metrics-kpi-db
   {:datasource
    @(pool-create
-     {:jdbc-url "jdbc:duckdb:./db/metrics-kpi.duck"
+     {:jdbc-url "jdbc:duckdb:db/metrics-kpi.duck"
       :idle-timeout      600000
       :maximum-pool-size 200
       ;;:connection-init-sql (str "CREATE SCHEMA IF NOT EXISTS " default-schema "; USE " default-schema ";")

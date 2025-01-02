@@ -728,7 +728,7 @@
 
                    (swap! db/last-solvers-data-atom assoc-in [(last ui-keypath)] (get output :value))
                    (ext/write-transit-data output (last ui-keypath) client-name (cstr/replace id ":" ""))
-                   (when (cstr/includes? (str client-name) "skillful") (ut/pp [:repl-data-write! (last ui-keypath) client-name (cstr/replace id ":" "")]))
+                  ;;  (when (cstr/includes? (str client-name) "skillful") (ut/pp [:repl-data-write! (last ui-keypath) client-name (cstr/replace id ":" "")]))
 
                 ;;(when (cstr/includes? (str client-name) "snake") (ut/pp [:repl-eval-end client-name id ui-keypath output]))
 
