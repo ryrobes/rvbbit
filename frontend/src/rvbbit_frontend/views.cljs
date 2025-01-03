@@ -6989,7 +6989,7 @@
                                  "0px 10px 20px rgba(0,0,0,0.2)"
                                  "none")}])])]))
 
-(defn clear-state! []
+(defn clear-state! [] ;; has a copy in bricks - TODO
   (reset! db/drop-spawn-modal? false)
   (reset! bricks/dragging-body {})
   (reset! hover-state nil)

@@ -1067,7 +1067,7 @@
                                    end-time (System/nanoTime)
                                    duration-ms (/ (- end-time start-time) 1000000.0)]
                                (ppl [(str prefix "   ✓ Completed in") (format "%.2f" duration-ms) "ms"
-                                     ;(vec (keys (first result)))
+                                     (first result) ;;(vec (keys (first result)))
                                      [:fields-added (cset/difference (set (keys (first result))) @fields) (:params step)]])
                                (swap! step-vec conj (let [fields-added (vec (cset/difference (set (keys (first result))) @fields))
                                                           related-fields (if (str/starts-with? (str (get-in step [:params :formula])) "=")

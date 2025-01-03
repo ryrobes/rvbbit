@@ -94,6 +94,94 @@
 
 (defn deselect-keys [m ks] (apply dissoc m ks))
 
+(defn ansi-string? [s]
+  (and (string? s)
+       (.contains ^String s "\u001b[")))
+
+(defn generate-256-colors
+  "Generate map of ANSI codes (0-255) to their hex color values"
+  []
+  (let [;; Standard 16 colors (0-15)
+        basic-colors ["#000000" "#800000" "#008000" "#808000"
+                      "#000080" "#800080" "#008080" "#c0c0c0"
+                      "#808080" "#ff0000" "#00ff00" "#ffff00"
+                      "#0000ff" "#ff00ff" "#00ffff" "#ffffff"]
+
+        ;; 216 colors color-cube (16-231)
+        color-cube (for [r (range 0 6)
+                         g (range 0 6)
+                         b (range 0 6)
+                         :let [hex (format "#%02x%02x%02x"
+                                           (* r 51)  ; 51 = 255/5
+                                           (* g 51)
+                                           (* b 51))]]
+                     hex)
+
+        ;; Grayscale colors (232-255)
+        grayscale (for [i (range 24)]
+                    (let [v (+ 8 (* i 10))]  ; from 8 to 238
+                      (format "#%02x%02x%02x" v v v)))]
+
+    ;; Combine all colors into a map
+    (into {}
+          (map-indexed vector
+                       (concat basic-colors
+                               color-cube
+                               grayscale)))))
+
+(def ansi-colors
+  "Map of ANSI color codes to their hex values"
+  (generate-256-colors))
+
+(defn hex-to-rgb [hex]
+  (let [hex (cstr/replace hex #"^#" "")
+        r (Integer/parseInt (subs hex 0 2) 16)
+        g (Integer/parseInt (subs hex 2 4) 16)
+        b (Integer/parseInt (subs hex 4 6) 16)]
+    [r g b]))
+
+(defn rgb-distance [[r1 g1 b1] [r2 g2 b2]]
+  (Math/sqrt (+ (Math/pow (- r1 r2) 2)
+                (Math/pow (- g1 g2) 2)
+                (Math/pow (- b1 b2) 2))))
+
+(defn hex-to-ansi [hex]
+  (let [target-rgb (hex-to-rgb hex)
+        [code _] (apply min-key
+                        (fn [[_ hex-color]]
+                          (rgb-distance target-rgb (hex-to-rgb hex-color)))
+                        ansi-colors)]
+    code))
+
+(defn colorize
+  "Wrap text in ANSI color codes"
+  [text hex & {:keys [background? bright?]}]
+  (let [ansi-code (hex-to-ansi hex)
+        prefix (if background? "\u001b[48;5;" "\u001b[38;5;")]
+    (str prefix ansi-code "m"
+         (when bright? "\u001b[1m")
+         text
+         "\u001b[0m")))
+
+;; Optional: Debug function to visualize the palette
+(defn print-color-palette []
+  (doseq [[code hex] (sort-by first ansi-colors)]
+    (println (format "Color %3d: %s %s"
+                     code
+                     hex
+                     (colorize "Sample Text" hex)))))
+
+;; (println (print-color-palette))
+
+;; (println (colorize "Sample Text" "#fafafa"))
+
+(defn colorize
+  "Wrap text in ANSI color codes"
+  [text hex & {:keys [background?]}]
+  (let [ansi-code (hex-to-ansi hex)
+        prefix (if background? "\u001b[48;5;" "\u001b[38;5;")]
+    (str prefix ansi-code "m" text "\u001b[0m")))
+
 (def console-lock (Object.))
 
 (defn safe-println [x] (locking console-lock (println x)))
@@ -1914,7 +2002,7 @@
   ([prev m result] (reduce-kv (fn [res k v] (if (map? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
 
 
- (defn diff-keypaths
+(defn diff-keypaths
   [old-state new-state]
   (letfn [(diff-helper [prev old new result]
             (cond

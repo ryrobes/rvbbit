@@ -5651,6 +5651,21 @@
  (fn [db _]
    (get db :theme-debounce?)))
 
+(declare reco-modal-page)
+
+(defn clear-state! []
+  (reset! db/drop-spawn-modal? false)
+  (reset! dragging-body {})
+  ;(reset! rvbbit-frontend.views/hover-state nil)
+  (ut/pp [:fresh-spawns-modal-clear-state!])
+  (reset! db/dragged-kp [:canvas :canvas :canvas])  ;; atom watcher trigger
+  (ut/tracked-dispatch [::leaf-push [:canvas :canvas :canvas] {}])
+  (reset! reco-modal-page 0)
+  (reset! over-block? false)
+  (reset! db/drop-spawn-package {})
+  (reset! db/clover-leaf-previews nil)
+  (reset! db/fresh-spawn-modal? false))
+
 (def theme-animation (reagent/atom nil))
 
 (defn search-box-result-pill-screens [context-key ttype]
@@ -5719,10 +5734,13 @@
                              (ut/tracked-dispatch [::http/load file-path])
                              (reset! theme-animation context-key)
                              (reset! rabbit-search-hover nil)
+                             (clear-state!)
                              (js/setTimeout (fn [] (reset! theme-animation nil)) 3000))}
                {:on-click #(do
                              (ut/tracked-dispatch [::overwrite-theme theme-map table-name])
                              (reset! theme-animation context-key)
+                             (reset! rabbit-search-hover nil)
+                             (clear-state!)
                              (js/setTimeout (fn [] (reset! theme-animation nil)) 3000))}
                ))
       :style (merge
@@ -11717,6 +11735,8 @@
          stack-map (first (filterv #(= col-name (get % :result-field)) stack-meta))]
      stack-map)))
 
+(declare console-viewer)
+
 (defn magic-table
   [panel-key data-keypath & [ww hh hide-fields]]
   [reecatch (let [viewer-sourced? (try (and (cstr/starts-with? (first data-keypath) "::") (string? (first data-keypath)))
@@ -12189,7 +12209,8 @@
                                                :else equal-width-final)
                                          (some #(= % c) (keys custom-col-widths)) (get custom-col-widths c)
                                          :else                                          equal-width-final)
-                        dcolor (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in metadata [:fields c :data-type]))
+                        data-type (get-in metadata [:fields c :data-type])
+                        dcolor (get @(ut/tracked-subscribe [::conn/data-colors]) data-type)
                         custom-field-action? (contains? (set temp-fields-actions) c)
                    ;;; _ (tapp>> [:field-actions custom-field-action? temp-fields-actions c ])
                         row-num-fn (fn [row] (try (.indexOf @rowset row) (catch :default _ -1)))]
@@ -12199,7 +12220,7 @@
                                      f (get-in post-metadata [c :distinct])]
                                  (if f [true f] [false q]))
                      :upstream? (some #(= % c) child-cols)
-                     :data-type (get-in metadata [:fields c :data-type])
+                     :data-type data-type
                      :color (if custom-field-action?
                               "#FC0FC0"
                               dcolor)
@@ -12361,6 +12382,10 @@
                                [edn-box nil nil (str (get % c)) "13px" :no]
                            ;;[re-com/box :child (str (get % c))]
                                )])
+
+                          (= data-type "ansi-string")
+                          ;[re-com/box :child "fart"] ;; console-viewer [{:keys [text style width height]}]
+                          [console-viewer {:text (get % c) :style {:margin-top "-12px"} }]
 
                           (nil? (get % c)) [re-com/box :child "NULL" :attr
                                             {:on-context-menu (fn [_]

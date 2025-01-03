@@ -1042,7 +1042,9 @@
                                meta            (merge res-meta {:fields res-meta-fields})
                                new-map         (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)]
                            (swap! db/running-queries disj (last ui-keypath))
-                           (ut/pp ["🦃" :data-in (str ui-keypath) (str repl-output) (count new-map) :rows])
+                           (ut/pp ["🦃" :data-in (str ui-keypath)
+                                   ;result
+                                   (str repl-output) (count new-map) :rows])
                            (if (not (nil? map-order)) ;; indicates bigger problem, too risky
                              (if (and (not (nil? repl-output)) (ut/ne? repl-output))
                                (-> db

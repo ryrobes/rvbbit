@@ -5981,7 +5981,8 @@
         (and (string? v)
              (or (cstr/starts-with? (cstr/trim v) "[")
                  (cstr/starts-with? (cstr/trim v) "{"))
-             (try (edn/read-string v) (catch Exception _ false)))                    "rabbit-code"
+             (try (edn/read-string v) (catch Exception _ false)))                     "rabbit-code"
+        (and (string? v) (ut/ansi-string? v))                                         "ansi-string"
         (string? v)                                                                   "string"
         (integer? v)                                                                  "integer"
         (float? v)                                                                    "float"
@@ -9233,6 +9234,54 @@
      client-maps)
     (println "------------------------------------------------------------------------------------------------------------------------")
     (println)))
+
+;; (defn print-client-spark [client-name cwidth]
+;;   (let [client-name (if (string? client-name) (edn/read-string client-name) client-name)
+;;         colors (vec (vals ansi-colors))
+;;         clients-vec (filterv #(= (first %) client-name) @db/ack-scoreboard)
+;;         client-maps (sort-by (fn [[k _]] (count (get @client-metrics k))) clients-vec)
+;;         reset-code "\u001b[0m"]
+;;     (mapv
+;;      (fn [[cid _]]
+;;        (let [color-index (mod (hash cid) (count colors))
+;;              color (nth colors color-index)
+;;              ;;cc (fn [s] (str color (str s) reset-code))
+;;              mem-vec (mapv :mem-mb (get @client-metrics cid))
+;;              spark-vec (take-last cwidth mem-vec)]
+;;          (try (if (ut/ne? mem-vec)
+;;                 (println (str color (sparkline spark-vec) reset-code))
+;;                 (println (str color "(no data)" reset-code)))
+;;               (catch Exception _ (println (str color "(data error*)" reset-code))))))
+;;      client-maps)))
+
+(defn print-client-spark [client-name cwidth & [hex]]
+  (let [client-name (if (string? client-name) (edn/read-string client-name) client-name)
+        ;;colors [(ut/hex-to-ansi hex)] ;; (vec (vals ansi-colors))
+        colors (if hex [(ut/hex-to-ansi hex)] (vec (vals ansi-colors)))
+        clients-vec (filterv #(= (first %) client-name) @db/ack-scoreboard)
+        client-maps (sort-by (fn [[k _]] (count (get @client-metrics k))) clients-vec)
+        reset-code "\u001b[0m"
+        lines (mapv
+               (fn [[cid _]]
+                 (let [color-index (mod (hash cid) (count colors))
+                       color (nth colors color-index)
+                       mem-vec (mapv :mem-mb (get @client-metrics cid))
+                       spark-vec (take-last cwidth mem-vec)
+                       line (try
+                              (if (ut/ne? mem-vec)
+                                (str color (sparkline spark-vec) reset-code)
+                                (str color "(no data)" reset-code))
+                              (catch Exception _
+                                (str color "(data error*)" reset-code)))]
+                   ;; Remove the println since we want to return the string
+                   line))
+               client-maps)]
+    ;; Return the full string with ANSI codes preserved
+    (if (seq lines)
+      (first lines)
+      "")))
+
+;; (print-client-spark ":beneficial-lilac-mallard-31" 25)
 
 ;; (print-client-stats-vector)
 

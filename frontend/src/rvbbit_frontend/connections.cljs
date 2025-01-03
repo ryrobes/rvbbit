@@ -1360,7 +1360,11 @@
          honey-sql     (ut/postwalk-replacer {:*client-name client-name
                                               :*client-name* client-name
                                               :*client-name-str (str client-name)} orig-honey-sql)
-
+        ;;  honey-sql (if (get honey-sql :stacks)
+        ;;              (assoc honey-sql :stacks
+        ;;                     (vec (for [ss (get honey-sql :stacks)]
+        ;;                            (assoc ss :formula (str (logic-and-params (edn/read-string (get ss :formula)) nil))))))
+        ;;              honey-sql)
          ;;;;honey-sql     (assoc honey-sql :connection-id connection-id)
          literal-data? (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
          honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
@@ -1377,7 +1381,7 @@
        {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call)
                       :ui-keypath    keypath
                       :panel-key     panel-key
-                      :stack?    stack?
+                      :stack?        stack?
                       :kit-name      kit-name
                       :clover-sql    clover-sql
                       :honey-sql     honey-modded
@@ -1423,6 +1427,11 @@
            honey-sql  (ut/postwalk-replacer {:*client-name client-name
                                              :*client-name* client-name
                                              :*client-name-str (str client-name)} honey-sql)
+          ;;  honey-sql (if (get honey-sql :stacks)
+          ;;              (assoc honey-sql :stacks
+          ;;                     (vec (for [ss (get honey-sql :stacks)]
+          ;;                            (assoc ss :formula (str (logic-and-params (edn/read-string (get ss :formula)) nil))))))
+          ;;              honey-sql)
            connection-id (cond (get honey-sql :connection-id) (get honey-sql :connection-id)
                                (nil? connection-id)           "cache.db"
                                (= connection-id "system")     "system-db"
