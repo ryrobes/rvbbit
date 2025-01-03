@@ -3,8 +3,7 @@
  :basic-h-bar-nivo {:axes {:x [:and :dimension?
                                 ;;:reasonable-cardinality? ;;
                                [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
-                                ;[:or :is-string? :is-year? :is-month?]
-                                ;[:and [:not :is-date?] [:not :is-datetime?]]
+
                                ]
                            :y [:measure?]}
 
@@ -30,12 +29,10 @@
                       :axisLeft {:tickRotation 0
                                  :legendPosition "middle"
                                  :legendOffset -65
-                                    ;:legend ":sightings-sum"
                                  }
                       :axisBottom {:tickRotation 0
                                    :legendPosition "middle"
                                    :legendOffset 40
-                                      ;:legend ":season"
                                    }
                       :enableGridX false ;true
                       :enableGridY false ;true
@@ -80,12 +77,10 @@
                            :axisLeft {:tickRotation 0
                                       :legendPosition "middle"
                                       :legendOffset -65
-                                                             ;:legend ":sightings-sum"
                                       }
                            :axisBottom {:tickRotation 0
                                         :legendPosition "middle"
                                         :legendOffset 40
-                                                               ;:legend ":season"
                                         }
                            :enableGridX false ;true
                            :enableGridY false ;true
@@ -177,10 +172,6 @@
            :base-score 1}
 
  :scatterplot-nivo {:axes {:x [:and [:measure?] [:not :is-rowcount?]  ]
-                                 ;:color [:and :dimension?
-                                 ;        [:or :low-cardinality? :very-low-cardinality?]
-                                 ;        [:or :is-string? :is-year? :is-month?]
-                                 ;        [:and [:not :is-date?] [:not :is-datetime?]]]
                           :y [:and [:measure?] [:not :is-rowcount?]]}
 
                    :sql-maps [{:select [:y-field :x-field]  ;; aliasing as original name to lessen confusion?

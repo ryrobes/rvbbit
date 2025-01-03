@@ -2,7 +2,7 @@
   (:require
    [clojure.core.async   :as async]
    [clojure.data         :as data]
-   [clojure.edn          :as edn]
+   [fast-edn.core          :as edn]
    [clojure.java.io      :as io]
    [clojure.set          :as cset]
    [clojure.string       :as cstr]

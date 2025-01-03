@@ -4446,7 +4446,9 @@
 
         on-before-change-fn (fn [editor _ _] ;; data value]
                               (ut/tracked-dispatch [::highlight-panel-code])
-                              (swap! db/cm-instance-panel-code-box assoc [bid (last view-kp) editor?] editor))]
+                              (swap! db/cm-instance-panel-code-box assoc [bid (last view-kp) editor?] editor))
+
+        ]
     ;;(tapp>> [:ss (str @tt) ])
     ;;(tapp>> [:code repl? (cstr/starts-with? (cstr/trim (str value)) "(do") value])
     [re-com/box :size "none" :width (px (- width-int 24)) :height (px (- height-int 24))
@@ -4459,18 +4461,9 @@
              :font-weight      700} :child
      [(reagent/adapt-react-class cm/UnControlled)
       {:value          (ut/format-map code-width (str value)) ;; value will be pre filtered by caller
-       :onBeforeChange on-before-change-fn
        :onFocus        on-focus-fn
        :onBlur         on-blur-fn
-      ;;  :onInputRead    (fn [cm]
-      ;;                    (let [cursor       (.getCursor cm)
-      ;;                          token        (.getTokenAt cm cursor)
-      ;;                          token-string (.-string token)
-      ;;                          token-end    (= (.-ch cursor) (.-end token))]
-      ;;                      (when (or (= token-string ":")
-      ;;                                ;;(= token-string ">") ;; this didnt work
-      ;;                                (and token-end (can-be-autocompleted? token-string)))
-      ;;                        (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
+       :onBeforeChange (when (not @db/cm-focused?) on-before-change-fn)
       ;;  :onCursorActivity (fn [cm]
       ;;                      (let [cursor       (.getCursor cm)
       ;;                            line         (.-line cursor)
@@ -4478,31 +4471,12 @@
       ;;                            token        (.getTokenAt cm (clj->js {:line line :ch (dec ch)}))
       ;;                            token-string (.-string token)
       ;;                            token-end    (= ch (.-end token))]
-      ;;                        (when (or (= token-string ":")
-      ;;                                  (and token-end (can-be-autocompleted? token-string)))
+      ;;                        (when (and token-end
+      ;;                                   (cstr/starts-with? token-string ":")
+      ;;                                   (can-be-autocompleted? token-string))
       ;;                          (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
-       :onCursorActivity (fn [cm]
-                           (let [cursor       (.getCursor cm)
-                                 line         (.-line cursor)
-                                 ch           (.-ch cursor)
-                                 token        (.getTokenAt cm (clj->js {:line line :ch (dec ch)}))
-                                 token-string (.-string token)
-                                 token-end    (= ch (.-end token))]
-                             (when (and token-end
-                                        (cstr/starts-with? token-string ":")
-                                        (can-be-autocompleted? token-string))
-                               (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
-      ;;  :onCursorActivity    (fn [cm]
-      ;;                         (let [cursor       (.getCursor cm)
-      ;;                               token        (.getTokenAt cm cursor)
-      ;;                               token-string (.-string token)
-      ;;                               token-end    (= (.-ch cursor) (.-end token))]
-      ;;                           (when (or (= token-string ":")
-      ;;                                ;;(= token-string ">") ;; this didnt work
-      ;;                                     (and token-end (can-be-autocompleted? token-string)))
-      ;;                             (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
        :options        {:mode              "clojure" ;;(if sql-hint? "sql" "clojure")
-                        :hintOptions       {:hint custom-hint-simple-fn :completeSingle false}
+                        ;:hintOptions       {:hint custom-hint-simple-fn :completeSingle false}
                         :lineWrapping      true
                         :lineNumbers       true
                         :matchBrackets     true
@@ -8982,7 +8956,10 @@
 (re-frame/reg-sub ::stylers
                   (fn [db [_ panel-key query-key]]
                     (into {}
-                          (for [[[cols name] logic-map] (get-in db [:sql-source query-key :style-rules])]
+                          (for [[[cols name] logic-map]
+                                ;;(get-in db [:sql-source query-key :style-rules])
+                                (into {} (for [[k v] (get-in db [:sql-source query-key :style-rules])] {k (assoc v :style (resolver/logic-and-params (get v :style) nil))}))
+                                ]
                             {name (merge {:cols cols} logic-map)}))))
 
 (defn hex-to-rgb [hex]
@@ -19383,8 +19360,12 @@
          panel-data (get-in db [:panels panel-key])
          selected-view (or override-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}))
          runner @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
-         debug-ui? (and (not db/headless?) (get-in db [:server :settings :ui-debug?]))
-         render-pop? (and (not db/headless?) (get-in db [:server :settings :render-pop?]))
+         editing? (and ;; if a block is selected AND editor is open - stop auto-run...
+                   (true? (get db :editor?))
+                   (not (or (= (get db :selected-block) "none!")
+                            (nil? (get db :selected-block)))))
+         render-pop? (and (not db/headless?) (not editing?) (get-in db [:server :settings :render-pop?]))
+         debug-ui?   (and (not db/headless?) (not editing?) (get-in db [:server :settings :ui-debug?]))
          panel-data (if (not= runner :views)
                       (dissoc panel-data :root :h :w)
                       (dissoc panel-data :root))

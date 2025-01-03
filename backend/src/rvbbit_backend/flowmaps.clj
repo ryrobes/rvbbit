@@ -3,7 +3,7 @@
   (:require
     [chime.core              :as chime]
     [clojure.core.async      :as async]
-    [clojure.edn             :as edn]
+    [fast-edn.core             :as edn]
     [clojure.set             :as cset]
     [clojure.spec.alpha      :as s]
     [clojure.spec.test.alpha :as stest]

@@ -2,7 +2,7 @@
   (:require [clojure.string :as cstr]
             [clj-http.client :as client]
             [clojure.data.json :as json]
-            [clojure.edn :as edn]
+            [fast-edn.core :as edn]
             [rvbbit-backend.config   :as config]
             [rvbbit-backend.util :as ut]
             [clojure.walk :as walk]))

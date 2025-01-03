@@ -4704,10 +4704,173 @@
 
 (defn ifnil [x n] (if (nil? x) n x))
 
+
+
+
+
+(defonce path-edit-idx (reagent/atom nil))
+
+(defn path-menu []
+  (let [;tabs @(ut/tracked-subscribe [::bricks/tabs])
+        tabs @(ut/tracked-subscribe [::bricks/visible-tabs])
+        hidden-tabs @(ut/tracked-subscribe [::bricks/hidden-tabs])
+        selected-tab @(ut/tracked-subscribe [::bricks/selected-tab])
+        react-hack [@db/show-tabs? @path-edit-idx] ;; important
+        tab-row
+        (fn [top tabs & [hidden?]]
+          [re-com/h-box :attr
+           {:on-mouse-over  #(when (not @bricks/over-block?) (reset! bricks/over-block? true))
+            :on-mouse-leave #(do (reset! bricks/over-block? false))} :children
+           (reverse (conj
+            (vec
+             (conj
+              (when (or (not hidden?) (and hidden? @db/show-hidden-tabs?))
+                (for [t    tabs
+                      :let [selected? (= selected-tab t)
+                            tooltip (if selected?
+                                      (str "'" t "' (you are here)")
+                                      (str "Switch data-board tab to '" t "'"))
+                            tab-box [re-com/box :child
+                                     [re-com/box :child
+                                      (if (not @db/show-tabs?)
+                                        (str (try (.indexOf tabs t) (catch :default _ "e")))
+                                        (if (= @path-edit-idx t)
+                                          [re-com/h-box
+                                           :children [[re-com/input-text :model (str t) :on-change
+                                                       #(do (ut/tapp>> [:changed-tab-name (str t) :to (str %)])
+                                                            (when (and (ut/ne? (cstr/trim (str %))) (not (some (fn [x] (= x %)) tabs)))
+                                                              (ut/tracked-dispatch [::bricks/rename-tab (str t) (str %)])) ;; dont
+                                                            (reset! path-edit-idx nil)) :change-on-blur? true :width
+                                                       (px (+ 15 (* (count (str t)) 11))) ;"inherit" ;
+                                                       :style
+                                                       {:background-color "#00000000"
+                                                        :text-decoration  "underline"
+                                                        :border           "none"
+                                                        :padding-left     "0px"
+                                                        :color            (theme-pull :theme/editor-outer-rim-color nil)}]
+                                                      [re-com/md-icon-button :src (at) :md-icon-name "zmdi-delete"
+                                                       :tooltip
+                                                       "delete this tab"
+                                                       :style
+                                                       {:color       (theme-pull :theme/editor-outer-rim-color nil)
+                                                        :font-size   "14px"
+                                                        :padding-top "5px"
+                                                        :width       "10px"
+                                                        :height      "20px"} :attr
+                                                       {:on-click #(ut/tracked-dispatch [::bricks/delete-tab (str t)])}]]]
+                                          (str t)))
+                                      :size "none"
+                                      :align :center
+                                      :justify (when (not @db/show-tabs?) :center)
+                                      :padding "5px" :width (when (not @db/show-tabs?) "5px")
+                                      :style {:transition_NOT "all 0.2s ease-in-out" :backdrop-filter "blur(8px)"}]
+                                     :attr (merge (when (not (= @path-edit-idx t))
+                                                    {:on-click #(do (ut/tracked-dispatch [::bricks/select-tab (str t)])
+                                                                    (reset! path-edit-idx nil))
+                                                     :on-mouse-enter (fn []
+                                                                       (reset! db/bar-hover-text tooltip))
+                                                     :on-mouse-over (fn []
+                                                                      (when (not= @db/bar-hover-text tooltip)
+                                                                        (reset! db/bar-hover-text tooltip)))
+                                                     :on-mouse-leave (fn []
+                                                                       (reset! db/bar-hover-text nil))})
+                                                  (if selected? {:on-double-click #(reset! path-edit-idx (str t))} {})
+                                                  {:on-context-menu #(ut/tracked-dispatch [::bricks/toggle-tab-visibility
+                                                                                           (str t)])})
+                                     :style {:cursor           "pointer"
+                                             :background-color (theme-pull :theme/base-block-color-selected nil)
+                                             :color            (theme-pull :theme/editor-outer-rim-color nil)
+                                             :opacity          (if selected? 1.0 0.4)
+                                             :backdrop-filter  "blur(8px)"
+                                             :padding-left     "5px"
+                                             :padding-right    "5px"
+                                             :height           "30px"
+                                             :border           (when (not hidden?)
+                                                                 (if (= @path-edit-idx t)
+                                                                   (str "3px dashed "
+                                                                        (theme-pull :theme/block-tab-selected-font-color nil))
+                                                                   (str "1px solid "
+                                                                        (theme-pull :theme/block-tab-selected-font-color nil))))}]]]
+                  ;; (if (not selected?)
+                  ;;   [bricks/draggable (fn [] (let [[_ _ w h] @(ut/tracked-sub ::bricks/tab-recenter-alpha {:tab t})]
+                  ;;                              {:w w
+                  ;;                               :selected-view :vv
+                  ;;                               :name (str t)
+                  ;;                               :h h
+                  ;;                               :drag-meta {:type :tab-grid}
+                  ;;                               :ghosted? false
+                  ;;                               :views {:vv [:grid t]}}))
+                  ;;    "meta-menu"
+                  ;;    tab-box]
+                  ;;   tab-box)
+                  tab-box
+                  ))
+
+              ;; (if hidden?
+              ;;   [re-com/md-icon-button :src (at) :md-icon-name (if @db/show-hidden-tabs? "zmdi-tab" "zmdi-tab-unselected")
+              ;;    :style
+              ;;    {:background-color "#00000099" ;(theme-pull
+              ;;     :color            (theme-pull :theme/editor-outer-rim-color nil)
+              ;;     :backdrop-filter  "blur(2px)"
+              ;;     :border-radius    (when (not @db/show-hidden-tabs?) "0px 0px 8px 0px")
+              ;;     :padding-left     "4px"
+              ;;     :margin-left      "-3px"
+              ;;     :font-size        "20px"
+              ;;     :padding-top      "3px"
+              ;;     :width            "30px"
+              ;;     :height           "30px"} :attr {:on-click #(reset! db/show-hidden-tabs? (not @db/show-hidden-tabs?))}]
+              ;;   [re-com/md-icon-button :src (at) :md-icon-name (if @db/show-tabs? "zmdi-chevron-left" "zmdi-chevron-right")
+              ;;    :style
+              ;;    {:background-color (theme-pull :theme/base-block-color-selected nil)
+              ;;     :color            (theme-pull :theme/editor-outer-rim-color nil)
+              ;;     :padding-left     "4px"
+              ;;     :margin-left      "-3px"
+              ;;     :font-size        "20px"
+              ;;     :padding-top      "3px"
+              ;;     :width            "30px"
+              ;;     :height           "30px"} :attr {:on-click #(reset! db/show-tabs? (not @db/show-tabs?))}])
+
+                  ))
+            (when (and @db/show-tabs? (not hidden?)) ;; ri-flow-chart
+              (let [tooltip "Add new data-board tab"]
+                [re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus"
+                 :style
+                 {:color        (theme-pull :theme/editor-outer-rim-color nil)
+                  :padding-left "4px"
+                  :margin-left  "-3px"
+                  :font-size    "20px"
+                  :padding-top  "3px"
+                  :width        "30px"
+                  :height       "30px"}
+                 :attr
+                 {:on-click #(let [new-tab (ut/make-tab-name)]
+                               (ut/tracked-dispatch [::bricks/add-tab new-tab])
+                               (ut/tracked-dispatch [::bricks/select-tab new-tab]))
+                  :on-mouse-enter (fn []
+                                    (reset! db/bar-hover-text tooltip))
+                  :on-mouse-over (fn []
+                                   (when (not= @db/bar-hover-text tooltip)
+                                     (reset! db/bar-hover-text tooltip)))
+                  :on-mouse-leave (fn []
+                                    (reset! db/bar-hover-text nil))}])))) :height "30px" :style
+           {:position        "fixed"
+            :top             top
+            :right            0
+            :z-index         999
+            :backdrop-filter "blur(8px)"
+              ;:pointer-events "none"
+            :user-select     "none"
+            :transition_NOT  "all 0.2s ease-in-out"
+            :transform-style "preserve-3d"}])]
+    [re-com/v-box :children [[tab-row 0 tabs] (when (ut/not-empty? hidden-tabs) [tab-row 30 hidden-tabs true])]]))
+
+
+
+
+
 (defonce title-edit-idx (reagent/atom nil))
 
-(defn tab-menu
-  []
+(defn tab-menu []
   (let [;tabs @(ut/tracked-subscribe [::bricks/tabs])
         tabs @(ut/tracked-subscribe [::bricks/visible-tabs])
         hidden-tabs @(ut/tracked-subscribe [::bricks/hidden-tabs])
@@ -4724,6 +4887,10 @@
                    (when (or (not hidden?) (and hidden? @db/show-hidden-tabs?))
                      (for [t    tabs
                            :let [selected? (= selected-tab t)
+                                 tooltip (if selected?
+                                           (str "'" t "' (you are here)")
+                                           (str "Switch data-board tab to '" t "'"))
+                                 is-path-board? (cstr/includes? (str t) "deer")
                                  tab-box [re-com/box :child
                                           [re-com/box :child
                                            (if (not @db/show-tabs?)
@@ -4742,15 +4909,31 @@
                                                              :border           "none"
                                                              :padding-left     "0px"
                                                              :color            (theme-pull :theme/editor-outer-rim-color nil)}]
-                                                           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-delete" :tooltip
-                                                            "delete this tab" :style
+                                                           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-delete"
+                                                            :tooltip
+                                                            "delete this tab"
+                                                            :style
                                                             {:color       (theme-pull :theme/editor-outer-rim-color nil)
                                                              :font-size   "14px"
                                                              :padding-top "5px"
                                                              :width       "10px"
                                                              :height      "20px"} :attr
                                                             {:on-click #(ut/tracked-dispatch [::bricks/delete-tab (str t)])}]]]
-                                               (str t)))
+                                               (if is-path-board?
+                                                 [re-com/h-box
+                                                  :align :center :gap "6px"
+                                                  :children [[re-com/box :child (str t)]
+                                                                          [re-com/md-icon-button :src (at)
+                                                                           :md-icon-name "ri-flow-chart"
+                                                                           :style
+                                                                           {:color       (theme-pull :theme/editor-outer-rim-color nil)
+                                                                            :font-size   "16px"
+                                                                            ;:padding-top "1px"
+                                                                            ;:width       "10px"
+                                                                            ;:height      "20px"
+                                                                            }]]]
+                                                 [re-com/box :child (str t)])
+                                               ))
                                            :size "none"
                                            :align :center
                                            :justify (when (not @db/show-tabs?) :center)
@@ -4758,7 +4941,14 @@
                                            :style {:transition_NOT "all 0.2s ease-in-out" :backdrop-filter "blur(8px)"}]
                                           :attr (merge (when (not (= @title-edit-idx t))
                                                          {:on-click #(do (ut/tracked-dispatch [::bricks/select-tab (str t)])
-                                                                         (reset! title-edit-idx nil))})
+                                                                         (reset! title-edit-idx nil))
+                                                          :on-mouse-enter (fn []
+                                                                            (reset! db/bar-hover-text tooltip))
+                                                          :on-mouse-over (fn []
+                                                                           (when (not= @db/bar-hover-text tooltip)
+                                                                             (reset! db/bar-hover-text tooltip)))
+                                                          :on-mouse-leave (fn []
+                                                                            (reset! db/bar-hover-text nil))})
                                                        (if selected? {:on-double-click #(reset! title-edit-idx (str t))} {})
                                                        {:on-context-menu #(ut/tracked-dispatch [::bricks/toggle-tab-visibility
                                                                                                 (str t)])})
@@ -4812,17 +5002,27 @@
                        :width            "30px"
                        :height           "30px"} :attr {:on-click #(reset! db/show-tabs? (not @db/show-tabs?))}])))
                (when (and @db/show-tabs? (not hidden?))
-                 [re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus" :tooltip "add new tab" :style
-                  {:color        (theme-pull :theme/editor-outer-rim-color nil)
-                   :padding-left "4px"
-                   :margin-left  "-3px"
-                   :font-size    "20px"
-                   :padding-top  "3px"
-                   :width        "30px"
-                   :height       "30px"} :attr
-                  {:on-click #(let [new-tab (ut/make-tab-name)]
-                                (ut/tracked-dispatch [::bricks/add-tab new-tab])
-                                (ut/tracked-dispatch [::bricks/select-tab new-tab]))}])) :height "30px" :style
+                 (let [tooltip "Add new data-board tab"]
+                   [re-com/md-icon-button :src (at) :md-icon-name "zmdi-plus"
+                    :style
+                    {:color        (theme-pull :theme/editor-outer-rim-color nil)
+                     :padding-left "4px"
+                     :margin-left  "-3px"
+                     :font-size    "20px"
+                     :padding-top  "3px"
+                     :width        "30px"
+                     :height       "30px"}
+                    :attr
+                    {:on-click #(let [new-tab (ut/make-tab-name)]
+                                  (ut/tracked-dispatch [::bricks/add-tab new-tab])
+                                  (ut/tracked-dispatch [::bricks/select-tab new-tab]))
+                     :on-mouse-enter (fn []
+                                       (reset! db/bar-hover-text tooltip))
+                     :on-mouse-over (fn []
+                                      (when (not= @db/bar-hover-text tooltip)
+                                        (reset! db/bar-hover-text tooltip)))
+                     :on-mouse-leave (fn []
+                                       (reset! db/bar-hover-text nil))}]))) :height "30px" :style
              {:position        "fixed"
               :top             top
               :left            0
@@ -8126,6 +8326,8 @@
                                                          (when (get custom-map :background-size) ", ")
                                                          (get custom-map :background-size))})))
                :children [(when mouse-active? [bricks/reecatch [tab-menu]])
+
+                          ;; (when mouse-active? [bricks/reecatch [path-menu]])
 
                           (when (and ;(not @bricks/dragging?)
                                  (or @db/drop-spawn-modal?

@@ -1,6 +1,6 @@
 (ns rvbbit-backend.embeddings
   (:require
-    [clojure.edn             :as edn]
+    [fast-edn.core             :as edn]
     [clojure.java.io         :as io]
    ; [rvbbit-backend.config   :as config]
     [rvbbit-backend.freezepop   :as fpop]

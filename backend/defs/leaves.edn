@@ -65,7 +65,7 @@
   :repl-add-types* (fn [{:keys [drag-field drag-meta parent-metadata]}] ;; data-ref.data-trigger.render-trigger
                      (let [ttype (get drag-meta :type)
                            dtype (get drag-meta :data-type)
-                           ;_ (pp [:drag-meta drag-meta])
+
                            ]
                        (cond (and (contains? #{"float" "string"} dtype) (= ttype :field)) [:data-ref :data-ref+sum]
                              ;(or (= ttype ":param") (= ttype ":where")) [:data-ref]
@@ -249,8 +249,7 @@
                                             :drag-field/facet-cardinality?
                                             :is-vega-lite?
                                             :drag-from-same-connection?
-                          ;:parent-has-field?
-                          ;[:not :is-self?]
+
                                             ]
 
   :pivot/add-as.column.row [:and
@@ -355,12 +354,13 @@
   :fresh/fresh-repl     [:fresh-drop?]
   :fresh/fresh-api-call [:fresh-drop?]
   :fresh/fresh-shell    [:fresh-drop?]
-  :fresh/fresh-raw-sql  [:fresh-drop?]
+
   ;:fresh/fresh-ask-calliope  [:fresh-drop?]
 
   ;:action/drop-down [:and :drag-field/dimension? :drag-field/medium-cardinality?]
   ;:action/fresh-clover2 [:fresh?]
   ;:action/do-param-thing! [:<> :drag-param/field nil]
+  :fresh/fresh-raw-sql  [:fresh-drop?]
   }
 
 ;;  :fields ;; runs on all visible dataset fields. these will be accessable during a drag event via :drag-field-* - RUN LEVEL
@@ -420,7 +420,7 @@
         ;;:new-agg.sum.avg.min.max.count  {:color "#ffd3b6" :label ["SQL Aggregate" :*arg]}
         :new-agg.sql-agg-types  {:color "#ffd3b6" :label ["SQL Aggregate" :*arg]}
         :add-agg.sql-agg-types  {:color "#ffd3b6" :label ["Add SQL Agg" :*arg]}
-        ;:new-agg.min  {:color "#dddddd" :label ["SQL Aggregate" "MINNY"]} ;; if overriding a dynamic label, put it AFTER the dynamic def
+
 } ;; drop only, so not needed
   :fresh {:fresh-clover {:label ["Clover Block (View)" "(hiccup, re-com, viz)"] :icon "images/clover2.svg"} ;; "images/rabbit-console.png"} "🍀"
           :fresh-repl {:label ["REPL Block" "(clojure)"] :icon "images/clojure-alt.svg"}
@@ -437,17 +437,17 @@
                                                     :tooltip ["Add a connected scrubber slider for XTDB Bi-Temporal field" :*arg]
                                                     :label [["Temporal Scrubber"]
                                                             [:*arg "ri-timeline-view"]
-                                                            ;;"more stuff"
+
                                                             ]
-                                                    ;:clover [:box :child [:str "stuff! " :*arg] :style {:color "red"}]
+
                                                     }
               :temporal-ops2.SYSTEM_TIME.VALID_TIME {;:color "#ffffff"
                                                      :tooltip ["Add a calendar filter for XTDB Bi-Temporal field" :*arg]
                                                      :label [["Temporal Calendar"]
                                                              [:*arg "ri-calendar-2-line"]
-                                                                          ;;"more stuff"
+
                                                              ]
-                                                                  ;:clover [:box :child [:str "stuff! " :*arg] :style {:color "red"}]
+
                                                      }}
   :action {:param-where.=.<>.>.<  {:color "#f7f77f"
                                    :label ["Param Filter" :*arg]}
@@ -620,7 +620,7 @@
                                       :height :panel-height+50-px
                                       :align :center :justify :center
                                       :style {:color "red" :font-size "36px"
-                                              ;:border "1px solid green"
+
                                               }
                                       :child [:speak (str "hold yer horses" (rand-int 12))]]
                                :runner :views
@@ -854,8 +854,7 @@
                                                        (get target-query :order-by [])))
                                  target-query (-> target-query (assoc :select select) (assoc :order-by order-by))
                                  target-query (if (empty? order-by) (dissoc target-query :order-by) target-query)
-                                 ;target-deep-keypath-sel (conj target-kp :select)
-                                 ;target-deep-keypath-ob (conj target-kp :order-by)
+
                                  ]
                              {target-kp target-query}))
 
@@ -1024,7 +1023,7 @@
                                                 :from     [[parent-table table-alias]]
                                                 :group-by [target]
                                                 :order-by [[:rowcnt :desc]]
-                                                ;:order-by [[target :asc]]
+
                                                 }}}))}
   :cell {
          :new-view (fn [{:keys [drag-meta]}]
@@ -1073,7 +1072,7 @@
                                                           [[[:count 1] :rowcnt]])
                                                 :where [:= param-field param-full]
                                                 :from [[source-table table-alias]]}]
-                                                                       ;; (pp [:drag-meta ?connection-id source-query sopurce-table table-fields])
+
                                      {:h (if all? 6 4)
                                       :w (if all? (max 32 (+ 2 (Math/ceil (* (count table-fields) 1.2)))) 6)
                                       :connection-id connection-id
@@ -1150,9 +1149,7 @@ client_stats c1) rawsub")]]]]}}})
                                            :style {:font-size "22px"}
                                            :child "howdy"]}})
 
-           ;:everyone (fn [context-map] [:context-map! context-map])
-           ;:everyone2 (fn [{:keys [drag-block target-block]}] [:box :child "hi"])
-           ;:drop-down (fn [{:keys [drag-block target-block]}] [:box :child "hi"])
+
            }}
 
 }

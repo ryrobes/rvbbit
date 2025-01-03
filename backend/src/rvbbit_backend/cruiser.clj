@@ -3,7 +3,7 @@
    ;[rvbbit-backend.xtdb-init :as xtdb-init]
    [clojure.java.jdbc         :as jdbc]
    [clojure.core.async        :as async]
-   [clojure.edn               :as edn]
+   [fast-edn.core               :as edn]
    [hikari-cp.core            :as hik]
    [rvbbit-backend.embeddings :as em]
    [taskpool.taskpool         :as tp]

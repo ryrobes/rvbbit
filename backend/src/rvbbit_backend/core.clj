@@ -9,7 +9,7 @@
    [clojure.core.async :as    async :refer [<! <!! >! >!! chan go]]
    [clojure.core.async :refer [<! timeout]]
    [clojure.data :as data]
-   [clojure.edn :as edn]
+   [fast-edn.core :as edn]
    [clojure.java.io :as io]
    [clojure.java.jdbc :as jdbc]
    [clojure.java.shell :as shell]
@@ -1307,6 +1307,9 @@
     ;;                     ;;  :xtdb.flight-sql/server {:host "0.0.0.0", :port 9832}}
     ;;                     ))
     ;; (ut/pp ["XTDB node started successfully" (xt/status xtdb-node)])
+
+    ;; (ut/pp [:EDN? (->> "[:foo \"bar\" 123 ;comment\n  ]\n"
+    ;;      edn/read-string)])
 
     (println " ")
     (ut/print-ansi-art "data/nname.ans")

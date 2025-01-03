@@ -7,8 +7,9 @@
                        [lein-eftest "0.6.0"]
                        [lein-ancient "0.6.15"]]
   :dependencies       [;[org.clojure/clojure "1.10.3"]
-                       [org.clojure/clojure "1.11.4"]
-                       ;[org.clojure/clojure "1.12.0"]
+                       ;[org.clojure/clojure "1.11.4"]
+                       [io.github.tonsky/fast-edn "1.1.1"]
+                       [org.clojure/clojure "1.12.0"]
                        ;;[org.clojure/core.async "1.6.673"]
                        [org.clojure/core.async "1.6.681"]
                        ;;[com.github.seancorfield/honeysql "2.2.868"]
@@ -68,8 +69,10 @@
                        ;[org.slf4j/slf4j-nop "1.7.32"]
                        [org.slf4j/slf4j-nop "2.0.16"]
                        [com.github.vertical-blank/sql-formatter "1.0.3"]
-                       [org.clojars.rutledgepaulv/websocket-layer "0.1.11"]
-                       ;[com.ryrobes/websocket-layer "0.1.12-SNAPSHOT"]
+
+                       ;[org.clojars.rutledgepaulv/websocket-layer "0.1.11"]
+                       [com.ryrobes/websocket-layer "0.1.12-SNAPSHOT"] ;; using fast-edn and standard named thread pools
+
                        ;; [com.fasterxml.jackson.core/jackson-core "2.14.0-rc1"]
                        [com.fasterxml.jackson.core/jackson-core "2.17.2"]
                        [io.pedestal/pedestal.service "0.6.4"]

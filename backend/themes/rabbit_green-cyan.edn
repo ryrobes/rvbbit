@@ -1,4 +1,4 @@
-{:theme-name "rabbit_cyber-cyan",
+{:theme-name "rabbit_green-cyan",
  :generated-from "assets/openai-images/upscaled/b64-image3-55134-56594-4k.webp",
  :codemirror-theme "rvbbit-dynamic",
  :editor-param-background-color "#000000",
@@ -7,8 +7,9 @@
  {:text-shadow "4px 4px 4px #00000088",
   :border-radius [:sticky-border-radius "12px"],
   :filter "brightness(120%)",
+  :_border "none",
   :background-blend-mode "screen",
-  :backdrop-filter "blur(4px)"},
+  :backdrop-filter "brightness(35%) blur(4px)"},
  :vega-defaults
  {:mark {:font "Lato", :stroke "#09565e", :color "#09565e65"},
   :legend
@@ -148,7 +149,7 @@
  :grid-font-color "#ffffff",
  :canvas-background-css
  {:background-image
-  "linear-gradient(#0c414a70,#0c414a12),url(images/gray-brick.png)",
+  "linear-gradient(#0c414a70,#0c414a12),url(assets/backgrounds/Green_icons.jpg)",
   :transition "all 0.6s ease-in-out",
   :background-blend-mode "normal",
   :background-color "#424f57"},

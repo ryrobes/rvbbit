@@ -2,7 +2,7 @@
   (:require
    [clojure.java.jdbc         :as jdbc]
    [clojure.core.async        :as async]
-   [clojure.edn               :as edn]
+   [fast-edn.core               :as edn]
    [clojure.set               :as cset]
    [hikari-cp.core            :as hik]
    [honey.sql                 :as honey]

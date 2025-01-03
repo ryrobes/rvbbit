@@ -1,547 +1,89 @@
 {:reco-preview nil,
- :doom-modal? false,
  :annotate? false,
+ :wss-config ["ws" 3030],
  :default-col-widths
- {:block-11815 {:agg-grouped-all-offenses-1 261},
-  :block-5869 {:all-offense-codes-1 130},
-  :block-7671 {:agg-grouped-all-offenses-3-1 261},
-  :block-695 {:countd-all-ufo-sightings 261},
-  :block-469 {:grouped-all-superstore-1 130},
-  :block-3452 {:grouped-all-offenses-1 130},
-  :block-2175 {:new-clojure-1-sqlized 261},
-  :block-10943 {:grouped-all-offenses-2 130},
-  :block-3412 {:all-superstore 100},
-  :block-9638 {:grouped-agg-grouped-all-offenses 130},
-  :block-263 {:query1-2 130},
-  :block-8681 {:agg-grouped-all-superstore-1 261},
-  :block-3108 {:client-memory-drag-36 132},
-  :block-10824 {:game-daily-player-summary-drag-30 ##Inf},
-  :block-1226-window {:network-analysis-sqlized 711},
-  :searches-sub-types-sys-list* {:searches-sub-types-sys ##Inf},
-  :block-5159 {:reporting-market-drag-41 361},
-  :block-10889 {:all-offenses 100},
-  :block-11124 {:all-superstore-1 100},
-  :block-5145 {:agg-all-offenses 261},
-  :block-9970 {:all-offense-codes 130},
-  :block-8880 {:agg-new-api-call-sqlized 261},
-  :block-10470 {:grouped-all-superstore-2 130},
-  :block-6855 {:agg-all-superstore 261},
-  :block-834 {:grouped-all-offenses-4 130},
-  :block-4032 {:grouped-all-superstore-3 130},
-  :block-7831 {:query1 130},
-  :block-2990 {:grouped-grouped-all-offenses-3 130},
-  :block-5158 {:agg-grouped-all-superstore-1-1 261},
-  :block-10207 {:new-api-call-sqlized 100},
-  :block-1892 {:agg-grouped-all-superstore-1-1 261},
-  :block-1226 {:network-analysis-sqlized 711},
-  :block-1881 {:agg-all-offenses-2 261},
-  :block-7866 {:agg-grouped-all-offenses-3 261},
-  :system-connections-list* {:connections-sys 126},
-  :block-11913 {:all-ufo-sightings 120, :grouped-all-superstore-4 130},
-  :realms-list* {:realms-sys 126},
-  :block-8727 {:agg-grouped-all-offenses-4 261},
-  :block-8619 {:agg-grouped-all-offenses 130},
-  :system-fields-list* {:fields-sys 127},
-  :block-11288 {:grouped-all-superstore 130},
-  :block-9644 {:rowcnt-drag-14 161},
-  :block-7953 {:offenses-drag-2 100},
-  :block-1667 {:agg-all-offenses-1 261},
-  :block-9915 {:grouped-all-superstore-1-1 130},
-  :realm-blocks-list* {:realm-blocks-sys ##Inf},
-  :block-8193 {:agg-grouped-all-superstore-1 261},
+ {:block-3108 {:client-memory-drag-36 132},
   :block-2618 {:client-stats-drag-36 114},
-  :block-10902 {:grouped-all-offense-codes 130},
-  :block-7724 {:countd-all-superstore-1 161},
-  :block-5189 {:countd-all-ufo-sightings-1 261},
-  :block-6676 {:grouped-all-superstore-1 155},
-  :block-806 {:agg-all-superstore-1-1 261},
-  :files-list* {:files-sys ##Inf},
-  :block-7035 {:all-game-daily-player-summary-1k-1 108},
-  :block-10955 {:agg-all-superstore 361},
-  :realms-typev-list* {:realms-type-sys ##Inf},
-  :block-10297 {:grouped-grouped-all-offenses-5 130},
-  :block-10081 {:grouped-all-superstore 130},
-  :block-702 {:agg-grouped-all-offense-codes 261},
-  :block-1902 {:all-game-daily-player-summary-1k 100},
-  :block-1400 {:query1-1 130},
-  :blocks-list* {:blocks-sys ##Inf},
-  :block-7349 {:cnt-all-superstore 261},
-  :block-6951 {:agg-all-superstore-1 261},
-  :block-7312 {:agg-grouped-all-superstore 261},
-  :block-305 {:combos-drag-30 1461},
-  :system-tables-list* {:tables-sys 100},
-  :block-9004 {:agg-grouped-all-superstore-1-2 261},
-  :searches-types-list* {:searches-types-sys ##Inf},
-  :block-10898 {:screen-type-drag-1 361},
-  :block-3255 {:grouped-all-offenses-5 130},
-  :block-10826 {:grouped-all-offenses 130},
-  :searches-rows-sys-list* {:searches-rows-sys ##Inf},
-  :block-4941 {:new-query-1 253},
-  :block-3695 {:cnt-offense-codes 261},
-  :block-10941 {:grouped-all-offenses-3 130},
-  :block-703 {:all-superstore 100}},
+  :system-connections-list* {:connections-sys 261},
+  :system-tables-list* {:tables-sys ##Inf},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :tabs ["client stats" "terminal stats"],
+ :tabs ["client stats" "server terminal stats"],
  :selected-cols nil,
  :server nil,
  :runstreams {},
- :editor? false,
  :buffy? false,
- :memory [2748120235 2633997599 4294705152],
+ :memory [782945232 711022760 4294705152],
  :sched
- {:client-memory-drag-36 748,
-  :gen-viz-516 748,
-  :client-stats-drag-36 757,
-  :new-query 757},
- :client-name :meaningful-rectangular-rhinoceros-27,
+ {:client-memory-drag-36 1342,
+  :gen-viz-516 1342,
+  :client-stats-drag-36 1350,
+  :new-query 1350},
+ :client-name :great-icosahedral-whale-43,
  :server-panels
- [:block-64
-  :block-11815
-  :block-66
-  :block-5869
-  :block-7671
-  :block-67
-  :block-695
-  :block-7838
-  :block-469
-  :block-684
+ [:block-7838
   :block-8670
   :block-7377
   :block-8000
   :block-6441
-  :block-61
-  :block-3452
-  :block-2175
-  :block-10943
-  :block-3412
-  :block-9638
-  :block-5136
-  :block-263
-  :block-8681
   :block-7453
   :block-3108
-  :block-10824
-  :block-62
-  :block-10889
-  :block-11124
-  :block-5145
-  :block-9970
-  :block-8880
-  :block-10470
   :block-2505
-  :block-6855
-  :block-834
   :block-5659
-  :block-4032
-  :block-7831
-  :block-488
-  :block-4928
-  :block-2990
-  :block-5158
-  :block-10207
-  :block-689
   :block-9994
-  :block-8676
-  :block-1892
   :block-4424
-  :block-1881
-  :block-7866
-  :block-11913
-  :block-70
-  :block-8727
-  :block-8619
-  :block-68
-  :block-11288
-  :block-8103
   :block-285
   :block-12050
-  :block-10540
-  :block-7953
-  :block-1667
-  :block-9915
-  :block-23
-  :block-998
-  :block-8193
   :block-2618
-  :block-10902
-  :block-7724
   :block-2178
-  :block-5189
-  :block-6676
-  :block-806
-  :block-173
-  :block-10955
-  :block-65
-  :block-10297
-  :block-10081
-  :block-172
-  :block-702
-  :block-63
-  :block-60
-  :block-1902
-  :block-1400
   :block-384
-  :block-609
-  :block-69
-  :block-801
-  :block-653
-  :block-350
-  :xtdb-val-scrub-11
-  :block-12288
-  :block-7349
-  :block-6951
-  :block-411
-  :block-7312
-  :block-305
-  :block-629
-  :block-9004
-  :block-3255
-  :block-10826
-  :block-3695
-  :block-10941
-  :block-703],
+  :block-12288],
  :flow-editor? true,
- :window {:w 2656, :h 1520},
+ :window {:w 2384, :h 1475},
  :ai-worker? false,
  :quake-console? true,
  :implicit-rowsets {:solver [nil], :clover [:pulled-val]},
  :post-meta
- {:blocks-sys
-  {:* {:rowcount 5},
-   :query_names {:distinct 1},
-   :view_names {:distinct 3},
-   :rrows {:distinct nil},
-   :block_data {:distinct 5},
-   :block_key {:distinct 5},
-   :block_name {:distinct 5},
-   :queries {:distinct 2},
-   :views {:distinct 3}},
-  :client_memory
-  {:mem_limit {:distinct 2},
-   :server_subs {:distinct 7},
-   :mem_used {:distinct 111},
-   :* {:rowcount 111},
-   :selected_tab {:distinct 6},
-   :client_subs {:distinct 7},
-   :recent_messages_per_second {:distinct 10},
-   :mem_time {:distinct 107},
-   :screen_name {:distinct 5},
-   :rrows {:distinct nil},
-   :ts {:distinct 111},
-   :messages_per_second {:distinct 5},
-   :latency {:distinct 101},
-   :batches {:distinct 111},
-   :client_name {:distinct 8},
-   :mem_total {:distinct 101},
-   :packets {:distinct 101},
-   :mem_used_mb {:distinct 111}},
-  :superstore
-  {:category {:distinct 3},
-   :sales {:distinct 109},
-   :* {:rowcount 111},
-   :ship_date {:distinct 54},
-   :product_id {:distinct 108},
-   :city {:distinct 37},
-   :profit {:distinct 110},
-   :rrows {:distinct nil},
-   :state {:distinct 23},
-   :zipcode {:distinct 46},
-   :row_id {:distinct 111},
-   :region {:distinct 4},
-   :ship_mode {:distinct 3},
-   :order_id {:distinct 55},
-   :segment {:distinct 3},
-   :sub_category {:distinct 14},
-   :order_date {:distinct 54},
-   :quantity {:distinct 9},
-   :discount {:distinct 1},
-   :country {:distinct 1},
-   :customer_name {:distinct 52},
-   :product_name {:distinct 108},
-   :customer_id {:distinct 52}},
-  :files-sys
-  {:file_path {:distinct 33},
-   :* {:rowcount 33},
-   :screen_name {:distinct 33},
-   :blocks {:distinct 26},
-   :queries {:distinct 23},
-   :theme_map {:distinct 27},
-   :ts {:distinct 33},
-   :rrows {:distinct nil}},
-  :client-stats-drag-36
-  {:server_subs {:distinct 6},
-   :* {:rowcount 8},
-   :push {:distinct 8},
-   :recent_messages_per_second {:distinct 4},
-   :uptime {:distinct 6},
-   :last_seen_seconds {:distinct 3},
-   :memory {:distinct 8},
-   :rrows {:distinct nil},
-   :queue_distro {:distinct 1},
-   :styler_highlight_8717 {:distinct 2},
-   :client_latency {:distinct 8},
-   :ack {:distinct 3},
-   :client_name {:distinct 8},
-   :last_seen {:distinct 3}},
-  :offenses-drag-2
-  {:SHOOTING {:distinct 1},
-   :DISTRICT {:distinct 12},
-   :* {:rowcount 319073},
-   :INCIDENT_NUMBER {:distinct 282517},
-   :OFFENSE_DESCRIPTION {:distinct 244},
-   :DAY_OF_WEEK {:distinct 7},
-   :rrows {:distinct nil},
-   :MONTH {:distinct 12},
-   :YEAR {:distinct 4},
-   :HOUR {:distinct 24},
-   :STREET {:distinct 4657},
-   :OFFENSE_CODE_GROUP {:distinct 67},
-   :UCR_PART {:distinct 4},
-   :Long {:distinct 18178},
-   :REPORTING_AREA {:distinct 878},
-   :Location {:distinct 18194},
-   :OFFENSE_CODE {:distinct 222},
-   :Lat {:distinct 18178},
-   :OCCURRED_ON_DATE {:distinct 233229}},
-  :agg-grouped-all-offenses-3
-  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
-  :block_10207_new_api_call__block_10207_api_call_new_api_call_
-  {:total_wows_in_movie {:distinct 6},
-   :* {:rowcount 22},
-   :release_date {:distinct 13},
-   :director {:distinct 12},
-   :full_line {:distinct 18},
-   :rrows {:distinct nil},
-   :movie {:distinct 13},
-   :year {:distinct 10},
-   :video_480p {:distinct 22},
-   :poster {:distinct 13},
-   :video_1080p {:distinct 22},
-   :video_720p {:distinct 22},
-   :audio {:distinct 22},
-   :current_wow_in_movie {:distinct 8},
-   :video_360p {:distinct 22},
-   :timestamp {:distinct 22},
-   :movie_duration {:distinct 12},
-   :character {:distinct 12}},
-  :grouped-all-offenses
-  {:DISTRICT {:distinct 12},
-   :* {:rowcount 13},
-   :rowcnt {:distinct 13},
-   :rrows {:distinct nil}},
-  :client_stats
-  {:server_subs {:distinct 0},
-   :queue_size {:distinct 0},
-   :* {:rowcount 8},
-   :push {:distinct 0},
-   :selected_tab {:distinct 0},
-   :client_subs {:distinct 0},
-   :recent_messages_per_second {:distinct 0},
-   :uptime_seconds {:distinct 0},
-   :uptime {:distinct 0},
-   :last_seen_seconds {:distinct 0},
-   :memory {:distinct 0},
-   :screen_name {:distinct 0},
-   :rrows {:distinct nil},
-   :queue_distro {:distinct 0},
-   :ts {:distinct 0},
-   :messages_per_second {:distinct 0},
-   :client_latency {:distinct 0},
-   :ack {:distinct 0},
-   :booted_ts {:distinct 0},
-   :client_name {:distinct 0},
-   :last_seen {:distinct 0}},
-  :grouped-all-offenses-5
-  {:DISTRICT {:distinct 12},
-   :* {:rowcount 13},
-   :rowcnt {:distinct 13},
-   :rrows {:distinct nil}},
-  :grouped-all-superstore-4
-  {:customer_name {:distinct 793},
-   :* {:rowcount 793},
-   :rowcnt {:distinct 34},
-   :rrows {:distinct nil}},
-  :agg-grouped-all-superstore-1
-  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
-  :ufo_sightings
-  {:* {:rowcount 111},
-   :duration_seconds_int {:distinct 26},
-   :comments {:distinct 111},
-   :city {:distinct 102},
-   :date_posted {:distinct 69},
-   :rrows {:distinct nil},
-   :longitude {:distinct 103},
-   :state {:distinct 37},
-   :duration_seconds {:distinct 26},
-   :duration_hours {:distinct 76},
-   :id {:distinct 111},
-   :shape {:distinct 18},
-   :datetime {:distinct 103},
-   :latitude {:distinct 103},
-   :country {:distinct 4}},
-  :offenses
-  {:SHOOTING {:distinct 0},
-   :DISTRICT {:distinct 11},
-   :* {:rowcount 111},
-   :INCIDENT_NUMBER {:distinct 102},
-   :OFFENSE_DESCRIPTION {:distinct 49},
-   :DAY_OF_WEEK {:distinct 7},
-   :rrows {:distinct nil},
-   :MONTH {:distinct 2},
-   :YEAR {:distinct 1},
-   :HOUR {:distinct 15},
-   :STREET {:distinct 80},
-   :OFFENSE_CODE_GROUP {:distinct 29},
-   :UCR_PART {:distinct 3},
-   :Long {:distinct 97},
-   :REPORTING_AREA {:distinct 85},
-   :Location {:distinct 98},
-   :OFFENSE_CODE {:distinct 49},
-   :Lat {:distinct 97},
-   :OCCURRED_ON_DATE {:distinct 95}},
-  :all-superstore
-  {:category {:distinct 3},
-   :sales {:distinct 5825},
-   :* {:rowcount 9994},
-   :ship_date {:distinct 1334},
-   :product_id {:distinct 1862},
-   :city {:distinct 531},
-   :profit {:distinct 7287},
-   :rrows {:distinct nil},
-   :state {:distinct 49},
-   :zipcode {:distinct 631},
-   :row_id {:distinct 9994},
-   :region {:distinct 4},
-   :ship_mode {:distinct 4},
-   :order_id {:distinct 5009},
-   :segment {:distinct 3},
-   :sub_category {:distinct 17},
-   :order_date {:distinct 1237},
-   :quantity {:distinct 14},
-   :discount {:distinct 1},
-   :country {:distinct 1},
-   :customer_name {:distinct 793},
-   :product_name {:distinct 1850},
-   :customer_id {:distinct 793}},
-  :agg-grouped-all-offenses-3-1
-  {:rowcnt {:distinct 1}, :* {:rowcount 1}, :rrows {:distinct nil}},
-  :client-memory-drag-36
-  {:mem_used {:distinct 22},
-   :* {:rowcount 48},
-   :recent_messages_per_second {:distinct 8},
-   :rrows {:distinct nil},
-   :ts {:distinct 22},
-   :messages_per_second {:distinct 2},
-   :batches {:distinct 22},
-   :client_name {:distinct 1},
-   :ts_hour {:distinct 2},
-   :packets {:distinct 22}},
-  :all-offenses
-  {:SHOOTING {:distinct 1},
-   :DISTRICT {:distinct 12},
-   :* {:rowcount 319073},
-   :INCIDENT_NUMBER {:distinct 282517},
-   :OFFENSE_DESCRIPTION {:distinct 244},
-   :DAY_OF_WEEK {:distinct 7},
-   :rrows {:distinct nil},
-   :MONTH {:distinct 12},
-   :YEAR {:distinct 4},
-   :HOUR {:distinct 24},
-   :STREET {:distinct 4657},
-   :OFFENSE_CODE_GROUP {:distinct 67},
-   :UCR_PART {:distinct 4},
-   :Long {:distinct 18178},
-   :REPORTING_AREA {:distinct 878},
-   :Location {:distinct 18194},
-   :OFFENSE_CODE {:distinct 222},
-   :Lat {:distinct 18178},
-   :OCCURRED_ON_DATE {:distinct 233229}}},
+ {:client_memory {:* {:rowcount 111}},
+  :client-memory-drag-36 {:* {:rowcount 17}},
+  :gen-viz-516 {:* {:rowcount 50}},
+  :client-stats-drag-36 {:* {:rowcount 3}},
+  :new-query {:* {:rowcount 3}},
+  :rabbit-search-like {:* {:rowcount 498}},
+  :rabbit-search-like-themes {:* {:rowcount 92}},
+  :connections-sys {:* {:rowcount 7}}},
  :flow-estimates
- {:grouped-all-offenses-3 {:times 0.382, :run-id :grouped-all-offenses-3},
-  :blocks-sys {:times 0.005, :run-id :blocks-sys},
-  :fields-sys {:times 0.001, :run-id :fields-sys},
-  :grouped-grouped-all-offenses-5
-  {:times 0.529, :run-id :grouped-grouped-all-offenses-5},
-  :all-offense-codes {:times 0.002, :run-id :all-offense-codes},
-  :agg-all-superstore {:times 0.004, :run-id :agg-all-superstore},
-  :grouped-all-offenses-1 {:times 0.233, :run-id :grouped-all-offenses-1},
-  :client_memory {:times 0.009, :run-id :client_memory},
-  :realms-sys {:times 0.001, :run-id :realms-sys},
-  :grouped-all-offenses-2 {:times 0.191, :run-id :grouped-all-offenses-2},
-  :superstore {:times 0.006, :run-id :superstore},
-  :tables-sys {:times 0.003, :run-id :tables-sys},
-  :realms-type-sys {:times 0.001, :run-id :realms-type-sys},
-  :grouped-all-superstore-1 {:times 0.006, :run-id :grouped-all-superstore-1},
-  :agg-all-offenses-1 {:times 0.123, :run-id :agg-all-offenses-1},
-  :new-query {:times 0.005, :run-id :new-query},
-  :new-query-1 {:times 0.002, :run-id :new-query-1},
-  :grouped-grouped-all-offenses-3
-  {:times 0.441, :run-id :grouped-grouped-all-offenses-3},
-  :grouped-all-superstore-3 {:times 0.017, :run-id :grouped-all-superstore-3},
-  :virtual-panel-virtual-viewmeaningful-rectangular-rhinoceros-27
-  {:times 0.016,
-   :run-id :virtual-panel-virtual-viewmeaningful-rectangular-rhinoceros-27},
-  :files-sys {:times 0.002, :run-id :files-sys},
+ {:fields-sys {:times 0.001, :run-id :fields-sys},
+  :client_memory {:times 0.007, :run-id :client_memory},
+  :tables-sys {:times 0.001, :run-id :tables-sys},
+  :new-query {:times 0.002, :run-id :new-query},
   :client-stats-drag-36 {:times 0.001, :run-id :client-stats-drag-36},
-  :block-8000-new-clojure {:times 0.078, :run-id :block-8000-new-clojure},
-  :agg-all-offenses-2 {:times 0.138, :run-id :agg-all-offenses-2},
-  :agg-grouped-all-offenses-3 {:times 0.295, :run-id :agg-grouped-all-offenses-3},
-  :agg-all-offenses {:times 0.145, :run-id :agg-all-offenses},
-  :all-game-daily-player-summary-1k
-  {:times 0.024, :run-id :all-game-daily-player-summary-1k},
-  :grouped-all-offenses {:times 0.495, :run-id :grouped-all-offenses},
+  :block-8000-new-clojure {:times 0.246, :run-id :block-8000-new-clojure},
   :client_stats {:times 0.001, :run-id :client_stats},
-  :grouped-all-superstore-2 {:times 0.006, :run-id :grouped-all-superstore-2},
   :rabbit-search-like-themes {:times 0.002, :run-id :rabbit-search-like-themes},
-  :agg-grouped-all-offenses-4 {:times 0.235, :run-id :agg-grouped-all-offenses-4},
-  :grouped-all-offense-codes {:times 0.006, :run-id :grouped-all-offense-codes},
-  :grouped-all-offenses-5 {:times 0.578, :run-id :grouped-all-offenses-5},
-  :grouped-all-superstore-4 {:times 0.036, :run-id :grouped-all-superstore-4},
-  :grouped-all-superstore {:times 0.011, :run-id :grouped-all-superstore},
-  :realm-blocks-sys {:times 0.001, :run-id :realm-blocks-sys},
-  :agg-grouped-all-superstore-1
-  {:times 0.006, :run-id :agg-grouped-all-superstore-1},
-  :all-offense-codes-1 {:times 0.002, :run-id :all-offense-codes-1},
-  :offense_codes {:times 0.001, :run-id :offense_codes},
-  :agg-grouped-all-superstore-1-1
-  {:times 0.011, :run-id :agg-grouped-all-superstore-1-1},
-  :agg-grouped-all-offenses-1 {:times 0.23, :run-id :agg-grouped-all-offenses-1},
-  :offenses {:times 0.01, :run-id :offenses},
-  :gen-viz-764 {:times 0.169, :run-id :gen-viz-764},
-  :connections-sys {:times 0.009, :run-id :connections-sys},
-  :all-superstore {:times 0.009, :run-id :all-superstore},
-  :grouped-all-offenses-4 {:times 0.36, :run-id :grouped-all-offenses-4},
-  :new-clojure-1-sqlized {:times 0.001, :run-id :new-clojure-1-sqlized},
-  :rabbit-search-like-screens {:times 0.002, :run-id :rabbit-search-like-screens},
-  :agg-grouped-all-offenses-3-1
-  {:times 0.276, :run-id :agg-grouped-all-offenses-3-1},
-  :grouped-agg-grouped-all-offenses
-  {:times 0.332, :run-id :grouped-agg-grouped-all-offenses},
-  :agg-grouped-all-offenses {:times 0.305, :run-id :agg-grouped-all-offenses},
-  :client-memory-drag-36 {:times 0.001, :run-id :client-memory-drag-36},
-  :all-offenses {:times 0.019, :run-id :all-offenses},
-  :gen-viz-516 {:times 0.002, :run-id :gen-viz-516},
-  :agg-grouped-all-superstore-1-2
-  {:times 0.025, :run-id :agg-grouped-all-superstore-1-2}},
+  :connections-sys {:times 0.002, :run-id :connections-sys},
+  :rabbit-search-like-screens {:times 0.001, :run-id :rabbit-search-like-screens},
+  :client-memory-drag-36 {:times 0.004, :run-id :client-memory-drag-36},
+  :gen-viz-516 {:times 0.002, :run-id :gen-viz-516}},
  :screen-name "basic-client-stats",
  :panel-hashes
- {:block-7838 -1987091657,
-  :block-8670 -959826999,
-  :block-7377 -1165762329,
-  :block-8000 279065675,
-  :block-6441 891528405,
-  :block-7453 2059201088,
+ {:block-7838 -1630370521,
+  :block-8670 1365090163,
+  :block-7377 1885584294,
+  :block-8000 340722839,
+  :block-6441 462795712,
+  :block-7453 -899248897,
   :block-3108 -1018549023,
-  :block-2505 1780416330,
-  :block-5659 -236914590,
-  :block-9994 -541734113,
-  :block-4424 -277031396,
-  :block-285 -67724591,
-  :block-12050 -1002949368,
-  :block-2618 1044802103,
-  :block-2178 1012005658,
-  :block-384 -2128421274,
-  :block-12288 -837594982},
+  :block-2505 -554738424,
+  :block-5659 165070352,
+  :block-9994 2096324346,
+  :block-4424 676977366,
+  :block-285 -903084522,
+  :block-12050 -647754718,
+  :block-2618 -1345951274,
+  :block-2178 -1543608047,
+  :block-384 871177750,
+  :block-12288 -1676755515},
  :recos-page2 0,
  :selected-tab "client stats",
  :col-names nil,
@@ -1199,12 +741,12 @@
      :block-342 {:country nil}}}}},
  :recos-page 0,
  :rs-overrides-hashmap {},
- :user-params-hash -620225235,
+ :user-params-hash -756208986,
  :grid-recos? true,
- :session-hash -2023680651,
+ :session-hash -1250970611,
  :resolved-queries
- {:shape-rotation-maps-sys {:_last-run "13:39:06"},
-  nil {:_last-run "13:38:59"},
+ {:shape-rotation-maps-sys {:_last-run "05:47:33"},
+  nil {:_last-run "05:47:13"},
   :client-memory-drag-36
   {:select
    [:client_name
@@ -1219,7 +761,7 @@
    :from [[:client_memory :ee183]],
    :refresh-every 20,
    :cache? false,
-   :_last-run "13:38:40",
+   :_last-run "05:47:08",
    :order-by [[:mem_time :desc]]},
   :gen-viz-516
   {:cache? false,
@@ -1227,7 +769,7 @@
    [:and [:> :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
    :limit 50,
    :group-by [:ts],
-   :_last-run "13:38:40",
+   :_last-run "05:47:08",
    :refresh-every 20,
    :from
    [{:select
@@ -1269,7 +811,7 @@
    :from [[:client_stats :gg588]],
    :refresh-every 10,
    :cache? false,
-   :_last-run "13:39:05",
+   :_last-run "05:47:33",
    :col-widths
    {:ack 81,
     :client_latency 141,
@@ -1283,13 +825,16 @@
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
-     :style {:border "1px solid #cac18255"}}}},
+     :style
+     {:color "#09565e",
+      :background-color [:str "#09565e" "19"],
+      :border-left [:str "3px solid " "#09565e"]}}}},
   :new-query
   {:cache? false,
    :where [:= :client_name :*client-name-str],
    :limit 126,
    :group-by [:ts_hour],
-   :_last-run "13:39:05",
+   :_last-run "05:47:33",
    :refresh-every 10,
    :from
    [{:select
@@ -1337,7 +882,7 @@
  :panels
  {nil
   {:queries
-   {:shape-rotation-maps-sys {:_last-run "13:39:06"}, nil {:_last-run "13:38:59"}}},
+   {:shape-rotation-maps-sys {:_last-run "05:47:33"}, nil {:_last-run "05:47:13"}}},
   :block-7838
   {:h 8,
    :w 11,
@@ -1345,7 +890,7 @@
    {:editor-block-8000-new-clojure [:editor [:block-8000 :clojure :new-clojure]]},
    :name "editor-block-8000-new-clojure",
    :root [26 1],
-   :tab "terminal stats"},
+   :tab "server terminal stats"},
   :block-8670
   {:h 5,
    :w 12,
@@ -1367,7 +912,7 @@
       :font-weight 700,
       :padding-right "20px",
       :padding-top "6px",
-      :color "#cac182",
+      :color :theme/editor-outer-rim-color,
       :transition "all 0.6s ease-in-out"}
      :child
      [:str :client/*client-name*>stats>client-name]],
@@ -1392,7 +937,7 @@
      :center
      :style
      {:font-size "35px",
-      :color "#82ca9d",
+      :color :theme/pop-2,
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
@@ -1430,7 +975,7 @@
    :h 26,
    :display {:new-clojure :output},
    :queries {},
-   :tab "terminal stats",
+   :tab "server terminal stats",
    :views
    {:hare-vw
     [:box
@@ -1470,7 +1015,7 @@
       :padding-top "6px",
       :padding-left "14px",
       :margin-top "-8px",
-      :color "#cac182",
+      :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
      [:string :time/now]],
@@ -1495,7 +1040,7 @@
      :center
      :style
      {:font-size "35px",
-      :color "#82ca9d",
+      :color :theme/pop-2,
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
@@ -1525,7 +1070,7 @@
      :from [[:client_memory :ee183]],
      :refresh-every 20,
      :cache? false,
-     :_last-run "13:38:40",
+     :_last-run "05:47:08",
      :order-by [[:mem_time :desc]]}},
    :root [1 21],
    :tab "client stats",
@@ -1549,7 +1094,7 @@
      :center
      :style
      {:font-size "56px",
-      :color "#82ca9d",
+      :color :theme/pop-2,
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
@@ -1579,7 +1124,7 @@
      :center
      :style
      {:font-size "56px",
-      :color "#82ca9d",
+      :color :theme/pop-2,
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
@@ -1609,7 +1154,7 @@
      :center
      :style
      {:font-size "56px",
-      :color "#82ca9d",
+      :color :theme/pop-2,
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
@@ -1638,7 +1183,7 @@
      :style
      {:font-size "23px",
       :font-weight 700,
-      :color "#cac182",
+      :color :theme/editor-outer-rim-color,
       :padding-right "20px",
       :transition "all 0.6s ease-in-out"}
      :child
@@ -1663,7 +1208,7 @@
      :center
      :style
      {:font-size "60px",
-      :color "#8884d8",
+      :color :theme/pop-1,
       :font-weight 700,
       :transition "all 0.6s ease-in-out"}
      :children
@@ -1687,7 +1232,7 @@
      [:and [:> :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
      :limit 50,
      :group-by [:ts],
-     :_last-run "13:38:40",
+     :_last-run "05:47:08",
      :refresh-every 20,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
@@ -1727,7 +1272,7 @@
         :label
         {:value "MB",
          :angle -90,
-         :fill "#8884d8",
+         :fill :theme/pop-1,
          :style {:font-size "20px", :font-weight 700},
          :position "middle",
          :dx -25},
@@ -1738,7 +1283,7 @@
         :label
         {:value "Messages per Second",
          :angle 90,
-         :fill "#82ca9d",
+         :fill :theme/pop-2,
          :style {:font-weight 700, :font-size "15px"},
          :position "middle",
          :dx 20},
@@ -1751,7 +1296,7 @@
         :dataKey :mb,
         :yAxisId "left",
         :stroke-width 3,
-        :stroke "#8884d8",
+        :stroke :theme/pop-1,
         :activeDot {:r 8}}]
       [:>
        :Bar
@@ -1761,7 +1306,7 @@
         :yAxisId "right",
         :fill "#00000000",
         :stroke-width 3,
-        :stroke "#82ca9d"}]]]}},
+        :stroke :theme/pop-2}]]]}},
   :block-2618
   {:h 8,
    :w 26,
@@ -1784,7 +1329,7 @@
      :from [[:client_stats :gg588]],
      :refresh-every 10,
      :cache? false,
-     :_last-run "13:39:05",
+     :_last-run "05:47:33",
      :col-widths
      {:ack 81,
       :client_latency 141,
@@ -1798,7 +1343,10 @@
      :style-rules
      {[:* :highlight-8717]
       {:logic [:= :client_name :*client-name-str],
-       :style {:border "1px solid #cac18255"}}}}},
+       :style
+       {:color :theme/pop-1,
+        :background-color [:str :theme/pop-1 "19"],
+        :border-left [:str "3px solid " :theme/pop-1]}}}}},
    :root [14 13],
    :tab "client stats"},
   :block-2178
@@ -1833,13 +1381,13 @@
        {:type "monotone",
         :isAnimationActive false,
         :dataKey :mem_used,
-        :stroke "#8884d8",
+        :stroke :theme/pop-1,
         :stroke-width 3,
         :fill "#8884d801"}
        [:>
         :LabelList
         {:dataKey :diff,
-         :fill "#8884d8",
+         :fill :theme/pop-1,
          :style {:font-size "18px", :font-weight 700},
          :position "top"}]]]]},
    :queries
@@ -1848,7 +1396,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 126,
      :group-by [:ts_hour],
-     :_last-run "13:39:05",
+     :_last-run "05:47:33",
      :refresh-every 10,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts_hour :desc]],
@@ -1889,7 +1437,7 @@
    :root [26 9],
    :h 18,
    :queries {},
-   :tab "terminal stats",
+   :tab "server terminal stats",
    :views {:pulled-val [:solver-meta/block-8000-new-clojure>history]}},
   :block-12288
   {:h 4,
@@ -1913,30 +1461,26 @@
       :padding-top "6px",
       :padding-left "14px",
       :margin-top "-8px",
-      :color "#cac182",
+      :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
      [:string :time/second]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}}},
  :materialized-theme
- {:codemirror-theme "rvbbit-dynamic",
+ {:theme-name "rabbit_cyber-cyan",
+  :generated-from "assets/openai-images/upscaled/b64-image3-55134-56594-4k.webp",
+  :codemirror-theme "rvbbit-dynamic",
   :editor-param-background-color "#000000",
-  :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+  :pop-2 "#499894",
+  :base-block-style
+  {:text-shadow "4px 4px 4px #00000088",
+   :border-radius "12px 12px 12px 12px",
+   :filter "brightness(120%)",
+   :background-blend-mode "screen",
+   :backdrop-filter "blur(4px)"},
   :vega-defaults
-  {:view {:stroke "transparent"},
-   :axis
-   {:domainColor "#ffffff22",
-    :grid true,
-    :font "Lato",
-    :labelColor "#ffffff88",
-    :titleFont "Lato",
-    :titleColor "#ffffff99",
-    :labelFont "Lato",
-    :domain false,
-    :gridColor "#ffffff22",
-    :tickColor "#ffffff22",
-    :axisFont "Lato"},
+  {:mark {:font "Lato", :stroke "#09565e", :color "#09565e65"},
    :legend
    {:labelFont "Lato",
     :legendFont "Lato",
@@ -1949,43 +1493,95 @@
     :titleFont "Lato",
     :titleColor "#ffffff99",
     :labelColor "#f2e8ff"},
-   :mark {:font "Lato"},
    :title
    {:font "Lato",
     :subtitleFont "Lato",
     :labelFont "Lato",
     :titleFont "Lato",
-    :titleColor "#ffffff99"}},
+    :titleColor "#ffffff99"},
+   :point {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+   :area {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+   :axis
+   {:domainColor "#ffffff22",
+    :grid true,
+    :font "Lato",
+    :labelColor "#ffffff88",
+    :titleFont "Lato",
+    :titleColor "#ffffff99",
+    :labelFont "Lato",
+    :domain false,
+    :gridColor "#ffffff22",
+    :tickColor "#ffffff22",
+    :axisFont "Lato"},
+   :tooltip {:fill "white", :stroke "steelblue", :strokeWidth 1, :color "black"},
+   :view {:stroke "transparent"}},
   :grid-selected-column-css
   {:background-color "#00000088", :filter "brightness(200%)"},
   :running-gif "images/running.gif",
-  :base-block-color-selected "#091536",
+  :generated-tree
+  {:second-darkest "#0f2a34",
+   :highest-saturation "#098984",
+   :most-contrasting "#24c4b4",
+   :darkest "#070d15",
+   :contrast-with-dominant "#d9a5b8",
+   :colors
+   ["#d9a5b8"
+    "#09565e"
+    "#499894"
+    "#070d15"
+    "#bc748f"
+    "#098984"
+    "#0f2a34"
+    "#57556b"
+    "#9c5c74"
+    "#24c4b4"
+    "#0c414a"],
+   :most-frequent "#57556b",
+   :data-colors
+   {"float" "#d1d9a5",
+    "boolean" "#edcd40",
+    "map" "#64c08a",
+    "list" "#008504",
+    "string" "#f7fbf5",
+    "any" "#5c00bd",
+    "vector" "#776b8d",
+    "keyword" "#b1addd",
+    "rabbit-code" "#40c424",
+    "datetime" "#682107",
+    "integer" "#be8489",
+    "unknown" "#0e1048",
+    "date" "#071d0b"},
+   :dominant "#0c414a",
+   :most-contrasting-dark "#070d15",
+   :second-brightest "#24c4b4",
+   :brightest "#d9a5b8",
+   :most-contrasting-light "#24c4b4"},
+  :base-block-color-selected "#00030a",
   :block-title-font-color "#ffffff",
-  :base-block-color "#0b0f2180",
-  :editor-rim-color "#2b4270",
+  :base-block-color "#01030477",
+  :pop-3 "#d9a5b8",
+  :editor-rim-color "#24c4b499",
   :base-block-filter-selected
   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
-  :vega-default-color-scheme {:scheme "pastel2"},
+  :vega-default-color-scheme {:scheme "category20b"},
   :data-colors
-  {"float" "#2c728e",
-   "boolean" "#f386bf",
-   "map" "#00FFFF",
-   "list" "#c32148",
-   "string" "#7de8b9",
-   "rowset" "#DAF7A6",
-   "any" "#c3ec52",
-   "vector" "#008080",
-   "keyword" "#add8e6",
-   "rabbit-code" "#FC0FC0",
-   "datetime" "#472d7b",
-   "integer" "#12e3ff",
-   "unknown" "#ffcf99",
-   "date" "#3b528b",
-   "rabbitsql" "#FC0FC0",
-   "nil" "#eeeeee"},
+  {"float" "#d1d9a5",
+   "boolean" "#edcd40",
+   "map" "#64c08a",
+   "list" "#008504",
+   "string" "#f7fbf5",
+   "any" "#5c00bd",
+   "vector" "#776b8d",
+   "keyword" "#b1addd",
+   "rabbit-code" "#40c424",
+   "datetime" "#682107",
+   "integer" "#be8489",
+   "unknown" "#0e1048",
+   "date" "#071d0b"},
   :editor-grid-selected-font-color "#000000",
   :monospaced-font "JetBrains Mono",
-  :editor-grid-selected-background-color "#8879bc",
+  :editor-grid-selected-background-color "#dc9cb0",
+  :_vega-default-color-scheme {:scheme "pastel2"},
   :nivo-defaults
   {:font-family "Instagram Sans",
    :labels
@@ -2015,40 +1611,39 @@
     :ticks
     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-  :editor-outer-rim-color "#40d6ff",
+  :editor-outer-rim-color "#24c4b4",
   :grid-selected-font-color "#000000",
   :block-title-selected-font-color "#ffffff",
   :grid-selected-background-color "#a3d3ff",
   :grid-font-color "#ffffff",
   :canvas-background-css
-  {:background-image "url(images/fake-brick4.png)",
+  {:background-image
+   "linear-gradient(#0c414a70,#0c414a12),url(images/gray-brick.png)",
    :transition "all 0.6s ease-in-out",
    :background-blend-mode "normal",
    :background-color "#424f57"},
   :editor-font-color "#ffffff",
   :line-style "curved-path-h",
-  :base-font "Instagram Sans",
+  :base-font "Rubik",
   :block-tab-selected-font-color "#c9d1ff",
   :editor-background-color "#000006",
-  :editor-grid-font-color "#ffffff"},
+  :editor-grid-font-color "#ffffff",
+  :pop-1 "#09565e"},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#2c728e",
-  "boolean" "#f386bf",
-  "map" "#00FFFF",
-  "list" "#c32148",
-  "string" "#7de8b9",
-  "rowset" "#DAF7A6",
-  "any" "#c3ec52",
-  "vector" "#008080",
-  "keyword" "#add8e6",
-  "rabbit-code" "#FC0FC0",
-  "datetime" "#472d7b",
-  "integer" "#12e3ff",
-  "unknown" "#ffcf99",
-  "date" "#3b528b",
-  "rabbitsql" "#FC0FC0",
-  "nil" "#eeeeee"},
+ {"float" "#d1d9a5",
+  "boolean" "#edcd40",
+  "map" "#64c08a",
+  "list" "#008504",
+  "string" "#f7fbf5",
+  "any" "#5c00bd",
+  "vector" "#776b8d",
+  "keyword" "#b1addd",
+  "rabbit-code" "#40c424",
+  "datetime" "#682107",
+  "integer" "#be8489",
+  "unknown" "#0e1048",
+  "date" "#071d0b"},
  :solver-fn nil,
  :click-param
  {:blocks-sys
@@ -2063,64 +1658,83 @@
    :query_names ""},
   :realms-sys {:realm_name ":dash8"},
   :render-hash
-  {:block-11815 -2112184020,
+  {:block-494 -1165410335,
+   :block-11815 -2112184020,
    :block-5869 1921542058,
    :block-7671 -1625056861,
-   :block-7838 -1063240553,
+   :block-1956 -1802782684,
+   :block-4808 1411732973,
+   :block-7838 1894893780,
    :block-469 -405453145,
-   :block-8670 -1895289279,
-   :block-7377 -29261886,
-   :block-8000 -350756981,
+   :block-8670 -1085761376,
+   :block-7377 -12476071,
+   :block-8000 1935385292,
+   :block 2108994155,
+   :block-10778 762233012,
    :block-3452 -1522995690,
+   :block-8179 -1649092015,
    :block-10943 211384161,
+   :block-7876 -1003021986,
    :block-3412 1804838558,
    :block-9638 2060077921,
    :block-5136 -1260751101,
    :block-8681 -492928568,
-   :block-7453 -445975934,
-   :block-3108 2049124858,
+   :block-9727 -1072955008,
+   :block-7453 -508424101,
+   :block-3108 -1593562199,
    :block-10824 -1439812161,
    :block-1226-window 2089497908,
    :block-5159 -617274640,
+   :block-1 1775215232,
    :block-10889 -878305769,
    :block-5145 -19086706,
    :block-9970 -1792165078,
    :block-10470 -1787682784,
    :block-501 1958592943,
-   :block-2505 1134254528,
+   :block-2505 906920241,
    :block-675 -1619576870,
+   :block-3438 -206957414,
    :block-6855 -1875388961,
    :block-834 71380992,
-   :block-5659 -1318757913,
+   :block-5659 -2118365219,
+   :block-10180 -1633825072,
    :block-4032 760771332,
    :block-7831 -1491487087,
    :block-488 132117360,
+   :block-3719 -878131517,
+   :block-1430 -1463889917,
    :block-2990 730182561,
+   :block-901 -843978510,
    :block-5158 -375589397,
+   :block-12161 -749608415,
+   :block-3218 703685801,
    :block-689 162692768,
-   :block-9994 -129448629,
+   :block-9994 169865458,
    :block-1226 1576259257,
-   :block-4424 154836034,
+   :block-4424 2103029724,
    :block-1881 1574630048,
    :block-4331 594087454,
    :block-7866 -835073390,
    :block-11913 -1142686672,
    :block-8727 -1691587122,
-   :block-8619 296921370,
+   :block-8619 1150148052,
    :block-11288 -613131982,
    :block-8103 1212635680,
-   :block-285 874209820,
-   :block-12050 -415764851,
+   :block-285 916360659,
+   :block-12050 1136246618,
    :block-9644 1587999197,
    :block-10540 -601781734,
    :block-7953 811877002,
    :block-1667 -405487118,
    :block-23 1255572886,
+   :block-11070 -1540437532,
+   :block-4109 -1251557977,
    :block-998 -1072785599,
    :block-8193 785042936,
-   :block-2618 985358101,
+   :block-2618 999378398,
    :block-10902 -342095608,
-   :block-2178 -566197443,
+   :block-8083 -408731112,
+   :block-2178 1339583590,
    :block-6676 950012757,
    :block-173 248423351,
    :block-7035 929679235,
@@ -2129,9 +1743,10 @@
    :block-10081 1436362862,
    :block-172 -830539956,
    :block-702 8664963,
+   :block-10067 -2046709564,
    :block-1902 1701653441,
    :block-1400 449559541,
-   :block-384 -50053633,
+   :block-384 1272827649,
    :block-609 1917739963,
    :block-653 1544510895,
    :block-350 -1906737314,
@@ -2143,12 +1758,14 @@
    :block-305 1165704681,
    :block-9004 197968539,
    :block-10898 -1795788391,
+   :block-2 -1945374829,
    :block-3255 866665667,
    :block-10826 2107373933,
    :block-4941 560111096,
    :block-3695 1699844351,
    :block-10941 486849899,
-   :block-703 -1470042098},
+   :block-703 -1470042098,
+   :block-4603 307881044},
   :grouped-all-offenses-2 {:OFFENSE_DESCRIPTION "A&B ON POLICE OFFICER", :rowcnt 3},
   :tables-sys
   {:db_schema "public",
@@ -2161,21 +1778,25 @@
   :data-hash
   {nil -1652801366,
    :grouped-all-offenses-3 -410083272,
+   :new-clojure-1 1599030890,
    :blocks-sys 2072928602,
+   :fields-sys -2017569654,
    :grouped-grouped-all-offenses-5 1493405184,
    :game_daily_player_summary -913183019,
    :all-offense-codes 1976922113,
    :agg-all-superstore -1364426632,
    :grouped-all-offenses-1 -1578798670,
-   :client_memory 1627783528,
+   :client_memory 1816749334,
    :screen-type-drag-1 -1236632591,
    :grouped-all-offenses-2 -1626705085,
    :superstore -1729702703,
+   :tables-sys -2017569654,
+   :rabbit-search-like 27670227,
    :combos 619197464,
    :game_daily_player_summary_1k -913183019,
    :grouped-all-superstore-1 -2030464101,
    :agg-all-offenses-1 580012475,
-   :new-query 485876950,
+   :new-query 900725592,
    :network-analysis -522454394,
    :all-game-daily-player-summary-1k-1 2050675814,
    :new-query-1 -891751817,
@@ -2183,7 +1804,7 @@
    :grouped-grouped-all-offenses-3 1493405184,
    :grouped-all-superstore-3 -1326997085,
    :files-sys -1991486530,
-   :client-stats-drag-36 -580293214,
+   :client-stats-drag-36 1666124062,
    :agg-all-offenses-2 580012475,
    :gen-viz-591 -1658277147,
    :offenses-drag-2 -985052635,
@@ -2192,9 +1813,10 @@
    :agg-all-offenses 580012475,
    :all-game-daily-player-summary-1k 2050675814,
    :grouped-all-offenses -410083272,
-   :client_stats 852478649,
+   :client_stats -586754817,
    :bounds -41230648,
    :grouped-all-superstore-2 341169804,
+   :rabbit-search-like-themes -1589909448,
    :game-daily-player-summary-drag-30 -2017569654,
    :agg-grouped-all-offenses-4 1657545427,
    :grouped-all-offense-codes 226837071,
@@ -2212,15 +1834,17 @@
    :offenses -634447600,
    :gen-viz-764 1641052884,
    :reporting-market-drag-41 193742860,
+   :connections-sys 1559621138,
    :all-superstore 1943520345,
    :grouped-all-offenses-4 -410083272,
+   :rabbit-search-like-screens 786360288,
    :agg-grouped-all-offenses-3-1 1657545427,
    :grouped-agg-grouped-all-offenses 1493405184,
    :combos-drag-30 619197464,
    :agg-grouped-all-offenses -410083272,
-   :client-memory-drag-36 1040799565,
+   :client-memory-drag-36 -1592231234,
    :all-offenses -985052635,
-   :gen-viz-516 -1045217167,
+   :gen-viz-516 -2070449226,
    :agg-grouped-all-superstore-1-2 510236691,
    :rowcnt-drag-14 -638659407,
    :drop-pivot-flat -1548281514},
@@ -2251,47 +1875,19 @@
    :client_name ":familiar-prismatic-woodpecker-22",
    :last_seen "19 seconds"},
   :block-12 {:country nil},
-  :param
-  {:selected-view nil,
-   :selected-view-data nil,
-   :selected-block :block-2178,
-   :my-dash-killswitch? false,
-   :upstanding-crimson-frog "new parameter value!",
-   :super-cobalt-mole ["1121pm - 229mb"]},
-  :bounds {:go! :done},
-  :block-1226
-  {:groups
-   ["network"
-    "reporting_market"
-    "period"
-    "demographic"
-    "station_family"
-    "daypart"
-    "viewing_type"
-    "audience_type"
-    "screen_type"
-    "day_of_week"
-    "share_to"],
-   :measures
-   ["total_minutes_millions" "total_minutes_percent" "audience_thousands" "tarp"]},
-  :theme
-  {:codemirror-theme "rvbbit-dynamic",
+  :stored-theme
+  {:theme-name "rabbit_cyber-cyan",
+   :generated-from "assets/openai-images/upscaled/b64-image3-55134-56594-4k.webp",
+   :codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
-   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :pop-2 "#499894",
+   :base-block-style
+   {:text-shadow "4px 4px 4px #00000088",
+    :border-radius "12px 12px 12px 12px",
+    :filter "brightness(120%)",
+    :backdrop-filter "brightness(35%) blur(4px)"},
    :vega-defaults
-   {:view {:stroke "transparent"},
-    :axis
-    {:domainColor "#ffffff22",
-     :grid true,
-     :font "Lato",
-     :labelColor "#ffffff88",
-     :titleFont "Lato",
-     :titleColor "#ffffff99",
-     :labelFont "Lato",
-     :domain false,
-     :gridColor "#ffffff22",
-     :tickColor "#ffffff22",
-     :axisFont "Lato"},
+   {:mark {:font "Lato", :stroke "#09565e", :color "#09565e65"},
     :legend
     {:labelFont "Lato",
      :legendFont "Lato",
@@ -2304,50 +1900,102 @@
      :titleFont "Lato",
      :titleColor "#ffffff99",
      :labelColor "#f2e8ff"},
-    :mark {:font "Lato"},
     :title
     {:font "Lato",
      :subtitleFont "Lato",
      :labelFont "Lato",
      :titleFont "Lato",
-     :titleColor "#ffffff99"}},
+     :titleColor "#ffffff99"},
+    :point {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+    :area {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :tooltip {:fill "white", :stroke "steelblue", :strokeWidth 1, :color "black"},
+    :view {:stroke "transparent"}},
    :grid-selected-column-css
    {:background-color "#00000088", :filter "brightness(200%)"},
    :running-gif "images/running.gif",
-   :base-block-color-selected "#091536",
+   :generated-tree
+   {:second-darkest "#0f2a34",
+    :highest-saturation "#098984",
+    :most-contrasting "#24c4b4",
+    :darkest "#070d15",
+    :contrast-with-dominant "#d9a5b8",
+    :colors
+    ["#d9a5b8"
+     "#09565e"
+     "#499894"
+     "#070d15"
+     "#bc748f"
+     "#098984"
+     "#0f2a34"
+     "#57556b"
+     "#9c5c74"
+     "#24c4b4"
+     "#0c414a"],
+    :most-frequent "#57556b",
+    :data-colors
+    {"float" "#d1d9a5",
+     "boolean" "#edcd40",
+     "map" "#64c08a",
+     "list" "#008504",
+     "string" "#f7fbf5",
+     "any" "#5c00bd",
+     "vector" "#776b8d",
+     "keyword" "#b1addd",
+     "rabbit-code" "#40c424",
+     "datetime" "#682107",
+     "integer" "#be8489",
+     "unknown" "#0e1048",
+     "date" "#071d0b"},
+    :dominant "#0c414a",
+    :most-contrasting-dark "#070d15",
+    :second-brightest "#24c4b4",
+    :brightest "#d9a5b8",
+    :most-contrasting-light "#24c4b4"},
+   :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
-   :base-block-color "#0b0f2180",
-   :editor-rim-color "#2b4270",
+   :base-block-color "#01030499",
+   :pop-3 "#d9a5b8",
+   :editor-rim-color "#24c4b499",
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
-   :vega-default-color-scheme {:scheme "pastel2"},
+   :vega-default-color-scheme {:scheme "category20b"},
    :data-colors
-   {"float" "#2c728e",
-    "boolean" "#f386bf",
-    "map" "#00FFFF",
-    "list" "#c32148",
-    "string" "#7de8b9",
-    "rowset" "#DAF7A6",
-    "any" "#c3ec52",
-    "vector" "#008080",
-    "keyword" "#add8e6",
-    "rabbit-code" "#FC0FC0",
-    "datetime" "#472d7b",
-    "integer" "#12e3ff",
-    "unknown" "#ffcf99",
-    "date" "#3b528b",
-    "rabbitsql" "#FC0FC0",
-    "nil" "#eeeeee"},
+   {"float" "#d1d9a5",
+    "boolean" "#edcd40",
+    "map" "#64c08a",
+    "list" "#008504",
+    "string" "#f7fbf5",
+    "any" "#5c00bd",
+    "vector" "#776b8d",
+    "keyword" "#b1addd",
+    "rabbit-code" "#40c424",
+    "datetime" "#682107",
+    "integer" "#be8489",
+    "unknown" "#0e1048",
+    "date" "#071d0b"},
    :editor-grid-selected-font-color "#000000",
    :monospaced-font "JetBrains Mono",
-   :editor-grid-selected-background-color "#8879bc",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :_vega-default-color-scheme {:scheme "pastel2"},
    :nivo-defaults
-   {:font-family :theme/base-font,
+   {:font-family "Instagram Sans",
     :labels
     {:text
      {:fill "#ffffff",
       :font-size "16px",
-      :font-family :theme/base-font,
+      :font-family "Instagram Sans",
       :font-weight 700}},
     :tooltip
     {:container
@@ -2365,27 +2013,215 @@
      {:text
       {:fill "#ffffff",
        :font-size "14px",
-       :font-family :theme/base-font,
+       :font-family "Instagram Sans",
        :font-weight 700}},
      :ticks
      {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
     :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-   :editor-outer-rim-color "#40d6ff",
+   :editor-outer-rim-color "#24c4b4",
    :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/fake-brick4.png)",
+   {:background-image
+    "linear-gradient(#0c414a70,#0c414a12),url(images/gray-brick.png)",
     :transition "all 0.6s ease-in-out",
     :background-blend-mode "normal",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
    :line-style "curved-path-h",
-   :base-font "Instagram Sans",
+   :base-font "Rubik",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
-   :editor-grid-font-color "#ffffff"},
+   :editor-grid-font-color "#ffffff",
+   :pop-1 "#09565e"},
+  :param
+  {:selected-view nil,
+   :selected-view-data nil,
+   :selected-block :block-2178,
+   :my-dash-killswitch? false,
+   :upstanding-crimson-frog "new parameter value!",
+   :super-cobalt-mole ["1121pm - 229mb"],
+   :domain "localhost"},
+  :bounds {:go! :done},
+  :block-1226
+  {:groups
+   ["network"
+    "reporting_market"
+    "period"
+    "demographic"
+    "station_family"
+    "daypart"
+    "viewing_type"
+    "audience_type"
+    "screen_type"
+    "day_of_week"
+    "share_to"],
+   :measures
+   ["total_minutes_millions" "total_minutes_percent" "audience_thousands" "tarp"]},
+  :theme
+  {:theme-name "rabbit_cyber-cyan",
+   :generated-from "assets/openai-images/upscaled/b64-image3-55134-56594-4k.webp",
+   :codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :pop-2 "#499894",
+   :base-block-style
+   {:text-shadow "4px 4px 4px #00000088",
+    :border-radius [:sticky-border-radius "12px"],
+    :filter "brightness(120%)",
+    :background-blend-mode "screen",
+    :backdrop-filter "blur(4px)"},
+   :vega-defaults
+   {:mark {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelColor "#f2e8ff"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"},
+    :point {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+    :area {:font "Lato", :stroke "#09565e", :color "#09565e65"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :tooltip {:fill "white", :stroke "steelblue", :strokeWidth 1, :color "black"},
+    :view {:stroke "transparent"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :running-gif "images/running.gif",
+   :generated-tree
+   {:second-darkest "#0f2a34",
+    :highest-saturation "#098984",
+    :most-contrasting "#24c4b4",
+    :darkest "#070d15",
+    :contrast-with-dominant "#d9a5b8",
+    :colors
+    ["#d9a5b8"
+     "#09565e"
+     "#499894"
+     "#070d15"
+     "#bc748f"
+     "#098984"
+     "#0f2a34"
+     "#57556b"
+     "#9c5c74"
+     "#24c4b4"
+     "#0c414a"],
+    :most-frequent "#57556b",
+    :data-colors
+    {"float" "#d1d9a5",
+     "boolean" "#edcd40",
+     "map" "#64c08a",
+     "list" "#008504",
+     "string" "#f7fbf5",
+     "any" "#5c00bd",
+     "vector" "#776b8d",
+     "keyword" "#b1addd",
+     "rabbit-code" "#40c424",
+     "datetime" "#682107",
+     "integer" "#be8489",
+     "unknown" "#0e1048",
+     "date" "#071d0b"},
+    :dominant "#0c414a",
+    :most-contrasting-dark "#070d15",
+    :second-brightest "#24c4b4",
+    :brightest "#d9a5b8",
+    :most-contrasting-light "#24c4b4"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#01030477",
+   :pop-3 "#d9a5b8",
+   :editor-rim-color "#24c4b499",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "category20b"},
+   :data-colors
+   {"float" "#d1d9a5",
+    "boolean" "#edcd40",
+    "map" "#64c08a",
+    "list" "#008504",
+    "string" "#f7fbf5",
+    "any" "#5c00bd",
+    "vector" "#776b8d",
+    "keyword" "#b1addd",
+    "rabbit-code" "#40c424",
+    "datetime" "#682107",
+    "integer" "#be8489",
+    "unknown" "#0e1048",
+    "date" "#071d0b"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :_vega-default-color-scheme {:scheme "pastel2"},
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#24c4b4",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image
+    "linear-gradient(#0c414a70,#0c414a12),url(images/gray-brick.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :line-style "curved-path-h",
+   :base-font "Rubik",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff",
+   :pop-1 "#09565e"},
   :realm-blocks-sys
   {:block_key ":start-date-filter",
    :block_name "Start Date Filter (datepicker)",
@@ -2396,7 +2232,7 @@
   {:database_name "PostgreSQL",
    :connection_id "xtdb-pg",
    :styler_highlight_8717ssa 0},
-  :sys {:selected-tab "generated lass of the woodlands", :selected-tab-idx 0},
+  :sys {:selected-tab "client stats", :selected-tab-idx 0},
   :xtdb-val-scrub-11 {:valid-date-slider "2024-04-08"},
   :block-678 {:sub_category "Copiers"},
   :client-memory-drag-36
@@ -2408,4 +2244,4 @@
    :packets 47211,
    :ts "2024-05-13 21:53:16"},
   :block-342 {:country nil}},
- :selected-flow "my-new-flow1336"}
+ :selected-flow "my-new-flow4583"}

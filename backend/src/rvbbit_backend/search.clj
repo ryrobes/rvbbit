@@ -1,7 +1,7 @@
 
 (ns rvbbit-backend.search
   (:require
-    [clojure.edn    :as edn]
+    [fast-edn.core    :as edn]
     [clojure.string :as cstr])
   (:import ;[org.apache.lucene.analysis Analyzer Analyzer$TokenStreamComponents]
     [org.apache.lucene.document            Document StringField TextField Field$Store StoredField]

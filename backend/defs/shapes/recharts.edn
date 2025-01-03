@@ -37,9 +37,7 @@
 
  :recharts-line {:axes {:x [:or
                             [:and :dimension?
-                             ;[:not :measure?]
-                              ;;;:reasonable-cardinality? ;;
-                             ;[:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
+
                              ]
                             [:or :looks-like-date? :looks-like-datetime?
                              :is-date? :is-datetime?]]
@@ -158,6 +156,8 @@
                                             :itemStyle    {:color "#ecf0f1"}
                                             :labelStyle   {:color  :theme/pop-1}}]]]}
                 :base-score 1}
+
+}
 
 ;; :drop-down-filter  {:axes {:dim [:and :dimension? :is-string?
 ;;                                  [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
@@ -294,4 +294,4 @@
 ;;                                                                 :on-click [:set-recharts-param>]}]]]}
 ;;                            :base-score 1}
 
-                }
+

@@ -5,7 +5,8 @@
    [clojure.core.async      :as async]
    [clojure.data.csv        :as csv]
    [clojure.data.json       :as json2]
-   [clojure.edn             :as edn]
+   [fast-edn.core           :as edn]
+  ;;  [clojure.edn             :as edn]
    [clojure.set             :as cset]
    [clojure.data            :as data]
    [clojure.java.io         :as io]
@@ -257,9 +258,14 @@
   [initial-state file-path & [out?]]
   (let [file  (io/file file-path)
         state (if (.exists file)
-                (with-open [rdr (io/reader file)]
-                  (try (edn/read (java.io.PushbackReader. rdr))
-                       (catch Exception e (do (pp [:thaw-atom-error!!!! file e]) (System/exit 0)))))
+                (try
+                  (edn/read-once file)
+                  (catch Exception e (do (pp [:thaw-atom-error!!!! file e]) (System/exit 0))))
+                ;; (with-open [rdr (io/reader file)]
+                ;;   (try
+                ;;     (edn/read (java.io.PushbackReader. rdr))
+                ;;     ;;(edn/parser (java.io.PushbackReader. rdr))
+                ;;        (catch Exception e (do (pp [:thaw-atom-error!!!! file e]) (System/exit 0)))))
                 initial-state)
         a     (atom state)]
     (when (not out?) ;; we dont want to manage some of these, do it manually

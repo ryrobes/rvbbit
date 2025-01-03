@@ -2,7 +2,7 @@
   (:require
    [cheshire.core           :as json]
    [clj-http.client         :as client]
-   [clojure.edn             :as edn]
+   [fast-edn.core             :as edn]
    [clojure.java.io         :as io]
    [clojure.java.shell      :as shell]
    [clojure.pprint          :as pp]

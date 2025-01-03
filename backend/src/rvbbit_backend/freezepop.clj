@@ -1,6 +1,7 @@
 (ns rvbbit-backend.freezepop
   (:require [clojure.java.io :as io]
-            [clojure.edn :as edn]
+            ;; [clojure.edn :as edn]
+            [fast-edn.core  :as edn]
             [clojure.string :as cstr]
             [clojure.pprint :as pprint]
             [rvbbit-backend.util :as ut]
@@ -32,8 +33,10 @@
                 (try
                   (if (cstr/ends-with? file-path ".msgpack.transit")
                     (read-transit-data file-path)
-                    (with-open [rdr (io/reader file)]
-                      (edn/read (java.io.PushbackReader. rdr))))
+                    (edn/read-once file)
+                    ;; (with-open [rdr (io/reader file)]
+                    ;;   (edn/read (java.io.PushbackReader. rdr)))
+                    )
                   (catch Exception e
                     (ut/pp [:thaw-atom-error!!!! file-path e])
                     (ut/pp [:using-initial-state-instead])

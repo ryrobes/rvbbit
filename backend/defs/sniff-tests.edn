@@ -43,7 +43,8 @@
                   ;:when       [:= :field-name "*"]
                   :fetch-one? true}
 
+}
+
 ;;  :sample-rows     {:sql-map    {:select [:*] :from [:table] :limit 10}
 ;;                    ;:when       [:not-string?]
 ;;                    :fetch-one? false}
- }

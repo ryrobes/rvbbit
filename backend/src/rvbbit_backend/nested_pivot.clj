@@ -1,6 +1,6 @@
 (ns rvbbit-backend.nested-pivot
   (:require [clojure.pprint :refer [pprint]]
-            [clojure.edn :as edn]
+            [fast-edn.core :as edn]
             [clojure.string :as cstr]
             [rvbbit-backend.db :as db]
             [rvbbit-backend.util :as ut]

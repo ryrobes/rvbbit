@@ -1336,6 +1336,8 @@
 (defn sql-data
   ([keypath honey-sql]
    (let [style-rules   (get honey-sql :style-rules)
+         ;style-rules   (into {} (for [[k v] style-rules] {k (assoc v :style (logic-and-params (get v :style) nil))}))
+         ;_ (ut/pp [:style-rules1 style-rules])
          orig-honey-sql honey-sql
          stack?    (true? (= @deep-meta-on-deck (first keypath)))
         ;;  _             (when stack?
@@ -1403,6 +1405,8 @@
   ([keypath honey-sql connection-id]
    (doall
      (let [style-rules   (get honey-sql :style-rules)
+           ;style-rules   (into {} (for [[k v] style-rules] {k (assoc v :style (logic-and-params (get v :style) nil))}))
+           ;_ (ut/pp [:style-rules2 style-rules])
            orig-honey-sql honey-sql
            stack?    (true? (= @deep-meta-on-deck (first keypath)))
           ;;  _             (when stack?

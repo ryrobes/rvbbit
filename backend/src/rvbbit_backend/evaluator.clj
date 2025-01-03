@@ -1,6 +1,6 @@
 (ns rvbbit-backend.evaluator
   (:require
-   [clojure.edn           :as edn]
+   [fast-edn.core           :as edn]
    [clojure.string        :as cstr]
    [clojure.pprint        :as ppt]
    [nrepl.core            :as nrepl]

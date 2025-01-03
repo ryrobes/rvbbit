@@ -5,8 +5,7 @@
   :basic-h-bar  {:axes {:x [:and :dimension?
                             ;;:reasonable-cardinality? ;;
                            [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]
-                            ;[:or :is-string? :is-year? :is-month?]
-                            ;[:and [:not :is-date?] [:not :is-datetime?]]
+
                            ]
                        :y [:measure?]}
                 :w 9
@@ -55,7 +54,7 @@
                 {:layer
                  [{:encoding
                    {:y {:field :x-field :type "ordinal"
-                        ;:sort "-y"
+
                         }
                     :x {:aggregate "sum"
                         :field :y-field
@@ -90,7 +89,7 @@
                     {:layer
                      [{:encoding
                        {:x {:field :x-field :type "ordinal"
-                         ;:sort "-y"
+
                             }
                         :y {:aggregate "avg"
                             :field :y-field
@@ -125,7 +124,7 @@
                     {:layer
                      [{:encoding
                        {:y {:field :x-field :type "ordinal"
-                        ;:sort "-y"
+
                             }
                         :x {:aggregate "avg"
                             :field :y-field
@@ -164,7 +163,7 @@
                       {:layer
                        [{:encoding
                          {:x {:field :x-field :type "ordinal"
-                         ;:sort "-y"
+
                               }
                           :y {:aggregate "sum"
                               :field :y-field
@@ -254,7 +253,7 @@
                            {:layer
                             [{:encoding
                               {:x {:field :x-field :type "ordinal"
-                          ;:sort "-y"
+
                                    }
                                :y {:aggregate "avg"
                                    :field :y-field
@@ -300,7 +299,7 @@
                           {:layer
                            [{:encoding
                              {:y {:field :x-field :type "ordinal"
-                        ;:sort "-y"
+
                                   }
                               :x {:aggregate "avg"
                                   :field :y-field

@@ -35,7 +35,7 @@
    [ring.util.response        :as ring-resp]
    [io.pedestal.http          :as server]
    [taskpool.taskpool         :as tp]
-   [clojure.edn               :as edn]
+   [fast-edn.core               :as edn]
    [clojure.core.memoize      :as memoize]
    [rvbbit-backend.util       :as    ut
     :refer [ne?]]

@@ -3,7 +3,7 @@
    ;[rvbbit-backend.xtdb-init :as xtdb-init]
    [rvbbit-backend.util       :as ut :refer [ne?]]
    [clojure.string            :as cstr]
-   [clojure.edn               :as edn]
+   [fast-edn.core               :as edn]
    [clojure.data.json         :as json]
    [clojure.set               :as cset]
    [clojure.walk              :as walk]

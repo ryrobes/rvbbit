@@ -3,7 +3,7 @@
    ;[rvbbit-backend.xtdb-init :as xtdb-init]
    [clojure.string :as cstr]
    [clojure.walk :as walk]
-   [clojure.edn :as edn]
+   [fast-edn.core :as edn]
    [clojure.set :as cset]
    [rvbbit-backend.sql        :as    sql
     :refer [sql-exec sql-query ghost-db system-db to-sql]]

@@ -1,6 +1,6 @@
 (ns rvbbit-backend.realms
   (:require [clojure.string :as cstr]
-            [clojure.edn :as edn]
+            [fast-edn.core :as edn]
             [rvbbit-backend.db  :as db]
             [rvbbit-backend.evaluator  :as evl]
             [rvbbit-backend.util       :as    ut

@@ -1,6 +1,5 @@
 {:reco-preview nil,
  :meta {:reco-counts {:fields {}, :rowcount 0}},
- :runstream-drops nil,
  :tabs ["color test" "tick tock tick tock"],
  :selected-cols {},
  :server {:settings nil},

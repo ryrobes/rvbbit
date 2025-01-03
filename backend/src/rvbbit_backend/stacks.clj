@@ -1,7 +1,7 @@
 (ns rvbbit-backend.stacks
   (:require [clojure.string         :as str]
             [clojure.set            :as cset]
-            [clojure.edn            :as edn]
+            [fast-edn.core            :as edn]
             [rvbbit-backend.rabbit-script :as p]
             [rvbbit-backend.util :as ut]
             [rvbbit-backend.db :as db]

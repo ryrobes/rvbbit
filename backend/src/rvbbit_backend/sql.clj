@@ -4,7 +4,7 @@
    [clj-time.coerce     :as tc]
    [clj-time.core       :as time]
   ;;  [clj-time.jdbc]
-   [clojure.edn         :as edn]
+   [fast-edn.core         :as edn]
    [clojure.java.jdbc   :as jdbc]
    [clojure.string      :as cstr]
    [clojure.walk        :as walk]

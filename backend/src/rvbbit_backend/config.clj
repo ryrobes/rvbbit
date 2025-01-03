@@ -3,7 +3,7 @@
    [cheshire.core   :as json]
    [clj-http.client :as client]
    [puget.printer   :as puget]
-   [clojure.edn     :as edn]
+   [fast-edn.core     :as edn]
    [clojure.java.io :as io]
    ;;[rvbbit-backend.util :as ut]
    [clojure.string  :as cstr]))
